@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// --- Rôles ---
+enum Role {
+  ADMIN
+  LANDLORD
+  AGENCY
+  TENANT
+}
+
+// --- Modèles NextAuth ---
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?   @unique
+  role          Role      @default(TENANT)
+
+  accounts Account[]
+  sessions Session[]
+
+  // Relations métier
+  propertiesOwned   Property[] @relation("PropertyOwner")
+  propertiesManaged Property[] @relation("PropertyManager")
+  leasesAsTenant    Lease[]    @relation("LeaseTenant")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Modèles Métier QAPRIL ---
+
+model Property {
+  id         String  @id @default(cuid())
+  name       String? // Ex: "Appartement A1"
+  address    String
+  city       String
+  postalCode String?
+  country    String  @default("Côte d'Ivoire")
+
+  ownerId String
+  owner   User   @relation("PropertyOwner", fields: [ownerId], references: [id])
+
+  managerId String? // En cas de gestion déléguée à une agence
+  manager   User?   @relation("PropertyManager", fields: [managerId], references: [id])
+
+  leases Lease[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LeaseStatus {
+  ACTIVE
+  TERMINATED
+  PENDING
+}
+
+model Lease {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  tenantId String
+  tenant   User   @relation("LeaseTenant", fields: [tenantId], references: [id])
+
+  startDate  DateTime
+  endDate    DateTime?
+  rentAmount Float // Loyer mensuel de base
+  charges    Float?    @default(0) // Charges locatives
+  deposit    Float? // Caution
+
+  status LeaseStatus @default(ACTIVE)
+
+  receipts Receipt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MOBILE_MONEY
+  CREDIT_CARD
+  OTHER
+}
+
+model Receipt {
+  id            String @id @default(cuid())
+  receiptNumber String @unique // Numéro unique de quittance pour la légalité et l'audit
+
+  leaseId String
+  lease   Lease  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+
+  periodStart DateTime // Début de la période de location
+  periodEnd   DateTime // Fin de la période de location
+
+  amountPaid    Float // Montant réellement payé
+  paymentDate   DateTime
+  paymentMethod PaymentMethod @default(MOBILE_MONEY)
+
+  isSent     Boolean @default(false) // Pour l'optimisation des notifications
+  pdfUrl     String? // URL du PDF de quittance archivé
+  qrCodeHash String? @unique // Hash pour le QR code
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
