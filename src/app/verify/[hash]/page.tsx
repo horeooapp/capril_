@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-
-const prisma = new PrismaClient()
 
 export default async function VerifyReceiptPage({ params }: { params: { hash: string } }) {
     const receiptHash = params.hash

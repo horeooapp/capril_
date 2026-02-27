@@ -1,9 +1,8 @@
 "use server"
 
-import { PrismaClient, PaymentMethod } from "@prisma/client"
+import { PaymentMethod } from "@prisma/client"
 import { auth } from "@/auth"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 // Generates a unique receipt number like Q-YYYYMM-000X
 async function generateUniqueReceiptNumber(): Promise<string> {
@@ -138,10 +137,14 @@ export async function getReceiptsForTenant() {
             lease: {
                 include: {
                     property: {
-                        select: { name: true, address: true, city: true }
-                    },
-                    owner: {
-                        select: { name: true, email: true, phone: true }
+                        select: {
+                            name: true,
+                            address: true,
+                            city: true,
+                            owner: {
+                                select: { name: true, email: true, phone: true }
+                            }
+                        }
                     }
                 }
             }

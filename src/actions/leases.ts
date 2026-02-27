@@ -1,9 +1,8 @@
 "use server"
 
-import { PrismaClient, LeaseStatus } from "@prisma/client"
+import { LeaseStatus } from "@prisma/client"
 import { auth } from "@/auth"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function createLease(data: {
     propertyId: string,

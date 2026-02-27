@@ -1,9 +1,7 @@
 "use server"
 
-import { PrismaClient } from "@prisma/client"
 import { auth } from "@/auth"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function getProperties() {
     const session = await auth()
@@ -24,7 +22,14 @@ export async function getProperties() {
             ]
         },
         include: {
-            leases: true
+            leases: {
+                include: {
+                    receipts: true,
+                    tenant: {
+                        select: { name: true, email: true }
+                    }
+                }
+            }
         },
         orderBy: {
             createdAt: 'desc'

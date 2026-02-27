@@ -1,9 +1,7 @@
 "use server"
 
-import { PrismaClient } from "@prisma/client"
 import { auth } from "@/auth"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function getCurrentUser() {
     const session = await auth()
