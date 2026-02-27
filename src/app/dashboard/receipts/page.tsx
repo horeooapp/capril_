@@ -52,9 +52,9 @@ export default async function ReceiptsPage() {
                                                 }`}>
                                                 {receipt.isSent ? 'Envoyée' : 'Non envoyée'}
                                             </span>
-                                            <button className="text-xs text-primary hover:text-orange-600 font-medium">
-                                                Télécharger PDF
-                                            </button>
+                                            <a href={`/receipts/${receipt.id}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:text-orange-600 font-medium">
+                                                Voir & Imprimer
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

@@ -61,8 +61,9 @@ export async function createReceipt(data: {
     }
 
     const receiptNumber = await generateUniqueReceiptNumber()
+    const qrCodeHash = `${lease.id}-${Date.now()}`
 
-    return await prisma.receipt.create({
+    const receipt = await prisma.receipt.create({
         data: {
             receiptNumber,
             leaseId: data.leaseId,
@@ -71,9 +72,50 @@ export async function createReceipt(data: {
             amountPaid: data.amountPaid,
             paymentDate: data.paymentDate || new Date(),
             paymentMethod: data.paymentMethod || PaymentMethod.MOBILE_MONEY,
-            isSent: false
+            isSent: true, // Optimistically mapping to true
+            qrCodeHash
         }
     })
+
+    // Envoi de l'e-mail de notification au locataire
+    const nodemailer = await import("nodemailer")
+
+    if (process.env.EMAIL_SERVER) {
+        try {
+            const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER)
+            // @ts-ignore
+            const tenantEmail = lease.tenant?.email
+
+            if (tenantEmail) {
+                const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
+                await transporter.sendMail({
+                    from: process.env.EMAIL_FROM || 'no-reply@qapril.ci',
+                    to: tenantEmail,
+                    subject: `QAPRIL - Votre quittance de loyer N° ${receiptNumber} est disponible`,
+                    html: `
+             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+               <h2 style="color: #FF8200;">QAPRIL - Registre Locatif</h2>
+               <p>Bonjour,</p>
+               <p>Votre propriétaire a généré une nouvelle quittance de loyer pour le bien : <strong>${lease.property.name}</strong>.</p>
+               <p>Période couverte : <strong>${new Date(data.periodStart).toLocaleDateString('fr-FR')} - ${new Date(data.periodEnd).toLocaleDateString('fr-FR')}</strong></p>
+               <p>Montant : <strong>${data.amountPaid} FCFA</strong></p>
+               <div style="margin: 30px 0;">
+                 <a href="${appUrl}/receipts/${receipt.id}" style="background-color: #009E60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                   Voir et télécharger ma quittance
+                 </a>
+               </div>
+               <p style="font-size: 12px; color: #666;">Ce document est officiel et comporte un QR code de vérification garanti par la plateforme QAPRIL.</p>
+             </div>
+           `
+                })
+            }
+        } catch (e) {
+            console.error("Erreur lors de l'envoi de l'email :", e)
+            // Ne pas échouer la création de quittance si l'e-mail échoue.
+        }
+    }
+
+    return receipt
 }
 
 export async function getReceiptsForTenant() {

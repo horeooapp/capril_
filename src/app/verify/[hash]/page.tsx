@@ -11,8 +11,9 @@ export default async function VerifyReceiptPage({ params }: { params: { hash: st
         include: {
             lease: {
                 include: {
-                    property: true,
-                    owner: true,
+                    property: {
+                        include: { owner: true }
+                    },
                     tenant: true
                 }
             }
@@ -67,7 +68,7 @@ export default async function VerifyReceiptPage({ params }: { params: { hash: st
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Bailleur</dt>
-                                <dd className="font-medium text-gray-900">{receipt.lease.owner.name || receipt.lease.owner.email}</dd>
+                                <dd className="font-medium text-gray-900">{receipt.lease.property.owner.name || receipt.lease.property.owner.email}</dd>
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Période</dt>
