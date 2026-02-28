@@ -7,9 +7,9 @@ export default async function PropertiesPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Mes Logements</h1>
-                <button className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors">
+                <a href="/dashboard/properties/new" className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-center inline-block">
                     + Ajouter un logement
-                </button>
+                </a>
             </div>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -21,9 +21,9 @@ export default async function PropertiesPage() {
                         <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun logement</h3>
                         <p className="mt-1 text-sm text-gray-500">Commencez par ajouter votre première propriété pour générer des quittances.</p>
                         <div className="mt-6">
-                            <button type="button" className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700">
+                            <a href="/dashboard/properties/new" className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700">
                                 + Nouveau Logement
-                            </button>
+                            </a>
                         </div>
                     </div>
                 ) : (

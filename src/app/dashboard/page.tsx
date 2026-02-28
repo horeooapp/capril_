@@ -7,6 +7,17 @@ export default async function DashboardOverview() {
     const totalProperties = properties.length
     const totalLeases = properties.reduce((acc, current) => acc + current.leases.length, 0)
 
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+
+    let receiptsThisMonth = 0
+    properties.forEach(p => {
+        p.leases.forEach(l => {
+            receiptsThisMonth += l.receipts.filter(r => new Date(r.paymentDate) >= startOfMonth).length
+        })
+    })
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -32,7 +43,7 @@ export default async function DashboardOverview() {
                 <div className="bg-white overflow-hidden shadow rounded-lg border-l-4 border-blue-500">
                     <div className="px-4 py-5 sm:p-6">
                         <dt className="text-sm font-medium text-gray-500 truncate">Quittances générées ce mois</dt>
-                        <dd className="mt-1 text-3xl font-semibold text-gray-900">0</dd>
+                        <dd className="mt-1 text-3xl font-semibold text-gray-900">{receiptsThisMonth}</dd>
                     </div>
                 </div>
             </div>

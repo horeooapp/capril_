@@ -7,6 +7,18 @@ export default async function AdminDashboardOverview() {
     const totalLeases = await prisma.lease.count()
     const totalReceipts = await prisma.receipt.count()
 
+    const recentReceipts = await prisma.receipt.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: {
+            lease: {
+                include: {
+                    property: { select: { address: true, city: true } }
+                }
+            }
+        }
+    })
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -66,13 +78,42 @@ export default async function AdminDashboardOverview() {
                 </div>
             </div>
 
-            {/* Alert / Validation Section */}
-            <div className="mt-8 bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-                <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Demandes de validation Agence / Bailleur professionnel</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                {/* Alert / Validation Section */}
+                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+                    <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Demandes de validation Agence</h3>
+                    </div>
+                    <div className="p-6 text-center text-gray-500">
+                        Aucune demande de validation en attente.
+                    </div>
                 </div>
-                <div className="p-6 text-center text-gray-500">
-                    Aucune demande de validation en attente.
+
+                {/* Audit Logs Section */}
+                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+                    <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Journal d'Audit - Dernières Éditions</h3>
+                        <span className="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">Securisé</span>
+                    </div>
+                    <ul className="divide-y divide-gray-200">
+                        {recentReceipts.map(r => (
+                            <li key={r.id} className="p-4 hover:bg-gray-50 text-sm flex justify-between">
+                                <div>
+                                    <p className="font-medium text-gray-900">{r.receiptNumber}</p>
+                                    <p className="text-gray-500 text-xs mt-1">{r.lease.property.city} - {r.lease.property.address}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-semibold text-primary">{r.amountPaid} FCFA</p>
+                                    <p className="text-gray-400 text-xs mt-1">{r.createdAt.toLocaleDateString()}</p>
+                                </div>
+                            </li>
+                        ))}
+                        {recentReceipts.length === 0 && (
+                            <li className="p-6 text-center text-gray-500 text-sm">
+                                Aucun flux audité recemment.
+                            </li>
+                        )}
+                    </ul>
                 </div>
             </div>
 
