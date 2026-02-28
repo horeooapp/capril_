@@ -1,14 +1,15 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import HeroSlider from "@/components/HeroSlider";
+import ContentAccordion from "@/components/ContentAccordion";
 
 export default function Home() {
   return (
     <div className="bg-background min-h-screen text-foreground font-sans">
       <header className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4 md:justify-start md:space-x-10">
-            <div className="flex justify-start lg:w-0 lg:flex-1">
+          <div className="flex justify-between items-center py-4 lg:justify-between space-x-4">
+            <div className="flex justify-start">
               <Link href="/">
                 <span className="sr-only">QAPRIL</span>
                 {/* Logo with Ivorian Colors Concept */}
@@ -23,14 +24,14 @@ export default function Home() {
               </Link>
             </div>
 
-            <nav className="hidden xl:flex space-x-10">
-              <Link href="/#a-propos" className="text-base font-medium text-gray-500 hover:text-gray-900">À propos</Link>
-              <Link href="/#qui-sommes-nous" className="text-base font-medium text-gray-500 hover:text-gray-900">Qui sommes-nous ?</Link>
-              <Link href="/#faq" className="text-base font-medium text-gray-500 hover:text-gray-900">FAQ</Link>
-              <Link href="/#contact" className="text-base font-medium text-gray-500 hover:text-gray-900">Contact</Link>
+            <nav className="hidden xl:flex space-x-6">
+              <Link href="/#a-propos" className="text-sm font-medium text-gray-500 hover:text-gray-900">À propos</Link>
+              <Link href="/#qui-sommes-nous" className="text-sm font-medium text-gray-500 hover:text-gray-900">Qui sommes-nous ?</Link>
+              <Link href="/#faq" className="text-sm font-medium text-gray-500 hover:text-gray-900">FAQ</Link>
+              <Link href="/#contact" className="text-sm font-medium text-gray-500 hover:text-gray-900">Contact</Link>
             </nav>
 
-            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 space-x-4">
+            <div className="hidden lg:flex items-center justify-end space-x-4">
               <Link href="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
                 Se connecter
               </Link>
@@ -160,6 +161,12 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Dynamic Accordion Section */}
+        <div className="bg-white py-16">
+          <ContentAccordion />
+        </div>
+
       </main>
 
       <Footer />
