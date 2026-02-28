@@ -1,4 +1,5 @@
 import { signIn } from "@/auth"
+import Link from "next/link"
 
 export default function LoginPage() {
     return (
@@ -6,14 +7,14 @@ export default function LoginPage() {
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
 
-                    <div className="flex items-center space-x-2 mb-8 cursor-pointer" onClick={() => window.location.href = '/'}>
+                    <Link href="/" className="flex items-center space-x-2 mb-8 cursor-pointer">
                         <div className="flex space-x-1 h-8">
                             <div className="w-3 bg-[#FF8200] rounded-sm" />
                             <div className="w-3 bg-gray-100 rounded-sm border border-gray-200" />
                             <div className="w-3 bg-[#009E60] rounded-sm" />
                         </div>
                         <span className="font-extrabold text-2xl tracking-tight text-gray-900">QAPRIL</span>
-                    </div>
+                    </Link>
 
                     <div>
                         <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
