@@ -114,7 +114,7 @@ export default function Home() {
                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white font-bold text-xl">
                       1
                     </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Gestion des logements & contrats</p>
+                    <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Gestion des logements & contrats</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
                     Ajoutez vos propriétés et créez les baux locatifs facilement avec un suivi centralisé pour chaque locataire.
@@ -126,7 +126,7 @@ export default function Home() {
                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-secondary text-white font-bold text-xl">
                       2
                     </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Quittances automatisées (E-quittance)</p>
+                    <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Quittances automatisées (E-quittance)</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
                     Générez des quittances d'un clic. Elles sont automatiquement envoyées par Mail/SMS à vos locataires avec toutes les mentions légales.
@@ -138,7 +138,7 @@ export default function Home() {
                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white font-bold text-xl">
                       3
                     </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Vérification par QR Code (Audit)</p>
+                    <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Vérification par QR Code (Audit)</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
                     Chaque quittance générée possède un QR Code unique pour lutter contre la fraude et garantir l'authenticité du document.
@@ -150,7 +150,7 @@ export default function Home() {
                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-secondary text-white font-bold text-xl">
                       4
                     </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Espace Locataire dédié</p>
+                    <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Espace Locataire dédié</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
                     Les locataires peuvent se connecter en toute sécurité avec leur e-mail pour télécharger l'historique complet de leurs quittances.

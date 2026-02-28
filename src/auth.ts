@@ -41,6 +41,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
         }),
     ],
+    pages: {
+        verifyRequest: '/verify-request', // Redirects here instead of the default crashing NextAuth page
+    },
     callbacks: {
         async session({ session, user }) {
             if (session.user) {
