@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Footer from "@/components/Footer";
+import HeroSlider from "@/components/HeroSlider";
 
 export default function Home() {
   return (
@@ -20,6 +22,13 @@ export default function Home() {
                 </div>
               </Link>
             </div>
+
+            <nav className="hidden xl:flex space-x-10">
+              <Link href="/#a-propos" className="text-base font-medium text-gray-500 hover:text-gray-900">À propos</Link>
+              <Link href="/#qui-sommes-nous" className="text-base font-medium text-gray-500 hover:text-gray-900">Qui sommes-nous ?</Link>
+              <Link href="/#faq" className="text-base font-medium text-gray-500 hover:text-gray-900">FAQ</Link>
+              <Link href="/#contact" className="text-base font-medium text-gray-500 hover:text-gray-900">Contact</Link>
+            </nav>
 
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 space-x-4">
               <Link href="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
@@ -78,12 +87,10 @@ export default function Home() {
               </main>
             </div>
           </div>
-          <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50 border-l border-gray-100 flex items-center justify-center">
-            <div className="p-8 text-center text-gray-400">
-              {/* Illustration Placeholder */}
-              <div className="h-64 w-full bg-gray-200 rounded-lg shadow-inner flex items-center justify-center">
-                <span className="text-xl font-semibold">Illustration Interface QAPRIL</span>
-              </div>
+          <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-gray-50 flex items-center justify-center">
+            {/* Contextual Hero Slider */}
+            <div className="h-56 w-full sm:h-72 md:h-96 lg:w-full lg:h-full relative">
+              <HeroSlider />
             </div>
           </div>
         </div>
@@ -154,6 +161,8 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
