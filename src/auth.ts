@@ -7,12 +7,10 @@ import { createTransport } from "nodemailer"
 import { Role } from "@prisma/client"
 import bcrypt from "bcryptjs"
 
-console.log("[AUTH DEBUG] Configuration status:", {
-    hasSecret: !!process.env.AUTH_SECRET,
-    hasEmailServer: !!process.env.EMAIL_SERVER,
-    authUrl: process.env.AUTH_URL || "NOT_SET",
-    env: process.env.NODE_ENV
-});
+console.log("[AUTH DEBUG] Starting NextAuth initialization...");
+if (!process.env.AUTH_SECRET) {
+    console.warn("⚠️ [AUTH DEBUG] AUTH_SECRET is missing! This will cause a crash in production.");
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
