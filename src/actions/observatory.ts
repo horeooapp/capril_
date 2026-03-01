@@ -41,7 +41,7 @@ export async function refreshMarketStats() {
             where: {
                 city_neighborhood_propertyType: {
                     city,
-                    neighborhood: neighborhood === 'N/A' ? null : neighborhood,
+                    neighborhood: neighborhood === 'N/A' ? "" : neighborhood,
                     propertyType
                 }
             },
@@ -52,7 +52,7 @@ export async function refreshMarketStats() {
             },
             create: {
                 city,
-                neighborhood: neighborhood === 'N/A' ? null : neighborhood,
+                neighborhood: neighborhood === 'N/A' ? "" : neighborhood,
                 propertyType,
                 averageRent,
                 sampleSize: data.count

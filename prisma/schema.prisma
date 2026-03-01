@@ -299,7 +299,7 @@ model MediationMessage {
 model MarketData {
   id           String   @id @default(cuid())
   city         String
-  neighborhood String?
+  neighborhood String   @default("")
   propertyType String   // APARTMENT, HOUSE, etc.
   averageRent  Float
   sampleSize   Int
