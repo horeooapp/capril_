@@ -37,7 +37,7 @@ export async function GET(req: Request) {
             select: { amountPaid: true }
         })
 
-        const financialVolumeThisMonth = recentReceipts.reduce((acc, curr) => acc + curr.amountPaid, 0)
+        const financialVolumeThisMonth = recentReceipts.reduce((acc: number, curr: any) => acc + curr.amountPaid, 0)
 
         // Répartition par ville (pour l'Observatoire National)
         const propertiesByCity = await prisma.property.groupBy({
@@ -65,7 +65,7 @@ export async function GET(req: Request) {
                     receiptsGeneratedThisMonth: recentReceipts.length,
                     financialVolumeGeneratedThisMonthFCFA: financialVolumeThisMonth
                 },
-                geography: propertiesByCity.map(p => ({
+                geography: propertiesByCity.map((p: any) => ({
                     city: p.city,
                     propertiesCount: p._count.id
                 }))
