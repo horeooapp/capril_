@@ -22,8 +22,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     debug: true,
     providers: [
         Nodemailer({
-            server: process.env.EMAIL_SERVER,
-            from: process.env.EMAIL_FROM,
+            server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
+            from: process.env.EMAIL_FROM || "noreply@qapril.net",
             async sendVerificationRequest(params) {
                 const { identifier, url, provider } = params
                 console.log(`[AUTH DEBUG] Attempting magic link for: ${identifier}`);
