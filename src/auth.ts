@@ -24,30 +24,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
             from: process.env.EMAIL_FROM || "noreply@qapril.net",
-            async sendVerificationRequest(params) {
-                const { identifier, url, provider } = params
-                console.log(`[AUTH DEBUG] Attempting magic link for: ${identifier}`);
-
-                try {
-                    const transport = createTransport(provider.server)
-                    const result = await transport.sendMail({
-                        to: identifier,
-                        from: provider.from,
-                        subject: `QAPRIL - Lien de connexion sécurisé`,
-                        text: `Connectez-vous à QAPRIL : ${url}`,
-                        html: `<body>
-                                <h2>QAPRIL - Registre Locatif</h2>
-                                <p>Cliquez sur le lien ci-dessous pour accéder à votre espace :</p>
-                                <p><a href="${url}" style="background-color: #FF8200; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Se connecter</a></p>
-                                <p><small>Lien direct : ${url}</small></p>
-                               </body>`,
-                    })
-                    console.log("[AUTH DEBUG] Email sent successfully:", result.messageId);
-                } catch (error) {
-                    console.error("❌ [AUTH DEBUG] SMTP Failure:", error)
-                    throw new Error("SMTP_ERROR")
-                }
-            }
         }),
         Credentials({
             name: "Credentials",
