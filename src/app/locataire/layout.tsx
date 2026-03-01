@@ -20,9 +20,9 @@ export default async function LocataireLayout({
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
-                            <Link href="/locataire" className="flex items-center space-x-3 group">
-                                <img src="/logo.png" alt="QAPRIL Logo" className="h-8 w-auto border border-gray-200 rounded shadow-sm group-hover:scale-105 transition-transform" />
-                                <span className="font-bold text-xl text-gray-900">QAPRIL <span className="text-sm font-normal text-gray-500">| Portail Locataire</span></span>
+                            <Link href="/locataire" className="flex items-center space-x-4 group">
+                                <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto border border-gray-200 rounded shadow-sm group-hover:scale-105 transition-transform" />
+                                <span className="font-bold text-2xl text-gray-900">QAPRIL <span className="text-sm font-normal text-gray-500">| Portail Locataire</span></span>
                             </Link>
                         </div>
 

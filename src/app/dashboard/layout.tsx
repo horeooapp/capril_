@@ -20,9 +20,9 @@ export default async function DashboardLayout({
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
-                            <Link href="/dashboard" className="flex items-center space-x-3 group">
-                                <img src="/logo.png" alt="QAPRIL Logo" className="h-8 w-auto border border-white/20 rounded shadow-sm group-hover:scale-105 transition-transform" />
-                                <span className="font-bold text-xl">QAPRIL <span className="text-sm font-normal text-orange-200">| Portail Gestionnaire</span></span>
+                            <Link href="/dashboard" className="flex items-center space-x-4 group">
+                                <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto border border-white/20 rounded shadow-sm group-hover:scale-105 transition-transform" />
+                                <span className="font-bold text-2xl">QAPRIL <span className="text-sm font-normal text-orange-200">| Portail Gestionnaire</span></span>
                             </Link>
                         </div>
 

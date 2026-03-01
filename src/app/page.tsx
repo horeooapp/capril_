@@ -13,9 +13,9 @@ export default function Home() {
               <Link href="/">
                 <span className="sr-only">QAPRIL</span>
                 {/* QAPRIL Official Logo */}
-                <div className="flex items-center space-x-3">
-                  <img src="/logo.png" alt="QAPRIL Logo" className="h-10 w-auto" />
-                  <span className="font-extrabold text-2xl tracking-tight text-gray-900">QAPRIL</span>
+                <div className="flex items-center space-x-4">
+                  <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto" />
+                  <span className="font-extrabold text-3xl tracking-tight text-gray-900">QAPRIL</span>
                 </div>
               </Link>
             </div>

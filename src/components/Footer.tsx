@@ -8,9 +8,9 @@ export default function Footer() {
 
                     {/* Brand and Info */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="flex items-center space-x-3">
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-8 w-auto border border-gray-700 rounded shadow-sm opacity-90" />
-                            <span className="font-extrabold text-xl tracking-tight text-white">QAPRIL</span>
+                        <div className="flex items-center space-x-4">
+                            <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto border border-gray-700 rounded shadow-sm opacity-90" />
+                            <span className="font-extrabold text-2xl tracking-tight text-white">QAPRIL</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             La plateforme nationale de gestion des loyers et d'émission de quittances certifiées en République de Côte d'Ivoire.
