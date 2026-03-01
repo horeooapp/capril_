@@ -105,7 +105,7 @@ export async function createReceipt(data: {
             if (tenantEmail) {
                 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
                 await transporter.sendMail({
-                    from: process.env.EMAIL_FROM || 'no-reply@qapril.ci',
+                    from: process.env.EMAIL_FROM || 'no-reply@qapril.net',
                     to: tenantEmail,
                     subject: `QAPRIL - Votre quittance de loyer N° ${receiptNumber} est disponible`,
                     html: `

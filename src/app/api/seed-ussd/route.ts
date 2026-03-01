@@ -5,7 +5,7 @@ export async function GET() {
     try {
         const tenant = await prisma.user.create({
             data: {
-                email: "locataire.ussd@qapril.ci",
+                email: "locataire.ussd@qapril.net",
                 name: "Locataire USSD",
                 phone: "+2250707070707",
                 role: "TENANT"
@@ -14,7 +14,7 @@ export async function GET() {
 
         const landlord = await prisma.user.create({
             data: {
-                email: "bailleur.ussd@qapril.ci",
+                email: "bailleur.ussd@qapril.net",
                 name: "Bailleur USSD",
                 role: "LANDLORD"
             }

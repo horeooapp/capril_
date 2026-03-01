@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">5. Vos Droits</h2>
                     <p>
-                        Conformément à la loi sur la protection des données à caractère personnel, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition. Pour exercer ces droits, vous pouvez contacter notre support à l'adresse : protection@qapril.ci.
+                        Conformément à la loi sur la protection des données à caractère personnel, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition. Pour exercer ces droits, vous pouvez contacter notre support à l'adresse : protection@qapril.net.
                     </p>
                 </section>
 

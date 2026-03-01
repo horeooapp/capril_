@@ -13,7 +13,7 @@ export default function MentionsLegalesPage() {
                         <ul className="list-none mt-2 space-y-1">
                             <li><strong>Société :</strong> Habiteax</li>
                             <li><strong>Siège Social :</strong> Cocody, Abidjan, Côte d'Ivoire</li>
-                            <li><strong>Email :</strong> contact@qapril.ci</li>
+                            <li><strong>Email :</strong> contact@qapril.net</li>
                         </ul>
                     </p>
                 </section>

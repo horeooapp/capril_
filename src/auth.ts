@@ -7,41 +7,45 @@ import { createTransport } from "nodemailer"
 import { Role } from "@prisma/client"
 import bcrypt from "bcryptjs"
 
+console.log("[AUTH DEBUG] Configuration status:", {
+    hasSecret: !!process.env.AUTH_SECRET,
+    hasEmailServer: !!process.env.EMAIL_SERVER,
+    authUrl: process.env.AUTH_URL || "NOT_SET",
+    env: process.env.NODE_ENV
+});
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     trustHost: true,
     secret: process.env.AUTH_SECRET,
-    debug: true, // Désactiver après résolution en production
+    debug: true,
     providers: [
         Nodemailer({
-            server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
-            from: process.env.EMAIL_FROM || "no-reply@localhost.com",
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM,
             async sendVerificationRequest(params) {
                 const { identifier, url, provider } = params
-
-                console.log("==========================================")
-                console.log(`[QAPRIL AUTH] LIEN DE CONNEXION POUR : ${identifier}`)
-                console.log(url)
-                console.log("==========================================")
+                console.log(`[AUTH DEBUG] Attempting magic link for: ${identifier}`);
 
                 try {
                     const transport = createTransport(provider.server)
-                    await transport.sendMail({
+                    const result = await transport.sendMail({
                         to: identifier,
                         from: provider.from,
                         subject: `QAPRIL - Lien de connexion sécurisé`,
-                        text: `Connectez-vous à QAPRIL en cliquant sur ce lien : ${url}`,
+                        text: `Connectez-vous à QAPRIL : ${url}`,
                         html: `<body>
                                 <h2>QAPRIL - Registre Locatif</h2>
                                 <p>Cliquez sur le lien ci-dessous pour accéder à votre espace :</p>
                                 <p><a href="${url}" style="background-color: #FF8200; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Se connecter</a></p>
-                                <p><small>Si le bouton ne fonctionne pas, copiez ce lien : ${url}</small></p>
+                                <p><small>Lien direct : ${url}</small></p>
                                </body>`,
                     })
+                    console.log("[AUTH DEBUG] Email sent successfully:", result.messageId);
                 } catch (error) {
-                    console.error("❌ [QAPRIL ERREUR SMTP] Impossible d'envoyer l'e-mail.", error)
-                    throw new Error("Échec de l'envoi de l'e-mail")
+                    console.error("❌ [AUTH DEBUG] SMTP Failure:", error)
+                    throw new Error("SMTP_ERROR")
                 }
             }
         }),

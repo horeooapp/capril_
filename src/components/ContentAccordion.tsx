@@ -91,7 +91,7 @@ export default function ContentAccordion() {
                     </p>
                     <ul className="list-none space-y-2 mt-4 bg-gray-50 p-4 rounded-md inline-block border border-gray-100">
                         <li className="flex items-center text-sm">
-                            <span className="font-semibold mr-2 w-20">E-mail :</span> support@qapril.ci
+                            <span className="font-semibold mr-2 w-20">E-mail :</span> support@qapril.net
                         </li>
                         <li className="flex items-center text-sm">
                             <span className="font-semibold mr-2 w-20">Téléphone :</span> +225 00 00 00 00 00

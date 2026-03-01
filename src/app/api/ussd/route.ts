@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         });
 
         if (!user) {
-            return new NextResponse("END Compte introuvable. Veuillez vous inscrire sur qapril.ci", {
+            return new NextResponse("END Compte introuvable. Veuillez vous inscrire sur qapril.net", {
                 headers: { 'Content-Type': 'text/plain' }
             });
         }
