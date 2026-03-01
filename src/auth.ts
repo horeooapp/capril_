@@ -10,6 +10,9 @@ import bcrypt from "bcryptjs"
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
+    trustHost: true,
+    secret: process.env.AUTH_SECRET,
+    debug: true, // Désactiver après résolution en production
     providers: [
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
