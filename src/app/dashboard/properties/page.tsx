@@ -28,7 +28,7 @@ export default async function PropertiesPage() {
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {properties.map((property) => (
+                        {properties.map((property: any) => (
                             <li key={property.id}>
                                 <div className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-center justify-between">

@@ -96,7 +96,7 @@ export default async function AdminDashboardOverview() {
                         <span className="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">Securisé</span>
                     </div>
                     <ul className="divide-y divide-gray-200">
-                        {recentReceipts.map(r => (
+                        {recentReceipts.map((r: any) => (
                             <li key={r.id} className="p-4 hover:bg-gray-50 text-sm flex justify-between">
                                 <div>
                                     <p className="font-medium text-gray-900">{r.receiptNumber}</p>

@@ -7,8 +7,8 @@ export default async function LeasesPage() {
     const properties = await getProperties().catch(() => [])
 
     // Flatten leases
-    const leases = properties.flatMap(prop =>
-        prop.leases.map(lease => ({
+    const leases = properties.flatMap((prop: any) =>
+        prop.leases.map((lease: any) => ({
             ...lease,
             propertyName: prop.name || prop.address
         }))
@@ -34,7 +34,7 @@ export default async function LeasesPage() {
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {leases.map((lease) => (
+                        {leases.map((lease: any) => (
                             <li key={lease.id} className="hover:bg-gray-50 transition-colors">
                                 <Link href={`/dashboard/leases/${lease.id}`} className="block px-4 py-4 sm:px-6">
                                     <div className="flex items-center justify-between">

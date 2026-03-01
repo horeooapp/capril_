@@ -4,16 +4,16 @@ export default async function ReceiptsPage() {
     const properties = await getProperties().catch(() => [])
 
     // Flatten properties -> leases -> receipts
-    const receipts = properties.flatMap(prop =>
-        prop.leases.flatMap(lease =>
-            lease.receipts.map(receipt => ({
+    const receipts = properties.flatMap((prop: any) =>
+        prop.leases.flatMap((lease: any) =>
+            lease.receipts.map((receipt: any) => ({
                 ...receipt,
                 propertyName: prop.name || prop.address,
                 // @ts-ignore
                 tenantName: lease.tenant?.name || lease.tenant?.email
             }))
         )
-    ).sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
+    ).sort((a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
 
     return (
         <div className="space-y-6">
@@ -32,7 +32,7 @@ export default async function ReceiptsPage() {
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {receipts.map((receipt) => (
+                        {receipts.map((receipt: any) => (
                             <li key={receipt.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center justify-between">
                                     <div>

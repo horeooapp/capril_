@@ -9,12 +9,12 @@ export default async function DashboardOverview() {
     const properties = await getProperties().catch(() => [])
 
     const totalProperties = properties.length
-    const totalLeases = properties.reduce((acc, current) => acc + current.leases.length, 0)
+    const totalLeases = properties.reduce((acc: number, current: any) => acc + current.leases.length, 0)
 
     // Calculate total funds in Escrow/CDC for this manager/owner
     let totalSecuredFunds = 0
-    properties.forEach(p => {
-        p.leases.forEach(l => {
+    properties.forEach((p: any) => {
+        p.leases.forEach((l: any) => {
             // @ts-ignore
             if (l.escrow?.amount) totalSecuredFunds += l.escrow.amount
             // @ts-ignore
@@ -27,9 +27,9 @@ export default async function DashboardOverview() {
     startOfMonth.setHours(0, 0, 0, 0)
 
     let receiptsThisMonth = 0
-    properties.forEach(p => {
-        p.leases.forEach(l => {
-            receiptsThisMonth += l.receipts.filter(r => new Date(r.paymentDate) >= startOfMonth).length
+    properties.forEach((p: any) => {
+        p.leases.forEach((l: any) => {
+            receiptsThisMonth += l.receipts.filter((r: any) => new Date(r.paymentDate) >= startOfMonth).length
         })
     })
 
@@ -97,7 +97,7 @@ export default async function DashboardOverview() {
                         <h3 className="text-lg leading-6 font-medium text-gray-900">Vos récents logements</h3>
                     </div>
                     <ul className="divide-y divide-gray-200">
-                        {properties.slice(0, 3).map((prop) => (
+                        {properties.slice(0, 3).map((prop: any) => (
                             <li key={prop.id} className="px-6 py-4 hover:bg-gray-50">
                                 <div className="flex items-center justify-between">
                                     <div>

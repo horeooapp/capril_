@@ -23,7 +23,7 @@ export default async function LocataireDashboard() {
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {receipts.map((receipt) => (
+                        {receipts.map((receipt: any) => (
                             <li key={receipt.id} className="p-6 transition-colors hover:bg-orange-50/30">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
 

@@ -69,14 +69,14 @@ export async function POST(req: Request) {
                     responseText = "END Vous n'avez aucun contrat de bail actif sur QAPRIL.";
                     isFinal = true;
                 } else {
-                    const allReceipts = leases.flatMap(l => l.receipts).sort((a, b) => b.paymentDate.getTime() - a.paymentDate.getTime()).slice(0, 3);
+                    const allReceipts = leases.flatMap((l: any) => l.receipts).sort((a: any, b: any) => b.paymentDate.getTime() - a.paymentDate.getTime()).slice(0, 3);
 
                     if (allReceipts.length === 0) {
                         responseText = "END Aucune quittance generee pour le moment.";
                         isFinal = true;
                     } else {
                         responseText = "END Vos dernieres quittances:\n" +
-                            allReceipts.map((r, i) => `${i + 1}. ${r.receiptNumber} - ${r.amountPaid}F (${new Date(r.periodStart).toLocaleDateString()})`).join('\n');
+                            allReceipts.map((r: any, i: number) => `${i + 1}. ${r.receiptNumber} - ${r.amountPaid}F (${new Date(r.periodStart).toLocaleDateString()})`).join('\n');
                         isFinal = true;
                     }
                 }
