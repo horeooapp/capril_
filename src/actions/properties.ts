@@ -25,6 +25,10 @@ export async function getProperties() {
             leases: {
                 include: {
                     receipts: true,
+                    // @ts-ignore
+                    escrow: true,
+                    // @ts-ignore
+                    cdcDeposit: true,
                     tenant: {
                         select: { name: true, email: true }
                     }

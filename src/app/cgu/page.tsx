@@ -41,7 +41,7 @@ export default function CGUPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">5. Propriété Intellectuelle</h2>
                     <p>
-                        Tous les contenus (logos, textes, algorithmes, codes) présents sur la plateforme sont la propriété exclusive de Polynovagroupe360ci. Toute reproduction non autorisée est interdite.
+                        Tous les contenus (logos, textes, algorithmes, codes) présents sur la plateforme sont la propriété exclusive de Habiteax. Toute reproduction non autorisée est interdite.
                     </p>
                 </section>
 

@@ -9,9 +9,9 @@ export default function MentionsLegalesPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">1. Éditeur de la Plateforme</h2>
                     <p>
-                        La plateforme QAPRIL (Qualité de l'Administration du Patrimoine et du Registre Immobilier Locatif) est éditée par la société <strong>Polynovagroupe360ci</strong>.
+                        La plateforme QAPRIL (Qualité de l'Administration du Patrimoine et du Registre Immobilier Locatif) est éditée par la société <strong>Habiteax</strong>.
                         <ul className="list-none mt-2 space-y-1">
-                            <li><strong>Société :</strong> Polynovagroupe360ci</li>
+                            <li><strong>Société :</strong> Habiteax</li>
                             <li><strong>Siège Social :</strong> Cocody, Abidjan, Côte d'Ivoire</li>
                             <li><strong>Email :</strong> contact@qapril.ci</li>
                         </ul>
@@ -21,7 +21,7 @@ export default function MentionsLegalesPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">2. Directeur de la Publication</h2>
                     <p>
-                        Le Directeur de la publication de la plateforme est le Responsable Innovation de Polynovagroupe360ci.
+                        Le Directeur de la publication de la plateforme est le Responsable Innovation de Habiteax.
                     </p>
                 </section>
 
@@ -42,7 +42,7 @@ export default function MentionsLegalesPage() {
                         L'ensemble des éléments constituant la plateforme QAPRIL (textes, graphiques, logiciels, photographies, images, vidéos, sons, plans, noms, logos, marques, créations et œuvres protégeables diverses, bases de données, etc.) ainsi que la plateforme elle-même relèvent de la législation ivoirienne et internationale sur le droit d'auteur et la propriété intellectuelle.
                     </p>
                     <p>
-                        Ces éléments sont la propriété exclusive de <strong>Polynovagroupe360ci</strong>.
+                        Ces éléments sont la propriété exclusive de <strong>Habiteax</strong>.
                     </p>
                 </section>
 

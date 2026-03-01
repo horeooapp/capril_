@@ -1,7 +1,13 @@
 import { getAgentStatus as fetchAgentStatus } from "@/lib/agents"
 
 export default async function RegularizationAlert() {
-    const status = await fetchAgentStatus()
+    let status = null
+    try {
+        status = await fetchAgentStatus()
+    } catch (error) {
+        console.error("Error fetching agent status:", error)
+        return null
+    }
 
     if (!status || status.isCertified) return null
 

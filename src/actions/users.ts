@@ -10,13 +10,18 @@ export async function getCurrentUser() {
         return null
     }
 
-    const user = await prisma.user.findUnique({
-        where: {
-            email: session.user.email
-        }
-    })
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: session.user.email
+            }
+        })
 
-    return user
+        return user
+    } catch (error) {
+        console.error("Error fetching current user:", error)
+        return null
+    }
 }
 
 export async function getUserProfile(userId: string) {
