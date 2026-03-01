@@ -1,3 +1,6 @@
+import { PrismaClient } from "@prisma/client"
+import { PrismaLibSql } from "@prisma/adapter-libsql"
+
 console.log("[PRISMA DEBUG] Initializing with URL:", process.env.DATABASE_URL || "file:./dev.db");
 
 let adapter;
