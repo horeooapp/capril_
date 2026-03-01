@@ -84,6 +84,27 @@ model VerificationToken {
 
 // --- Modèles Métier QAPRIL ---
 
+enum EscrowStatus {
+  ACTIVE
+  EN_LITIGE
+  LIBERE
+  PARTIELLEMENT_LIBERE
+}
+
+model Escrow {
+  id        String       @id @default(cuid())
+  leaseId   String       @unique
+  lease     Lease        @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  amount    Float
+  status    EscrowStatus @default(ACTIVE)
+  
+  // Historique des mouvements pour la preuve renforcée
+  history   String?      // JSON stringified history of status changes
+  
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
 model Property {
   id         String  @id @default(cuid())
   name       String? // Ex: "Appartement A1"
@@ -130,6 +151,9 @@ model Mandate {
   startDate   DateTime
   endDate     DateTime?
   documentUrl String? // URL du mandat signé
+  
+  // Preuve renforcée
+  proofHash   String? @unique // Empreinte cryptographique du document/mandat
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -143,7 +167,10 @@ model AuditLog {
   entityType String // Ex: "LEASE", "MANDATE"
   entityId   String
   details    String? // JSON stringifié pour plus de détails
+  
+  // Horodatage avancé pour la preuve renforcée
   timestamp  DateTime @default(now())
+  proofHash  String?  // Hash combiné (prevLogHash + currentLogData)
 }
 
 enum LeaseStatus {
@@ -173,6 +200,7 @@ model Lease {
   status LeaseStatus @default(ACTIVE)
 
   receipts Receipt[]
+  escrow   Escrow?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -203,6 +231,9 @@ model Receipt {
   isSent     Boolean @default(false) // Pour l'optimisation des notifications
   pdfUrl     String? // URL du PDF de quittance archivé
   qrCodeHash String? @unique // Hash pour le QR code
+  
+  // Preuve renforcée
+  documentHash String? @unique // Empreinte cryptographique (SHA256) du contenu
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
