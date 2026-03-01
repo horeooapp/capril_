@@ -1,12 +1,14 @@
 import { getAuditLogs } from "@/actions/audit"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { Role } from "@prisma/client"
 
 export default async function AuditPage() {
     const session = await auth()
 
     // Only ADMIN and AUDITOR can access this page
-    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "AUDITOR") {
+    const userRole = session?.user?.role as string
+    if (userRole !== "ADMIN" && userRole !== "AUDITOR") {
         redirect("/dashboard")
     }
 
@@ -29,8 +31,8 @@ export default async function AuditPage() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {logs.map((log) => (
-                            <li key={log.id} style={{ display: 'table-row' }}>
+                        {logs.map((log: any) => (
+                            <tr key={log.id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {new Date(log.timestamp).toLocaleString()}
                                 </td>
@@ -48,7 +50,7 @@ export default async function AuditPage() {
                                 <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">
                                     {log.details || '-'}
                                 </td>
-                            </li>
+                            </tr>
                         ))}
                     </tbody>
                 </table>

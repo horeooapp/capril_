@@ -2,8 +2,8 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import Nodemailer from "next-auth/providers/nodemailer"
-
 import { createTransport } from "nodemailer"
+import { Role } from "@prisma/client"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -47,8 +47,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     callbacks: {
         async session({ session, user }) {
             if (session.user) {
-                // @ts-ignore
                 session.user.id = user.id
+                session.user.role = user.role as Role
+                session.user.isCertified = user.isCertified
             }
             return session
         },
