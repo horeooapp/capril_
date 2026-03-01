@@ -13,7 +13,9 @@ export default async function AdminLayout({
         redirect("/login")
     }
 
-    // Note: En production, on vérifierait le rôle "ADMIN" du session.user ici.
+    if (session.user.role !== "ADMIN") {
+        redirect("/dashboard")
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">

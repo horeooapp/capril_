@@ -2,11 +2,14 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import Nodemailer from "next-auth/providers/nodemailer"
+import Credentials from "next-auth/providers/credentials"
 import { createTransport } from "nodemailer"
 import { Role } from "@prisma/client"
+import bcrypt from "bcryptjs"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
+    session: { strategy: "jwt" },
     providers: [
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
@@ -14,7 +17,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             async sendVerificationRequest(params) {
                 const { identifier, url, provider } = params
 
-                // Log de secours : Permet de se connecter même si le SMTP ne marche pas encore (Visible dans les logs Hostinger)
                 console.log("==========================================")
                 console.log(`[QAPRIL AUTH] LIEN DE CONNEXION POUR : ${identifier}`)
                 console.log(url)
@@ -35,21 +37,58 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                </body>`,
                     })
                 } catch (error) {
-                    console.error("❌ [QAPRIL ERREUR SMTP] Impossible d'envoyer l'e-mail. Vérifiez vos variables d'environnement EMAIL_SERVER et EMAIL_FROM sur Hostinger.", error)
-                    throw new Error("Échec de l'envoi de l'e-mail (Vérifiez les logs du serveur)")
+                    console.error("❌ [QAPRIL ERREUR SMTP] Impossible d'envoyer l'e-mail.", error)
+                    throw new Error("Échec de l'envoi de l'e-mail")
                 }
             }
         }),
+        Credentials({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Mot de passe", type: "password" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) return null
+
+                const user = await prisma.user.findUnique({
+                    where: { email: credentials.email as string }
+                })
+
+                if (!user || !user.password) return null
+
+                const isValid = await bcrypt.compare(credentials.password as string, user.password)
+
+                if (!isValid) return null
+
+                return {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    isCertified: user.isCertified
+                }
+            }
+        })
     ],
     pages: {
-        verifyRequest: '/verify-request', // Redirects here instead of the default crashing NextAuth page
+        signIn: '/login',
+        verifyRequest: '/verify-request',
     },
     callbacks: {
-        async session({ session, user }) {
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id
+                token.role = user.role
+                token.isCertified = user.isCertified
+            }
+            return token
+        },
+        async session({ session, token }) {
             if (session.user) {
-                session.user.id = user.id
-                session.user.role = user.role as Role
-                session.user.isCertified = user.isCertified
+                session.user.id = token.id as string
+                session.user.role = token.role as Role
+                session.user.isCertified = token.isCertified as boolean
             }
             return session
         },

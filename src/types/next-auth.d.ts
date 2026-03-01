@@ -6,19 +6,29 @@ declare module "next-auth" {
         user: {
             id: string
             role: Role
-            isCertified?: boolean
+            isCertified?: boolean | null
         } & DefaultSession["user"]
     }
 
     interface User {
         role?: Role
-        isCertified?: boolean
+        isCertified?: boolean | null
+        password?: string | null
+    }
+}
+
+declare module "next-auth/jwt" {
+    interface JWT {
+        id?: string
+        role?: Role
+        isCertified?: boolean | null
     }
 }
 
 declare module "@auth/core/adapters" {
     interface AdapterUser {
         role?: Role
-        isCertified?: boolean
+        isCertified?: boolean | null
+        password?: string | null
     }
 }

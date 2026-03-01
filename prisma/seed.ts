@@ -37,6 +37,9 @@ async function main() {
             email: 'admin@qapril.ci',
             name: 'Ministère de la Construction',
             role: Role.ADMIN,
+            // Mot de passe par défaut: admin1234 (hashé)
+            // @ts-ignore
+            password: await require('bcryptjs').hash('admin1234', 10)
         }
     })
 
