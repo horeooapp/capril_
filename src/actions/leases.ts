@@ -69,6 +69,7 @@ export async function createLease(data: {
 
     // Create the lease
     const lease = await prisma.lease.create({
+        // @ts-ignore
         data: {
             propertyId: data.propertyId,
             tenantId: tenant.id,
@@ -99,6 +100,24 @@ export async function createLease(data: {
     })
 
     return lease
+}
+
+export async function getLeaseById(id: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error("Unauthorized")
+
+    return await prisma.lease.findUnique({
+        where: { id },
+        // @ts-ignore
+        include: {
+            property: true,
+            tenant: true,
+            escrow: true,
+            insurance: { include: { claims: true } },
+            cdcDeposit: true,
+            mediation: { include: { messages: true } }
+        }
+    })
 }
 
 export async function getLeasesByProperty(propertyId: string) {

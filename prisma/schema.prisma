@@ -112,9 +112,11 @@ model Property {
   id         String  @id @default(cuid())
   name       String? // Ex: "Appartement A1"
   address    String
-  city       String
-  postalCode String?
-  country    String  @default("Côte d'Ivoire")
+  city         String
+  neighborhood String?
+  postalCode   String?
+  country      String  @default("Côte d'Ivoire")
+  type         String  @default("APARTMENT")
 
   ownerId String
   owner   User   @relation("PropertyOwner", fields: [ownerId], references: [id])
@@ -205,6 +207,8 @@ model Lease {
   receipts Receipt[]
   escrow   Escrow?
   insurance Insurance?
+  cdcDeposit CDCDeposit?
+  mediation Mediation?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -249,6 +253,74 @@ model InsuranceClaim {
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum CDCDepositStatus {
+  PENDING
+  CONSIGNED
+  RELEASED
+  DISPUTED
+}
+
+enum CDCDepositInitiator {
+  TENANT
+  OWNER
+}
+
+enum MediationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  FAILED
+}
+
+model Mediation {
+  id        String          @id @default(cuid())
+  leaseId   String          @unique
+  lease     Lease           @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  status    MediationStatus @default(OPEN)
+  subject   String
+  messages  MediationMessage[]
+  
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model MediationMessage {
+  id          String    @id @default(cuid())
+  mediationId String
+  mediation   Mediation @relation(fields: [mediationId], references: [id], onDelete: Cascade)
+  senderId    String
+  content     String
+  
+  createdAt   DateTime  @default(now())
+}
+
+model MarketData {
+  id           String   @id @default(cuid())
+  city         String
+  neighborhood String?
+  propertyType String   // APARTMENT, HOUSE, etc.
+  averageRent  Float
+  sampleSize   Int
+  
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  @@unique([city, neighborhood, propertyType])
+}
+
+model CDCDeposit {
+  id           String             @id @default(cuid())
+  leaseId      String             @unique
+  lease        Lease              @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  initiator    CDCDepositInitiator
+  amount       Float
+  cdcReference String?            @unique
+  status       CDCDepositStatus   @default(PENDING)
+  proofHash    String?
+  
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 model Receipt {

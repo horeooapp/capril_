@@ -1,12 +1,26 @@
 import { getProperties } from "@/actions/properties"
+import { getCurrentUser } from "@/actions/users"
 import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
+import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 
 export default async function DashboardOverview() {
-    // Fetch properties managed by this user
+    // Fetch user and properties
+    const user = await getCurrentUser()
     const properties = await getProperties().catch(() => [])
 
     const totalProperties = properties.length
     const totalLeases = properties.reduce((acc, current) => acc + current.leases.length, 0)
+
+    // Calculate total funds in Escrow/CDC for this manager/owner
+    let totalSecuredFunds = 0
+    properties.forEach(p => {
+        p.leases.forEach(l => {
+            // @ts-ignore
+            if (l.escrow?.amount) totalSecuredFunds += l.escrow.amount
+            // @ts-ignore
+            if (l.cdcDeposit?.amount) totalSecuredFunds += l.cdcDeposit.amount
+        })
+    })
 
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
@@ -22,7 +36,10 @@ export default async function DashboardOverview() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+                <div className="flex items-center space-x-4">
+                    <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+                    {user && <ReliabilityBadge score={user.reliabilityScore} />}
+                </div>
             </div>
 
             <RegularizationAlert />
@@ -44,6 +61,13 @@ export default async function DashboardOverview() {
                 </div>
 
                 <div className="bg-white overflow-hidden shadow rounded-lg border-l-4 border-blue-500">
+                    <div className="px-4 py-5 sm:p-6">
+                        <dt className="text-sm font-medium text-gray-500 truncate">Fonds Sécurisés (CDC/Séquestre)</dt>
+                        <dd className="mt-1 text-3xl font-semibold text-gray-900">{totalSecuredFunds.toLocaleString()} FCFA</dd>
+                    </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg border-l-4 border-green-500">
                     <div className="px-4 py-5 sm:p-6">
                         <dt className="text-sm font-medium text-gray-500 truncate">Quittances générées ce mois</dt>
                         <dd className="mt-1 text-3xl font-semibold text-gray-900">{receiptsThisMonth}</dd>

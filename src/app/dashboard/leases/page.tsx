@@ -1,4 +1,6 @@
 import { getProperties } from "@/actions/properties"
+import Link from "next/link"
+import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 
 export default async function LeasesPage() {
     // We fetch properties and extract leases to show them
@@ -33,32 +35,36 @@ export default async function LeasesPage() {
                 ) : (
                     <ul className="divide-y divide-gray-200">
                         {leases.map((lease) => (
-                            <li key={lease.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-sm font-medium text-primary truncate">
-                                        {/* @ts-ignore */}
-                                        {lease.tenant?.name || lease.tenant?.email || "Locataire inconnu"}
-                                    </p>
-                                    <div className="ml-2 flex-shrink-0 flex">
-                                        <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${lease.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                            }`}>
-                                            {lease.status === 'ACTIVE' ? 'Actif' : 'Terminé'}
+                            <li key={lease.id} className="hover:bg-gray-50 transition-colors">
+                                <Link href={`/dashboard/leases/${lease.id}`} className="block px-4 py-4 sm:px-6">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium text-primary truncate">
+                                            {/* @ts-ignore */}
+                                            {lease.tenant?.name || lease.tenant?.email || "Locataire inconnu"}
                                         </p>
+                                        <div className="ml-2 flex-shrink-0 flex items-center space-x-2">
+                                            {/* @ts-ignore */}
+                                            {lease.tenant && <ReliabilityBadge score={lease.tenant.reliabilityScore} showLabel={false} />}
+                                            <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${lease.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                {lease.status === 'ACTIVE' ? 'Actif' : 'Terminé'}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="mt-2 sm:flex sm:justify-between">
-                                    <div className="sm:flex">
-                                        <p className="flex items-center text-sm text-gray-500">
-                                            {lease.propertyName}
-                                        </p>
+                                    <div className="mt-2 sm:flex sm:justify-between">
+                                        <div className="sm:flex">
+                                            <p className="flex items-center text-sm text-gray-500">
+                                                {lease.propertyName}
+                                            </p>
+                                        </div>
+                                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 space-x-4">
+                                            <p>Loyer: {lease.rentAmount} FCFA</p>
+                                            <p>
+                                                Début: {new Date(lease.startDate).toLocaleDateString('fr-FR')}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 space-x-4">
-                                        <p>Loyer: {lease.rentAmount} FCFA</p>
-                                        <p>
-                                            Début: {new Date(lease.startDate).toLocaleDateString('fr-FR')}
-                                        </p>
-                                    </div>
-                                </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>
