@@ -3,6 +3,9 @@
 import { LeaseStatus } from "@prisma/client"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { validateLeaseFinancials } from "@/lib/validation"
+import { logAction } from "./audit"
+import { enforceAgentActive } from "@/lib/agents"
 
 export async function createLease(data: {
     propertyId: string,
@@ -11,23 +14,40 @@ export async function createLease(data: {
     startDate: Date,
     rentAmount: number,
     charges?: number,
-    deposit?: number
+    deposit?: number,
+    advancePayment?: number,
+    agencyFee?: number
 }) {
     const session = await auth()
 
     // @ts-ignore
-    const landlordId = session?.user?.id
+    const userId = session?.user?.id
 
-    if (!landlordId) {
+    if (!userId) {
         throw new Error("Unauthorized")
     }
 
-    // Verify property ownership
+    // Enforce QAPRIL Regularization for Agents
+    await enforceAgentActive()
+
+    // 1. Financial Validation (QAPRIL Regulation)
+    const validation = validateLeaseFinancials({
+        rentAmount: data.rentAmount,
+        deposit: data.deposit,
+        advancePayment: data.advancePayment,
+        agencyFee: data.agencyFee
+    })
+
+    if (!validation.isValid) {
+        throw new Error(`Règlementation QAPRIL: ${validation.errors.join(" ")}`)
+    }
+
+    // Verify property ownership or management
     const property = await prisma.property.findUnique({
         where: { id: data.propertyId }
     })
 
-    if (!property || (property.ownerId !== landlordId && property.managerId !== landlordId)) {
+    if (!property || (property.ownerId !== userId && property.managerId !== userId)) {
         throw new Error("Unauthorized to manage this property")
     }
 
@@ -47,7 +67,7 @@ export async function createLease(data: {
     }
 
     // Create the lease
-    return await prisma.lease.create({
+    const lease = await prisma.lease.create({
         data: {
             propertyId: data.propertyId,
             tenantId: tenant.id,
@@ -55,9 +75,24 @@ export async function createLease(data: {
             rentAmount: data.rentAmount,
             charges: data.charges || 0,
             deposit: data.deposit,
+            advancePayment: data.advancePayment || 0,
+            agencyFee: data.agencyFee || 0,
             status: LeaseStatus.ACTIVE
         }
     })
+
+    // 2. Audit Logging
+    await logAction({
+        action: "CREATE_LEASE",
+        entityType: "LEASE",
+        entityId: lease.id,
+        details: {
+            rentAmount: data.rentAmount,
+            tenantEmail: data.tenantEmail
+        }
+    })
+
+    return lease
 }
 
 export async function getLeasesByProperty(propertyId: string) {

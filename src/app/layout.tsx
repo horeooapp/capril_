@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "QAPRIL - Registre Locatif Numérique",
   description: "La plateforme nationale officielle pour la gestion de vos quittances de loyer en Côte d'Ivoire.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

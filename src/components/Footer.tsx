@@ -8,12 +8,8 @@ export default function Footer() {
 
                     {/* Brand and Info */}
                     <div className="md:col-span-1 space-y-4">
-                        <div className="flex items-center space-x-2">
-                            <div className="flex space-x-1 h-6">
-                                <div className="w-2 bg-[#FF8200] rounded-sm" />
-                                <div className="w-2 bg-gray-100 rounded-sm" />
-                                <div className="w-2 bg-[#009E60] rounded-sm" />
-                            </div>
+                        <div className="flex items-center space-x-3">
+                            <img src="/logo.png" alt="QAPRIL Logo" className="h-8 w-auto border border-gray-700 rounded shadow-sm opacity-90" />
                             <span className="font-extrabold text-xl tracking-tight text-white">QAPRIL</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">

@@ -12,13 +12,9 @@ export default function Home() {
             <div className="flex justify-start">
               <Link href="/">
                 <span className="sr-only">QAPRIL</span>
-                {/* Logo with Ivorian Colors Concept */}
-                <div className="flex items-center space-x-2">
-                  <div className="flex space-x-1">
-                    <div className="w-3 h-8 bg-primary rounded-sm" />
-                    <div className="w-3 h-8 bg-gray-200 rounded-sm" />
-                    <div className="w-3 h-8 bg-secondary rounded-sm" />
-                  </div>
+                {/* QAPRIL Official Logo */}
+                <div className="flex items-center space-x-3">
+                  <img src="/logo.png" alt="QAPRIL Logo" className="h-10 w-auto" />
                   <span className="font-extrabold text-2xl tracking-tight text-gray-900">QAPRIL</span>
                 </div>
               </Link>

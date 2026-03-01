@@ -1,4 +1,5 @@
 import { getProperties } from "@/actions/properties"
+import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
 
 export default async function DashboardOverview() {
     // Fetch properties managed by this user
@@ -23,6 +24,8 @@ export default async function DashboardOverview() {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
             </div>
+
+            <RegularizationAlert />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

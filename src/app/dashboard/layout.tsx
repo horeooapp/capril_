@@ -20,11 +20,9 @@ export default async function DashboardLayout({
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
-                            <Link href="/dashboard" className="flex items-center space-x-2">
-                                <div className="w-2 h-6 bg-white rounded-sm" />
-                                <div className="w-2 h-6 bg-gray-200 rounded-sm" />
-                                <div className="w-2 h-6 bg-secondary rounded-sm" />
-                                <span className="font-bold text-xl ml-2">QAPRIL <span className="text-sm font-normal text-orange-200">| Portail Gestionnaire</span></span>
+                            <Link href="/dashboard" className="flex items-center space-x-3 group">
+                                <img src="/logo.png" alt="QAPRIL Logo" className="h-8 w-auto border border-white/20 rounded shadow-sm group-hover:scale-105 transition-transform" />
+                                <span className="font-bold text-xl">QAPRIL <span className="text-sm font-normal text-orange-200">| Portail Gestionnaire</span></span>
                             </Link>
                         </div>
 
@@ -33,6 +31,9 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/properties" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Logements</Link>
                             <Link href="/dashboard/leases" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Contrats</Link>
                             <Link href="/dashboard/receipts" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Quittances</Link>
+                            {(session.user.role === "ADMIN" || session.user.role === "AUDITOR") && (
+                                <Link href="/dashboard/audit" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
+                            )}
                         </nav>
 
                         <div className="flex items-center space-x-4">
