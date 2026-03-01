@@ -3,6 +3,8 @@
 import { PaymentMethod } from "@prisma/client"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { generateProofHash } from "@/lib/proof"
+import { scoreRentPayment } from "@/lib/scoring"
 
 // Generates a unique receipt number like Q-YYYYMM-000X
 async function generateUniqueReceiptNumber(): Promise<string> {
@@ -62,6 +64,14 @@ export async function createReceipt(data: {
     const receiptNumber = await generateUniqueReceiptNumber()
     const qrCodeHash = `${lease.id}-${Date.now()}`
 
+    // Reinforced Proof: Document Content Hash
+    const documentHash = generateProofHash({
+        receiptNumber,
+        leaseId: data.leaseId,
+        amountPaid: data.amountPaid,
+        period: `${data.periodStart}-${data.periodEnd}`
+    })
+
     const receipt = await prisma.receipt.create({
         data: {
             receiptNumber,
@@ -71,10 +81,17 @@ export async function createReceipt(data: {
             amountPaid: data.amountPaid,
             paymentDate: data.paymentDate || new Date(),
             paymentMethod: data.paymentMethod || PaymentMethod.MOBILE_MONEY,
-            isSent: true, // Optimistically mapping to true
-            qrCodeHash
+            isSent: true,
+            qrCodeHash,
+            documentHash
         }
     })
+
+    // Update Tenant Reliability Score based on payment date vs period
+    // If paymentDate is before or on periodEnd, it's considered on time
+    const paymentDate = data.paymentDate || new Date()
+    const isOnTime = paymentDate <= new Date(data.periodEnd)
+    await scoreRentPayment(lease.tenantId, isOnTime)
 
     // Envoi de l'e-mail de notification au locataire
     const nodemailer = await import("nodemailer")

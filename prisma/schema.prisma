@@ -29,6 +29,9 @@ model User {
   phone         String?   @unique
   role          Role      @default(TENANT)
 
+  // Indice de Fiabilité Locative
+  reliabilityScore Float @default(100.0)
+
   // Champs pour les agents
   isCertified       Boolean?  @default(false)
   certificationDate DateTime?
@@ -201,6 +204,7 @@ model Lease {
 
   receipts Receipt[]
   escrow   Escrow?
+  insurance Insurance?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -212,6 +216,39 @@ enum PaymentMethod {
   MOBILE_MONEY
   CREDIT_CARD
   OTHER
+}
+
+enum InsuranceStatus {
+  INACTIVE
+  ACTIVE
+  PENDING
+  CANCELLED
+}
+
+model Insurance {
+  id        String          @id @default(cuid())
+  leaseId   String          @unique
+  lease     Lease           @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  status    InsuranceStatus @default(INACTIVE)
+  provider  String?         // Nom de l'assureur
+  policyNo  String?         @unique
+  
+  claims    InsuranceClaim[]
+  
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model InsuranceClaim {
+  id          String   @id @default(cuid())
+  insuranceId String
+  insurance   Insurance @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  amount      Float
+  reason      String
+  status      String   @default("OPEN") // OPEN, PAID, REJECTED
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Receipt {

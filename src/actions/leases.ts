@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { validateLeaseFinancials } from "@/lib/validation"
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
+import { createEscrow } from "./escrow"
 
 export async function createLease(data: {
     propertyId: string,
@@ -77,9 +78,14 @@ export async function createLease(data: {
             deposit: data.deposit,
             advancePayment: data.advancePayment || 0,
             agencyFee: data.agencyFee || 0,
-            status: LeaseStatus.ACTIVE
+            status: "ACTIVE"
         }
     })
+
+    // Create Digital Escrow if deposit exists
+    if (data.deposit && data.deposit > 0) {
+        await createEscrow(lease.id, data.deposit)
+    }
 
     // 2. Audit Logging
     await logAction({

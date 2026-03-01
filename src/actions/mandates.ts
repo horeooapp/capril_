@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma"
 import { MandateStatus, MandateType } from "@prisma/client"
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
+import { generateProofHash } from "@/lib/proof"
+import { scoreAgentCompliance } from "@/lib/scoring"
 
 export async function createMandate(data: {
     propertyId: string,
@@ -39,6 +41,14 @@ export async function createMandate(data: {
         throw new Error("Une gestion exclusive est déjà en cours pour ce bien.")
     }
 
+    const proofHash = generateProofHash({
+        propertyId: data.propertyId,
+        agentId: agentId,
+        type: data.type,
+        startDate: data.startDate,
+        endDate: data.endDate
+    })
+
     const mandate = await prisma.mandate.create({
         data: {
             propertyId: data.propertyId,
@@ -47,7 +57,8 @@ export async function createMandate(data: {
             startDate: data.startDate,
             endDate: data.endDate,
             documentUrl: data.documentUrl,
-            status: MandateStatus.PENDING
+            status: MandateStatus.PENDING,
+            proofHash
         }
     })
 
@@ -55,7 +66,7 @@ export async function createMandate(data: {
         action: "CREATE_MANDATE",
         entityType: "MANDATE",
         entityId: mandate.id,
-        details: { propertyId: data.propertyId }
+        details: { propertyId: data.propertyId, proofHash }
     })
 
     return mandate
@@ -82,6 +93,9 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
         where: { id: mandateId },
         data: { status }
     })
+
+    // Update Agent Reliability Score
+    await scoreAgentCompliance(mandate.agentId, status === MandateStatus.VALIDATED)
 
     // If validated, update property manager
     if (status === MandateStatus.VALIDATED) {
