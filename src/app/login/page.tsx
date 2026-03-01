@@ -1,48 +1,11 @@
 "use client"
 
-import { signIn } from "next-auth/react"
 import Link from "next/link"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
+import { loginWithMagicLink, loginWithPassword } from "@/actions/auth"
 
 export default function LoginPage() {
     const [loginMode, setLoginMode] = useState<'magic-link' | 'password'>('magic-link')
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
-    const router = useRouter()
-
-    const handleMagicLink = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
-        try {
-            await signIn("nodemailer", { email, callbackUrl: "/dashboard" })
-        } catch (err) {
-            setError("Erreur lors de l'envoi du lien.")
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handlePasswordLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
-        const result = await signIn("credentials", {
-            email,
-            password,
-            redirect: false,
-        })
-
-        if (result?.error) {
-            setError("Email ou mot de passe incorrect.")
-            setLoading(false)
-        } else {
-            router.push("/dashboard")
-        }
-    }
 
     return (
         <div className="min-h-screen bg-white flex">
@@ -79,60 +42,11 @@ export default function LoginPage() {
                     </div>
 
                     <div className="mt-6">
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
-                                {error}
-                            </div>
+                        {loginMode === 'magic-link' ? (
+                            <MagicLinkForm />
+                        ) : (
+                            <PasswordLoginForm />
                         )}
-
-                        <form className="space-y-6" onSubmit={loginMode === 'magic-link' ? handleMagicLink : handlePasswordLogin}>
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                    Adresse e-mail
-                                </label>
-                                <div className="mt-1">
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                                        placeholder="nom@exemple.ci"
-                                    />
-                                </div>
-                            </div>
-
-                            {loginMode === 'password' && (
-                                <div>
-                                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                        Mot de passe
-                                    </label>
-                                    <div className="mt-1">
-                                        <input
-                                            id="password"
-                                            name="password"
-                                            type="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <div>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
-                                >
-                                    {loading ? 'Connexion...' : (loginMode === 'magic-link' ? 'Recevoir le lien' : 'Se connecter')}
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -146,5 +60,123 @@ export default function LoginPage() {
                 <div className="absolute inset-0 bg-gray-900 bg-opacity-30 mix-blend-multiply"></div>
             </div>
         </div>
+    )
+}
+
+function MagicLinkForm() {
+    const [isPending, startTransition] = useTransition()
+    const [error, setError] = useState<string | null>(null)
+
+    async function handleSubmit(formData: FormData) {
+        setError(null)
+        startTransition(async () => {
+            const result = await loginWithMagicLink(formData)
+            if (result?.error) {
+                setError(result.error)
+            }
+        })
+    }
+
+    return (
+        <form className="space-y-6" action={handleSubmit}>
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
+                    {error}
+                </div>
+            )}
+            <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Adresse e-mail
+                </label>
+                <div className="mt-1">
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                        placeholder="nom@exemple.ci"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <button
+                    type="submit"
+                    disabled={isPending}
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                >
+                    {isPending ? 'Envoi...' : 'Recevoir le lien'}
+                </button>
+            </div>
+
+            <p className="text-xs text-center text-gray-500 mt-4">
+                Un lien de connexion sécurisé vous sera envoyé par e-mail.
+            </p>
+        </form>
+    )
+}
+
+function PasswordLoginForm() {
+    const [isPending, startTransition] = useTransition()
+    const [error, setError] = useState<string | null>(null)
+
+    async function handleSubmit(formData: FormData) {
+        setError(null)
+        startTransition(async () => {
+            const result = await loginWithPassword(formData)
+            if (result?.error) {
+                setError(result.error)
+            }
+        })
+    }
+
+    return (
+        <form className="space-y-6" action={handleSubmit}>
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
+                    {error}
+                </div>
+            )}
+            <div>
+                <label htmlFor="email-pwd" className="block text-sm font-medium text-gray-700">
+                    Adresse e-mail
+                </label>
+                <div className="mt-1">
+                    <input
+                        id="email-pwd"
+                        name="email"
+                        type="email"
+                        required
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <label htmlFor="password" title="password" className="block text-sm font-medium text-gray-700">
+                    Mot de passe
+                </label>
+                <div className="mt-1">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        required
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <button
+                    type="submit"
+                    disabled={isPending}
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                >
+                    {isPending ? 'Connexion...' : 'Se connecter'}
+                </button>
+            </div>
+        </form>
     )
 }
