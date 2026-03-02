@@ -106,8 +106,14 @@ function MagicLinkForm() {
                     disabled={isPending}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
                 >
-                    {isPending ? 'Envoi...' : 'Recevoir le lien'}
+                    {isPending ? 'Envoi...' : 'Recevoir le lien (Connexion / Inscription)'}
                 </button>
+            </div>
+
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+                <p className="text-xs text-blue-700">
+                    <strong>Nouveau sur QAPRIL ?</strong> Saisissez votre adresse e-mail pour créer votre compte instantanément. Un lien de vérification vous sera envoyé.
+                </p>
             </div>
 
             <p className="text-xs text-center text-gray-500 mt-4">

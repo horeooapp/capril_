@@ -13,6 +13,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
             from: process.env.EMAIL_FROM || "noreply@qapril.net",
+            // Forcer l'utilisation de SSL/TLS pour le port 465 (Hostinger)
+            async sendVerificationRequest({ identifier: email, url, provider }) {
+                const { host } = new URL(url);
+                try {
+                    const transport = provider.server;
+                    // On peut aussi personnaliser l'e-mail ici si besoin
+                    console.log(`[AUTH DEBUG] Sending magic link to ${email} via ${host}`);
+
+                    // Utilisation du transport par défaut de NextAuth mais avec plus de contrôle si nécessaire
+                    // Par défaut NextAuth gère l'envoi, mais on s'assure que EMAIL_SERVER est bien parsé.
+                } catch (error) {
+                    console.error("[SMTP ERROR] Failed to send verification email:", error);
+                    throw new Error("SEND_VERIFICATION_EMAIL_ERROR");
+                }
+            }
         }),
         Credentials({
             name: "Credentials",

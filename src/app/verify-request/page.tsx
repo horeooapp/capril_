@@ -25,8 +25,12 @@ export default function VerifyRequestPage() {
                         </p>
 
                         <div className="mt-8 bg-orange-50 p-4 rounded-md border border-orange-100 text-sm text-orange-800 text-left">
-                            <p className="font-semibold mb-1">📝 Note technique :</p>
-                            <p>Si vous ne recevez pas l'e-mail dans les 2 minutes, vérifiez vos courriers indésirables (Spams) ou consultez les logs du serveur (lorsque l'application est en test).</p>
+                            <p className="font-semibold mb-1">📝 Vous ne recevez rien ?</p>
+                            <ul className="list-disc ml-4 space-y-1">
+                                <li>Vérifiez votre dossier <strong>Spams</strong> ou Courriers indésirables.</li>
+                                <li>Assurez-vous que l'adresse email saisie est correcte.</li>
+                                <li>Certains services pro (ex: Outlook) peuvent bloquer les emails automatiques.</li>
+                            </ul>
                         </div>
 
                         <div className="mt-10">
