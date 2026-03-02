@@ -3,9 +3,10 @@ import QRCode from "qrcode"
 import { notFound } from "next/navigation"
 import PrintButton from "@/components/PrintButton"
 
-export default async function ReceiptDocumentPage({ params }: { params: { id: string } }) {
+export default async function ReceiptDocumentPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: receiptId } = await params
     const receipt = await prisma.receipt.findUnique({
-        where: { id: params.id },
+        where: { id: receiptId },
         include: {
             lease: {
                 include: {

@@ -3,8 +3,9 @@ import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-export default async function LeaseDetailPage({ params }: { params: { id: string } }) {
-    const lease = await getLeaseById(params.id)
+export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: leaseId } = await params
+    const lease = await getLeaseById(leaseId)
 
     if (!lease) {
         notFound()

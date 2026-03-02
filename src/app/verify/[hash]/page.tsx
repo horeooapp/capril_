@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 
-export default async function VerifyReceiptPage({ params }: { params: { hash: string } }) {
-    const receiptHash = params.hash
+export default async function VerifyReceiptPage({ params }: { params: Promise<{ hash: string }> }) {
+    const { hash: receiptHash } = await params
 
     const receipt = await prisma.receipt.findUnique({
         where: { qrCodeHash: receiptHash },

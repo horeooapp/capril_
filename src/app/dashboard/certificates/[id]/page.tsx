@@ -1,12 +1,14 @@
 import { generateRentalCertificate } from "@/actions/certificates"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import PrintButton from "@/components/PrintButton"
 
-export default async function CertificatePage({ params }: { params: { id: string } }) {
+export default async function CertificatePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: certificateId } = await params
     const session = await auth()
     if (!session?.user) redirect("/api/auth/signin")
 
-    const cert = await generateRentalCertificate(params.id)
+    const cert = await generateRentalCertificate(certificateId)
 
     return (
         <div className="max-w-4xl mx-auto p-8 my-10 bg-white shadow-2xl border-t-8 border-orange-500 rounded-lg">
@@ -80,12 +82,7 @@ export default async function CertificatePage({ params }: { params: { id: string
             </div>
 
             <div className="mt-10 text-center print:hidden">
-                <button
-                    onClick={() => window.print()}
-                    className="px-6 py-2 bg-gray-900 text-white rounded-md font-bold hover:bg-black transition-colors"
-                >
-                    Télécharger en PDF / Imprimer
-                </button>
+                <PrintButton />
             </div>
         </div>
     )
