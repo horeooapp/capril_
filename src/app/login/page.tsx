@@ -70,9 +70,13 @@ function MagicLinkForm() {
                 const result = await loginWithMagicLink(formData)
                 if (result?.error) {
                     setError(result.error)
+                } else if (result?.success) {
+                    // Si succès, on laisse la page verify-request s'afficher via redirectTo ou on redirige
+                    window.location.href = "/verify-request"
                 }
             } catch (e) {
-                setError("Une erreur inattendue est survenue.")
+                console.error("Login unexpected error:", e)
+                setError("Une erreur technique est survenue. Veuillez vérifier votre connexion.")
             }
         })
     }

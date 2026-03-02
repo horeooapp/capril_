@@ -10,13 +10,12 @@ export async function loginWithMagicLink(formData: FormData) {
     try {
         await signIn("nodemailer", {
             email,
-            redirectTo: "/dashboard"
+            redirect: false,
         })
+        return { success: true }
     } catch (error: any) {
-        if (error.type === "AuthError") {
-            return { error: "Erreur d'authentification. Veuillez réessayer." }
-        }
-        throw error // Propage pour que Next.js gère la redirection automatique vers /verify-request
+        console.error("Login magic link error:", error)
+        return { error: "Erreur d'authentification. Veuillez réessayer." }
     }
 }
 
