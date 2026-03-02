@@ -62,11 +62,7 @@ export default async function ReceiptDocumentPage({ params }: { params: Promise<
                 {/* En-tête avec Branding */}
                 <div className="flex justify-between items-start border-b-2 border-gray-900 pb-8 mb-10 relative">
                     <div className="flex items-center space-x-4">
-                        <div className="flex space-x-1.5 h-16">
-                            <div className="w-5 bg-[#FF8200] rounded-sm" /> {/* Orange CI */}
-                            <div className="w-5 bg-gray-100 rounded-sm border border-gray-200" /> {/* Blanc CI */}
-                            <div className="w-5 bg-[#009E60] rounded-sm" /> {/* Vert CI */}
-                        </div>
+                        <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto" />
                         <div>
                             <h1 className="font-extrabold text-4xl tracking-tighter text-gray-900 leading-none">QAPRIL</h1>
                             <p className="text-sm text-gray-600 font-semibold tracking-wide uppercase mt-1">Registre Locatif National</p>

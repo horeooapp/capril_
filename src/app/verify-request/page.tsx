@@ -6,12 +6,8 @@ export default function VerifyRequestPage() {
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
                 <div className="mx-auto w-full max-w-sm lg:w-96 text-center">
 
-                    <Link href="/" className="flex items-center justify-center space-x-2 mb-8 cursor-pointer">
-                        <div className="flex space-x-1 h-8">
-                            <div className="w-3 bg-[#FF8200] rounded-sm" />
-                            <div className="w-3 bg-gray-100 rounded-sm border border-gray-200" />
-                            <div className="w-3 bg-[#009E60] rounded-sm" />
-                        </div>
+                    <Link href="/" className="flex items-center justify-center space-x-4 mb-8 cursor-pointer">
+                        <img src="/logo.png" alt="QAPRIL Logo" className="h-12 w-auto" />
                         <span className="font-extrabold text-2xl tracking-tight text-gray-900">QAPRIL</span>
                     </Link>
 
