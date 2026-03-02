@@ -1,8 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function promote(email, password) {
+    const bcrypt = await import('bcrypt-ts');
     if (!email) {
         console.error("Usage: node prisma/promote.js <email> [password]");
         process.exit(1);

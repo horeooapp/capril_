@@ -3,23 +3,12 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import Nodemailer from "next-auth/providers/nodemailer"
 import Credentials from "next-auth/providers/credentials"
-import { createTransport } from "nodemailer"
-import type { Role } from "@prisma/client"
-// bcrypt is imported dynamically in authorize to avoid bundling it on the client
-
-if (typeof window === "undefined") {
-    console.log("[AUTH DEBUG] Starting NextAuth initialization...");
-    if (!process.env.AUTH_SECRET) {
-        console.warn("⚠️ [AUTH DEBUG] AUTH_SECRET is missing! This will cause a crash in production.");
-    }
-}
+import { authConfig } from "./auth.config"
+import * as bcrypt from "bcrypt-ts"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    ...authConfig,
     adapter: PrismaAdapter(prisma),
-    session: { strategy: "jwt" },
-    trustHost: true,
-    secret: process.env.AUTH_SECRET,
-    debug: true,
     providers: [
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
@@ -32,28 +21,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Mot de passe", type: "password" }
             },
             async authorize(credentials) {
-                console.log("[AUTH DEBUG] Authorize called for:", credentials?.email);
-                if (!credentials?.email || !credentials?.password) {
-                    console.log("[AUTH DEBUG] Missing credentials");
-                    return null;
-                }
+                if (!credentials?.email || !credentials?.password) return null;
 
                 try {
                     const user = await prisma.user.findUnique({
                         where: { email: credentials.email as string }
                     })
 
-                    console.log("[AUTH DEBUG] User found in DB:", !!user);
-                    if (!user || !user.password) {
-                        console.log("[AUTH DEBUG] User not found or no password set");
-                        return null;
-                    }
+                    if (!user || !user.password) return null;
 
-                    // Dynamic import of bcryptjs for server-only execution
-                    const bcrypt = await import("bcryptjs")
                     const isValid = await bcrypt.compare(credentials.password as string, user.password)
-                    console.log("[AUTH DEBUG] Password valid:", isValid);
-
                     if (!isValid) return null
 
                     return {
@@ -64,32 +41,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         isCertified: user.isCertified
                     }
                 } catch (error) {
-                    console.error("[AUTH DEBUG] Error in authorize:", error);
+                    console.error("[AUTH ERROR]", error);
                     return null;
                 }
             }
         })
     ],
-    pages: {
-        signIn: '/login',
-        verifyRequest: '/verify-request',
-    },
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id
-                token.role = user.role
-                token.isCertified = user.isCertified
-            }
-            return token
-        },
-        async session({ session, token }) {
-            if (session.user) {
-                session.user.id = token.id as string
-                session.user.role = token.role as Role
-                session.user.isCertified = token.isCertified as boolean
-            }
-            return session
-        },
-    },
 })
