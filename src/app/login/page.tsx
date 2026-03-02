@@ -28,13 +28,13 @@ export default function LoginPage() {
                         <div className="mt-4 flex space-x-4 border-b">
                             <button
                                 onClick={() => setLoginMode('magic-link')}
-                                className={`pb-2 text-sm font-medium ${loginMode === 'magic-link' ? 'border-b-2 border-primary text-primary' : 'text-gray-500'}`}
+                                className={`pb-2 text-sm font-medium ${loginMode === 'magic-link' ? 'border-b-2 border-[#FF8200] text-[#FF8200]' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 Lien Magique
                             </button>
                             <button
                                 onClick={() => setLoginMode('password')}
-                                className={`pb-2 text-sm font-medium ${loginMode === 'password' ? 'border-b-2 border-primary text-primary' : 'text-gray-500'}`}
+                                className={`pb-2 text-sm font-medium ${loginMode === 'password' ? 'border-b-2 border-[#FF8200] text-[#FF8200]' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 Mot de passe (Admin)
                             </button>
@@ -70,9 +70,13 @@ function MagicLinkForm() {
     async function handleSubmit(formData: FormData) {
         setError(null)
         startTransition(async () => {
-            const result = await loginWithMagicLink(formData)
-            if (result?.error) {
-                setError(result.error)
+            try {
+                const result = await loginWithMagicLink(formData)
+                if (result?.error) {
+                    setError(result.error)
+                }
+            } catch (e) {
+                setError("Une erreur inattendue est survenue.")
             }
         })
     }
@@ -94,8 +98,8 @@ function MagicLinkForm() {
                         name="email"
                         type="email"
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                        placeholder="nom@exemple.ci"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
+                        placeholder="nom@exemple.net"
                     />
                 </div>
             </div>
@@ -104,7 +108,7 @@ function MagicLinkForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
                 >
                     {isPending ? 'Envoi...' : 'Recevoir le lien'}
                 </button>
@@ -124,9 +128,13 @@ function PasswordLoginForm() {
     async function handleSubmit(formData: FormData) {
         setError(null)
         startTransition(async () => {
-            const result = await loginWithPassword(formData)
-            if (result?.error) {
-                setError(result.error)
+            try {
+                const result = await loginWithPassword(formData)
+                if (result?.error) {
+                    setError(result.error)
+                }
+            } catch (e) {
+                setError("Email ou mot de passe incorrect.")
             }
         })
     }
@@ -148,7 +156,7 @@ function PasswordLoginForm() {
                         name="email"
                         type="email"
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
                     />
                 </div>
             </div>
@@ -163,7 +171,7 @@ function PasswordLoginForm() {
                         name="password"
                         type="password"
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
                     />
                 </div>
             </div>
@@ -172,7 +180,7 @@ function PasswordLoginForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
                 >
                     {isPending ? 'Connexion...' : 'Se connecter'}
                 </button>

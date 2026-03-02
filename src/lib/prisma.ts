@@ -1,16 +1,20 @@
 import { PrismaClient } from "@prisma/client"
 import { PrismaLibSql } from "@prisma/adapter-libsql"
 
-console.log("[PRISMA DEBUG] Initializing with URL:", process.env.DATABASE_URL || "file:./dev.db");
+if (typeof window === "undefined") {
+    console.log("[PRISMA DEBUG] Initializing with URL:", process.env.DATABASE_URL || "file:./dev.db");
+}
 
 let adapter: any;
-try {
-    adapter = new PrismaLibSql({
-        url: process.env.DATABASE_URL || "file:./dev.db",
-    })
-    console.log("[PRISMA DEBUG] Adapter initialized successfully");
-} catch (e) {
-    console.error("[PRISMA DEBUG] Failed to initialize adapter:", e);
+if (typeof window === "undefined") {
+    try {
+        adapter = new PrismaLibSql({
+            url: process.env.DATABASE_URL || "file:./dev.db",
+        })
+        console.log("[PRISMA DEBUG] Adapter initialized successfully");
+    } catch (e) {
+        console.error("[PRISMA DEBUG] Failed to initialize adapter:", e);
+    }
 }
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }

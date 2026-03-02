@@ -4,12 +4,14 @@ import { prisma } from "@/lib/prisma"
 import Nodemailer from "next-auth/providers/nodemailer"
 import Credentials from "next-auth/providers/credentials"
 import { createTransport } from "nodemailer"
-import { Role } from "@prisma/client"
-import bcrypt from "bcryptjs"
+import type { Role } from "@prisma/client"
+// bcrypt is imported dynamically in authorize to avoid bundling it on the client
 
-console.log("[AUTH DEBUG] Starting NextAuth initialization...");
-if (!process.env.AUTH_SECRET) {
-    console.warn("⚠️ [AUTH DEBUG] AUTH_SECRET is missing! This will cause a crash in production.");
+if (typeof window === "undefined") {
+    console.log("[AUTH DEBUG] Starting NextAuth initialization...");
+    if (!process.env.AUTH_SECRET) {
+        console.warn("⚠️ [AUTH DEBUG] AUTH_SECRET is missing! This will cause a crash in production.");
+    }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -47,6 +49,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         return null;
                     }
 
+                    // Dynamic import of bcryptjs for server-only execution
+                    const bcrypt = await import("bcryptjs")
                     const isValid = await bcrypt.compare(credentials.password as string, user.password)
                     console.log("[AUTH DEBUG] Password valid:", isValid);
 
