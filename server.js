@@ -2,6 +2,14 @@
 const path = require('path');
 const fs = require('fs');
 
+// Charger les variables d'environnement depuis .env en production
+try {
+    require('dotenv').config();
+    console.log('[QAPRIL] Environment variables loaded from .env');
+} catch (e) {
+    console.warn('[QAPRIL] Could not load dotenv. Ensure variables are set in the environment.');
+}
+
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || 3000;
 
