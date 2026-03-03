@@ -1,17 +1,25 @@
 import { PrismaClient } from "@prisma/client"
 import { PrismaLibSql } from "@prisma/adapter-libsql"
+import { createClient } from "@libsql/client"
 
 if (typeof window === "undefined") {
     console.log("[PRISMA DEBUG] Initializing with URL:", process.env.DATABASE_URL || "file:./dev.db");
 }
 
-let adapter: any;
+let adapter: any = null;
 if (typeof window === "undefined") {
     try {
-        adapter = new PrismaLibSql({
-            url: process.env.DATABASE_URL || "file:./dev.db",
-        })
-        console.log("[PRISMA DEBUG] Adapter initialized successfully");
+        const url = process.env.DATABASE_URL || "file:./dev.db";
+        if (url.startsWith("libsql://") || url.startsWith("https://")) {
+            const libsql = createClient({
+                url,
+                authToken: process.env.DATABASE_AUTH_TOKEN
+            })
+            adapter = new PrismaLibSql(libsql)
+            console.log("[PRISMA DEBUG] LibSQL Adapter initialized successfully for remote database");
+        } else {
+            console.log("[PRISMA DEBUG] Using standard Prisma client for local SQLite");
+        }
     } catch (e) {
         console.error("[PRISMA DEBUG] Failed to initialize adapter:", e);
     }
