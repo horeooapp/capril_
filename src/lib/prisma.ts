@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { PrismaLibSql } from "@prisma/adapter-libsql"
+import { PrismaLibSQL } from "@prisma/adapter-libsql"
 import { createClient } from "@libsql/client"
 
 if (typeof window === "undefined") {
@@ -15,7 +15,7 @@ if (typeof window === "undefined") {
                 url,
                 authToken: process.env.DATABASE_AUTH_TOKEN
             })
-            adapter = new PrismaLibSql(libsql)
+            adapter = new PrismaLibSQL(libsql)
             console.log("[PRISMA DEBUG] LibSQL Adapter initialized successfully for remote database");
         } else {
             console.log("[PRISMA DEBUG] Using standard Prisma client for local SQLite");
@@ -28,6 +28,6 @@ if (typeof window === "undefined") {
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
 export const prisma =
-    globalForPrisma.prisma || new PrismaClient({ adapter })
+    globalForPrisma.prisma || (adapter ? new PrismaClient({ adapter }) : new PrismaClient())
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma

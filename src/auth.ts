@@ -11,14 +11,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         Nodemailer({
-            server: {
-                host: process.env.EMAIL_SERVER_HOST || "smtp.hostinger.com",
-                port: Number(process.env.EMAIL_SERVER_PORT) || 587,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-            },
+            server: process.env.EMAIL_SERVER,
             from: process.env.EMAIL_FROM || "noreply@qapril.net",
             async sendVerificationRequest({ identifier, url, provider }) {
                 console.log(`[AUTH DEBUG] Attempting to send magic link to: ${identifier}`);

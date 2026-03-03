@@ -1,12 +1,20 @@
 const { PrismaClient } = require('@prisma/client');
-const { PrismaLibSql } = require('@prisma/adapter-libsql');
+const { PrismaLibSQL } = require('@prisma/adapter-libsql');
+const { createClient } = require('@libsql/client');
 require('dotenv').config();
 
-const adapter = new PrismaLibSql({
-    url: process.env.DATABASE_URL || "file:./dev.db",
-});
+let adapter = null;
+const url = process.env.DATABASE_URL || "file:./dev.db";
 
-const prisma = new PrismaClient({ adapter });
+if (url.startsWith("libsql://") || url.startsWith("https://")) {
+    const libsql = createClient({
+        url,
+        authToken: process.env.DATABASE_AUTH_TOKEN
+    });
+    adapter = new PrismaLibSQL(libsql);
+}
+
+const prisma = adapter ? new PrismaClient({ adapter }) : new PrismaClient();
 
 async function testDb() {
     console.log('Testing Database connection and write access...');
