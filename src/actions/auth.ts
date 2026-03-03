@@ -14,8 +14,11 @@ export async function loginWithMagicLink(formData: FormData) {
         })
         return { success: true }
     } catch (error: any) {
-        console.error("Login magic link error:", error)
-        return { error: "Erreur d'authentification. Veuillez réessayer." }
+        console.error("DEBUG: Login magic link error full:", error)
+        if (error.type === "EmailSignin") {
+            return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP." }
+        }
+        return { error: `Erreur d'authentification: ${error.type || "Inconnue"}. Veuillez réessayer.` }
     }
 }
 

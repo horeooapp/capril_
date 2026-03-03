@@ -11,9 +11,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         Nodemailer({
-            server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
+            server: {
+                host: process.env.EMAIL_SERVER_HOST || "smtp.hostinger.com",
+                port: Number(process.env.EMAIL_SERVER_PORT) || 587,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            },
             from: process.env.EMAIL_FROM || "noreply@qapril.net",
-            // Options pour STARTTLS sur le port 587
+            async sendVerificationRequest({ identifier, url, provider }) {
+                console.log(`[AUTH DEBUG] Attempting to send magic link to: ${identifier}`);
+                console.log(`[AUTH DEBUG] Magic Link URL: ${url}`);
+                const { host } = new URL(url);
+                try {
+                    const { createTransport } = await import("nodemailer");
+                    const transport = createTransport(provider.server);
+                    const result = await transport.sendMail({
+                        to: identifier,
+                        from: provider.from,
+                        subject: `Connexion à ${host}`,
+                        text: `Connectez-vous à ${host}\n${url}\n\n`,
+                        html: `<body>
+                            <p>Connectez-vous à <strong>${host}</strong></p>
+                            <p><a href="${url}">Cliquez ici pour vous connecter</a></p>
+                            <p>Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.</p>
+                        </body>`,
+                    });
+                    const failed = result.rejected.concat(result.pending).filter(Boolean);
+                    if (failed.length) {
+                        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
+                    }
+                    console.log(`[AUTH DEBUG] Magic link successfully sent to: ${identifier}`);
+                } catch (error) {
+                    console.error("[SMTP ERROR] Error in sendVerificationRequest:", error);
+                    throw error;
+                }
+            },
             normalizeIdentifier(identifier: string): string {
                 const [local, domain] = identifier.toLowerCase().trim().split("@")
                 if (domain === "gmail.com") return `${local.replace(/\./g, "")}@${domain}`
