@@ -13,6 +13,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Nodemailer({
             server: process.env.EMAIL_SERVER || "smtp://localhost:2525",
             from: process.env.EMAIL_FROM || "noreply@qapril.net",
+            // Options pour STARTTLS sur le port 587
+            normalizeIdentifier(identifier: string): string {
+                const [local, domain] = identifier.toLowerCase().trim().split("@")
+                if (domain === "gmail.com") return `${local.replace(/\./g, "")}@${domain}`
+                return identifier
+            }
         }),
         Credentials({
             name: "Credentials",
