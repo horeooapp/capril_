@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { loginWithMagicLink, loginWithPassword } from "@/actions/auth"
 
@@ -62,17 +63,24 @@ export default function LoginPage() {
 function MagicLinkForm() {
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
+    const router = useRouter()
 
     async function handleSubmit(formData: FormData) {
         setError(null)
+        console.log("Form submitted. Starting transition...");
         startTransition(async () => {
+            console.log("Inside transition, calling loginWithMagicLink...");
             try {
                 const result = await loginWithMagicLink(formData)
+                console.log("Received result from loginWithMagicLink:", result);
                 if (result?.error) {
                     setError(result.error)
                 } else if (result?.success) {
-                    // Si succès, on laisse la page verify-request s'afficher via redirectTo ou on redirige
-                    window.location.href = "/verify-request"
+                    // Si succès, rediriger via le routeur Next.js
+                    console.log("Success! Redirecting...");
+                    router.push("/verify-request")
+                } else {
+                    console.log("No error or success in result:", result);
                 }
             } catch (e) {
                 console.error("Login unexpected error:", e)
