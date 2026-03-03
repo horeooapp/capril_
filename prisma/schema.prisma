@@ -181,9 +181,21 @@ model AuditLog {
 }
 
 enum LeaseStatus {
+  // Existing statuses
+  PENDING
   ACTIVE
   TERMINATED
-  PENDING
+  
+  // New unpaid rent workflow statuses
+  LOYER_IMPAYE
+  MISE_EN_DEMEURE
+  DELAI_LEGAL
+  CLEMENCE_EN_COURS
+  REPRISE_PROCEDURE
+  DEMANDE_RESILIATION
+  EN_CONTENTIEUX
+  RESILIE_AMIABLEMENT
+  RESILIE_JUDICIAIREMENT
 }
 
 model Lease {
@@ -206,14 +218,54 @@ model Lease {
 
   status LeaseStatus @default(ACTIVE)
 
-  receipts Receipt[]
-  escrow   Escrow?
-  insurance Insurance?
-  cdcDeposit CDCDeposit?
-  mediation Mediation?
+  receipts       Receipt[]
+  escrow         Escrow?
+  insurance      Insurance?
+  cdcDeposit     CDCDeposit?
+  mediation      Mediation?
+  repaymentPlans RepaymentPlan[]
+  procedurePhases ProcedurePhase[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum PlanStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  RESPECTED
+  BROKEN
+}
+
+model RepaymentPlan {
+  id              String      @id @default(cuid())
+  leaseId         String
+  lease           Lease       @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  
+  details         String      // Description de l'échéancier (JSON pour les dates/montants)
+  status          PlanStatus  @default(PROPOSED)
+  
+  // Signatures électroniques (Hash + Date)
+  ownerSignature  String?
+  tenantSignature String?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model ProcedurePhase {
+  id          String   @id @default(cuid())
+  leaseId     String
+  lease       Lease    @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  phaseNumber Int      // Ex: 1 à 10 comme décrit dans l'addendum
+  name        String   // Nom de la phase
+  description String?  // Détails additionnels
+  
+  createdAt   DateTime @default(now())
+  
+  // Association optionnelle avec un document ou preuve
+  proofHash   String?
 }
 
 enum PaymentMethod {
