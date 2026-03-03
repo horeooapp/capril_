@@ -8,6 +8,7 @@ import * as bcrypt from "bcrypt-ts"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    debug: true, // Enable debug logs to catch the AdapterError source
     adapter: PrismaAdapter(prisma),
     providers: [
         Nodemailer({
