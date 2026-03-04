@@ -1,16 +1,39 @@
-const { prisma } = require('./src/lib/prisma');
+require('dotenv').config();
+const { PrismaClient } = require('@prisma/client');
+const { PrismaAdapter } = require('@auth/prisma-adapter');
 
-async function checkAdapter() {
+async function testAdapter() {
     try {
-        console.log("Checking if Prisma can connect correctly...");
-        // This is essentially what NextAuth PrismaAdapter attempts when finding a user
-        const testUser = await prisma.user.findFirst();
-        console.log("Test user response:", testUser ? "Found" : "Not Found");
+        console.log("Initializing PrismaClient...");
+        const prisma = new PrismaClient();
+        const adapter = PrismaAdapter(prisma);
+
+        console.log("1. Simulating getUserByEmail...");
+        const user = await adapter.getUserByEmail("noreply@qapril.net");
+        console.log("User:", user);
+
+        console.log("2. Simulating createVerificationToken...");
+        const token = await adapter.createVerificationToken({
+            identifier: "noreply@qapril.net",
+            token: "adapter-token-" + Date.now(),
+            expires: new Date(Date.now() + 1000 * 60 * 60)
+        });
+
+        console.log("✅ Token successfully created:", token);
+
+        await prisma.verificationToken.delete({
+            where: {
+                identifier_token: {
+                    identifier: "noreply@qapril.net",
+                    token: token.token
+                }
+            }
+        });
+        console.log("✅ Token deleted.");
     } catch (e) {
-        console.error("Prisma Connection Error:", e);
-    } finally {
-        await prisma.$disconnect();
+        console.error("❌ Adapter Error Trace:");
+        console.error(e);
     }
 }
 
-checkAdapter();
+testAdapter();

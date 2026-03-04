@@ -1,6 +1,7 @@
 "use server"
 
 import { signIn, signOut } from "@/auth"
+import { prisma } from "@/lib/prisma"
 
 export async function loginWithMagicLink(formData: FormData) {
     const email = formData.get("email") as string
@@ -9,7 +10,15 @@ export async function loginWithMagicLink(formData: FormData) {
     if (!email) return { error: "L'adresse email est requise" }
 
     try {
-        console.log("[SERVER ACTION] Calling NextAuth signIn...");
+        // Preflight check: Verify database connection inside Next.js before hitting NextAuth
+        try {
+            console.log("[SERVER ACTION] Validating local database connection...");
+            const testUser = await prisma.user.findFirst();
+            console.log("[SERVER ACTION] DB Connection OK. User count test passed.");
+        } catch (dbError) {
+            console.error("[SERVER ACTION] CRITICAL DB ERROR before NextAuth:", dbError);
+            return { error: `La base de données est inaccessible ou désynchronisée: ${dbError instanceof Error ? dbError.message : "Erreur inconnue"}` };
+        }
 
         // Timeout de 30 secondes pour éviter le blocage de l'interface en cas de lenteur SMTP
         const timeoutPromise = new Promise((_, reject) => {
