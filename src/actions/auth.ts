@@ -21,17 +21,32 @@ export async function loginWithMagicLink(formData: FormData) {
             redirect: false,
         });
 
-        await Promise.race([signInPromise, timeoutPromise]);
+        const signInResult = await Promise.race([signInPromise, timeoutPromise]) as any;
 
-        console.log("[SERVER ACTION] NextAuth signIn returned successfully.");
+        console.log("[SERVER ACTION] NextAuth signIn returned:", signInResult);
+
+        // If redirect: false is passed, Auth.js might return an object instead of throwing
+        if (signInResult && signInResult.error) {
+            console.error("[SERVER ACTION] NextAuth returned internal error:", signInResult.error);
+            return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP (Mot de passe incorrect)." }
+        }
+
         return { success: true }
     } catch (error: any) {
         console.error("[SERVER ACTION] DEBUG: Login magic link error full:", error)
+
+        // Auth.js throw a RedirectError on success when using server-side signIn. 
+        // If it's a known Next.js redirect error, we should actually treat it as success!
+        if (error.message && error.message.includes("NEXT_REDIRECT")) {
+            console.log("[SERVER ACTION] Caught NEXT_REDIRECT, treating as success.");
+            return { success: true };
+        }
+
         if (error.message === "TIMEOUT_SMTP") {
             return { error: "Le serveur d'e-mail met trop de temps à répondre. Vérifiez la configuration SMTP." }
         }
-        if (error.type === "EmailSignin" || error.message?.includes("EmailSignin")) {
-            return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP." }
+        if (error.type === "EmailSignin" || error.message?.includes("EmailSignin") || error.message?.includes("Invalid login")) {
+            return { error: "Erreur d'authentification SMTP (Login/Mot de passe Hostinger refusé)." }
         }
         return { error: `Erreur d'authentification: ${error.type || error.message || "Inconnue"}. Veuillez réessayer.` }
     }
