@@ -27,7 +27,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const { host } = new URL(url);
                 try {
                     const { createTransport } = await import("nodemailer");
-                    const transport = createTransport(provider.server);
+
+                    // Ajout du paramètre TLS pour éviter les erreurs de certificat avec Hostinger
+                    let smtpConfig = provider.server as string;
+                    if (typeof smtpConfig === 'string' && !smtpConfig.includes("tls.rejectUnauthorized")) {
+                        smtpConfig += smtpConfig.includes("?") ? "&tls.rejectUnauthorized=false" : "?tls.rejectUnauthorized=false";
+                    }
+
+                    const transport = createTransport(smtpConfig);
                     const result = await transport.sendMail({
                         to: identifier,
                         from: provider.from,

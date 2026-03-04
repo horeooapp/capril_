@@ -36,9 +36,14 @@ export async function loginWithMagicLink(formData: FormData) {
         console.error("[SERVER ACTION] DEBUG: Login magic link error full:", error)
 
         // Auth.js throw a RedirectError on success when using server-side signIn. 
-        // If it's a known Next.js redirect error, we should actually treat it as success!
+        // If it's a known Next.js redirect error, we check its digest to see if it redirects to an error page.
         if (error.message && error.message.includes("NEXT_REDIRECT")) {
-            console.log("[SERVER ACTION] Caught NEXT_REDIRECT, treating as success.");
+            const digest = error.digest || "";
+            console.log("[SERVER ACTION] Caught NEXT_REDIRECT. Digest:", digest);
+            if (digest.includes("error=")) {
+                console.error("[SERVER ACTION] Redirect points to an error page.");
+                return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP ou vos identifiants." };
+            }
             return { success: true };
         }
 
