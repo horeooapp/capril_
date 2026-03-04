@@ -27,8 +27,21 @@ if (typeof window === "undefined") {
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
+// Ensure the local SQLite path is resolved as an absolute path based on the project root.
+// Next.js can sometimes shift the working directory of the process to `.next/server`, breaking relative URLs.
+let finalUrl = process.env.DATABASE_URL;
+if (finalUrl && finalUrl.startsWith("file:")) {
+    const fsPath = finalUrl.replace("file:", "");
+    // Use path.resolve against process.cwd() (which stays as the project root in Next.js)
+    finalUrl = "file:" + require("path").resolve(process.cwd(), fsPath);
+}
+
 export const prisma =
     globalForPrisma.prisma ||
-    (adapter ? new PrismaClient({ adapter }) : new PrismaClient())
+    (adapter ? new PrismaClient({ adapter }) : new PrismaClient({
+        datasources: {
+            db: { url: finalUrl }
+        }
+    }))
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
