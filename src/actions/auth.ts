@@ -11,9 +11,9 @@ export async function loginWithMagicLink(formData: FormData) {
     try {
         console.log("[SERVER ACTION] Calling NextAuth signIn...");
 
-        // Timeout de 10 secondes pour éviter le blocage de l'interface
+        // Timeout de 30 secondes pour éviter le blocage de l'interface en cas de lenteur SMTP
         const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error("TIMEOUT_SMTP")), 10000);
+            setTimeout(() => reject(new Error("TIMEOUT_SMTP")), 30000);
         });
 
         const signInPromise = signIn("nodemailer", {

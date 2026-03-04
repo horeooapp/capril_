@@ -28,13 +28,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 try {
                     const { createTransport } = await import("nodemailer");
 
-                    // Ajout du paramètre TLS pour éviter les erreurs de certificat avec Hostinger
-                    let smtpConfig = provider.server as string;
-                    if (typeof smtpConfig === 'string' && !smtpConfig.includes("tls.rejectUnauthorized")) {
-                        smtpConfig += smtpConfig.includes("?") ? "&tls.rejectUnauthorized=false" : "?tls.rejectUnauthorized=false";
+                    // Parcours de l'URL pour garantir une configuration stricte (comme test-smtp.js)
+                    let smtpOptions: any = provider.server;
+                    if (typeof smtpOptions === 'string') {
+                        const urlObj = new URL(smtpOptions);
+                        smtpOptions = {
+                            host: urlObj.hostname,
+                            port: urlObj.port ? parseInt(urlObj.port) : 587,
+                            secure: urlObj.port === '465', // false pour 587 (STARTTLS)
+                            auth: {
+                                user: decodeURIComponent(urlObj.username),
+                                pass: decodeURIComponent(urlObj.password)
+                            },
+                            tls: {
+                                rejectUnauthorized: false
+                            }
+                        };
                     }
 
-                    const transport = createTransport(smtpConfig);
+                    const transport = createTransport(smtpOptions);
                     const result = await transport.sendMail({
                         to: identifier,
                         from: provider.from,
@@ -46,7 +58,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             <p>Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.</p>
                         </body>`,
                     });
-                    const failed = result.rejected.concat(result.pending).filter(Boolean);
+                    const pending = (result as any).pending || [];
+                    const failed = result.rejected.concat(pending).filter(Boolean);
                     if (failed.length) {
                         throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
                     }
