@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import Nodemailer from "next-auth/providers/nodemailer"
+import Resend from "next-auth/providers/resend"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "./auth.config"
 import * as bcrypt from "bcrypt-ts"
@@ -11,45 +11,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     debug: true, // Enable debug logs to catch the AdapterError source
     adapter: PrismaAdapter(prisma),
     providers: [
-        Nodemailer({
-            server: process.env.EMAIL_SERVER || {
-                host: "localhost",
-                port: 1025,
-                auth: {
-                    user: "test",
-                    pass: "test",
-                },
-            },
-            from: process.env.EMAIL_FROM || "noreply@qapril.net",
+        Resend({
+            from: process.env.EMAIL_FROM || "onboarding@resend.dev",
             async sendVerificationRequest({ identifier, url, provider }) {
-                console.log(`[AUTH DEBUG] Attempting to send magic link to: ${identifier}`);
+                console.log(`[AUTH DEBUG] Attempting to send magic link via Resend to: ${identifier}`);
                 console.log(`[AUTH DEBUG] Magic Link URL: ${url}`);
                 const { host } = new URL(url);
                 try {
-                    const { createTransport } = await import("nodemailer");
+                    const { Resend: ResendClient } = await import("resend");
+                    const resend = new ResendClient(process.env.AUTH_RESEND_KEY);
 
-                    // Parcours de l'URL pour garantir une configuration stricte (comme test-smtp.js)
-                    let smtpOptions: any = provider.server;
-                    if (typeof smtpOptions === 'string') {
-                        const urlObj = new URL(smtpOptions);
-                        smtpOptions = {
-                            host: urlObj.hostname,
-                            port: urlObj.port ? parseInt(urlObj.port) : 587,
-                            secure: urlObj.port === '465', // false pour 587 (STARTTLS)
-                            auth: {
-                                user: decodeURIComponent(urlObj.username),
-                                pass: decodeURIComponent(urlObj.password)
-                            },
-                            tls: {
-                                rejectUnauthorized: false
-                            }
-                        };
-                    }
-
-                    const transport = createTransport(smtpOptions);
-                    const result = await transport.sendMail({
+                    const result = await resend.emails.send({
                         to: identifier,
-                        from: provider.from,
+                        from: provider.from as string,
                         subject: `Connexion à ${host}`,
                         text: `Connectez-vous à ${host}\n${url}\n\nSi vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.`,
                         html: `<!DOCTYPE html>
@@ -80,14 +54,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 </body>
 </html>`,
                     });
-                    const pending = (result as any).pending || [];
-                    const failed = result.rejected.concat(pending).filter(Boolean);
-                    if (failed.length) {
-                        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
+
+                    if (result.error) {
+                        throw new Error(result.error.message);
                     }
-                    console.log(`[AUTH DEBUG] Magic link successfully sent to: ${identifier}`);
+                    console.log(`[AUTH DEBUG] Magic link successfully sent to: ${identifier} (Resend ID: ${result.data?.id})`);
                 } catch (error) {
-                    console.error("[SMTP ERROR] Error in sendVerificationRequest:", error);
+                    console.error("[RESEND ERROR] Error in sendVerificationRequest:", error);
                     throw error;
                 }
             },

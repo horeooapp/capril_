@@ -25,7 +25,7 @@ export async function loginWithMagicLink(formData: FormData) {
             setTimeout(() => reject(new Error("TIMEOUT_SMTP")), 30000);
         });
 
-        const signInPromise = signIn("nodemailer", {
+        const signInPromise = signIn("resend", {
             email,
             redirect: false,
         });
