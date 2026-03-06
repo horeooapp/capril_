@@ -4,6 +4,11 @@ import { authConfig } from "./auth.config"
 export const { auth: middleware } = NextAuth(authConfig)
 
 export const config = {
-    // Protect all routes under /dashboard and /locataire
-    matcher: ["/dashboard/:path*", "/locataire/:path*"]
+    // Protect all routes under /dashboard, /locataire and /admin
+    matcher: [
+        "/dashboard/:path*", 
+        "/locataire/:path*", 
+        "/admin/:path*",
+        "/onboarding/:path*"
+    ]
 }
