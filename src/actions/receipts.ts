@@ -54,7 +54,10 @@ export async function createReceipt(data: {
     // Verify lease exists and is accessible
     const lease = await prisma.lease.findUnique({
         where: { id: data.leaseId },
-        include: { property: true }
+        include: { 
+            property: true,
+            tenant: true
+        }
     })
 
     if (!lease || (lease.property.ownerId !== userId && lease.property.managerId !== userId)) {
@@ -99,12 +102,11 @@ export async function createReceipt(data: {
     await scoreRentPayment(lease.tenantId, diffDays, receipt.id)
 
     // Envoi de l'e-mail de notification au locataire
-    const nodemailer = await import("nodemailer")
-
-    if (process.env.EMAIL_SERVER) {
+    if (process.env.EMAIL_SERVER && process.env.EMAIL_FROM) {
         try {
+            const nodemailer = await import("nodemailer")
             const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER)
-            // @ts-ignore
+            
             const tenantEmail = lease.tenant?.email
 
             if (tenantEmail) {
