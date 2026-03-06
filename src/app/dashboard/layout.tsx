@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
+import ProtectedLogo from "@/components/ProtectedLogo"
 
 export default async function DashboardLayout({
     children,
@@ -31,14 +32,11 @@ export default async function DashboardLayout({
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
                             <Link href="/dashboard" className="flex items-center space-x-4 group">
-                                <div className="logo-container" onContextMenu={(e) => e.preventDefault()}>
-                                    <img 
-                                        src="/logo.png" 
-                                        alt="QAPRIL Logo" 
-                                        className="h-16 w-auto border border-white/20 rounded shadow-sm group-hover:scale-105 transition-transform logo-shield" 
-                                        draggable="false"
-                                    />
-                                </div>
+                                <ProtectedLogo 
+                                    src="/logo.png" 
+                                    alt="QAPRIL Logo" 
+                                    className="h-16 w-auto border border-white/20 rounded shadow-sm group-hover:scale-105 transition-transform" 
+                                />
                                 <span className="font-bold text-2xl">QAPRIL <span className="text-sm font-normal text-orange-200">| Portail Gestionnaire</span></span>
                             </Link>
                         </div>
