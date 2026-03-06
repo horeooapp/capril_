@@ -18,14 +18,22 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-transparent flex flex-col relative overflow-hidden">
+            <div className="bg-ivory-pattern"></div>
             {/* Navbar Admin */}
             <header className="bg-gray-900 border-b border-gray-800 shadow-sm sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
                             <Link href="/admin" className="flex items-center space-x-4 group">
-                                <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto border border-gray-700 rounded shadow-sm group-hover:scale-105 transition-transform" />
+                                <div className="logo-container" onContextMenu={(e) => e.preventDefault()}>
+                                    <img 
+                                        src="/logo.png" 
+                                        alt="QAPRIL Logo" 
+                                        className="h-16 w-auto border border-gray-700 rounded shadow-sm group-hover:scale-105 transition-transform logo-shield" 
+                                        draggable="false"
+                                    />
+                                </div>
                                 <span className="font-bold text-2xl text-white">QAPRIL <span className="text-sm font-normal text-gray-400">| Administration Centrale</span></span>
                             </Link>
                         </div>

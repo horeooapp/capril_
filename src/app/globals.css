@@ -34,4 +34,43 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+}
+
+.bg-ivory-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-image: url('/assets/bg-qapril-immobilier.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(10px) brightness(1.1);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.logo-shield {
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.logo-container {
+  position: relative;
+  display: inline-block;
+}
+
+.logo-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: transparent;
 }
