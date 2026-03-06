@@ -18,17 +18,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const urlObj = new URL(url);
                 const host = urlObj.host;
                 
-                // Détecter si on est en localhost ou non pour le protocole
+                // Détection robuste du protocole
                 const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
                 const protocol = isLocal ? 'http' : 'https';
                 const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
                 
-                // On utilise l'URL fournie par NextAuth mais on s'assure que le domaine est correct
-                const finalNextAuthUrl = new URL(url);
-                finalNextAuthUrl.protocol = protocol;
-                finalNextAuthUrl.host = host;
-
-                const robustNextAuthUrl = finalNextAuthUrl.toString();
+                // EXTRACTION EXPLICITE DES PARAMÈTRES (Solution précédemment trouvée)
+                const params = urlObj.searchParams;
+                const token = params.get("token");
+                const email = params.get("email");
+                
+                // Reconstruction propre de l'URL callback
+                // Note: Auth.js v5 beta.30 avec le provider Resend utilise /api/auth/callback/resend
+                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/resend?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
+                
                 const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
 
                 try {
