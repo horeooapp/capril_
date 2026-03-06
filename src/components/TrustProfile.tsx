@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { getUserTrustData } from "@/actions/users"
 import { notFound } from "next/navigation"
 
