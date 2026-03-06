@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
+import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import MobileMenu from "@/components/MobileMenu"
 
@@ -20,6 +21,7 @@ export default async function LocataireLayout({
     }
 
     const navLinks = [
+        { href: "/", label: "Accueil", icon: "🏠" },
         { href: "/locataire", label: "Mes Quittances", icon: "📜" },
         { href: "/locataire/leases", label: "Mes Contrats", icon: "📋" },
         { href: "/locataire/trust", label: "Indice de Confiance", icon: "⭐" },
@@ -62,6 +64,7 @@ export default async function LocataireLayout({
                             <MobileMenu links={navLinks} session={session} variant="light" />
 
                             <div className="hidden md:flex items-center space-x-4">
+                                <NotificationCenter />
                                 <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{session.user.email}</span>
                                 <form action={async () => {
                                     "use server"

@@ -7,6 +7,7 @@ import { validateLeaseFinancials } from "@/lib/validation"
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
 import { createEscrow } from "./escrow"
+import { createNotification } from "./notifications"
 
 export async function createLease(data: {
     propertyId: string,
@@ -115,7 +116,9 @@ export async function getLeaseById(id: string) {
             escrow: true,
             insurance: { include: { claims: true } },
             cdcDeposit: true,
-            mediation: { include: { messages: true } }
+            mediation: { include: { messages: true } },
+            procedurePhases: { orderBy: { createdAt: 'asc' } },
+            repaymentPlans: { orderBy: { createdAt: 'desc' }, take: 1 }
         }
     })
 }
@@ -250,11 +253,20 @@ export async function registerLease(formData: FormData) {
                 legalPlafonningMet,
                 officialLeaseNumber,
                 scanUrl,
-                status: "ACTIVE"
+                status: "PENDING"
             }
         })
 
-        // 7. Revalidation UI Cache
+        // --- 7. Notification au Locataire ---
+        await createNotification({
+            userId: tenant.id,
+            title: "Nouveau bail à signer",
+            message: `Un nouveau contrat de bail pour le bien "${lease.propertyId}" a été déposé par votre propriétaire. Veuillez le consulter et le signer.`,
+            type: "WARNING",
+            link: `/dashboard/leases/${lease.id}/signature`
+        })
+
+        // --- 8. Revalidation UI Cache
         const { revalidatePath } = await import("next/cache")
         revalidatePath("/dashboard/leases")
         revalidatePath("/dashboard/properties")
@@ -287,4 +299,72 @@ export async function getTenantLeases() {
         },
         orderBy: { startDate: 'desc' }
     })
+}
+
+export async function signLease(leaseId: string, signature: string) {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) throw new Error("Non autorisé")
+
+    const lease = await prisma.lease.findUnique({
+        where: { id: leaseId },
+        include: { property: true, tenant: true }
+    })
+
+    if (!lease) throw new Error("Bail introuvable")
+
+    const isTenant = lease.tenantId === userId
+    const isOwner = lease.property.ownerId === userId
+
+    if (!isTenant && !isOwner) throw new Error("Accès non autorisé pour signer ce bail")
+
+    const updateData: any = {
+        signedAt: new Date(),
+    }
+
+    if (isTenant) {
+        updateData.tenantSignature = signature
+    } else {
+        updateData.ownerSignature = signature
+    }
+
+    // Mise à jour de la signature spécifique
+    const updatedLease = await prisma.lease.update({
+        where: { id: leaseId },
+        data: updateData
+    })
+
+    // Si les deux signatures sont présentes, le bail devient ACTIVE
+    if (updatedLease.tenantSignature && updatedLease.ownerSignature) {
+        await prisma.lease.update({
+            where: { id: leaseId },
+            data: { status: "ACTIVE" }
+        })
+
+        // Notifier l'autre partie de la signature finale
+        const targetUserId = isTenant ? lease.property.ownerId : lease.tenantId
+        await createNotification({
+            userId: targetUserId,
+            title: "Bail Actif 📄",
+            message: `Le bail pour le bien "${lease.property.address}" est désormais actif suite à la signature des deux parties.`,
+            type: "SUCCESS",
+            link: `/dashboard/leases/${leaseId}`
+        })
+    } else {
+        // Notifier l'autre partie qu'une signature a été apposée
+        const targetUserId = isTenant ? lease.property.ownerId : lease.tenantId
+        await createNotification({
+            userId: targetUserId,
+            title: "Contrat Signé ✍️",
+            message: `Le ${isTenant ? 'locataire' : 'propriétaire'} a signé le contrat de bail. Votre signature est requise pour finaliser.`,
+            type: "INFO",
+            link: `/dashboard/leases/${leaseId}/signature`
+        })
+    }
+
+    const { revalidatePath } = await import("next/cache")
+    revalidatePath(`/dashboard/leases/${leaseId}`)
+    revalidatePath("/dashboard/leases")
+    return { success: true }
 }

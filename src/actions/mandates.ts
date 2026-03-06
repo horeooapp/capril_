@@ -141,3 +141,24 @@ export async function getMandatesByAgent() {
         orderBy: { createdAt: 'desc' }
     })
 }
+export async function getLandlordMandates() {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) return []
+
+    return await prisma.mandate.findMany({
+        where: {
+            property: {
+                ownerId: userId
+            }
+        },
+        include: {
+            property: true,
+            agent: {
+                select: { name: true, email: true, role: true }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+}

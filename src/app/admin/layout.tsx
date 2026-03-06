@@ -20,6 +20,7 @@ export default async function AdminLayout({
     }
 
     const navLinks = [
+        { href: "/", label: "Accueil", icon: "🏠" },
         { href: "/admin", label: "Vue Globale", icon: "🌍" },
         { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
         { href: "/admin/validation", label: "Validations Agences", icon: "🏢" },
