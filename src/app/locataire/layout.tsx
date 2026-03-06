@@ -30,8 +30,15 @@ export default async function LocataireLayout({
                             </Link>
                         </div>
 
-                        <nav className="hidden md:flex space-x-8">
-                            <Link href="/locataire" className="text-gray-900 border-b-2 border-primary px-1 py-2 text-sm font-medium">Mes Quittances</Link>
+                        <nav className="hidden md:flex space-x-6 items-center">
+                            <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors flex items-center group">
+                                <svg className="h-5 w-5 mr-1 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span>Accueil</span>
+                            </Link>
+                            <div className="h-4 w-px bg-gray-200"></div>
+                            <Link href="/locataire" className="text-gray-900 border-b-2 border-primary px-1 py-1.5 text-sm font-medium">Mes Quittances</Link>
                             <Link href="/dashboard/trust" className="text-gray-500 hover:text-gray-900 px-1 py-2 text-sm font-medium flex items-center">
                                 <span className="mr-1">⭐</span> Mon Indice de Confiance
                             </Link>
