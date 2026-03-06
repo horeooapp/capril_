@@ -13,6 +13,15 @@ export default async function DashboardLayout({
         redirect("/login")
     }
 
+    // Role-based redirection out of dashboard
+    if (session.user.role === "TENANT") {
+        redirect("/locataire")
+    }
+
+    if (session.user.role === "ADMIN") {
+        redirect("/admin")
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col">
             {/* Navbar Dashboard */}

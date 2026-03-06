@@ -130,6 +130,8 @@ function MagicLinkForm() {
 
             <p className="text-xs text-center text-gray-500 mt-4">
                 Un lien de connexion sécurisé vous sera envoyé par e-mail.
+                <br />
+                <span className="italic mt-1 block">Le système détectera automatiquement si vous êtes Locataire, Propriétaire ou Administrateur et vous dirigera vers le bon portail.</span>
             </p>
         </form>
     )
@@ -199,6 +201,10 @@ function PasswordLoginForm() {
                     {isPending ? 'Connexion...' : 'Se connecter'}
                 </button>
             </div>
+
+            <p className="text-xs text-center text-gray-500 mt-4 italic">
+                Le système détectera automatiquement votre profil et vous dirigera vers le bon portail.
+            </p>
         </form>
     )
 }
