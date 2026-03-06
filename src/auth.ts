@@ -11,81 +11,81 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     debug: true, // Enable debug logs to catch the AdapterError source
     adapter: PrismaAdapter(prisma),
     providers: [
-        ...(process.env.EMAIL_SERVER ? [
-            Nodemailer({
-                server: process.env.EMAIL_SERVER,
-                from: process.env.EMAIL_FROM || "noreply@qapril.net",
-                async sendVerificationRequest({ identifier, url, provider }) {
-                    console.log(`[AUTH DEBUG] Original NextAuth URL: ${url}`);
-                    const { host, searchParams } = new URL(url);
-                    const baseUrl = process.env.NEXTAUTH_URL || `https://${host}`;
+        Nodemailer({
+            server: process.env.EMAIL_SERVER || "smtp://localhost:25",
+            from: process.env.EMAIL_FROM || "noreply@qapril.net",
+            async sendVerificationRequest({ identifier, url, provider }) {
+                const isProduction = process.env.NODE_ENV === "production";
+                const { host, searchParams } = new URL(url);
+                const baseUrl = process.env.NEXTAUTH_URL || (isProduction ? `https://${host}` : `http://${host}`);
+                
+                console.log(`[AUTH] Attempting verification for: ${identifier}`);
+                console.log(`[AUTH] NextAuth provided URL: ${url}`);
+                console.log(`[AUTH] Determined Base URL: ${baseUrl}`);
 
-                    // Extraire les paramètres critiques de l'URL générée par NextAuth
+                try {
                     const token = searchParams.get("token");
                     const email = searchParams.get("email");
 
-                    // Reconstruire l'URL NextAuth de manière explicite
+                    // Reconstruct a robust URL
                     const robustNextAuthUrl = `${baseUrl}/api/auth/callback/nodemailer?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
-
-                    // Transmettre cette URL robuste à notre page de vérification intermédiaire
                     const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
-                    console.log(`[AUTH DEBUG] Intermediary Magic Link URL to be emailed: ${intermediaryUrl}`);
 
-                    try {
-                        const { createTransport } = await import("nodemailer");
-                        
-                        // Configuration spécifique pour le SMTP
-                        let smtpOptions: any = provider.server;
-                        if (typeof smtpOptions === 'string') {
-                             const urlObj = new URL(smtpOptions);
-                             smtpOptions = {
-                                 host: urlObj.hostname,
-                                 port: urlObj.port ? parseInt(urlObj.port) : 587,
-                                 secure: urlObj.port === '465',
-                                 auth: {
-                                     user: decodeURIComponent(urlObj.username),
-                                     pass: decodeURIComponent(urlObj.password)
-                                 },
-                                 tls: { rejectUnauthorized: false }
-                             };
+                    console.log(`[AUTH] Robust URL constructed: ${robustNextAuthUrl}`);
+                    console.log(`[AUTH] Intermediary Link: ${intermediaryUrl}`);
+
+                    const { createTransport } = await import("nodemailer");
+                    
+                    let smtpOptions: any = provider.server;
+                    // Hostinger specific parsing if string
+                    if (typeof smtpOptions === 'string' && smtpOptions.startsWith("smtp")) {
+                        try {
+                            const urlObj = new URL(smtpOptions);
+                            smtpOptions = {
+                                host: urlObj.hostname,
+                                port: urlObj.port ? parseInt(urlObj.port) : 587,
+                                secure: urlObj.port === '465',
+                                auth: {
+                                    user: decodeURIComponent(urlObj.username),
+                                    pass: decodeURIComponent(urlObj.password)
+                                },
+                                tls: { rejectUnauthorized: false }
+                            };
+                            console.log(`[AUTH] SMTP Configured for ${smtpOptions.host}:${smtpOptions.port} (SSL: ${smtpOptions.secure})`);
+                        } catch (e) {
+                            console.error("[AUTH] Error parsing SMTP URL:", e);
                         }
-
-                        if (!smtpOptions) return;
-
-                        const transport = createTransport(smtpOptions);
-                        const result = await transport.sendMail({
-                            to: identifier,
-                            from: provider.from as string,
-                            subject: `Connexion à QAPRIL`,
-                            text: `Connectez-vous à QAPRIL\nCliquez sur ce lien sécurisé: ${intermediaryUrl}`,
-                            html: `<!DOCTYPE html>
-<html lang="fr">
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <h2 style="color: #FF8200; text-align: center;">Connexion à QAPRIL</h2>
-    <p style="color: #555555; text-align: center; font-size: 16px;">
-      Cliquez sur le bouton ci-dessous pour accéder à la vérification sécurisée.
-    </p>
-    <div style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
-      <a href="${intermediaryUrl}" style="background-color: #FF8200; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; font-size: 16px; display: inline-block;">Continuer la Connexion</a>
-    </div>
-    <p style="color: #aaaaaa; text-align: center; font-size: 12px;">
-      Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.
-    </p>
-  </div>
-</body>
-</html>`,
-                        });
-                        console.log(`[AUTH DEBUG] Magic link successfully sent to: ${identifier} (MessageId: ${result.messageId})`);
-                    } catch (error) {
-                        console.error("[SMTP ERROR] Error in sendVerificationRequest:", error);
-                        throw error;
                     }
+
+                    if (!smtpOptions || (typeof smtpOptions === 'string' && !smtpOptions)) {
+                         console.warn("[AUTH] No valid SMTP options, skipping email.");
+                         return;
+                    }
+
+                    const transport = createTransport(smtpOptions);
+                    const result = await transport.sendMail({
+                        to: identifier,
+                        from: provider.from as string,
+                        subject: `Connexion à QAPRIL`,
+                        text: `Votre lien de connexion QAPRIL : ${intermediaryUrl}`,
+                        html: `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+                                <h1 style="color: #FF8200; text-align: center;">QAPRIL</h1>
+                                <p>Cliquez sur le bouton ci-dessous pour vous connecter à votre espace.</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <a href="${intermediaryUrl}" style="background-color: #FF8200; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Me connecter</a>
+                                </div>
+                                <p style="font-size: 12px; color: #888; text-align: center;">Si le bouton ne fonctionne pas, copiez ce lien : <br> ${intermediaryUrl}</p>
+                            </div>
+                        `
+                    });
+                    console.log(`[AUTH] SUCCESS: Email sent to ${identifier}. MessageID: ${result.messageId}`);
+                } catch (error) {
+                    console.error("[AUTH] CRITICAL ERROR in sendVerificationRequest:", error);
                 }
-            })
-        ] : []),
+            }
+        }),
         Credentials({
-            // ... credentials logic ...
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "email" },
@@ -112,7 +112,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         isCertified: user.isCertified
                     }
                 } catch (error) {
-                    console.error("[AUTH ERROR]", error);
+                    console.error("[AUTH ERROR CREDENTIALS]", error);
                     return null;
                 }
             }
