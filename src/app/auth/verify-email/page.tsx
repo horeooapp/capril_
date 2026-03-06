@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-function VerifyEmailContent({ searchParams }: { searchParams: { callback_url?: string } }) {
+async function VerifyEmailContent({ searchParams }: { searchParams: { callback_url?: string } }) {
     if (!searchParams.callback_url) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
@@ -14,7 +14,7 @@ function VerifyEmailContent({ searchParams }: { searchParams: { callback_url?: s
         );
     }
 
-    const authUrl = decodeURIComponent(searchParams.callback_url);
+    const authUrl = searchParams.callback_url;
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
@@ -25,14 +25,18 @@ function VerifyEmailContent({ searchParams }: { searchParams: { callback_url?: s
             <a href={authUrl} className="px-6 py-3 bg-blue-600 font-semibold text-white rounded shadow hover:bg-blue-700 transition">
                 Se connecter maintenant
             </a>
+            <p className="mt-4 text-xs text-gray-400 max-w-xs break-all">
+                Cible : {authUrl}
+            </p>
         </div>
     );
 }
 
-export default function VerifyEmailPage({ searchParams }: { searchParams: { callback_url?: string } }) {
+export default async function VerifyEmailPage(props: { searchParams: Promise<{ callback_url?: string }> }) {
+    const resolvedParams = await props.searchParams;
     return (
         <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Chargement...</div>}>
-            <VerifyEmailContent searchParams={searchParams} />
+            <VerifyEmailContent searchParams={resolvedParams} />
         </Suspense>
     );
 }

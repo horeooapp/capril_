@@ -15,14 +15,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             apiKey: process.env.AUTH_RESEND_KEY,
             from: process.env.EMAIL_FROM || "onboarding@resend.dev",
             async sendVerificationRequest({ identifier, url, provider }) {
-                const { host } = new URL(url);
-                const baseUrl = process.env.NEXTAUTH_URL || `https://${host}`;
+                const urlObj = new URL(url);
+                const host = urlObj.host;
                 
-                // Reconstruct robust URLs for the custom flow
-                const searchParams = new URL(url).searchParams;
-                const token = searchParams.get("token");
-                const email = searchParams.get("email");
-                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/resend?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
+                // Détecter si on est en localhost ou non pour le protocole
+                const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+                const protocol = isLocal ? 'http' : 'https';
+                const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
+                
+                // On utilise l'URL fournie par NextAuth mais on s'assure que le domaine est correct
+                const finalNextAuthUrl = new URL(url);
+                finalNextAuthUrl.protocol = protocol;
+                finalNextAuthUrl.host = host;
+
+                const robustNextAuthUrl = finalNextAuthUrl.toString();
                 const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
 
                 try {
