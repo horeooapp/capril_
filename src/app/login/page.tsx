@@ -6,6 +6,8 @@ import { useState, useTransition } from "react"
 import { loginWithMagicLink } from "@/actions/auth"
 
 export default function LoginPage() {
+    const [selectedRole, setSelectedRole] = useState<'TENANT' | 'LANDLORD'>('TENANT')
+
     return (
         <div className="min-h-screen bg-white flex">
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -20,13 +22,28 @@ export default function LoginPage() {
                         <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
                             Connexion
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-gray-600 mb-6">
                             Accédez à votre espace sécurisé via un lien magique.
                         </p>
+
+                        <div className="bg-gray-100 p-1 rounded-lg flex mb-6">
+                            <button
+                                onClick={() => setSelectedRole('TENANT')}
+                                className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-md transition-all ${selectedRole === 'TENANT' ? 'bg-white text-[#FF8200] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                <span className="mr-2">🏠</span> Locataire
+                            </button>
+                            <button
+                                onClick={() => setSelectedRole('LANDLORD')}
+                                className={`flex-1 flex items-center justify-center py-2 text-sm font-medium rounded-md transition-all ${selectedRole === 'LANDLORD' ? 'bg-white text-[#FF8200] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                <span className="mr-2">🔑</span> Propriétaire
+                            </button>
+                        </div>
                     </div>
 
                     <div className="mt-6 border-t pt-6">
-                        <MagicLinkForm />
+                        <MagicLinkForm role={selectedRole} />
                     </div>
                 </div>
             </div>
@@ -43,7 +60,7 @@ export default function LoginPage() {
     )
 }
 
-function MagicLinkForm() {
+function MagicLinkForm({ role }: { role: string }) {
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
@@ -74,6 +91,7 @@ function MagicLinkForm() {
 
     return (
         <form className="space-y-6" action={handleSubmit}>
+            <input type="hidden" name="role" value={role} />
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
                     {error}

@@ -5,16 +5,36 @@ import { prisma } from "@/lib/prisma"
 
 export async function loginWithMagicLink(formData: FormData) {
     const email = formData.get("email") as string
-    console.log("[SERVER ACTION] loginWithMagicLink called for email:", email);
+    const role = formData.get("role") as string // "TENANT" or "LANDLORD"
+    console.log("[SERVER ACTION] loginWithMagicLink called for email:", email, "with role:", role);
 
     if (!email) return { error: "L'adresse email est requise" }
 
     try {
         // Preflight check: Verify database connection inside Next.js before hitting NextAuth
         try {
-            console.log("[SERVER ACTION] Validating local database connection...");
-            const testUser = await prisma.user.findFirst();
-            console.log("[SERVER ACTION] DB Connection OK. User count test passed.");
+            console.log("[SERVER ACTION] Validating local database connection & preparing user role...");
+            
+            // On pré-crée l'utilisateur avec le rôle choisi s'il n'existe pas encore
+            // Cela permet à NextAuth de trouver l'utilisateur avec le bon rôle lors du premier login
+            if (role === "TENANT" || role === "LANDLORD") {
+                const existingUser = await prisma.user.findUnique({ where: { email } });
+                
+                if (!existingUser) {
+                    await prisma.user.create({
+                        data: {
+                            email,
+                            role: role as any,
+                            name: email.split('@')[0]
+                        }
+                    });
+                    console.log(`[SERVER ACTION] New user pre-created as ${role}`);
+                } else {
+                    console.log(`[SERVER ACTION] Existing user found (Role: ${existingUser.role}). Selection ${role} ignored to prevent role hijacking.`);
+                }
+            }
+            
+            console.log("[SERVER ACTION] DB Preparation OK.");
         } catch (dbError) {
             console.error("[SERVER ACTION] CRITICAL DB ERROR before NextAuth:", dbError);
             return { error: `La base de données est inaccessible ou désynchronisée: ${dbError instanceof Error ? dbError.message : "Erreur inconnue"}` };
