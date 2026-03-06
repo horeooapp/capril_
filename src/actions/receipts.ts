@@ -102,39 +102,59 @@ export async function createReceipt(data: {
     await scoreRentPayment(lease.tenantId, diffDays, receipt.id)
 
     // Envoi de l'e-mail de notification au locataire
-    if (process.env.EMAIL_SERVER && process.env.EMAIL_FROM) {
+    const resendKey = process.env.AUTH_RESEND_KEY
+    const tenantEmail = lease.tenant?.email
+
+    if (resendKey && tenantEmail) {
+        try {
+            const { Resend: ResendSDK } = await import("resend")
+            const resend = new ResendSDK(resendKey)
+            
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
+
+            await resend.emails.send({
+                from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+                to: tenantEmail,
+                subject: `QAPRIL - Quittance de loyer N° ${receiptNumber}`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #FF8200;">QAPRIL - Registre Locatif</h2>
+                        <p>Bonjour,</p>
+                        <p>Une nouvelle quittance de loyer est disponible pour le bien : <strong>${lease.property.name}</strong>.</p>
+                        <p>Période : <strong>${new Date(data.periodStart).toLocaleDateString('fr-FR')} - ${new Date(data.periodEnd).toLocaleDateString('fr-FR')}</strong></p>
+                        <div style="margin: 30px 0;">
+                            <a href="${appUrl}/receipts/${receipt.id}" style="background-color: #009E60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                                Télécharger ma quittance
+                            </a>
+                        </div>
+                    </div>
+                `
+            })
+            console.log(`[RECEIPT] Email sent via Resend to ${tenantEmail}`)
+        } catch (e) {
+            console.error("[RECEIPT ERROR] Resend failed:", e)
+        }
+    } else if (process.env.EMAIL_SERVER && process.env.EMAIL_FROM && tenantEmail) {
+        // Fallback to Nodemailer if SMTP is configured but Resend is not or fails
         try {
             const nodemailer = await import("nodemailer")
             const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER)
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
             
-            const tenantEmail = lease.tenant?.email
-
-            if (tenantEmail) {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
-                await transporter.sendMail({
-                    from: process.env.EMAIL_FROM || 'no-reply@qapril.net',
-                    to: tenantEmail,
-                    subject: `QAPRIL - Votre quittance de loyer N° ${receiptNumber} est disponible`,
-                    html: `
-             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-               <h2 style="color: #FF8200;">QAPRIL - Registre Locatif</h2>
-               <p>Bonjour,</p>
-               <p>Votre propriétaire a généré une nouvelle quittance de loyer pour le bien : <strong>${lease.property.name}</strong>.</p>
-               <p>Période couverte : <strong>${new Date(data.periodStart).toLocaleDateString('fr-FR')} - ${new Date(data.periodEnd).toLocaleDateString('fr-FR')}</strong></p>
-               <p>Montant : <strong>${data.amountPaid} FCFA</strong></p>
-               <div style="margin: 30px 0;">
-                 <a href="${appUrl}/receipts/${receipt.id}" style="background-color: #009E60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
-                   Voir et télécharger ma quittance
-                 </a>
-               </div>
-               <p style="font-size: 12px; color: #666;">Ce document est officiel et comporte un QR code de vérification garanti par la plateforme QAPRIL.</p>
-             </div>
-           `
-                })
-            }
+            await transporter.sendMail({
+                from: process.env.EMAIL_FROM,
+                to: tenantEmail,
+                subject: `QAPRIL - Votre quittance de loyer N° ${receiptNumber}`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #FF8200;">QAPRIL</h2>
+                        <p>Une nouvelle quittance est disponible.</p>
+                        <a href="${appUrl}/receipts/${receipt.id}" style="color: #FF8200; font-weight: bold;">Télécharger la quittance</a>
+                    </div>
+                `
+            })
         } catch (e) {
-            console.error("Erreur lors de l'envoi de l'email :", e)
-            // Ne pas échouer la création de quittance si l'e-mail échoue.
+            console.error("[RECEIPT ERROR] Nodemailer fallback failed:", e)
         }
     }
 
