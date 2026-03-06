@@ -268,3 +268,23 @@ export async function registerLease(formData: FormData) {
         return { error: error.message || "Erreur inconnue lors de l'enregistrement du bail" }
     }
 }
+
+export async function getTenantLeases() {
+    const session = await auth()
+    // @ts-ignore
+    const userId = session?.user?.id
+    if (!userId) throw new Error("Unauthorized")
+
+    return await prisma.lease.findMany({
+        where: { tenantId: userId },
+        include: {
+            property: true,
+            receipts: {
+                orderBy: { paymentDate: 'desc' },
+                take: 3
+            },
+            escrow: true
+        },
+        orderBy: { startDate: 'desc' }
+    })
+}

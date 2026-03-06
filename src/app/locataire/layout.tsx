@@ -45,6 +45,7 @@ export default async function LocataireLayout({
                             </Link>
                             <div className="h-4 w-px bg-gray-200"></div>
                             <Link href="/locataire" className="text-gray-900 border-b-2 border-primary px-1 py-1.5 text-sm font-medium">Mes Quittances</Link>
+                            <Link href="/locataire/leases" className="text-gray-500 hover:text-gray-900 px-1 py-1.5 text-sm font-medium transition-colors">Mes Contrats</Link>
                             <Link href="/locataire/trust" className="text-gray-500 hover:text-gray-900 px-1 py-2 text-sm font-medium flex items-center">
                                 <span className="mr-1">⭐</span> Mon Indice de Confiance
                             </Link>
