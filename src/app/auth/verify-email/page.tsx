@@ -22,9 +22,9 @@ function VerifyEmailContent({ searchParams }: { searchParams: { callback_url?: s
             <p className="text-gray-600 mb-6 max-w-md">
                 Vous avez demandé à vous connecter via un lien magique (Magic Link). Cliquez sur le bouton ci-dessous pour finaliser votre connexion de manière sécurisée.
             </p>
-            <Link href={authUrl} className="px-6 py-3 bg-blue-600 font-semibold text-white rounded shadow hover:bg-blue-700 transition">
+            <a href={authUrl} className="px-6 py-3 bg-blue-600 font-semibold text-white rounded shadow hover:bg-blue-700 transition">
                 Se connecter maintenant
-            </Link>
+            </a>
         </div>
     );
 }
