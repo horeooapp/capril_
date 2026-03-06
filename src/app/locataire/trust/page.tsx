@@ -1,5 +1,5 @@
 import TrustProfile from "@/components/TrustProfile"
 
-export default function TrustProfilePage() {
+export default function LocataireTrustPage() {
     return <TrustProfile />
 }
