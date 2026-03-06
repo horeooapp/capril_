@@ -15,9 +15,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             from: process.env.EMAIL_FROM || "onboarding@resend.dev",
             async sendVerificationRequest({ identifier, url, provider }) {
                 console.log(`[AUTH DEBUG] Original NextAuth URL: ${url}`);
-                const { host } = new URL(url);
+                const { host, searchParams } = new URL(url);
                 const baseUrl = process.env.NEXTAUTH_URL || `https://${host}`;
-                const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(url)}`;
+
+                // Extraire les paramètres critiques de l'URL générée par NextAuth
+                const token = searchParams.get("token");
+                const email = searchParams.get("email");
+
+                // Reconstruire l'URL NextAuth de manière explicite et robuste pour éviter les problèmes de domaine/protocole (Hostinger)
+                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/resend?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
+
+                // Transmettre cette URL robuste à notre page de vérification intermédiaire
+                const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
                 console.log(`[AUTH DEBUG] Intermediary Magic Link URL to be emailed: ${intermediaryUrl}`);
 
                 try {
