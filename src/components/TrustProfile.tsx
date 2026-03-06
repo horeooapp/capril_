@@ -2,10 +2,22 @@ import { getUserTrustData } from "@/actions/users"
 import { notFound } from "next/navigation"
 
 export default async function TrustProfile() {
+    const session = await auth()
     const data = await getUserTrustData()
 
     if (!data) {
-        notFound()
+        return (
+            <div className="max-w-4xl mx-auto py-20 px-4 text-center">
+                <h1 className="text-2xl font-bold text-gray-800">Profil de confiance non trouvé</h1>
+                <p className="mt-4 text-gray-500">
+                    Nous n'avons pas pu charger vos données de confiance. 
+                    Si le problème persiste, veuillez contacter le support.
+                </p>
+                <div className="mt-8 p-4 bg-gray-100 rounded text-xs text-gray-400">
+                    Debug info: ID {session?.user?.id || "Non connecté"}
+                </div>
+            </div>
+        )
     }
 
     const score = data.reliabilityScore
