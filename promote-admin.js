@@ -2,17 +2,18 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function promoteToAdmin(email) {
+  const defaultName = email.split('@')[0].split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
   try {
     const user = await prisma.user.upsert({
       where: { email: email },
       update: { role: 'ADMIN' },
       create: {
         email: email,
-        name: 'Achille Mbesso',
+        name: defaultName,
         role: 'ADMIN'
       }
     })
-    console.log(`Utilisateur ${email} promu au rôle ADMIN avec succès !`)
+    console.log(`Utilisateur ${email} (${user.name}) promu au rôle ADMIN avec succès !`)
   } catch (error) {
     console.error(`Erreur lors de la promotion de ${email}:`, error.message)
   } finally {
