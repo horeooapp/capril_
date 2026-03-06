@@ -3,11 +3,9 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
-import { loginWithMagicLink, loginWithPassword } from "@/actions/auth"
+import { loginWithMagicLink } from "@/actions/auth"
 
 export default function LoginPage() {
-    const [loginMode, setLoginMode] = useState<'magic-link' | 'password'>('magic-link')
-
     return (
         <div className="min-h-screen bg-white flex">
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -22,28 +20,13 @@ export default function LoginPage() {
                         <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
                             Connexion
                         </h2>
-                        <div className="mt-4 flex space-x-4 border-b">
-                            <button
-                                onClick={() => setLoginMode('magic-link')}
-                                className={`pb-2 text-sm font-medium ${loginMode === 'magic-link' ? 'border-b-2 border-[#FF8200] text-[#FF8200]' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                Lien Magique
-                            </button>
-                            <button
-                                onClick={() => setLoginMode('password')}
-                                className={`pb-2 text-sm font-medium ${loginMode === 'password' ? 'border-b-2 border-[#FF8200] text-[#FF8200]' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                Mot de passe (Admin)
-                            </button>
-                        </div>
+                        <p className="mt-2 text-sm text-gray-600">
+                            Accédez à votre espace sécurisé via un lien magique.
+                        </p>
                     </div>
 
-                    <div className="mt-6">
-                        {loginMode === 'magic-link' ? (
-                            <MagicLinkForm />
-                        ) : (
-                            <PasswordLoginForm />
-                        )}
+                    <div className="mt-6 border-t pt-6">
+                        <MagicLinkForm />
                     </div>
                 </div>
             </div>
@@ -132,78 +115,6 @@ function MagicLinkForm() {
                 Un lien de connexion sécurisé vous sera envoyé par e-mail.
                 <br />
                 <span className="italic mt-1 block">Le système détectera automatiquement si vous êtes Locataire, Propriétaire ou Administrateur et vous dirigera vers le bon portail.</span>
-            </p>
-        </form>
-    )
-}
-
-function PasswordLoginForm() {
-    const [isPending, startTransition] = useTransition()
-    const [error, setError] = useState<string | null>(null)
-
-    async function handleSubmit(formData: FormData) {
-        setError(null)
-        startTransition(async () => {
-            try {
-                const result = await loginWithPassword(formData)
-                if (result?.error) {
-                    setError(result.error)
-                }
-            } catch (e) {
-                setError("Email ou mot de passe incorrect.")
-            }
-        })
-    }
-
-    return (
-        <form className="space-y-6" action={handleSubmit}>
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
-                    {error}
-                </div>
-            )}
-            <div>
-                <label htmlFor="email-pwd" className="block text-sm font-medium text-gray-700">
-                    Adresse e-mail
-                </label>
-                <div className="mt-1">
-                    <input
-                        id="email-pwd"
-                        name="email"
-                        type="email"
-                        required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
-                    />
-                </div>
-            </div>
-
-            <div>
-                <label htmlFor="password" title="password" className="block text-sm font-medium text-gray-700">
-                    Mot de passe
-                </label>
-                <div className="mt-1">
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
-                    />
-                </div>
-            </div>
-
-            <div>
-                <button
-                    type="submit"
-                    disabled={isPending}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
-                >
-                    {isPending ? 'Connexion...' : 'Se connecter'}
-                </button>
-            </div>
-
-            <p className="text-xs text-center text-gray-500 mt-4 italic">
-                Le système détectera automatiquement votre profil et vous dirigera vers le bon portail.
             </p>
         </form>
     )
