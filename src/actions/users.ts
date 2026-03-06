@@ -3,6 +3,16 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
+export async function getCurrentUser() {
+    const session = await auth()
+    const userId = session?.user?.id
+    if (!userId) return null
+
+    return await prisma.user.findUnique({
+        where: { id: userId }
+    })
+}
+
 export async function getUserTrustData() {
     const session = await auth()
     // @ts-ignore
