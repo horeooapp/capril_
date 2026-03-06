@@ -78,40 +78,42 @@ export default async function TrustProfile() {
                     </div>
                 </div>
 
-                {/* Historique des événements */}
                 <div className="bg-white shadow rounded-2xl overflow-hidden border border-gray-100">
-                    <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                        <h2 className="font-bold text-gray-800">Historique de Confiance (Audit Log)</h2>
+                    <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+                        <h2 className="font-bold text-gray-800">Historique de Confiance</h2>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase md:hidden tracking-widest">Glissez pour voir →</span>
                     </div>
                     {data.trustEvents.length === 0 ? (
                         <div className="p-10 text-center text-gray-400 italic">
                             Aucun événement enregistré. Votre score initial est de 750.
                         </div>
                     ) : (
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="text-[10px] uppercase text-gray-400 font-bold tracking-widest border-b border-gray-50">
-                                    <th className="px-6 py-3">Date</th>
-                                    <th className="px-6 py-3">Événement</th>
-                                    <th className="px-6 py-3 text-right">Points</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {data.trustEvents.map((event) => (
-                                    <tr key={event.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
-                                        <td className="px-6 py-4 text-xs text-gray-500">
-                                            {new Date(event.createdAt).toLocaleDateString('fr-FR')}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-800">
-                                            {event.reason}
-                                        </td>
-                                        <td className={`px-6 py-4 text-sm font-bold text-right ${event.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {event.points > 0 ? `+${event.points}` : event.points}
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[500px] md:min-w-full">
+                                <thead>
+                                    <tr className="text-[10px] uppercase text-gray-400 font-bold tracking-widest border-b border-gray-50">
+                                        <th className="px-6 py-3">Date</th>
+                                        <th className="px-6 py-3">Événement</th>
+                                        <th className="px-6 py-3 text-right">Points</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {data.trustEvents.map((event) => (
+                                        <tr key={event.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
+                                            <td className="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                                                {new Date(event.createdAt).toLocaleDateString('fr-FR')}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                                                {event.reason}
+                                            </td>
+                                            <td className={`px-6 py-4 text-sm font-bold text-right whitespace-nowrap ${event.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {event.points > 0 ? `+${event.points}` : event.points}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
 
