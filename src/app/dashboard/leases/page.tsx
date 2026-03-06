@@ -18,9 +18,9 @@ export default async function LeasesPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Contrats Locatifs</h1>
-                <button className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors">
-                    + Nouveau Contrat
-                </button>
+                <Link href="/dashboard/leases/new" className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-center">
+                    + Enregistrer un Bail Physique
+                </Link>
             </div>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -38,9 +38,21 @@ export default async function LeasesPage() {
                             <li key={lease.id} className="hover:bg-gray-50 transition-colors">
                                 <Link href={`/dashboard/leases/${lease.id}`} className="block px-4 py-4 sm:px-6">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-primary truncate">
+                                        <p className="text-sm font-medium text-primary truncate flex items-center space-x-2">
+                                            <span>
                                             {/* @ts-ignore */}
                                             {lease.tenant?.name || lease.tenant?.email || "Locataire inconnu"}
+                                            </span>
+                                            {lease.officialLeaseNumber && (
+                                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                                  N° {lease.officialLeaseNumber}
+                                              </span>
+                                            )}
+                                            {lease.legalPlafonningMet === false && (
+                                                <span title="Dépassements des plafonds légaux" className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                    Non Conforme
+                                                </span>
+                                            )}
                                         </p>
                                         <div className="ml-2 flex-shrink-0 flex items-center space-x-2">
                                             {/* @ts-ignore */}

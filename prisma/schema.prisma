@@ -12,6 +12,11 @@ datasource db {
 }
 
 // --- Rôles ---
+enum UserType {
+  PERSON
+  COMPANY
+}
+
 enum Role {
   ADMIN
   LANDLORD
@@ -29,6 +34,12 @@ model User {
   emailVerified DateTime?
   image         String?
   phone         String?   @unique
+  userType      UserType  @default(PERSON)
+  companyName   String?
+  nationality   String?
+  profession    String?
+  cniNumber     String?   // Ou tout autre document d'identité
+  birthDate     DateTime?
   password      String?
   role          Role      @default(TENANT)
 
@@ -112,12 +123,15 @@ model Escrow {
 }
 
 model Property {
-  id         String  @id @default(cuid())
-  name       String? // Ex: "Appartement A1"
-  address    String
+  id           String  @id @default(cuid())
+  name         String? // Ex: "Appartement A1"
+  address      String
   city         String
   neighborhood String?
   postalCode   String?
+  lotNumber    String? // Numéro du lot
+  dependencies String? // Détail des dépendances
+  usage        String  @default("Habitation")
   country      String  @default("Côte d'Ivoire")
   type         String  @default("APARTMENT")
 
@@ -207,15 +221,27 @@ model Lease {
   tenantId String
   tenant   User   @relation("LeaseTenant", fields: [tenantId], references: [id])
 
-  startDate  DateTime
-  endDate    DateTime?
+  startDate   DateTime
+  endDate     DateTime?
+  renewalMode String?   @default("Tacite reconduction")
+  
+  // Nouveaux champs officiels pour le registre numérique
+  officialLeaseNumber String? @unique // Numéro unique figurant sur le contrat physique
+  scanUrl             String? // URL du document scanné ou PDF du contrat
+
   rentAmount Float // Loyer mensuel de base
+  paymentDueDate Int? @default(5) // Jour d'échéance du paiement (ex: le 5 du mois)
   charges    Float?    @default(0) // Charges locatives
-  deposit    Float? // Caution
+  deposit    Float? // Caution (max 2 mois)
   
   // Nouveaux champs financiers
-  advancePayment Float? @default(0) // Avance sur loyer
-  agencyFee      Float? @default(0) // Frais d'agence
+  advancePayment Float? @default(0) // Avance sur loyer (max 2 mois)
+  agencyFee      Float? @default(0) // Frais d'agence (max 1 mois)
+  legalPlafonningMet Boolean? @default(true) // Indicateur si le plafond légal est respecté
+
+  // Etat des lieux (textuel ou lien vers un document/JSON)
+  entryInventoryNotes String? 
+  exitInventoryNotes  String? 
 
   status LeaseStatus @default(ACTIVE)
 

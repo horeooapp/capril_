@@ -1,205 +1,169 @@
-import { prisma } from "@/lib/prisma"
-import QRCode from "qrcode"
+import { getReceiptById } from "@/actions/receipts"
 import { notFound } from "next/navigation"
-import PrintButton from "@/components/PrintButton"
+import { QRCodeSVG } from "qrcode.react"
 
-export default async function ReceiptDocumentPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id: receiptId } = await params
-    const receipt = await prisma.receipt.findUnique({
-        where: { id: receiptId },
-        include: {
-            lease: {
-                include: {
-                    property: {
-                        include: { owner: true }
-                    },
-                    tenant: true
-                }
-            }
-        }
-    })
+export default async function ReceiptVerificationPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+    const receipt = await getReceiptById(id)
 
     if (!receipt) {
         notFound()
     }
 
-    // Si le QR code hash n'existe pas, on le génère
-    let qrCodeDataUrl = ""
-    if (!receipt.qrCodeHash) {
-        const hashData = `${receipt.id}-${Date.now()}`
-        await prisma.receipt.update({
-            where: { id: receipt.id },
-            data: { qrCodeHash: hashData }
-        })
-        receipt.qrCodeHash = hashData
-    }
+    const { lease } = receipt
+    const { property, tenant } = lease
+    // @ts-ignore owner is included via custom action
+    const owner = property.owner
 
-    // @ts-ignore
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'}/verify/${receipt.qrCodeHash}`
-    try {
-        qrCodeDataUrl = await QRCode.toDataURL(verificationUrl, { width: 120, margin: 1, color: { dark: '#009E60', light: '#FFFFFF' } })
-    } catch (err) {
-        console.error(err)
-    }
+    // Construction of the verification URL encoded in the QR Code
+    // In production, NEXT_PUBLIC_APP_URL ensures the absolute path
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'
+    const verificationUrl = `${appUrl}/receipts/${receipt.id}?verify=${receipt.documentHash}`
 
     return (
-        <div className="min-h-screen bg-gray-200 py-8 print:bg-white print:py-0 font-sans relative">
-
-            {/* Background Watermark (Visible at Print) */}
-            <div className="hidden print:flex fixed inset-0 z-0 items-center justify-center opacity-5 pointer-events-none">
-                <div className="transform -rotate-45 text-9xl font-black text-gray-900 tracking-widest text-center leading-none">
-                    QAPRIL<br />
-                    <span className="text-4xl text-gray-800">REPUBLIQUE DE COTE D'IVOIRE</span>
+        <div className="min-h-screen bg-gray-100 py-10 print:bg-white print:py-0">
+            <div className="max-w-3xl mx-auto bg-white shadow-lg print:shadow-none p-10 border border-gray-200 printable-receipt relative">
+                
+                {/* Filigrane QAPRIL */}
+                <div className="absolute inset-0 z-0 flex items-center justify-center opacity-5 pointer-events-none">
+                    <img src="/logo.png" alt="Watermark" className="w-96 grayscale transform -rotate-12" />
                 </div>
-            </div>
 
-            <div className="max-w-4xl mx-auto bg-white shadow-2xl min-h-[1056px] relative p-14 print:shadow-none print:p-8 print:m-0 z-10 border border-gray-100 print:border-none">
-
-                {/* Cadre décoratif officiel */}
-                <div className="absolute inset-4 border-2 border-primary opacity-20 pointer-events-none print:inset-0 rounded-sm"></div>
-                <div className="absolute inset-5 border border-secondary opacity-30 pointer-events-none print:inset-1 rounded-sm"></div>
-
-                {/* En-tête avec Branding */}
-                <div className="flex justify-between items-start border-b-2 border-gray-900 pb-8 mb-10 relative">
-                    <div className="flex items-center space-x-4">
-                        <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto" />
+                <div className="relative z-10">
+                    {/* En-tête officiel */}
+                    <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
                         <div>
-                            <h1 className="font-extrabold text-4xl tracking-tighter text-gray-900 leading-none">QAPRIL</h1>
-                            <p className="text-sm text-gray-600 font-semibold tracking-wide uppercase mt-1">Registre Locatif National</p>
-                            <p className="text-xs text-gray-500 font-medium">République de Côte d'Ivoire</p>
+                            <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto" />
+                            <p className="mt-2 text-xs font-bold text-gray-500 uppercase tracking-widest">Registre Locatif Numérique - RCI</p>
                         </div>
-                    </div>
-
-                    <div className="text-right">
-                        <h2 className="text-3xl font-black text-gray-900 uppercase tracking-widest border-b-2 border-primary inline-block pb-1">Quittance</h2>
-                        <p className="text-gray-800 font-bold mt-2 text-lg">N° {receipt.receiptNumber}</p>
-                        <p className="text-sm text-gray-500 mt-1">Émise le {new Date(receipt.createdAt).toLocaleDateString('fr-FR')}</p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-12 mb-10 relative z-10">
-                    {/* Bailleur */}
-                    <div className="bg-gray-50 p-5 rounded-md border border-gray-200">
-                        <h3 className="text-xs font-black text-primary uppercase tracking-widest mb-3 border-b border-gray-300 pb-2">Bailleur / Propriétaire</h3>
-                        <div className="text-sm text-gray-900 space-y-1.5">
-                            <p className="font-bold text-base uppercase">{receipt.lease.property.owner.name || 'Nom non renseigné'}</p>
-                            <p className="text-gray-600 flex items-center"><span className="w-16 inline-block font-semibold">Email:</span> {receipt.lease.property.owner.email}</p>
-                            <p className="text-gray-600 flex items-center"><span className="w-16 inline-block font-semibold">Tél:</span> {receipt.lease.property.owner.phone || 'Non renseigné'}</p>
-                        </div>
-                    </div>
-
-                    {/* Locataire */}
-                    <div className="bg-gray-50 p-5 rounded-md border border-gray-200">
-                        <h3 className="text-xs font-black text-secondary uppercase tracking-widest mb-3 border-b border-gray-300 pb-2">Locataire</h3>
-                        <div className="text-sm text-gray-900 space-y-1.5">
-                            {/* @ts-ignore */}
-                            <p className="font-bold text-base uppercase">{receipt.lease.tenant.name || 'Nom non renseigné'}</p>
-                            {/* @ts-ignore */}
-                            <p className="text-gray-600 flex items-center"><span className="w-16 inline-block font-semibold">Email:</span> {receipt.lease.tenant.email}</p>
-                            {/* @ts-ignore */}
-                            <p className="text-gray-600 flex items-center"><span className="w-16 inline-block font-semibold">Contact:</span> {receipt.lease.tenant.phone || 'Non renseigné'}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Détails du logement */}
-                <div className="mb-10 relative z-10">
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Désignation du Logement</h3>
-                    <div className="bg-white border-l-4 border-gray-900 p-4 shadow-sm">
-                        <p className="text-lg text-gray-900 font-bold uppercase">{receipt.lease.property.name || 'Logement Standard'}</p>
-                        <p className="text-base text-gray-700 mt-1">{receipt.lease.property.address}</p>
-                        <p className="text-sm text-gray-600 font-medium mt-1">{receipt.lease.property.postalCode} {receipt.lease.property.city}, Côte d'Ivoire</p>
-                    </div>
-                </div>
-
-                {/* Déclaration et Mentions Légales */}
-                <div className="mb-10 text-gray-800 leading-relaxed text-justify text-xs space-y-3">
-                    <p>
-                        Je soussigné(e), <span className="font-semibold">{receipt.lease.property.owner.name}</span>, agissant en qualité de bailleur / propriétaire, certifie avoir reçu de la part de <span className="font-semibold">{/* @ts-ignore */}{receipt.lease.tenant.name}</span>, locataire, la somme totale indiquée dans le tableau ci-dessous, au titre du paiement du loyer et des charges pour la période spécifiée, concernant le logement désiré.
-                    </p>
-                    <p className="font-medium">
-                        Mentions légales et conditions :
-                    </p>
-                    <ul className="list-disc pl-5 space-y-1 text-gray-600 text-[11px]">
-                        <li>Cette quittance annule et remplace tout reçu précédemment délivré pour la même période.</li>
-                        <li>Le versement stipulé ne libère le locataire qu'à la condition que le paiement soit effectivement et intégralement encaissé, particulièrement dans le cas de chèques ou virements bancaires non compensés.</li>
-                        <li>Dans le cas d'un versement partiel ne couvrant pas la totalité du terme échu, le présent document fait office de simple reçu pour le montant payé et n'a pas valeur de quittance libératoire complète de la période locative.</li>
-                        <li>En application des dispositions régissant les baux à usage d'habitation en République de Côte d'Ivoire, l'acceptation de la présente quittance ne constitue pas renonciation de la part du bailleur à d'éventuels arriérés, pénalités de retard ou révisions de loyer dues antérieurement.</li>
-                        <li>Le locataire est tenu de conserver cette quittance numériquement ou physiquement pour toute démarche administrative et pendant toute la durée légale de conservation des pièces comptables requises par la législation ivoirienne.</li>
-                    </ul>
-                </div>
-
-                {/* Tableau Financier */}
-                <div className="mb-14 relative z-10">
-                    <table className="w-full text-left border-collapse border border-gray-900">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-900 border-b-2 border-gray-900 text-sm">
-                                <th className="p-3 font-bold border-r border-gray-900">Période de location</th>
-                                <th className="p-3 text-right font-bold border-r border-gray-900">Loyer de base</th>
-                                <th className="p-3 text-right font-bold border-r border-gray-900">Charges</th>
-                                <th className="p-4 text-right font-black w-40">Total Réglé</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm">
-                            <tr>
-                                <td className="p-4 border-r border-gray-900 text-gray-800 font-medium">
-                                    Du {new Date(receipt.periodStart).toLocaleDateString('fr-FR')} <br />
-                                    au {new Date(receipt.periodEnd).toLocaleDateString('fr-FR')}
-                                </td>
-                                <td className="p-4 text-right border-r border-gray-900 font-mono text-gray-700">{receipt.lease.rentAmount.toLocaleString('fr-FR')} FCFA</td>
-                                <td className="p-4 text-right border-r border-gray-900 font-mono text-gray-700">{(receipt.lease.charges || 0).toLocaleString('fr-FR')} FCFA</td>
-                                <td className="p-4 text-right text-xl font-black text-gray-900 bg-gray-50 border-gray-900 font-mono">
-                                    {receipt.amountPaid.toLocaleString('fr-FR')} <span className="text-sm">FCFA</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className="mt-4 bg-green-50 text-green-800 p-3 rounded text-sm border border-green-200 flex items-center font-medium shadow-sm">
-                        <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                        Paiement certifié reçu le {new Date(receipt.paymentDate).toLocaleDateString('fr-FR')} par {receipt.paymentMethod || 'Espèces / Virement'}.
-                    </div>
-                </div>
-
-                {/* Footer Validation & QR */}
-                <div className="flex justify-between items-end pt-8 relative z-10">
-
-                    {/* Authentification par QR Code */}
-                    <div className="flex items-center space-x-6 bg-white p-4 border-2 border-gray-900 rounded shadow-sm">
-                        <div className="flex-shrink-0">
-                            {qrCodeDataUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={qrCodeDataUrl} alt="QR Code d'authenticité" className="w-28 h-28 print:w-32 print:h-32 object-contain" />
-                            ) : (
-                                <div className="w-28 h-28 bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-400 border border-dashed border-gray-300">QR CODE</div>
-                            )}
-                        </div>
-                        <div className="max-w-[200px]">
-                            <h4 className="font-black text-gray-900 uppercase text-xs tracking-wider mb-1">Authentification QAPRIL</h4>
-                            <p className="text-[10px] text-gray-600 leading-tight">
-                                Ce document est cryptographiquement certifié. Scannez le QR Code officiel avec votre smartphone ou composez le service USSD pour vérifier sa validité sur la plateforme d'État.
+                        <div className="text-right">
+                            <h1 className="text-3xl font-extrabold text-gray-900 uppercase tracking-tight">E-Quittance de Loyer</h1>
+                            <p className="text-lg font-bold text-red-700 mt-1">N° {receipt.receiptNumber}</p>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Émise le {new Date(receipt.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
                             </p>
-                            <p className="text-[9px] text-gray-400 mt-2 font-mono break-all">{receipt.qrCodeHash}</p>
                         </div>
                     </div>
 
-                    {/* Signature */}
-                    <div className="w-64 text-center">
-                        <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-8">Signature du bailleur</p>
-                        <div className="border-b-2 border-gray-900 w-full mb-2 border-dashed"></div>
-                        <p className="text-[10px] text-gray-500 italic">Document numérique valant quitus de paiement</p>
+                    {/* Informations des parties */}
+                    <div className="grid grid-cols-2 gap-12 mb-8">
+                        <div className="bg-gray-50 p-4 rounded-md border border-gray-100">
+                            <h3 className="text-sm font-bold text-gray-500 uppercase mb-3 border-b pb-1">Bailleur / Propriétaire</h3>
+                            <p className="font-bold text-gray-900 text-lg">{owner.name || owner.email}</p>
+                            <p className="text-gray-600 mt-1">Contact: {owner.phone || owner.email}</p>
+                        </div>
+                        
+                        <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                            <h3 className="text-sm font-bold text-blue-800 uppercase mb-3 border-b border-blue-200 pb-1">Locataire</h3>
+                            <p className="font-bold text-gray-900 text-lg">{tenant.name || tenant.email}</p>
+                            <p className="text-gray-600 mt-1">Contact: {tenant.phone || tenant.email}</p>
+                        </div>
+                    </div>
+
+                    {/* Détails du Logement */}
+                    <div className="mb-8">
+                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-2">Désignation du Logement</h3>
+                        <p className="text-gray-900">{property.name || property.type} - {property.address}</p>
+                        <p className="text-gray-600">{property.postalCode} {property.neighborhood}, {property.city}</p>
+                        {lease.officialLeaseNumber && (
+                            <p className="text-sm text-gray-500 mt-2 italic">Contrat Physique N°: {lease.officialLeaseNumber}</p>
+                        )}
+                    </div>
+
+                    {/* Détails Financiers */}
+                    <div className="bg-orange-50 p-6 rounded-lg mb-8 border border-[#FF8200]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-gray-900 text-xl">Détail du Paiement</h3>
+                            <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                                Payé
+                            </span>
+                        </div>
+                        <table className="w-full text-left">
+                            <tbody>
+                                <tr className="border-b border-orange-200">
+                                    <td className="py-3 text-gray-600">Période concernée</td>
+                                    <td className="py-3 font-medium text-right text-gray-900">
+                                        Du {new Date(receipt.periodStart).toLocaleDateString('fr-FR')} au {new Date(receipt.periodEnd).toLocaleDateString('fr-FR')}
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-orange-200">
+                                    <td className="py-3 text-gray-600">Date de règlement effectif</td>
+                                    <td className="py-3 font-medium text-right text-gray-900">
+                                        {new Date(receipt.paymentDate).toLocaleDateString('fr-FR')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="py-3 text-gray-600">Moyen de paiement</td>
+                                    <td className="py-3 font-medium text-right text-gray-900 border-b border-orange-200">
+                                        {receipt.paymentMethod.replace('_', ' ')}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="py-4 text-lg font-bold text-gray-900">Total Réglé</td>
+                                    <td className="py-4 text-2xl font-black text-right text-primary">
+                                        {receipt.amountPaid.toLocaleString('fr-FR')} FCFA
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Zone de Certification QR */}
+                    <div className="flex items-start justify-between border-t-2 border-gray-800 pt-8 mt-12 page-break-inside-avoid">
+                        <div className="w-2/3 pr-8">
+                            <h4 className="font-bold text-gray-900 mb-2">Certification & Valeur Légale</h4>
+                            <p className="text-xs text-justify text-gray-600 leading-relaxed">
+                                Le propriétaire atteste avoir reçu du locataire la somme indiquée ci-dessus au titre du loyer et des charges pour la période désignée. Sous réserve de tous droits.
+                                <br/><br/>
+                                Ce document est certifié conforme par la plateforme QAPRIL. Son authenticité peut être vérifiée à tout moment en scannant le QR code avec un smartphone ou en visitant le registre numérique.
+                            </p>
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                                <p className="text-[10px] text-gray-400 font-mono break-all">
+                                    Empreinte Cryptographique (SHA-256):<br/>
+                                    {receipt.documentHash}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="w-1/3 flex flex-col items-center">
+                            <div className="p-2 bg-white border-2 border-primary rounded-lg shadow-sm">
+                                <QRCodeSVG 
+                                    value={verificationUrl}
+                                    size={120}
+                                    level="Q"
+                                    includeMargin={false}
+                                />
+                            </div>
+                            <p className="text-[10px] font-bold text-gray-500 mt-2 uppercase tracking-wider text-center">
+                                Scannez pour<br/>vérifier l'authenticité
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Bouton d'impression (masqué à l'impression) */}
+                    <div className="mt-12 text-center print:hidden">
+                        <button 
+                            onClick={(e) => {
+                                // Need 'use client' for this, so we'll wrap it via an inline script or client wrapper in real app.
+                                // Simplest way in app router for a purely server component is a simple link back, 
+                                // or we can make this entire component a client component later if needed.
+                                
+                            }} 
+                            className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 print:hidden"
+                        >
+                            Imprimer ce document
+                        </button>
+                        <p className="text-sm mt-3 text-gray-500">Utilisez <kbd className="bg-gray-100 px-2 py-1 rounded">Ctrl</kbd> + <kbd className="bg-gray-100 px-2 py-1 rounded">P</kbd> pour imprimer en PDF.</p>
                     </div>
 
                 </div>
-
             </div>
-
-            {/* Barre d'outils flottante pour imprimer (masquée à l'impression) */}
-            <div className="fixed bottom-8 right-8 print:hidden flex space-x-4">
-                <a href="/locataire" className="bg-white text-gray-800 shadow-lg px-6 py-3 rounded-full font-medium hover:bg-gray-50">
-                    Retour
-                </a>
-                <PrintButton />
-            </div>
+            
+            <style dangerouslySetInnerHTML={{__html: `
+                @media print {
+                    @page { margin: 0; size: A4; }
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                }
+            `}} />
         </div>
     )
 }

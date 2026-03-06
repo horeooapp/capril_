@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import Resend from "next-auth/providers/resend"
+import Nodemailer from "next-auth/providers/nodemailer"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "./auth.config"
 import * as bcrypt from "bcrypt-ts"
@@ -11,8 +11,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     debug: true, // Enable debug logs to catch the AdapterError source
     adapter: PrismaAdapter(prisma),
     providers: [
-        Resend({
-            from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+        Nodemailer({
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM || "noreply@qapril.net",
             async sendVerificationRequest({ identifier, url, provider }) {
                 console.log(`[AUTH DEBUG] Original NextAuth URL: ${url}`);
                 const { host, searchParams } = new URL(url);
@@ -22,18 +23,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const token = searchParams.get("token");
                 const email = searchParams.get("email");
 
-                // Reconstruire l'URL NextAuth de manière explicite et robuste pour éviter les problèmes de domaine/protocole (Hostinger)
-                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/resend?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
+                // Reconstruire l'URL NextAuth de manière explicite
+                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/nodemailer?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
 
                 // Transmettre cette URL robuste à notre page de vérification intermédiaire
                 const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
                 console.log(`[AUTH DEBUG] Intermediary Magic Link URL to be emailed: ${intermediaryUrl}`);
 
                 try {
-                    const { Resend: ResendClient } = await import("resend");
-                    const resend = new ResendClient(process.env.AUTH_RESEND_KEY);
+                    const { createTransport } = await import("nodemailer");
+                    
+                    // Configuration spécifique pour le SMTP (ex: Hostinger avec le port 465)
+                    let smtpOptions: any = provider.server;
+                    if (typeof smtpOptions === 'string') {
+                         const urlObj = new URL(smtpOptions);
+                         smtpOptions = {
+                             host: urlObj.hostname,
+                             port: urlObj.port ? parseInt(urlObj.port) : 587,
+                             secure: urlObj.port === '465' || urlObj.port === '465',
+                             auth: {
+                                 user: decodeURIComponent(urlObj.username),
+                                 pass: decodeURIComponent(urlObj.password)
+                             },
+                             tls: { rejectUnauthorized: false }
+                         };
+                    }
 
-                    const result = await resend.emails.send({
+                    const transport = createTransport(smtpOptions);
+                    const result = await transport.sendMail({
                         to: identifier,
                         from: provider.from as string,
                         subject: `Connexion à ${host}`,
@@ -67,12 +84,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 </html>`,
                     });
 
-                    if (result.error) {
-                        throw new Error(result.error.message);
+                    const failed = result.rejected.concat(result.pending).filter(Boolean)
+                    if (failed.length) {
+                        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
                     }
-                    console.log(`[AUTH DEBUG] Magic link successfully sent to: ${identifier} (Resend ID: ${result.data?.id})`);
+                    console.log(`[AUTH DEBUG] Magic link successfully sent via SMTP to: ${identifier} (MessageId: ${result.messageId})`);
                 } catch (error) {
-                    console.error("[RESEND ERROR] Error in sendVerificationRequest:", error);
+                    console.error("[SMTP ERROR] Error in sendVerificationRequest:", error);
                     throw error;
                 }
             },

@@ -2,6 +2,7 @@ import { getLeaseById } from "@/actions/leases"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import GenerateReceiptForm from "@/components/dashboard/GenerateReceiptForm"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -26,9 +27,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     >
                         📄 Certificat de Location
                     </Link>
-                    <button className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-all transform hover:scale-105">
-                        Générer Quittance
-                    </button>
+                    <GenerateReceiptForm leaseId={lease.id} rentAmount={lease.rentAmount} />
                 </div>
             </div>
 

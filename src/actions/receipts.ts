@@ -62,14 +62,18 @@ export async function createReceipt(data: {
     }
 
     const receiptNumber = await generateUniqueReceiptNumber()
-    const qrCodeHash = `${lease.id}-${Date.now()}`
+    const paymentDate = data.paymentDate || new Date()
+    const paymentMethod = data.paymentMethod || PaymentMethod.MOBILE_MONEY
 
-    // Reinforced Proof: Document Content Hash
+    // Reinforced Proof: Document Content Hash (SHA-256 equivalent via proof.ts)
+    const qrCodeHash = `${receiptNumber}-${lease.id}-${Date.now()}`
     const documentHash = generateProofHash({
         receiptNumber,
         leaseId: data.leaseId,
         amountPaid: data.amountPaid,
-        period: `${data.periodStart}-${data.periodEnd}`
+        period: `${data.periodStart}-${data.periodEnd}`,
+        paymentDate: paymentDate.toISOString(),
+        paymentMethod: paymentMethod
     })
 
     const receipt = await prisma.receipt.create({
@@ -78,9 +82,10 @@ export async function createReceipt(data: {
             leaseId: data.leaseId,
             periodStart: data.periodStart,
             periodEnd: data.periodEnd,
+            periodEnd: data.periodEnd,
             amountPaid: data.amountPaid,
-            paymentDate: data.paymentDate || new Date(),
-            paymentMethod: data.paymentMethod || PaymentMethod.MOBILE_MONEY,
+            paymentDate,
+            paymentMethod,
             isSent: true,
             qrCodeHash,
             documentHash
@@ -132,6 +137,28 @@ export async function createReceipt(data: {
     }
 
     return receipt
+}
+
+export async function getReceiptById(id: string) {
+    return await prisma.receipt.findUnique({
+        where: { id },
+        include: {
+            lease: {
+                include: {
+                    property: {
+                        include: {
+                            owner: {
+                                select: { name: true, email: true, phone: true }
+                            }
+                        }
+                    },
+                    tenant: {
+                        select: { name: true, email: true, phone: true }
+                    }
+                }
+            }
+        }
+    })
 }
 
 export async function getReceiptsForTenant() {

@@ -56,12 +56,16 @@ export default async function LocataireDashboard() {
                                         <span className="text-lg font-bold text-primary">
                                             {receipt.amountPaid.toLocaleString('fr-FR')} FCFA
                                         </span>
-                                        <button className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary">
+                                        <Link 
+                                            href={`/receipts/${receipt.id}`}
+                                            target="_blank"
+                                            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                                        >
                                             <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
-                                            Télécharger PDF
-                                        </button>
+                                            Voir la Quittance
+                                        </Link>
                                         <p className="text-xs text-gray-400">
                                             Réf: {receipt.receiptNumber}
                                         </p>

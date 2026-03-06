@@ -2,8 +2,11 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import HeroSlider from "@/components/HeroSlider";
 import ContentAccordion from "@/components/ContentAccordion";
+import { auth } from "@/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
     <div className="bg-background min-h-screen text-foreground font-sans">
       <header className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
@@ -28,21 +31,43 @@ export default function Home() {
             </nav>
 
             <div className="hidden lg:flex items-center justify-end space-x-4">
-              <Link href="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                Se connecter
-              </Link>
-              <Link
-                href="/login"
-                className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-secondary hover:bg-green-700"
-              >
-                Accès Locataire
-              </Link>
-              <Link
-                href="/login"
-                className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-orange-600"
-              >
-                Espace Propriétaire
-              </Link>
+              {session?.user ? (
+                <>
+                  <Link
+                    href={session.user.role === 'TENANT' ? "/locataire" : "/dashboard"}
+                    className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-orange-600"
+                  >
+                    {session.user.role === 'TENANT' ? "Mon Espace" : "Tableau de Bord"}
+                  </Link>
+                  <form action={async () => {
+                    "use server";
+                    const { signOut } = await import("@/auth");
+                    await signOut();
+                  }}>
+                    <button type="submit" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-md">
+                      Déconnexion
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+                    Se connecter
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-secondary hover:bg-green-700"
+                  >
+                    Accès Locataire
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-orange-600"
+                  >
+                    Espace Propriétaire
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

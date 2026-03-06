@@ -132,3 +132,139 @@ export async function getLeasesByProperty(propertyId: string) {
         }
     })
 }
+
+export async function registerLease(formData: FormData) {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) {
+        return { error: "Non autorisé" }
+    }
+    
+    const landlordId = session.user.id
+
+    try {
+        // --- 1. Extraction: Identification des parties ---
+        const tenantType = formData.get("tenantType") as any
+        const tenantName = formData.get("tenantName") as string
+        const tenantEmail = formData.get("tenantEmail") as string
+        const tenantCni = formData.get("tenantCni") as string
+        const tenantPhone = formData.get("tenantPhone") as string
+        const tenantNationality = formData.get("tenantNationality") as string
+        const tenantProfession = formData.get("tenantProfession") as string
+
+        // Find or create tenant
+        let tenant = await prisma.user.findUnique({ where: { email: tenantEmail } })
+        if (!tenant) {
+            tenant = await prisma.user.create({
+                data: {
+                    email: tenantEmail,
+                    name: tenantName,
+                    userType: tenantType || "PERSON",
+                    cniNumber: tenantCni,
+                    phone: tenantPhone,
+                    nationality: tenantNationality,
+                    profession: tenantProfession,
+                    role: "TENANT"
+                }
+            })
+        } else {
+             await prisma.user.update({
+                 where: { id: tenant.id },
+                 data: {
+                     cniNumber: tenant.cniNumber || tenantCni,
+                     nationality: tenant.nationality || tenantNationality,
+                     profession: tenant.profession || tenantProfession,
+                     userType: tenantType || tenant.userType
+                 }
+             })
+        }
+
+        // --- 2. Extraction: Désignation du logement ---
+        const existingPropertyId = formData.get("propertyId") as string
+        let propertyId = existingPropertyId
+
+        if (!existingPropertyId || existingPropertyId === "NEW") {
+            const propType = formData.get("propertyType") as string
+            const propAddress = formData.get("propertyAddress") as string
+            const propCity = formData.get("propertyCity") as string
+            const propCommune = formData.get("propertyCommune") as string
+            const propLot = formData.get("propertyLot") as string
+            const propRooms = parseInt(formData.get("propertyRooms") as string || "1")
+            
+            const newProp = await prisma.property.create({
+                data: {
+                    type: propType || "APARTMENT",
+                    address: propAddress,
+                    city: propCity,
+                    neighborhood: propCommune,
+                    lotNumber: propLot,
+                    ownerId: landlordId,
+                }
+            })
+            propertyId = newProp.id
+        }
+
+        // --- 3. Extraction: Durée du bail ---
+        const startDate = new Date(formData.get("startDate") as string)
+        const rawEndDate = formData.get("endDate") as string
+        const endDate = rawEndDate ? new Date(rawEndDate) : null
+        const renewalMode = formData.get("renewalMode") as string
+
+        // --- 4. Extraction: Loyer, Caution et Avances ---
+        const rentAmount = parseFloat(formData.get("rentAmount") as string)
+        const paymentDueDate = parseInt(formData.get("paymentDueDate") as string || "5")
+        
+        const deposit = parseFloat(formData.get("deposit") as string || "0")
+        const advancePayment = parseFloat(formData.get("advancePayment") as string || "0")
+        const agencyFee = parseFloat(formData.get("agencyFee") as string || "0")
+        const charges = parseFloat(formData.get("charges") as string || "0")
+
+        // === VÉRIFICATION STRATÉGIQUE DES PLAFONDS LÉGAUX ===
+        let legalPlafonningMet = true;
+        if (deposit > rentAmount * 2) legalPlafonningMet = false;
+        if (advancePayment > rentAmount * 2) legalPlafonningMet = false;
+        if (agencyFee > rentAmount * 1) legalPlafonningMet = false;
+
+        // Validation bloquante optionnelle
+        // if (!legalPlafonningMet) {
+        //     return { error: `Plafonds légaux dépassés. (Caution max: 2 mois, Avance max: 2 mois, Agence max: 1 mois).` }
+        // }
+
+        // --- 5. Extraction: Informations du contrat physique ---
+        const officialLeaseNumber = formData.get("officialLeaseNumber") as string || undefined
+        const scanUrl = formData.get("scanUrl") as string || null
+
+        // --- 6. Création Finale du Bail ---
+        const lease = await prisma.lease.create({
+            data: {
+                propertyId,
+                tenantId: tenant.id,
+                startDate,
+                endDate,
+                renewalMode,
+                rentAmount,
+                paymentDueDate,
+                charges,
+                deposit,
+                advancePayment,
+                agencyFee,
+                legalPlafonningMet,
+                officialLeaseNumber,
+                scanUrl,
+                status: "ACTIVE"
+            }
+        })
+
+        // 7. Revalidation UI Cache
+        const { revalidatePath } = await import("next/cache")
+        revalidatePath("/dashboard/leases")
+        revalidatePath("/dashboard/properties")
+
+        return { success: true, leaseId: lease.id, legalPlafonningMet }
+    } catch (error: any) {
+        console.error("[SERVER ACTION] Error registering lease:", error)
+        if (error.code === 'P2002' && error.meta?.target?.includes('officialLeaseNumber')) {
+            return { error: "Ce numéro officiel de bail a déjà été enregistré." }
+        }
+        return { error: error.message || "Erreur inconnue lors de l'enregistrement du bail" }
+    }
+}
