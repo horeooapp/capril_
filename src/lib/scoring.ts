@@ -1,11 +1,13 @@
 import { prisma } from "./prisma"
 
 /**
- * Updates the reliability score of a user based on their actions.
+ * Updates the Indice de Confiance Locatif (ICL) of a user and logs the event.
  * @param userId - ID of the user (Tenant, Owner, or Agent)
  * @param points - Points to add (positive) or subtract (negative)
+ * @param reason - Text description of the event
+ * @param relatedEntityId - Optional ID of the lease or receipt linked to this event
  */
-export async function updateReliabilityScore(userId: string, points: number) {
+export async function updateICLScore(userId: string, points: number, reason: string, relatedEntityId?: string) {
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { reliabilityScore: true }
@@ -13,48 +15,62 @@ export async function updateReliabilityScore(userId: string, points: number) {
 
     if (!user) return
 
-    const newScore = Math.min(100, Math.max(0, user.reliabilityScore + points))
+    // Clamp score between 300 and 1000
+    const newScore = Math.min(1000, Math.max(300, user.reliabilityScore + points))
 
-    await prisma.user.update({
-        where: { id: userId },
-        data: { reliabilityScore: newScore }
-    })
+    // Transactions ensure data consistency
+    await prisma.$transaction([
+        prisma.user.update({
+            where: { id: userId },
+            data: { reliabilityScore: newScore }
+        }),
+        prisma.trustEvent.create({
+            data: {
+                userId,
+                points,
+                reason,
+                relatedEntityId
+            }
+        })
+    ])
 }
 
 /**
- * Handles scoring logic for rent payments.
- * Called when a receipt is created.
+ * Handles scoring logic for rent payments based on the Premium Addendum.
  */
-export async function scoreRentPayment(tenantId: string, isOnTime: boolean) {
-    // Reward systematic on-time payment
-    if (isOnTime) {
-        await updateReliabilityScore(tenantId, 1.0)
+export async function scoreRentPayment(tenantId: string, diffDays: number, receiptId?: string) {
+    if (diffDays <= 0) {
+        // Anticipated payment
+        await updateICLScore(tenantId, 5, "Paiement anticipé", receiptId)
+    } else if (diffDays === 0) {
+        // Exactly on time (handled by <= 0 logic or dedicated)
+        await updateICLScore(tenantId, 2, "Paiement à temps", receiptId)
+    } else if (diffDays <= 7) {
+        // Late < 7 days
+        await updateICLScore(tenantId, -5, "Retard inférieur à 7 jours", receiptId)
+    } else if (diffDays > 30) {
+        // Late > 30 days
+        await updateICLScore(tenantId, -30, "Retard critique supérieur à 30 jours", receiptId)
     } else {
-        // Penalty for late payment (significant)
-        await updateReliabilityScore(tenantId, -5.0)
+        // Regular late
+        await updateICLScore(tenantId, -15, "Retard de paiement", receiptId)
     }
 }
 
 /**
- * Handles scoring logic for agents.
- * Called when a mandate is validated or rejected.
+ * Penalty for confirmed unpaid rent.
  */
-export async function scoreAgentCompliance(agentId: string, isApproved: boolean) {
-    if (isApproved) {
-        await updateReliabilityScore(agentId, 0.5)
-    } else {
-        await updateReliabilityScore(agentId, -2.0)
-    }
+export async function scoreUnpaidRent(tenantId: string, leaseId: string) {
+    await updateICLScore(tenantId, -100, "Impayé confirmé", leaseId)
 }
 
 /**
- * Handles scoring logic for owners/managers.
- * Typically based on escrow releases or dispute resolution.
+ * Reward for clean security deposit restitution.
  */
-export async function scoreOwnerManagement(ownerId: string, isFairRelease: boolean) {
-    if (isFairRelease) {
-        await updateReliabilityScore(ownerId, 0.5)
+export async function scoreSecurityDepositRestitution(userId: string, isFair: boolean, leaseId: string) {
+    if (isFair) {
+        await updateICLScore(userId, 20, "Restitution correcte de caution", leaseId)
     } else {
-        await updateReliabilityScore(ownerId, -3.0)
+        await updateICLScore(userId, -50, "Litige sur restitution de caution", leaseId)
     }
 }

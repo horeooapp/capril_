@@ -126,17 +126,27 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 )}
                             </div>
 
-                            <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                                <p className="text-xs font-bold text-gray-400 uppercase">Assurance Loyer</p>
+                            <div className={`p-4 rounded-xl border-2 transition-all ${lease.insurance && lease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-blue-50 border-blue-100 shadow-sm'}`}>
+                                <div className="flex justify-between items-start mb-2">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Assurance Loyers Impayés</p>
+                                    {lease.insurance && lease.insurance.status === 'ACTIVE' ? (
+                                        <span className="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full font-bold">ACTIVE</span>
+                                    ) : (
+                                        <span className="text-[10px] bg-gray-400 text-white px-2 py-0.5 rounded-full font-bold">MANQUANTE</span>
+                                    )}
+                                </div>
                                 {lease.insurance && lease.insurance.status === 'ACTIVE' ? (
-                                    <div className="mt-2">
-                                        <p className="text-sm font-bold text-green-700">🛡️ Active ({lease.insurance.provider})</p>
-                                        <p className="text-xs text-gray-500">Police: {lease.insurance.policyNo}</p>
+                                    <div className="mt-1">
+                                        <p className="text-sm font-bold text-gray-900">🛡️ {lease.insurance.provider}</p>
+                                        <p className="text-[10px] text-gray-500 mt-1 italic tracking-tight">Police N°: {lease.insurance.policyNo}</p>
                                     </div>
                                 ) : (
-                                    <div className="mt-2 flex justify-between items-center">
-                                        <p className="text-sm text-gray-500 italic">Non assuré</p>
-                                        <button className="text-[10px] bg-primary text-white px-2 py-0.5 rounded">Souscrire</button>
+                                    <div className="mt-1">
+                                        <p className="text-xs text-blue-800 leading-snug">Boostez votre Indice de Confiance et sécurisez vos revenus.</p>
+                                        <button className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg shadow-sm transition-transform active:scale-95">
+                                            Protéger ce Bail
+                                        </button>
+                                        <p className="text-[9px] text-blue-400 text-center mt-2 italic">Partenariat QAPRIL x Assureurs RCI</p>
                                     </div>
                                 )}
                             </div>

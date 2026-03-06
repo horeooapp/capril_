@@ -42,9 +42,10 @@ model User {
   birthDate     DateTime?
   password      String?
   role          Role      @default(TENANT)
-
-  // Indice de Fiabilité Locative
-  reliabilityScore Float @default(100.0)
+  
+  // Indice de Confiance Locatif (ICL)
+  reliabilityScore Int    @default(750) // Entre 300 et 1000
+  trustEvents      TrustEvent[]
 
   // Champs pour les agents
   isCertified       Boolean?  @default(false)
@@ -129,10 +130,17 @@ model Property {
   city         String
   neighborhood String?
   postalCode   String?
-  lotNumber    String? // Numéro du lot
-  dependencies String? // Détail des dépendances
-  usage        String  @default("Habitation")
-  country      String  @default("Côte d'Ivoire")
+  lotNumber     String? // Numéro du lot
+  dependencies  String? // Détail des dépendances
+  usage         String  @default("Habitation")
+  
+  // Passeport Logement
+  surface              Float?
+  digitalPostalAddress String?
+  gpsLatitude          Float?
+  gpsLongitude         Float?
+  
+  country       String  @default("Côte d'Ivoire")
   type         String  @default("APARTMENT")
 
   ownerId String
@@ -245,6 +253,7 @@ model Lease {
 
   status LeaseStatus @default(ACTIVE)
 
+  incidents      Incident[]
   receipts       Receipt[]
   escrow         Escrow?
   insurance      Insurance?
@@ -427,4 +436,31 @@ model Receipt {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// --- Module: Indice de Confiance Locatif (ICL) ---
+
+model TrustEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  points    Int      // Ex: +2, -30
+  reason    String   // Ex: "Paiement à temps", "Retard > 30j"
+  createdAt DateTime @default(now())
+
+  relatedEntityId String? // ID de la quittance ou du bail lié
+}
+
+// --- Module: Passeport Logement & Incidents ---
+
+model Incident {
+  id          String   @id @default(cuid())
+  leaseId     String
+  lease       Lease    @relation(fields: [leaseId], references: [id])
+  reporterId  String
+  type        String   // Ex: DEGRADATION, LITIGE_CAUTION, BRUIT
+  description String
+  severity    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status      String   @default("OPEN")   // OPEN, RESOLVED
+  createdAt   DateTime @default(now())
 }

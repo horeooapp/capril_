@@ -73,3 +73,25 @@ export async function getPropertyById(id: string) {
         }
     })
 }
+export async function getPropertyPassport(id: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error("Unauthorized")
+
+    return await prisma.property.findUnique({
+        where: { id },
+        include: {
+            owner: { select: { name: true, email: true, phone: true } },
+            leases: {
+                include: {
+                    tenant: { select: { name: true, email: true } },
+                    incidents: true,
+                    receipts: {
+                        orderBy: { paymentDate: 'desc' },
+                        take: 10
+                    }
+                },
+                orderBy: { startDate: 'desc' }
+            }
+        }
+    })
+}

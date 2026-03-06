@@ -40,6 +40,9 @@ export default async function DashboardLayout({
                             <Link href="/dashboard/properties" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Logements</Link>
                             <Link href="/dashboard/leases" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Contrats</Link>
                             <Link href="/dashboard/receipts" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Quittances</Link>
+                            <Link href="/dashboard/trust" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                <span className="mr-1">⭐</span> Mon ICL
+                            </Link>
                             {((session.user.role as string) === "ADMIN" || (session.user.role as string) === "AUDITOR") && (
                                 <Link href="/dashboard/audit" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
                             )}

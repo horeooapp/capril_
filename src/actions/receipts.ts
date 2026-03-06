@@ -82,7 +82,6 @@ export async function createReceipt(data: {
             leaseId: data.leaseId,
             periodStart: data.periodStart,
             periodEnd: data.periodEnd,
-            periodEnd: data.periodEnd,
             amountPaid: data.amountPaid,
             paymentDate,
             paymentMethod,
@@ -93,10 +92,11 @@ export async function createReceipt(data: {
     })
 
     // Update Tenant Reliability Score based on payment date vs period
-    // If paymentDate is before or on periodEnd, it's considered on time
-    const paymentDate = data.paymentDate || new Date()
-    const isOnTime = paymentDate <= new Date(data.periodEnd)
-    await scoreRentPayment(lease.tenantId, isOnTime)
+    // diffDays > 0 means late, <= 0 means on time or anticipated
+    const diffTime = paymentDate.getTime() - new Date(data.periodEnd).getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    await scoreRentPayment(lease.tenantId, diffDays, receipt.id)
 
     // Envoi de l'e-mail de notification au locataire
     const nodemailer = await import("nodemailer")

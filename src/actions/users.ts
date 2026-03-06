@@ -3,48 +3,40 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
-export async function getCurrentUser() {
+export async function getUserTrustData() {
     const session = await auth()
+    // @ts-ignore
+    const userId = session?.user?.id
+    if (!userId) throw new Error("Unauthorized")
 
-    if (!session?.user?.email) {
-        return null
-    }
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email
-            }
-        })
-
-        return user
-    } catch (error) {
-        console.error("Error fetching current user:", error)
-        return null
-    }
-}
-
-export async function getUserProfile(userId: string) {
     return await prisma.user.findUnique({
         where: { id: userId },
-        include: {
-            propertiesOwned: true,
-            propertiesManaged: true,
+        select: {
+            reliabilityScore: true,
+            trustEvents: {
+                orderBy: { createdAt: 'desc' },
+                take: 20
+            }
         }
     })
 }
-
-export async function updateUserProfile(userId: string, data: { name?: string, phone?: string }) {
+export async function logScoreConsultation(targetUserId: string, reason: string) {
     const session = await auth()
-
-    // Basic authorization: user can only update themselves
     // @ts-ignore
-    if (!session?.user || session.user.id !== userId) {
-        throw new Error("Unauthorized")
-    }
+    const viewerId = session?.user?.id
+    if (!viewerId) throw new Error("Unauthorized")
 
-    return await prisma.user.update({
-        where: { id: userId },
-        data
+    // In a real app, logic would verify authorization (e.g., active lease app)
+    
+    await prisma.auditLog.create({
+        data: {
+            userId: viewerId,
+            action: "CONSULTATION_SCORE",
+            entityType: "USER",
+            entityId: targetUserId,
+            details: JSON.stringify({ reason, timestamp: new Date() })
+        }
     })
+    
+    return { success: true }
 }

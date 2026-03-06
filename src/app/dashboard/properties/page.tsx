@@ -35,7 +35,13 @@ export default async function PropertiesPage() {
                                         <p className="text-sm font-medium text-primary truncate">
                                             {property.name || property.address}
                                         </p>
-                                        <div className="ml-2 flex-shrink-0 flex">
+                                        <div className="ml-2 flex-shrink-0 flex items-center space-x-2">
+                                            <a 
+                                                href={`/dashboard/properties/${property.id}/passport`}
+                                                className="px-2.5 py-1 text-xs font-bold border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all"
+                                            >
+                                                Passeport Logement
+                                            </a>
                                             <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 {property.leases.length} contrat(s) actif(s)
                                             </p>

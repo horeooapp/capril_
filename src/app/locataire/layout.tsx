@@ -32,6 +32,9 @@ export default async function LocataireLayout({
 
                         <nav className="hidden md:flex space-x-8">
                             <Link href="/locataire" className="text-gray-900 border-b-2 border-primary px-1 py-2 text-sm font-medium">Mes Quittances</Link>
+                            <Link href="/dashboard/trust" className="text-gray-500 hover:text-gray-900 px-1 py-2 text-sm font-medium flex items-center">
+                                <span className="mr-1">⭐</span> Mon Indice de Confiance
+                            </Link>
                         </nav>
 
                         <div className="flex items-center space-x-4">
