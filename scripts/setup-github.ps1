@@ -3,18 +3,28 @@
 # Et d'être connecté : gh auth login
 
 $secrets = @{
-    "DATABASE_URL" = "votre_url_prisma_ici"
-    "AUTH_SECRET" = "$(npx auth secret)"
-    "AUTH_RESEND_KEY" = "re_..."
-    "EMAIL_SERVER" = "smtp://..."
-    "NEXTAUTH_URL" = "https://votre-site.com"
-    "HOSTINGER_SSH_HOST" = "votre_ip_vps"
+    "DATABASE_URL" = "file:/home/u341324010/domains/qapril.net/public_html/dev.db"
+    "AUTH_SECRET" = "3d0bc4d35913c364e31a5242fde2489a6a95d9ad4427383b05d228a3c6c4dbef"
+    "AUTH_RESEND_KEY" = "re_YRdesQfm_2fN4yLN5uJYYhgWZvX1HxEiz"
+    "EMAIL_SERVER" = "smtp://resend:re_YRdesQfm_2fN4yLN5uJYYhgWZvX1HxEiz@smtp.resend.com:465"
+    "NEXTAUTH_URL" = "https://qapril.net"
+    "HOSTINGER_SSH_HOST" = "vsrv1472050.hstgr.cloud"
     "HOSTINGER_SSH_USER" = "root"
-    "HOSTINGER_SSH_KEY" = "$(Get-Content ~/.ssh/id_rsa -Raw)"
+    # IMPORTANT: Mettez ici le contenu de votre CLÉ PRIVÉE (Private Key), pas la clé publique (.pub)
+    "HOSTINGER_SSH_KEY"  = @"
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABCLLzQXZC
+bspXuwgU1A9u3WAAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIAGF98HNcl8aoYPd
+CYA6g7mYfNF05M4A9cdZa6cPey4nAAAAoONiyNiYo+tOpsl8FppMBy/ADVmm2RoDalSLaD
+zQRHartTsFKyErCUdScUU2w//Ca/Ja5sIYYYibNTaOgZfDMwppl9jTqnYLn9xeaz+DsKZQ
+MV+lLxZYAk/CWYtAHXi8KTF9G4X3+71TaDmgWocB4vhe+Q0rGwidPzeAS8BAYOI0SVtL+d
+bHTEII/FtB/5fcDSqtQKlIEwYiy6a/zy8u5oU=
+-----END OPENSSH PRIVATE KEY-----
+"@
 }
 
 $variables = @{
-    "EMAIL_FROM" = "noreply@votre-site.com"
+    "EMAIL_FROM"  = "noreply@qapril.net"
     "DEPLOY_PATH" = "/var/www/capril"
 }
 
@@ -24,7 +34,8 @@ foreach ($key in $secrets.Keys) {
     if ($val -ne "votre_url_prisma_ici" -and $val -ne "re_...") {
         Write-Host "Set secret: $key"
         echo "$val" | gh secret set "$key"
-    } else {
+    }
+    else {
         Write-Host "⚠️ Skip secret $key (valeur par défaut)" -ForegroundColor Yellow
     }
 }
