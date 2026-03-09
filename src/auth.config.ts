@@ -2,26 +2,31 @@ import type { NextAuthConfig } from "next-auth"
 import type { Role } from "@prisma/client"
 
 export const authConfig = {
-    session: { strategy: "jwt" },
+    session: { 
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
     trustHost: true,
     pages: {
         signIn: '/login',
-        verifyRequest: '/verify-request',
+        error: '/auth/error',
     },
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
+                token.phone = user.phone
                 token.role = user.role
-                token.isCertified = user.isCertified
+                token.status = user.status
             }
             return token
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string
-                session.user.role = token.role as Role
-                session.user.isCertified = token.isCertified as boolean
+                session.user.phone = token.phone as string
+                session.user.role = token.role as string
+                session.user.status = token.status as string
             }
             return session
         },

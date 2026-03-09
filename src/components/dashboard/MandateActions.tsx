@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { MandateStatus } from "@prisma/client"
+// MandateStatus is a plain string field in this schema
+type MandateStatus = string
 import { validateMandate } from "@/actions/mandates"
 import { useRouter } from "next/navigation"
 

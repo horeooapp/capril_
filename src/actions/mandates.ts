@@ -2,7 +2,11 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { MandateStatus, MandateType } from "@prisma/client"
+// These are plain string fields in the schema (no Prisma enums generated)
+type MandateStatus = string
+type MandateType = string
+const MandateStatus = { VALIDATED: 'active', PENDING: 'draft', REJECTED: 'terminated' } as const
+const MandateType = { EXCLUSIVE: 'management_extended', NON_EXCLUSIVE: 'management_simple', RENTAL: 'rental' } as const
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
 import { generateProofHash } from "@/lib/proof"

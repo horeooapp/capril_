@@ -1,484 +1,529 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// --- Rôles ---
-enum UserType {
-  PERSON
-  COMPANY
-}
-
 enum Role {
+  SUPER_ADMIN
   ADMIN
+  ANAH_AGENT
+  CDC_AGENT
   LANDLORD
+  LANDLORD_PRO
   AGENCY
   TENANT
-  AUDITOR
   NON_CERTIFIED_AGENT
 }
 
-// --- Modèles NextAuth ---
+// ═══════════════════════════════════════════════════════
+// USERS (Part 4 & 5)
+// ═══════════════════════════════════════════════════════
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  phone         String?   @unique
-  userType      UserType  @default(PERSON)
-  companyName   String?
-  nationality   String?
-  profession    String?
-  cniNumber     String?   // Ou tout autre document d'identité
-  birthDate     DateTime?
-  password      String?
-  role          Role      @default(TENANT)
+  id                      String    @id @default(uuid()) @map("user_id")
+  phone                   String    @unique
+  fullName                String?   @map("full_name")
+  email                   String?
+  role                    Role      @default(TENANT)
+  kycLevel                Int       @default(0) @map("kyc_level") // 0-4
+  kycStatus               String    @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
+  status                  String    @default("active") // active|suspended|inactive
   
-  // Indice de Confiance Locatif (ICL)
-  reliabilityScore Int    @default(750) // Entre 300 et 1000
-  trustEvents      TrustEvent[]
-
-  // Champs pour les agents
-  isCertified       Boolean?  @default(false)
-  certificationDate DateTime?
-
-  accounts Account[]
-  sessions Session[]
-
-  // Relations métier
-  propertiesOwned   Property[] @relation("PropertyOwner")
-  propertiesManaged Property[] @relation("PropertyManager")
-  leasesAsTenant    Lease[]    @relation("LeaseTenant")
-  mandates          Mandate[]  @relation("AgentMandates")
-  auditLogs         AuditLog[]
-  notifications    Notification[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
-  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR
-  link      String?  // Optionnel: lien vers l'entité concernée (ex: /dashboard/leases/id)
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// --- Modèles Métier QAPRIL ---
-
-enum EscrowStatus {
-  ACTIVE
-  EN_LITIGE
-  LIBERE
-  PARTIELLEMENT_LIBERE
-}
-
-model Escrow {
-  id        String       @id @default(cuid())
-  leaseId   String       @unique
-  lease     Lease        @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  amount    Float
-  status    EscrowStatus @default(ACTIVE)
+  legalEntityId           String?   @map("legal_entity_id")
+  legalEntity             LegalEntity? @relation(fields: [legalEntityId], references: [id])
   
-  // Historique des mouvements pour la preuve renforcée
-  history   String?      // JSON stringified history of status changes
+  preferredLang           String?   @default("fr") @map("preferred_lang")
+  notificationPrefs       Json?     @default("{}") @map("notification_prefs")
   
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  // MaPoste & Other
+  maposteId               String?   @map("maposte_id")
+  pushToken               String?   @map("push_token")
+  
+  // Relations
+  identityDocuments       IdentityDocument[]
+  propertiesOwned         Property[]         @relation("PropertyOwner")
+  leasesAsLandlord        Lease[]            @relation("LeaseLandlord")
+  leasesAsTenant          Lease[]            @relation("LeaseTenant")
+  leasesAsAgent           Lease[]            @relation("LeaseAgent")
+  legalEntitiesCreated    LegalEntity[]      @relation("EntityCreator")
+  auditLogs               AuditLog[]
+  notifications           Notification[]
+  verifiedDocuments       IdentityDocument[] @relation("DocumentVerifier")
+  reliabilityScores       ReliabilityScore[]
+  certificates            Certificate[]
+  mandates                Mandate[]         @relation("AgentMandates")
+  propertiesManaged       Property[]        @relation("AgentProperties")
+
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+  @@index([phone])
+  @@index([role])
 }
 
+// ═══════════════════════════════════════════════════════
+// LEGAL ENTITIES (Part 5.1/Level 4)
+// ═══════════════════════════════════════════════════════
+model LegalEntity {
+  id                String   @id @default(uuid()) @map("entity_id")
+  createdByUserId   String   @map("created_by")
+  creator           User     @relation("EntityCreator", fields: [createdByUserId], references: [id])
+  companyName       String   @map("company_name")
+  legalForm         String?  @map("legal_form")
+  rccmNumber        String   @map("rccm_number")
+  nifNumber         String?  @map("nif_number")
+  registeredAddress String?  @map("registered_address")
+  activitySector    String?  @map("activity_sector")
+  bankAccount       String?  @map("bank_account")
+  status            String   @default("pending")
+  
+  users             User[]
+  leases            Lease[]           @relation("LeaseTenantEntity")
+  documents         IdentityDocument[]
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("legal_entities")
+}
+
+// ═══════════════════════════════════════════════════════
+// IDENTITY DOCUMENTS (Part 5.2)
+// ═══════════════════════════════════════════════════════
+model IdentityDocument {
+  id              String    @id @default(uuid()) @map("doc_id")
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id])
+  
+  legalEntityId   String?   @map("legal_entity_id")
+  legalEntity     LegalEntity? @relation(fields: [legalEntityId], references: [id])
+
+  docType         String    @map("doc_type") // CNI_CI|PASS_CI|RCCM|NIF|...
+  docNumber       String    @map("doc_number")
+  docNumberHash   String    @unique @map("doc_number_hash")
+  fullName        String?   @map("full_name")
+  birthDate       DateTime? @map("birth_date") @db.Date
+  nationality     String?   @db.Char(3)
+  issuingCountry  String?   @map("issuing_country") @db.Char(3)
+  expiryDate      DateTime? @map("expiry_date") @db.Date
+  mrzRawData      String?   @map("mrz_raw_data")
+  scanS3Key       String?   @map("scan_s3_key")
+  status          String    @default("pending") // pending|verified|under_review|expired|rejected
+  verifiedAt      DateTime? @map("verified_at")
+  verifiedByUserId String?  @map("verified_by")
+  verifier        User?     @relation("DocumentVerifier", fields: [verifiedByUserId], references: [id])
+  rejectionReason String?   @map("rejection_reason")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("identity_documents")
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPERTIES (Part 6)
+// ═══════════════════════════════════════════════════════
 model Property {
-  id           String  @id @default(cuid())
-  name         String? // Ex: "Appartement A1"
-  address      String
-  city         String
-  neighborhood String?
-  postalCode   String?
-  lotNumber     String? // Numéro du lot
-  dependencies  String? // Détail des dépendances
-  usage         String  @default("Habitation")
+  id                String   @id @default(uuid()) @map("property_id")
+  propertyCode      String   @unique @map("property_code") // HAB-ABJ-YOP-00001
+  ownerUserId       String   @map("owner_id")
+  owner             User     @relation("PropertyOwner", fields: [ownerUserId], references: [id])
+  propertyType      String   @map("property_type") // apartment|house|studio|villa|room|commercial
+  leaseType         String   @default("residential") @map("lease_type") // residential|commercial
+  commune           String
+  address           String   @db.Text
+  areaSqm           Decimal? @map("area_sqm") @db.Decimal(8, 2)
+  rooms             Int?     @db.SmallInt
+  bedrooms          Int?     @db.SmallInt
+  amenities         String[]
+  status            String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
+  documents         Json?    @default("{}")
   
-  // Passeport Logement
-  surface              Float?
-  digitalPostalAddress String?
-  gpsLatitude          Float?
-  gpsLongitude         Float?
+  verifiedAt        DateTime? @map("verified_at")
+  verifiedByUserId  String?   @map("verified_by")
   
-  country       String  @default("Côte d'Ivoire")
-  type         String  @default("APARTMENT")
+  managedByUserId   String?   @map("managed_by")
+  manager           User?     @relation("AgentProperties", fields: [managedByUserId], references: [id])
 
-  ownerId String
-  owner   User   @relation("PropertyOwner", fields: [ownerId], references: [id])
+  leases            Lease[]
+  mandates          Mandate[]
+  passports         Passport[]
+  images            PropertyImage[]
 
-  managerId String? // En cas de gestion déléguée à une agence
-  manager   User?   @relation("PropertyManager", fields: [managerId], references: [id])
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  leases   Lease[]
-  mandates Mandate[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("properties")
+  @@index([ownerUserId])
+  @@index([commune])
+  @@index([status])
 }
 
-enum MandateType {
-  EXCLUSIVE
-  NON_EXCLUSIVE
-}
-
-enum MandateStatus {
-  PENDING
-  VALIDATED
-  REJECTED
-  EXPIRED
-}
-
-model Mandate {
-  id         String @id @default(cuid())
-  propertyId String
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-
-  agentId String
-  agent   User   @relation("AgentMandates", fields: [agentId], references: [id])
-
-  type        MandateType   @default(NON_EXCLUSIVE)
-  status      MandateStatus @default(PENDING)
-  startDate   DateTime
-  endDate     DateTime?
-  documentUrl String? // URL du mandat signé
+model PropertyImage {
+  id         String   @id @default(uuid())
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id])
+  s3Key      String   @map("s3_key")
+  isMain     Boolean  @default(false) @map("is_main")
   
-  // Preuve renforcée
-  proofHash   String? @unique // Empreinte cryptographique du document/mandat
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("property_images")
 }
 
-model AuditLog {
-  id         String   @id @default(cuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
-  action     String // Ex: "CREATE_LEASE", "VALIDATE_MANDATE"
-  entityType String // Ex: "LEASE", "MANDATE"
-  entityId   String
-  details    String? // JSON stringifié pour plus de détails
-  
-  // Horodatage avancé pour la preuve renforcée
-  timestamp  DateTime @default(now())
-  proofHash  String?  // Hash combiné (prevLogHash + currentLogData)
-}
-
-enum LeaseStatus {
-  // Existing statuses
-  PENDING
-  ACTIVE
-  TERMINATED
-  
-  // New unpaid rent workflow statuses
-  LOYER_IMPAYE
-  MISE_EN_DEMEURE
-  DELAI_LEGAL
-  CLEMENCE_EN_COURS
-  REPRISE_PROCEDURE
-  DEMANDE_RESILIATION
-  EN_CONTENTIEUX
-  RESILIE_AMIABLEMENT
-  RESILIE_JUDICIAIREMENT
-}
-
+// ═══════════════════════════════════════════════════════
+// LEASES (Part 7 & 8)
+// ═══════════════════════════════════════════════════════
 model Lease {
-  id         String   @id @default(cuid())
-  propertyId String
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-
-  tenantId String
-  tenant   User   @relation("LeaseTenant", fields: [tenantId], references: [id])
-
-  startDate   DateTime
-  endDate     DateTime?
-  renewalMode String?   @default("Tacite reconduction")
+  id                String   @id @default(uuid()) @map("lease_id")
+  leaseReference    String   @unique @map("lease_reference") // BAIL-2026-00123
+  propertyId        String   @map("property_id")
+  property          Property @relation(fields: [propertyId], references: [id])
+  landlordId        String   @map("landlord_id")
+  landlord          User     @relation("LeaseLandlord", fields: [landlordId], references: [id])
+  tenantId          String?  @map("tenant_id")
+  tenant            User?    @relation("LeaseTenant", fields: [tenantId], references: [id])
+  tenantEntityId    String?  @map("tenant_entity_id")
+  tenantEntity      LegalEntity? @relation("LeaseTenantEntity", fields: [tenantEntityId], references: [id])
+  agentId           String?  @map("agent_id")
+  agent             User?    @relation("LeaseAgent", fields: [agentId], references: [id])
+  mandateId         String?  @map("mandate_id")
+  mandate           Mandate? @relation(fields: [mandateId], references: [id])
+  leaseType         String   @default("residential") @map("lease_type") // residential|commercial
   
-  // Nouveaux champs officiels pour le registre numérique
-  officialLeaseNumber String? @unique // Numéro unique figurant sur le contrat physique
-  scanUrl             String? // URL du document scanné ou PDF du contrat
-
-  rentAmount Float // Loyer mensuel de base
-  paymentDueDate Int? @default(5) // Jour d'échéance du paiement (ex: le 5 du mois)
-  charges    Float?    @default(0) // Charges locatives
-  deposit    Float? // Caution (max 2 mois)
+  startDate         DateTime @map("start_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
+  durationMonths    Int      @map("duration_months") @db.SmallInt
+  rentAmount        Int      @map("rent_amount") // FCFA entiers
+  chargesAmount     Int      @default(0) @map("charges_amount")
+  paymentDay        Int      @default(5) @map("payment_day") @db.SmallInt
+  depositAmount     Int      @default(0) @map("deposit_amount")
   
-  // Nouveaux champs financiers
-  advancePayment Float? @default(0) // Avance sur loyer (max 2 mois)
-  agencyFee      Float? @default(0) // Frais d'agence (max 1 mois)
-  legalPlafonningMet Boolean? @default(true) // Indicateur si le plafond légal est respecté
+  status            String   @default("draft") // draft|pending_signature|pending_deposit|active|notice_given|suspended|terminated|archived|cancelled
+  importMode        Boolean  @default(false) @map("import_mode")
+  
+  signedAt          DateTime? @map("signed_at")
+  terminatedAt      DateTime? @map("terminated_at")
+  terminationReason String?   @map("termination_reason") @db.Text
+  
+  commercialData    Json?     @map("commercial_data") // Indexation settings, company name, etc.
+  
+  receipts          Receipt[]
+  arrears           LeaseArrear[]
+  cdcDeposits       CDCDeposit[]
+  disputes          Dispute[]
+  incidentLogs      Incident[]
+  procedurePhases   ProcedurePhase[]
 
-  // Etat des lieux (textuel ou lien vers un document/JSON)
-  entryInventoryNotes String? 
-  exitInventoryNotes  String? 
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-  status LeaseStatus @default(ACTIVE)
-
-  // Signature Numérique
-  tenantSignature String?
-  ownerSignature  String?
-  signedAt       DateTime?
-
-  incidents      Incident[]
-  receipts       Receipt[]
-  escrow         Escrow?
-  insurance      Insurance?
-  cdcDeposit     CDCDeposit?
-  mediation      Mediation?
-  repaymentPlans RepaymentPlan[]
-  procedurePhases ProcedurePhase[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("leases")
+  @@index([propertyId])
+  @@index([tenantId])
+  @@index([status])
 }
 
-enum PlanStatus {
-  PROPOSED
-  ACCEPTED
-  REJECTED
-  RESPECTED
-  BROKEN
+// ═══════════════════════════════════════════════════════
+// RECEIPTS & PAYMENTS (Part 9)
+// ═══════════════════════════════════════════════════════
+model Receipt {
+  id                String   @id @default(uuid()) @map("receipt_id")
+  receiptRef        String   @unique @map("receipt_ref") // REC-2026-04-00123AB (or QR- format)
+  leaseId           String   @map("lease_id")
+  lease             Lease    @relation(fields: [leaseId], references: [id])
+  periodMonth       String   @map("period_month") // YYYY-MM
+  rentAmount        Int      @map("rent_amount")
+  chargesAmount     Int      @default(0) @map("charges_amount")
+  totalAmount       Int      @map("total_amount")
+  paymentMethod     String   @map("payment_method") // MOBILE_MONEY|CASH|BANK_TRANSFER
+  paymentRef        String?  @map("payment_ref")
+  paidAt            DateTime? @map("paid_at")
+  pdfUrl            String?  @map("pdf_url")
+  qrToken           String?  @unique @map("qr_token")
+  receiptHash       String?  @map("receipt_hash") // SHA256 of contents
+  status            String   @default("pending") // pending|paid|cancelled|disputed
+  declarative       Boolean  @default(false) @map("declarative")
+  
+  digitalDeliveryId String?  @map("digital_delivery_id")
+  delivery          DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
+
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("receipts")
+  @@index([leaseId])
+  @@index([periodMonth])
 }
 
-model RepaymentPlan {
-  id              String      @id @default(cuid())
-  leaseId         String
-  lease           Lease       @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+model PaymentIntent {
+  id                String   @id @default(uuid())
+  idempotencyKey    String   @unique @map("idempotency_key")
+  leaseId           String   @map("lease_id")
+  amount            Int
+  operator          String // orange|mtn|moov|wave
+  operatorRef       String?  @map("operator_ref")
+  status            String   @default("pending") // pending|success|failed
+  payerPhone        String   @map("payer_phone")
+  metadata          Json?
   
-  details         String      // Description de l'échéancier (JSON pour les dates/montants)
-  status          PlanStatus  @default(PROPOSED)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_intents")
+  @@index([operatorRef])
+}
+
+// ═══════════════════════════════════════════════════════
+// ARREARS & PROCEDURES (Part 11)
+// ═══════════════════════════════════════════════════════
+model LeaseArrear {
+  id        String   @id @default(uuid())
+  leaseId   String   @map("lease_id")
+  lease     Lease    @relation(fields: [leaseId], references: [id])
+  dueDate   DateTime @map("due_date") @db.Date
+  amount    Int
+  status    String   @default("unpaid") // unpaid|paid|partial|waived
   
-  // Signatures électroniques (Hash + Date)
-  ownerSignature  String?
-  tenantSignature String?
-  
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("lease_arrears")
+  @@index([dueDate, status])
 }
 
 model ProcedurePhase {
-  id          String   @id @default(cuid())
-  leaseId     String
-  lease       Lease    @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  phaseNumber Int      // Ex: 1 à 10 comme décrit dans l'addendum
-  name        String   // Nom de la phase
-  description String?  // Détails additionnels
+  id        String   @id @default(uuid())
+  leaseId   String   @map("lease_id")
+  lease     Lease    @relation(fields: [leaseId], references: [id])
+  phase     String // PHASE_1_FRIENDLY_REMINDER|...|PHASE_10
+  actionDate DateTime @default(now()) @map("action_date")
+  metadata  Json?
   
-  createdAt   DateTime @default(now())
+  @@map("procedure_phases")
+}
+
+// ═══════════════════════════════════════════════════════
+// CDC DEPOSIT (Part 10)
+// ═══════════════════════════════════════════════════════
+model CDCDeposit {
+  id              String   @id @default(uuid())
+  leaseId         String   @unique @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  amount          Int
+  cdcReference    String?  @map("cdc_reference")
+  status          String   @default("awaiting_payment") // awaiting_payment|payment_initiated|consigned|return_requested|returned|forfeited
+  consignedAt     DateTime? @map("consigned_at")
+  returnedAt      DateTime? @map("returned_at")
   
-  // Association optionnelle avec un document ou preuve
-  proofHash   String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("cdc_deposits")
 }
 
-enum PaymentMethod {
-  CASH
-  BANK_TRANSFER
-  MOBILE_MONEY
-  CREDIT_CARD
-  OTHER
-}
-
-enum InsuranceStatus {
-  INACTIVE
-  ACTIVE
-  PENDING
-  CANCELLED
-}
-
-model Insurance {
-  id        String          @id @default(cuid())
-  leaseId   String          @unique
-  lease     Lease           @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  status    InsuranceStatus @default(INACTIVE)
-  provider  String?         // Nom de l'assureur
-  policyNo  String?         @unique
+// ═══════════════════════════════════════════════════════
+// MANDATES (Part 12)
+// ═══════════════════════════════════════════════════════
+model Mandate {
+  id                String   @id @default(uuid())
+  mandateRef        String   @unique @map("mandate_ref")
+  propertyId        String   @map("property_id")
+  property          Property @relation(fields: [propertyId], references: [id])
+  agentUserId       String   @map("agent_id")
+  agent             User     @relation("AgentMandates", fields: [agentUserId], references: [id])
+  mandateType       String   @map("mandate_type") // management_simple|management_extended|rental|sale
+  commissionPct     Decimal  @map("commission_pct") @db.Decimal(5, 2) // max 15.00
+  startDate         DateTime @map("start_date") @db.Date
+  endDate           DateTime @map("end_date") @db.Date
+  status            String   @default("draft") // draft|active|expired|terminated
+  signedAt          DateTime? @map("signed_at")
+  pdfUrl            String?  @map("pdf_url")
   
-  claims    InsuranceClaim[]
+  leases            Lease[]
   
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("mandates")
 }
 
-model InsuranceClaim {
-  id          String   @id @default(cuid())
-  insuranceId String
-  insurance   Insurance @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
-  amount      Float
-  reason      String
-  status      String   @default("OPEN") // OPEN, PAID, REJECTED
+// ═══════════════════════════════════════════════════════
+// SCORING & CERTIFICATES (Part 13 & 14)
+// ═══════════════════════════════════════════════════════
+model ReliabilityScore {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  score           Int // 0-100
+  grade           String // A|B|C|D|E|F
+  breakdown       Json // payment_timeliness, payment_completeness, etc.
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("reliability_scores")
 }
 
-enum CDCDepositStatus {
-  PENDING
-  CONSIGNED
-  RELEASED
-  DISPUTED
-}
-
-enum CDCDepositInitiator {
-  TENANT
-  OWNER
-}
-
-enum MediationStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  FAILED
-}
-
-model Mediation {
-  id        String          @id @default(cuid())
-  leaseId   String          @unique
-  lease     Lease           @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  status    MediationStatus @default(OPEN)
-  subject   String
-  messages  MediationMessage[]
+model Certificate {
+  id              String    @id @default(uuid()) @map("cert_id")
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id])
+  certType        String    @map("cert_type") // CNL (Certificat Numérique Locataire)
+  issuedAt        DateTime  @default(now()) @map("issued_at")
+  expiresAt       DateTime  @map("expires_at")
+  qrToken         String    @unique @map("qr_token")
+  pdfUrl          String?   @map("pdf_url")
+  status          String    @default("valid") // valid|expired|revoked
   
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  @@map("certificates")
+}
+
+model Passport {
+  id              String   @id @default(uuid())
+  propertyId      String   @map("property_id")
+  property        Property @relation(fields: [propertyId], references: [id])
+  content         Json // Immutable facts about property history
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("passports")
+}
+
+// ═══════════════════════════════════════════════════════
+// DISPUTES & MEDIATION (Part 16)
+// ═══════════════════════════════════════════════════════
+model Dispute {
+  id              String   @id @default(uuid())
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  title           String
+  description     String   @db.Text
+  amountInDispute Int?     @map("amount_in_dispute")
+  status          String   @default("open") // open|waiting_response|in_mediation|resolved|escalated|closed
+  resolution      String?  @db.Text
+  
+  messages        MediationMessage[]
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("disputes")
 }
 
 model MediationMessage {
-  id          String    @id @default(cuid())
-  mediationId String
-  mediation   Mediation @relation(fields: [mediationId], references: [id], onDelete: Cascade)
-  senderId    String
-  content     String
+  id          String   @id @default(uuid())
+  disputeId   String   @map("dispute_id")
+  dispute     Dispute  @relation(fields: [disputeId], references: [id])
+  senderId    String   @map("sender_id")
+  content     String   @db.Text
+  attachments String[]
   
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("mediation_messages")
 }
 
-model MarketData {
-  id           String   @id @default(cuid())
-  city         String
-  neighborhood String   @default("")
-  propertyType String   // APARTMENT, HOUSE, etc.
-  averageRent  Float
-  sampleSize   Int
+// ═══════════════════════════════════════════════════════
+// INTEGRATIONS & SYSTEM (Part 17, 19, 20, 23)
+// ═══════════════════════════════════════════════════════
+model DigitalDelivery {
+  id             String   @id @default(uuid())
+  trackingNumber String   @unique @map("tracking_number") // CI-POST-2026-00123
+  deliveryMode   String   @map("delivery_mode") // maposte_number|physical_address|post_office
+  status         String   @default("submitted") // submitted|in_transit|delivered|failed|returned
+  recipientData  Json     @map("recipient_data")
+  deliveredAt    DateTime? @map("delivered_at")
   
-  updatedAt    DateTime @default(now()) @updatedAt
+  receipts       Receipt[]
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  @@unique([city, neighborhood, propertyType])
+  @@map("digital_deliveries")
 }
 
-model CDCDeposit {
-  id           String             @id @default(cuid())
-  leaseId      String             @unique
-  lease        Lease              @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-  initiator    CDCDepositInitiator
-  amount       Float
-  cdcReference String?            @unique
-  status       CDCDepositStatus   @default(PENDING)
-  proofHash    String?
-  
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-}
-
-model Receipt {
-  id            String @id @default(cuid())
-  receiptNumber String @unique // Numéro unique de quittance pour la légalité et l'audit
-
-  leaseId String
-  lease   Lease  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
-
-  periodStart DateTime // Début de la période de location
-  periodEnd   DateTime // Fin de la période de location
-
-  amountPaid    Float // Montant réellement payé
-  paymentDate   DateTime
-  paymentMethod PaymentMethod @default(MOBILE_MONEY)
-
-  isSent     Boolean @default(false) // Pour l'optimisation des notifications
-  pdfUrl     String? // URL du PDF de quittance archivé
-  qrCodeHash String? @unique // Hash pour le QR code
-  
-  // Preuve renforcée
-  documentHash String? @unique // Empreinte cryptographique (SHA256) du contenu
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// --- Module: Indice de Confiance Locatif (ICL) ---
-
-model TrustEvent {
-  id        String   @id @default(cuid())
-  userId    String
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id])
-  points    Int      // Ex: +2, -30
-  reason    String   // Ex: "Paiement à temps", "Retard > 30j"
-  createdAt DateTime @default(now())
+  channel   String // SMS|PUSH|EMAIL|WHATSAPP|USSD_PUSH|COURRIER
+  title     String?
+  content   String   @db.Text
+  status    String   @default("pending") // pending|sent|delivered|failed
+  retryCount Int     @default(0) @map("retry_count")
+  
+  createdAt DateTime @default(now()) @map("created_at")
 
-  relatedEntityId String? // ID de la quittance ou du bail lié
+  @@map("notifications")
 }
 
-// --- Module: Passeport Logement & Incidents ---
+model ObservatorySnapshot {
+  id          String   @id @default(uuid())
+  commune     String
+  propertyType String  @map("property_type")
+  period      String // YYYY-QX
+  avgRent     Int      @map("avg_rent")
+  medianRent  Int      @map("median_rent")
+  minRent     Int      @map("min_rent")
+  maxRent     Int      @map("max_rent")
+  sampleCount Int      @map("sample_count")
+  trendPct    Decimal  @map("trend_pct") @db.Decimal(5, 2)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("observatory_snapshots")
+  @@index([commune, period])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String // User creation, lease signed, payment processed...
+  module    String // AUTH|KYC|LEASE|PAYMENT|...
+  entityId  String?  @map("entity_id")
+  oldValues Json?    @map("old_values")
+  newValues Json?    @map("new_values")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_log")
+}
+
+model WebhookEvent {
+  id             String   @id @default(uuid())
+  operator       String // orange|mtn|moov|wave|maposte|cdcci
+  eventType      String   @map("event_type")
+  payload        Json
+  signatureValid Boolean  @map("signature_valid")
+  processed      Boolean  @default(false)
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("webhook_events")
+}
+
+model SystemConfig {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_config")
+}
 
 model Incident {
-  id          String   @id @default(cuid())
-  leaseId     String
-  lease       Lease    @relation(fields: [leaseId], references: [id])
-  reporterId  String
-  type        String   // Ex: DEGRADATION, LITIGE_CAUTION, BRUIT
-  description String
-  severity    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
-  status      String   @default("OPEN")   // OPEN, RESOLVED
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  leaseId   String   @map("lease_id")
+  lease     Lease    @relation(fields: [leaseId], references: [id])
+  type      String // Damage, late payment, early exit, etc.
+  description String @db.Text
+  resolved  Boolean  @default(false)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("incidents")
 }
+

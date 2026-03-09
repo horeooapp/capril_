@@ -1,38 +1,40 @@
 import { prisma } from "./prisma"
 
 /**
- * Updates the Indice de Confiance Locatif (ICL) of a user and logs the event.
- * @param userId - ID of the user (Tenant, Owner, or Agent)
- * @param points - Points to add (positive) or subtract (negative)
- * @param reason - Text description of the event
- * @param relatedEntityId - Optional ID of the lease or receipt linked to this event
+ * Updates the ICL score of a user and logs it to ReliabilityScore table.
  */
 export async function updateICLScore(userId: string, points: number, reason: string, relatedEntityId?: string) {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { reliabilityScore: true }
-    })
+    const db = prisma as any; // Bypass stale generated client until next `prisma generate`
+    const latest = await db.reliabilityScore.findFirst({
+        where: { userId },
+        orderBy: { calculatedAt: 'desc' }
+    });
 
-    if (!user) return
+    const currentScore = latest?.score ?? 500;
+    const newScore = Math.min(1000, Math.max(300, currentScore + points));
 
-    // Clamp score between 300 and 1000
-    const newScore = Math.min(1000, Math.max(300, user.reliabilityScore + points))
+    await db.reliabilityScore.create({
+        data: {
+            userId,
+            score: newScore,
+            grade: scoreToGrade(newScore),
+            kycPoints: 0,
+            punctualityPoints: points > 0 ? points : 0,
+            completenessPoints: 0,
+            digitalSignaturePoints: 0,
+            incidentFreePoints: 0,
+            entityPresencePoints: 0,
+        }
+    });
+}
 
-    // Transactions ensure data consistency
-    await prisma.$transaction([
-        prisma.user.update({
-            where: { id: userId },
-            data: { reliabilityScore: newScore }
-        }),
-        prisma.trustEvent.create({
-            data: {
-                userId,
-                points,
-                reason,
-                relatedEntityId
-            }
-        })
-    ])
+function scoreToGrade(score: number): string {
+    if (score >= 90) return 'A';
+    if (score >= 75) return 'B';
+    if (score >= 60) return 'C';
+    if (score >= 45) return 'D';
+    if (score >= 30) return 'E';
+    return 'F';
 }
 
 /**

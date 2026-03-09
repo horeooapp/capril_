@@ -23,7 +23,7 @@ export default function LoginPage() {
                             Connexion
                         </h2>
                         <p className="mt-2 text-sm text-gray-600 mb-6">
-                            Accédez à votre espace sécurisé via un lien magique.
+                            Accédez à votre espace sécurisé via votre numéro de téléphone.
                         </p>
 
                         <div className="bg-gray-100 p-1 rounded-lg flex mb-6">
@@ -43,7 +43,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="mt-6 border-t pt-6">
-                        <MagicLinkForm role={selectedRole} />
+                        <PhoneOTPForm role={selectedRole} />
                     </div>
                 </div>
             </div>
@@ -60,55 +60,110 @@ export default function LoginPage() {
     )
 }
 
-function MagicLinkForm({ role }: { role: string }) {
+import { requestOTP, loginWithOTP } from "@/actions/auth"
+
+function PhoneOTPForm({ role }: { role: string }) {
+    const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE')
+    const [phone, setPhone] = useState('')
+    const [otp, setOtp] = useState('')
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
-    async function handleSubmit(formData: FormData) {
+    async function handleRequestOTP(e: React.FormEvent) {
+        e.preventDefault()
         setError(null)
-        console.log("Form submitted. Starting transition...");
         startTransition(async () => {
-            console.log("Inside transition, calling loginWithMagicLink...");
-            try {
-                const result = await loginWithMagicLink(formData)
-                console.log("Received result from loginWithMagicLink:", result);
-                if (result?.error) {
-                    setError(result.error)
-                } else if (result?.success) {
-                    // Si succès, rediriger via le routeur Next.js
-                    console.log("Success! Redirecting...");
-                    router.push("/verify-request")
-                } else {
-                    console.log("No error or success in result:", result);
-                }
-            } catch (e) {
-                console.error("Login unexpected error:", e)
-                setError("Une erreur technique est survenue. Veuillez vérifier votre connexion.")
+            const result = await requestOTP(phone)
+            if (result.success) {
+                setStep('OTP')
+            } else {
+                setError(result.error || "Échec de l'envoi du code.")
             }
         })
     }
 
+    async function handleVerifyOTP(e: React.FormEvent) {
+        e.preventDefault()
+        setError(null)
+        startTransition(async () => {
+            const result = await loginWithOTP(phone, otp)
+            if (result.success) {
+                router.push("/dashboard")
+                router.refresh()
+            } else {
+                setError(result.error || "Code incorrect.")
+            }
+        })
+    }
+
+    if (step === 'PHONE') {
+        return (
+            <form className="space-y-6" onSubmit={handleRequestOTP}>
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
+                        {error}
+                    </div>
+                )}
+                <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                        Numéro de téléphone
+                    </label>
+                    <div className="mt-1">
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            required
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
+                            placeholder="+225 00 00 00 00 00"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <button
+                        type="submit"
+                        disabled={isPending}
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
+                    >
+                        {isPending ? 'Envoi...' : 'Recevoir le code par SMS'}
+                    </button>
+                </div>
+
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
+                    <p className="text-xs text-blue-700">
+                        <strong>Nouveau sur QAPRIL ?</strong> Votre compte sera créé automatiquement après vérification de votre numéro.
+                    </p>
+                </div>
+            </form>
+        )
+    }
+
     return (
-        <form className="space-y-6" action={handleSubmit}>
-            <input type="hidden" name="role" value={role} />
+        <form className="space-y-6" onSubmit={handleVerifyOTP}>
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
                     {error}
                 </div>
             )}
             <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Adresse e-mail
+                <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                    Code de vérification (6 chiffres)
                 </label>
                 <div className="mt-1">
                     <input
-                        id="email"
-                        name="email"
-                        type="email"
+                        id="otp"
+                        name="otp"
+                        type="text"
+                        maxLength={6}
                         required
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
-                        placeholder="nom@exemple.net"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm text-center tracking-[1em] font-bold"
+                        placeholder="000000"
                     />
                 </div>
             </div>
@@ -119,21 +174,16 @@ function MagicLinkForm({ role }: { role: string }) {
                     disabled={isPending}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] transition-colors disabled:opacity-50"
                 >
-                    {isPending ? 'Envoi...' : 'Recevoir le lien (Connexion / Inscription)'}
+                    {isPending ? 'Vérification...' : 'Se connecter'}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setStep('PHONE')}
+                    className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700"
+                >
+                    Modifier le numéro
                 </button>
             </div>
-
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-md">
-                <p className="text-xs text-blue-700">
-                    <strong>Nouveau sur QAPRIL ?</strong> Saisissez votre adresse e-mail pour créer votre compte instantanément. Un lien de vérification vous sera envoyé.
-                </p>
-            </div>
-
-            <p className="text-xs text-center text-gray-500 mt-4">
-                Un lien de connexion sécurisé vous sera envoyé par e-mail.
-                <br />
-                <span className="italic mt-1 block">Le système détectera automatiquement si vous êtes Locataire, Propriétaire ou Administrateur et vous dirigera vers le bon portail.</span>
-            </p>
         </form>
     )
 }

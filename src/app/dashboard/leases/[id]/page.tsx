@@ -24,16 +24,16 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Détails du Bail</h1>
-                    <p className="text-sm text-gray-500">Réf: {lease.id}</p>
+                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {lease.leaseRef}</p>
                 </div>
                 <div className="flex space-x-3">
                     <Link
                         href={`/dashboard/certificates/${lease.id}`}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all font-bold"
                     >
-                        📄 Certificat de Location
+                        📄 Certificat
                     </Link>
-                    <GenerateReceiptForm leaseId={lease.id} rentAmount={lease.rentAmount} />
+                    <GenerateReceiptForm leaseId={lease.id} monthlyRentFcfa={lease.monthlyRentFcfa} />
                 </div>
             </div>
 

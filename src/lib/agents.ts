@@ -23,7 +23,8 @@ export async function getAgentStatus(userId?: string): Promise<AgentStatus | nul
         where: { id },
         select: {
             createdAt: true,
-            isCertified: true,
+            kycLevel: true,
+            kycStatus: true,
             role: true
         }
     })
@@ -32,16 +33,19 @@ export async function getAgentStatus(userId?: string): Promise<AgentStatus | nul
         return null
     }
 
+    // `isCertified` proxy: KYC level 4 and verified status = certified agent
+    const isCertified = user.kycLevel >= 4 && user.kycStatus === 'verified';
+
     const registrationDate = user.createdAt;
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - registrationDate.getTime());
     const daysSinceRegistration = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     const daysRemaining = Math.max(0, REGULARIZATION_PERIOD_DAYS - daysSinceRegistration);
-    const isSuspended = !user.isCertified && daysRemaining === 0;
+    const isSuspended = !isCertified && daysRemaining === 0;
 
-    const alerts: string[] = [];
-    if (!user.isCertified) {
+    const alerts: string[] = []
+    if (!isCertified) {
         if (daysSinceRegistration >= 240) alerts.push("ALERTE CRITIQUE (J+240): Suspension imminente dans moins de 30 jours.");
         else if (daysSinceRegistration >= 180) alerts.push("ALERTE RÈGLEMENTAIRE (J+180): Veuillez régulariser votre situation.");
         else if (daysSinceRegistration >= 90) alerts.push("Information (J+90): Rappel de l'obligation de certification sous 9 mois.");
@@ -49,7 +53,7 @@ export async function getAgentStatus(userId?: string): Promise<AgentStatus | nul
     }
 
     return {
-        isCertified: !!user.isCertified,
+        isCertified,
         daysSinceRegistration,
         daysRemaining,
         isSuspended,

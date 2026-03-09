@@ -19,16 +19,21 @@ export async function getUserTrustData() {
     const userId = session?.user?.id
     if (!userId) throw new Error("Unauthorized")
 
-    return await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-            reliabilityScore: true,
-            trustEvents: {
-                orderBy: { createdAt: 'desc' },
-                take: 20
-            }
-        }
-    })
+    const db = prisma as any;
+
+    const reliabilityScores = await db.reliabilityScore.findMany({
+        where: { userId },
+        orderBy: { calculatedAt: 'desc' },
+        take: 20
+    });
+
+    const latestScore = reliabilityScores[0];
+
+    return {
+        reliabilityScore: latestScore?.score ?? 750,
+        reliabilityScores,
+        grade: latestScore?.grade ?? 'C'
+    }
 }
 export async function logScoreConsultation(targetUserId: string, reason: string) {
     const session = await auth()

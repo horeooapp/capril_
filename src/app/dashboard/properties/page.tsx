@@ -4,65 +4,70 @@ export default async function PropertiesPage() {
     const properties = await getProperties().catch(() => [])
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">Mes Logements</h1>
-                <a href="/dashboard/properties/new" className="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium shadow-sm transition-colors text-center inline-block">
-                    + Ajouter un logement
+        <div className="space-y-8 py-8 animate-in fade-in duration-500">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Mes Biens Immobiliers</h1>
+                    <p className="text-gray-500 mt-1">Gérez votre parc immobilier et suivez vos quittances.</p>
+                </div>
+                <a href="/dashboard/properties/new" className="bg-[#FF8200] hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-1 text-center inline-block">
+                    + Enregistrer un bien
                 </a>
             </div>
 
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="grid grid-cols-1 gap-6">
                 {properties.length === 0 ? (
-                    <div className="text-center py-12">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun logement</h3>
-                        <p className="mt-1 text-sm text-gray-500">Commencez par ajouter votre première propriété pour générer des quittances.</p>
-                        <div className="mt-6">
-                            <a href="/dashboard/properties/new" className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700">
-                                + Nouveau Logement
-                            </a>
+                    <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-12 text-center">
+                        <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span className="text-4xl">🏢</span>
                         </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Aucun bien enregistré</h3>
+                        <p className="text-gray-500 max-w-sm mx-auto mb-8">
+                            Ajoutez votre premier bien résidentiel ou commercial pour commencer à générer des quittances automatiques.
+                        </p>
+                        <a href="/dashboard/properties/new" className="inline-flex items-center px-6 py-3 bg-[#FF8200] text-white font-bold rounded-xl shadow-md hover:bg-orange-600 transition-all">
+                            Enregistrer mon premier bien
+                        </a>
                     </div>
                 ) : (
-                    <ul className="divide-y divide-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {properties.map((property: any) => (
-                            <li key={property.id}>
-                                <div className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
-                                    <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-primary truncate">
-                                            {property.name || property.address}
-                                        </p>
-                                        <div className="ml-2 flex-shrink-0 flex items-center space-x-2">
-                                            <a 
-                                                href={`/dashboard/properties/${property.id}/passport`}
-                                                className="px-2.5 py-1 text-xs font-bold border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all"
-                                            >
-                                                Passeport Logement
-                                            </a>
-                                            <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {property.leases.length} contrat(s) actif(s)
-                                            </p>
+                            <div key={property.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all group">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${property.propertyCategory === 'RESIDENTIAL' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                                            {property.propertyCategory === 'RESIDENTIAL' ? 'Résidentiel' : 'Commercial'}
                                         </div>
+                                        <span className="text-xs font-mono font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+                                            {property.propertyCode}
+                                        </span>
                                     </div>
-                                    <div className="mt-2 sm:flex sm:justify-between">
-                                        <div className="sm:flex">
-                                            <p className="flex items-center text-sm text-gray-500">
-                                                {property.address}, {property.postalCode} {property.city}
+                                    
+                                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#FF8200] transition-colors">
+                                        {property.propertyType === 'VILLA' ? '🏡 Villa' : property.propertyType === 'APARTMENT' ? '🏢 Appartement' : '🏠 Bien'} {property.commune}
+                                    </h3>
+                                    <p className="text-sm text-gray-500 line-clamp-1 mb-4">
+                                        📍 {property.addressLine1}
+                                    </p>
+
+                                    <div className="flex items-end justify-between pt-4 border-t border-gray-50">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loyer mensuel</p>
+                                            <p className="text-xl font-black text-gray-900">
+                                                {parseInt(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-xs font-medium">FCFA</span>
                                             </p>
                                         </div>
-                                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                            <p>
-                                                Créé le {new Date(property.createdAt).toLocaleDateString('fr-FR')}
-                                            </p>
-                                        </div>
+                                        <a 
+                                            href={`/dashboard/properties/${property.id}`}
+                                            className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-[#FF8200] hover:text-white transition-all"
+                                        >
+                                            →
+                                        </a>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 )}
             </div>
         </div>

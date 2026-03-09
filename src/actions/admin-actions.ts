@@ -24,10 +24,12 @@ export async function getAllUsers() {
         orderBy: { createdAt: 'desc' },
         select: {
             id: true,
-            name: true,
+            fullName: true,
             email: true,
             role: true,
-            isCertified: true,
+            kycLevel: true,
+            kycStatus: true,
+            status: true,
             createdAt: true,
             phone: true
         }
@@ -45,16 +47,21 @@ export async function getPendingValidations() {
                 { role: Role.AGENCY },
                 { role: Role.NON_CERTIFIED_AGENT }
             ],
-            isCertified: false
+            kycLevel: { lt: 4 } // Level 4 is for verified legal entities/agencies
         },
         orderBy: { createdAt: 'desc' },
         select: {
             id: true,
-            name: true,
+            fullName: true,
             email: true,
             role: true,
-            companyName: true,
-            createdAt: true
+            legalEntity: {
+                select: {
+                    companyName: true
+                }
+            },
+            createdAt: true,
+            kycStatus: true
         }
     })
 }
@@ -69,9 +76,9 @@ export async function certifyAgency(userId: string) {
         await prisma.user.update({
             where: { id: userId },
             data: {
-                isCertified: true,
-                certificationDate: new Date(),
-                role: Role.AGENCY // S'assure qu'il est bien AGENCY s'il était NON_CERTIFIED
+                kycLevel: 4,
+                kycStatus: "verified",
+                role: Role.AGENCY
             }
         })
         

@@ -83,7 +83,7 @@ export default async function TrustProfile() {
                         <h2 className="font-bold text-gray-800">Historique de Confiance</h2>
                         <span className="text-[10px] text-gray-400 font-bold uppercase md:hidden tracking-widest">Glissez pour voir →</span>
                     </div>
-                    {data.trustEvents.length === 0 ? (
+                    {(data.reliabilityScores ?? []).length === 0 ? (
                         <div className="p-10 text-center text-gray-400 italic">
                             Aucun événement enregistré. Votre score initial est de 750.
                         </div>
@@ -98,16 +98,16 @@ export default async function TrustProfile() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {data.trustEvents.map((event) => (
+                                    {(data.reliabilityScores ?? []).map((event: any) => (
                                         <tr key={event.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
                                             <td className="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                                {new Date(event.createdAt).toLocaleDateString('fr-FR')}
+                                                {new Date(event.calculatedAt ?? event.createdAt).toLocaleDateString('fr-FR')}
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-800">
-                                                {event.reason}
+                                                Score: {event.score} — Grade {event.grade}
                                             </td>
-                                            <td className={`px-6 py-4 text-sm font-bold text-right whitespace-nowrap ${event.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                {event.points > 0 ? `+${event.points}` : event.points}
+                                            <td className={`px-6 py-4 text-sm font-bold text-right whitespace-nowrap text-blue-600`}>
+                                                {event.score} pts
                                             </td>
                                         </tr>
                                     ))}

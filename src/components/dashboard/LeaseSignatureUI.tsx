@@ -1,103 +1,138 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { signLease } from "@/actions/leases"
-import LeaseAgreement from "@/components/dashboard/LeaseAgreement"
-import { useRouter } from "next/navigation"
+import { useState } from 'react'
+import { requestSignatureOTP, signLease } from '@/actions/leases'
+import { Button } from '@/components/ui/button' // Assuming these exist or using standard buttons
+import { Input } from '@/components/ui/input'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { ShieldCheck, Send, CheckCircle2 } from 'lucide-react'
 
-interface LeaseSignatureUIProps {
-    lease: any
-    userId: string
-}
+export function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, leaseRef: string }) {
+    const [step, setStep] = useState<'initial' | 'otp' | 'success'>('initial')
+    const [otp, setOtp] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
-export default function LeaseSignatureUI({ lease, userId }: LeaseSignatureUIProps) {
-    const [agree, setAgree] = useState(false)
-    const [isPending, setIsPending] = useState(false)
-    const router = useRouter()
-
-    const isTenant = lease.tenantId === userId
-    const isOwner = lease.property.ownerId === userId
-    const alreadySigned = (isTenant && lease.tenantSignature) || (isOwner && lease.ownerSignature)
-
-    const handleSign = async () => {
-        if (!agree) return
-        setIsPending(true)
+    const handleRequestOTP = async () => {
+        setLoading(true)
+        setError(null)
         try {
-            // Dans une version réelle, on pourrait générer un code de validation SMS
-            const signatureHash = `SIGN-${userId}-${Date.now()}`
-            const result = await signLease(lease.id, signatureHash)
-            if (result.success) {
-                router.refresh()
+            const res = await requestSignatureOTP(leaseId)
+            if (res.success) {
+                setStep('otp')
+            } else {
+                setError(res.error || "Échec de l'envoi du code.")
             }
-        } catch (error) {
-            alert("Erreur lors de la signature.")
+        } catch (err) {
+            setError("Une erreur est survenue.")
         } finally {
-            setIsPending(false)
+            setLoading(false)
         }
     }
 
+    const handleSign = async () => {
+        setLoading(true)
+        setError(null)
+        try {
+            const res = await signLease(leaseId, otp)
+            if (res.success) {
+                setStep('success')
+            } else {
+                setError(res.error || "Code invalide.")
+            }
+        } catch (err) {
+            setError("Une erreur est survenue lors de la signature.")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (step === 'success') {
+        return (
+            <Card className="max-w-md mx-auto border-green-200 bg-green-50 shadow-lg animate-in fade-in zoom-in duration-300">
+                <CardContent className="pt-6 text-center">
+                    <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                    <CardTitle className="text-2xl font-bold text-green-800 mb-2">Signature Réussie !</CardTitle>
+                    <p className="text-green-700">Le bail <strong>{leaseRef}</strong> est désormais actif et certifié v3.0.</p>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => window.location.href = '/dashboard/leases'}>
+                        Retour aux baux
+                    </Button>
+                </CardFooter>
+            </Card>
+        )
+    }
+
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="max-w-4xl mx-auto flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div>
-                    <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Validation du Contrat</h1>
-                    <p className="text-sm text-gray-500 font-medium">Veuillez relire attentivement les clauses avant de signer numériquement.</p>
+        <Card className="max-w-md mx-auto shadow-xl border-t-4 border-t-primary overflow-hidden">
+            <CardHeader className="bg-slate-50 border-b">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full">
+                        <ShieldCheck className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-xl">Signature Digitale 2FA</CardTitle>
+                        <p className="text-sm text-muted-foreground">Bail: {leaseRef}</p>
+                    </div>
                 </div>
-                <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                    lease.status === 'ACTIVE' 
-                        ? 'bg-green-100 text-green-700 border border-green-200' 
-                        : 'bg-orange-100 text-orange-700 border border-orange-200 animate-pulse'
-                }`}>
-                    Statut : {lease.status === 'ACTIVE' ? 'Contrat Actif' : 'En attente de signature'}
-                </div>
-            </div>
-
-            <LeaseAgreement lease={lease} />
-
-            <div className="max-w-4xl mx-auto bg-gray-900 text-white p-8 rounded-3xl shadow-2xl border border-gray-800">
-                {alreadySigned ? (
-                    <div className="text-center py-4">
-                        <div className="text-4xl mb-4">✅</div>
-                        <h2 className="text-xl font-bold uppercase tracking-tight">Vous avez déjà signé ce contrat</h2>
-                        <p className="text-gray-400 mt-2 text-sm">Le contrat deviendra actif dès que {isTenant ? 'le propriétaire' : 'le locataire'} aura également apposé sa signature.</p>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+                {step === 'initial' ? (
+                    <div className="space-y-4">
+                        <div className="p-4 bg-amber-50 rounded-lg border border-amber-100 text-sm text-amber-800">
+                            <p className="font-semibold mb-1">Processus de certification v3.0</p>
+                            <p>Un code de validation sera envoyé au numéro de téléphone du locataire pour confirmer la signature.</p>
+                        </div>
+                        <Button 
+                            className="w-full h-12 text-lg font-semibold flex gap-2" 
+                            onClick={handleRequestOTP}
+                            disabled={loading}
+                        >
+                            {loading ? "Envoi en cours..." : "Demander le Code (2FA)"}
+                            <Send className="w-5 h-5" />
+                        </Button>
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                        <h2 className="text-xl font-black uppercase tracking-tight flex items-center">
-                            <span className="mr-3 text-orange-500">✍️</span> Signature Numérique
-                        </h2>
-                        
-                        <div className="space-y-4">
-                            <label className="flex items-start space-x-3 cursor-pointer group">
-                                <input 
-                                    type="checkbox" 
-                                    checked={agree}
-                                    onChange={(e) => setAgree(e.target.checked)}
-                                    className="mt-1 w-5 h-5 rounded border-gray-700 bg-gray-800 text-orange-500 focus:ring-orange-500 transition-all"
-                                />
-                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors leading-relaxed">
-                                    Je reconnais avoir pris connaissance de l'intégralité des clauses du présent contrat de bail et j'accepte d'y apposer ma signature numérique. 
-                                    Je comprends que cette signature a <strong>valeur légale et probante</strong> au sens de la législation ivoirienne.
-                                </span>
-                            </label>
-
-                            <div className="pt-6 flex justify-center">
-                                <button
-                                    onClick={handleSign}
-                                    disabled={!agree || isPending}
-                                    className={`px-12 py-4 rounded-xl font-black uppercase tracking-widest transition-all ${
-                                        agree 
-                                            ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-xl shadow-orange-500/20 active:scale-95' 
-                                            : 'bg-gray-800 text-gray-600 cursor-not-allowed border border-gray-700'
-                                    }`}
-                                >
-                                    {isPending ? 'Signature en cours...' : 'Apposer ma Signature Numérique'}
-                                </button>
-                            </div>
-                        </div>
+                    <div className="space-y-4 animate-in slide-in-from-right duration-300">
+                        <p className="text-sm text-center text-muted-foreground">
+                            Entrez le code à 6 chiffres reçu par SMS.
+                        </p>
+                        <Input 
+                            type="text" 
+                            placeholder="000000" 
+                            className="text-center text-2xl tracking-[0.5em] font-mono h-14"
+                            maxLength={6}
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                        />
+                        <Button 
+                            className="w-full h-12 text-lg font-semibold" 
+                            onClick={handleSign}
+                            disabled={loading || otp.length !== 6}
+                        >
+                            {loading ? "Validation..." : "Signer le Bail"}
+                        </Button>
+                        <button 
+                            className="text-sm text-primary underline w-full text-center"
+                            onClick={() => setStep('initial')}
+                            disabled={loading}
+                        >
+                            Renvoyer le code
+                        </button>
                     </div>
                 )}
-            </div>
-        </div>
+                {error && (
+                    <p className="text-sm text-red-500 bg-red-50 p-3 rounded border border-red-100 animate-shake">
+                        {error}
+                    </p>
+                )}
+            </CardContent>
+            <CardFooter className="bg-slate-50 border-t py-4">
+                <p className="text-xs text-center w-full text-muted-foreground">
+                    Signature sécurisée par cryptographie asymétrique (SHA-256).
+                </p>
+            </CardFooter>
+        </Card>
     )
 }

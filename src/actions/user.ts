@@ -3,9 +3,8 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { Role } from "@prisma/client"
 
-export async function updateUserRole(role: Role) {
+export async function updateProfile(data: { fullName?: string, email?: string, role?: string }) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
@@ -15,7 +14,10 @@ export async function updateUserRole(role: Role) {
     try {
         await prisma.user.update({
             where: { id: session.user.id },
-            data: { role }
+            data: {
+                ...data,
+                status: 'ACTIVE' 
+            } as any
         })
 
         revalidatePath("/dashboard")
@@ -23,7 +25,7 @@ export async function updateUserRole(role: Role) {
         
         return { success: true }
     } catch (error) {
-        console.error("[SERVER ACTION] Error updating user role:", error)
+        console.error("[SERVER ACTION] Error updating user profile:", error)
         return { error: "Impossible de mettre à jour le profil. Veuillez réessayer." }
     }
 }

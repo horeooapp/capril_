@@ -5,30 +5,40 @@ declare module "next-auth" {
     interface Session {
         user: {
             id: string
+            phone?: string
             role: Role
-            isCertified?: boolean | null
+            status?: string
+            kycLevel: number
+            kycStatus: string
         } & DefaultSession["user"]
     }
 
     interface User {
+        phone?: string | null
         role?: Role
-        isCertified?: boolean | null
-        password?: string | null
+        status?: string | null
+        kycLevel?: number
+        kycStatus?: string
     }
 }
 
 declare module "next-auth/jwt" {
     interface JWT {
         id?: string
+        phone?: string
         role?: Role
-        isCertified?: boolean | null
+        status?: string
+        kycLevel?: number
+        kycStatus?: string
     }
 }
 
 declare module "@auth/core/adapters" {
     interface AdapterUser {
+        phone?: string | null
         role?: Role
-        isCertified?: boolean | null
-        password?: string | null
+        status?: string | null
+        kycLevel?: number
+        kycStatus?: string
     }
 }

@@ -1,4 +1,4 @@
-name: 🚀 Deploy to Hostinger
+name: 🚀 Deploy QAPRIL v3.0 to Hostinger
 
 on:
   push:
@@ -6,7 +6,11 @@ on:
       - main
 
 jobs:
-  deploy:
+  # ──────────────────────────────────────────────────────
+  # JOB 1: Quality Gate (Build + Type Check)
+  # ──────────────────────────────────────────────────────
+  build:
+    name: 🔨 Build & Type Check
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +29,9 @@ jobs:
       - name: 🏗️ Generate Prisma Client
         run: npx prisma generate
 
+      - name: 🔍 TypeScript type check
+        run: npx tsc --noEmit
+
       - name: 🔨 Build application
         run: npm run build
         env:
@@ -34,6 +41,49 @@ jobs:
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           EMAIL_FROM: ${{ vars.EMAIL_FROM }}
           EMAIL_SERVER: ${{ secrets.EMAIL_SERVER }}
+          # Mobile Money & Payments
+          MOBILE_MONEY_WEBHOOK_SECRET: ${{ secrets.MOBILE_MONEY_WEBHOOK_SECRET }}
+          ORANGE_MONEY_API_KEY: ${{ secrets.ORANGE_MONEY_API_KEY }}
+          MTN_MOMO_API_KEY: ${{ secrets.MTN_MOMO_API_KEY }}
+          MOOV_MONEY_API_KEY: ${{ secrets.MOOV_MONEY_API_KEY }}
+          # MaPoste
+          MAPOSTE_WEBHOOK_SECRET: ${{ secrets.MAPOSTE_WEBHOOK_SECRET }}
+          MAPOSTE_API_KEY: ${{ secrets.MAPOSTE_API_KEY }}
+          # SMS Gateway
+          SMS_GATEWAY_PROVIDER: ${{ vars.SMS_GATEWAY_PROVIDER }}
+          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
+          # USSD
+          USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
+          # App
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+
+      - name: 💾 Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            .next/standalone
+            .next/static
+            public
+            prisma
+            server.js
+            package.json
+          retention-days: 1
+
+  # ──────────────────────────────────────────────────────
+  # JOB 2: Deploy to Hostinger
+  # ──────────────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy to Hostinger
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    steps:
+      - name: 📥 Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
 
       - name: 🗝️ Setup SSH
         uses: shimataro/ssh-key-action@v2
@@ -44,9 +94,8 @@ jobs:
 
       - name: 📂 Sync files (Rsync)
         run: |
-          # On synchronise le wrapper server.js, le dossier standalone (renommé), les assets statiques et prisma
-          # Hostinger a besoin du dossier .next/standalone complet pour fonctionner
           rsync -avz --delete \
+            --exclude='.env*' \
             server.js \
             package.json \
             prisma \
@@ -55,13 +104,42 @@ jobs:
             .next/standalone/ \
             ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}
 
-      - name: 🚀 Restart Application
+      - name: 🗃️ Run Prisma Migrations
         run: |
           ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
             cd ${{ vars.DEPLOY_PATH }} &&
-            # Pas besoin de npm install complet car standalone contient les node_modules nécessaires
-            # mais on s'assure que prisma est prêt
-            npx prisma generate &&
-            pm2 restart capril || pm2 start server.js --name capril
+            export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
+            npx prisma migrate deploy
           "
 
+      - name: 🚀 Restart Application (PM2)
+        run: |
+          ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+            cd ${{ vars.DEPLOY_PATH }} &&
+            npx prisma generate &&
+            pm2 restart capril || pm2 start server.js --name capril --env production
+          "
+
+      - name: 🩺 Health Check
+        run: |
+          echo "Waiting for app to start..."
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.NEXT_PUBLIC_APP_URL }}/api/health || echo "000")
+          echo "Health check status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Health check failed! Triggering PM2 rollback..."
+            ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "pm2 restart capril"
+            exit 1
+          fi
+          echo "✅ Application is healthy!"
+
+      - name: 📣 Notify on Success
+        if: success()
+        run: |
+          echo "🎉 QAPRIL v3.0 deployed successfully to production"
+          echo "URL: ${{ vars.NEXT_PUBLIC_APP_URL }}"
+
+      - name: 🔴 Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed. Check logs above."

@@ -3,106 +3,63 @@
 import { signIn, signOut } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
-export async function loginWithMagicLink(formData: FormData) {
-    const email = formData.get("email") as string
-    const role = formData.get("role") as string // "TENANT" or "LANDLORD"
-    console.log("[SERVER ACTION] loginWithMagicLink called for email:", email, "with role:", role);
+/**
+ * Part 3.3: Request OTP (Server Action)
+ * Initiates the phone verification flow.
+ */
+export async function requestOTP(phone: string) {
+    console.log("[SERVER ACTION] requestOTP called for phone:", phone);
 
-    if (!email) return { error: "L'adresse email est requise" }
+    if (!phone) return { error: "Le numéro de téléphone est requis" }
 
     try {
-        // Preflight check: Verify database connection inside Next.js before hitting NextAuth
-        try {
-            console.log("[SERVER ACTION] Validating local database connection & preparing user role...");
-            
-            // On pré-crée l'utilisateur avec le rôle choisi s'il n'existe pas encore
-            // Cela permet à NextAuth de trouver l'utilisateur avec le bon rôle lors du premier login
-            if (role === "TENANT" || role === "LANDLORD") {
-                const existingUser = await prisma.user.findUnique({ where: { email } });
-                
-                if (!existingUser) {
-                    await prisma.user.create({
-                        data: {
-                            email,
-                            role: role as any,
-                            name: email.split('@')[0]
-                        }
-                    });
-                    console.log(`[SERVER ACTION] New user pre-created as ${role}`);
-                } else {
-                    console.log(`[SERVER ACTION] Existing user found (Role: ${existingUser.role}). Selection ${role} ignored to prevent role hijacking.`);
-                }
-            }
-            
-            console.log("[SERVER ACTION] DB Preparation OK.");
-        } catch (dbError) {
-            console.error("[SERVER ACTION] CRITICAL DB ERROR before NextAuth:", dbError);
-            return { error: `La base de données est inaccessible ou désynchronisée: ${dbError instanceof Error ? dbError.message : "Erreur inconnue"}` };
-        }
-
-        // Timeout de 30 secondes pour éviter le blocage de l'interface en cas de lenteur SMTP
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error("TIMEOUT_SMTP")), 30000);
+        const response = await fetch(`${process.env.NEXTAUTH_URL || ''}/api/v1/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone }),
         });
 
-        const signInPromise = signIn("resend", {
-            email,
-            redirect: false,
-        });
-
-        const signInResult = await Promise.race([signInPromise, timeoutPromise]) as any;
-
-        console.log("[SERVER ACTION] NextAuth signIn returned:", signInResult);
-
-        // If redirect: false is passed, Auth.js might return an object instead of throwing
-        if (signInResult && signInResult.error) {
-            console.error("[SERVER ACTION] NextAuth returned internal error:", signInResult.error);
-            return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP (Mot de passe incorrect)." }
+        const result = await response.json();
+        
+        if (!response.ok) {
+            return { error: result.error || "Erreur lors de l'envoi de l'OTP" };
         }
 
-        return { success: true }
-    } catch (error: any) {
-        console.error("[SERVER ACTION] DEBUG: Login magic link error full:", error)
-
-        // Auth.js throw a RedirectError on success when using server-side signIn. 
-        // If it's a known Next.js redirect error, we check its digest to see if it redirects to an error page.
-        if (error.message && error.message.includes("NEXT_REDIRECT")) {
-            const digest = error.digest || "";
-            console.log("[SERVER ACTION] Caught NEXT_REDIRECT. Digest:", digest);
-            if (digest.includes("error=")) {
-                console.error("[SERVER ACTION] Redirect points to an error page.");
-                return { error: "Erreur lors de l'envoi de l'e-mail. Vérifiez la configuration SMTP ou vos identifiants." };
-            }
-            return { success: true };
-        }
-
-        if (error.message === "TIMEOUT_SMTP") {
-            return { error: "Le serveur d'e-mail met trop de temps à répondre. Vérifiez la configuration SMTP." }
-        }
-        if (error.type === "EmailSignin" || error.message?.includes("EmailSignin") || error.message?.includes("Invalid login")) {
-            return { error: "Erreur d'authentification SMTP (Login/Mot de passe Hostinger refusé)." }
-        }
-        return { error: `Erreur d'authentification: ${error.type || error.message || "Inconnue"}. Veuillez réessayer.` }
+        return { success: true };
+    } catch (error) {
+        console.error("[SERVER ACTION] requestOTP error:", error);
+        return { error: "Erreur technique lors de l'envoi du code." };
     }
 }
 
-export async function loginWithPassword(formData: FormData) {
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
+/**
+ * Part 3.4: Login with OTP (Server Action)
+ * Finalizes authentication via NextAuth.
+ */
+export async function loginWithOTP(phone: string, otp: string) {
+    console.log("[SERVER ACTION] loginWithOTP called for phone:", phone);
 
-    if (!email || !password) return { error: "Email et mot de passe requis" }
+    if (!phone || !otp) return { error: "Téléphone et code OTP requis" }
 
     try {
-        await signIn("credentials", {
-            email,
-            password,
-            redirectTo: "/dashboard"
-        })
-    } catch (error: any) {
-        if (error.type === "CredentialsSignin") {
-            return { error: "Email ou mot de passe incorrect." }
+        const result = await signIn("phone-otp", {
+            phone,
+            otp,
+            redirect: false,
+        });
+
+        if (result?.error) {
+            return { error: "Code OTP incorrect ou expiré." };
         }
-        throw error
+
+        return { success: true };
+    } catch (error: any) {
+        if (error.message === "NEXT_REDIRECT") {
+             // In NextAuth v5 server actions, signin might throw a redirect
+             return { success: true };
+        }
+        console.error("[SERVER ACTION] loginWithOTP error:", error);
+        return { error: "Échec de l'authentification." };
     }
 }
 

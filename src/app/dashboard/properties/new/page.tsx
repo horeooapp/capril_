@@ -1,99 +1,131 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { createProperty } from "@/actions/properties"
+import { registerProperty } from "@/actions/properties"
 
 export default function NewPropertyPage() {
     const router = useRouter()
-    const [loading, setLoading] = useState(false)
+    const [isPending, startTransition] = useTransition()
     const [error, setError] = useState("")
+    const [category, setCategory] = useState<'RESIDENTIAL' | 'COMMERCIAL'>('RESIDENTIAL')
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setLoading(true)
         setError("")
 
         const formData = new FormData(e.currentTarget)
-        const name = formData.get("name") as string
-        const address = formData.get("address") as string
-        const city = formData.get("city") as string
-        const postalCode = formData.get("postalCode") as string
-
-        try {
-            await createProperty({
-                name,
-                address,
-                city,
-                postalCode,
-                country: "CI" // Default to Côte d'Ivoire
-            })
-            router.push("/dashboard/properties")
-            router.refresh()
-        } catch (err: any) {
-            setError(err.message || "Une erreur est survenue lors de l'ajout.")
-        } finally {
-            setLoading(false)
+        const data = {
+            category,
+            addressLine1: formData.get("addressLine1") as string,
+            commune: formData.get("commune") as string,
+            declaredRentFcfa: parseInt(formData.get("rent") as string),
+            propertyType: formData.get("propertyType") as string,
+            totalRooms: parseInt(formData.get("rooms") as string) || undefined,
+            usefulAreaSqm: parseFloat(formData.get("area") as string) || undefined,
         }
+
+        startTransition(async () => {
+            const result = await registerProperty(data)
+            if (result.error) {
+                setError(result.error)
+            } else {
+                router.push("/dashboard/properties")
+                router.refresh()
+            }
+        })
     }
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6 py-8 px-4">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">Ajouter un logement</h1>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Enregistrer un bien</h1>
                 <button
                     onClick={() => router.back()}
-                    className="text-gray-600 hover:text-gray-900 font-medium"
+                    className="text-gray-500 hover:text-gray-700 text-sm font-medium"
                 >
-                    Retour
+                    Annuler
                 </button>
             </div>
 
-            <div className="bg-white shadow sm:rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
+            <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+                <div className="p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
-                            <div className="bg-red-50 border-l-4 border-red-400 p-4">
-                                <p className="text-sm text-red-700">{error}</p>
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-6 animate-shake">
+                                {error}
                             </div>
                         )}
 
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nom du logement (Optionnel)</label>
-                            <div className="mt-1">
-                                <input type="text" name="name" id="name" placeholder="Ex: Rsidence Les Mimosas - Appt 12" className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md p-2 border" />
-                            </div>
+                        <div className="grid grid-cols-2 gap-4 p-1 bg-gray-100 rounded-xl mb-8">
+                            <button
+                                type="button"
+                                onClick={() => setCategory('RESIDENTIAL')}
+                                className={`py-2 text-sm font-bold rounded-lg transition-all ${category === 'RESIDENTIAL' ? 'bg-[#FF8200] text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Résidentiel (HAB)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCategory('COMMERCIAL')}
+                                className={`py-2 text-sm font-bold rounded-lg transition-all ${category === 'COMMERCIAL' ? 'bg-[#FF8200] text-white shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Commercial (COM)
+                            </button>
                         </div>
 
-                        <div>
-                            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Adresse complte *</label>
-                            <div className="mt-1">
-                                <input required type="text" name="address" id="address" className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md p-2 border" />
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div className="sm:col-span-2">
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Adresse complète</label>
+                                <input required name="addressLine1" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: Rue des Jardins, Immeuble Horizon" />
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                             <div>
-                                <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ville / Commune *</label>
-                                <div className="mt-1">
-                                    <input required type="text" name="city" id="city" placeholder="Ex: Cocody" className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md p-2 border" />
-                                </div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Commune</label>
+                                <input required name="commune" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: Cocody" />
                             </div>
+
                             <div>
-                                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Code Postal (Optionnel)</label>
-                                <div className="mt-1">
-                                    <input type="text" name="postalCode" id="postalCode" className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md p-2 border" />
-                                </div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Loyer déclaré (FCFA / mois)</label>
+                                <input required type="number" name="rent" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: 250000" />
                             </div>
+
+                            {category === 'RESIDENTIAL' ? (
+                                <>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Type de bien</label>
+                                        <select name="propertyType" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none">
+                                            <option value="APARTMENT">Appartement</option>
+                                            <option value="VILLA">Villa</option>
+                                            <option value="STUDIO">Studio</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nombre de pièces</label>
+                                        <input type="number" name="rooms" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: 3" />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Surface utile (m²)</label>
+                                        <input type="number" name="area" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: 85" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Places de parking</label>
+                                        <input type="number" name="parking" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" defaultValue={0} />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        <div className="pt-4 border-t border-gray-200">
+                        <div className="pt-6">
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-opacity-50 transition-colors"
+                                disabled={isPending}
+                                className="w-full py-4 px-6 bg-[#FF8200] hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 disabled:opacity-50 transition-all transform hover:-translate-y-1"
                             >
-                                {loading ? "Enregistrement en cours..." : "Enregistrer le logement"}
+                                {isPending ? "Traitement..." : "Générer le code et enregistrer"}
                             </button>
                         </div>
                     </form>

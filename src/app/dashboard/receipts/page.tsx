@@ -1,66 +1,77 @@
-import { getProperties } from "@/actions/properties"
+import { getMyReceipts } from "@/actions/receipts"
+import Link from "next/link"
 
 export default async function ReceiptsPage() {
-    const properties = await getProperties().catch(() => [])
-
-    // Flatten properties -> leases -> receipts
-    const receipts = properties.flatMap((prop: any) =>
-        prop.leases.flatMap((lease: any) =>
-            lease.receipts.map((receipt: any) => ({
-                ...receipt,
-                propertyName: prop.name || prop.address,
-                // @ts-ignore
-                tenantName: lease.tenant?.name || lease.tenant?.email
-            }))
-        )
-    ).sort((a: any, b: any) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime())
+    const receipts = await getMyReceipts()
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">Quittances de Loyer</h1>
+        <div className="space-y-10 py-8 animate-in fade-in duration-700">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                <div>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Registre des Quittances</h1>
+                    <p className="text-gray-500 mt-1">Historique certifié de vos paiements et justificatifs.</p>
+                </div>
             </div>
 
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="grid grid-cols-1 gap-6">
                 {receipts.length === 0 ? (
-                    <div className="text-center py-12">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune quittance</h3>
-                        <p className="mt-1 text-sm text-gray-500">Générez des quittances depuis la section "Contrats".</p>
+                    <div className="bg-white border-2 border-dashed border-gray-200 rounded-[2.5rem] p-16 text-center">
+                        <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <span className="text-5xl">🧾</span>
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-900 mb-3">Aucune quittance générée</h3>
+                        <p className="text-gray-500 max-w-md mx-auto text-lg">
+                            Les quittances apparaissent ici dès qu'un paiement est validé sur l'un de vos contrats actifs.
+                        </p>
                     </div>
                 ) : (
-                    <ul className="divide-y divide-gray-200">
-                        {receipts.map((receipt: any) => (
-                            <li key={receipt.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-primary truncate">
-                                            Quittance {receipt.receiptNumber}
-                                        </p>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Locataire: {receipt.tenantName} - {receipt.propertyName}
-                                        </p>
-                                    </div>
-                                    <div className="text-right flex flex-col items-end space-y-2">
-                                        <p className="text-sm font-bold text-gray-900">
-                                            {receipt.amountPaid} FCFA
-                                        </p>
-                                        <div className="flex space-x-2">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${receipt.isSent ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                }`}>
-                                                {receipt.isSent ? 'Envoyée' : 'Non envoyée'}
-                                            </span>
-                                            <a href={`/receipts/${receipt.id}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:text-orange-600 font-medium">
-                                                Voir & Imprimer
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50/50">
+                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Référence / Date</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Contrat / Bien</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Montant / Période</th>
+                                    <th className="px-8 py-5 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {receipts.map((receipt: any) => (
+                                    <tr key={receipt.id} className="hover:bg-gray-50/30 transition-all group">
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-black text-[#FF8200] mb-1">{receipt.receiptRef}</span>
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                    Émise le {new Date(receipt.createdAt).toLocaleDateString('fr-FR')}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-gray-800">{receipt.lease?.leaseRef}</span>
+                                                <span className="text-xs text-gray-500">{receipt.lease?.property?.addressLine1}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-black text-gray-900">{parseInt(receipt.amountFcfa).toLocaleString()} <small className="text-[10px] font-bold">FCFA</small></span>
+                                                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter bg-blue-50 px-2 py-0.5 rounded-full w-fit mt-1">
+                                                    {new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6 text-right">
+                                            <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Link href={`/receipts/${receipt.id}`} target="_blank" className="px-4 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-black transition-colors shadow-lg shadow-gray-200">
+                                                    Imprimer
+                                                </Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
         </div>

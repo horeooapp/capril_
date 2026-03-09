@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { LeaseStatus } from "@prisma/client"
+// LeaseStatus is a plain string field in this schema (no Prisma enum generated)
+type LeaseStatus = string
 import { declareUnpaidRent, sendFormalNotice, initiateTermination, proposeClemency } from "@/actions/lease-procedures"
 import { useRouter } from "next/navigation"
 

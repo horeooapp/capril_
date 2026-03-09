@@ -1,93 +1,63 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
-import Resend from "next-auth/providers/resend"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "./auth.config"
-import * as bcrypt from "bcrypt-ts"
+import { redis } from "@/lib/redis"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
-    debug: true, // Enable debug logs to catch the AdapterError source
     adapter: PrismaAdapter(prisma),
     providers: [
-        Resend({
-            apiKey: process.env.AUTH_RESEND_KEY,
-            from: process.env.EMAIL_FROM || "onboarding@resend.dev",
-            async sendVerificationRequest({ identifier, url, provider }) {
-                const urlObj = new URL(url);
-                const host = urlObj.host;
-                
-                // Détection robuste du protocole
-                const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-                const protocol = isLocal ? 'http' : 'https';
-                const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
-                
-                // EXTRACTION EXPLICITE DES PARAMÈTRES (Solution précédemment trouvée)
-                const params = urlObj.searchParams;
-                const token = params.get("token");
-                const email = params.get("email");
-                
-                // Reconstruction propre de l'URL callback
-                // Note: Auth.js v5 beta.30 avec le provider Resend utilise /api/auth/callback/resend
-                const robustNextAuthUrl = `${baseUrl}/api/auth/callback/resend?callbackUrl=${encodeURIComponent(`${baseUrl}/dashboard`)}&token=${token}&email=${encodeURIComponent(email || identifier)}`;
-                
-                const intermediaryUrl = `${baseUrl}/auth/verify-email?callback_url=${encodeURIComponent(robustNextAuthUrl)}`;
-
-                try {
-                    const { Resend: ResendSDK } = await import("resend");
-                    const resend = new ResendSDK(process.env.AUTH_RESEND_KEY);
-
-                    await resend.emails.send({
-                        from: provider.from as string,
-                        to: identifier,
-                        subject: `Connexion à QAPRIL`,
-                        html: `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-                                <h1 style="color: #FF8200; text-align: center;">QAPRIL</h1>
-                                <p>Cliquez sur le bouton ci-dessous pour vous connecter à votre espace.</p>
-                                <div style="text-align: center; margin: 30px 0;">
-                                    <a href="${intermediaryUrl}" style="background-color: #FF8200; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Me connecter</a>
-                                </div>
-                                <p style="font-size: 12px; color: #888; text-align: center;">Lien direct : ${intermediaryUrl}</p>
-                            </div>
-                        `
-                    });
-                } catch (error) {
-                    console.error("[AUTH] Resend verification failed:", error);
-                }
-            }
-        }),
         Credentials({
-            name: "Credentials",
+            id: "phone-otp",
+            name: "Phone OTP",
             credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Mot de passe", type: "password" }
+                phone: { label: "Téléphone", type: "text" },
+                otp: { label: "Code OTP", type: "text" }
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                if (!credentials?.phone || !credentials?.otp) return null;
 
-                try {
-                    const user = await prisma.user.findUnique({
-                        where: { email: credentials.email as string }
-                    })
+                const phone = credentials.phone as string;
+                const otp = credentials.otp as string;
 
-                    if (!user || !user.password) return null;
+                // 1. Verify OTP in Redis (Part 3.3)
+                const storedOtp = await redis.get(`otp:${phone}`);
+                
+                // Dev bypass for testing if needed
+                const isDev = process.env.NODE_ENV === 'development';
+                const isValid = storedOtp === otp || (isDev && otp === '123456');
 
-                    const isValid = await bcrypt.compare(credentials.password as string, user.password)
-                    if (!isValid) return null
-
-                    return {
-                        id: user.id,
-                        email: user.email,
-                        name: user.name,
-                        role: user.role,
-                        isCertified: user.isCertified
-                    }
-                } catch (error) {
-                    console.error("[AUTH ERROR CREDENTIALS]", error);
-                    return null;
+                if (!isValid) {
+                    throw new Error("Invalid or expired OTP");
                 }
+
+                // 2. Clear OTP
+                await redis.del(`otp:${phone}`);
+
+                // 3. Find or Create User (Part 3.4.1)
+                let user = await prisma.user.findUnique({
+                    where: { phone }
+                });
+
+                if (!user) {
+                    user = await prisma.user.create({
+                        data: {
+                            phone,
+                            role: 'TENANT',
+                            status: 'PENDING_PROFILE'
+                        }
+                    });
+                }
+
+                return {
+                    id: user.id,
+                    phone: user.phone,
+                    role: user.role,
+                    status: user.status,
+                    fullName: user.fullName
+                };
             }
         })
     ],
