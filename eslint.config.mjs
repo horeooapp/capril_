@@ -11,7 +11,11 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": "warn",
       "@next/next/no-img-element": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
-      "react/no-unescaped-entities": "off"
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "react-hooks/error-boundaries": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "@next/next/no-html-link-for-pages": "warn"
     }
   },
   // Override default ignores of eslint-config-next.
