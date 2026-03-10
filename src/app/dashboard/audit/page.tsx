@@ -16,7 +16,7 @@ export default async function AuditPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-gray-900">Journal d'Audit</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Journal d&apos;Audit</h1>
             <p className="text-gray-500 text-sm">Traçabilité complète des actions sur la plateforme QAPRIL.</p>
 
             <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -56,7 +56,7 @@ export default async function AuditPage() {
                 </table>
                 {logs.length === 0 && (
                     <div className="px-6 py-10 text-center text-gray-500">
-                        Aucun log d'audit trouvé.
+                        Aucun log d&apos;audit trouvé.
                     </div>
                 )}
             </div>

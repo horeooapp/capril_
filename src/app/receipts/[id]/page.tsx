@@ -118,10 +118,10 @@ export default function ReceiptVerificationPage({ params }: { params: any }) {
                 {/* Legal & QR Section */}
                 <div className="grid grid-cols-3 gap-12 items-end pt-12 border-t-2 border-dashed border-gray-100 page-break-inside-avoid">
                     <div className="col-span-2">
-                        <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4 italic">Mentions Obligatoires & Certificat d'Authenticité</h4>
+                        <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4 italic">Mentions Obligatoires & Certificat d&apos;Authenticité</h4>
                         <p className="text-[10px] text-justify text-gray-500 leading-loose">
                             La présente certifie que le locataire susnommé a acquitté les sommes dues au titre de son occupation. 
-                            Ce document électronique dispose d'un horodatage immuable et d'une signature cryptographique active. 
+                            Ce document électronique dispose d&apos;un horodatage immuable et d&apos;une signature cryptographique active. 
                             Le QR-Code ci-contre contient les paramètres de validation du registre national QAPRIL RCI. 
                             Toute falsification est passible de poursuites pénales conformément à la loi sur les transactions électroniques.
                         </p>

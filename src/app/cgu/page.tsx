@@ -3,20 +3,20 @@ import Link from "next/link";
 export default function CGUPage() {
     return (
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Conditions Générales d'Utilisation (CGU)</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-4">Conditions Générales d&apos;Utilisation (CGU)</h1>
 
             <div className="prose prose-orange max-w-none text-gray-700 space-y-6">
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">1. Objet de la Plateforme</h2>
                     <p>
-                        QAPRIL (Qualité de l'Administration du Patrimoine et du Registre Immobilier Locatif) est une plateforme numérique dédiée à la sécurisation des baux, à la dématérialisation des quittances de loyer et à la transparence du marché locatif en République de Côte d'Ivoire.
+                        QAPRIL (Qualité de l&apos;Administration du Patrimoine et du Registre Immobilier Locatif) est une plateforme numérique dédiée à la sécurisation des baux, à la dématérialisation des quittances de loyer et à la transparence du marché locatif en République de Côte d&apos;Ivoire.
                     </p>
                 </section>
 
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">2. Acceptation des Conditions</h2>
                     <p>
-                        L'utilisation des services de QAPRIL implique l'acceptation pleine et entière des présentes CGU. L'accès aux services est réservé aux personnes physiques ou morales dument identifiées.
+                        L&apos;utilisation des services de QAPRIL implique l&apos;acceptation pleine et entière des présentes CGU. L&apos;accès aux services est réservé aux personnes physiques ou morales dument identifiées.
                     </p>
                 </section>
 
@@ -32,9 +32,9 @@ export default function CGUPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-xl font-bold text-gray-800">4. Obligations de l'Utilisateur</h2>
+                    <h2 className="text-xl font-bold text-gray-800">4. Obligations de l&apos;Utilisateur</h2>
                     <p>
-                        L'utilisateur s'engage à fournir des informations exactes et à jour. Toute fraude documentaire ou fausse déclaration pourra entrainer la suspension immédiate du compte et des poursuites judiciaires.
+                        L&apos;utilisateur s&apos;engage à fournir des informations exactes et à jour. Toute fraude documentaire ou fausse déclaration pourra entrainer la suspension immédiate du compte et des poursuites judiciaires.
                     </p>
                 </section>
 
@@ -58,7 +58,7 @@ export default function CGUPage() {
             </div>
 
             <div className="mt-8">
-                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l'accueil</Link>
+                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l&apos;accueil</Link>
             </div>
         </div>
     );

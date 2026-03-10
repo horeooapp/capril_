@@ -129,7 +129,7 @@ export default function MobileMenu({ links, session, logoSrc = "/logo.png", bran
                                     onClick={() => setIsOpen(false)}
                                     className="block w-full text-center border-2 border-primary text-primary py-3 rounded-xl font-bold text-sm uppercase tracking-widest"
                                 >
-                                    S'inscrire
+                                    S&apos;inscrire
                                 </Link>
                             </div>
                         )}

@@ -62,7 +62,7 @@ export default async function DashboardLayout({
                                     <span>Accueil</span>
                                 </Link>
                                 <div className="h-4 w-px bg-white/20"></div>
-                                <Link href="/dashboard" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Vue d'ensemble</Link>
+                                <Link href="/dashboard" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Vue d&apos;ensemble</Link>
                                 <Link href="/dashboard/properties" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Logements</Link>
                                 <Link href="/dashboard/leases" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Contrats</Link>
                                 <Link href="/dashboard/receipts" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Quittances</Link>

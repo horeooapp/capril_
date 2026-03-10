@@ -24,7 +24,7 @@ export default async function AdminDashboardOverview() {
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-gray-900">Observatoire National du Logement</h1>
                 <div className="bg-white border rounded-md px-3 py-1 shadow-sm text-sm text-gray-500">
-                    Mise à jour: Aujourd'hui
+                    Mise à jour: Aujourd&apos;hui
                 </div>
             </div>
 
@@ -92,7 +92,7 @@ export default async function AdminDashboardOverview() {
                 {/* Audit Logs Section */}
                 <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
                     <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Journal d'Audit - Dernières Éditions</h3>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Journal d&apos;Audit - Dernières Éditions</h3>
                         <span className="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">Securisé</span>
                     </div>
                     <ul className="divide-y divide-gray-200">

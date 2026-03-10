@@ -107,7 +107,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus, userId }
             {showClemencyModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Proposition d'Échéancier</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Proposition d&apos;Échéancier</h3>
                         <p className="text-sm text-gray-600 mb-4">
                             Décrivez les modalités de paiement proposées au locataire (Ex: Paiement du reliquat en 3 fois).
                         </p>
@@ -115,7 +115,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus, userId }
                             value={clemencyDetails}
                             onChange={(e) => setClemencyDetails(e.target.value)}
                             className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none min-h-[120px]"
-                            placeholder="Ex: Le locataire s'engage à payer 50.000 FCFA supplémentaire chaque mois pendant 4 mois..."
+                            placeholder="Ex: Le locataire s&apos;engage à payer 50.000 FCFA supplémentaire chaque mois pendant 4 mois..."
                         />
                         <div className="mt-6 flex space-x-3">
                             <button

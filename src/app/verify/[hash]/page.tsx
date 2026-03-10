@@ -48,7 +48,7 @@ export default async function VerifyReceiptPage({ params }: { params: Promise<{ 
                                 <div className="ml-3">
                                     <h3 className="text-sm font-medium text-green-800">Quittance Authentique</h3>
                                     <div className="mt-2 text-sm text-green-700">
-                                        <p>Ce document est officiellement enregistré dans le registre national de Côte d'Ivoire.</p>
+                                        <p>Ce document est officiellement enregistré dans le registre national de Côte d&apos;Ivoire.</p>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@ export default async function VerifyReceiptPage({ params }: { params: Promise<{ 
 
                 <div className="pt-6">
                     <Link href="/" className="text-sm font-medium text-primary hover:text-orange-600 block text-center">
-                        &larr; Retour à l'accueil QAPRIL
+                        &larr; Retour à l&apos;accueil QAPRIL
                     </Link>
                 </div>
             </div>

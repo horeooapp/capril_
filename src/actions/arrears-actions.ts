@@ -13,7 +13,7 @@ export async function scanLeaseForArrears(leaseId: string) {
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT, Role.AGENCY];
 
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
         throw new Error("Action réservée aux administrateurs ou agents.");
     }
 
@@ -53,7 +53,7 @@ export async function scanLeaseForArrears(leaseId: string) {
  */
 export async function resetLeaseProcedure(leaseId: string) {
     const session = await auth();
-    if (!session || !session.user || (session.user.role as any) !== 'ADMIN') {
+    if (!session || !session.user || session.user.role !== Role.ADMIN) {
         throw new Error("Action réservée aux administrateurs.");
     }
 

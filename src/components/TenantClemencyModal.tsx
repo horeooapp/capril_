@@ -15,7 +15,7 @@ export default function TenantClemencyModal({ planId, details }: TenantClemencyM
 
     const handleResponse = async (accepted: boolean) => {
         if (accepted && !acceptedTerms) {
-            alert("Vous devez accepter les termes de l'échéancier pour procéder.");
+            alert("Vous devez accepter les termes de l&apos;échéancier pour procéder.");
             return;
         }
 
@@ -56,7 +56,7 @@ export default function TenantClemencyModal({ planId, details }: TenantClemencyM
                         onChange={(e) => setAcceptedTerms(e.target.checked)}
                         className="rounded text-blue-600"
                     />
-                    <span>J'accepte les termes de cet échéancier qui suspend temporairement la procédure d'impayé.</span>
+                    <span>J&apos;accepte les termes de cet échéancier qui suspend temporairement la procédure d&apos;impayé.</span>
                 </label>
             </div>
 

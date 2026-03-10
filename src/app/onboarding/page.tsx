@@ -181,7 +181,7 @@ function KYCStep({ onComplete }: { onComplete: () => void }) {
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Vérification d'identité</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Vérification d&apos;identité</h3>
             <p className="text-xs text-gray-500">Conformément à la réglementation (Partie 4 du spec), nous devons vérifier votre identité.</p>
             
             <div>
@@ -191,7 +191,7 @@ function KYCStep({ onComplete }: { onComplete: () => void }) {
                     onChange={(e) => setDocType(e.target.value)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
                 >
-                    <option value="CNI">Carte Nationale d'Identité (CNI)</option>
+                    <option value="CNI">Carte Nationale d&apos;Identité (CNI)</option>
                     <option value="PASSPORT">Passeport</option>
                     <option value="DRIVING_LICENSE">Permis de conduire</option>
                 </select>

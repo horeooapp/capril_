@@ -151,7 +151,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                     <div className="bg-gray-900 rounded-2xl p-6 text-white">
                         <h3 className="text-sm font-black uppercase tracking-tight mb-4 text-orange-500">Aide QAPRIL</h3>
                         <p className="text-xs text-gray-400 leading-relaxed font-medium">
-                            Besoin d'aide avec votre contrat ? Notre service de médiation est disponible 24/7 pour résoudre vos litiges à l'amiable.
+                            Besoin d&apos;aide avec votre contrat ? Notre service de médiation est disponible 24/7 pour résoudre vos litiges à l&apos;amiable.
                         </p>
                         <button className="mt-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-gray-700 rounded-lg hover:border-gray-500 transition-colors">
                             Contacter le Support

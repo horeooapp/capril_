@@ -35,9 +35,9 @@ export async function createMandate(data: {
             propertyId: data.propertyId,
             status: MandateStatus.VALIDATED,
             OR: [
-                { type: MandateType.EXCLUSIVE },
-                { type: data.type === MandateType.EXCLUSIVE ? MandateType.NON_EXCLUSIVE : undefined }
-            ].filter(Boolean) as any
+                { mandateType: MandateType.EXCLUSIVE },
+                { mandateType: data.type === MandateType.EXCLUSIVE ? MandateType.NON_EXCLUSIVE : undefined }
+            ].filter((cond) => cond.mandateType !== undefined)
         }
     })
 

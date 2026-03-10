@@ -24,7 +24,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Détails du Bail</h1>
-                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {lease.leaseRef}</p>
+                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {lease.leaseReference}</p>
                 </div>
                 <div className="flex space-x-3">
                     <Link
@@ -33,12 +33,12 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     >
                         📄 Certificat
                     </Link>
-                    <GenerateReceiptForm leaseId={lease.id} monthlyRentFcfa={lease.monthlyRentFcfa} />
+                    <GenerateReceiptForm leaseId={lease.id} monthlyRentFcfa={lease.rentAmount} />
                 </div>
             </div>
 
-            {/* Alerte Signature si PENDING */}
-            {lease.status === "PENDING" && (
+            {/* Alerte Signature si PENDING_SIGNATURE */}
+            {(lease.status === "PENDING_SIGNATURE" || lease.status === "DRAFT") && (
                 <div className="mb-8 p-6 bg-orange-50 border-2 border-orange-200 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-lg shadow-orange-100 animate-pulse">
                     <div className="mb-4 md:mb-0">
                         <h3 className="text-lg font-black text-orange-800 uppercase tracking-tight">Validation Requise ✍️</h3>
@@ -64,17 +64,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Locataire</h3>
-                                <p className="text-lg font-bold">{lease.tenant.name || "N/A"}</p>
-                                <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded inline-block">{lease.tenant.email}</p>
+                                <p className="text-lg font-bold">{lease.tenant?.fullName || "N/A"}</p>
+                                <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded inline-block">{lease.tenant?.email}</p>
                                 <div className="pt-2">
-                                    <ReliabilityBadge score={lease.tenant.reliabilityScore} showLabel={true} />
+                                    <ReliabilityBadge score={lease.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Logement</h3>
                                 <p className="text-lg font-bold">{lease.property.name || lease.property.address}</p>
-                                <p className="text-sm text-gray-600">{lease.property.city}, {lease.property.neighborhood}</p>
-                                <p className="text-xs text-gray-400 font-medium">Type: {lease.property.type}</p>
+                                <p className="text-sm text-gray-600">{lease.property.commune}</p>
+                                <p className="text-xs text-gray-400 font-medium">Type: {lease.property.propertyType}</p>
                             </div>
                         </div>
                     </div>
@@ -87,15 +87,15 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Loyer Mensuel</p>
-                                <p className="text-xl font-black text-gray-900">{lease.rentAmount.toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{parseInt(lease.rentAmount).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Charges</p>
-                                <p className="text-xl font-black text-gray-900">{(lease.charges || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{parseInt(lease.chargesAmount || "0").toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Caution</p>
-                                <p className="text-xl font-black text-gray-900">{(lease.deposit || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{parseInt(lease.depositAmount || "0").toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Status</p>
@@ -179,16 +179,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="space-y-4">
                             <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Caution Sécurisée</p>
-                                {lease.cdcDeposit ? (
+                                {lease.cdcDeposits?.[0] ? (
                                     <div className="mt-2 text-center py-2">
                                         <p className="text-sm font-black text-green-700">✅ CONSIGNATION CDC</p>
-                                        <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {lease.cdcDeposit.cdcReference || "Paiement en attente"}</p>
-                                    </div>
-                                ) : lease.escrow ? (
-                                    <div className="mt-2 bg-blue-600 p-3 rounded-xl text-white shadow-lg">
-                                        <p className="text-xs font-black uppercase tracking-widest opacity-80 mb-1">Séquestre Virtuel</p>
-                                        <p className="text-lg font-black">{lease.escrow.amount.toLocaleString()} FCFA</p>
-                                        <p className="text-[10px] font-bold mt-2 py-1 px-2 bg-white/20 rounded inline-block uppercase tracking-tighter">Status: {lease.escrow.status}</p>
+                                        <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {lease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
                                     </div>
                                 ) : (
                                     <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center">
@@ -216,7 +210,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                     </div>
                                 ) : (
                                     <div className="mt-2">
-                                        <p className="text-xs text-blue-900 font-bold leading-snug">Prenez l'option Assurance QAPRIL pour protéger 100% de vos revenus.</p>
+                                        <p className="text-xs text-blue-900 font-bold leading-snug">Prenez l&apos;option Assurance QAPRIL pour protéger 100% de vos revenus.</p>
                                         <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">
                                             Activer la Protection
                                         </button>

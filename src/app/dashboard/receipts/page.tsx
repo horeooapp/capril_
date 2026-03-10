@@ -21,7 +21,7 @@ export default async function ReceiptsPage() {
                         </div>
                         <h3 className="text-2xl font-black text-gray-900 mb-3">Aucune quittance générée</h3>
                         <p className="text-gray-500 max-w-md mx-auto text-lg">
-                            Les quittances apparaissent ici dès qu'un paiement est validé sur l'un de vos contrats actifs.
+                            Les quittances apparaissent ici dès qu&apos;un paiement est validé sur l&apos;un de vos contrats actifs.
                         </p>
                     </div>
                 ) : (

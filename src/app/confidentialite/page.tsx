@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
                         QAPRIL collecte des données personnelles nécessaires à la gestion des baux et à la sécurisation des transactions immobilières. Ces données incluent notamment :
                         <ul className="list-disc pl-5 mt-2 space-y-1">
                             <li>Nom, prénoms, adresse email et numéro de téléphone.</li>
-                            <li>Pièces d'identité et documents justificatifs.</li>
+                            <li>Pièces d&apos;identité et documents justificatifs.</li>
                             <li>Coordonnées bancaires pour le séquestre ou la consignation.</li>
                             <li>Empreintes cryptographiques (hashes) des documents pour la preuve renforcée.</li>
                         </ul>
@@ -24,10 +24,10 @@ export default function PrivacyPolicyPage() {
                     <p>
                         Les données sont utilisées pour :
                         <ul className="list-disc pl-5 mt-2 space-y-1">
-                            <li>La création et l'authentification de votre compte.</li>
+                            <li>La création et l&apos;authentification de votre compte.</li>
                             <li>La génération automatique de quittances et de certificats de location.</li>
-                            <li>Le calcul de l'indice de fiabilité locative.</li>
-                            <li>L'élaboration de statistiques anonymisées pour l'Observatoire National.</li>
+                            <li>Le calcul de l&apos;indice de fiabilité locative.</li>
+                            <li>L&apos;élaboration de statistiques anonymisées pour l&apos;Observatoire National.</li>
                         </ul>
                     </p>
                 </section>
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">3. Conservation des Données</h2>
                     <p>
-                        Les données relatives aux baux sont conservées pendant toute la durée du contrat de location, augmentée des délais de prescription légale applicables en République de Côte d'Ivoire.
+                        Les données relatives aux baux sont conservées pendant toute la durée du contrat de location, augmentée des délais de prescription légale applicables en République de Côte d&apos;Ivoire.
                     </p>
                 </section>
 
@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">5. Vos Droits</h2>
                     <p>
-                        Conformément à la loi sur la protection des données à caractère personnel, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition. Pour exercer ces droits, vous pouvez contacter notre support à l'adresse : protection@qapril.net.
+                        Conformément à la loi sur la protection des données à caractère personnel, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et d&apos;opposition. Pour exercer ces droits, vous pouvez contacter notre support à l&apos;adresse : protection@qapril.net.
                     </p>
                 </section>
 
@@ -66,7 +66,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="mt-8">
-                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l'accueil</Link>
+                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l&apos;accueil</Link>
             </div>
         </div>
     );

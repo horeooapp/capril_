@@ -13,7 +13,7 @@ export default function Footer() {
                             <span className="font-extrabold text-2xl tracking-tight text-white">QAPRIL</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
-                            La plateforme nationale de gestion des loyers et d'émission de quittances certifiées en République de Côte d'Ivoire.
+                            La plateforme nationale de gestion des loyers et d&apos;émission de quittances certifiées en République de Côte d&apos;Ivoire.
                         </p>
                     </div>
 
@@ -71,7 +71,7 @@ export default function Footer() {
                         &copy; {new Date().getFullYear()} QAPRIL - Registre Locatif. Tous droits réservés.
                     </p>
                     <div className="flex space-x-6">
-                        <span className="text-xs text-gray-500">Un service sécurisé pour la République de Côte d'Ivoire</span>
+                        <span className="text-xs text-gray-500">Un service sécurisé pour la République de Côte d&apos;Ivoire</span>
                     </div>
                 </div>
             </div>

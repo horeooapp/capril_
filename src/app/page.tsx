@@ -98,7 +98,7 @@ export default async function Home() {
                     <span className="block text-primary">numérique national</span>
                   </h1>
                   <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                    QAPRIL normalise et automatise la gestion locative en Côte d'Ivoire. Générez des quittances électroniques sécurisées par QR Code pour tous vos locataires en quelques clics.
+                    QAPRIL normalise et automatise la gestion locative en Côte d&apos;Ivoire. Générez des quittances électroniques sécurisées par QR Code pour tous vos locataires en quelques clics.
                   </p>
                   <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                     <div className="rounded-md shadow">
@@ -163,7 +163,7 @@ export default async function Home() {
                     <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Quittances automatisées (E-quittance)</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Générez des quittances d'un clic. Elles sont automatiquement envoyées par Mail/SMS à vos locataires avec toutes les mentions légales.
+                    Générez des quittances d&apos;un clic. Elles sont automatiquement envoyées par Mail/SMS à vos locataires avec toutes les mentions légales.
                   </dd>
                 </div>
 
@@ -175,7 +175,7 @@ export default async function Home() {
                     <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Vérification par QR Code (Audit)</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Chaque quittance générée possède un QR Code unique pour lutter contre la fraude et garantir l'authenticité du document.
+                    Chaque quittance générée possède un QR Code unique pour lutter contre la fraude et garantir l&apos;authenticité du document.
                   </dd>
                 </div>
 
@@ -187,7 +187,7 @@ export default async function Home() {
                     <div className="ml-16 text-lg leading-6 font-medium text-gray-900">Espace Locataire dédié</div>
                   </dt>
                   <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Les locataires peuvent se connecter en toute sécurité avec leur e-mail pour télécharger l'historique complet de leurs quittances.
+                    Les locataires peuvent se connecter en toute sécurité avec leur e-mail pour télécharger l&apos;historique complet de leurs quittances.
                   </dd>
                 </div>
 

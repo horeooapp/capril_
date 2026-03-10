@@ -9,10 +9,10 @@ export default function MentionsLegalesPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">1. Éditeur de la Plateforme</h2>
                     <p>
-                        La plateforme QAPRIL (Qualité de l'Administration du Patrimoine et du Registre Immobilier Locatif) est éditée par la société <strong>Habiteax</strong>.
+                        La plateforme QAPRIL (Qualité de l&apos;Administration du Patrimoine et du Registre Immobilier Locatif) est éditée par la société <strong>Habiteax</strong>.
                         <ul className="list-none mt-2 space-y-1">
                             <li><strong>Société :</strong> Habiteax</li>
-                            <li><strong>Siège Social :</strong> Cocody, Abidjan, Côte d'Ivoire</li>
+                            <li><strong>Siège Social :</strong> Cocody, Abidjan, Côte d&apos;Ivoire</li>
                             <li><strong>Email :</strong> contact@qapril.net</li>
                         </ul>
                     </p>
@@ -39,7 +39,7 @@ export default function MentionsLegalesPage() {
                 <section>
                     <h2 className="text-xl font-bold text-gray-800">4. Propriété Intellectuelle</h2>
                     <p>
-                        L'ensemble des éléments constituant la plateforme QAPRIL (textes, graphiques, logiciels, photographies, images, vidéos, sons, plans, noms, logos, marques, créations et œuvres protégeables diverses, bases de données, etc.) ainsi que la plateforme elle-même relèvent de la législation ivoirienne et internationale sur le droit d'auteur et la propriété intellectuelle.
+                        L&apos;ensemble des éléments constituant la plateforme QAPRIL (textes, graphiques, logiciels, photographies, images, vidéos, sons, plans, noms, logos, marques, créations et œuvres protégeables diverses, bases de données, etc.) ainsi que la plateforme elle-même relèvent de la législation ivoirienne et internationale sur le droit d&apos;auteur et la propriété intellectuelle.
                     </p>
                     <p>
                         Ces éléments sont la propriété exclusive de <strong>Habiteax</strong>.
@@ -59,7 +59,7 @@ export default function MentionsLegalesPage() {
             </div>
 
             <div className="mt-8">
-                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l'accueil</Link>
+                <Link href="/" className="text-primary hover:underline font-medium">← Retour à l&apos;accueil</Link>
             </div>
         </div>
     );

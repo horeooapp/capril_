@@ -107,7 +107,7 @@ export default function LeaseRegistrationPage() {
                                     <input type="number" name="advance" className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none transition-all" placeholder={rentAmount ? (rentAmount * 2).toString() : "0"} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-600">Frais d'agence (Max 1 mois)</label>
+                                    <label className="text-xs font-bold text-gray-600">Frais d&apos;agence (Max 1 mois)</label>
                                     <input type="number" name="agency" className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none transition-all" placeholder={rentAmount ? rentAmount.toString() : "0"} />
                                 </div>
                             </div>

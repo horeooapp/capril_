@@ -19,7 +19,7 @@ export default async function LocataireDashboard() {
                         </div>
                         <h3 className="mt-2 text-lg font-medium text-gray-900">Aucune quittance disponible</h3>
                         <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            Il semble que votre propriétaire n'ait pas encore généré de quittance électronique pour vous sur la plateforme QAPRIL.
+                            Il semble que votre propriétaire n&apos;ait pas encore généré de quittance électronique pour vous sur la plateforme QAPRIL.
                         </p>
                     </div>
                 ) : (

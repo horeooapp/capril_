@@ -6,15 +6,7 @@ import { generateLeaseRef } from "@/lib/lease"
 import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
 
-/**
- * Helper to serialize BigInt
- */
-const serializeLease = (lease: any) => ({
-    ...lease,
-    rentAmount: lease.rentAmount?.toString(),
-    depositAmount: lease.depositAmount?.toString(),
-    chargesAmount: lease.chargesAmount?.toString(),
-})
+import { serializeLease } from "@/lib/serialize"
 
 /**
  * Part 8.1: Create Lease (Residential or Commercial OHADA)
@@ -50,11 +42,11 @@ export async function createLease(data: {
 
         if (!landlord) throw new Error("Profil introuvable.")
         
-        const isPro = (['AGENCY', 'LANDLORD_PRO'] as any[]).includes(landlord.role as any)
-        if (isPro && (landlord as any).kycLevel < 4) {
+        const isPro = ([Role.AGENCY, Role.LANDLORD_PRO] as Role[]).includes(landlord.role as Role)
+        if (isPro && landlord.kycLevel < 4) {
             throw new Error("Votre entité légale doit être vérifiée (Niveau 4).")
         }
-        if (!isPro && (landlord as any).kycLevel < 2) {
+        if (!isPro && landlord.kycLevel < 2) {
             throw new Error("Votre identité doit être vérifiée (Niveau 2).")
         }
 
@@ -97,9 +89,10 @@ export async function createLease(data: {
         revalidatePath("/dashboard/leases")
         return { success: true, leaseId: lease.id, leaseReference: lease.leaseReference }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur création bail:", error)
-        return { error: error.message || "Impossible de créer le bail." }
+        const message = error instanceof Error ? error.message : "Impossible de créer le bail."
+        return { error: message }
     }
 }
 
@@ -112,7 +105,17 @@ export async function getLeaseById(id: string) {
         include: {
             property: true,
             landlord: { select: { fullName: true, phone: true } },
-            tenant: { select: { fullName: true, phone: true } }
+            tenant: { select: { fullName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
+            procedurePhases: true,
+            repaymentPlans: {
+                orderBy: { createdAt: 'desc' },
+                take: 1
+            },
+            mediation: {
+                include: { messages: true }
+            },
+            cdcDeposits: true, // plural in schema
+            insurance: true
         }
     })
 

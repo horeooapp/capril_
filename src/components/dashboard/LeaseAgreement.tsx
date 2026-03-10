@@ -137,7 +137,7 @@ export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
 
             {/* Footer */}
             <div className="mt-12 pt-6 border-t border-gray-100 text-[8px] font-bold text-gray-400 uppercase text-center font-sans tracking-widest relative z-10">
-                Document certifié par QAPRIL - Registre National des Baux de Côte d'Ivoire - {new Date().getFullYear()}
+                Document certifié par QAPRIL - Registre National des Baux de Côte d&apos;Ivoire - {new Date().getFullYear()}
             </div>
         </div>
     )

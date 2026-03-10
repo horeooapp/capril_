@@ -12,7 +12,7 @@ export default async function TrustProfile() {
                 <div className="max-w-4xl mx-auto py-20 px-4 text-center">
                     <h1 className="text-2xl font-bold text-gray-800">Profil de confiance non trouvé</h1>
                     <p className="mt-4 text-gray-500">
-                        Nous n'avons pas pu charger vos données de confiance. 
+                        Nous n&apos;avons pas pu charger vos données de confiance. 
                         Si le problème persiste, veuillez contacter le support.
                     </p>
                     <div className="mt-8 p-4 bg-gray-100 rounded text-xs text-gray-400">
@@ -125,7 +125,7 @@ export default async function TrustProfile() {
                             Comment améliorer votre score ?
                         </h3>
                         <ul className="text-xs text-orange-700 space-y-2 list-disc list-inside">
-                            <li>Payez votre loyer avant la date d'échéance (+5 pts)</li>
+                            <li>Payez votre loyer avant la date d&apos;échéance (+5 pts)</li>
                             <li>Soyez ponctuel à chaque mois (+2 pts)</li>
                             <li>Évitez les litiges de caution lors du départ (+20 pts)</li>
                             <li>Restez longtemps dans le même logement</li>
@@ -137,7 +137,7 @@ export default async function TrustProfile() {
                             À quoi sert ce score ?
                         </h3>
                         <p className="text-xs text-blue-700 leading-relaxed">
-                            Un score élevé vous permet de bénéficier de frais d'agence réduits, de cautions allégées et d'un accès prioritaire aux meilleurs logements. Il peut également débloquer des offres d'assurance loyers à tarifs préférentiels.
+                            Un score élevé vous permet de bénéficier de frais d&apos;agence réduits, de cautions allégées et d&apos;un accès prioritaire aux meilleurs logements. Il peut également débloquer des offres d&apos;assurance loyers à tarifs préférentiels.
                         </p>
                     </div>
                 </div>
@@ -148,7 +148,7 @@ export default async function TrustProfile() {
         return (
             <div className="max-w-4xl mx-auto py-10 px-4">
                 <div className="p-8 bg-red-50 border border-red-200 rounded-lg">
-                    <h1 className="text-xl font-bold text-red-800">Erreur lors du chargement de l'Indice de Confiance</h1>
+                    <h1 className="text-xl font-bold text-red-800">Erreur lors du chargement de l&apos;Indice de Confiance</h1>
                     <p className="mt-2 text-red-700">{error.message}</p>
                     <div className="mt-4 p-4 bg-white rounded border text-xs overflow-auto max-h-60">
                         <pre>{error.stack}</pre>

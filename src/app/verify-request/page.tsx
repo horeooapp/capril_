@@ -28,7 +28,7 @@ export default function VerifyRequestPage() {
                             <p className="font-semibold mb-1">📝 Vous ne recevez rien ?</p>
                             <ul className="list-disc ml-4 space-y-1">
                                 <li>Vérifiez votre dossier <strong>Spams</strong> ou Courriers indésirables.</li>
-                                <li>Assurez-vous que l'adresse email saisie est correcte.</li>
+                                <li>Assurez-vous que l&apos;adresse email saisie est correcte.</li>
                                 <li>Certains services pro (ex: Outlook) peuvent bloquer les emails automatiques.</li>
                             </ul>
                         </div>

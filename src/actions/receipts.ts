@@ -7,17 +7,7 @@ import { scoreRentPayment } from "@/lib/scoring"
 import { generateReceiptRef } from "@/lib/receipt"
 import { revalidatePath } from "next/cache"
 
-/**
- * Helper to serialize BigInt
- */
-const serializeReceipt = (receipt: any) => ({
-    ...receipt,
-    rentAmount: receipt.rentAmount?.toString(),
-    chargesAmount: receipt.chargesAmount?.toString(),
-    totalAmount: receipt.totalAmount?.toString(),
-    paidAt: receipt.paidAt?.toISOString(),
-    createdAt: receipt.createdAt?.toISOString(),
-})
+import { serializeReceipt } from "@/lib/serialize"
 
 /**
  * Part 8.1: Create/Generate Receipt

@@ -25,7 +25,7 @@ export default async function TenantLeasesPage() {
                     <div className="text-6xl text-gray-200">🏠</div>
                     <h2 className="text-2xl font-bold text-gray-400 uppercase">Aucun bail trouvé</h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                        Vous n'avez pas encore de contrats de bail enregistrés sur QAPRIL. 
+                        Vous n&apos;avez pas encore de contrats de bail enregistrés sur QAPRIL. 
                         Contactez votre propriétaire pour la régularisation de votre situation.
                     </p>
                 </div>

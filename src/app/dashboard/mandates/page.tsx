@@ -79,8 +79,8 @@ export default async function LandlordMandatesPage() {
                     <div>
                         <h3 className="font-bold text-blue-900">Règle de gestion QAPRIL</h3>
                         <p className="text-sm text-blue-800 leading-relaxed mt-1">
-                            La validation d'un mandat délègue officiellement la gestion de votre bien à l'agent sélectionné. 
-                            QAPRIL s'assure que l'agent est certifié et dispose des garanties nécessaires avant de lui permettre de vous soumettre un mandat.
+                            La validation d&apos;un mandat délègue officiellement la gestion de votre bien à l&apos;agent sélectionné. 
+                            QAPRIL s&apos;assure que l&apos;agent est certifié et dispose des garanties nécessaires avant de lui permettre de vous soumettre un mandat.
                         </p>
                     </div>
                 </div>

@@ -81,7 +81,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl border-2 border-blue-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-blue-900 placeholder-blue-300 shadow-sm"
-                            placeholder="Ex: Retard de loyer (Mois d'Octobre)"
+                            placeholder="Ex: Retard de loyer (Mois d&apos;Octobre)"
                             required
                         />
                     </div>
@@ -139,7 +139,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
             >
                 {messages.length === 0 && (
                     <div className="text-center py-10">
-                        <p className="text-gray-400 italic text-sm">Le médiateur QAPRIL est à votre écoute. Envoyez un message pour débuter l'échange.</p>
+                        <p className="text-gray-400 italic text-sm">Le médiateur QAPRIL est à votre écoute. Envoyez un message pour débuter l&apos;échange.</p>
                     </div>
                 )}
                 {messages.map((msg) => (

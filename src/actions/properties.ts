@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { generatePropertyCode } from "@/lib/property"
 import { revalidatePath } from "next/cache"
+import { serializeLease } from "@/lib/serialize"
 
 /**
  * Part 5: List Owner Properties
@@ -16,12 +17,20 @@ export async function getProperties() {
 
     const properties = await prisma.property.findMany({
         where: { ownerUserId: session.user.id },
+        include: {
+            leases: {
+                include: {
+                    tenant: { select: { fullName: true, phone: true } }
+                }
+            }
+        },
         orderBy: { createdAt: 'desc' }
     })
 
     return properties.map(p => ({
         ...p,
-        declaredRentFcfa: p.declaredRentFcfa?.toString() || "0"
+        declaredRentFcfa: p.declaredRentFcfa?.toString() || "0",
+        leases: p.leases.map(serializeLease)
     }))
 }
 
