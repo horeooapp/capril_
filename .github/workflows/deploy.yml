@@ -102,7 +102,6 @@ jobs:
       - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-<<<<<<< HEAD
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           # On EXCLUT expressément node_modules et on retire --delete pour éviter de casser le VPS
           rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=15 -o ServerAliveCountMax=3" \
@@ -115,17 +114,9 @@ jobs:
       - name: 🗃️ Run Prisma Migrations
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-=======
->>>>>>> 086b8fc933552f7844af887d9b5af50be98aef69
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          # On EXCLUT expressément node_modules et on empêche le timeout logiciel
-          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=15 -o ServerAliveCountMax=3" \
-            --delete \
-            --exclude='.env*' \
-            --exclude='node_modules' \
-            server.js package.json prisma public .next/static .next/standalone/ \
-            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}/
-
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+            cd ${{ vars.DEPLOY_PATH }} &&
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
             npx prisma migrate deploy
           "
