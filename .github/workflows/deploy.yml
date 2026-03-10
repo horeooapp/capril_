@@ -92,6 +92,13 @@ jobs:
           known_hosts: unnecessary
           if_key_exists: replace
 
+      - name: 🔐 Add known hosts automatically
+        run: |
+          mkdir -p ~/.ssh
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
+          ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
