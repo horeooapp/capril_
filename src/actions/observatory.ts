@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 
 /**
  * Aggregates platform data to refresh market statistics.
- * Anonymizes data by grouping by city and neighborhood.
+ * Anonymizes data by grouping by city and commune.
  */
 export async function refreshMarketStats() {
     // Group all active leases to calculate averages
@@ -14,8 +14,8 @@ export async function refreshMarketStats() {
             property: {
                 select: {
                     city: true,
-                    neighborhood: true,
-                    type: true
+                    commune: true,
+                    propertyType: true
                 }
             }
         }
@@ -24,7 +24,11 @@ export async function refreshMarketStats() {
     const marketMap = new Map<string, { totalRent: number, count: number }>()
 
     stats.forEach((lease: any) => {
-        const key = `${lease.property.city}|${lease.property.neighborhood || 'N/A'}|${lease.property.type}`
+        const city = lease.property.city || 'ABIDJAN'
+        const commune = lease.property.commune || 'N/A'
+        const type = lease.property.propertyType
+        const key = `${city}|${commune}|${type}`
+        
         const current = marketMap.get(key) || { totalRent: 0, count: 0 }
         marketMap.set(key, {
             totalRent: current.totalRent + lease.rentAmount,
@@ -34,14 +38,14 @@ export async function refreshMarketStats() {
 
     // Update MarketData table
     for (const [key, data] of marketMap.entries()) {
-        const [city, neighborhood, propertyType] = key.split('|')
+        const [city, commune, propertyType] = key.split('|')
         const averageRent = data.totalRent / data.count
 
         await prisma.marketData.upsert({
             where: {
-                city_neighborhood_propertyType: {
+                city_commune_propertyType: {
                     city,
-                    neighborhood: neighborhood === 'N/A' ? "" : neighborhood,
+                    commune: commune === 'N/A' ? "" : commune,
                     propertyType
                 }
             },
@@ -52,7 +56,7 @@ export async function refreshMarketStats() {
             },
             create: {
                 city,
-                neighborhood: neighborhood === 'N/A' ? "" : neighborhood,
+                commune: commune === 'N/A' ? "" : commune,
                 propertyType,
                 averageRent,
                 sampleSize: data.count

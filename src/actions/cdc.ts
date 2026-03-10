@@ -45,9 +45,9 @@ export async function initiateCDCDeposit(data: {
 
     await logAction({
         action: "INITIATE_CDC_DEPOSIT",
-        entityType: "CDC_DEPOSIT",
+        module: "CDC_DEPOSIT",
         entityId: deposit.id,
-        details: { initiator: data.initiator, amount: data.amount, proofHash }
+        newValues: { initiator: data.initiator, amount: data.amount, proofHash }
     })
 
     return deposit
@@ -70,9 +70,9 @@ export async function validateCDCDeposit(depositId: string, cdcReference: string
 
     await logAction({
         action: "VALIDATE_CDC_DEPOSIT",
-        entityType: "CDC_DEPOSIT",
+        module: "CDC_DEPOSIT",
         entityId: depositId,
-        details: { cdcReference }
+        newValues: { cdcReference }
     })
 
     return deposit

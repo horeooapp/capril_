@@ -16,7 +16,7 @@ export async function requestCNL() {
     }
 
     // Role check
-    if ((session.user.role as Role) !== Role.TENANT && (session.user.role as Role) !== Role.ADMIN) {
+    if ((session.user.role as any) !== 'TENANT' && (session.user.role as any) !== 'ADMIN') {
         throw new Error("Seuls les locataires peuvent demander un CNL.");
     }
 

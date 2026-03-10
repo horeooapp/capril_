@@ -40,10 +40,10 @@ export default async function AdminUsersPage() {
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
-                                            {user.name?.charAt(0) || user.email?.charAt(0)}
+                                            {user.fullName?.charAt(0) || user.email?.charAt(0)}
                                         </div>
                                         <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">{user.name || "N/A"}</div>
+                                            <div className="text-sm font-medium text-gray-900">{user.fullName || "N/A"}</div>
                                             <div className="text-sm text-gray-500">{user.email}</div>
                                         </div>
                                     </div>
@@ -58,7 +58,7 @@ export default async function AdminUsersPage() {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {user.isCertified ? (
+                                    {user.kycStatus === 'verified' ? (
                                         <span className="text-green-600 flex items-center">
                                             <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                                             Certifié

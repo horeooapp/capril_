@@ -2,12 +2,17 @@
 
 import { useState } from 'react'
 import { requestSignatureOTP, signLease } from '@/actions/leases'
-import { Button } from '@/components/ui/button' // Assuming these exist or using standard buttons
-import { Input } from '@/components/ui/input'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { ShieldCheck, Send, CheckCircle2 } from 'lucide-react'
 
-export function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, leaseRef: string }) {
+const Button = ({ children, ...props }: any) => <button {...props}>{children}</button>
+const Input = (props: any) => <input {...props} />
+const Card = ({ children, className }: any) => <div className={className}>{children}</div>
+const CardHeader = ({ children, className }: any) => <div className={className}>{children}</div>
+const CardTitle = ({ children, className }: any) => <h2 className={className}>{children}</h2>
+const CardContent = ({ children, className }: any) => <div className={className}>{children}</div>
+const CardFooter = ({ children, className }: any) => <div className={className}>{children}</div>
+
+export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, leaseRef: string }) {
     const [step, setStep] = useState<'initial' | 'otp' | 'success'>('initial')
     const [otp, setOtp] = useState('')
     const [loading, setLoading] = useState(false)
@@ -104,7 +109,7 @@ export function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, lease
                             className="text-center text-2xl tracking-[0.5em] font-mono h-14"
                             maxLength={6}
                             value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
+                            onChange={(e: any) => setOtp(e.target.value)}
                         />
                         <Button 
                             className="w-full h-12 text-lg font-semibold" 

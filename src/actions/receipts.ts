@@ -71,7 +71,6 @@ export async function createReceipt(data: {
         const receipt = await prisma.receipt.create({
             data: {
                 receiptRef,
-                receiptType: data.receiptType,
                 leaseId: data.leaseId,
                 periodMonth: data.periodMonth,
                 rentAmount: data.rentAmount,
@@ -162,6 +161,32 @@ export async function getMyReceipts() {
         },
         orderBy: { createdAt: 'desc' },
         take: 10
+    })
+
+    return receipts.map(serializeReceipt)
+}
+
+/**
+ * Part 8.2: Get Receipts for the logged-in Tenant
+ */
+export async function getReceiptsForTenant() {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) {
+        return []
+    }
+
+    const receipts = await prisma.receipt.findMany({
+        where: { lease: { tenantId: session.user.id } },
+        include: {
+            lease: {
+                include: {
+                    property: {
+                        include: { owner: true }
+                    }
+                }
+            }
+        },
+        orderBy: { periodMonth: 'desc' }
     })
 
     return receipts.map(serializeReceipt)

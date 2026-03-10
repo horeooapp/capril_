@@ -36,7 +36,7 @@ export async function createProperty(input: CreatePropertyInput) {
     if (!user) throw new Error("Utilisateur non trouvé.")
 
     // Level 2 required for individual landlords, Level 4 for Pros/Agencies
-    const isPro = [Role.AGENCY, Role.LANDLORD_PRO].includes(session.user.role as Role)
+    const isPro = ['AGENCY', 'LANDLORD_PRO'].includes(session.user.role as any)
     if (isPro && user.kycLevel < 4) {
         throw new Error("Votre entité légale doit être vérifiée (Niveau 4) avant d'enregistrer des biens.")
     }
@@ -97,7 +97,7 @@ export async function validateProperty(
     
     // Only ANAH Agents or Admins
     const authorizedRoles: Role[] = [Role.SUPER_ADMIN, Role.ADMIN, Role.ANAH_AGENT]
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Accès non autorisé : Droits ANAH requis.")
     }
 

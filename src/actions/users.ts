@@ -47,9 +47,9 @@ export async function logScoreConsultation(targetUserId: string, reason: string)
         data: {
             userId: viewerId,
             action: "CONSULTATION_SCORE",
-            entityType: "USER",
+            module: "USER",
             entityId: targetUserId,
-            details: JSON.stringify({ reason, timestamp: new Date() })
+            newValues: { reason, timestamp: new Date() }
         }
     })
     

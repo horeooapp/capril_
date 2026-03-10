@@ -32,13 +32,13 @@ export default function LeaseRegistrationPage() {
 
         const data = {
             propertyId: formData.get("propertyId") as string,
+            leaseType: 'residential' as const,
             tenantPhone: formData.get("tenantPhone") as string,
             startDate: new Date(formData.get("startDate") as string),
-            monthlyRentFcfa: rentAmount,
-            chargesFcfa: parseInt(formData.get("charges") as string || "0"),
-            securityDepositFcfa: deposit,
-            rentAdvanceFcfa: advance,
-            agencyFeeFcfa: agency,
+            rentAmount: rentAmount,
+            durationMonths: 12, // Default duration
+            chargesAmount: parseInt(formData.get("charges") as string || "0"),
+            depositAmount: deposit,
         }
 
         startTransition(async () => {

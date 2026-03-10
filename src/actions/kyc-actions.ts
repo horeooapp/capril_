@@ -19,7 +19,7 @@ export async function verifyUserIdentity(
     
     // Security: Only Admin or ANAH/CDC Agents can verify identities
     const authorizedRoles: Role[] = [Role.SUPER_ADMIN, Role.ADMIN, Role.ANAH_AGENT, Role.CDC_AGENT]
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Accès non autorisé : Droits de vérification requis.")
     }
 

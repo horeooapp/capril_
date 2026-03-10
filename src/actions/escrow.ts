@@ -2,73 +2,54 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { EscrowStatus } from "@prisma/client"
+import { CDCDepositStatus } from "@prisma/client"
 import { logAction } from "./audit"
 
 export async function createEscrow(leaseId: string, amount: number) {
     const session = await auth()
     if (!session?.user) throw new Error("Non authentifié")
 
-    const escrow = await prisma.escrow.create({
+    const deposit = await prisma.cDCDeposit.create({
         data: {
             leaseId,
             amount,
-            status: "ACTIVE",
-            history: JSON.stringify([{
-                status: "ACTIVE",
-                timestamp: new Date(),
-                reason: "Initialisation du bail"
-            }])
+            status: "PENDING",
         }
     })
 
     await logAction({
         action: "CREATE_ESCROW",
-        entityType: "ESCROW",
-        entityId: escrow.id,
-        details: { leaseId, amount }
+        module: "ESCROW",
+        entityId: deposit.id,
+        newValues: { leaseId, amount }
     })
 
-    return escrow
+    return deposit
 }
 
-export async function updateEscrowStatus(escrowId: string, newStatus: EscrowStatus, reason: string) {
+export async function updateEscrowStatus(depositId: string, newStatus: CDCDepositStatus, reason: string) {
     const session = await auth()
     if (!session?.user) throw new Error("Non authentifié")
 
-    const currentEscrow = await prisma.escrow.findUnique({
-        where: { id: escrowId }
-    })
-
-    if (!currentEscrow) throw new Error("Séquestre introuvable")
-
-    const history = JSON.parse(currentEscrow.history || "[]")
-    history.push({
-        status: newStatus,
-        timestamp: new Date(),
-        reason
-    })
-
-    const updatedEscrow = await prisma.escrow.update({
-        where: { id: escrowId },
+    const updatedDeposit = await prisma.cDCDeposit.update({
+        where: { id: depositId },
         data: {
             status: newStatus,
-            history: JSON.stringify(history)
         }
     })
 
     await logAction({
         action: "UPDATE_ESCROW_STATUS",
-        entityType: "ESCROW",
-        entityId: escrowId,
-        details: { oldStatus: currentEscrow.status, newStatus, reason }
+        module: "ESCROW",
+        entityId: depositId,
+        newValues: { newStatus, reason }
     })
 
-    return updatedEscrow
+    return updatedDeposit
 }
 
 export async function getEscrowByLease(leaseId: string) {
-    return await prisma.escrow.findUnique({
+    return await prisma.cDCDeposit.findUnique({
         where: { leaseId }
     })
 }

@@ -54,11 +54,11 @@ export async function createReceipt(input: CreateReceiptInput) {
         if (input.isDeposit) {
             await prisma.cDCDeposit.upsert({
                 where: { leaseId: lease.id },
-                update: { amount: totalAmount, status: 'awaiting_payment' },
+                update: { amount: totalAmount, status: 'AWAITING_PAYMENT' },
                 create: {
                     leaseId: lease.id,
                     amount: totalAmount,
-                    status: 'awaiting_payment'
+                    status: 'AWAITING_PAYMENT'
                 }
             });
         }
@@ -79,7 +79,7 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.LANDLORD, Role.AGENCY, Role.LANDLORD_PRO];
     
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Accès non autorisé.");
     }
 
@@ -116,11 +116,11 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
                 where: { leaseId: r.leaseId }
             });
 
-            if (cdcDeposit && cdcDeposit.status === 'awaiting_payment') {
+            if (cdcDeposit && cdcDeposit.status === 'AWAITING_PAYMENT') {
                 await tx.cDCDeposit.update({
                     where: { leaseId: r.leaseId },
                     data: { 
-                        status: 'payment_initiated',
+                        status: 'PENDING',
                         consignedAt: paidAt
                     }
                 });

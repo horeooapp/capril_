@@ -30,7 +30,7 @@ export async function createDispute(input: CreateDisputeInput) {
         if (!lease) throw new Error("Bail introuvable.");
 
         // Check if user is landlord or tenant of this lease
-        if (session.user.id !== lease.landlordId && session.user.id !== lease.tenantId && (session.user.role as Role) !== Role.ADMIN) {
+        if (session.user.id !== lease.landlordId && session.user.id !== lease.tenantId && (session.user.role as any) !== 'ADMIN') {
             throw new Error("Vous n'êtes pas autorisé à ouvrir un litige sur ce bail.");
         }
 
@@ -40,7 +40,7 @@ export async function createDispute(input: CreateDisputeInput) {
                 title: input.title,
                 description: input.description,
                 amountInDispute: input.amountInDispute,
-                status: 'open'
+                status: 'OPEN'
             }
         });
 
@@ -72,13 +72,13 @@ export async function sendMediationMessage(disputeId: string, content: string, a
 
         // Authorization: Landlord, Tenant, or Agent/Admin
         const isParticipant = session.user.id === dispute.lease.landlordId || session.user.id === dispute.lease.tenantId;
-        const isAgent = [Role.ADMIN, Role.ANAH_AGENT, Role.CDC_AGENT].includes(session.user.role as Role);
+        const isAgent = ['ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(session.user.role as any);
 
         if (!isParticipant && !isAgent) {
             throw new Error("Accès non autorisé.");
         }
 
-        const message = await prisma.mediationMessage.create({
+        const message = await prisma.disputeMessage.create({
             data: {
                 disputeId,
                 senderId: session.user.id,
@@ -87,11 +87,11 @@ export async function sendMediationMessage(disputeId: string, content: string, a
             }
         });
 
-        // Automatically transition to 'in_mediation' if an agent responds
-        if (isAgent && dispute.status === 'open') {
+        // Automatically transition to 'IN_MEDIATION' if an agent responds
+        if (isAgent && dispute.status === 'OPEN') {
             await prisma.dispute.update({
                 where: { id: disputeId },
-                data: { status: 'in_mediation' }
+                data: { status: 'IN_MEDIATION' }
             });
         }
 
@@ -111,7 +111,7 @@ export async function resolveDispute(disputeId: string, resolution: string) {
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT];
 
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Seuls les agents/admins peuvent clore officiellement un litige.");
     }
 
@@ -119,7 +119,7 @@ export async function resolveDispute(disputeId: string, resolution: string) {
         await prisma.dispute.update({
             where: { id: disputeId },
             data: {
-                status: 'resolved',
+                status: 'RESOLVED',
                 resolution,
                 updatedAt: new Date()
             }

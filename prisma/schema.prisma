@@ -19,6 +19,74 @@ enum Role {
   NON_CERTIFIED_AGENT
 }
 
+enum CDCDepositStatus {
+  AWAITING_PAYMENT
+  PENDING
+  CONSIGNED
+  RETURN_REQUESTED
+  RETURNED
+  FORFEITED
+}
+
+enum CDCDepositInitiator {
+  OWNER
+  AGENCY
+  ADMIN
+}
+
+enum LeaseStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  PENDING_DEPOSIT
+  ACTIVE
+  LOYER_IMPAYE
+  MISE_EN_DEMEURE
+  CLEMENCE_EN_COURS
+  REPRISE_PROCEDURE
+  DEMANDE_RESILIATION
+  TERMINATED
+  CANCELLED
+  ARCHIVED
+}
+
+enum PlanStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  BROKEN
+  COMPLETED
+}
+
+enum InsuranceStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum InsuranceClaimStatus {
+  OPEN
+  PROCESSING
+  RESOLVED
+  REJECTED
+}
+
+enum MediationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  WAITING_RESPONSE
+  IN_MEDIATION
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
+
 // ═══════════════════════════════════════════════════════
 // USERS (Part 4 & 5)
 // ═══════════════════════════════════════════════════════
@@ -31,6 +99,8 @@ model User {
   kycLevel                Int       @default(0) @map("kyc_level") // 0-4
   kycStatus               String    @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
   status                  String    @default("active") // active|suspended|inactive
+  password                String?
+  isCertified             Boolean   @default(false) @map("is_certified")
   
   legalEntityId           String?   @map("legal_entity_id")
   legalEntity             LegalEntity? @relation(fields: [legalEntityId], references: [id])
@@ -56,6 +126,7 @@ model User {
   certificates            Certificate[]
   mandates                Mandate[]         @relation("AgentMandates")
   propertiesManaged       Property[]        @relation("AgentProperties")
+  mediationMessages       MediationMessage[]
 
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
@@ -139,6 +210,12 @@ model Property {
   areaSqm           Decimal? @map("area_sqm") @db.Decimal(8, 2)
   rooms             Int?     @db.SmallInt
   bedrooms          Int?     @db.SmallInt
+  name              String?  @map("name")
+  city              String?  @map("city")
+  declaredRentFcfa  Decimal? @map("declared_rent_fcfa") @db.Decimal(12, 2)
+  digitalPostalAddress String? @map("digital_postal_address")
+  gpsLatitude       Decimal? @map("gps_latitude") @db.Decimal(10, 8)
+  gpsLongitude      Decimal? @map("gps_longitude") @db.Decimal(11, 8)
   amenities         String[]
   status            String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
   documents         Json?    @default("{}")
@@ -201,7 +278,7 @@ model Lease {
   paymentDay        Int      @default(5) @map("payment_day") @db.SmallInt
   depositAmount     Int      @default(0) @map("deposit_amount")
   
-  status            String   @default("draft") // draft|pending_signature|pending_deposit|active|notice_given|suspended|terminated|archived|cancelled
+  status            LeaseStatus @default(DRAFT)
   importMode        Boolean  @default(false) @map("import_mode")
   
   signedAt          DateTime? @map("signed_at")
@@ -216,6 +293,10 @@ model Lease {
   disputes          Dispute[]
   incidentLogs      Incident[]
   procedurePhases   ProcedurePhase[]
+  insurance         Insurance?
+  repaymentPlans    RepaymentPlan[]
+  mediation         Mediation?
+  paymentIntents    PaymentIntent[]
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -229,6 +310,24 @@ model Lease {
 // ═══════════════════════════════════════════════════════
 // RECEIPTS & PAYMENTS (Part 9)
 // ═══════════════════════════════════════════════════════
+model PaymentIntent {
+  id                String   @id @default(uuid())
+  idempotencyKey    String   @unique @map("idempotency_key")
+  leaseId           String   @map("lease_id")
+  lease             Lease    @relation(fields: [leaseId], references: [id])
+  amount            Int
+  operator          String // orange|mtn|moov|wave
+  operatorRef       String?  @map("operator_ref")
+  payerPhone        String   @map("payer_phone")
+  status            String   @default("pending") // pending|success|failed
+  metadata          Json?
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("payment_intents")
+}
+
 model Receipt {
   id                String   @id @default(uuid()) @map("receipt_id")
   receiptRef        String   @unique @map("receipt_ref") // REC-2026-04-00123AB (or QR- format)
@@ -257,23 +356,6 @@ model Receipt {
   @@index([periodMonth])
 }
 
-model PaymentIntent {
-  id                String   @id @default(uuid())
-  idempotencyKey    String   @unique @map("idempotency_key")
-  leaseId           String   @map("lease_id")
-  amount            Int
-  operator          String // orange|mtn|moov|wave
-  operatorRef       String?  @map("operator_ref")
-  status            String   @default("pending") // pending|success|failed
-  payerPhone        String   @map("payer_phone")
-  metadata          Json?
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  @@map("payment_intents")
-  @@index([operatorRef])
-}
 
 // ═══════════════════════════════════════════════════════
 // ARREARS & PROCEDURES (Part 11)
@@ -294,12 +376,14 @@ model LeaseArrear {
 }
 
 model ProcedurePhase {
-  id        String   @id @default(uuid())
-  leaseId   String   @map("lease_id")
-  lease     Lease    @relation(fields: [leaseId], references: [id])
-  phase     String // PHASE_1_FRIENDLY_REMINDER|...|PHASE_10
-  actionDate DateTime @default(now()) @map("action_date")
-  metadata  Json?
+  id          String   @id @default(uuid())
+  leaseId     String   @map("lease_id")
+  lease       Lease    @relation(fields: [leaseId], references: [id])
+  phaseNumber Int      @map("phase_number")
+  name        String
+  description String?  @db.Text
+  actionDate  DateTime @default(now()) @map("action_date")
+  metadata    Json?
   
   @@map("procedure_phases")
 }
@@ -312,8 +396,10 @@ model CDCDeposit {
   leaseId         String   @unique @map("lease_id")
   lease           Lease    @relation(fields: [leaseId], references: [id])
   amount          Int
+  initiator       CDCDepositInitiator @default(OWNER)
   cdcReference    String?  @map("cdc_reference")
-  status          String   @default("awaiting_payment") // awaiting_payment|payment_initiated|consigned|return_requested|returned|forfeited
+  status          CDCDepositStatus @default(AWAITING_PAYMENT)
+  proofHash       String?  @map("proof_hash")
   consignedAt     DateTime? @map("consigned_at")
   returnedAt      DateTime? @map("returned_at")
   
@@ -336,9 +422,10 @@ model Mandate {
   mandateType       String   @map("mandate_type") // management_simple|management_extended|rental|sale
   commissionPct     Decimal  @map("commission_pct") @db.Decimal(5, 2) // max 15.00
   startDate         DateTime @map("start_date") @db.Date
-  endDate           DateTime @map("end_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
   status            String   @default("draft") // draft|active|expired|terminated
   signedAt          DateTime? @map("signed_at")
+  proofHash         String?  @map("proof_hash")
   pdfUrl            String?  @map("pdf_url")
   
   leases            Lease[]
@@ -400,10 +487,10 @@ model Dispute {
   title           String
   description     String   @db.Text
   amountInDispute Int?     @map("amount_in_dispute")
-  status          String   @default("open") // open|waiting_response|in_mediation|resolved|escalated|closed
+  status          DisputeStatus @default(OPEN)
   resolution      String?  @db.Text
   
-  messages        MediationMessage[]
+  messages        DisputeMessage[]
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -411,7 +498,7 @@ model Dispute {
   @@map("disputes")
 }
 
-model MediationMessage {
+model DisputeMessage {
   id          String   @id @default(uuid())
   disputeId   String   @map("dispute_id")
   dispute     Dispute  @relation(fields: [disputeId], references: [id])
@@ -421,7 +508,7 @@ model MediationMessage {
   
   createdAt   DateTime @default(now()) @map("created_at")
 
-  @@map("mediation_messages")
+  @@map("dispute_messages")
 }
 
 // ═══════════════════════════════════════════════════════
@@ -447,10 +534,13 @@ model Notification {
   id        String   @id @default(uuid())
   userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id])
-  channel   String // SMS|PUSH|EMAIL|WHATSAPP|USSD_PUSH|COURRIER
+  channel   String @default("PUSH") // SMS|PUSH|EMAIL|WHATSAPP|USSD_PUSH|COURRIER
   title     String?
   content   String   @db.Text
+  type      String   @default("INFO")
+  link      String?
   status    String   @default("pending") // pending|sent|delivered|failed
+  read      Boolean  @default(false)
   retryCount Int     @default(0) @map("retry_count")
   
   createdAt DateTime @default(now()) @map("created_at")
@@ -476,6 +566,20 @@ model ObservatorySnapshot {
   @@index([commune, period])
 }
 
+model MarketData {
+  id              String   @id @default(uuid())
+  city            String
+  commune         String
+  propertyType    String   @map("property_type")
+  averageRent     Float    @map("average_rent")
+  sampleSize      Int      @map("sample_size")
+  
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([city, commune, propertyType], name: "city_commune_propertyType")
+  @@map("market_data")
+}
+
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String?  @map("user_id")
@@ -487,6 +591,7 @@ model AuditLog {
   newValues Json?    @map("new_values")
   ipAddress String?  @map("ip_address")
   userAgent String?  @map("user_agent")
+  proofHash String?  @map("proof_hash")
   
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -525,5 +630,77 @@ model Incident {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("incidents")
+}
+
+model Insurance {
+  id              String   @id @default(uuid())
+  leaseId         String   @unique @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  provider        String
+  policyNo        String   @unique @map("policy_no")
+  status          InsuranceStatus @default(ACTIVE)
+  
+  claims          InsuranceClaim[]
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("insurances")
+}
+
+model InsuranceClaim {
+  id              String   @id @default(uuid())
+  insuranceId     String   @map("insurance_id")
+  insurance       Insurance @relation(fields: [insuranceId], references: [id])
+  amount          Int
+  reason          String
+  status          InsuranceClaimStatus @default(OPEN)
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("insurance_claims")
+}
+
+model RepaymentPlan {
+  id              String   @id @default(uuid())
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  details         String   @db.Text
+  status          PlanStatus @default(PROPOSED)
+  tenantSignature String?  @map("tenant_signature")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("repayment_plans")
+}
+
+model Mediation {
+  id              String   @id @default(uuid())
+  leaseId         String   @unique @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  subject         String
+  status          MediationStatus @default(OPEN)
+  
+  messages        MediationMessage[]
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("mediations")
+}
+
+model MediationMessage {
+  id              String   @id @default(uuid())
+  mediationId     String   @map("mediation_id")
+  mediation       Mediation @relation(fields: [mediationId], references: [id])
+  senderId        String   @map("sender_id")
+  sender          User     @relation(fields: [senderId], references: [id])
+  content         String   @db.Text
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("mediation_messages")
 }
 

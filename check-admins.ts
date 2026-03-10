@@ -9,7 +9,7 @@ async function main() {
             id: true,
             email: true,
             role: true,
-            name: true
+            fullName: true
         }
     })
 

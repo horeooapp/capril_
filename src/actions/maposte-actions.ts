@@ -25,11 +25,12 @@ export async function dispatchMiseEnDemeure(leaseId: string, phaseId: string) {
         });
 
         if (!lease) throw new Error("Bail introuvable.");
+        if (!lease.tenant) throw new Error("Locataire introuvable.");
 
         const delivery = await createMaPosteDispatch({
             recipientData: {
-                name: `${lease.tenant.firstName} ${lease.tenant.lastName}`,
-                phone: lease.tenant.phoneNumber,
+                name: lease.tenant.fullName || "Locataire",
+                phone: lease.tenant.phone,
                 leaseRef: lease.leaseReference,
                 phaseId
             },

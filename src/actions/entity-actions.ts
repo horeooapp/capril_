@@ -71,7 +71,7 @@ export async function validateLegalEntity(entityId: string, action: 'approve' | 
     const session = await auth()
     
     const authorizedRoles: Role[] = [Role.SUPER_ADMIN, Role.ADMIN, Role.CDC_AGENT]
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Accès non autorisé.")
     }
 

@@ -30,13 +30,13 @@ export default async function AdminValidationPage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex-1">
                                             <div className="flex items-center mb-1">
-                                                <h3 className="text-lg font-bold text-gray-900 mr-2">{user.companyName || user.name}</h3>
+                                                <h3 className="text-lg font-bold text-gray-900 mr-2">{user.legalEntity?.companyName || user.fullName}</h3>
                                                 <span className={`px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800`}>
                                                     {user.role}
                                                 </span>
                                             </div>
                                             <div className="text-sm text-gray-600 space-y-1">
-                                                <p><span className="font-medium">Responsable :</span> {user.name}</p>
+                                                <p><span className="font-medium">Responsable :</span> {user.fullName}</p>
                                                 <p><span className="font-medium">E-mail :</span> {user.email}</p>
                                                 <p><span className="font-medium">Inscrit le :</span> {user.createdAt.toLocaleDateString()}</p>
                                             </div>

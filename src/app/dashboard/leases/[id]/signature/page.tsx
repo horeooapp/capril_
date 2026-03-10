@@ -21,7 +21,7 @@ export default async function LandlordLeaseSignaturePage({ params }: { params: P
 
     return (
         <div className="max-w-5xl mx-auto py-12">
-            <LeaseSignatureUI lease={lease} userId={userId} />
+            <LeaseSignatureUI leaseId={lease.id} leaseRef={lease.leaseReference} />
         </div>
     )
 }

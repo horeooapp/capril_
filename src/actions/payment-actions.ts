@@ -3,7 +3,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { crypto } from "node:crypto"
+import crypto from "node:crypto"
 
 export type PaymentOperator = 'orange' | 'mtn' | 'moov' | 'wave';
 

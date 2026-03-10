@@ -18,7 +18,7 @@ export async function refreshReliabilityScore(targetUserId?: string) {
     const userId = targetUserId || session.user.id;
     
     // Authorization check: Self or Admin
-    if (userId !== session.user.id && (session.user.role as Role) !== Role.ADMIN) {
+    if (userId !== session.user.id && (session.user.role as any) !== 'ADMIN') {
         throw new Error("Accès non autorisé.");
     }
 

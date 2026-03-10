@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
-import { loginWithMagicLink } from "@/actions/auth"
+import { requestOTP, loginWithOTP } from "@/actions/auth"
 
 export default function LoginPage() {
     const [selectedRole, setSelectedRole] = useState<'TENANT' | 'LANDLORD'>('TENANT')
@@ -58,9 +58,8 @@ export default function LoginPage() {
             </div>
         </div>
     )
-}
 
-import { requestOTP, loginWithOTP } from "@/actions/auth"
+}
 
 function PhoneOTPForm({ role }: { role: string }) {
     const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE')

@@ -16,13 +16,13 @@ export default function NewPropertyPage() {
 
         const formData = new FormData(e.currentTarget)
         const data = {
-            category,
-            addressLine1: formData.get("addressLine1") as string,
+            leaseType: category.toLowerCase() as 'residential' | 'commercial',
+            address: formData.get("addressLine1") as string,
             commune: formData.get("commune") as string,
             declaredRentFcfa: parseInt(formData.get("rent") as string),
             propertyType: formData.get("propertyType") as string,
-            totalRooms: parseInt(formData.get("rooms") as string) || undefined,
-            usefulAreaSqm: parseFloat(formData.get("area") as string) || undefined,
+            rooms: parseInt(formData.get("rooms") as string) || undefined,
+            areaSqm: parseFloat(formData.get("area") as string) || undefined,
         }
 
         startTransition(async () => {

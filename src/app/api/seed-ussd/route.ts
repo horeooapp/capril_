@@ -6,7 +6,7 @@ export async function GET() {
         const tenant = await prisma.user.create({
             data: {
                 email: "locataire.ussd@qapril.net",
-                name: "Locataire USSD",
+                fullName: "Locataire USSD",
                 phone: "+2250707070707",
                 role: "TENANT"
             }
@@ -15,25 +15,30 @@ export async function GET() {
         const landlord = await prisma.user.create({
             data: {
                 email: "bailleur.ussd@qapril.net",
-                name: "Bailleur USSD",
+                fullName: "Bailleur USSD",
+                phone: "+2250808080808",
                 role: "LANDLORD"
             }
         });
 
         const property = await prisma.property.create({
             data: {
+                propertyCode: "PROP-SEED-USSD",
                 address: "Rue des Jardins",
-                city: "Abidjan",
-                country: "CI",
-                ownerId: landlord.id
+                commune: "Cocody",
+                ownerUserId: landlord.id,
+                propertyType: "APARTMENT"
             }
         });
 
         const lease = await prisma.lease.create({
             data: {
+                leaseReference: "BAIL-SEED-USSD",
                 propertyId: property.id,
+                landlordId: landlord.id,
                 tenantId: tenant.id,
                 startDate: new Date(),
+                durationMonths: 12,
                 rentAmount: 150000,
                 status: "ACTIVE"
             }
@@ -42,12 +47,12 @@ export async function GET() {
         await prisma.receipt.create({
             data: {
                 leaseId: lease.id,
-                receiptNumber: "Q-2024-009999",
-                amountPaid: 150000,
-                periodStart: new Date(),
-                periodEnd: new Date(),
-                paymentDate: new Date(),
-                qrCodeHash: "ussd-test-qr-hash",
+                receiptRef: "REC-SEED-USSD",
+                rentAmount: 150000,
+                totalAmount: 150000,
+                periodMonth: "2024-03",
+                paymentMethod: "MOBILE_MONEY",
+                paidAt: new Date(),
             }
         });
 

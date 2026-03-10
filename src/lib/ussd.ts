@@ -57,7 +57,7 @@ export async function processUSSDRequest(phone: string, text: string, sessionId:
                 orderBy: { actionDate: 'desc' }
             }) : null;
             if (!procedure) return "END Aucune procédure de recouvrement en cours.";
-            return `END État actuel: ${procedure.phase}\nDate: ${procedure.actionDate.toLocaleDateString()}`;
+            return `END État actuel: ${procedure.name}\nDate: ${procedure.actionDate.toLocaleDateString()}`;
         }
 
         case "4":

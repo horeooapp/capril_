@@ -4,8 +4,8 @@ import Link from "next/link"
 export default async function VerifyReceiptPage({ params }: { params: Promise<{ hash: string }> }) {
     const { hash: receiptHash } = await params
 
-    const receipt = await prisma.receipt.findUnique({
-        where: { qrCodeHash: receiptHash },
+    const receipt = await prisma.receipt.findFirst({
+        where: { receiptHash: receiptHash },
         include: {
             lease: {
                 include: {
@@ -57,24 +57,24 @@ export default async function VerifyReceiptPage({ params }: { params: Promise<{ 
                         <dl className="mt-4 space-y-4 divide-y divide-gray-200 text-sm">
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">N° Quittance</dt>
-                                <dd className="font-semibold text-gray-900">{receipt.receiptNumber}</dd>
+                                <dd className="font-semibold text-gray-900">{receipt.receiptRef}</dd>
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Locataire</dt>
                                 {/* @ts-ignore */}
-                                <dd className="font-medium text-gray-900">{receipt.lease.tenant.name || receipt.lease.tenant.email}</dd>
+                                <dd className="font-medium text-gray-900">{receipt.lease.tenant?.fullName || receipt.lease.tenant?.email}</dd>
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Bailleur</dt>
-                                <dd className="font-medium text-gray-900">{receipt.lease.property.owner.name || receipt.lease.property.owner.email}</dd>
+                                <dd className="font-medium text-gray-900">{receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}</dd>
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Période</dt>
-                                <dd className="font-medium text-gray-900">{new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</dd>
+                                <dd className="font-medium text-gray-900">{receipt.periodMonth}</dd>
                             </div>
                             <div className="pt-4 flex justify-between items-center">
                                 <dt className="text-gray-500">Montant réglé</dt>
-                                <dd className="font-bold text-lg text-primary">{receipt.amountPaid.toLocaleString('fr-FR')} FCFA</dd>
+                                <dd className="font-bold text-lg text-primary">{receipt.totalAmount.toLocaleString('fr-FR')} FCFA</dd>
                             </div>
                         </dl>
                     </div>

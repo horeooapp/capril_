@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
                     include: { receipts: { include: { lease: { include: { landlord: true } } } } }
                 });
 
-                const landlordPhone = delivery?.receipts?.[0]?.lease?.landlord?.phoneNumber;
+                const landlordPhone = delivery?.receipts?.[0]?.lease?.landlord?.phone;
                 if (landlordPhone) {
                     await sendSMS(landlordPhone, `📬 ${label} - Réf: ${result.trackingNumber}`);
                 }

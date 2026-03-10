@@ -3,7 +3,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { getLeaseProceduralState, transitionArrearsPhase, ARREARS_PHASES } from "@/lib/arrears-engine"
+import { getLeaseProceduralState, transitionArrearsPhase, ARREARS_PHASE_CONFIG } from "@/lib/arrears-engine"
 import { Role } from "@prisma/client"
 
 /**
@@ -13,7 +13,7 @@ export async function scanLeaseForArrears(leaseId: string) {
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT, Role.AGENCY];
 
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Action réservée aux administrateurs ou agents.");
     }
 
@@ -24,11 +24,12 @@ export async function scanLeaseForArrears(leaseId: string) {
         let phaseToTrigger: string | null = null;
 
         // Determine which phase to trigger based on delay (Logic simple simulation)
-        if (state.delayDays >= ARREARS_PHASES.PHASE_1_AMIABLE.day && state.lastPhase === null) {
+        const delayDays = state.delayDays || 0;
+        if (delayDays >= ARREARS_PHASE_CONFIG.PHASE_1_AMIABLE.day && state.lastPhase === null) {
             phaseToTrigger = "PHASE_1_AMIABLE";
-        } else if (state.delayDays >= ARREARS_PHASES.PHASE_2_FORMAL.day && state.lastPhase === "PHASE_1_AMIABLE") {
+        } else if (state.delayDays >= ARREARS_PHASE_CONFIG.PHASE_2_FORMAL.day && state.lastPhase === "PHASE_1_AMIABLE") {
             phaseToTrigger = "PHASE_2_FORMAL";
-        } else if (state.delayDays >= ARREARS_PHASES.PHASE_3_MAPOSTE.day && state.lastPhase === "PHASE_2_FORMAL") {
+        } else if (state.delayDays >= ARREARS_PHASE_CONFIG.PHASE_3_MAPOSTE.day && state.lastPhase === "PHASE_2_FORMAL") {
             phaseToTrigger = "PHASE_3_MAPOSTE";
         }
         // ... Higher phases would typically require manual validation or specific triggers
@@ -52,7 +53,7 @@ export async function scanLeaseForArrears(leaseId: string) {
  */
 export async function resetLeaseProcedure(leaseId: string) {
     const session = await auth();
-    if (!session || !session.user || (session.user.role as Role) !== Role.ADMIN) {
+    if (!session || !session.user || (session.user.role as any) !== 'ADMIN') {
         throw new Error("Action réservée aux administrateurs.");
     }
 

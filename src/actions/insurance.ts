@@ -36,9 +36,9 @@ export async function activateInsurance(leaseId: string, provider: string) {
 
     await logAction({
         action: "ACTIVATE_INSURANCE",
-        entityType: "INSURANCE",
+        module: "INSURANCE",
         entityId: insurance.id,
-        details: { leaseId, provider, policyNo: insurance.policyNo }
+        newValues: { leaseId, provider, policyNo: insurance.policyNo }
     })
 
     return insurance
@@ -71,9 +71,9 @@ export async function reportInsuranceClaim(insuranceId: string, amount: number, 
 
     await logAction({
         action: "REPORT_INSURANCE_CLAIM",
-        entityType: "INSURANCE_CLAIM",
+        module: "INSURANCE_CLAIM",
         entityId: claim.id,
-        details: { insuranceId, amount, reason }
+        newValues: { insuranceId, amount, reason }
     })
 
     return claim

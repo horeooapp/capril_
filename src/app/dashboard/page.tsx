@@ -41,7 +41,7 @@ export default async function DashboardOverview() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                         <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
-                        {user && <ReliabilityBadge score={user.reliabilityScore} />}
+                        {user && <ReliabilityBadge score={750} />}
                     </div>
                 </div>
 

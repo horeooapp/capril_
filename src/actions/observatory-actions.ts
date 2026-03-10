@@ -24,7 +24,7 @@ export async function refreshObservatory(commune: string, propertyType: string) 
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT];
 
-    if (!session?.user || !authorizedRoles.includes(session.user.role as Role)) {
+    if (!session?.user || !authorizedRoles.includes(session.user.role as any)) {
         throw new Error("Action réservée aux administrateurs ANAH.");
     }
 

@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import { Role } from "@prisma/client";
 
-export const ARREARS_PHASES = {
+export const ARREARS_PHASE_CONFIG = {
     PHASE_1_AMIABLE: { day: 5, label: "Relance Amiable (SMS/Push)" },
     PHASE_2_FORMAL: { day: 15, label: "Mise en Demeure (Email/SMS)" },
     PHASE_3_MAPOSTE: { day: 30, label: "Mise en Demeure (MaPoste)" },
@@ -28,7 +28,14 @@ export async function getLeaseProceduralState(leaseId: string) {
         orderBy: { periodMonth: 'asc' }
     });
 
-    if (unpaidReceipts.length === 0) return { active: false, currentPhase: null };
+    if (unpaidReceipts.length === 0) {
+        return { 
+            active: false, 
+            delayDays: 0, 
+            lastPhase: null, 
+            unpaidCount: 0 
+        };
+    }
 
     // Use the earliest unpaid month to determine delay
     const earliestMonth = unpaidReceipts[0].periodMonth; // YYYY-MM
@@ -40,7 +47,7 @@ export async function getLeaseProceduralState(leaseId: string) {
     return {
         active: true,
         delayDays,
-        lastPhase: lastPhase?.phase || null,
+        lastPhase: (lastPhase as any)?.phase || null,
         unpaidCount: unpaidReceipts.length
     };
 }
@@ -49,7 +56,7 @@ export async function getLeaseProceduralState(leaseId: string) {
  * Part 11.2: Execute Phase Transition
  */
 export async function transitionArrearsPhase(leaseId: string, targetPhase: string) {
-    return await prisma.$transaction(async (tx) => {
+    return await (prisma as any).$transaction(async (tx: any) => {
         const phase = await tx.procedurePhase.create({
             data: {
                 leaseId,

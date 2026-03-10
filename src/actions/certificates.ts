@@ -36,9 +36,9 @@ export async function generateRentalCertificate(leaseId: string): Promise<Rental
         include: {
             tenant: true,
             property: true,
-            escrow: true,
+            cdcDeposits: true,
             receipts: {
-                orderBy: { periodEnd: 'desc' },
+                orderBy: { periodMonth: 'desc' },
                 take: 1
             }
         }
@@ -48,7 +48,7 @@ export async function generateRentalCertificate(leaseId: string): Promise<Rental
 
     // Authorization: Tenant, Owner, or Manager
     const userId = session.user.id
-    if (lease.tenantId !== userId && lease.property.ownerId !== userId && lease.property.managerId !== userId) {
+    if (lease.tenantId !== userId && lease.property.ownerUserId !== userId && lease.property.managedByUserId !== userId) {
         throw new Error("Accès non autorisé au certificat")
     }
 
@@ -65,18 +65,18 @@ export async function generateRentalCertificate(leaseId: string): Promise<Rental
         certificateId: `CERT-${lease.id.substring(0, 8).toUpperCase()}`,
         issueDate: new Date(),
         tenant: {
-            name: lease.tenant.name,
-            email: lease.tenant.email
+            name: lease.tenant?.fullName || null,
+            email: lease.tenant?.email || null
         },
         property: {
-            name: lease.property.name,
+            name: lease.property.name || lease.property.propertyCode,
             address: lease.property.address,
-            city: lease.property.city
+            city: lease.property.city || lease.property.commune
         },
         status: {
-            isCertified: !!lease.tenant.isCertified,
-            lastReceiptDate: lease.receipts[0]?.periodEnd || null,
-            escrowStatus: lease.escrow?.status || null
+            isCertified: !!lease.tenant?.isCertified,
+            lastReceiptDate: lease.receipts[0] ? new Date(lease.receipts[0].periodMonth + "-05") : null,
+            escrowStatus: (lease as any).cdcDeposits?.[0]?.status || null
         },
         verificationHash
     }

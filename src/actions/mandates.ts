@@ -55,12 +55,13 @@ export async function createMandate(data: {
 
     const mandate = await prisma.mandate.create({
         data: {
+            mandateRef: `MAND-${Date.now()}-${agentId.slice(-5)}`,
             propertyId: data.propertyId,
-            agentId: agentId,
-            type: data.type,
+            agentUserId: agentId,
+            mandateType: data.type,
+            commissionPct: 10, // Default 10% for the simplified action
             startDate: data.startDate,
-            endDate: data.endDate,
-            documentUrl: data.documentUrl,
+            endDate: data.endDate || null,
             status: MandateStatus.PENDING,
             proofHash
         }
@@ -68,9 +69,9 @@ export async function createMandate(data: {
 
     await logAction({
         action: "CREATE_MANDATE",
-        entityType: "MANDATE",
+        module: "MANDATE",
         entityId: mandate.id,
-        details: { propertyId: data.propertyId, proofHash }
+        newValues: { propertyId: data.propertyId, proofHash }
     })
 
     return mandate
@@ -89,7 +90,7 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
         include: { property: true }
     })
 
-    if (!mandate || mandate.property.ownerId !== userId) {
+    if (!mandate || mandate.property.ownerUserId !== userId) {
         throw new Error("Unauthorized to validate this mandate")
     }
 
@@ -99,21 +100,21 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
     })
 
     // Update Agent Reliability Score
-    await scoreAgentCompliance(mandate.agentId, status === MandateStatus.VALIDATED)
+    await scoreAgentCompliance(mandate.agentUserId, status === MandateStatus.VALIDATED)
 
     // If validated, update property manager
     if (status === MandateStatus.VALIDATED) {
         await prisma.property.update({
             where: { id: mandate.propertyId },
-            data: { managerId: mandate.agentId }
+            data: { managedByUserId: mandate.agentUserId }
         })
     }
 
     await logAction({
         action: "VALIDATE_MANDATE",
-        entityType: "MANDATE",
+        module: "MANDATE",
         entityId: mandateId,
-        details: { status }
+        newValues: { status }
     })
 
     return updatedMandate
@@ -124,7 +125,7 @@ export async function getMandatesByProperty(propertyId: string) {
         where: { propertyId },
         include: {
             agent: {
-                select: { name: true, email: true, role: true }
+                select: { fullName: true, email: true, role: true }
             }
         },
         orderBy: { createdAt: 'desc' }
@@ -138,7 +139,7 @@ export async function getMandatesByAgent() {
     if (!agentId) return []
 
     return await prisma.mandate.findMany({
-        where: { agentId },
+        where: { agentUserId: agentId },
         include: {
             property: true
         },
@@ -154,13 +155,13 @@ export async function getLandlordMandates() {
     return await prisma.mandate.findMany({
         where: {
             property: {
-                ownerId: userId
+                ownerUserId: userId
             }
         },
         include: {
             property: true,
             agent: {
-                select: { name: true, email: true, role: true }
+                select: { fullName: true, email: true, role: true }
             }
         },
         orderBy: { createdAt: 'desc' }

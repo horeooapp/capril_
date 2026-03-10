@@ -21,7 +21,7 @@ export async function initiateMediation(leaseId: string, subject: string) {
 
     // Only tenant, owner or manager can initiate
     const userId = session.user.id
-    if (lease.tenantId !== userId && lease.property.ownerId !== userId && lease.property.managerId !== userId) {
+    if (lease.tenantId !== userId && lease.property.ownerUserId !== userId && lease.property.managedByUserId !== userId) {
         throw new Error("Accès non autorisé")
     }
 
@@ -35,9 +35,9 @@ export async function initiateMediation(leaseId: string, subject: string) {
 
     await logAction({
         action: "INITIATE_MEDIATION",
-        entityType: "MEDIATION",
+        module: "MEDIATION",
         entityId: mediation.id,
-        details: { leaseId, subject }
+        newValues: { leaseId, subject }
     })
 
     return mediation
@@ -59,7 +59,7 @@ export async function addMediationMessage(mediationId: string, content: string) 
 
     const userId = session.user.id
     const lease = mediation.lease
-    if (lease.tenantId !== userId && lease.property.ownerId !== userId && lease.property.managerId !== userId) {
+    if (lease.tenantId !== userId && lease.property.ownerUserId !== userId && lease.property.managedByUserId !== userId) {
         throw new Error("Accès non autorisé")
     }
 
@@ -97,9 +97,9 @@ export async function resolveMediation(mediationId: string, status: MediationSta
 
     await logAction({
         action: "RESOLVE_MEDIATION",
-        entityType: "MEDIATION",
+        module: "MEDIATION",
         entityId: mediationId,
-        details: { status }
+        newValues: { status }
     })
 
     return updatedMediation

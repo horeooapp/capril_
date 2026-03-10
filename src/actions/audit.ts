@@ -6,33 +6,33 @@ import { chainAuditHash } from "@/lib/proof"
 
 export async function logAction(data: {
     action: string,
-    entityType: string,
+    module: string,
     entityId: string,
-    details?: any
+    newValues?: any
 }) {
     const session = await auth()
     const userId = session?.user?.id
 
     // Get latest log to chain the hash
-    const lastLog = await prisma.auditLog.findFirst({
-        orderBy: { timestamp: 'desc' }
+    const lastLog: any = await prisma.auditLog.findFirst({
+        orderBy: { createdAt: 'desc' }
     })
 
     const proofHash = chainAuditHash(lastLog?.proofHash || null, {
         userId,
         action: data.action,
-        entityType: data.entityType,
+        module: data.module,
         entityId: data.entityId,
-        details: data.details
+        details: data.newValues
     })
 
     return await prisma.auditLog.create({
         data: {
             userId: userId || null,
             action: data.action,
-            entityType: data.entityType,
+            module: data.module,
             entityId: data.entityId,
-            details: data.details ? JSON.stringify(data.details) : null,
+            newValues: data.newValues ? data.newValues : null,
             proofHash
         }
     })
@@ -40,7 +40,7 @@ export async function logAction(data: {
 
 export async function getAuditLogs(filters?: {
     userId?: string,
-    entityType?: string,
+    module?: string,
     entityId?: string
 }) {
     const session = await auth()
@@ -48,14 +48,14 @@ export async function getAuditLogs(filters?: {
     // Users might see their own logs (implementation detail for later)
 
     return await prisma.auditLog.findMany({
-        where: filters,
+        where: filters as any,
         include: {
             user: {
-                select: { name: true, email: true }
+                select: { fullName: true, email: true }
             }
         },
         orderBy: {
-            timestamp: 'desc'
+            createdAt: 'desc'
         }
     })
 }

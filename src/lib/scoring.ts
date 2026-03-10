@@ -76,3 +76,14 @@ export async function scoreSecurityDepositRestitution(userId: string, isFair: bo
         await updateICLScore(userId, -50, "Litige sur restitution de caution", leaseId)
     }
 }
+
+/**
+ * Updates agent reliability score based on mandate compliance.
+ */
+export async function scoreAgentCompliance(agentId: string, isValidated: boolean) {
+    if (isValidated) {
+        await updateICLScore(agentId, 10, "Mandat validé avec succès")
+    } else {
+        await updateICLScore(agentId, -20, "Mandat rejeté ou expiré")
+    }
+}

@@ -54,16 +54,15 @@ export async function POST(req: NextRequest) {
         const property = await prisma.property.create({
             data: {
                 propertyCode,
-                propertyCategory: category,
+                leaseType: category.toLowerCase() as any,
                 ownerUserId: session.user.id,
-                addressLine1,
+                address: addressLine1,
                 commune,
-                declaredRentFcfa: BigInt(declaredRentFcfa),
+                declaredRentFcfa: declaredRentFcfa,
                 propertyType: data.propertyType,
-                totalRooms: data.totalRooms ? parseInt(data.totalRooms) : null,
-                usefulAreaSqm: data.usefulAreaSqm ? parseFloat(data.usefulAreaSqm) : null,
-                neighborhood: data.neighborhood,
-                status: 'AVAILABLE'
+                rooms: data.totalRooms ? parseInt(data.totalRooms) : null,
+                areaSqm: data.usefulAreaSqm ? parseFloat(data.usefulAreaSqm) : null,
+                status: 'active'
             }
         });
 

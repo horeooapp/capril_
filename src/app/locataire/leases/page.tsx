@@ -31,7 +31,7 @@ export default async function TenantLeasesPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {leases.map((lease) => (
+                    {leases.map((lease: any) => (
                         <div key={lease.id} className="group relative bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500">
                             {/* Accent Bar */}
                             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-ivoire-orange via-ivoire-white to-ivoire-green"></div>
@@ -40,13 +40,13 @@ export default async function TenantLeasesPage() {
                                 {/* Header: Property Type & Status */}
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-1">
-                                        <h3 className="text-xl font-black text-gray-900 uppercase">{lease.property.type}</h3>
+                                        <h3 className="text-xl font-black text-gray-900 uppercase">{lease.property.propertyType}</h3>
                                         <p className="text-sm text-gray-500 flex items-center">
                                             <svg className="h-4 w-4 mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
-                                            {lease.property.city}, {lease.property.neighborhood}
+                                            {lease.property.commune}, {lease.property.address}
                                         </p>
                                     </div>
                                     <span className="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-200">
@@ -62,7 +62,7 @@ export default async function TenantLeasesPage() {
                                     </div>
                                     <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Caution Gérée</p>
-                                        <p className="text-2xl font-black text-primary">{(lease.deposit || 0).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                        <p className="text-2xl font-black text-primary">{(Number(lease.depositAmount) || 0).toLocaleString()} <span className="text-xs">FCFA</span></p>
                                     </div>
                                 </div>
 
@@ -74,12 +74,12 @@ export default async function TenantLeasesPage() {
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Jour de paiement</span>
-                                        <span className="font-bold text-gray-900">Le {lease.paymentDueDate || 5} du mois</span>
+                                        <span className="font-bold text-gray-900">Le {lease.paymentDay || 5} du mois</span>
                                     </div>
-                                    {lease.officialLeaseNumber && (
+                                    {lease.leaseReference && (
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">N° de bail officiel</span>
-                                            <span className="font-mono font-bold text-gray-900">{lease.officialLeaseNumber}</span>
+                                            <span className="font-mono font-bold text-gray-900">{lease.leaseReference}</span>
                                         </div>
                                     )}
                                 </div>
@@ -91,13 +91,13 @@ export default async function TenantLeasesPage() {
                                         <p className="text-xs text-gray-400 italic">Aucune quittance générée pour le moment.</p>
                                     ) : (
                                         <div className="space-y-2">
-                                            {lease.receipts.map((receipt) => (
+                                            {lease.receipts.map((receipt: any) => (
                                                 <div key={receipt.id} className="flex items-center justify-between p-3 bg-white border border-gray-50 rounded-xl hover:bg-gray-50 transition-colors">
                                                     <div className="flex items-center space-x-3">
                                                         <div className="bg-blue-50 text-blue-600 p-2 rounded-lg text-xs font-bold">📜</div>
                                                         <div>
-                                                            <p className="text-xs font-bold text-gray-800">Loyer {receipt.period}</p>
-                                                            <p className="text-[10px] text-gray-400">Payé le {new Date(receipt.paymentDate).toLocaleDateString('fr-FR')}</p>
+                                                            <p className="text-xs font-bold text-gray-800">Loyer {receipt.periodMonth}</p>
+                                                            <p className="text-[10px] text-gray-400">Payé le {new Date(receipt.paidAt).toLocaleDateString('fr-FR')}</p>
                                                         </div>
                                                     </div>
                                                     <Link href={`/locataire/receipts/${receipt.id}`} className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">

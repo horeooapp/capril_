@@ -20,7 +20,7 @@ export type CreateMandateInput = {
  */
 export async function createMandate(input: CreateMandateInput) {
     const session = await auth();
-    if (!session || !session.user || (session.user.role as Role) !== Role.ADMIN && (session.user.role as Role) !== Role.AGENCY) {
+    if (!session || !session.user || (session.user.role as any) !== 'ADMIN' && (session.user.role as any) !== 'AGENCY') {
         throw new Error("Action réservée aux agences ou administrateurs.");
     }
 
@@ -90,7 +90,7 @@ export async function getAgencyRevenueForecast(agentId: string) {
         where: { agentUserId: agentId, status: 'active' },
         include: {
             leases: {
-                where: { status: 'active' }
+                where: { status: 'ACTIVE' }
             }
         }
     });

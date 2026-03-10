@@ -21,7 +21,7 @@ export async function getProperties() {
 
     return properties.map(p => ({
         ...p,
-        declaredRentFcfa: p.declaredRentFcfa?.toString()
+        declaredRentFcfa: p.declaredRentFcfa?.toString() || "0"
     }))
 }
 
@@ -91,6 +91,42 @@ export async function getPropertyById(id: string) {
 
     return {
         ...property,
-        declaredRentFcfa: property.declaredRentFcfa.toString()
+        declaredRentFcfa: property.declaredRentFcfa?.toString() || "0"
+    }
+}
+
+/**
+ * Part 6.3: Get Property Passport (Digital Identity)
+ */
+export async function getPropertyPassport(id: string) {
+    const property = await prisma.property.findUnique({
+        where: { id },
+        include: {
+            leases: {
+                include: {
+                    tenant: {
+                        select: { fullName: true, email: true }
+                    }
+                },
+                orderBy: { startDate: 'desc' }
+            }
+        }
+    })
+
+    if (!property) return null
+
+    // Transform for UI (Passport page expects specific names)
+    return {
+        ...property,
+        type: property.propertyType,
+        surface: property.areaSqm,
+        leases: property.leases.map(lease => ({
+            ...lease,
+            tenant: lease.tenant ? {
+                name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
+                email: lease.tenant.email
+            } : { name: "Inconnu", email: null },
+            incidents: [] // Stub for now
+        }))
     }
 }

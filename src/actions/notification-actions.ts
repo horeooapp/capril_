@@ -38,7 +38,7 @@ export async function notifyPaymentConfirmed(userId: string, amount: number, ref
  */
 export async function adminBroadcast(content: string, title?: string) {
     const session = await auth();
-    if (!session?.user || (session.user.role as Role) !== Role.ADMIN) {
+    if (!session?.user || (session.user.role as any) !== 'ADMIN') {
         throw new Error("Réservé aux administrateurs.");
     }
 

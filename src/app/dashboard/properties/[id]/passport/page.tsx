@@ -43,7 +43,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             </div>
                             <div>
                                 <label className="text-xs text-gray-400">Surface</label>
-                                <p className="font-medium text-gray-900">{property.surface || "--"} m²</p>
+                                <p className="font-medium text-gray-900">{property.surface?.toString() || "--"} m²</p>
                             </div>
                             <div>
                                 <label className="text-xs text-gray-400">Adresse Numérique</label>
@@ -52,8 +52,8 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             <div className="pt-4 border-t border-gray-50">
                                 <label className="text-xs text-gray-400">Géolocalisation (GPS)</label>
                                 <div className="mt-1 bg-gray-50 p-2 rounded text-xs font-mono text-gray-600 flex justify-between">
-                                    <span>Lat: {property.gpsLatitude || "N/A"}</span>
-                                    <span>Lon: {property.gpsLongitude || "N/A"}</span>
+                                    <span>Lat: {property.gpsLatitude?.toString() || "N/A"}</span>
+                                    <span>Lon: {property.gpsLongitude?.toString() || "N/A"}</span>
                                 </div>
                             </div>
                         </div>
@@ -117,9 +117,9 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                                 </div>
                                                 
                                                 {/* Summary of incidents for this lease */}
-                                                {lease.incidents.length > 0 && (
+                                                {(lease.incidents as any[]).length > 0 && (
                                                     <div className="ml-12 mt-2">
-                                                        {lease.incidents.map(inc => (
+                                                        {(lease.incidents as any[]).map(inc => (
                                                             <div key={inc.id} className="text-[10px] bg-red-50 text-red-700 px-2 py-0.5 rounded inline-flex items-center mr-2">
                                                                 ⚠️ {inc.type} : {inc.severity}
                                                             </div>

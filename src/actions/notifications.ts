@@ -42,7 +42,7 @@ export async function createNotification(data: {
         data: {
             userId: data.userId,
             title: data.title,
-            message: data.message,
+            content: data.message,
             type: data.type || "INFO",
             link: data.link
         }

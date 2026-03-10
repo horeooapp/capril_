@@ -1,4 +1,5 @@
 import { getReceiptsForTenant } from "@/actions/receipts"
+import { auth } from "@/auth"
 import Link from "next/link"
 
 export default async function LocataireDashboard() {
@@ -30,7 +31,7 @@ export default async function LocataireDashboard() {
                                     <div className="flex-1">
                                         <div className="flex items-center space-x-3">
                                             <h4 className="text-base font-semibold text-gray-900">
-                                                Période : {new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                                                Période : {receipt.periodMonth}
                                             </h4>
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 Payé
@@ -41,20 +42,20 @@ export default async function LocataireDashboard() {
                                                 <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                 </svg>
-                                                {receipt.lease.property.name || receipt.lease.property.address}
+                                                {receipt.lease.property.address}
                                             </span>
                                             <span className="flex items-center mt-2 sm:mt-0">
                                                 <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                 </svg>
-                                                Bailleur : {receipt.lease.property.owner.name || receipt.lease.property.owner.email}
+                                                Bailleur : {receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div className="mt-4 sm:mt-0 flex flex-col items-end space-y-3 w-full sm:w-auto">
                                         <span className="text-lg font-bold text-primary">
-                                            {receipt.amountPaid.toLocaleString('fr-FR')} FCFA
+                                            {Number(receipt.totalAmount).toLocaleString('fr-FR')} FCFA
                                         </span>
                                         <Link 
                                             href={`/receipts/${receipt.id}`}
@@ -67,7 +68,7 @@ export default async function LocataireDashboard() {
                                             Voir la Quittance
                                         </Link>
                                         <p className="text-xs text-gray-400">
-                                            Réf: {receipt.receiptNumber}
+                                            Réf: {receipt.receiptRef}
                                         </p>
                                     </div>
 

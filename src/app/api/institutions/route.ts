@@ -34,10 +34,10 @@ export async function GET(req: Request) {
                     gte: startOfMonth
                 }
             },
-            select: { amountPaid: true }
+            select: { rentAmount: true }
         })
 
-        const financialVolumeThisMonth = recentReceipts.reduce((acc: number, curr: any) => acc + curr.amountPaid, 0)
+        const financialVolumeThisMonth = recentReceipts.reduce((acc: number, curr: any) => acc + (curr.rentAmount as any), 0)
 
         // Répartition par ville (pour l'Observatoire National)
         const propertiesByCity = await prisma.property.groupBy({

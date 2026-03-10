@@ -31,17 +31,12 @@ export default function GenerateReceiptForm({
         setError(null)
         setIsPending(true)
 
-        // Calculate Period Start/End from YYYY-MM
-        const [year, month] = periodStr.split('-')
-        const periodStart = new Date(parseInt(year), parseInt(month) - 1, 1)
-        const periodEnd = new Date(parseInt(year), parseInt(month), 0)
-
         try {
             const result = await createReceipt({
                 leaseId,
-                amountFcfa: amountFcfa,
-                periodStart,
-                periodEnd,
+                periodMonth: periodStr,
+                rentAmount: amountFcfa,
+                chargesAmount: 0, // Charges are usually included or added separately in v3.0 logic
                 paymentChannel,
                 paymentReference,
                 receiptType

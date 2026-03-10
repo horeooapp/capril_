@@ -41,19 +41,19 @@ export default async function LandlordMandatesPage() {
                                     <tr key={mandate.id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <p className="text-sm font-bold text-gray-900">{mandate.property.name || mandate.property.address}</p>
-                                            <p className="text-[10px] text-gray-500">{mandate.property.city}, {mandate.property.neighborhood}</p>
+                                            <p className="text-[10px] text-gray-500">{mandate.property.city}, {mandate.property.commune}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="text-sm font-medium text-gray-800">{mandate.agent.name}</p>
+                                            <p className="text-sm font-medium text-gray-800">{mandate.agent.fullName}</p>
                                             <p className="text-[10px] text-gray-500">{mandate.agent.email}</p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`text-[10px] px-2 py-1 rounded font-bold border ${
-                                                mandate.type === 'EXCLUSIVE' 
+                                                mandate.mandateType === 'management_extended' 
                                                     ? 'bg-purple-50 text-purple-700 border-purple-100' 
                                                     : 'bg-blue-50 text-blue-700 border-blue-100'
                                             }`}>
-                                                {mandate.type === 'EXCLUSIVE' ? 'Exclusif' : 'Simple'}
+                                                {mandate.mandateType === 'management_extended' ? 'Exclusif' : 'Simple'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">

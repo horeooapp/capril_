@@ -50,7 +50,7 @@ export async function createLease(data: {
 
         if (!landlord) throw new Error("Profil introuvable.")
         
-        const isPro = ([Role.AGENCY, Role.LANDLORD_PRO] as Role[]).includes(landlord.role as Role)
+        const isPro = (['AGENCY', 'LANDLORD_PRO'] as any[]).includes(landlord.role as any)
         if (isPro && (landlord as any).kycLevel < 4) {
             throw new Error("Votre entité légale doit être vérifiée (Niveau 4).")
         }
@@ -90,7 +90,7 @@ export async function createLease(data: {
                 chargesAmount: data.chargesAmount || 0,
                 depositAmount: data.depositAmount || 0,
                 commercialData: data.commercialData as any,
-                status: 'draft' 
+                status: 'DRAFT' 
             }
         })
 
@@ -118,6 +118,30 @@ export async function getLeaseById(id: string) {
 
     if (!lease) return null
     return serializeLease(lease)
+}
+
+/**
+ * Part 14.1: Get Leases for the logged-in Tenant
+ */
+export async function getTenantLeases() {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) {
+        return []
+    }
+
+    const leases = await prisma.lease.findMany({
+        where: { tenantId: session.user.id },
+        include: {
+            property: true,
+            receipts: {
+                orderBy: { periodMonth: 'desc' },
+                take: 3
+            }
+        },
+        orderBy: { startDate: 'desc' }
+    })
+
+    return leases.map(serializeLease)
 }
 
 /**
@@ -219,7 +243,7 @@ export async function signLease(leaseId: string, otp: string) {
         await prisma.lease.update({
             where: { id: leaseId },
             data: { 
-                status: 'active',
+                status: 'ACTIVE',
                 signedAt: new Date(),
                 commercialData: {
                     ...commData,

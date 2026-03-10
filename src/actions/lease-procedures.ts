@@ -27,9 +27,9 @@ export async function declareUnpaidRent(leaseId: string, userId: string) {
             data: {
                 userId,
                 action: "DECLARE_UNPAID",
-                entityType: "LEASE",
+                module: "LEASE",
                 entityId: leaseId,
-                details: JSON.stringify({ oldStatus: "ACTIVE", newStatus: "LOYER_IMPAYE" }),
+                newValues: { oldStatus: "ACTIVE", newStatus: "LOYER_IMPAYE" },
             },
         });
 
@@ -63,7 +63,7 @@ export async function sendFormalNotice(leaseId: string, userId: string) {
             data: {
                 userId,
                 action: "SEND_FORMAL_NOTICE",
-                entityType: "LEASE",
+                module: "LEASE",
                 entityId: leaseId,
             },
         });
@@ -106,7 +106,7 @@ export async function proposeClemency(leaseId: string, details: string, userId: 
             data: {
                 userId,
                 action: "PROPOSE_CLEMENCY",
-                entityType: "REPAYMENT_PLAN",
+                module: "REPAYMENT_PLAN",
                 entityId: repaymentPlan.id,
             },
         });
@@ -135,9 +135,9 @@ export async function respondToClemency(planId: string, accepted: boolean, tenan
             data: {
                 userId,
                 action: "RESPOND_CLEMENCY",
-                entityType: "REPAYMENT_PLAN",
+                module: "REPAYMENT_PLAN",
                 entityId: planId,
-                details: JSON.stringify({ accepted }),
+                newValues: { accepted },
             },
         });
 
@@ -176,7 +176,7 @@ export async function breakClemency(planId: string, leaseId: string, userId: str
             data: {
                 userId,
                 action: "BREAK_CLEMENCY",
-                entityType: "LEASE",
+                module: "LEASE",
                 entityId: leaseId,
             },
         });
@@ -211,7 +211,7 @@ export async function initiateTermination(leaseId: string, userId: string) {
             data: {
                 userId,
                 action: "INITIATE_TERMINATION",
-                entityType: "LEASE",
+                module: "LEASE",
                 entityId: leaseId,
             },
         });
