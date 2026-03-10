@@ -89,21 +89,19 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          known_hosts: unnecessary
+          known_hosts: ${{ secrets.HOSTINGER_SSH_HOST }}
           if_key_exists: replace
 
-      - name: 🔐 Add known hosts automatically
+      - name: 📋 Add SSH host key to known_hosts
         run: |
           mkdir -p ~/.ssh
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
-          ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
           if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi # Hostinger typical port, or 2222
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT" --delete \
+          rsync -avz -e "ssh -p $SSH_PORT" --delete \
             --exclude='.env*' \
             server.js \
             package.json \
