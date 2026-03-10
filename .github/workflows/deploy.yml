@@ -102,16 +102,14 @@ jobs:
       - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi # Dedicated server ssh port usually 22
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT" --delete \
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
+          # On EXCLUT expressément node_modules et on retire --delete pour éviter de casser le VPS
+          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=15 -o ServerAliveCountMax=3" \
             --exclude='.env*' \
-            server.js \
-            package.json \
-            prisma \
-            public \
-            .next/static \
-            .next/standalone/ \
-            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}
+            --exclude='node_modules' \
+            --exclude='.*' \
+            server.js package.json prisma public .next/static .next/standalone/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}/
 
       - name: 🗃️ Run Prisma Migrations
         run: |
