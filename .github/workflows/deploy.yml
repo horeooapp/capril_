@@ -85,42 +85,68 @@ jobs:
         with:
           name: build-output
 
-      - name: 📂 Sync files (FTP)
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      - name: 🗝️ Setup SSH
+        uses: shimataro/ssh-key-action@v2
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ vars.DEPLOY_PATH }}/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .env*
-            .github/**
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          known_hosts: unnecessary
+          if_key_exists: replace
 
-      - name: ⚠️ WARNING - Manual Restart Required
+      - name: 🔐 Install SSH Key to known_hosts
         run: |
-          echo "======================================================================"
-          echo "🚨 SSH is completely blocked by Hostinger Firewall for Github Actions."
-          echo "🚨 Prisma Migrations and PM2 Restart CANNOT be automated via SSH."
-          echo "======================================================================"
-          echo "Please log into Hostinger Terminal manually and run:"
-          echo "cd ${{ vars.DEPLOY_PATH }}"
-          echo "npx prisma migrate deploy"
-          echo "npx prisma generate"
-          echo "pm2 restart capril || pm2 start server.js --name capril --env production"
+          mkdir -p ~/.ssh
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
+          ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts || true
 
-      - name: 🩺 Health Check (Ping)
+      - name: 📂 Sync files (Rsync)
         run: |
-          echo "Waiting 5s for any auto-restarts to take effect..."
-          sleep 5
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi # Dedicated server ssh port usually 22
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT" --delete \
+            --exclude='.env*' \
+            server.js \
+            package.json \
+            prisma \
+            public \
+            .next/static \
+            .next/standalone/ \
+            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}
+
+      - name: 🗃️ Run Prisma Migrations
+        run: |
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+            cd ${{ vars.DEPLOY_PATH }} &&
+            export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
+            npx prisma migrate deploy
+          "
+
+      - name: 🚀 Restart Application (PM2)
+        run: |
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+            cd ${{ vars.DEPLOY_PATH }} &&
+            npx prisma generate &&
+            pm2 restart capril || pm2 start server.js --name capril --env production
+          "
+
+      - name: 🩺 Health Check
+        run: |
+          echo "Waiting for app to start..."
+          sleep 10
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.NEXT_PUBLIC_APP_URL }}/api/health || echo "000")
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
-            echo "⚠️ Health check returned $STATUS. Note: You may need to manually restart PM2 as detailed above!"
-          else
-            echo "✅ Application is responding!"
+            echo "❌ Health check failed! Triggering PM2 rollback..."
+            SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+            if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
+            ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "pm2 restart capril"
+            exit 1
           fi
+          echo "✅ Application is healthy!"
 
       - name: 📣 Notify on Success
         if: success()
