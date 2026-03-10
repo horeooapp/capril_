@@ -92,6 +92,9 @@ jobs:
           known_hosts: unnecessary
           if_key_exists: replace
 
+      - name: Add Hostinger to known_hosts
+        run: ssh-keyscan ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
