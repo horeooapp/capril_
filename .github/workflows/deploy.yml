@@ -99,20 +99,18 @@ jobs:
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts || true
 
-                - name: 📂 Sync files (Rsync)
+      - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          # Ajout des options ServerAlive pour empècher le VPS de couper la connexion 255
-          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=30 -o ServerAliveCountMax=5" --delete \
+          # On EXCLUT expressément node_modules et on empêche le timeout logiciel
+          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=15 -o ServerAliveCountMax=3" \
+            --delete \
             --exclude='.env*' \
+            --exclude='node_modules' \
             server.js package.json prisma public .next/static .next/standalone/ \
             ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}/
 
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
-            cd ${{ vars.DEPLOY_PATH }} &&
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
             npx prisma migrate deploy
           "
