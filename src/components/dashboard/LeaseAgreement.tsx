@@ -3,11 +3,37 @@
 import ProtectedLogo from "@/components/ProtectedLogo"
 
 interface LeaseAgreementProps {
-    lease: any
+    lease: {
+        id: string;
+        officialLeaseNumber?: string;
+        startDate: Date | string;
+        rentAmount: number;
+        charges: number;
+        deposit: number;
+        advancePayment: number;
+        agencyFee: number;
+        ownerSignature?: string;
+        tenantSignature?: string;
+        property: {
+            type: string;
+            address: string;
+            neighborhood: string;
+            city: string;
+            lotNumber?: string;
+            owner: {
+                name: string;
+                email: string;
+            };
+        };
+        tenant: {
+            name: string;
+            email: string;
+        };
+    }
 }
 
 export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
-    const formatDate = (date: any) => date ? new Date(date).toLocaleDateString('fr-FR', {
+    const formatDate = (date: Date | string | null) => date ? new Date(date).toLocaleDateString('fr-FR', {
         day: '2-digit', month: 'long', year: 'numeric'
     }) : '---';
 

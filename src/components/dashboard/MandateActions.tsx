@@ -23,7 +23,7 @@ export default function MandateActions({ mandateId, currentStatus }: MandateActi
         try {
             await validateMandate(mandateId, newStatus)
             router.refresh()
-        } catch (error) {
+        } catch (_error) {
             alert("Une erreur est survenue lors de la validation du mandat.")
         } finally {
             setLoading(false)

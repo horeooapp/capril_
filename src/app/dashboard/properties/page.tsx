@@ -1,7 +1,17 @@
 import { getProperties } from "@/actions/properties"
 
+interface Property {
+    id: string;
+    propertyCategory: string;
+    propertyCode: string;
+    propertyType: string;
+    commune: string;
+    addressLine1: string;
+    declaredRentFcfa: bigint | number;
+}
+
 export default async function PropertiesPage() {
-    const properties = await getProperties().catch(() => [])
+    const properties = await getProperties().catch(() => []) as unknown as Property[]
 
     return (
         <div className="space-y-8 py-8 animate-in fade-in duration-500">
@@ -31,7 +41,7 @@ export default async function PropertiesPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {properties.map((property: any) => (
+                        {properties.map((property) => (
                             <div key={property.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all group">
                                 <div className="p-6">
                                     <div className="flex justify-between items-start mb-4">
@@ -54,7 +64,7 @@ export default async function PropertiesPage() {
                                         <div>
                                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loyer mensuel</p>
                                             <p className="text-xl font-black text-gray-900">
-                                                {parseInt(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-xs font-medium">FCFA</span>
+                                                {Number(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-xs font-medium">FCFA</span>
                                             </p>
                                         </div>
                                         <a 

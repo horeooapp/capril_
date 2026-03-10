@@ -23,7 +23,7 @@ export async function refreshMarketStats() {
 
     const marketMap = new Map<string, { totalRent: number, count: number }>()
 
-    stats.forEach((lease: any) => {
+    stats.forEach((lease) => {
         const city = lease.property.city || 'ABIDJAN'
         const commune = lease.property.commune || 'N/A'
         const type = lease.property.propertyType
@@ -31,7 +31,7 @@ export async function refreshMarketStats() {
         
         const current = marketMap.get(key) || { totalRent: 0, count: 0 }
         marketMap.set(key, {
-            totalRent: current.totalRent + lease.rentAmount,
+            totalRent: current.totalRent + Number(lease.rentAmount),
             count: current.count + 1
         })
     })

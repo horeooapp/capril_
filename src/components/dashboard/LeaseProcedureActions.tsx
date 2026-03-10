@@ -29,7 +29,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus, userId }
             } else {
                 alert("Erreur: " + result.error)
             }
-        } catch (error) {
+        } catch (_error) {
             alert("Une erreur inattendue est survenue.")
         } finally {
             setLoading(false)
@@ -47,7 +47,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus, userId }
             } else {
                 alert("Erreur: " + result.error)
             }
-        } catch (error) {
+        } catch (_error) {
             alert("Une erreur inattendue est survenue.")
         } finally {
             setLoading(false)

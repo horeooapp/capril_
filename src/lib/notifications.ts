@@ -70,7 +70,7 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
             }
 
             channelStatus = delivered ? 'sent' : 'failed';
-        } catch (err) {
+        } catch (_err) {
             console.warn(`[Notifications] Channel ${channel} failed, trying next...`);
         }
 

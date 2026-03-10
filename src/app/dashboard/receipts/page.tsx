@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getMyReceipts } from "@/actions/receipts"
 import Link from "next/link"
 
@@ -36,7 +37,7 @@ export default async function ReceiptsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {receipts.map((receipt: any) => (
+                                {receipts.map((receipt: any) => receipt && (
                                     <tr key={receipt.id} className="hover:bg-gray-50/30 transition-all group">
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">

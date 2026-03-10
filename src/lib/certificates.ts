@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { prisma } from "./prisma";
-import { randomBytes } from "node:crypto";
 import { generateQRToken } from "./financial-utils";
 
 const db = prisma as any; // Bypass stale generated client until next `prisma generate`

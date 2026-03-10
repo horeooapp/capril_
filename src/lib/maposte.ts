@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "./prisma";
 import { createHash } from "node:crypto";
 
@@ -111,7 +112,7 @@ export async function processMaPosteWebhook(payload: {
         arnHash = generateDeliveryReceiptHash(trackingNumber, deliveredAt, recipientPhone);
     }
 
-    const updated = await prisma.digitalDelivery.update({
+    await prisma.digitalDelivery.update({
         where: { id: delivery.id },
         data: {
             status: newStatus,

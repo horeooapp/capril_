@@ -1,5 +1,4 @@
 import { prisma } from "./prisma";
-import { Role } from "@prisma/client";
 
 export const MANDATE_TYPES = {
     RENTAL: "rental",

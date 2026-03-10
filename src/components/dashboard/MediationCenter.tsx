@@ -11,10 +11,17 @@ interface Message {
     createdAt: Date
 }
 
+interface Mediation {
+    id: string
+    subject: string
+    status: string
+    messages: Message[]
+}
+
 interface MediationCenterProps {
     leaseId: string
     userId: string
-    initialMediation: any
+    initialMediation: Mediation | null
 }
 
 export default function MediationCenter({ leaseId, userId, initialMediation }: MediationCenterProps) {
@@ -39,10 +46,11 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
         setLoading(true)
         try {
             const msg = await addMediationMessage(initialMediation.id, newMessage)
-            // @ts-ignore
-            setMessages([...messages, msg])
-            setNewMessage("")
-        } catch (error) {
+            if (msg) {
+                setMessages([...messages, msg as Message])
+                setNewMessage("")
+            }
+        } catch (_error) {
             alert("Erreur lors de l'envoi du message.")
         } finally {
             setLoading(false)
@@ -58,7 +66,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
             await initiateMediation(leaseId, subject)
             router.refresh()
             setShowInitForm(false)
-        } catch (error) {
+        } catch (_error) {
             alert("Erreur lors de l'ouverture de la médiation.")
         } finally {
             setLoading(false)

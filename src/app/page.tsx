@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import HeroSlider from "@/components/HeroSlider";

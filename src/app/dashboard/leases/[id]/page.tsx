@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getLeaseById } from "@/actions/leases"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
@@ -7,45 +8,65 @@ import LeaseProcedureActions from "@/components/dashboard/LeaseProcedureActions"
 import MediationCenter from "@/components/dashboard/MediationCenter"
 import { auth } from "@/auth"
 
+import { LeaseStatus } from "@prisma/client"
+
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
-    const lease = await getLeaseById(leaseId)
     const session = await auth()
+    const lease = await getLeaseById(leaseId) as any 
+    
+    interface Lease {
+        id: string;
+        leaseReference: string | null;
+        status: LeaseStatus;
+        rentAmount: number;
+        chargesAmount: number;
+        depositAmount: number;
+        startDate: string | Date;
+        signedAt: string | Date | null;
+        tenant: { id: string; fullName: string | null; email: string | null; phone: string | null; reliabilityScore?: number } | null;
+        property: { name: string | null; address: string; commune: string; propertyType: string };
+        procedurePhases: any[];
+        repaymentPlans: any[];
+        mediation: any;
+        cdcDeposits: any[];
+        insurance: any;
+    }
 
     if (!lease) {
         notFound()
     }
 
+    const tLease = lease as unknown as Lease;
     const userId = session?.user?.id || ""
 
-    // @ts-ignore
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Détails du Bail</h1>
-                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {lease.leaseReference}</p>
+                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {tLease.leaseReference}</p>
                 </div>
                 <div className="flex space-x-3">
                     <Link
-                        href={`/dashboard/certificates/${lease.id}`}
+                        href={`/dashboard/certificates/${tLease.id}`}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all font-bold"
                     >
                         📄 Certificat
                     </Link>
-                    <GenerateReceiptForm leaseId={lease.id} monthlyRentFcfa={lease.rentAmount} />
+                    <GenerateReceiptForm leaseId={tLease.id} monthlyRentFcfa={tLease.rentAmount} />
                 </div>
             </div>
 
             {/* Alerte Signature si PENDING_SIGNATURE */}
-            {(lease.status === "PENDING_SIGNATURE" || lease.status === "DRAFT") && (
+            {(tLease.status === "PENDING_SIGNATURE" || tLease.status === "DRAFT") && (
                 <div className="mb-8 p-6 bg-orange-50 border-2 border-orange-200 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-lg shadow-orange-100 animate-pulse">
                     <div className="mb-4 md:mb-0">
                         <h3 className="text-lg font-black text-orange-800 uppercase tracking-tight">Validation Requise ✍️</h3>
                         <p className="text-orange-700 text-sm font-medium">Ce contrat de bail est en attente de signature numérique bilatérale.</p>
                     </div>
                     <Link 
-                        href={`/dashboard/leases/${lease.id}/signature`}
+                        href={`/dashboard/leases/${tLease.id}/signature`}
                         className="px-8 py-3 bg-orange-500 text-white font-black rounded-xl hover:bg-orange-600 transition-all uppercase tracking-widest text-sm shadow-md"
                     >
                         Accéder à la Signature
@@ -64,17 +85,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Locataire</h3>
-                                <p className="text-lg font-bold">{lease.tenant?.fullName || "N/A"}</p>
-                                <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded inline-block">{lease.tenant?.email}</p>
+                                <p className="text-lg font-bold">{tLease.tenant?.fullName || "N/A"}</p>
+                                <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded inline-block">{tLease.tenant?.email}</p>
                                 <div className="pt-2">
-                                    <ReliabilityBadge score={lease.tenant?.reliabilityScore || 750} showLabel={true} />
+                                    <ReliabilityBadge score={tLease.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Logement</h3>
-                                <p className="text-lg font-bold">{lease.property.name || lease.property.address}</p>
-                                <p className="text-sm text-gray-600">{lease.property.commune}</p>
-                                <p className="text-xs text-gray-400 font-medium">Type: {lease.property.propertyType}</p>
+                                <p className="text-lg font-bold">{tLease.property.name || tLease.property.address}</p>
+                                <p className="text-sm text-gray-600">{tLease.property.commune}</p>
+                                <p className="text-xs text-gray-400 font-medium">Type: {tLease.property.propertyType}</p>
                             </div>
                         </div>
                     </div>
@@ -87,28 +108,28 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Loyer Mensuel</p>
-                                <p className="text-xl font-black text-gray-900">{parseInt(lease.rentAmount).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{Number(tLease.rentAmount).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Charges</p>
-                                <p className="text-xl font-black text-gray-900">{parseInt(lease.chargesAmount || "0").toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Caution</p>
-                                <p className="text-xl font-black text-gray-900">{parseInt(lease.depositAmount || "0").toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                                <p className="text-xl font-black text-gray-900">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-xs font-bold text-gray-400 uppercase">Status</p>
                                 <div>
                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-sm ${
-                                        lease.status === 'ACTIVE' 
+                                        tLease.status === 'ACTIVE' 
                                             ? 'bg-green-100 text-green-800 border border-green-200' 
-                                            : lease.status === 'LOYER_IMPAYE' || lease.status === 'MISE_EN_DEMEURE'
+                                            : tLease.status === 'LOYER_IMPAYE' || tLease.status === 'MISE_EN_DEMEURE'
                                                 ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
                                                 : 'bg-orange-100 text-orange-800 border border-orange-200'
                                     }`}>
-                                        <span className={`w-2 h-2 rounded-full mr-2 ${lease.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                        {lease.status}
+                                        <span className={`w-2 h-2 rounded-full mr-2 ${tLease.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                        {tLease.status}
                                     </span>
                                 </div>
                             </div>
@@ -116,7 +137,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     </div>
 
                     {/* Procedure Tracking (Added) */}
-                    {(lease.procedurePhases?.length > 0 || lease.status !== "ACTIVE") && (
+                    {(tLease.procedurePhases?.length > 0 || tLease.status !== "ACTIVE") && (
                         <div className="bg-white shadow rounded-2xl overflow-hidden border border-gray-100 italic">
                             <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
                                 <h2 className="text-xl font-semibold text-gray-800 flex items-center">
@@ -125,13 +146,13 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded font-bold uppercase tracking-widest">Valeur Probante QAPRIL</span>
                             </div>
                             <div className="p-6 space-y-4">
-                                {lease.procedurePhases?.map((phase: any, idx: number) => (
+                                {tLease.procedurePhases?.map((phase: { phaseNumber: number, name: string, description: string, createdAt: string | Date }, idx: number) => (
                                     <div key={idx} className="flex space-x-4">
                                         <div className="flex flex-col items-center">
                                             <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
                                                 {phase.phaseNumber}
                                             </div>
-                                            {idx < (lease.procedurePhases.length - 1) && <div className="w-0.5 h-full bg-red-200 my-1"></div>}
+                                            {idx < (tLease.procedurePhases.length - 1) && <div className="w-0.5 h-full bg-red-200 my-1"></div>}
                                         </div>
                                         <div className="flex-1 pb-4">
                                             <p className="text-sm font-black text-gray-900">{phase.name}</p>
@@ -140,17 +161,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                         </div>
                                     </div>
                                 ))}
-                                {lease.repaymentPlans?.[0] && (
+                                {tLease.repaymentPlans?.[0] && (
                                     <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-xl">
                                         <h4 className="text-sm font-bold text-blue-900 mb-2">🤝 Plan de Clémence en cours</h4>
-                                        <p className="text-xs text-blue-800">{lease.repaymentPlans[0].details}</p>
+                                        <p className="text-xs text-blue-800">{tLease.repaymentPlans[0].details}</p>
                                         <div className="mt-3 flex items-center space-x-4">
                                             <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-widest border border-blue-200 ${
-                                                lease.repaymentPlans[0].status === 'ACCEPTED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                                tLease.repaymentPlans[0].status === 'ACCEPTED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                                             }`}>
-                                                Status: {lease.repaymentPlans[0].status}
+                                                Status: {tLease.repaymentPlans[0].status}
                                             </span>
-                                            {lease.repaymentPlans[0].tenantSignature && (
+                                            {tLease.repaymentPlans[0].tenantSignature && (
                                                 <span className="text-[10px] text-green-600 font-bold italic">✓ Signé par le locataire</span>
                                             )}
                                         </div>
@@ -163,9 +184,9 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     {/* Mediation Section */}
                     <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
                         <MediationCenter 
-                            leaseId={lease.id} 
+                            leaseId={tLease.id} 
                             userId={userId} 
-                            initialMediation={lease.mediation} 
+                            initialMediation={tLease.mediation} 
                         />
                     </div>
                 </div>
@@ -179,10 +200,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="space-y-4">
                             <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Caution Sécurisée</p>
-                                {lease.cdcDeposits?.[0] ? (
+                                {tLease.cdcDeposits?.[0] ? (
                                     <div className="mt-2 text-center py-2">
                                         <p className="text-sm font-black text-green-700">✅ CONSIGNATION CDC</p>
-                                        <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {lease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
+                                        <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {tLease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
                                     </div>
                                 ) : (
                                     <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center">
@@ -192,21 +213,21 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 )}
                             </div>
 
-                            <div className={`p-5 rounded-2xl border-2 transition-all ${lease.insurance && lease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm'}`}>
+                            <div className={`p-5 rounded-2xl border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm'}`}>
                                 <div className="flex justify-between items-start mb-3">
                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assurance Impayés</p>
-                                    {lease.insurance && lease.insurance.status === 'ACTIVE' ? (
+                                    {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
                                         <span className="text-[10px] bg-green-600 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
                                     ) : (
                                         <span className="text-[10px] bg-gray-400 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ABSENTE</span>
                                     )}
                                 </div>
-                                {lease.insurance && lease.insurance.status === 'ACTIVE' ? (
+                                {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
                                     <div className="mt-2">
                                         <p className="text-md font-black text-gray-900 flex items-center">
-                                            <span className="mr-2">🛡️</span> {lease.insurance.provider}
+                                            <span className="mr-2">🛡️</span> {tLease.insurance.provider}
                                         </p>
-                                        <p className="text-[10px] text-gray-500 mt-2 font-mono italic tracking-tight bg-white/50 px-2 py-1 rounded">Police N°: {lease.insurance.policyNo}</p>
+                                        <p className="text-[10px] text-gray-500 mt-2 font-mono italic tracking-tight bg-white/50 px-2 py-1 rounded">Police N°: {tLease.insurance.policyNo}</p>
                                     </div>
                                 ) : (
                                     <div className="mt-2">
@@ -223,7 +244,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Procedure Actions Sidebar */}
                     <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 shadow-red-100/50">
-                        <LeaseProcedureActions leaseId={leaseId} currentStatus={lease.status} userId={userId} />
+                        <LeaseProcedureActions leaseId={leaseId} currentStatus={tLease.status} userId={userId} />
                     </div>
                 </div>
             </div>

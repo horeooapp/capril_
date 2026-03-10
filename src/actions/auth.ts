@@ -53,8 +53,8 @@ export async function loginWithOTP(phone: string, otp: string) {
         }
 
         return { success: true };
-    } catch (error: any) {
-        if (error.message === "NEXT_REDIRECT") {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === "NEXT_REDIRECT") {
              // In NextAuth v5 server actions, signin might throw a redirect
              return { success: true };
         }

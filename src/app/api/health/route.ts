@@ -21,12 +21,13 @@ export async function GET() {
             environment: process.env.NODE_ENV
         }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Database unreachable";
         return NextResponse.json({
             status: "error",
             timestamp: new Date().toISOString(),
             error: "Database unreachable",
-            detail: process.env.NODE_ENV === "development" ? error.message : undefined
+            detail: process.env.NODE_ENV === "development" ? message : undefined
         }, { status: 503 });
     }
 }

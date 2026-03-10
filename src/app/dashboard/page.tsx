@@ -4,18 +4,31 @@ import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
 
+interface DashboardProperty {
+    id: string;
+    name?: string | null;
+    address: string;
+    city: string;
+    neighborhood: string;
+    leases: Array<{
+        id: string;
+        cdcDeposits: Array<{ amount: number }>;
+        receipts?: Array<{ paidAt: Date | string | null }>;
+    }>;
+}
+
 export default async function DashboardOverview() {
     // Fetch user and properties
     const user = await getCurrentUser()
-    const properties = await getProperties().catch(() => [])
+    const properties = await getProperties() as unknown as DashboardProperty[]
 
     const totalProperties = properties.length
-    const totalLeases = properties.reduce((acc: number, current: any) => acc + (current.leases?.length || 0), 0)
+    const totalLeases = properties.reduce((acc: number, current: DashboardProperty) => acc + (current.leases?.length || 0), 0)
 
     // Calculate total funds in Escrow/CDC for this manager/owner
     let totalSecuredFunds = 0
-    properties.forEach((p: any) => {
-        p.leases?.forEach((l: any) => {
+    properties.forEach((p: DashboardProperty) => {
+        p.leases?.forEach((l) => {
             if (l.cdcDeposits?.[0]?.amount) totalSecuredFunds += l.cdcDeposits[0].amount
         })
     })
@@ -25,10 +38,10 @@ export default async function DashboardOverview() {
     startOfMonth.setHours(0, 0, 0, 0)
 
     let receiptsThisMonth = 0
-    properties.forEach((p: any) => {
-        p.leases?.forEach((l: any) => {
+    properties.forEach((p: DashboardProperty) => {
+        p.leases?.forEach((l) => {
             if (l.receipts) {
-                receiptsThisMonth += l.receipts.filter((r: any) => r.paidAt && new Date(r.paidAt) >= startOfMonth).length
+                receiptsThisMonth += l.receipts.filter((r) => r.paidAt && new Date(r.paidAt) >= startOfMonth).length
             }
         })
     })
@@ -97,7 +110,7 @@ export default async function DashboardOverview() {
                         <h3 className="text-lg leading-6 font-medium text-gray-900">Vos récents logements</h3>
                     </div>
                     <ul className="divide-y divide-gray-200">
-                        {properties.slice(0, 3).map((prop: any) => (
+                        {properties.slice(0, 3).map((prop) => (
                             <li key={prop.id} className="px-6 py-4 hover:bg-gray-50">
                                 <div className="flex items-center justify-between">
                                     <div>

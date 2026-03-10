@@ -46,7 +46,7 @@ export async function createReceipt(input: CreateReceiptInput) {
                 totalAmount,
                 paymentMethod: input.paymentMethod,
                 paymentRef: input.paymentRef,
-                status: 'pending'
+                status: 'PENDING'
             }
         });
 
@@ -66,9 +66,10 @@ export async function createReceipt(input: CreateReceiptInput) {
         revalidatePath("/dashboard/receipts");
         return { success: true, receiptId: receipt.id, receiptRef };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur création quittance:", error);
-        return { error: error.message || "Erreur serveur." };
+        const errorMessage = error instanceof Error ? error.message : "Erreur serveur.";
+        return { error: errorMessage };
     }
 }
 
@@ -79,7 +80,7 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.LANDLORD, Role.AGENCY, Role.LANDLORD_PRO];
     
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
         throw new Error("Accès non autorisé.");
     }
 
@@ -91,7 +92,7 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
             const r = await tx.receipt.update({
                 where: { id: receiptId },
                 data: {
-                    status: 'paid',
+                    status: 'PAID',
                     paidAt,
                     paymentRef,
                     qrToken
@@ -132,7 +133,7 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
         revalidatePath("/dashboard/receipts");
         return { success: true, receiptRef: receipt.receiptRef, qrToken: receipt.qrToken };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur confirmation paiement:", error);
         return { error: "Impossible de confirmer le paiement." };
     }

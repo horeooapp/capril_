@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { Prisma } from "@prisma/client";
 
 export type ScoringBreakdown = {
     kycLevel: number;       // 15%
@@ -9,13 +10,11 @@ export type ScoringBreakdown = {
     entityPresence: number; // 10%
 };
 
-const db = prisma as any; // Bypass stale generated client until next `prisma generate`
-
 /**
  * Part 13.1: Reliability Scoring Algorithm
  */
 export async function calculateReliabilityScore(userId: string) {
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { id: userId },
         include: {
             leasesAsTenant: {
@@ -34,20 +33,20 @@ export async function calculateReliabilityScore(userId: string) {
     const kycScore = Math.min((user.kycLevel / 4) * 100, 100);
 
     // 2. Punctuality (30%)
-    const allReceipts = user.leasesAsTenant.flatMap((l: any) => l.receipts);
-    const paidOnTime = allReceipts.filter((r: any) => r.status === 'paid').length;
+    const allReceipts = user.leasesAsTenant.flatMap((l) => l.receipts);
+    const paidOnTime = allReceipts.filter((r) => r.status === 'PAID').length;
     const punctualityScore = allReceipts.length > 0 ? (paidOnTime / allReceipts.length) * 100 : 100;
 
     // 3. Completeness (20%)
-    const paidCount = allReceipts.filter((r: any) => r.status === 'paid').length;
+    const paidCount = allReceipts.filter((r) => r.status === 'PAID').length;
     const completenessScore = allReceipts.length > 0 ? (paidCount / allReceipts.length) * 100 : 100;
 
     // 4. Digital Signature (10%)
-    const signedLeases = user.leasesAsTenant.filter((l: any) => l.signedAt !== null).length;
+    const signedLeases = user.leasesAsTenant.filter((l) => l.signedAt !== null).length;
     const signatureScore = user.leasesAsTenant.length > 0 ? (signedLeases / user.leasesAsTenant.length) * 100 : 100;
 
     // 5. Incident Free (15%) — incidents nested via leases
-    const totalIncidents = user.leasesAsTenant.reduce((acc: number, l: any) => acc + l.incidentLogs.length, 0);
+    const totalIncidents = user.leasesAsTenant.reduce((acc: number, l) => acc + l.incidentLogs.length, 0);
     const incidentScore = totalIncidents === 0 ? 100 : Math.max(100 - (totalIncidents * 25), 0);
 
     // 6. Entity Presence (10%)
@@ -78,12 +77,12 @@ export async function calculateReliabilityScore(userId: string) {
         entityPresence: entityScore
     };
 
-    return await db.reliabilityScore.create({
+    return await prisma.reliabilityScore.create({
         data: {
             userId,
             score: totalScore,
             grade,
-            breakdown: breakdown as any
+            breakdown: breakdown as unknown as Prisma.InputJsonValue
         }
     });
 }

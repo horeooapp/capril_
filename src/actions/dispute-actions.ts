@@ -30,7 +30,7 @@ export async function createDispute(input: CreateDisputeInput) {
         if (!lease) throw new Error("Bail introuvable.");
 
         // Check if user is landlord or tenant of this lease
-        if (session.user.id !== lease.landlordId && session.user.id !== lease.tenantId && (session.user.role as any) !== 'ADMIN') {
+        if (session.user.id !== lease.landlordId && session.user.id !== lease.tenantId && session.user.role !== 'ADMIN') {
             throw new Error("Vous n'êtes pas autorisé à ouvrir un litige sur ce bail.");
         }
 
@@ -47,9 +47,10 @@ export async function createDispute(input: CreateDisputeInput) {
         revalidatePath(`/dashboard/leases/${input.leaseId}`);
         return { success: true, disputeId: dispute.id };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur création litige:", error);
-        return { error: error.message || "Impossible d'ouvrir le litige." };
+        const errorMessage = error instanceof Error ? error.message : "Impossible d'ouvrir le litige.";
+        return { error: errorMessage };
     }
 }
 
@@ -72,7 +73,7 @@ export async function sendMediationMessage(disputeId: string, content: string, a
 
         // Authorization: Landlord, Tenant, or Agent/Admin
         const isParticipant = session.user.id === dispute.lease.landlordId || session.user.id === dispute.lease.tenantId;
-        const isAgent = ['ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(session.user.role as any);
+        const isAgent = ['ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(session.user.role || '');
 
         if (!isParticipant && !isAgent) {
             throw new Error("Accès non autorisé.");
@@ -98,7 +99,7 @@ export async function sendMediationMessage(disputeId: string, content: string, a
         revalidatePath(`/dashboard/disputes/${disputeId}`);
         return { success: true, messageId: message.id };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur envoi message:", error);
         return { error: "Impossible d'envoyer le message." };
     }
@@ -111,7 +112,7 @@ export async function resolveDispute(disputeId: string, resolution: string) {
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT];
 
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
+    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
         throw new Error("Seuls les agents/admins peuvent clore officiellement un litige.");
     }
 

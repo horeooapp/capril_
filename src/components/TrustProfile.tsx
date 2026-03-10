@@ -1,6 +1,5 @@
 import { auth } from "@/auth"
 import { getUserTrustData } from "@/actions/users"
-import { notFound } from "next/navigation"
 
 export default async function TrustProfile() {
     try {
@@ -98,7 +97,7 @@ export default async function TrustProfile() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {(data.reliabilityScores ?? []).map((event: any) => (
+                                    {(data.reliabilityScores ?? []).map((event: { id: string, calculatedAt?: string, createdAt: string, score: number, grade: string }) => (
                                         <tr key={event.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
                                             <td className="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
                                                 {new Date(event.calculatedAt ?? event.createdAt).toLocaleDateString('fr-FR')}
@@ -143,16 +142,20 @@ export default async function TrustProfile() {
                 </div>
             </div>
         )
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("[TRUST PROFILE ERROR]", error)
+        const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+        const errorStack = error instanceof Error ? error.stack : "";
         return (
             <div className="max-w-4xl mx-auto py-10 px-4">
                 <div className="p-8 bg-red-50 border border-red-200 rounded-lg">
                     <h1 className="text-xl font-bold text-red-800">Erreur lors du chargement de l&apos;Indice de Confiance</h1>
-                    <p className="mt-2 text-red-700">{error.message}</p>
-                    <div className="mt-4 p-4 bg-white rounded border text-xs overflow-auto max-h-60">
-                        <pre>{error.stack}</pre>
-                    </div>
+                    <p className="mt-2 text-red-700">{errorMessage}</p>
+                    {errorStack && (
+                        <div className="mt-4 p-4 bg-white rounded border text-xs overflow-auto max-h-60">
+                            <pre>{errorStack}</pre>
+                        </div>
+                    )}
                 </div>
             </div>
         )

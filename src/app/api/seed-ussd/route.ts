@@ -57,7 +57,8 @@ export async function GET() {
         });
 
         return NextResponse.json({ success: true, user: tenant })
-    } catch (e: any) {
-        return NextResponse.json({ success: false, error: e.message })
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : "Erreur inconnue";
+        return NextResponse.json({ success: false, error: message })
     }
 }

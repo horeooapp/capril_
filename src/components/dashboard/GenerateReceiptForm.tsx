@@ -51,7 +51,8 @@ export default function GenerateReceiptForm({
             setIsModalOpen(false)
             router.push(`/dashboard/receipts`)
             router.refresh()
-        } catch (err: any) {
+        } catch (err) {
+            console.error("[RECEIPT_GEN_ERROR]", err)
             setError("Une erreur est survenue lors de la génération.")
             setIsPending(false)
         }

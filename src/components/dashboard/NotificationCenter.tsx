@@ -4,26 +4,47 @@ import { useState, useEffect } from "react"
 import { getNotifications, markAsRead } from "@/actions/notifications"
 import Link from "next/link"
 
+interface Notification {
+    id: string;
+    title: string;
+    message: string;
+    status: string;
+    read: boolean;
+    link?: string;
+    createdAt: string;
+}
+
 export default function NotificationCenter() {
-    const [notifications, setNotifications] = useState<any[]>([])
+    const [notifications, setNotifications] = useState<Notification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
 
     const fetchNotifications = async () => {
-        const data = await getNotifications()
+        const data = await getNotifications() as unknown as Notification[]
         setNotifications(data)
-        setUnreadCount(data.filter((n: any) => n.status !== 'sent').length)
+        setUnreadCount(data.filter((n: Notification) => n.status !== 'sent').length)
     }
 
     useEffect(() => {
+        let isMounted = true
+        
         const init = async () => {
-            await fetchNotifications()
+            if (isMounted) {
+                await fetchNotifications()
+            }
         }
+        
         init()
         
         // Poll every 30 seconds for new notifications
-        const interval = setInterval(fetchNotifications, 30000)
-        return () => clearInterval(interval)
+        const interval = setInterval(() => {
+            if (isMounted) fetchNotifications()
+        }, 30000)
+        
+        return () => {
+            isMounted = false
+            clearInterval(interval)
+        }
     }, [])
 
     const handleMarkAsRead = async (id: string) => {

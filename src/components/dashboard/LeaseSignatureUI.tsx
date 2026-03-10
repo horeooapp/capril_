@@ -4,13 +4,42 @@ import { useState } from 'react'
 import { requestSignatureOTP, signLease } from '@/actions/leases'
 import { ShieldCheck, Send, CheckCircle2 } from 'lucide-react'
 
-const Button = ({ children, ...props }: any) => <button {...props}>{children}</button>
-const Input = (props: any) => <input {...props} />
-const Card = ({ children, className }: any) => <div className={className}>{children}</div>
-const CardHeader = ({ children, className }: any) => <div className={className}>{children}</div>
-const CardTitle = ({ children, className }: any) => <h2 className={className}>{children}</h2>
-const CardContent = ({ children, className }: any) => <div className={className}>{children}</div>
-const CardFooter = ({ children, className }: any) => <div className={className}>{children}</div>
+import React from 'react'
+
+interface BaseProps {
+    children?: React.ReactNode
+    className?: string
+}
+
+const Button = ({ children, className, ...props }: BaseProps & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button className={`px-4 py-2 rounded font-bold transition-all ${className}`} {...props}>
+        {children}
+    </button>
+)
+
+const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input className={`border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 ${className}`} {...props} />
+)
+
+const Card = ({ children, className }: BaseProps) => (
+    <div className={`bg-white rounded-2xl border ${className}`}>{children}</div>
+)
+
+const CardHeader = ({ children, className }: BaseProps) => (
+    <div className={`p-6 ${className}`}>{children}</div>
+)
+
+const CardTitle = ({ children, className }: BaseProps) => (
+    <h2 className={`font-black uppercase tracking-tight ${className}`}>{children}</h2>
+)
+
+const CardContent = ({ children, className }: BaseProps) => (
+    <div className={`p-6 ${className}`}>{children}</div>
+)
+
+const CardFooter = ({ children, className }: BaseProps) => (
+    <div className={`p-6 border-t ${className}`}>{children}</div>
+)
 
 export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, leaseRef: string }) {
     const [step, setStep] = useState<'initial' | 'otp' | 'success'>('initial')
@@ -28,7 +57,7 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
             } else {
                 setError(res.error || "Échec de l'envoi du code.")
             }
-        } catch (err) {
+        } catch (_err) {
             setError("Une erreur est survenue.")
         } finally {
             setLoading(false)
@@ -45,7 +74,7 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
             } else {
                 setError(res.error || "Code invalide.")
             }
-        } catch (err) {
+        } catch (_err) {
             setError("Une erreur est survenue lors de la signature.")
         } finally {
             setLoading(false)
@@ -109,7 +138,7 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
                             className="text-center text-2xl tracking-[0.5em] font-mono h-14"
                             maxLength={6}
                             value={otp}
-                            onChange={(e: any) => setOtp(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
                         />
                         <Button 
                             className="w-full h-12 text-lg font-semibold" 

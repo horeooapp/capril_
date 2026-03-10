@@ -53,9 +53,10 @@ export async function dispatchMiseEnDemeure(leaseId: string, phaseId: string) {
         revalidatePath(`/dashboard/leases/${leaseId}`);
         return { success: true, trackingNumber: delivery.trackingNumber };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur dispatch MaPoste:", error);
-        return { error: error.message || "Échec de l'envoi MaPoste." };
+        const errorMessage = error instanceof Error ? error.message : "Échec de l'envoi MaPoste.";
+        return { error: errorMessage };
     }
 }
 

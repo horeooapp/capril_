@@ -23,10 +23,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const otp = credentials.otp as string;
 
                 // 1. Verify OTP in Redis (Part 3.3)
-                const storedOtp = await redis.get(`otp:${phone}`);
+                const isDev = process.env.NODE_ENV === 'development';
+                let storedOtp: string | null = null;
+                if (redis) {
+                    storedOtp = await redis.get(`otp:${phone}`);
+                }
                 
                 // Dev bypass for testing if needed
-                const isDev = process.env.NODE_ENV === 'development';
                 const isValid = storedOtp === otp || (isDev && otp === '123456');
 
                 if (!isValid) {
@@ -34,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 // 2. Clear OTP
-                await redis.del(`otp:${phone}`);
+                if (redis) await redis.del(`otp:${phone}`);
 
                 // 3. Find or Create User (Part 3.4.1)
                 let user = await prisma.user.findUnique({

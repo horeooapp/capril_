@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -5,12 +6,12 @@ import { getReceiptById } from "@/actions/receipts"
 import { notFound } from "next/navigation"
 import { QRCodeSVG } from "qrcode.react"
 
-export default function ReceiptVerificationPage({ params }: { params: any }) {
+export default function ReceiptVerificationPage({ params }: { params: Promise<{ id: string }> }) {
     const [receipt, setReceipt] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        params.then((p: any) => {
+        params.then((p) => {
             getReceiptById(p.id).then((data) => {
                 setReceipt(data)
                 setLoading(false)

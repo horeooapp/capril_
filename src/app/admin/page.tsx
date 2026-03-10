@@ -100,11 +100,13 @@ export default async function AdminDashboardOverview() {
                             <li key={r.id} className="p-4 hover:bg-gray-50 text-sm flex justify-between">
                                 <div>
                                     <p className="font-medium text-gray-900">{r.receiptNumber}</p>
-                                    <p className="text-gray-500 text-xs mt-1">{r.lease.property.city} - {r.lease.property.address}</p>
+                                    <p className="text-gray-500 text-xs mt-1">
+                                        {r.lease?.property?.city || "N/A"} - {r.lease?.property?.address || "N/A"}
+                                    </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-semibold text-primary">{r.amountPaid} FCFA</p>
-                                    <p className="text-gray-400 text-xs mt-1">{r.createdAt.toLocaleDateString()}</p>
+                                    <p className="font-semibold text-primary">{Number(r.amountPaid).toLocaleString()} FCFA</p>
+                                    <p className="text-gray-400 text-xs mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
                                 </div>
                             </li>
                         ))}

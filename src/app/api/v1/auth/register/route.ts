@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
 
     // 2. Store in Redis with TTL (Part 3.3.3)
     // Key format: otp:phone_number
+    if (!redis) {
+      return NextResponse.json({ error: 'Redis not available' }, { status: 500 });
+    }
     await redis.set(`otp:${phone}`, otp, 'EX', ttl);
 
     // 3. Send SMS via Gateway (Part 3.3.4)

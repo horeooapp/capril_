@@ -10,7 +10,7 @@ export type USSDSession = {
 /**
  * Part 18.1: USSD Menu Engine
  */
-export async function processUSSDRequest(phone: string, text: string, sessionId: string) {
+export async function processUSSDRequest(phone: string, text: string, _sessionId: string) {
     const input = text.trim();
 
     // Check for user existence and load their active leases
@@ -18,8 +18,8 @@ export async function processUSSDRequest(phone: string, text: string, sessionId:
         where: { phone },
         include: {
             leasesAsTenant: {
-                where: { status: 'active' as any },
-                include: { receipts: { where: { status: 'pending' } } }
+                where: { status: 'ACTIVE' },
+                include: { receipts: { where: { status: 'PENDING' } } }
             }
         }
     });
@@ -44,7 +44,7 @@ export async function processUSSDRequest(phone: string, text: string, sessionId:
 
         case "2": {
             const totalDue = user.leasesAsTenant.reduce(
-                (acc: number, l: { receipts: any[]; rentAmount: number }) => acc + l.receipts.length * l.rentAmount,
+                (acc: number, l) => acc + (l.receipts?.length || 0) * (l.rentAmount || 0),
                 0
             );
             return `END Votre solde total dû est de ${totalDue} FCFA.`;

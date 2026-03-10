@@ -3,12 +3,29 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { generatePropertyCode } from '@/lib/property';
 
+interface Property {
+    id: string;
+    propertyCode: string;
+    leaseType: string;
+    ownerUserId: string;
+    address: string;
+    commune: string;
+    declaredRentFcfa: any; // Decimal from Prisma
+    propertyType: string;
+    rooms: number | null;
+    areaSqm: any; // Decimal from Prisma
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 /**
- * Handle BigInt serialization
+ * Handle BigInt/Decimal serialization
  */
-const serializeProperty = (p: any) => ({
+const serializeProperty = (p: Property) => ({
     ...p,
-    declaredRentFcfa: p.declaredRentFcfa.toString()
+    declaredRentFcfa: p.declaredRentFcfa?.toString() || "0",
+    areaSqm: p.areaSqm ? Number(p.areaSqm.toString()) : null
 });
 
 /**
@@ -54,7 +71,7 @@ export async function POST(req: NextRequest) {
         const property = await prisma.property.create({
             data: {
                 propertyCode,
-                leaseType: category.toLowerCase() as any,
+                leaseType: category.toUpperCase() as 'RESIDENTIAL' | 'COMMERCIAL',
                 ownerUserId: session.user.id,
                 address: addressLine1,
                 commune,
@@ -62,9 +79,9 @@ export async function POST(req: NextRequest) {
                 propertyType: data.propertyType,
                 rooms: data.totalRooms ? parseInt(data.totalRooms) : null,
                 areaSqm: data.usefulAreaSqm ? parseFloat(data.usefulAreaSqm) : null,
-                status: 'active'
+                status: 'ACTIVE'
             }
-        });
+        }) as unknown as Property;
 
         return NextResponse.json(serializeProperty(property));
     } catch (error) {

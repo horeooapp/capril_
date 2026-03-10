@@ -16,7 +16,7 @@ export async function requestCNL() {
     }
 
     // Role check
-    if ((session.user.role as any) !== 'TENANT' && (session.user.role as any) !== 'ADMIN') {
+    if (session.user.role !== 'TENANT' && session.user.role !== 'ADMIN') {
         throw new Error("Seuls les locataires peuvent demander un CNL.");
     }
 
@@ -28,9 +28,10 @@ export async function requestCNL() {
             certificateId: certificate.id, 
             expiresAt: certificate.expiresAt 
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur demande CNL:", error);
-        return { error: error.message || "Impossible de générer le certificat." };
+        const errorMessage = error instanceof Error ? error.message : "Impossible de générer le certificat.";
+        return { error: errorMessage };
     }
 }
 

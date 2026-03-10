@@ -6,8 +6,9 @@ export async function GET() {
         console.log("TEST ROUTE HIT");
         const res = await signIn("nodemailer", { email: "test@qapril.net", redirect: false });
         return NextResponse.json({ success: true, res });
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error("TEST ROUTE ERROR", e);
-        return NextResponse.json({ error: e.message, name: e.name, stack: e.stack });
+        const err = e as { message?: string; name?: string; stack?: string };
+        return NextResponse.json({ error: err.message, name: err.name, stack: err.stack });
     }
 }

@@ -1,9 +1,24 @@
 import { getReceiptsForTenant } from "@/actions/receipts"
-import { auth } from "@/auth"
 import Link from "next/link"
 
+interface TenantReceipt {
+    id: string;
+    periodMonth: string;
+    totalAmount: number | string;
+    receiptRef: string;
+    lease: {
+        property: {
+            address: string;
+            owner: {
+                fullName: string | null;
+                email: string | null;
+            };
+        };
+    };
+}
+
 export default async function LocataireDashboard() {
-    const receipts = await getReceiptsForTenant().catch(() => [])
+    const receipts = await getReceiptsForTenant() as unknown as TenantReceipt[]
 
     return (
         <div className="space-y-6">
@@ -24,7 +39,7 @@ export default async function LocataireDashboard() {
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-200">
-                        {receipts.map((receipt: any) => (
+                        {receipts.map((receipt) => (
                             <li key={receipt.id} className="p-6 transition-colors hover:bg-orange-50/30">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
 

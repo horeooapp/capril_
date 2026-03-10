@@ -7,6 +7,18 @@ import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
 
 import { serializeLease } from "@/lib/serialize"
+import { Prisma } from "@prisma/client"
+
+interface CommercialData {
+    indexationType: 'fixed' | 'ipc';
+    indexationPeriod: number;
+    activityType: string;
+    indexationPercentage?: number;
+    pendingSignatureOTP?: string | null;
+    otpGeneratedAt?: Date | string | null;
+    signatureVerifiedAt?: Date | string | null;
+    [key: string]: any;
+}
 
 /**
  * Part 8.1: Create Lease (Residential or Commercial OHADA)
@@ -81,7 +93,7 @@ export async function createLease(data: {
                 rentAmount: data.rentAmount,
                 chargesAmount: data.chargesAmount || 0,
                 depositAmount: data.depositAmount || 0,
-                commercialData: data.commercialData as any,
+                commercialData: data.commercialData as Prisma.InputJsonValue,
                 status: 'DRAFT' 
             }
         })
@@ -105,7 +117,7 @@ export async function getLeaseById(id: string) {
         include: {
             property: true,
             landlord: { select: { fullName: true, phone: true } },
-            tenant: { select: { fullName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
+            tenant: { select: { id: true, fullName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
             procedurePhases: true,
             repaymentPlans: {
                 orderBy: { createdAt: 'desc' },
@@ -204,14 +216,15 @@ export async function requestSignatureOTP(leaseId: string) {
         await sendSMS(lease.tenant.phone, `Votre code de signature QAPRIL est: ${otp}`);
 
         // Store OTP in commercialData (encrypted/hashed in prod, clear for demo)
+        const commData = (lease.commercialData as unknown as CommercialData) || {}
         await prisma.lease.update({
             where: { id: leaseId },
             data: {
                 commercialData: {
-                    ...(lease.commercialData as any || {}),
+                    ...commData,
                     pendingSignatureOTP: otp,
                     otpGeneratedAt: new Date()
-                }
+                } as Prisma.InputJsonValue
             }
         })
 
@@ -237,7 +250,7 @@ export async function signLease(leaseId: string, otp: string) {
 
         if (!lease) return { error: "Bail introuvable." }
         
-        const commData = (lease.commercialData as any) || {}
+        const commData = (lease.commercialData as unknown as CommercialData) || {}
         if (commData.pendingSignatureOTP !== otp) {
             return { error: "Code OTP invalide." }
         }
@@ -252,7 +265,7 @@ export async function signLease(leaseId: string, otp: string) {
                     ...commData,
                     pendingSignatureOTP: null, // Clear OTP
                     signatureVerifiedAt: new Date()
-                }
+                } as Prisma.InputJsonValue
             }
         })
 

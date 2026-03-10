@@ -3,6 +3,16 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Role } from "@prisma/client"
 
+interface AuditLog {
+    id: string;
+    timestamp: string | Date;
+    action: string;
+    entityType: string;
+    entityId: string;
+    details: string | null;
+    user: { name: string | null; email: string | null } | null;
+}
+
 export default async function AuditPage() {
     const session = await auth()
 
@@ -12,7 +22,7 @@ export default async function AuditPage() {
         redirect("/dashboard")
     }
 
-    const logs = await getAuditLogs()
+    const logs = await getAuditLogs() as unknown as AuditLog[]
 
     return (
         <div className="space-y-6">
@@ -31,7 +41,7 @@ export default async function AuditPage() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {logs.map((log: any) => (
+                        {logs.map((log) => (
                             <tr key={log.id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {new Date(log.timestamp).toLocaleString()}

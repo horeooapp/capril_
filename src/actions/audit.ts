@@ -3,18 +3,19 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { chainAuditHash } from "@/lib/proof"
+import { Prisma } from "@prisma/client"
 
 export async function logAction(data: {
     action: string,
     module: string,
     entityId: string,
-    newValues?: any
+    newValues?: Prisma.InputJsonValue
 }) {
     const session = await auth()
     const userId = session?.user?.id
 
     // Get latest log to chain the hash
-    const lastLog: any = await prisma.auditLog.findFirst({
+    const lastLog = await prisma.auditLog.findFirst({
         orderBy: { createdAt: 'desc' }
     })
 
@@ -32,7 +33,7 @@ export async function logAction(data: {
             action: data.action,
             module: data.module,
             entityId: data.entityId,
-            newValues: data.newValues ? data.newValues : null,
+            newValues: data.newValues || Prisma.JsonNull,
             proofHash
         }
     })
@@ -43,12 +44,11 @@ export async function getAuditLogs(filters?: {
     module?: string,
     entityId?: string
 }) {
-    const session = await auth()
     // Simple check: only admins or auditors can see all logs
     // Users might see their own logs (implementation detail for later)
 
     return await prisma.auditLog.findMany({
-        where: filters as any,
+        where: filters,
         include: {
             user: {
                 select: { fullName: true, email: true }

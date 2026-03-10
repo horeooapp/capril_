@@ -1,5 +1,4 @@
 import { prisma } from "./prisma";
-import { Role } from "@prisma/client";
 
 export const ARREARS_PHASE_CONFIG = {
     PHASE_1_AMIABLE: { day: 5, label: "Relance Amiable (SMS/Push)" },
@@ -24,7 +23,7 @@ export async function getLeaseProceduralState(leaseId: string) {
     });
 
     const unpaidReceipts = await prisma.receipt.findMany({
-        where: { leaseId, status: 'pending' },
+        where: { leaseId, status: 'PENDING' },
         orderBy: { periodMonth: 'asc' }
     });
 
@@ -47,7 +46,7 @@ export async function getLeaseProceduralState(leaseId: string) {
     return {
         active: true,
         delayDays,
-        lastPhase: (lastPhase as any)?.phase || null,
+        lastPhase: lastPhase?.name || null,
         unpaidCount: unpaidReceipts.length
     };
 }
@@ -56,11 +55,12 @@ export async function getLeaseProceduralState(leaseId: string) {
  * Part 11.2: Execute Phase Transition
  */
 export async function transitionArrearsPhase(leaseId: string, targetPhase: string) {
-    return await (prisma as any).$transaction(async (tx: any) => {
+    return await prisma.$transaction(async (tx) => {
         const phase = await tx.procedurePhase.create({
             data: {
                 leaseId,
-                phase: targetPhase,
+                name: targetPhase,
+                phaseNumber: 1, // Default or calculated
                 actionDate: new Date(),
                 metadata: { automated: true, timestamp: Date.now() }
             }

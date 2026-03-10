@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 
@@ -61,8 +62,7 @@ export default async function VerifyReceiptPage({ params }: { params: Promise<{ 
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Locataire</dt>
-                                {/* @ts-ignore */}
-                                <dd className="font-medium text-gray-900">{receipt.lease.tenant?.fullName || receipt.lease.tenant?.email}</dd>
+                                <dd className="font-medium text-gray-900">{(receipt.lease as any).tenant?.fullName || (receipt.lease as any).tenant?.email}</dd>
                             </div>
                             <div className="pt-4 flex justify-between">
                                 <dt className="text-gray-500">Bailleur</dt>

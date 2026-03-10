@@ -1,13 +1,30 @@
 import { getProperties } from "@/actions/properties"
 import Link from "next/link"
 
+interface Lease {
+    id: string;
+    leaseReference: string | null;
+    status: string;
+    rentAmount: bigint | number;
+    startDate: Date | string;
+    tenant: { fullName: string | null; phone: string | null } | null;
+}
+
+interface Property {
+    id: string;
+    address: string;
+    propertyCode: string;
+    commune: string;
+    leases: Lease[];
+}
+
 export default async function LeasesPage() {
     // We fetch properties and extract leases to show them
-    const properties = await getProperties().catch(() => [])
+    const properties = await getProperties().catch(() => []) as unknown as Property[]
 
     // Flatten leases and inject property info
-    const leases = properties.flatMap((prop: any) =>
-        (prop.leases || []).map((lease: any) => ({
+    const leases = properties.flatMap((prop: Property) =>
+        (prop.leases || []).map((lease: Lease) => ({
             ...lease,
             propertyName: prop.address,
             propertyCode: prop.propertyCode,
@@ -53,7 +70,7 @@ export default async function LeasesPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {leases.map((lease: any) => (
+                                {leases.map((lease) => (
                                     <tr key={lease.id} className="hover:bg-gray-50/30 transition-all group">
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
@@ -79,7 +96,7 @@ export default async function LeasesPage() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-black text-gray-900">{parseInt(lease.rentAmount || "0").toLocaleString()} <small className="text-[10px] font-bold">FCFA</small></span>
+                                                <span className="text-sm font-black text-gray-900">{Number(lease.rentAmount || 0).toLocaleString()} <small className="text-[10px] font-bold">FCFA</small></span>
                                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Début: {new Date(lease.startDate).toLocaleDateString('fr-FR')}</span>
                                             </div>
                                         </td>

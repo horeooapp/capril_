@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "./prisma"
 
 /**
  * Updates the ICL score of a user and logs it to ReliabilityScore table.
  */
-export async function updateICLScore(userId: string, points: number, reason: string, relatedEntityId?: string) {
+export async function updateICLScore(userId: string, points: number, _reason: string, _relatedEntityId?: string) {
     const db = prisma as any; // Bypass stale generated client until next `prisma generate`
     const latest = await db.reliabilityScore.findFirst({
         where: { userId },

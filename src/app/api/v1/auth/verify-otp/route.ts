@@ -16,6 +16,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Retrieve OTP from Redis
+    if (!redis) {
+      return NextResponse.json({ error: 'Redis not available' }, { status: 500 });
+    }
     const storedOtp = await redis.get(`otp:${phone}`);
 
     if (!storedOtp) {

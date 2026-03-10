@@ -25,7 +25,9 @@ export const authConfig = {
             if (session.user) {
                 session.user.id = token.id as string
                 session.user.phone = token.phone as string
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 session.user.role = token.role as any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 session.user.status = token.status as any
             }
             return session

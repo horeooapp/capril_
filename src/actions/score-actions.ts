@@ -18,7 +18,7 @@ export async function refreshReliabilityScore(targetUserId?: string) {
     const userId = targetUserId || session.user.id;
     
     // Authorization check: Self or Admin
-    if (userId !== session.user.id && (session.user.role as any) !== 'ADMIN') {
+    if (userId !== session.user.id && session.user.role !== 'ADMIN') {
         throw new Error("Accès non autorisé.");
     }
 
@@ -26,7 +26,7 @@ export async function refreshReliabilityScore(targetUserId?: string) {
         const scoreEntry = await calculateReliabilityScore(userId);
         revalidatePath("/dashboard/profile");
         return { success: true, score: scoreEntry.score, grade: scoreEntry.grade };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur refresh score:", error);
         return { error: "Impossible de mettre à jour le score." };
     }

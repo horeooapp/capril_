@@ -24,7 +24,7 @@ export async function refreshObservatory(commune: string, propertyType: string) 
     const session = await auth();
     const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT];
 
-    if (!session?.user || !authorizedRoles.includes(session.user.role as any)) {
+    if (!session?.user || !authorizedRoles.includes(session.user.role as Role)) {
         throw new Error("Action réservée aux administrateurs ANAH.");
     }
 
@@ -32,7 +32,8 @@ export async function refreshObservatory(commune: string, propertyType: string) 
         const snapshot = await computeCommunalStats(commune, propertyType);
         if (!snapshot) return { error: "Données insuffisantes (3 baux actifs minimum requis)." };
         return { success: true, snapshot };
-    } catch (error: any) {
-        return { error: error.message || "Échec du calcul des statistiques." };
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Échec du calcul des statistiques.";
+        return { error: message };
     }
 }

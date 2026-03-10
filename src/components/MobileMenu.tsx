@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useState } from 'react'
@@ -9,9 +10,17 @@ interface NavLink {
     icon?: React.ReactNode
 }
 
+interface Session {
+    user: {
+        id?: string | null;
+        email?: string | null;
+        role?: string | null;
+    };
+}
+
 interface MobileMenuProps {
     links: NavLink[]
-    session?: any
+    session?: Session | null
     logoSrc?: string
     brandName?: string
     variant?: 'light' | 'dark' | 'primary'

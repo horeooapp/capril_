@@ -42,7 +42,7 @@ export async function scanLeaseForArrears(leaseId: string) {
 
         return { success: true, message: "En attente de la prochaine échéance procédurale." };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur de scan impayés:", error);
         return { error: "Impossible d'exécuter la procédure de recouvrement." };
     }

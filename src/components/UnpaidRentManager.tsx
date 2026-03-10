@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -13,7 +14,10 @@ export default function UnpaidRentManager({ leaseId, currentStatus }: UnpaidRent
     const [clemencyDetails, setClemencyDetails] = useState("");
     const [showClemencyForm, setShowClemencyForm] = useState(false);
 
-    const handleAction = async (actionFn: any, ...args: any[]) => {
+    const handleAction = async <T extends any[]>(
+        actionFn: (leaseId: string, ...args: [...T, string]) => Promise<{ success: boolean }>,
+        ...args: T
+    ) => {
         setLoading(true);
         try {
             // Pour la démo on passe "user_id_demo"

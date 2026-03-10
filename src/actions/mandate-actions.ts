@@ -20,7 +20,7 @@ export type CreateMandateInput = {
  */
 export async function createMandate(input: CreateMandateInput) {
     const session = await auth();
-    if (!session || !session.user || (session.user.role as any) !== 'ADMIN' && (session.user.role as any) !== 'AGENCY') {
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'AGENCY')) {
         throw new Error("Action réservée aux agences ou administrateurs.");
     }
 
@@ -40,14 +40,14 @@ export async function createMandate(input: CreateMandateInput) {
                 commissionPct: input.commissionPct,
                 startDate: new Date(input.startDate),
                 endDate: new Date(input.endDate),
-                status: 'draft'
+                status: 'DRAFT'
             }
         });
 
         revalidatePath(`/dashboard/mandates`);
         return { success: true, mandateId: mandate.id, mandateRef };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur création mandat:", error);
         return { error: "Impossible de créer le mandat." };
     }
@@ -64,7 +64,7 @@ export async function signMandate(mandateId: string) {
         const mandate = await prisma.mandate.update({
             where: { id: mandateId },
             data: {
-                status: 'active',
+                status: 'ACTIVE',
                 signedAt: new Date(),
             }
         });
@@ -72,7 +72,7 @@ export async function signMandate(mandateId: string) {
         // Proactively activate property if linked
         await prisma.property.update({
             where: { id: mandate.propertyId },
-            data: { status: 'available' }
+            data: { status: 'AVAILABLE' }
         });
 
         revalidatePath(`/dashboard/mandates/${mandateId}`);
@@ -87,7 +87,7 @@ export async function signMandate(mandateId: string) {
  */
 export async function getAgencyRevenueForecast(agentId: string) {
     const mandates = await prisma.mandate.findMany({
-        where: { agentUserId: agentId, status: 'active' },
+        where: { agentUserId: agentId, status: 'ACTIVE' },
         include: {
             leases: {
                 where: { status: 'ACTIVE' }

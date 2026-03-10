@@ -15,6 +15,11 @@ export type CreatePaymentIntentInput = {
     receiptId?: string; // Optional if existing receipt
 };
 
+interface PaymentIntentMetadata {
+    receiptId?: string;
+    [key: string]: any;
+}
+
 /**
  * Part 10.1: Create Payment Intent (MM Integration)
  * Standardizes the initial step for all MM operators.
@@ -38,15 +43,15 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
                 amount: input.amount,
                 operator: input.operator,
                 payerPhone: input.payerPhone,
-                status: 'pending',
-                metadata: { receiptId: input.receiptId }
+                status: 'PENDING',
+                metadata: { receiptId: input.receiptId } satisfies PaymentIntentMetadata
             }
         });
 
         revalidatePath("/dashboard/payments");
         return { success: true, intentId: intent.id, idempotencyKey };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur intent paiement:", error);
         return { error: "Erreur lors de l'initiation du paiement." };
     }
@@ -68,20 +73,20 @@ export async function processMMWebhook(payload: {
         });
 
         if (!intent) throw new Error("Intent introuvable.");
-        if (intent.status !== 'pending') return { success: true, message: "Déjà traité." };
+        if (intent.status !== 'PENDING') return { success: true, message: "Déjà traité." };
 
         const updatedIntent = await prisma.$transaction(async (tx) => {
             const result = await tx.paymentIntent.update({
                 where: { id: intent.id },
                 data: {
-                    status: payload.status === 'SUCCESS' ? 'success' : 'failed',
+                    status: payload.status,
                     operatorRef: payload.operatorRef,
                 }
             });
 
             // If success, update the linked receipt (if any) or create one
             if (payload.status === 'SUCCESS') {
-                const metadata = intent.metadata as any;
+                const metadata = intent.metadata as Record<string, any>;
                 if (metadata?.receiptId) {
                     // Update existing pending receipt
                     // This logic would ideally call confirmation actions
@@ -93,7 +98,7 @@ export async function processMMWebhook(payload: {
 
         return { success: true, status: updatedIntent.status };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur traitement webhook:", error);
         return { error: "Erreur traitement webhook." };
     }
