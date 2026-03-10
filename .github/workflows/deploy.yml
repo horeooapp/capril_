@@ -94,7 +94,9 @@ jobs:
 
       - name: 📂 Sync files (Rsync)
         run: |
-          rsync -avz --delete \
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi # Hostinger typical port, or 2222
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT" --delete \
             --exclude='.env*' \
             server.js \
             package.json \
@@ -106,7 +108,9 @@ jobs:
 
       - name: 🗃️ Run Prisma Migrations
         run: |
-          ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
             cd ${{ vars.DEPLOY_PATH }} &&
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
             npx prisma migrate deploy
@@ -114,7 +118,9 @@ jobs:
 
       - name: 🚀 Restart Application (PM2)
         run: |
-          ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
+          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
             cd ${{ vars.DEPLOY_PATH }} &&
             npx prisma generate &&
             pm2 restart capril || pm2 start server.js --name capril --env production
@@ -128,7 +134,9 @@ jobs:
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "❌ Health check failed! Triggering PM2 rollback..."
-            ssh ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "pm2 restart capril"
+            SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+            if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
+            ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "pm2 restart capril"
             exit 1
           fi
           echo "✅ Application is healthy!"
