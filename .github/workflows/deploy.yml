@@ -99,19 +99,16 @@ jobs:
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts || true
 
-            - name: 📂 Sync files (Rsync)
+                - name: 📂 Sync files (Rsync)
         run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          # On transfère le CONTENU de .next/standalone vers la racine du DEPLOY_PATH
-          rsync -avz --timeout=60 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT" --delete \
+          # Ajout des options ServerAlive pour empècher le VPS de couper la connexion 255
+          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=30 -o ServerAliveCountMax=5" --delete \
             --exclude='.env*' \
             server.js package.json prisma public .next/static .next/standalone/ \
             ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ vars.DEPLOY_PATH }}/
-OY_PATH }}
 
-      - name: 🗃️ Run Prisma Migrations
-        run: |
           SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
           if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
