@@ -89,8 +89,15 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          known_hosts: ${{ secrets.HOSTINGER_SSH_HOST }}
+          known_hosts: unnecessary
           if_key_exists: replace
+
+      - name: 🔐 Install SSH Key to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT="65002"; fi
+          ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts || true
 
       - name: 📂 Sync files (Rsync)
         run: |
