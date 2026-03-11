@@ -117,6 +117,29 @@ jobs:
           export DATABASE_URL='${{ secrets.DATABASE_URL }}'
           npx prisma@6.4.1 migrate deploy
 
+      - name: 🔐 Create Production .env
+        run: |
+          DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
+          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
+          cd $DEPLOY_DEST
+          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "AUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
+          echo "AUTH_RESEND_KEY=\"${{ secrets.AUTH_RESEND_KEY }}\"" >> .env
+          echo "NEXTAUTH_URL=\"${{ secrets.NEXTAUTH_URL }}\"" >> .env
+          echo "EMAIL_FROM=\"${{ vars.EMAIL_FROM }}\"" >> .env
+          echo "EMAIL_SERVER=\"${{ secrets.EMAIL_SERVER }}\"" >> .env
+          echo "MOBILE_MONEY_WEBHOOK_SECRET=\"${{ secrets.MOBILE_MONEY_WEBHOOK_SECRET }}\"" >> .env
+          echo "ORANGE_MONEY_API_KEY=\"${{ secrets.ORANGE_MONEY_API_KEY }}\"" >> .env
+          echo "MTN_MOMO_API_KEY=\"${{ secrets.MTN_MOMO_API_KEY }}\"" >> .env
+          echo "MOOV_MONEY_API_KEY=\"${{ secrets.MOOV_MONEY_API_KEY }}\"" >> .env
+          echo "MAPOSTE_WEBHOOK_SECRET=\"${{ secrets.MAPOSTE_WEBHOOK_SECRET }}\"" >> .env
+          echo "MAPOSTE_API_KEY=\"${{ secrets.MAPOSTE_API_KEY }}\"" >> .env
+          echo "SMS_GATEWAY_PROVIDER=\"${{ vars.SMS_GATEWAY_PROVIDER }}\"" >> .env
+          echo "SMS_API_KEY=\"${{ secrets.SMS_API_KEY }}\"" >> .env
+          echo "USSD_SHARED_SECRET=\"${{ secrets.USSD_SHARED_SECRET }}\"" >> .env
+          echo "NEXT_PUBLIC_APP_URL=\"${{ vars.NEXT_PUBLIC_APP_URL }}\"" >> .env
+          echo "NODE_ENV=\"production\"" >> .env
+
       - name: 🚀 Restart Application (PM2)
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
@@ -137,7 +160,9 @@ jobs:
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/health" || echo "000")
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
-            echo "❌ Health check failed! Triggering PM2 rollback..."
+            echo "❌ Health check failed! Showing PM2 logs:"
+            pm2 logs capril --lines 60 --nostream
+            echo "Triggering PM2 rollback..."
             pm2 restart capril
             exit 1
           fi
