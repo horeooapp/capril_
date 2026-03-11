@@ -7,7 +7,17 @@ if (process.env.REDIS_URL) {
         const redisGlobal = global as typeof globalThis & {
             redis: Redis | undefined;
         };
-        redis = redisGlobal.redis ?? new Redis(process.env.REDIS_URL);
+        const redisOptions = {
+            maxRetriesPerRequest: null,
+            retryStrategy(times: number) {
+                const delay = Math.min(times * 50, 2000);
+                return delay;
+            },
+            tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
+        };
+
+        redis = redisGlobal.redis ?? new Redis(process.env.REDIS_URL, redisOptions);
+            
         if (process.env.NODE_ENV !== 'production') {
             redisGlobal.redis = redis;
         }
