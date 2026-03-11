@@ -141,8 +141,15 @@ jobs:
           echo "SMS_API_KEY=\"${{ secrets.SMS_API_KEY }}\"" >> .env
           echo "USSD_SHARED_SECRET=\"${{ secrets.USSD_SHARED_SECRET }}\"" >> .env
           echo "NEXT_PUBLIC_APP_URL=\"${{ vars.NEXT_PUBLIC_APP_URL }}\"" >> .env
-          echo "REDIS_URL=\"${{ secrets.REDIS_URL }}\"" >> .env
+          echo "REDIS_URL=\"redis://127.0.0.1:6379\"" >> .env
           echo "NODE_ENV=\"production\"" >> .env
+
+      - name: 📦 Install and Start Local Redis
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y redis-server
+          sudo systemctl enable redis-server || true
+          sudo systemctl start redis-server || true
 
       - name: 🚀 Restart Application (PM2)
         run: |
