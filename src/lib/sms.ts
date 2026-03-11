@@ -33,7 +33,7 @@ export class OrangeCIService implements SMSService {
         if (!tokenRes.ok) {
             const errText = await tokenRes.text();
             console.error('[SMS] Orange Auth failed:', errText);
-            return { success: false, error: 'Orange API Authentication failed' };
+            return { success: false, error: `Orange API Auth failed (${tokenRes.status}): ${errText}` };
         }
 
         const { access_token } = await tokenRes.json();
