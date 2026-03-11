@@ -127,7 +127,7 @@ jobs:
         run: |
           echo "Waiting for app to start..."
           sleep 10
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ vars.NEXT_PUBLIC_APP_URL }}/api/health || echo "000")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/health" || echo "000")
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "❌ Health check failed! Triggering PM2 rollback..."
