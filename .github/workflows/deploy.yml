@@ -68,6 +68,12 @@ jobs:
             prisma
             package.json
             package-lock.json
+            next.config.ts
+            next-env.d.ts
+            tsconfig.json
+            postcss.config.mjs
+            tailwind.config.ts
+            src
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
