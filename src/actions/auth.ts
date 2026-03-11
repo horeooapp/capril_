@@ -28,7 +28,9 @@ export async function requestOTP(phone: string) {
         return { success: true };
     } catch (error) {
         console.error("[SERVER ACTION] requestOTP error:", error);
-        return { error: "Erreur technique lors de l'envoi du code." };
+        const urlFetched = `${process.env.NEXTAUTH_URL || ''}/api/v1/auth/register`;
+        const errMessage = error instanceof Error ? error.message : String(error);
+        return { error: `Erreur technique lors de l'envoi du code. [Détails: ${errMessage} | URL: ${urlFetched}]` };
     }
 }
 
