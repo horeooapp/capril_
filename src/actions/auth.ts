@@ -47,7 +47,8 @@ export async function requestOTP(phone: string) {
     } catch (error) {
         console.error("[SERVER ACTION] requestOTP error:", error);
         const errMessage = error instanceof Error ? error.message : String(error);
-        return { error: `Erreur technique: ${errMessage}` };
+        const redisInfo = redis ? `Redis status: ${redis.status}` : 'Redis is null';
+        return { error: `Erreur technique: ${errMessage} [${redisInfo}]` };
     }
 }
 
