@@ -40,7 +40,7 @@ export async function requestOTP(phone: string) {
 
         if (!sendResult.success) {
             console.error(`[SERVER ACTION] Failed to send SMS to ${phone}:`, sendResult.error);
-            return { error: 'Échec de l\'envoi du SMS de validation' };
+            return { error: `Échec de l'envoi du SMS de validation: ${sendResult.error}` };
         }
 
         return { success: true };
