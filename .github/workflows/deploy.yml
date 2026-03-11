@@ -110,14 +110,14 @@ jobs:
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
           export DATABASE_URL='${{ secrets.DATABASE_URL }}'
-          npx prisma migrate deploy
+          npx prisma@6.4.1 migrate deploy
 
       - name: 🚀 Restart Application (PM2)
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
-          npx prisma generate
+          npx prisma@6.4.1 generate
           # Démarrer avec sudo pour forcer le runtime s'il utilise un autre user
           sudo pm2 restart capril || sudo pm2 start server.js --name capril --env production
 
