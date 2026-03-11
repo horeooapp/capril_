@@ -8,8 +8,12 @@ if (process.env.REDIS_URL) {
             redis: Redis | undefined;
         };
         const redisOptions = {
-            maxRetriesPerRequest: null,
+            maxRetriesPerRequest: 3,
+            commandTimeout: 5000,
             retryStrategy(times: number) {
+                if (times > 3) {
+                    return null; // Stop retrying and throw error
+                }
                 const delay = Math.min(times * 50, 2000);
                 return delay;
             },
