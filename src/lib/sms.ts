@@ -20,10 +20,11 @@ export class OrangeCIService implements SMSService {
 
     try {
         // 1. Authenticate with Orange Developer API
+        const authValue = authHeader.startsWith('Basic ') ? authHeader : `Basic ${authHeader}`;
         const tokenRes = await fetch('https://api.orange.com/oauth/v3/token', {
             method: 'POST',
             headers: {
-                'Authorization': `Basic ${authHeader}`,
+                'Authorization': authValue,
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Accept': 'application/json'
             },
