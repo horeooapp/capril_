@@ -3,6 +3,14 @@
 import { signIn, signOut } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
+import { redis } from '@/lib/redis';
+import { getSMSService } from '@/lib/sms';
+
+function generateOTP(): string {
+  if (process.env.NODE_ENV === 'development') return '123456';
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 /**
  * Part 3.3: Request OTP (Server Action)
  * Initiates the phone verification flow.
@@ -10,31 +18,36 @@ import { prisma } from "@/lib/prisma"
 export async function requestOTP(phone: string) {
     console.log("[SERVER ACTION] requestOTP called for phone:", phone);
 
-    if (!phone) return { error: "Le numéro de téléphone est requis" }
+    if (!phone || !/^\+?[1-9]\d{1,14}$/.test(phone)) {
+        return { error: 'Format de numéro de téléphone invalide' };
+    }
 
     try {
-        const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '');
-        const urlToFetch = `${baseUrl}/api/v1/auth/register`;
-        
-        const response = await fetch(urlToFetch, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone }),
-        });
+        // 1. Generate OTP
+        const otp = generateOTP();
+        const ttl = parseInt(process.env.OTP_TTL_SECONDS || '600');
 
-        const result = await response.json();
-        
-        if (!response.ok) {
-            return { error: result.error || "Erreur lors de l'envoi de l'OTP" };
+        // 2. Store in Redis
+        if (!redis) {
+            console.error("[SERVER ACTION] Redis not available");
+            return { error: 'Service de validation temporairement indisponible' };
+        }
+        await redis.set(`otp:${phone}`, otp, 'EX', ttl);
+
+        // 3. Send SMS
+        const sms = getSMSService();
+        const sendResult = await sms.sendOTP(phone, otp);
+
+        if (!sendResult.success) {
+            console.error(`[SERVER ACTION] Failed to send SMS to ${phone}:`, sendResult.error);
+            return { error: 'Échec de l\'envoi du SMS de validation' };
         }
 
         return { success: true };
     } catch (error) {
         console.error("[SERVER ACTION] requestOTP error:", error);
-        const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || '';
-        const urlFetched = `${baseUrl}/api/v1/auth/register`;
         const errMessage = error instanceof Error ? error.message : String(error);
-        return { error: `Erreur technique lors de l'envoi du code. [Détails: ${errMessage} | URL: ${urlFetched}]` };
+        return { error: `Erreur technique: ${errMessage}` };
     }
 }
 
