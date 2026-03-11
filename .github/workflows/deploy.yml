@@ -103,11 +103,12 @@ jobs:
           mkdir -p $DEPLOY_DEST
           
           # Sync the full Next.js project to the destination
-          rsync -avz --exclude='.env*' \
+          # We purposefully don't exclude all '.*' to allow '.next' through
+          rsync -avz \
+            --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='.git' \
             --exclude='.github' \
-            --include='.next/**' \
             ./ $DEPLOY_DEST/
 
       - name: 🗃️ Run Prisma Migrations
