@@ -128,7 +128,8 @@ jobs:
           npx prisma@6.4.1 generate
           # Install PM2 in the runner's isolated Node environment
           npm install -g pm2
-          pm2 restart capril || pm2 start server.js --name capril --env production
+          pm2 delete capril || true
+          pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production
           pm2 save
 
       - name: 🩺 Health Check
