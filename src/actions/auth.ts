@@ -13,7 +13,10 @@ export async function requestOTP(phone: string) {
     if (!phone) return { error: "Le numéro de téléphone est requis" }
 
     try {
-        const response = await fetch(`${process.env.NEXTAUTH_URL || ''}/api/v1/auth/register`, {
+        const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '');
+        const urlToFetch = `${baseUrl}/api/v1/auth/register`;
+        
+        const response = await fetch(urlToFetch, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone }),
@@ -28,7 +31,8 @@ export async function requestOTP(phone: string) {
         return { success: true };
     } catch (error) {
         console.error("[SERVER ACTION] requestOTP error:", error);
-        const urlFetched = `${process.env.NEXTAUTH_URL || ''}/api/v1/auth/register`;
+        const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || '';
+        const urlFetched = `${baseUrl}/api/v1/auth/register`;
         const errMessage = error instanceof Error ? error.message : String(error);
         return { error: `Erreur technique lors de l'envoi du code. [Détails: ${errMessage} | URL: ${urlFetched}]` };
     }
