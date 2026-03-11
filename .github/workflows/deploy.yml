@@ -63,12 +63,11 @@ jobs:
         with:
           name: build-output
           path: |
-            .next/standalone
-            .next/static
+            .next
             public
             prisma
-            server.js
             package.json
+            package-lock.json
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
@@ -97,18 +96,12 @@ jobs:
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           mkdir -p $DEPLOY_DEST
           
-          # Prepare the standalone directory with required static assets
-          cp -r public .next/standalone/
-          cp -r .next/static .next/standalone/.next/
-          # Also copy the prisma schemas needed for database migrations
-          cp -r prisma .next/standalone/
-          
-          # Sync ONLY the complete standalone directory to the destination
+          # Sync the full Next.js project to the destination
           rsync -avz --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='.git' \
             --exclude='.github' \
-            .next/standalone/ $DEPLOY_DEST/
+            ./ $DEPLOY_DEST/
 
       - name: 🗃️ Run Prisma Migrations
         run: |
@@ -123,11 +116,12 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
+          npm ci --omit=dev
           npx prisma@6.4.1 generate
           # Install PM2 in the runner's isolated Node environment
           npm install -g pm2
           pm2 delete capril || true
-          pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production
+          pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000
           pm2 save
 
       - name: 🩺 Health Check
