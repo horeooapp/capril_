@@ -95,23 +95,22 @@ jobs:
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          # Créer le répertoire s'il n'existe pas
           mkdir -p $DEPLOY_DEST
-          mkdir -p $DEPLOY_DEST/.next
           
-          # Synchronisation de la racine Standalone (contient server.js, package.json...)
+          # 1. Copier la racine du projet sauf dossiers inutiles
           rsync -avz --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='.git' \
             --exclude='.github' \
-            .next/standalone/ $DEPLOY_DEST/
+            ./ $DEPLOY_DEST/
             
-          # Synchronisation des assets statiques qui ne sont pas inclus dans standalone par défaut
-          rsync -avz public/ $DEPLOY_DEST/public/
-          rsync -avz .next/static/ $DEPLOY_DEST/.next/static/
+          # 2. Écraser la racine avec le contenu serveur de standalone
+          # Next.js standalone a besoin d'être au même niveau que le dossier .next
+          rsync -avz .next/standalone/ $DEPLOY_DEST/
           
-          # Synchronisation de Prisma (Nécessaire pour migrate deploy et generate)
-          rsync -avz prisma/ $DEPLOY_DEST/prisma/
+          # 3. Déplacer les assets statiques là où le standalone les attend
+          mkdir -p $DEPLOY_DEST/.next/static
+          rsync -avz .next/static/ $DEPLOY_DEST/.next/static/
 
       - name: 🗃️ Run Prisma Migrations
         run: |
