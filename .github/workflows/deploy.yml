@@ -86,6 +86,11 @@ jobs:
         with:
           name: build-output
 
+      - name: 🟢 Setup Node.js (Runner Env)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: 📂 Deploy files locally
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
