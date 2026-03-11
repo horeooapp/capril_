@@ -91,7 +91,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 📂 Deploy files locally
+      - name: 🚀 Transfer Files to VPS
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
@@ -100,8 +100,9 @@ jobs:
           # Synchronisation locale
           rsync -avz --exclude='.env*' \
             --exclude='node_modules' \
-            --exclude='.*' \
-            server.js package.json prisma public .next/static .next/standalone/ \
+            --exclude='.git' \
+            --exclude='.github' \
+            server.js package.json prisma public .next/ \
             $DEPLOY_DEST/
 
       - name: 🗃️ Run Prisma Migrations
