@@ -107,6 +107,7 @@ jobs:
             --exclude='node_modules' \
             --exclude='.git' \
             --exclude='.github' \
+            --include='.next/**' \
             ./ $DEPLOY_DEST/
 
       - name: 🗃️ Run Prisma Migrations
