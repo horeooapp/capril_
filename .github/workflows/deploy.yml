@@ -139,6 +139,7 @@ jobs:
           echo "MAPOSTE_API_KEY=\"${{ secrets.MAPOSTE_API_KEY }}\"" >> .env
           echo "SMS_GATEWAY_PROVIDER=\"${{ vars.SMS_GATEWAY_PROVIDER }}\"" >> .env
           echo "SMS_API_KEY=\"${{ secrets.SMS_API_KEY }}\"" >> .env
+          echo "SMS_SENDER_NAME=\"${{ vars.SMS_SENDER_NAME }}\"" >> .env
           echo "USSD_SHARED_SECRET=\"${{ secrets.USSD_SHARED_SECRET }}\"" >> .env
           echo "NEXT_PUBLIC_APP_URL=\"${{ vars.NEXT_PUBLIC_APP_URL }}\"" >> .env
           echo "REDIS_URL=\"redis://127.0.0.1:6379\"" >> .env
