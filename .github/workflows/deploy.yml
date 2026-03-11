@@ -76,7 +76,7 @@ jobs:
   # ──────────────────────────────────────────────────────
   deploy:
     name: 🚀 Deploy to Hostinger
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     environment: production
 
@@ -86,64 +86,35 @@ jobs:
         with:
           name: build-output
 
-      - name: 🗝️ Setup SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          known_hosts: unnecessary
-          if_key_exists: replace
-
-      - name: 🔐 Install SSH Key to known_hosts
+      - name: 📂 Deploy files locally
         run: |
-          mkdir -p ~/.ssh
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          ssh-keyscan -H -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_HOST }} >> ~/.ssh/known_hosts || true
-
-      - name: 🔍 Debug SSH Connection
-        run: |
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-          echo "Test of SSH Connection with Verbose Output..."
-          ssh -vvv -o BatchMode=yes -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "echo 'SSH Connection Successful!'" || true
-
-      - name: 📂 Sync files (Rsync)
-        run: |
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="~/capril_app"; fi
-          # On EXCLUT expressément node_modules et on retire --delete pour éviter de casser le VPS
-          rsync -avz --timeout=300 -e "ssh -o StrictHostKeyChecking=no -p $SSH_PORT -o ServerAliveInterval=15 -o ServerAliveCountMax=3" \
-            --exclude='.env*' \
+          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
+          # Créer le répertoire s'il n'existe pas
+          mkdir -p $DEPLOY_DEST
+          # Synchronisation locale
+          rsync -avz --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='.*' \
             server.js package.json prisma public .next/static .next/standalone/ \
-            ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:$DEPLOY_DEST/
+            $DEPLOY_DEST/
 
       - name: 🗃️ Run Prisma Migrations
         run: |
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="~/capril_app"; fi
-          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
-            cd $DEPLOY_DEST &&
-            export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
-            npx prisma migrate deploy
-          "
+          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
+          cd $DEPLOY_DEST
+          export DATABASE_URL='${{ secrets.DATABASE_URL }}'
+          npx prisma migrate deploy
 
       - name: 🚀 Restart Application (PM2)
         run: |
-          SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-          if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="~/capril_app"; fi
-          ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "
-            cd $DEPLOY_DEST &&
-            npx prisma generate &&
-            pm2 restart capril || pm2 start server.js --name capril --env production
-          "
+          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
+          cd $DEPLOY_DEST
+          npx prisma generate
+          # Démarrer avec sudo pour forcer le runtime s'il utilise un autre user
+          sudo pm2 restart capril || sudo pm2 start server.js --name capril --env production
 
       - name: 🩺 Health Check
         run: |
@@ -153,9 +124,7 @@ jobs:
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "❌ Health check failed! Triggering PM2 rollback..."
-            SSH_PORT="${{ secrets.HOSTINGER_SSH_PORT }}"
-            if [ -z "$SSH_PORT" ]; then SSH_PORT="22"; fi
-            ssh -o StrictHostKeyChecking=no -p $SSH_PORT ${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }} "pm2 restart capril"
+            sudo pm2 restart capril
             exit 1
           fi
           echo "✅ Application is healthy!"
