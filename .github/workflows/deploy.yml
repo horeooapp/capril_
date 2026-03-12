@@ -160,6 +160,10 @@ jobs:
           cd $DEPLOY_DEST
           npm ci --omit=dev
           npx prisma@6.4.1 generate
+          
+          # Fix PM2 socket permissions if they are owned by root or another user
+          sudo chown -R $USER:$USER ~/.pm2 || true
+          
           # Install PM2 in the runner's isolated Node environment
           npm install -g pm2
           pm2 delete capril || true
