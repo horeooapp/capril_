@@ -10,6 +10,7 @@ export default async function Home() {
   const session = await auth();
 
   const navLinks = [
+    { href: "/impact", label: "Impact" },
     { href: "/#a-propos", label: "À propos" },
     { href: "/#expertise", label: "Expertise" },
     { href: "/#faq", label: "FAQ" },
