@@ -624,6 +624,7 @@ model Incident {
   leaseId   String   @map("lease_id")
   lease     Lease    @relation(fields: [leaseId], references: [id])
   type      String // Damage, late payment, early exit, etc.
+  severity  String   @default("MEDIUM") // LOW|MEDIUM|HIGH|CRITICAL
   description String @db.Text
   resolved  Boolean  @default(false)
   

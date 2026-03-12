@@ -115,7 +115,8 @@ export async function getPropertyPassport(id: string) {
                 include: {
                     tenant: {
                         select: { fullName: true, email: true }
-                    }
+                    },
+                    incidentLogs: true
                 },
                 orderBy: { startDate: 'desc' }
             }
@@ -135,7 +136,13 @@ export async function getPropertyPassport(id: string) {
                 name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
                 email: lease.tenant.email
             } : { name: "Inconnu", email: null },
-            incidents: [] // Stub for now
+            incidents: lease.incidentLogs.map((inc: any) => ({
+                id: inc.id,
+                type: inc.type,
+                severity: inc.severity,
+                description: inc.description,
+                createdAt: inc.createdAt
+            }))
         }))
     }
 }
