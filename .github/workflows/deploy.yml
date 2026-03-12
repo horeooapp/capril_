@@ -101,11 +101,12 @@ jobs:
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          mkdir -p $DEPLOY_DEST
+          sudo mkdir -p $DEPLOY_DEST
+          sudo chown -R $USER:$USER $DEPLOY_DEST
           
           # Sync the full Next.js project to the destination
-          # We purposefully don't exclude all '.*' to allow '.next' through
-          rsync -avz \
+          # Use flags to ignore owner/group/perms from the build env
+          rsync -rlptvz --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='node_modules' \
             --exclude='.git' \
