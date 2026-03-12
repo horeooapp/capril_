@@ -127,18 +127,18 @@ export default function MobileMenu({ links, session, logoSrc = "/logo.png", bran
                         ) : (
                             <div className="space-y-3">
                                 <Link 
-                                    href="/login"
+                                    href="/locataire/login"
+                                    onClick={() => setIsOpen(false)}
+                                    className="block w-full text-center bg-secondary text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest"
+                                >
+                                    Accès Locataire
+                                </Link>
+                                <Link 
+                                    href="/dashboard/login"
                                     onClick={() => setIsOpen(false)}
                                     className="block w-full text-center bg-primary text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest shadow-lg shadow-primary/20"
                                 >
-                                    Connexion
-                                </Link>
-                                <Link 
-                                    href="/login"
-                                    onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center border-2 border-primary text-primary py-3 rounded-xl font-bold text-sm uppercase tracking-widest"
-                                >
-                                    S&apos;inscrire
+                                    Accès Propriétaire
                                 </Link>
                             </div>
                         )}

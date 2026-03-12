@@ -8,7 +8,7 @@ export const authConfig = {
     },
     trustHost: true,
     pages: {
-        signIn: '/login',
+        signIn: '/dashboard/login',
         error: '/auth/error',
     },
     callbacks: {
@@ -39,14 +39,21 @@ export const authConfig = {
             const isOnOnboarding = nextUrl.pathname.startsWith("/onboarding");
             const isOnAdmin = nextUrl.pathname.startsWith("/admin");
 
+            // Avoid infinite redirects on login pages
+            const isLoginPath = nextUrl.pathname.endsWith("/login");
+            if (isLoginPath) return true;
+
             if (isLoggedIn) {
-                // Si l'utilisateur est connecté et essaie d'accéder aux pages de connexion/onboarding
-                // On le laisse passer, les layouts ou pages redirigeront s'ils sont déjà "onboarded"
                 return true;
             } else {
-                // Si non connecté, on protège les routes privées
-                if (isOnDashboard || isOnLocataire || isOnOnboarding || isOnAdmin) {
-                    return false; // Redirige automatiquement vers /login
+                if (isOnAdmin) {
+                    return Response.redirect(new URL("/admin/login", nextUrl));
+                }
+                if (isOnDashboard || isOnOnboarding) {
+                    return Response.redirect(new URL("/dashboard/login", nextUrl));
+                }
+                if (isOnLocataire) {
+                    return Response.redirect(new URL("/locataire/login", nextUrl));
                 }
                 return true;
             }

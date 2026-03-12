@@ -22,8 +22,8 @@ export default function Footer() {
                     <div>
                         <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Plateforme</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Propriétaire</Link></li>
-                            <li><Link href="/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Locataire</Link></li>
+                            <li><Link href="/dashboard/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Propriétaire</Link></li>
+                            <li><Link href="/locataire/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Locataire</Link></li>
                             <li><Link href="/admin" className="text-sm text-gray-400 hover:text-white transition-colors">Observatoire National</Link></li>
                             <li><Link href="/#comment-ca-marche" className="text-sm text-gray-400 hover:text-white transition-colors">Comment ça marche ?</Link></li>
                         </ul>

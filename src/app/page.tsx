@@ -64,17 +64,14 @@ export default async function Home() {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-                      Se connecter
-                    </Link>
                     <Link
-                      href="/login"
+                      href="/locataire/login"
                       className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-secondary hover:bg-green-700"
                     >
                       Accès Locataire
                     </Link>
                     <Link
-                      href="/login"
+                      href="/dashboard/login"
                       className="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-orange-600"
                     >
                       Espace Propriétaire
@@ -104,18 +101,10 @@ export default async function Home() {
                   <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                     <div className="rounded-md shadow">
                       <Link
-                        href="/login"
+                        href="/dashboard/login"
                         className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-orange-600 md:py-4 md:text-lg md:px-10"
                       >
                         Créer mon compte
-                      </Link>
-                    </div>
-                    <div className="mt-3 sm:mt-0 sm:ml-3">
-                      <Link
-                        href="#comment-ca-marche"
-                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-orange-100 hover:bg-orange-200 md:py-4 md:text-lg md:px-10"
-                      >
-                        Comment ça marche ?
                       </Link>
                     </div>
                   </div>

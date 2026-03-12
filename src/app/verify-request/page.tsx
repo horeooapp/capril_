@@ -35,8 +35,8 @@ export default function VerifyRequestPage() {
                         </div>
 
                         <div className="mt-10">
-                            <Link href="/login" className="text-sm font-medium text-primary hover:text-orange-600">
-                                ← Retourner à la page de connexion
+                            <Link href="/" className="text-sm font-medium text-primary hover:text-orange-600">
+                                ← Retourner à l&apos;accueil
                             </Link>
                         </div>
                     </div>
