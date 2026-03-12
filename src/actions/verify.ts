@@ -8,8 +8,8 @@ import { prisma } from "@/lib/prisma";
  */
 export async function verifyQRToken(token: string) {
     try {
-        // 1. Check Receipts
-        const receipt = await prisma.receipt.findUnique({
+        // 1. Check Receipts (By Token or Fingerprint Hash)
+        let receipt = await prisma.receipt.findUnique({
             where: { qrToken: token },
             include: {
                 lease: {
@@ -21,6 +21,22 @@ export async function verifyQRToken(token: string) {
                 }
             }
         });
+
+        // Fallback to searching by receiptHash (fingerprint)
+        if (!receipt) {
+            receipt = await prisma.receipt.findFirst({
+                where: { receiptHash: token },
+                include: {
+                    lease: {
+                        include: {
+                            property: true,
+                            tenant: { select: { fullName: true } },
+                            landlord: { select: { fullName: true } }
+                        }
+                    }
+                }
+            }) as any;
+        }
 
         if (receipt) {
             return {
