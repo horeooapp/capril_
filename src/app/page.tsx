@@ -11,10 +11,10 @@ export default async function Home() {
 
   const navLinks = [
     { href: "/impact", label: "Impact" },
-    { href: "/#a-propos", label: "À propos" },
-    { href: "/#expertise", label: "Expertise" },
-    { href: "/#faq", label: "FAQ" },
-    { href: "/#contact", label: "Contact" },
+    { href: "/expertise", label: "Expertise" },
+    { href: "/a-propos", label: "À propos" },
+    { href: "/faq", label: "FAQ" },
+    { href: "/contact", label: "Contact" },
   ];
 
   return (
@@ -94,7 +94,7 @@ export default async function Home() {
                   href="/dashboard/login"
                   className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-primary transition-all shadow-2xl shadow-gray-300 flex items-center justify-center group"
                 >
-                  Débuter la Digitation
+                  Débuter la Digitalisation
                   <svg className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

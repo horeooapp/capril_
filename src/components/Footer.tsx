@@ -33,10 +33,10 @@ export default function Footer() {
                     <div>
                         <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">À découvrir</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/#a-propos" className="text-sm text-gray-400 hover:text-white transition-colors">À propos</Link></li>
-                            <li><Link href="/#qui-sommes-nous" className="text-sm text-gray-400 hover:text-white transition-colors">Qui sommes-nous ?</Link></li>
-                            <li><Link href="/#faq" className="text-sm text-gray-400 hover:text-white transition-colors">FAQ</Link></li>
-                            <li><Link href="/#contact" className="text-sm text-gray-400 hover:text-white transition-colors">Contact</Link></li>
+                            <li><Link href="/a-propos" className="text-sm text-gray-400 hover:text-white transition-colors">À propos</Link></li>
+                            <li><Link href="/a-propos" className="text-sm text-gray-400 hover:text-white transition-colors">Qui sommes-nous ?</Link></li>
+                            <li><Link href="/faq" className="text-sm text-gray-400 hover:text-white transition-colors">FAQ</Link></li>
+                            <li><Link href="/contact" className="text-sm text-gray-400 hover:text-white transition-colors">Contact</Link></li>
                         </ul>
                     </div>
 
