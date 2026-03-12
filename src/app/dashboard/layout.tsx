@@ -13,7 +13,7 @@ export default async function DashboardLayout({
     const session = await auth()
 
     if (!session?.user) {
-        redirect("/login")
+        redirect("/dashboard/login")
     }
 
     // Role-based redirection out of dashboard

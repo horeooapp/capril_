@@ -13,7 +13,7 @@ export default async function LocataireLayout({
     const session = await auth()
 
     if (!session?.user) {
-        redirect("/login")
+        redirect("/locataire/login")
     }
 
     if (session.user.role !== "TENANT") {
