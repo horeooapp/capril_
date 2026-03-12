@@ -8,6 +8,7 @@ import { redis } from "@/lib/redis"
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     secret: process.env.AUTH_SECRET,
+    trustHost: true,
     debug: process.env.NODE_ENV === "development",
     adapter: PrismaAdapter(prisma),
     providers: [

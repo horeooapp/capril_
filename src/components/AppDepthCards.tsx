@@ -5,7 +5,7 @@ interface CardProps {
     title: string
     description: string
     image: string
-    tag: string
+    tag?: string
     link: string
     reverse?: boolean
 }
@@ -14,9 +14,11 @@ function DepthCard({ title, description, image, tag, link, reverse }: CardProps)
     return (
         <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12 py-16 border-b border-gray-100 last:border-0`}>
             <div className="flex-1 space-y-6">
-                <span className="inline-block px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-widest">
-                    {tag}
-                </span>
+                {tag && (
+                    <span className="inline-block px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-widest">
+                        {tag}
+                    </span>
+                )}
                 <h3 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight">
                     {title}
                 </h3>
@@ -49,23 +51,20 @@ export default function AppDepthCards() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <DepthCard 
-                tag="Part 15: PNB"
-                title="Passeport Numérique du Bâtiment"
+                title="Passeport Numérique du Bâti (PNB)"
                 description="Plus qu'un mur, une mémoire. Chaque logement sur QAPRIL possède son propre ADN numérique. Un historique certifié des incidents, travaux et améliorations qui suit le bien à vie, valorisant le patrimoine et rassurant les occupants."
                 image="/passport_visual.png"
                 link="/impact"
             />
             <DepthCard 
-                tag="Part 21: Audit Public"
-                title="La Confiance par la Preuve"
+                title="Audit & Transparence Publique"
                 description="La fin de la fraude documentaire. Chaque quittance ou certificat généré sur la plateforme est authentifié par une signature numérique unique. Un simple scan QR permet à quiconque de vérifier l'exactitude des faits en temps réel."
                 image="/qr_visual.png"
                 link="/impact"
                 reverse
             />
             <DepthCard 
-                tag="Part 10: Protection"
-                title="Consignation CDC-CI"
+                title="Protection des Revenus"
                 description="La sécurité institutionnelle au service de l'immobilier. En partenariat avec la Caisse des Dépôts et Consignations, nous automalisons la sécurisation des dépôts de garantie, protégeant les intérêts financiers des deux parties."
                 image="/cdc_visual.png"
                 link="/impact"
