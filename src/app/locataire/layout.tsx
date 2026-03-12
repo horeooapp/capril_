@@ -12,11 +12,7 @@ export default async function LocataireLayout({
 }) {
     const session = await auth()
 
-    if (!session?.user) {
-        redirect("/locataire/login")
-    }
-
-    if (session.user.role !== "TENANT") {
+    if (session?.user && session.user.role !== "TENANT") {
         redirect("/dashboard")
     }
 
@@ -65,15 +61,19 @@ export default async function LocataireLayout({
 
                             <div className="hidden md:flex items-center space-x-4">
                                 <NotificationCenter />
-                                <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{session.user.email}</span>
-                                <form action={async () => {
-                                    "use server"
-                                    await signOut({ redirectTo: "/" })
-                                }}>
-                                    <button type="submit" className="text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md font-medium transition-colors shadow-sm">
-                                        Déconnexion
-                                    </button>
-                                </form>
+                                {session?.user && (
+                                    <>
+                                        <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{session.user.email}</span>
+                                        <form action={async () => {
+                                            "use server"
+                                            await signOut({ redirectTo: "/" })
+                                        }}>
+                                            <button type="submit" className="text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md font-medium transition-colors shadow-sm">
+                                                Déconnexion
+                                            </button>
+                                        </form>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

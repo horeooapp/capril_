@@ -12,16 +12,13 @@ export default async function DashboardLayout({
 }) {
     const session = await auth()
 
-    if (!session?.user) {
-        redirect("/dashboard/login")
-    }
 
     // Role-based redirection out of dashboard
-    if (session.user.role === "TENANT") {
+    if (session?.user?.role === "TENANT") {
         redirect("/locataire")
     }
 
-    if (session.user.role === "ADMIN") {
+    if (session?.user?.role === "ADMIN") {
         redirect("/admin")
     }
 
@@ -70,7 +67,7 @@ export default async function DashboardLayout({
                                 <Link href="/dashboard/trust" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium flex items-center">
                                     <span className="mr-1">⭐</span> Mon ICL
                                 </Link>
-                                {((session.user.role as string) === "ADMIN" || (session.user.role as string) === "AUDITOR") && (
+                                {((session?.user?.role as string) === "ADMIN" || (session?.user?.role as string) === "AUDITOR") && (
                                     <Link href="/dashboard/audit" className="hover:text-orange-200 px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
                                 )}
                             </nav>
@@ -79,15 +76,19 @@ export default async function DashboardLayout({
 
                             <div className="hidden md:flex items-center space-x-4">
                                 <NotificationCenter />
-                                <span className="text-sm border border-orange-400 px-3 py-1 rounded-full bg-orange-800/20">{session.user.email}</span>
-                                <form action={async () => {
-                                    "use server"
-                                    await signOut({ redirectTo: "/" })
-                                }}>
-                                    <button type="submit" className="text-sm bg-white text-primary hover:bg-gray-100 px-4 py-2 rounded-md font-medium transition-colors">
-                                        Déconnexion
-                                    </button>
-                                </form>
+                                {session?.user && (
+                                    <>
+                                        <span className="text-sm border border-orange-400 px-3 py-1 rounded-full bg-orange-800/20">{session.user.email}</span>
+                                        <form action={async () => {
+                                            "use server"
+                                            await signOut({ redirectTo: "/" })
+                                        }}>
+                                            <button type="submit" className="text-sm bg-white text-primary hover:bg-gray-100 px-4 py-2 rounded-md font-medium transition-colors">
+                                                Déconnexion
+                                            </button>
+                                        </form>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

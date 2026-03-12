@@ -11,11 +11,7 @@ export default async function AdminLayout({
 }) {
     const session = await auth()
 
-    if (!session?.user) {
-        redirect("/login")
-    }
-
-    if (session.user.role !== "ADMIN") {
+    if (session?.user && session.user.role !== "ADMIN") {
         redirect("/dashboard")
     }
 
@@ -61,15 +57,19 @@ export default async function AdminLayout({
                             <MobileMenu links={navLinks} session={session} variant="dark" />
 
                             <div className="hidden md:flex items-center space-x-4">
-                                <span className="text-sm text-gray-300 bg-gray-800 px-3 py-1 rounded-full">Administrateur</span>
-                                <form action={async () => {
-                                    "use server"
-                                    await signOut({ redirectTo: "/" })
-                                }}>
-                                    <button type="submit" className="text-sm bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white px-4 py-2 rounded-md font-medium transition-colors border border-gray-700">
-                                        Déconnexion
-                                    </button>
-                                </form>
+                                {session?.user && (
+                                    <>
+                                        <span className="text-sm text-gray-300 bg-gray-800 px-3 py-1 rounded-full">Administrateur</span>
+                                        <form action={async () => {
+                                            "use server"
+                                            await signOut({ redirectTo: "/" })
+                                        }}>
+                                            <button type="submit" className="text-sm bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white px-4 py-2 rounded-md font-medium transition-colors border border-gray-700">
+                                                Déconnexion
+                                            </button>
+                                        </form>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
