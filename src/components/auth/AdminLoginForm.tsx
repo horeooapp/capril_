@@ -11,16 +11,24 @@ export default function AdminLoginForm() {
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setError(null)
+        
+        const formData = new FormData(e.currentTarget);
+        
         startTransition(async () => {
-            const result = await loginAdmin(email, password)
-            if (result.success) {
-                router.push("/admin")
-                router.refresh()
-            } else {
-                setError(result.error || "Échec de la connexion.")
+            try {
+                const result = await loginAdmin(formData)
+                if (result?.error) {
+                    setError(result.error)
+                } else if (result?.success) {
+                    router.push("/admin")
+                }
+            } catch (error) {
+                // If it's a redirect, nextjs will handle it, but we can also force it
+                console.log("Caught potential redirect or error:", error);
+                router.push("/admin");
             }
         })
     }
@@ -33,7 +41,7 @@ export default function AdminLoginForm() {
                 </div>
             )}
             <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">
                     Email administratif
                 </label>
                 <div className="mt-1">
@@ -45,14 +53,14 @@ export default function AdminLoginForm() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300"
                         placeholder="admin@qapril.net"
                     />
                 </div>
             </div>
 
             <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">
                     Mot de passe
                 </label>
                 <div className="mt-1">
@@ -64,7 +72,7 @@ export default function AdminLoginForm() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300"
                         placeholder="••••••••"
                     />
                 </div>
@@ -74,9 +82,9 @@ export default function AdminLoginForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+                    className="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-black uppercase tracking-widest text-white bg-gray-900 hover:bg-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all active:scale-95 disabled:opacity-50"
                 >
-                    {isPending ? 'Authentification...' : 'Accéder à la console'}
+                    {isPending ? 'Vérification...' : 'Accéder à la console'}
                 </button>
             </div>
 
