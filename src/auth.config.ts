@@ -7,9 +7,10 @@ export const authConfig = {
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     trustHost: true,
+    secret: process.env.AUTH_SECRET,
     pages: {
         signIn: '/dashboard/login',
-        error: '/auth/error',
+        error: '/dashboard/login', // Redirect back to login on error for now
     },
     callbacks: {
         async jwt({ token, user }) {

@@ -7,6 +7,8 @@ import { redis } from "@/lib/redis"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    secret: process.env.AUTH_SECRET,
+    debug: process.env.NODE_ENV === "development",
     adapter: PrismaAdapter(prisma),
     providers: [
         Credentials({
@@ -71,36 +73,45 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                try {
+                    console.log("[AUTH] Admin authorize attempt:", credentials?.email);
+                    if (!credentials?.email || !credentials?.password) return null;
 
-                const email = credentials.email as string;
-                const password = credentials.password as string;
+                    const email = credentials.email as string;
+                    const password = credentials.password as string;
 
-                const user = await prisma.user.findFirst({
-                    where: { 
-                        email,
-                        role: { in: ['ADMIN', 'SUPER_ADMIN'] }
+                    const user = await prisma.user.findFirst({
+                        where: { 
+                            email,
+                            role: { in: ['ADMIN', 'SUPER_ADMIN'] }
+                        }
+                    });
+
+                    if (!user || !user.password) {
+                        console.warn("[AUTH] Admin user not found or no password:", email);
+                        throw new Error("Admin non trouvé ou mot de passe non configuré");
                     }
-                });
 
-                if (!user || !user.password) {
-                    throw new Error("Admin non trouvé ou mot de passe non configuré");
+                    const { compare } = await import("bcrypt-ts");
+                    const isValid = await compare(password, user.password);
+
+                    if (!isValid) {
+                        console.warn("[AUTH] Invalid password for admin:", email);
+                        throw new Error("Mot de passe incorrect");
+                    }
+
+                    console.log("[AUTH] Admin login success:", email);
+                    return {
+                        id: user.id,
+                        phone: user.phone,
+                        role: user.role,
+                        status: user.status,
+                        fullName: user.fullName
+                    };
+                } catch (error) {
+                    console.error("[AUTH] Error in admin-password authorize:", error);
+                    return null;
                 }
-
-                const { compare } = await import("bcrypt-ts");
-                const isValid = await compare(password, user.password);
-
-                if (!isValid) {
-                    throw new Error("Mot de passe incorrect");
-                }
-
-                return {
-                    id: user.id,
-                    phone: user.phone,
-                    role: user.role,
-                    status: user.status,
-                    fullName: user.fullName
-                };
             }
         })
     ],
