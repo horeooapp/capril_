@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import MobileMenu from "@/components/MobileMenu";
 import SectionHeading from "@/components/SectionHeading";
 import AppDepthCards from "@/components/AppDepthCards";
+import HeroSlider from "@/components/HeroSlider";
 
 export default async function Home() {
   const session = await auth();
@@ -66,22 +67,15 @@ export default async function Home() {
       <main>
         {/* --- HERO SECTION --- */}
         <section className="relative min-h-[90vh] flex items-center pt-24 pb-32 overflow-hidden">
-          {/* Background Layer */}
-          <div className="absolute inset-0 z-0">
-             <img 
-                src="/hero_abidjan.png" 
-                alt="Abidjan Modern Estate" 
-                className="w-full h-full object-cover grayscale-[20%] brightness-[85%]"
-             />
-             <div className="absolute inset-0 bg-gradient-to-tr from-white via-white/40 to-transparent"></div>
-          </div>
+          {/* Background Layer with Slider */}
+          <HeroSlider />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-2xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-in slide-in-from-left duration-700">
                 Infrastrastructure Nationale de Confiance
               </span>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 animate-in slide-in-from-bottom duration-700 delay-100">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 whitespace-nowrap animate-in slide-in-from-bottom duration-700 delay-100">
                 Le Registre <span className="text-primary italic">Locatif</span> National.
               </h1>
               <p className="text-xl text-gray-700 font-medium leading-relaxed mb-12 max-w-lg animate-in fade-in duration-1000 delay-300">
