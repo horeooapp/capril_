@@ -1,9 +1,8 @@
-@import "tailwindcss";
-
 @theme {
   --color-ivoire-orange: #FF8200;
   --color-ivoire-white: #FFFFFF;
   --color-ivoire-green: #009E60;
+  --color-ivoire-dark: #0F172A;
 
   --color-primary: var(--color-ivoire-orange);
   --color-secondary: var(--color-ivoire-green);
@@ -12,65 +11,80 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
   position: relative;
+}
+
+/* Premium Glassmorphism */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 130, 0, 0.2);
 }
 
 .bg-ivory-pattern {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: -1;
-  background-image: url('/assets/bg-qapril-immobilier.png');
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(255, 130, 0, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 158, 96, 0.05) 0px, transparent 50%),
+    url('/assets/bg-qapril-immobilier.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(10px) brightness(1.1);
-  opacity: 0.15;
+  filter: contrast(1.1);
+  opacity: 0.1;
   pointer-events: none;
 }
 
-.logo-shield {
-  user-select: none;
-  pointer-events: none;
-  -webkit-user-drag: none;
+/* Premium Typography labels */
+.label-tech {
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #64748B;
 }
 
-.logo-container {
-  position: relative;
-  display: inline-block;
-}
-
-.logo-container::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  background: transparent;
+/* Mesh Gradient Backgrounds */
+.bg-mesh {
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(158,100%,95%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(25,100%,95%,1) 0, transparent 50%);
 }
