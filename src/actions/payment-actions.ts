@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import crypto from "node:crypto"
+import { cinetpay } from "@/lib/cinetpay"
 
 export type PaymentOperator = 'orange' | 'mtn' | 'moov' | 'wave';
 
@@ -44,12 +45,40 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
                 operator: input.operator,
                 payerPhone: input.payerPhone,
                 status: 'PENDING',
-                metadata: { receiptId: input.receiptId } satisfies PaymentIntentMetadata
+                metadata: { receiptId: input.receiptId }
             }
         });
 
+        // 2. Initialize CinetPay Payment
+        const paymentResult = await cinetpay.initializePayment({
+            transaction_id: intent.id,
+            amount: input.amount,
+            currency: "XOF",
+            description: `Règlement Loyer - Contrat ${input.leaseId}`,
+            customer_name: session.user.name || "Locataire",
+            customer_surname: "QAPRIL",
+            customer_email: session.user.email || "client@qapril.ci",
+            customer_phone_number: input.payerPhone,
+            notify_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/cinetpay`,
+            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/payments/status?tid=${intent.id}`,
+            channels: "ALL" // Handles both MM and Cards via CinetPay
+        });
+
+        if (!paymentResult.success) {
+            await prisma.paymentIntent.update({
+                where: { id: intent.id },
+                data: { status: 'FAILED', metadata: { ...(intent.metadata as any), error: paymentResult.message } }
+            });
+            return { error: paymentResult.message };
+        }
+
         revalidatePath("/dashboard/payments");
-        return { success: true, intentId: intent.id, idempotencyKey };
+        return { 
+            success: true, 
+            intentId: intent.id, 
+            paymentUrl: paymentResult.payment_url,
+            paymentToken: paymentResult.payment_token
+        };
 
     } catch (error: unknown) {
         console.error("Erreur intent paiement:", error);

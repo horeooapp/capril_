@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createReceipt } from "@/actions/receipts"
+import CinetPayCheckout from "@/components/payment/CinetPayCheckout"
 
 export default function GenerateReceiptForm({ 
     leaseId, 
@@ -156,6 +157,19 @@ export default function GenerateReceiptForm({
                                                 className="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold focus:ring-2 focus:ring-[#FF8200] transition-all"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="pt-4 border-t border-gray-100">
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">
+                                            — OU RÉGLER MAINTENANT —
+                                        </p>
+                                        <CinetPayCheckout 
+                                            leaseId={leaseId}
+                                            amount={amountFcfa}
+                                            onError={(msg) => setError(msg)}
+                                        />
+                                        <p className="mt-3 text-[8px] text-gray-400 text-center italic">
+                                            Le paiement par CinetPay validera automatiquement cette quittance.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

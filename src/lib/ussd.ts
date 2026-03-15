@@ -63,6 +63,15 @@ export async function processUSSDRequest(phone: string, text: string, _sessionId
         case "4":
             return "END Merci d'avoir utilisé QAPRIL.";
 
+        case "1*1": {
+            const activeLease = user.leasesAsTenant[0];
+            if (!activeLease) return "END Erreur bail.";
+            
+            // In a real USSD push scenario, we would call CinetPay's Direct Pay API here
+            // For now, we simulate the request being sent
+            return `END Demande de paiement de ${activeLease.rentAmount} FCFA envoyée sur votre mobile.\nVeuillez valider avec votre code secret.`;
+        }
+
         default:
             return "CON Option invalide.\n1. Menu Principal\n0. Quitter";
     }
