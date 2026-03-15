@@ -161,12 +161,29 @@ jobs:
           npm ci --omit=dev
           npx prisma@6.4.1 generate
           
-          # Fix PM2 socket permissions if they are owned by root or another user
+          # 1. Kill potentially conflicting root instances (Part 3.1)
+          sudo HOME=/root pm2 stop all || true
+          sudo HOME=/root pm2 delete all || true
+          sudo HOME=/root pm2 kill || true
+          
+          # 2. Cleanup current user PM2 instances
+          pm2 stop capril || true
+          pm2 delete capril || true
+          pm2 kill || true
+          
+          # 3. Fix PM2 socket permissions
           sudo chown -R $USER:$USER ~/.pm2 || true
           
-          # Install PM2 in the runner's isolated Node environment
+          # 4. Install PM2 in the runner env
           npm install -g pm2
-          pm2 delete capril || true
+          
+          # 5. Check if AUTH_SECRET is set
+          if [ -z "${{ secrets.AUTH_SECRET }}" ]; then
+            echo "⚠️ WARNING: AUTH_SECRET is not set in GitHub Secrets! Authentication will fail."
+          fi
+          
+          # 6. Start the application
+          # Standardizing on port 3000, assuming Apache handles the proxy
           pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000
           pm2 save
 
