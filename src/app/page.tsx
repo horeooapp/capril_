@@ -81,9 +81,8 @@ export default async function Home() {
               <span className="inline-block px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-in slide-in-from-left duration-700">
                 Infrastrastructure Nationale de Confiance
               </span>
-              <h1 className="text-5xl md:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 animate-in slide-in-from-bottom duration-700 delay-100">
-                Le Registre <br />
-                <span className="text-primary italic">Locatif</span> National.
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 animate-in slide-in-from-bottom duration-700 delay-100">
+                Le Registre <span className="text-primary italic">Locatif</span> National.
               </h1>
               <p className="text-xl text-gray-700 font-medium leading-relaxed mb-12 max-w-lg animate-in fade-in duration-1000 delay-300">
                 QAPRIL normalise, sécurise et certifie chaque bail immobilier en Côte d&apos;Ivoire. Une solution d&apos;État pour une transparence totale entre propriétaires et locataires.
