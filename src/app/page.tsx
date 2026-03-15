@@ -75,7 +75,7 @@ export default async function Home() {
               <span className="inline-block px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-[0.3em] mb-6 animate-in slide-in-from-left duration-700">
                 Infrastrastructure Nationale de Confiance
               </span>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 whitespace-nowrap animate-in slide-in-from-bottom duration-700 delay-100">
+              <h1 className="text-3xl md:text-5xl lg:text-7xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 animate-in slide-in-from-bottom duration-700 delay-100">
                 Le Registre <span className="text-primary italic">Locatif</span> National.
               </h1>
               <p className="text-xl text-gray-700 font-medium leading-relaxed mb-12 max-w-lg animate-in fade-in duration-1000 delay-300">

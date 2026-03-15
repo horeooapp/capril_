@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 @theme {
   --color-ivoire-orange: #FF8200;
   --color-ivoire-white: #FFFFFF;
