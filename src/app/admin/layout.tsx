@@ -20,6 +20,7 @@ export default async function AdminLayout({
         { href: "/admin", label: "Vue Globale", icon: "🌍" },
         { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
         { href: "/admin/validation", label: "Validations Agences", icon: "🏢" },
+        { href: "/admin/audit", label: "Journal d'Audit", icon: "📜" },
     ];
 
     return (
@@ -51,7 +52,8 @@ export default async function AdminLayout({
                                 <div className="h-4 w-px bg-gray-700"></div>
                                 <Link href="/admin" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Vue Globale</Link>
                                 <Link href="/admin/users" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Utilisateurs</Link>
-                                <Link href="/admin/validation" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Validations Agences</Link>
+                                <Link href="/admin/validation" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Validations</Link>
+                                <Link href="/admin/audit" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
                             </nav>
 
                             <MobileMenu links={navLinks} session={session} variant="dark" />
@@ -59,7 +61,9 @@ export default async function AdminLayout({
                             <div className="hidden md:flex items-center space-x-4">
                                 {session?.user && (
                                     <>
-                                        <span className="text-sm text-gray-300 bg-gray-800 px-3 py-1 rounded-full">Administrateur</span>
+                                        <span className={`text-sm px-3 py-1 rounded-full ${session.user.role === 'SUPER_ADMIN' ? 'bg-indigo-600 text-white font-bold' : 'bg-gray-800 text-gray-300'}`}>
+                                            {session.user.role === 'SUPER_ADMIN' ? 'Super Administrateur' : 'Administrateur'}
+                                        </span>
                                         <form action={async () => {
                                             "use server"
                                             await signOut({ redirectTo: "/" })

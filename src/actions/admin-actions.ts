@@ -6,12 +6,22 @@ import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
 
 /**
- * Sécurité : Vérifie si l'utilisateur actuel est un administrateur
+ * Sécurité : Vérifie si l'utilisateur actuel est un administrateur (Simple ou Super)
  */
 async function ensureAdmin() {
     const session = await auth()
-    if (!session || session.user?.role !== Role.ADMIN) {
+    if (!session || (session.user?.role !== Role.ADMIN && session.user?.role !== Role.SUPER_ADMIN)) {
         throw new Error("Accès non autorisé : Droits administrateur requis.")
+    }
+}
+
+/**
+ * Sécurité : Vérifie si l'utilisateur actuel est un SUPER_ADMIN
+ */
+async function ensureSuperAdmin() {
+    const session = await auth()
+    if (!session || session.user?.role !== Role.SUPER_ADMIN) {
+        throw new Error("Accès non autorisé : Droits Super Administrateur requis.")
     }
 }
 
@@ -106,5 +116,71 @@ export async function deleteUser(userId: string) {
         return { success: true }
     } catch (error) {
         return { error: "Impossible de supprimer l'utilisateur." }
+    }
+}
+/**
+ * Promeut un utilisateur au rôle ADMIN (Super Admin seulement)
+ */
+export async function toggleAdminRole(userId: string) {
+    await ensureSuperAdmin()
+    
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) return { error: "Utilisateur non trouvé" }
+        
+        const newRole = user.role === Role.ADMIN ? Role.TENANT : Role.ADMIN
+        
+        await prisma.user.update({
+            where: { id: userId },
+            data: { role: newRole }
+        })
+        
+        revalidatePath("/admin/users")
+        return { success: true, newRole }
+    } catch (error) {
+        return { error: "Erreur lors du changement de rôle." }
+    }
+}
+
+/**
+ * Récupère les logs d'audit globaux
+ */
+export async function getGlobalAuditLogs() {
+    await ensureAdmin()
+    return await prisma.auditLog.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        include: {
+            user: {
+                select: { fullName: true, email: true }
+            }
+        }
+    })
+}
+
+/**
+ * Création d'un utilisateur par l'admin
+ */
+export async function createUserByAdmin(data: { phone: string, email: string, fullName: string, role: Role }) {
+    await ensureAdmin()
+    
+    try {
+        const existing = await prisma.user.findUnique({ where: { phone: data.phone } })
+        if (existing) return { error: "Un utilisateur avec ce numéro de téléphone existe déjà." }
+        
+        await prisma.user.create({
+            data: {
+                ...data,
+                status: 'active',
+                isCertified: true,
+                kycLevel: 4,
+                kycStatus: 'verified'
+            }
+        })
+        
+        revalidatePath("/admin/users")
+        return { success: true }
+    } catch (error) {
+        return { error: "Erreur lors de la création de l'utilisateur." }
     }
 }
