@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from "framer-motion"
-import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
 
@@ -35,10 +34,12 @@ const item = {
 
 export default function DashboardOverviewClient({ 
     user, 
-    properties 
+    properties,
+    regularizationAlert
 }: { 
     user: any, 
-    properties: DashboardProperty[] 
+    properties: any[],
+    regularizationAlert?: React.ReactNode
 }) {
     const totalProperties = properties.length
     const totalLeases = properties.reduce((acc: number, current: DashboardProperty) => acc + (current.leases?.length || 0), 0)
@@ -82,7 +83,7 @@ export default function DashboardOverviewClient({
                 {user && <ReliabilityBadge score={750} />}
             </div>
 
-            <RegularizationAlert />
+            {regularizationAlert}
 
             {/* Premium Stats Cards */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">

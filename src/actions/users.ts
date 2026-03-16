@@ -2,15 +2,18 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { serializeUser } from "@/lib/serialize"
 
 export async function getCurrentUser() {
     const session = await auth()
     const userId = session?.user?.id
     if (!userId) return null
 
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { id: userId }
     })
+    
+    return serializeUser(user)
 }
 
 export async function getUserTrustData() {

@@ -66,3 +66,15 @@ export const serializeReceipt = (receipt: RawReceipt | null) => {
         paidAt: receipt.paidAt instanceof Date ? receipt.paidAt.toISOString() : receipt.paidAt,
     }
 }
+
+/**
+ * Helper to serialize BigInt/Decimal for Users
+ */
+export const serializeUser = (user: any) => {
+    if (!user) return null
+    return {
+        ...user,
+        kycLevel: user.kycLevel ? Number(user.kycLevel) : 0,
+        // Ensure no other problematic fields
+    }
+}
