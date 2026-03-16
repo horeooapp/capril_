@@ -67,14 +67,14 @@ export default async function AdminDashboardOverview() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard 
                     title="Volume Fiscal (M17)" 
-                    value={`${(fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
+                    value={`${Number(fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
                     icon={Banknote} 
                     color="orange"
                     trend="+12%"
                 />
                 <StatCard 
                     title="Consignation CDC (M18)" 
-                    value={`${(cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
+                    value={`${Number(cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
                     icon={ShieldCheck} 
                     color="blue"
                 />
@@ -152,7 +152,7 @@ export default async function AdminDashboardOverview() {
                                     {recentAuditLogs.map((log: any) => (
                                         <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 font-mono text-[10px] text-gray-400">
-                                                {new Date(log.timestamp).toLocaleString('fr-FR')}
+                                                {new Date(log.createdAt).toLocaleString('fr-FR')}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="font-bold text-gray-900">{log.action.replace(/_/g, ' ')}</span>
