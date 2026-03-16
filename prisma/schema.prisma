@@ -87,6 +87,19 @@ enum DisputeStatus {
   CLOSED
 }
 
+enum FiscalStatus {
+  EN_ATTENTE_DECLARATION
+  NOTIFIE
+  EN_COURS_PAIEMENT
+  PAYE_CONFIRME
+  ENREGISTRE
+  ECHEC_PAIEMENT
+  PAIEMENT_PARTIEL
+  DECLARATION_EN_RETARD
+  IGNORE_PAR_BAILLEUR
+  RENOUVELE
+}
+
 // ═══════════════════════════════════════════════════════
 // USERS (Part 4 & 5)
 // ═══════════════════════════════════════════════════════
@@ -297,6 +310,7 @@ model Lease {
   repaymentPlans    RepaymentPlan[]
   mediation         Mediation?
   paymentIntents    PaymentIntent[]
+  fiscalDossiers    FiscalDossier[]
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -714,5 +728,59 @@ model NewsTicker {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("news_tickers")
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULE M17 — FISCAL REGISTRATION
+// ═══════════════════════════════════════════════════════
+model FiscalDossier {
+  id                  String       @id @default(uuid()) @map("fiscal_id")
+  leaseId             String       @map("bail_id")
+  lease               Lease        @relation(fields: [leaseId], references: [id])
+  
+  loyerMensuel        Int          @map("loyer_mensuel")
+  dureeBailMois       Int          @map("duree_bail_mois")
+  dureeRetenueMois    Int          @map("duree_retenue_mois")
+  baseCalcul          Int          @map("base_calcul")
+  tauxApplique        Decimal      @default(0.0250) @map("taux_applique") @db.Decimal(5, 4)
+  droitsEnregistrement Int          @map("droits_enregistrement")
+  fraisTimbre         Int          @default(1000) @map("frais_timbre")
+  fraisQapril         Int          @map("frais_qapril")
+  totalDgi            Int          @map("total_dgi")
+  totalBailleur       Int          @map("total_bailleur")
+  penaltyAmount       Int          @default(0) @map("penalty_amount")
+  exonere             Boolean      @default(false)
+
+  statut              FiscalStatus @default(EN_ATTENTE_DECLARATION)
+  dateLimiteLegale    DateTime     @map("date_limite_legale")
+  
+  cinetpayTransId     String?      @map("cinetpay_transaction_id")
+  cinetpayPaymentUrl  String?      @map("cinetpay_payment_url")
+  paidAt              DateTime?    @map("paid_at")
+
+  certificat          CertificatFiscal?
+
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+
+  @@map("fiscal_dossiers")
+  @@index([leaseId])
+  @@index([statut])
+}
+
+model CertificatFiscal {
+  id                String        @id @default(uuid()) @map("certificat_id")
+  fiscalId          String        @unique @map("fiscal_id")
+  fiscalDossier     FiscalDossier @relation(fields: [fiscalId], references: [id])
+  
+  numeroCertificat  String        @unique @map("numero_certificat")
+  qrToken           String        @unique @map("qr_token")
+  pdfPath           String        @map("pdf_path")
+  hashSha256        String        @map("hash_sha256")
+  
+  issuedAt          DateTime      @default(now()) @map("issued_at")
+  status            String        @default("VALIDE")
+
+  @@map("certificats_fiscaux")
 }
 

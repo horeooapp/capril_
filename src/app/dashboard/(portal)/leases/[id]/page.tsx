@@ -9,6 +9,8 @@ import MediationCenter from "@/components/dashboard/MediationCenter"
 import { auth } from "@/auth"
 
 import { LeaseStatus } from "@prisma/client"
+import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
+import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -39,6 +41,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
     const tLease = lease as unknown as Lease;
     const userId = session?.user?.id || ""
+
+    // Fetch Fiscal Dossier for M17
+    const fiscalRes = await getOrCreateFiscalDossier(leaseId)
+    const fiscalDossier = fiscalRes.success ? fiscalRes.data : null
 
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
@@ -193,6 +199,14 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                 {/* Sidebar Info */}
                 <div className="space-y-6">
+                    {/* Fiscal Registration Box (M17) */}
+                    {fiscalDossier && (
+                        <FiscalRegistrationBox 
+                            dossier={fiscalDossier as any} 
+                            leaseReference={tLease.leaseReference || "N/A"} 
+                        />
+                    )}
+
                     {/* Security Pack (Escrow/CDC) */}
                     <div className="bg-white shadow rounded-2xl p-6 border-t-4 border-primary border-x border-b border-gray-100">
                         <h2 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight">Pack Sécurité & Preuve</h2>
