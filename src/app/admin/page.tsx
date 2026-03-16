@@ -10,13 +10,13 @@ export default async function AdminDashboardOverview() {
     
     // 2. Stats v3.0 - Fiscalité (M17)
     const fiscalStats = await prisma.fiscalDossier.aggregate({
-        where: { status: "PAID" },
-        _sum: { totalFees: true }
+        where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] } },
+        _sum: { totalDgi: true }
     })
 
     // 3. Stats v3.0 - Cautions (M18)
     const cdcStats = await prisma.cDCDeposit.aggregate({
-        where: { status: "VALIDATED" },
+        where: { status: "CONSIGNED" },
         _sum: { amount: true }
     })
 
@@ -45,7 +45,7 @@ export default async function AdminDashboardOverview() {
     // 7. Audit Logs Récents
     const recentAuditLogs = await prisma.auditLog.findMany({
         take: 5,
-        orderBy: { timestamp: 'desc' },
+        orderBy: { createdAt: 'desc' },
         include: { user: { select: { fullName: true, role: true } } }
     })
 
@@ -67,14 +67,14 @@ export default async function AdminDashboardOverview() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard 
                     title="Volume Fiscal (M17)" 
-                    value={`${(fiscalStats._sum.totalFees || 0).toLocaleString()} FCFA`} 
+                    value={`${(fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
                     icon={Banknote} 
                     color="orange"
                     trend="+12%"
                 />
                 <StatCard 
                     title="Consignation CDC (M18)" 
-                    value={`${(cdcStats._sum.amount || 0).toLocaleString()} FCFA`} 
+                    value={`${(cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
                     icon={ShieldCheck} 
                     color="blue"
                 />
