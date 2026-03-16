@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { generatePropertyCode } from "@/lib/property"
 import { revalidatePath } from "next/cache"
-import { serializeLease } from "@/lib/serialize"
+import { serializeProperty } from "@/lib/serialize"
 
 /**
  * Part 5: List Owner Properties
@@ -27,11 +27,7 @@ export async function getProperties() {
         orderBy: { createdAt: 'desc' }
     })
 
-    return properties.map(p => ({
-        ...p,
-        declaredRentFcfa: p.declaredRentFcfa?.toString() || "0",
-        leases: p.leases.map(serializeLease)
-    }))
+    return properties.map(serializeProperty)
 }
 
 /**
@@ -98,10 +94,7 @@ export async function getPropertyById(id: string) {
 
     if (!property) return null
 
-    return {
-        ...property,
-        declaredRentFcfa: property.declaredRentFcfa?.toString() || "0"
-    }
+    return serializeProperty(property)
 }
 
 /**
@@ -126,17 +119,18 @@ export async function getPropertyPassport(id: string) {
     if (!property) return null
 
     // Transform for UI (Passport page expects specific names)
+    const serialized = serializeProperty(property);
     return {
-        ...property,
-        type: property.propertyType,
-        surface: property.areaSqm,
-        leases: property.leases.map(lease => ({
-            ...lease,
+        ...serialized,
+        type: (property as any).propertyType,
+        surface: (property as any).areaSqm ? Number((property as any).areaSqm) : null,
+        leases: (property.leases || []).map((lease: any) => ({
+            ...serializeLease(lease),
             tenant: lease.tenant ? {
                 name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
                 email: lease.tenant.email
             } : { name: "Inconnu", email: null },
-            incidents: lease.incidentLogs.map((inc: any) => ({
+            incidents: (lease.incidentLogs || []).map((inc: any) => ({
                 id: inc.id,
                 type: inc.type,
                 severity: inc.severity,

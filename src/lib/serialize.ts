@@ -1,8 +1,8 @@
 interface RawLease {
   id: string;
-  rentAmount: bigint | number;
-  depositAmount?: bigint | number | null;
-  chargesAmount?: bigint | number | null;
+  rentAmount: any;
+  depositAmount?: any;
+  chargesAmount?: any;
   tenant?: { id?: string; fullName: string | null; phone?: string; reliabilityScores?: any[] } | null;
   [key: string]: any;
 }
@@ -18,7 +18,22 @@ interface RawReceipt {
 }
 
 /**
- * Helper to serialize BigInt and relations for Leases
+ * Helper to serialize BigInt/Decimal and relations for Properties
+ */
+export const serializeProperty = (property: any) => {
+    if (!property) return null
+    return {
+        ...property,
+        areaSqm: property.areaSqm ? Number(property.areaSqm) : null,
+        declaredRentFcfa: property.declaredRentFcfa ? Number(property.declaredRentFcfa) : 0,
+        gpsLatitude: property.gpsLatitude ? Number(property.gpsLatitude) : null,
+        gpsLongitude: property.gpsLongitude ? Number(property.gpsLongitude) : null,
+        leases: (property.leases || []).map(serializeLease)
+    }
+}
+
+/**
+ * Helper to serialize BigInt/Decimal and relations for Leases
  */
 export const serializeLease = (lease: RawLease | null) => {
     if (!lease) return null
