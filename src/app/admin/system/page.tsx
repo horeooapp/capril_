@@ -58,15 +58,15 @@ export default function SystemPage() {
     const [loading, setLoading] = useState(true)
     const [updating, setUpdating] = useState<string | null>(null)
 
-    useEffect(() => {
-        loadFlags()
-    }, [])
-
     async function loadFlags() {
         const data = await getFeatureFlags()
         setFlags(data)
         setLoading(false)
     }
+
+    useEffect(() => {
+        loadFlags()
+    }, [])
 
     async function handleToggle(feature: AppFeature) {
         setUpdating(feature)

@@ -8,16 +8,16 @@ export default function AuditPage() {
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState({ module: "", action: "" })
 
-    useEffect(() => {
-        loadLogs()
-    }, [])
-
     async function loadLogs() {
         setLoading(true)
         const data = await getAuditLogs()
         setLogs(data)
         setLoading(false)
     }
+
+    useEffect(() => {
+        loadLogs()
+    }, [])
 
     const filteredLogs = logs.filter(log => {
         if (filter.module && log.module !== filter.module) return false
