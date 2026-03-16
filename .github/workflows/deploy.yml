@@ -158,6 +158,10 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
+          # 0. Fix permissions for npm and pm2 (Critical for self-hosted runners)
+          sudo chown -R $USER:$USER ~/.npm || true
+          sudo chown -R $USER:$USER ~/.pm2 || true
+
           npm ci --omit=dev
           npx prisma@6.4.1 generate
           
@@ -171,7 +175,7 @@ jobs:
           pm2 delete capril || true
           pm2 kill || true
           
-          # 3. Fix PM2 socket permissions
+          # 3. Fix PM2 socket permissions (Already covered above, but kept for clarity)
           sudo chown -R $USER:$USER ~/.pm2 || true
           
           # 4. Install PM2 in the runner env
