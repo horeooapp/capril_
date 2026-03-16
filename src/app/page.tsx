@@ -7,6 +7,8 @@ import SectionHeading from "@/components/SectionHeading";
 import AppDepthCards from "@/components/AppDepthCards";
 import HeroSlider from "@/components/HeroSlider";
 import { logout } from "@/actions/auth";
+import NewsTicker from "@/components/NewsTicker";
+import { getActiveNews } from "@/actions/news-actions";
 
 export default async function Home() {
   const session = await auth();
@@ -112,8 +114,11 @@ export default async function Home() {
     { href: "/contact", label: "Contact" },
   ];
 
+  const newsItems = await getActiveNews();
+
   return (
     <div className="bg-white min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
+      <NewsTicker items={newsItems} />
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">

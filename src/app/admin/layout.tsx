@@ -21,6 +21,7 @@ export default async function AdminLayout({
         { href: "/admin", label: "Vue Globale", icon: "🌍" },
         { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
         { href: "/admin/validation", label: "Validations Agences", icon: "🏢" },
+        { href: "/admin/news", label: "Actualités", icon: "📢" },
         { href: "/admin/audit", label: "Journal d'Audit", icon: "📜" },
     ];
 
@@ -54,6 +55,7 @@ export default async function AdminLayout({
                                 <Link href="/admin" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Vue Globale</Link>
                                 <Link href="/admin/users" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Utilisateurs</Link>
                                 <Link href="/admin/validation" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Validations</Link>
+                                <Link href="/admin/news" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Actualités</Link>
                                 <Link href="/admin/audit" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
                             </nav>
 

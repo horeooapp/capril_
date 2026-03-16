@@ -100,3 +100,16 @@ body {
 .animate-pulse-slow {
   animation: pulse-slow 20s infinite ease-in-out;
 }
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.33%); }
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}

@@ -705,3 +705,14 @@ model MediationMessage {
   @@map("mediation_messages")
 }
 
+model NewsTicker {
+  id        String   @id @default(uuid()) @map("news_id")
+  content   String   @db.Text
+  priority  Int      @default(0)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("news_tickers")
+}
+
