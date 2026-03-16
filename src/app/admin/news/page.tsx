@@ -10,16 +10,16 @@ export default function AdminNewsPage() {
     const [newContent, setNewContent] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        loadNews()
-    }, [])
-
     async function loadNews() {
         setLoading(true)
         const data = await getAllNews()
         setNews(data)
         setLoading(false)
     }
+
+    useEffect(() => {
+        loadNews()
+    }, [])
 
     async function handleAdd() {
         if (!newContent.trim()) return
