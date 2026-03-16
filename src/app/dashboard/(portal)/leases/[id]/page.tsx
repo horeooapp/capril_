@@ -11,6 +11,7 @@ import { auth } from "@/auth"
 import { LeaseStatus } from "@prisma/client"
 import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
 import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
+import { isFeatureEnabled } from "@/lib/features"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -42,8 +43,14 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     const tLease = lease as unknown as Lease;
     const userId = session?.user?.id || ""
 
-    // Fetch Fiscal Dossier for M17
-    const fiscalRes = await getOrCreateFiscalDossier(leaseId)
+    // Feature Flags Check
+    const showFiscal = await isFeatureEnabled("M17_FISCAL")
+    const showCdc = await isFeatureEnabled("CDC_CONSIGNATION")
+    const showInsurance = await isFeatureEnabled("ASSURANCE_LOYER")
+    const showMediation = await isFeatureEnabled("MEDIATION_CENTER")
+
+    // Fetch Fiscal Dossier for M17 if enabled
+    const fiscalRes = showFiscal ? await getOrCreateFiscalDossier(leaseId) : { success: false }
     const fiscalDossier = fiscalRes.success ? fiscalRes.data : null
 
     return (
@@ -188,13 +195,15 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     )}
 
                     {/* Mediation Section */}
-                    <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
-                        <MediationCenter 
-                            leaseId={tLease.id} 
-                            userId={userId} 
-                            initialMediation={tLease.mediation} 
-                        />
-                    </div>
+                    {showMediation && (
+                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
+                            <MediationCenter 
+                                leaseId={tLease.id} 
+                                userId={userId} 
+                                initialMediation={tLease.mediation} 
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Sidebar Info */}
@@ -208,53 +217,59 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     )}
 
                     {/* Security Pack (Escrow/CDC) */}
-                    <div className="bg-white shadow rounded-2xl p-6 border-t-4 border-primary border-x border-b border-gray-100">
-                        <h2 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight">Pack Sécurité & Preuve</h2>
+                    {(showCdc || showInsurance) && (
+                        <div className="bg-white shadow rounded-2xl p-6 border-t-4 border-primary border-x border-b border-gray-100">
+                            <h2 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight">Pack Sécurité & Preuve</h2>
 
-                        <div className="space-y-4">
-                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Caution Sécurisée</p>
-                                {tLease.cdcDeposits?.[0] ? (
-                                    <div className="mt-2 text-center py-2">
-                                        <p className="text-sm font-black text-green-700">✅ CONSIGNATION CDC</p>
-                                        <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {tLease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
-                                    </div>
-                                ) : (
-                                    <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center">
-                                        <p className="text-xs font-bold text-red-600 mb-1">Non sécurisé</p>
-                                        <p className="text-[10px] text-red-400 leading-tight">La caution est détenue hors système QAPRIL. Risque de litige élevé.</p>
+                            <div className="space-y-4">
+                                {showCdc && (
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Caution Sécurisée</p>
+                                        {tLease.cdcDeposits?.[0] ? (
+                                            <div className="mt-2 text-center py-2">
+                                                <p className="text-sm font-black text-green-700">✅ CONSIGNATION CDC</p>
+                                                <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {tLease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center">
+                                                <p className="text-xs font-bold text-red-600 mb-1">Non sécurisé</p>
+                                                <p className="text-[10px] text-red-400 leading-tight">La caution est détenue hors système QAPRIL. Risque de litige élevé.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
-                            </div>
 
-                            <div className={`p-5 rounded-2xl border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm'}`}>
-                                <div className="flex justify-between items-start mb-3">
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assurance Impayés</p>
-                                    {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
-                                        <span className="text-[10px] bg-green-600 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
-                                    ) : (
-                                        <span className="text-[10px] bg-gray-400 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ABSENTE</span>
-                                    )}
-                                </div>
-                                {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
-                                    <div className="mt-2">
-                                        <p className="text-md font-black text-gray-900 flex items-center">
-                                            <span className="mr-2">🛡️</span> {tLease.insurance.provider}
-                                        </p>
-                                        <p className="text-[10px] text-gray-500 mt-2 font-mono italic tracking-tight bg-white/50 px-2 py-1 rounded">Police N°: {tLease.insurance.policyNo}</p>
-                                    </div>
-                                ) : (
-                                    <div className="mt-2">
-                                        <p className="text-xs text-blue-900 font-bold leading-snug">Prenez l&apos;option Assurance QAPRIL pour protéger 100% de vos revenus.</p>
-                                        <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">
-                                            Activer la Protection
-                                        </button>
-                                        <p className="text-[9px] text-blue-400 text-center mt-3 font-medium uppercase tracking-tighter">Partenariat Strategique RCI</p>
+                                {showInsurance && (
+                                    <div className={`p-5 rounded-2xl border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm'}`}>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assurance Impayés</p>
+                                            {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
+                                                <span className="text-[10px] bg-green-600 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
+                                            ) : (
+                                                <span className="text-[10px] bg-gray-400 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ABSENTE</span>
+                                            )}
+                                        </div>
+                                        {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
+                                            <div className="mt-2">
+                                                <p className="text-md font-black text-gray-900 flex items-center">
+                                                    <span className="mr-2">🛡️</span> {tLease.insurance.provider}
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 mt-2 font-mono italic tracking-tight bg-white/50 px-2 py-1 rounded">Police N°: {tLease.insurance.policyNo}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-2">
+                                                <p className="text-xs text-blue-900 font-bold leading-snug">Prenez l&apos;option Assurance QAPRIL pour protéger 100% de vos revenus.</p>
+                                                <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">
+                                                    Activer la Protection
+                                                </button>
+                                                <p className="text-[9px] text-blue-400 text-center mt-3 font-medium uppercase tracking-tighter">Partenariat Strategique RCI</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Procedure Actions Sidebar */}
                     <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 shadow-red-100/50">

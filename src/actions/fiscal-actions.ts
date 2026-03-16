@@ -1,15 +1,18 @@
-"use strict"
+"use server"
 
 import { prisma } from "@/lib/prisma"
 import { calculateFiscalDroits } from "@/lib/fiscal"
 import { revalidatePath } from "next/cache"
 import { generateQRToken } from "@/lib/financial-utils"
-import crypto from "node:crypto"
+import crypto from "crypto"
+import { logAction } from "./audit"
+import { ensureFeatureEnabled } from "@/lib/features"
 
 /**
  * Récupère ou crée un dossier fiscal pour un bail donné
  */
 export async function getOrCreateFiscalDossier(leaseId: string) {
+    await ensureFeatureEnabled("M17_FISCAL")
     try {
         const lease = await prisma.lease.findUnique({
             where: { id: leaseId },
@@ -77,6 +80,7 @@ export async function getOrCreateFiscalDossier(leaseId: string) {
  * Dans une version réelle, on appellerait l'API CinetPay ici.
  */
 export async function initiateFiscalPayment(dossierId: string) {
+    await ensureFeatureEnabled("M17_FISCAL")
     try {
         const dossier = await prisma.fiscalDossier.findUnique({
             where: { id: dossierId },
@@ -96,6 +100,13 @@ export async function initiateFiscalPayment(dossierId: string) {
                 cinetpayTransId: transId,
                 cinetpayPaymentUrl: paymentUrl
             }
+        })
+
+        await logAction({
+            action: "INITIATE_FISCAL_PAYMENT",
+            module: "M17_FISCAL",
+            entityId: dossierId,
+            newValues: { transId, paymentUrl }
         })
 
         revalidatePath(`/dashboard/leases/${dossier.leaseId}`)
@@ -128,6 +139,7 @@ async function generateCENRef() {
  * Crée le certificat fiscal numérique (CEN)
  */
 export async function generateFiscalCert(fiscalId: string) {
+    await ensureFeatureEnabled("M17_FISCAL")
     try {
         const dossier = await prisma.fiscalDossier.findUnique({
             where: { id: fiscalId },
@@ -164,6 +176,13 @@ export async function generateFiscalCert(fiscalId: string) {
             data: { statut: "ENREGISTRE" }
         })
 
+        await logAction({
+            action: "GENERATE_FISCAL_CERT",
+            module: "M17_FISCAL",
+            entityId: cert.id,
+            newValues: { numeroCertificat: cert.numeroCertificat }
+        })
+
         revalidatePath(`/dashboard/leases/${dossier.leaseId}`)
         return { success: true, data: cert }
     } catch (error) {
@@ -176,7 +195,13 @@ export async function generateFiscalCert(fiscalId: string) {
  * M16/M17: Dashboard Stats pour la DGI
  */
 export async function getFiscalStats() {
+    await ensureFeatureEnabled("M17_FISCAL")
     try {
+        await logAction({
+            action: "ACCESS_DGI_STATS",
+            module: "M16_ANAH",
+            entityId: "DGI_DASHBOARD"
+        })
         const totalDossiers = await prisma.fiscalDossier.count()
         const registeredCount = await prisma.fiscalDossier.count({ where: { statut: "ENREGISTRE" } })
         

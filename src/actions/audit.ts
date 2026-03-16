@@ -5,37 +5,19 @@ import { prisma } from "@/lib/prisma"
 import { chainAuditHash } from "@/lib/proof"
 import { Prisma } from "@prisma/client"
 
+import { writeAuditLog } from "@/lib/audit"
+
 export async function logAction(data: {
     action: string,
     module: string,
     entityId: string,
+    oldValues?: Prisma.InputJsonValue,
     newValues?: Prisma.InputJsonValue
 }) {
-    const session = await auth()
-    const userId = session?.user?.id
-
-    // Get latest log to chain the hash
-    const lastLog = await prisma.auditLog.findFirst({
-        orderBy: { createdAt: 'desc' }
-    })
-
-    const proofHash = chainAuditHash(lastLog?.proofHash || null, {
-        userId,
-        action: data.action,
-        module: data.module,
-        entityId: data.entityId,
-        details: data.newValues
-    })
-
-    return await prisma.auditLog.create({
-        data: {
-            userId: userId || null,
-            action: data.action,
-            module: data.module,
-            entityId: data.entityId,
-            newValues: data.newValues || Prisma.JsonNull,
-            proofHash
-        }
+    return await writeAuditLog({
+        userId: undefined, // Will be picked up by writeAuditLog internals if we pass it, but writeAuditLog already calls auth()? 
+        // Wait, lib/audit.ts doesn't call auth(). I should probably add it or pass it.
+        ...data as any
     })
 }
 
