@@ -12,11 +12,25 @@ import { getActiveNews } from "@/actions/news-actions";
 
 export default async function Home() {
   const session = await auth();
+  const dbNews = await getActiveNews();
+  
+  // Fallback news if DB is empty
+  const fallbackNews = [
+    { id: "f1", content: "BIENVENUE SUR QAPRIL : PORTAIL NATIONAL DE NORMALISATION DU MARCHÉ LOCATIF." },
+    { id: "f2", content: "DIGITALISATION : TOUTES LES CAUTIONS IMMOBILIÈRES DOIVENT ÊTRE DÉPOSÉES À LA CDC-CI." },
+    { id: "f3", content: "INNOVATION : LE REGISTRE LOCATIF NATIONAL SÉCURISE VOS TRANSACTIONS IMMOBILIÈRES." }
+  ];
+
+  const newsItems = dbNews.length > 0 ? dbNews : fallbackNews;
+
+  // Unified Mobile/Desktop News Ticker (Always at the very top)
+  const ticker = <NewsTicker items={newsItems} />;
 
   // --- UNAUTHENTICATED: PREMIUM LOCK PORTAL ---
   if (!session?.user) {
     return (
       <div className="relative min-h-screen bg-black overflow-hidden flex flex-col font-sans">
+        {ticker}
         {/* Premium Background Image with Overlay */}
         <div className="absolute inset-0 z-0 text-white">
           <img 
@@ -114,12 +128,12 @@ export default async function Home() {
     { href: "/contact", label: "Contact" },
   ];
 
-  const newsItems = await getActiveNews();
-
   return (
     <div className="bg-white min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
-      <NewsTicker items={newsItems} />
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+      <div className="sticky top-0 z-[60]">
+        {ticker}
+      </div>
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-[41px] z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-3 group">

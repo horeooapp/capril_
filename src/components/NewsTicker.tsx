@@ -19,7 +19,7 @@ export default function NewsTicker({ items }: NewsTickerProps) {
     const duplicatedItems = [...items, ...items, ...items]
 
     return (
-        <div className="relative w-full overflow-hidden bg-gray-900 border-b border-white/5 py-2.5 z-50">
+        <div className="relative w-full overflow-hidden bg-gray-900 border-b border-white/5 py-2.5 z-[60]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
                 {/* Fixed Label */}
                 <div className="flex-shrink-0 flex items-center bg-primary px-3 py-1 rounded-lg mr-6 relative overflow-hidden group">

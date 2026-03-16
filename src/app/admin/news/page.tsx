@@ -28,6 +28,8 @@ export default function AdminNewsPage() {
         if (res.success) {
             setNewContent("")
             await loadNews()
+        } else {
+            alert(res.error || "Une erreur est survenue lors de l'ajout.")
         }
         setIsSubmitting(false)
     }
