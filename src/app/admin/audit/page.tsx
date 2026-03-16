@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { getAuditLogs } from "@/actions/audit"
-import { format } from "date-fns"
-import { fr } from "date-fns/locale"
 
 export default function AuditPage() {
     const [logs, setLogs] = useState<any[]>([])
@@ -98,7 +96,14 @@ export default function AuditPage() {
                             ) : filteredLogs.map((log) => (
                                 <tr key={log.id} className="hover:bg-gray-800/30 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
-                                        {format(new Date(log.createdAt), "dd/MM/yyyy HH:mm:ss", { locale: fr })}
+                                        {new Intl.DateTimeFormat('fr-FR', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit'
+                                        }).format(new Date(log.createdAt))}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 py-1 rounded-md text-xs font-bold border ${

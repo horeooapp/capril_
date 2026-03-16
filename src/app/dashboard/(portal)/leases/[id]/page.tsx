@@ -50,8 +50,8 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     const showMediation = await isFeatureEnabled("MEDIATION_CENTER")
 
     // Fetch Fiscal Dossier for M17 if enabled
-    const fiscalRes = showFiscal ? await getOrCreateFiscalDossier(leaseId) : { success: false }
-    const fiscalDossier = fiscalRes.success ? fiscalRes.data : null
+    const fiscalRes = showFiscal ? await getOrCreateFiscalDossier(leaseId) : { success: false, data: null }
+    const fiscalDossier = fiscalRes.success ? (fiscalRes as any).data : null
 
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
