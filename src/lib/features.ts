@@ -12,6 +12,7 @@ export type AppFeature =
     | "SMS_NOTIFICATIONS"
     | "USSD_PORTAL"
     | "NEWS_TICKER"
+    | "LANDING_PAGE"
 
 /**
  * Checks if a feature is enabled in the system config.

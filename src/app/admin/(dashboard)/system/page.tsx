@@ -51,6 +51,11 @@ const FEATURES: { key: AppFeature; label: string; description: string }[] = [
         label: "Espace Actualités", 
         description: "Affichage des flash infos et alertes sur le portail." 
     },
+    { 
+        key: "LANDING_PAGE", 
+        label: "Page d'Accueil Marketing", 
+        description: "Active ou désactive la Landing Page marketing pour les utilisateurs connectés." 
+    },
 ]
 
 export default function SystemPage() {

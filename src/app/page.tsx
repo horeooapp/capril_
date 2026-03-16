@@ -9,6 +9,8 @@ import HeroSlider from "@/components/HeroSlider";
 import { logout } from "@/actions/auth";
 import NewsTicker from "@/components/NewsTicker";
 import { getActiveNews } from "@/actions/news-actions";
+import { isFeatureEnabled } from "@/lib/features";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
@@ -117,6 +119,16 @@ export default async function Home() {
         </footer>
       </div>
     );
+  }
+
+  // --- AUTHENTICATED: LANDING PAGE CHECK ---
+  const isLandingPageEnabled = await isFeatureEnabled("LANDING_PAGE");
+  
+  if (session?.user && !isLandingPageEnabled) {
+    const dashboardPath = (session.user.role === 'SUPER_ADMIN' || session.user.role === 'ADMIN') 
+      ? "/admin" 
+      : "/dashboard";
+    redirect(dashboardPath);
   }
 
   // --- AUTHENTICATED: FULL PREMIUM HOMEPAGE ---
