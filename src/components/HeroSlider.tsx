@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 
 const images = [
-    "/hero_abidjan_modern_district_1773609699145.png",
-    "/hero_ivory_coast_home_interior_1773609718319.png",
-    "/hero_abidjan_skyline_dusk_1773609749211.png",
-    "/hero_family_moving_new_home_1773609766414.png",
-    "/hero_abidjan_night_lights_1773609789756.png"
+    "/images/hero_abidjan_modern_district_1773609699145.png",
+    "/images/hero_ivory_coast_home_interior_1773609718319.png",
+    "/images/hero_abidjan_skyline_dusk_1773609749211.png",
+    "/images/hero_family_moving_new_home_1773609766414.png",
+    "/images/hero_abidjan_night_lights_1773609789756.png"
 ]
 
 export default function HeroSlider() {

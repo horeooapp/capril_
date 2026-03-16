@@ -76,17 +76,23 @@ export default async function Home() {
               <p className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed mb-16 max-w-2xl mx-auto animate-in fade-in duration-1000 delay-500">
                 La plateforme institutionnelle de normalisation et de certification des baux immobiliers en Côte d&apos;Ivoire. Sécurisation intégrale des transactions et du patrimoine.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto animate-in fade-in delay-700">
-                  <Link href="/admin/login" className="group relative overflow-hidden px-10 py-7 bg-white rounded-3xl transition-all hover:scale-[1.02] shadow-2xl active:scale-95 text-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto animate-in fade-in delay-700">
+                  <Link href="/admin/login" className="group relative overflow-hidden px-8 py-7 bg-white rounded-3xl transition-all hover:scale-[1.02] shadow-2xl active:scale-95 text-center">
                     <div className="flex flex-col items-center">
                         <span className="font-black uppercase tracking-[0.2em] text-black text-sm mb-1">Accès Administrateur</span>
                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Portail de Contrôle DGI</span>
                     </div>
                   </Link>
-                  <Link href="/dashboard/login" className="group relative overflow-hidden px-10 py-7 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-95 text-center">
+                  <Link href="/dashboard/login" className="group relative overflow-hidden px-8 py-7 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-95 text-center">
                     <div className="flex flex-col items-center">
-                        <span className="font-black uppercase tracking-[0.2em] text-white text-sm mb-1">Espace Propriétaire</span>
+                        <span className="font-black uppercase tracking-[0.2em] text-white text-sm mb-1">Propriétaire / Agence</span>
                         <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Digitalisation Patrimoine</span>
+                    </div>
+                  </Link>
+                  <Link href="/locataire/login" className="group relative overflow-hidden px-8 py-7 bg-primary rounded-3xl transition-all hover:bg-orange-600 hover:scale-[1.02] shadow-2xl active:scale-95 text-center">
+                    <div className="flex flex-col items-center">
+                        <span className="font-black uppercase tracking-[0.2em] text-white text-sm mb-1">Connexion Locataire</span>
+                        <span className="text-[9px] font-bold text-white/60 uppercase tracking-widest">Accès Certificat de Bail</span>
                     </div>
                   </Link>
               </div>
@@ -131,10 +137,10 @@ export default async function Home() {
               <div className="h-4 w-px bg-gray-200"></div>
               
               <Link
-                href={isAdmin ? "/admin" : "/dashboard"}
+                href={session?.user ? (isAdmin ? "/admin" : "/dashboard") : "/dashboard/login"}
                 className={`px-6 py-2.5 ${isAdmin ? 'bg-primary' : 'bg-gray-900'} text-white text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-orange-600 transition-all shadow-xl active:scale-95`}
               >
-                {isAdmin ? "Panel Administrateur" : "Tableau de Bord"}
+                {session?.user ? (isAdmin ? "Panel Administrateur" : "Tableau de Bord") : "Connexion"}
               </Link>
             </nav>
 

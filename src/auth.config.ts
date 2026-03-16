@@ -38,6 +38,10 @@ export const authConfig = {
             // --- 1. WHITELIST OF PUBLIC PATHS (ALWAYS ALLOWED) ---
             const publicPaths = [
                 "/", 
+                "/impact",
+                "/expertise",
+                "/a-propos",
+                "/faq",
                 "/admin/login", 
                 "/dashboard/login", 
                 "/locataire/login",
