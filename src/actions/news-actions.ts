@@ -33,9 +33,9 @@ export async function createNews(content: string, priority: number = 0) {
         })
         revalidatePath("/")
         return { success: true, data: news }
-    } catch (error) {
+    } catch (error: any) {
         console.error("[ACTION] createNews error:", error)
-        return { error: "Erreur lors de la création de l'information." }
+        return { error: `Erreur: ${error.message || "Inconnue"}` }
     }
 }
 
