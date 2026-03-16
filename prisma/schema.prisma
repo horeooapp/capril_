@@ -201,6 +201,7 @@ model IdentityDocument {
   verifiedByUserId String?  @map("verified_by")
   verifier        User?     @relation("DocumentVerifier", fields: [verifiedByUserId], references: [id])
   rejectionReason String?   @map("rejection_reason")
+  metadata        Json?      @default("{}")
 
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")

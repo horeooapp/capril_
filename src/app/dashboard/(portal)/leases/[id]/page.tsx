@@ -12,6 +12,9 @@ import { LeaseStatus } from "@prisma/client"
 import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
 import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
 import { isFeatureEnabled } from "@/lib/features"
+import { getLeaseProceduralState } from "@/lib/arrears-engine"
+import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
+import CDCRestitutionBox from "@/components/CDCRestitutionBox"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -53,9 +56,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     const fiscalRes = showFiscal ? await getOrCreateFiscalDossier(leaseId) : { success: false, data: null }
     const fiscalDossier = fiscalRes.success ? (fiscalRes as any).data : null
 
+    // Fetch Procedural State for Arrears
+    const proceduralState = await getLeaseProceduralState(leaseId)
+
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
-            <div className="flex items-center justify-between">
+            {/* Hybrid Automation: Arrears Procedural Action */}
+            {proceduralState.active && (
+                <ArrearsProceduralBox leaseId={leaseId} proceduralState={proceduralState} />
+            )}
+
+            <div className="flex justify-between items-center bg-white shadow-sm p-4 rounded-xl border border-gray-100">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Détails du Bail</h1>
                     <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {tLease.leaseReference}</p>
@@ -104,7 +115,12 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                     <ReliabilityBadge score={tLease.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
                             </div>
-                            <div className="space-y-2">
+                            {/* Property Details Column */}
+                        <div className="space-y-6">
+                            {/* Hybrid Automation: CDC Restitution */}
+                            {tLease.cdcDeposits?.[0] && (tLease.status === "TERMINATED" || tLease.status === "ACTIVE") && (
+                                <CDCRestitutionBox leaseId={leaseId} deposit={tLease.cdcDeposits[0]} />
+                            )}
                                 <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Logement</h3>
                                 <p className="text-lg font-bold">{tLease.property.name || tLease.property.address}</p>
                                 <p className="text-sm text-gray-600">{tLease.property.commune}</p>

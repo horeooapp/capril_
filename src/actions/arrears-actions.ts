@@ -65,3 +65,59 @@ export async function resetLeaseProcedure(leaseId: string) {
         return { error: "Échec de la réinitialisation." };
     }
 }
+
+/**
+ * Part 11.5: Landlord-initiated Procedural Phase (Hybrid Automation)
+ */
+export async function initiateProceduralPhase(leaseId: string, phaseName: string) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error("Authentification requise.");
+    }
+
+    try {
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            select: { id: true, landlordId: true, status: true }
+        });
+
+        if (!lease) throw new Error("Bail introuvable.");
+
+        // Verification: Only owner (or Admin) can trigger
+        const isOwner = session.user.id === lease.landlordId;
+        const isAdmin = session.user.role === Role.ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new Error("Seul le propriétaire peut valider cette action.");
+        }
+
+        // Verify state is eligible for this phase
+        const state = await getLeaseProceduralState(leaseId);
+        if (!state.active) throw new Error("Aucun impayé actif pour ce bail.");
+
+        // Execute transition
+        await transitionArrearsPhase(leaseId, phaseName);
+
+        // Update lease status if it's a critical phase
+        if (phaseName === "PHASE_2_FORMAL") {
+            await prisma.lease.update({
+                where: { id: leaseId },
+                data: { status: "MISE_EN_DEMEURE" }
+            });
+        }
+
+        await logAction({
+            action: "INITIALIZE_RECOVERY_PHASE",
+            module: "RECOVERY",
+            entityId: leaseId,
+            newValues: { phase: phaseName, triggeredBy: session.user.id }
+        });
+
+        revalidatePath(`/dashboard/leases/${leaseId}`);
+        return { success: true };
+
+    } catch (error: unknown) {
+        console.error("Erreur initiation phase:", error);
+        const message = error instanceof Error ? error.message : "Erreur inconnue";
+        return { error: message };
+    }
+}
