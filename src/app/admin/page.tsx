@@ -110,10 +110,10 @@ export default async function AdminDashboardOverview() {
                                 <div key={doc.id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
-                                            {doc.user.fullName?.charAt(0)}
+                                            {doc.user?.fullName?.charAt(0) || "?"}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm text-gray-900">{doc.user.fullName}</p>
+                                            <p className="font-bold text-sm text-gray-900">{doc.user?.fullName || "Inconnu"}</p>
                                             <p className="text-xs text-gray-500">Document: {doc.docType} • Flag AI</p>
                                         </div>
                                     </div>
@@ -155,7 +155,7 @@ export default async function AdminDashboardOverview() {
                                                 {new Date(log.createdAt).toLocaleString('fr-FR')}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="font-bold text-gray-900">{log.action.replace(/_/g, ' ')}</span>
+                                                <span className="font-bold text-gray-900">{(log.action || "ACTION_INCONNUE").replace(/_/g, ' ')}</span>
                                             </td>
                                             <td className="px-6 py-4 text-gray-500">
                                                 {log.user?.fullName || "Système"}

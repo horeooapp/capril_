@@ -78,3 +78,15 @@ export const serializeUser = (user: any) => {
         // Ensure no other problematic fields
     }
 }
+
+/**
+ * Safe stringify that handles BigInt
+ */
+export const safeStringify = (obj: any) => {
+    return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'bigint') {
+            return value.toString();
+        }
+        return value;
+    }, 2);
+}

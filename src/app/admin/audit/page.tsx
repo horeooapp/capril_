@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { getAuditLogs } from "@/actions/audit"
+import { safeStringify } from "@/lib/serialize"
 
 export default function AuditPage() {
     const [logs, setLogs] = useState<any[]>([])
@@ -21,7 +22,7 @@ export default function AuditPage() {
 
     const filteredLogs = logs.filter(log => {
         if (filter.module && log.module !== filter.module) return false
-        if (filter.action && !log.action.includes(filter.action)) return false
+        if (filter.action && !(log.action || "").includes(filter.action)) return false
         return true
     })
 
@@ -122,7 +123,7 @@ export default function AuditPage() {
                                         <div className="text-xs text-gray-500">{log.user?.email || "internal@qapril.com"}</div>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-400 max-w-xs truncate">
-                                        {log.newValues ? JSON.stringify(log.newValues) : "-"}
+                                        {log.newValues ? safeStringify(log.newValues) : "-"}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-mono">
                                         <div>{log.ipAddress}</div>

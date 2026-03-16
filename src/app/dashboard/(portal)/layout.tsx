@@ -17,7 +17,7 @@ export default async function DashboardLayout({
         redirect("/locataire")
     }
 
-    if (session.user.role === "ADMIN") {
+    if (session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN") {
         redirect("/admin")
     }
 
