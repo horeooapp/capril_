@@ -157,39 +157,25 @@ jobs:
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          cd $DEPLOY_DEST
+          
           # 0. Fix permissions for npm and pm2 (Critical for self-hosted runners)
           sudo chown -R $USER:$USER ~/.npm || true
           sudo chown -R $USER:$USER ~/.pm2 || true
 
-          npm ci --omit=dev
-          npx prisma@6.4.1 generate
-          
-          # 1. Kill potentially conflicting root instances (Part 3.1)
-          sudo HOME=/root pm2 stop all || true
-          sudo HOME=/root pm2 delete all || true
+          # 1. Cleanup root instances if any (Part 3.1)
           sudo HOME=/root pm2 kill || true
           
-          # 2. Cleanup current user PM2 instances
-          pm2 stop capril || true
-          pm2 delete capril || true
-          pm2 kill || true
-          
-          # 3. Fix PM2 socket permissions (Already covered above, but kept for clarity)
-          sudo chown -R $USER:$USER ~/.pm2 || true
-          
-          # 4. Install PM2 in the runner env
-          npm install -g pm2
-          
-          # 5. Check if AUTH_SECRET is set
-          if [ -z "${{ secrets.AUTH_SECRET }}" ]; then
-            echo "⚠️ WARNING: AUTH_SECRET is not set in GitHub Secrets! Authentication will fail."
-          fi
-          
-          # 6. Start the application
-          # Standardizing on port 3000, assuming Apache handles the proxy
-          pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000
-          pm2 save
+          # 2. Secure Deployment Execution
+          # We use su - github -c to ensure all commands run in a clean environment as the github user.
+          # We use -H 0.0.0.0 to listen on all interfaces, allowing external access.
+          sudo su - github -c "
+            cd $DEPLOY_DEST && \
+            npm ci --omit=dev && \
+            npx prisma@6.4.1 generate && \
+            (pm2 reload capril --update-env || \
+             pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000 -H 0.0.0.0) && \
+            pm2 save
+          "
 
       - name: 🩺 Health Check
         run: |
