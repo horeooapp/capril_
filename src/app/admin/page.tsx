@@ -1,87 +1,128 @@
 import { prisma } from "@/lib/prisma"
-import { AlertCircle, ArrowUpRight, Banknote, ShieldCheck, Scale, History, UserCheck, FileText } from "lucide-react"
+import { AlertCircle, ArrowUpRight, Banknote, ShieldCheck, Scale, History, UserCheck, FileText, Sparkles, Database } from "lucide-react"
 import Link from "next/link"
+import { getDemoMode } from "@/actions/demo-actions"
+import { getDemoData } from "@/lib/demo-data"
+import DemoToggle from "@/components/admin/DemoToggle"
 
 export default async function AdminDashboardOverview() {
+    const isDemoMode = await getDemoMode()
+    
     try {
-        // 1. Stats de Base
-        const [totalUsers, totalProperties, totalLeases] = await Promise.all([
-            prisma.user.count(),
-            prisma.property.count(),
-            prisma.lease.count()
-        ])
-        
-        // 2. Stats v3.0 - Fiscalité (M17)
-        const fiscalStats = await prisma.fiscalDossier.aggregate({
-            where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] } },
-            _sum: { totalDgi: true }
-        })
+        let data: any;
 
-        // 3. Stats v3.0 - Cautions (M18)
-        const cdcStats = await prisma.cDCDeposit.aggregate({
-            where: { status: "CONSIGNED" },
-            _sum: { amount: true }
-        })
+        if (isDemoMode) {
+            data = getDemoData()
+        } else {
+            // 1. Stats de Base
+            const [totalUsers, totalProperties, totalLeases] = await Promise.all([
+                prisma.user.count(),
+                prisma.property.count(),
+                prisma.lease.count()
+            ])
+            
+            // 2. Stats v3.0 - Fiscalité (M17)
+            const fiscalStats = await prisma.fiscalDossier.aggregate({
+                where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] } },
+                _sum: { totalDgi: true }
+            })
 
-        // 4. Stats v3.0 - Contentieux (M19)
-        const activeMediations = await prisma.mediation.count({
-            where: { status: "OPEN" }
-        })
+            // 3. Stats v3.0 - Cautions (M18)
+            const cdcStats = await prisma.cDCDeposit.aggregate({
+                where: { status: "CONSIGNED" },
+                _sum: { amount: true }
+            })
 
-        // 5. Stats v3.0 - KYC (M21)
-        const kycAutoValidated = await prisma.identityDocument.count({
-            where: { status: "verified", verifiedByUserId: "SYSTEM_AI" }
-        })
-        const totalKycDocs = await prisma.identityDocument.count({
-            where: { status: "verified" }
-        })
-        const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
+            // 4. Stats v3.0 - Contentieux (M19)
+            const activeMediations = await prisma.mediation.count({
+                where: { status: "OPEN" }
+            })
 
-        // 6. Alertes & Anomalies (M21 flags)
-        const documentsUnderReview = await prisma.identityDocument.findMany({
-            where: { status: "under_review" },
-            select: {
-                id: true,
-                docType: true,
-                status: true,
-                createdAt: true,
-                user: {
-                    select: {
-                        fullName: true
+            // 5. Stats v3.0 - KYC (M21)
+            const kycAutoValidated = await prisma.identityDocument.count({
+                where: { status: "verified", verifiedByUserId: "SYSTEM_AI" }
+            })
+            const totalKycDocs = await prisma.identityDocument.count({
+                where: { status: "verified" }
+            })
+            const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
+
+            // 6. Alertes & Anomalies (M21 flags)
+            const documentsUnderReview = await prisma.identityDocument.findMany({
+                where: { status: "under_review" },
+                select: {
+                    id: true,
+                    docType: true,
+                    status: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            fullName: true
+                        }
                     }
-                }
-            },
-            take: 3,
-            orderBy: { createdAt: 'desc' }
-        })
+                },
+                take: 3,
+                orderBy: { createdAt: 'desc' }
+            })
 
-        // 7. Audit Logs Récents
-        const recentAuditLogs = await prisma.auditLog.findMany({
-            select: {
-                id: true,
-                action: true,
-                module: true,
-                createdAt: true,
-                user: {
-                    select: {
-                        fullName: true,
-                        role: true
+            // 7. Audit Logs Récents
+            const recentAuditLogs = await prisma.auditLog.findMany({
+                select: {
+                    id: true,
+                    action: true,
+                    module: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            fullName: true,
+                            role: true
+                        }
                     }
-                }
-            },
-            take: 5,
-            orderBy: { createdAt: 'desc' }
-        })
+                },
+                take: 5,
+                orderBy: { createdAt: 'desc' }
+            })
+
+            data = {
+                totalUsers, totalProperties, totalLeases,
+                fiscalStats, cdcStats, activeMediations,
+                kycAutoRate, documentsUnderReview, recentAuditLogs
+            }
+        }
 
         return (
             <div className="space-y-8 pb-12">
+                {/* Banner Mode Démo */}
+                {isDemoMode && (
+                    <div className="bg-orange-600/10 border border-orange-200 p-4 rounded-[2rem] flex items-center justify-between mb-8 shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
+                                <Sparkles size={24} className="animate-pulse" />
+                            </div>
+                            <div>
+                                <h2 className="text-orange-900 font-black uppercase text-sm tracking-widest leading-none mb-1">Showcase Investisseurs Actif</h2>
+                                <p className="text-orange-700/70 text-[10px] font-bold">L&apos;application affiche actuellement des données de simulation certifiées QAPRIL.</p>
+                            </div>
+                        </div>
+                        <div className="hidden md:block">
+                            <span className="bg-white px-4 py-2 rounded-xl text-[10px] font-black text-orange-600 border border-orange-100 uppercase tracking-tighter shadow-sm">
+                                Environnement Isolé [DEMO]
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">QAPRIL Command Center <span className="text-orange-500 font-mono text-xl">v3.0</span></h1>
-                        <p className="text-gray-500 mt-1">Supervision nationale des flux immobiliers et fiscaux sécurisés.</p>
+                        <div className="flex items-center gap-3 mb-1">
+                            <h1 className="text-4xl font-black text-gray-900 tracking-tight">QAPRIL Command Center</h1>
+                            <span className="bg-gray-900 text-white px-2 py-0.5 rounded text-xs font-mono">v3.0</span>
+                        </div>
+                        <p className="text-gray-500">Supervision nationale des flux immobiliers et fiscaux sécurisés.</p>
                     </div>
-                    <div className="flex gap-2">
-                        <div className="bg-green-500/10 text-green-700 px-4 py-2 rounded-full text-xs font-bold border border-green-500/20 flex items-center gap-2">
+                    <div className="flex items-center gap-4">
+                        <DemoToggle initialEnabled={isDemoMode} />
+                        <div className="bg-green-500/10 text-green-700 px-4 py-3 rounded-2xl text-xs font-bold border border-green-500/10 hidden sm:flex items-center gap-2">
                             <ShieldCheck size={14} /> Réseau Sécurisé
                         </div>
                     </div>
@@ -91,26 +132,26 @@ export default async function AdminDashboardOverview() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard 
                         title="Volume Fiscal (M17)" 
-                        value={`${Number(fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
+                        value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
                         icon={Banknote} 
                         color="orange"
-                        trend="+12%"
+                        trend={isDemoMode ? "SIM_DGI" : "+12%"}
                     />
                     <StatCard 
                         title="Consignation CDC (M18)" 
-                        value={`${Number(cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
+                        value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
                         icon={ShieldCheck} 
                         color="blue"
                     />
                     <StatCard 
                         title="Médiations Actives (M19)" 
-                        value={(activeMediations || 0).toString()} 
+                        value={(data.activeMediations || 0).toString()} 
                         icon={Scale} 
                         color="red"
                     />
                     <StatCard 
                         title="Auto-KYC IA (M21)" 
-                        value={`${kycAutoRate}%`} 
+                        value={`${data.kycAutoRate}%`} 
                         icon={UserCheck} 
                         color="purple"
                         trend="Efficience"
@@ -130,7 +171,7 @@ export default async function AdminDashboardOverview() {
                                 <Link href="/admin/validation" className="text-xs text-orange-600 font-bold hover:underline">Voir tout</Link>
                             </div>
                             <div className="divide-y divide-gray-100">
-                                {(documentsUnderReview || []).length > 0 ? documentsUnderReview.map((doc: any) => (
+                                {(data.documentsUnderReview || []).length > 0 ? data.documentsUnderReview.map((doc: any) => (
                                     <div key={doc.id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
@@ -141,9 +182,12 @@ export default async function AdminDashboardOverview() {
                                                 <p className="text-xs text-gray-500">Document: {doc.docType} • Flag AI</p>
                                             </div>
                                         </div>
-                                        <Link href={`/admin/validation`} className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
-                                            <ArrowUpRight size={18} className="text-gray-400" />
-                                        </Link>
+                                        <div className="flex items-center gap-2">
+                                            {isDemoMode && <span className="bg-orange-100 text-orange-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Demo</span>}
+                                            <Link href={`/admin/validation`} className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+                                                <ArrowUpRight size={18} className="text-gray-400" />
+                                            </Link>
+                                        </div>
                                     </div>
                                 )) : (
                                     <div className="p-12 text-center text-gray-400 text-sm italic">
@@ -173,13 +217,16 @@ export default async function AdminDashboardOverview() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {(recentAuditLogs || []).map((log: any) => (
+                                        {(data.recentAuditLogs || []).map((log: any) => (
                                             <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4 font-mono text-[10px] text-gray-400">
                                                     {log.createdAt ? new Date(log.createdAt).toLocaleString('fr-FR') : "-"}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="font-bold text-gray-900">{(log.action || "ACTION_INCONNUE").replace(/_/g, ' ')}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-gray-900">{(log.action || "ACTION_INCONNUE").replace(/_/g, ' ')}</span>
+                                                        {isDemoMode && <span className="text-[8px] bg-orange-100 text-orange-600 px-1 rounded font-black italic">DEMO</span>}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-500">
                                                     {log.user?.fullName || "Système"}
@@ -214,11 +261,11 @@ export default async function AdminDashboardOverview() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
                                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Users</p>
-                                <p className="text-2xl font-black text-gray-900">{totalUsers || 0}</p>
+                                <p className="text-2xl font-black text-gray-900">{data.totalUsers || 0}</p>
                             </div>
                             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
                                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Properties</p>
-                                <p className="text-2xl font-black text-gray-900">{totalProperties || 0}</p>
+                                <p className="text-2xl font-black text-gray-900">{data.totalProperties || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -233,18 +280,21 @@ export default async function AdminDashboardOverview() {
                     <AlertCircle size={32} />
                 </div>
                 <h2 className="text-2xl font-black text-gray-900 mb-2">Erreur de Supervision</h2>
-                <div className="bg-white/80 p-6 rounded-[2rem] border border-red-200 mb-8 max-w-2xl w-full shadow-inner">
-                    <p className="text-red-900 font-mono text-[10px] text-left whitespace-pre-wrap leading-relaxed">
+                <div className="bg-white/80 p-6 rounded-[2rem] border border-red-200 mb-8 max-w-2xl w-full shadow-inner text-[10px]">
+                    <p className="text-red-900 font-mono text-left whitespace-pre-wrap leading-relaxed">
                         <span className="font-black text-red-600 uppercase block mb-1">Diagnostic Technique :</span>
                         {error?.message || String(error)}
                     </p>
                 </div>
-                <p className="text-gray-500 text-[10px] max-w-md mb-8 italic">
-                    Note: Une fois l'erreur identifiée et corrigée, cette zone technique sera masquée.
-                </p>
-                <Link href="/admin" className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl">
-                    Tenter de rafraîchir
-                </Link>
+                <div className="flex flex-col items-center gap-4">
+                    <p className="text-gray-500 text-[10px] italic">Accrocs détectés côté base de données.</p>
+                     <div className="flex gap-4">
+                        <DemoToggle initialEnabled={isDemoMode} />
+                        <Link href="/admin" className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl">
+                            Rafraîchir
+                        </Link>
+                     </div>
+                </div>
             </div>
         )
     }

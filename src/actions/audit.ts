@@ -7,6 +7,9 @@ import { Prisma } from "@prisma/client"
 
 import { writeAuditLog } from "@/lib/audit"
 
+import { getDemoMode } from "@/actions/demo-actions"
+import { getDemoData } from "@/lib/demo-data"
+
 export async function logAction(data: {
     action: string,
     module: string,
@@ -26,6 +29,10 @@ export async function getAuditLogs(filters?: {
     module?: string,
     entityId?: string
 }) {
+    if (await getDemoMode()) {
+        return getDemoData().recentAuditLogs
+    }
+
     // Simple check: only admins or auditors can see all logs
     // Users might see their own logs (implementation detail for later)
 

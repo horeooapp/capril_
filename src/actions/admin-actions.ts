@@ -4,6 +4,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
+import { getDemoMode } from "@/actions/demo-actions"
+import { getDemoData } from "@/lib/demo-data"
 
 /**
  * Sécurité : Vérifie si l'utilisateur actuel est un administrateur (Simple ou Super)
@@ -30,6 +32,11 @@ async function ensureSuperAdmin() {
  */
 export async function getAllUsers() {
     await ensureAdmin()
+    
+    if (await getDemoMode()) {
+        return getDemoData().users
+    }
+    
     return await prisma.user.findMany({
         orderBy: { createdAt: 'desc' },
         select: {
@@ -51,6 +58,11 @@ export async function getAllUsers() {
  */
 export async function getPendingValidations() {
     await ensureAdmin()
+    
+    if (await getDemoMode()) {
+        return getDemoData().pendingValidations
+    }
+    
     return await prisma.user.findMany({
         where: {
             OR: [
