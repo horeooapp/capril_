@@ -35,33 +35,46 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const pathname = nextUrl.pathname;
 
-            // --- PUBLIC ROUTES (No Auth Required) ---
-            const isRoot = pathname === "/";
-            const isLoginPath = pathname.endsWith("/login");
-            const isPublicLegal = pathname === "/cgu" || pathname === "/confidentialite" || pathname === "/contact";
+            // --- 1. WHITELIST OF PUBLIC PATHS (ALWAYS ALLOWED) ---
+            const publicPaths = [
+                "/", 
+                "/admin/login", 
+                "/dashboard/login", 
+                "/locataire/login",
+                "/cgu", 
+                "/confidentialite", 
+                "/contact",
+                "/verify-request"
+            ];
+            
+            const isPublicPath = publicPaths.includes(pathname);
             const isApiPublic = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/public");
 
-            if (isRoot || isLoginPath || isPublicLegal || isApiPublic) {
+            if (isPublicPath || isApiPublic) {
                 return true;
             }
 
-            // --- PRIVATE ROUTES ---
+            // --- 2. PRIVATE ROUTES HANDLING ---
             if (isLoggedIn) {
-                // Potential role-based redirects could stay here
                 return true;
             } else {
-                // Redirect to specialized login or landing page
+                // Not logged in: Redirect to appropriate landing page
+                // IMPORTANT: Ensure we don't redirect if already on a login page (safety double-check)
+                if (pathname === "/admin/login") return true;
+                
                 if (pathname.startsWith("/admin")) {
                     return Response.redirect(new URL("/admin/login", nextUrl));
                 }
+                
                 if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
                     return Response.redirect(new URL("/dashboard/login", nextUrl));
                 }
+                
                 if (pathname.startsWith("/locataire")) {
                     return Response.redirect(new URL("/locataire/login", nextUrl));
                 }
                 
-                // For everything else (other pages), redirect to the premium landing page (lock)
+                // Fallback for any other protected page: portal home
                 return Response.redirect(new URL("/", nextUrl));
             }
         },
