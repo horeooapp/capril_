@@ -1,124 +1,230 @@
 import { prisma } from "@/lib/prisma"
+import { AlertCircle, ArrowUpRight, Banknote, ShieldCheck, Scale, History, UserCheck, FileText } from "lucide-react"
+import Link from "next/link"
 
 export default async function AdminDashboardOverview() {
-    // Agrégation des statistiques nationales
+    // 1. Stats de Base
     const totalUsers = await prisma.user.count()
     const totalProperties = await prisma.property.count()
     const totalLeases = await prisma.lease.count()
-    const totalReceipts = await prisma.receipt.count()
+    
+    // 2. Stats v3.0 - Fiscalité (M17)
+    const fiscalStats = await prisma.fiscalDossier.aggregate({
+        where: { status: "PAID" },
+        _sum: { totalFees: true }
+    })
 
-    const recentReceipts = await prisma.receipt.findMany({
+    // 3. Stats v3.0 - Cautions (M18)
+    const cdcStats = await prisma.cDCDeposit.aggregate({
+        where: { status: "VALIDATED" },
+        _sum: { amount: true }
+    })
+
+    // 4. Stats v3.0 - Contentieux (M19)
+    const activeMediations = await prisma.mediation.count({
+        where: { status: "OPEN" }
+    })
+
+    // 5. Stats v3.0 - KYC (M21)
+    const kycAutoValidated = await prisma.identityDocument.count({
+        where: { status: "verified", verifiedByUserId: "SYSTEM_AI" }
+    })
+    const totalKycDocs = await prisma.identityDocument.count({
+        where: { status: "verified" }
+    })
+    const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
+
+    // 6. Alertes & Anomalies (M21 flags)
+    const documentsUnderReview = await prisma.identityDocument.findMany({
+        where: { status: "under_review" },
+        include: { user: { select: { fullName: true } } },
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+    })
+
+    // 7. Audit Logs Récents
+    const recentAuditLogs = await prisma.auditLog.findMany({
         take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: {
-            lease: {
-                include: {
-                    property: { select: { address: true, city: true } }
-                }
-            }
-        }
+        orderBy: { timestamp: 'desc' },
+        include: { user: { select: { fullName: true, role: true } } }
     })
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-gray-900">Observatoire National du Logement</h1>
-                <div className="bg-white border rounded-md px-3 py-1 shadow-sm text-sm text-gray-500">
-                    Mise à jour: Aujourd&apos;hui
+        <div className="space-y-8 pb-12">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">QAPRIL Command Center <span className="text-orange-500 font-mono text-xl">v3.0</span></h1>
+                    <p className="text-gray-500 mt-1">Supervision nationale des flux immobiliers et fiscaux sécurisés.</p>
                 </div>
+                <div className="flex gap-2">
+                    <div className="bg-green-500/10 text-green-700 px-4 py-2 rounded-full text-xs font-bold border border-green-500/20 flex items-center gap-2">
+                        <ShieldCheck size={14} /> Réseau Sécurisé
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard 
+                    title="Volume Fiscal (M17)" 
+                    value={`${(fiscalStats._sum.totalFees || 0).toLocaleString()} FCFA`} 
+                    icon={Banknote} 
+                    color="orange"
+                    trend="+12%"
+                />
+                <StatCard 
+                    title="Consignation CDC (M18)" 
+                    value={`${(cdcStats._sum.amount || 0).toLocaleString()} FCFA`} 
+                    icon={ShieldCheck} 
+                    color="blue"
+                />
+                <StatCard 
+                    title="Médiations Actives (M19)" 
+                    value={activeMediations.toString()} 
+                    icon={Scale} 
+                    color="red"
+                />
+                <StatCard 
+                    title="Auto-KYC IA (M21)" 
+                    value={`${kycAutoRate}%`} 
+                    icon={UserCheck} 
+                    color="purple"
+                    trend="Efficience"
+                />
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="bg-white overflow-hidden shadow-sm border border-gray-100 rounded-lg">
-                    <div className="px-4 py-5 sm:p-6 flex items-center">
-                        <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Alerts & Systems */}
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Critical Alerts KYC */}
+                    <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                <AlertCircle className="text-red-500" size={18} />
+                                Anomalies & Vérifications requises
+                            </h3>
+                            <Link href="/admin/validation" className="text-xs text-orange-600 font-bold hover:underline">Voir tout</Link>
                         </div>
-                        <div>
-                            <dt className="text-sm font-medium text-gray-500 truncate">Utilisateurs Inscrits</dt>
-                            <dd className="mt-1 text-2xl font-semibold text-gray-900">{totalUsers}</dd>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow-sm border border-gray-100 rounded-lg">
-                    <div className="px-4 py-5 sm:p-6 flex items-center">
-                        <div className="p-3 rounded-full bg-orange-100 text-primary mr-4">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        </div>
-                        <div>
-                            <dt className="text-sm font-medium text-gray-500 truncate">Logements Déclarés</dt>
-                            <dd className="mt-1 text-2xl font-semibold text-gray-900">{totalProperties}</dd>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow-sm border border-gray-100 rounded-lg">
-                    <div className="px-4 py-5 sm:p-6 flex items-center">
-                        <div className="p-3 rounded-full bg-green-100 text-secondary mr-4">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        </div>
-                        <div>
-                            <dt className="text-sm font-medium text-gray-500 truncate">Baux Locatifs Actifs</dt>
-                            <dd className="mt-1 text-2xl font-semibold text-gray-900">{totalLeases}</dd>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white overflow-hidden shadow-sm border border-gray-100 rounded-lg">
-                    <div className="px-4 py-5 sm:p-6 flex items-center">
-                        <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                        </div>
-                        <div>
-                            <dt className="text-sm font-medium text-gray-500 truncate">Quittances Émises</dt>
-                            <dd className="mt-1 text-2xl font-semibold text-gray-900">{totalReceipts}</dd>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                {/* Alert / Validation Section */}
-                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-                    <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Demandes de validation Agence</h3>
-                    </div>
-                    <div className="p-6 text-center text-gray-500">
-                        Aucune demande de validation en attente.
-                    </div>
-                </div>
-
-                {/* Audit Logs Section */}
-                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-                    <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Journal d&apos;Audit - Dernières Éditions</h3>
-                        <span className="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">Securisé</span>
-                    </div>
-                    <ul className="divide-y divide-gray-200">
-                        {recentReceipts.map((r: any) => (
-                            <li key={r.id} className="p-4 hover:bg-gray-50 text-sm flex justify-between">
-                                <div>
-                                    <p className="font-medium text-gray-900">{r.receiptNumber}</p>
-                                    <p className="text-gray-500 text-xs mt-1">
-                                        {r.lease?.property?.city || "N/A"} - {r.lease?.property?.address || "N/A"}
-                                    </p>
+                        <div className="divide-y divide-gray-100">
+                            {documentsUnderReview.length > 0 ? documentsUnderReview.map((doc: any) => (
+                                <div key={doc.id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                                            {doc.user.fullName?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-gray-900">{doc.user.fullName}</p>
+                                            <p className="text-xs text-gray-500">Document: {doc.docType} • Flag AI</p>
+                                        </div>
+                                    </div>
+                                    <Link href={`/admin/validation`} className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+                                        <ArrowUpRight size={18} className="text-gray-400" />
+                                    </Link>
                                 </div>
-                                <div className="text-right">
-                                    <p className="font-semibold text-primary">{Number(r.amountPaid).toLocaleString()} FCFA</p>
-                                    <p className="text-gray-400 text-xs mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
+                            )) : (
+                                <div className="p-12 text-center text-gray-400 text-sm italic">
+                                    Aucune anomalie détectée par le moteur IA.
                                 </div>
-                            </li>
-                        ))}
-                        {recentReceipts.length === 0 && (
-                            <li className="p-6 text-center text-gray-500 text-sm">
-                                Aucun flux audité recemment.
-                            </li>
-                        )}
-                    </ul>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* Audit Trail */}
+                    <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                <History className="text-blue-500" size={18} />
+                                Journal d&apos;Audit Sécurisé
+                            </h3>
+                            <Link href="/admin/audit" className="text-xs text-blue-600 font-bold hover:underline">Accéder au Log</Link>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-gray-50 text-[10px] uppercase font-black text-gray-400 tracking-widest">
+                                    <tr>
+                                        <th className="px-6 py-3">Timestamp</th>
+                                        <th className="px-6 py-3">Action</th>
+                                        <th className="px-6 py-3">Utilisateur</th>
+                                        <th className="px-6 py-3 text-right">Module</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {recentAuditLogs.map((log: any) => (
+                                        <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
+                                            <td className="px-6 py-4 font-mono text-[10px] text-gray-400">
+                                                {new Date(log.timestamp).toLocaleString('fr-FR')}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="font-bold text-gray-900">{log.action.replace(/_/g, ' ')}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-gray-500">
+                                                {log.user?.fullName || "Système"}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold">
+                                                    {log.module}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                {/* Right Column: Key Links & Snapshots */}
+                <div className="space-y-8">
+                    <section className="bg-gray-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group">
+                         <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                            <FileText size={160} />
+                         </div>
+                         <h4 className="text-orange-400 font-bold text-xs uppercase tracking-widest mb-4">Moteur Fiscal (M17)</h4>
+                         <p className="text-xl font-bold mb-6">Générer le rapport consolidé DGI</p>
+                         <Link href="/admin/fiscal" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
+                            <span>Ouvrir l&apos;interface</span>
+                            <ArrowUpRight size={18} />
+                         </Link>
+                    </section>
+
+                    <div className="grid grid-cols-2 gap-4">
+                         <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Users</p>
+                            <p className="text-2xl font-black text-gray-900">{totalUsers}</p>
+                         </div>
+                         <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Properties</p>
+                            <p className="text-2xl font-black text-gray-900">{totalProperties}</p>
+                         </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    )
+}
 
+function StatCard({ title, value, icon: Icon, color, trend }: any) {
+    const colors: any = {
+        orange: "bg-orange-500/10 text-orange-600",
+        blue: "bg-blue-500/10 text-blue-600",
+        red: "bg-red-500/10 text-red-600",
+        purple: "bg-purple-500/10 text-purple-600"
+    }
+
+    return (
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+            <div className={`w-12 h-12 rounded-2xl ${colors[color]} flex items-center justify-center mb-4`}>
+                <Icon size={24} />
+            </div>
+            <div className="space-y-1">
+                <p className="text-xs font-bold text-gray-500 tracking-tight uppercase">{title}</p>
+                <h3 className="text-2xl font-black text-gray-900">{value}</h3>
+            </div>
+            {trend && (
+                <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-1 text-[10px] font-black text-green-600 uppercase">
+                    <ArrowUpRight size={12} /> {trend}
+                </div>
+            )}
         </div>
     )
 }
