@@ -26,7 +26,7 @@ export default function ImpactPage() {
         <section className="relative py-32 overflow-hidden bg-gray-900">
           <div className="absolute inset-0 z-0">
             <img 
-              src="/impact_vision.png" 
+              src="/images/impact_vision.png" 
               alt="QAPRIL Impact Vision" 
               className="w-full h-full object-cover opacity-40 grayscale-[30%]"
             />

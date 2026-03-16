@@ -167,18 +167,18 @@ export default function MobileMenu({
                         ) : (
                             <div className="space-y-3">
                                 <Link 
-                                    href="/locataire/login"
+                                    href="/dashboard/login"
                                     onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-white border border-gray-100 text-gray-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all"
+                                    className="block w-full text-center bg-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
                                 >
-                                    Accès Locataire
+                                    Accès Propriétaire
                                 </Link>
                                 <Link 
-                                    href="/dashboard/login"
+                                    href="/locataire/login"
                                     onClick={() => setIsOpen(false)}
                                     className="block w-full text-center bg-primary text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
                                 >
-                                    Accès Propriétaire
+                                    Accès Locataire
                                 </Link>
                             </div>
                         )}

@@ -53,20 +53,20 @@ export default function AppDepthCards() {
             <DepthCard 
                 title="Passeport Numérique du Bâti (PNB)"
                 description="Plus qu'un mur, une mémoire. Chaque logement sur QAPRIL possède son propre ADN numérique. Un historique certifié des incidents, travaux et améliorations qui suit le bien à vie, valorisant le patrimoine et rassurant les occupants."
-                image="/passport_visual.png"
+                image="/images/passport_visual.png"
                 link="/impact"
             />
             <DepthCard 
                 title="Audit & Transparence Publique"
                 description="La fin de la fraude documentaire. Chaque quittance ou certificat généré sur la plateforme est authentifié par une signature numérique unique. Un simple scan QR permet à quiconque de vérifier l'exactitude des faits en temps réel."
-                image="/qr_visual.png"
+                image="/images/qr_visual.png"
                 link="/impact"
                 reverse
             />
             <DepthCard 
                 title="Protection des Revenus"
                 description="La sécurité institutionnelle au service de l'immobilier. En partenariat avec la Caisse des Dépôts et Consignations, nous automalisons la sécurisation des dépôts de garantie, protégeant les intérêts financiers des deux parties."
-                image="/cdc_visual.png"
+                image="/images/cdc_visual.png"
                 link="/impact"
             />
         </div>

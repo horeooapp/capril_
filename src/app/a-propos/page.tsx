@@ -25,7 +25,7 @@ export default function AboutPage() {
         <section className="relative py-32 overflow-hidden bg-gray-900">
           <div className="absolute inset-0 z-0">
             <img 
-              src="/about_visual.png" 
+              src="/images/about_visual.png" 
               alt="QAPRIL Institutionnel" 
               className="w-full h-full object-cover opacity-30 grayscale-[20%]"
             />

@@ -136,12 +136,29 @@ export default async function Home() {
               ))}
               <div className="h-4 w-px bg-gray-200"></div>
               
-              <Link
-                href={session?.user ? (isAdmin ? "/admin" : "/dashboard") : "/dashboard/login"}
-                className={`px-6 py-2.5 ${isAdmin ? 'bg-primary' : 'bg-gray-900'} text-white text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-orange-600 transition-all shadow-xl active:scale-95`}
-              >
-                {session?.user ? (isAdmin ? "Panel Administrateur" : "Tableau de Bord") : "Connexion"}
-              </Link>
+              {session?.user ? (
+                <Link
+                  href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")}
+                  className={`px-6 py-2.5 ${isAdmin ? 'bg-primary' : 'bg-gray-900'} text-white text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-orange-600 transition-all shadow-xl active:scale-95`}
+                >
+                  {isAdmin ? "Panel Administrateur" : (session.user.role === 'TENANT' ? "Espace Locataire" : "Tableau de Bord")}
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/dashboard/login"
+                    className="px-6 py-2.5 bg-gray-900 text-white text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-gray-800 transition-all shadow-xl active:scale-95"
+                  >
+                    Propriétaire
+                  </Link>
+                  <Link
+                    href="/locataire/login"
+                    className="px-6 py-2.5 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-full hover:bg-orange-600 transition-all shadow-xl active:scale-95"
+                  >
+                    Locataire
+                  </Link>
+                </>
+              )}
             </nav>
 
             <div className="xl:hidden">

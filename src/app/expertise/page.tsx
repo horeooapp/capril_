@@ -26,7 +26,7 @@ export default function ExpertisePage() {
         <section className="relative py-32 overflow-hidden bg-gray-900">
           <div className="absolute inset-0 z-0">
             <img 
-              src="/expertise_visual.png" 
+              src="/images/expertise_visual.png" 
               alt="QAPRIL Expertise" 
               className="w-full h-full object-cover opacity-40"
             />
