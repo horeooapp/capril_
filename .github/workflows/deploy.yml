@@ -102,7 +102,7 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           sudo mkdir -p $DEPLOY_DEST
-          sudo chown -R $USER:$USER $DEPLOY_DEST
+          sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
           # Sync the full Next.js project to the destination
           # Use flags to ignore owner/group/perms from the build env
