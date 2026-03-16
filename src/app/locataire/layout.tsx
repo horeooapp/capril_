@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import MobileMenu from "@/components/MobileMenu"
+import { logout } from "@/actions/auth"
 
 export default async function LocataireLayout({
     children,
@@ -57,7 +58,7 @@ export default async function LocataireLayout({
                                 </Link>
                             </nav>
 
-                            <MobileMenu links={navLinks} session={session} variant="light" />
+                            <MobileMenu links={navLinks} session={session} variant="light" onLogout={logout} />
 
                             <div className="hidden md:flex items-center space-x-4">
                                 <NotificationCenter />

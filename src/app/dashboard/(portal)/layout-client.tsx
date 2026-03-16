@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
+import MobileMenu from "@/components/MobileMenu"
 import { signOut } from "next-auth/react"
 
 export default function DashboardLayoutClient({
@@ -77,6 +78,15 @@ export default function DashboardLayoutClient({
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <div className="flex xl:hidden">
+                            <MobileMenu 
+                                links={navLinks} 
+                                session={session} 
+                                variant="light" 
+                                onLogout={() => signOut({ callbackUrl: "/" })} 
+                            />
+                        </div>
+
                         <div className="hidden md:flex items-center gap-4 pr-6 border-r border-gray-100">
                             <NotificationCenter />
                             {session?.user && (
@@ -89,7 +99,7 @@ export default function DashboardLayoutClient({
                         
                         <button 
                             onClick={() => signOut({ callbackUrl: "/" })}
-                            className="p-3 bg-gray-900 text-white rounded-2xl hover:bg-orange-600 transition-all shadow-lg shadow-gray-200 active:scale-95 group"
+                            className="hidden md:flex p-3 bg-gray-900 text-white rounded-2xl hover:bg-orange-600 transition-all shadow-lg shadow-gray-200 active:scale-95 group"
                             title="Déconnexion"
                         >
                             <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

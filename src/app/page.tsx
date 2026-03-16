@@ -6,6 +6,7 @@ import MobileMenu from "@/components/MobileMenu";
 import SectionHeading from "@/components/SectionHeading";
 import AppDepthCards from "@/components/AppDepthCards";
 import HeroSlider from "@/components/HeroSlider";
+import { logout } from "@/actions/auth";
 
 export default async function Home() {
   const session = await auth();
@@ -138,7 +139,7 @@ export default async function Home() {
             </nav>
 
             <div className="xl:hidden">
-              <MobileMenu links={navLinks} session={session} variant="light" />
+              <MobileMenu links={navLinks} session={session} variant="light" onLogout={logout} />
             </div>
           </div>
         </div>

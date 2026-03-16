@@ -3,6 +3,7 @@ import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import MobileMenu from "@/components/MobileMenu"
+import { logout } from "@/actions/auth"
 
 export default async function AdminLayout({
     children,
@@ -56,7 +57,7 @@ export default async function AdminLayout({
                                 <Link href="/admin/audit" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Audit</Link>
                             </nav>
 
-                            <MobileMenu links={navLinks} session={session} variant="dark" />
+                            <MobileMenu links={navLinks} session={session} variant="dark" onLogout={logout} />
 
                             <div className="hidden md:flex items-center space-x-4">
                                 {session?.user && (
