@@ -40,16 +40,37 @@ export default async function AdminDashboardOverview() {
         // 6. Alertes & Anomalies (M21 flags)
         const documentsUnderReview = await prisma.identityDocument.findMany({
             where: { status: "under_review" },
-            include: { user: { select: { fullName: true } } },
+            select: {
+                id: true,
+                docType: true,
+                status: true,
+                createdAt: true,
+                user: {
+                    select: {
+                        fullName: true
+                    }
+                }
+            },
             take: 3,
             orderBy: { createdAt: 'desc' }
         })
 
         // 7. Audit Logs Récents
         const recentAuditLogs = await prisma.auditLog.findMany({
+            select: {
+                id: true,
+                action: true,
+                module: true,
+                createdAt: true,
+                user: {
+                    select: {
+                        fullName: true,
+                        role: true
+                    }
+                }
+            },
             take: 5,
-            orderBy: { createdAt: 'desc' },
-            include: { user: { select: { fullName: true, role: true } } }
+            orderBy: { createdAt: 'desc' }
         })
 
         return (
@@ -212,14 +233,14 @@ export default async function AdminDashboardOverview() {
                     <AlertCircle size={32} />
                 </div>
                 <h2 className="text-2xl font-black text-gray-900 mb-2">Erreur de Supervision</h2>
-                <div className="bg-white/50 p-4 rounded-xl border border-red-100 mb-8 max-w-2xl overflow-auto">
-                    <p className="text-red-800 font-mono text-xs text-left whitespace-pre-wrap">
+                <div className="bg-white/80 p-6 rounded-[2rem] border border-red-200 mb-8 max-w-2xl w-full shadow-inner">
+                    <p className="text-red-900 font-mono text-[10px] text-left whitespace-pre-wrap leading-relaxed">
+                        <span className="font-black text-red-600 uppercase block mb-1">Diagnostic Technique :</span>
                         {error?.message || String(error)}
-                        {error?.stack && `\n\nStack Trace:\n${error.stack.split('\n').slice(0, 3).join('\n')}`}
                     </p>
                 </div>
-                <p className="text-gray-600 max-w-md mb-8 italic text-sm">
-                    Cette erreur indique un décalage entre le code et la base de données (ex: table manquante ou champ renommé).
+                <p className="text-gray-500 text-[10px] max-w-md mb-8 italic">
+                    Note: Une fois l'erreur identifiée et corrigée, cette zone technique sera masquée.
                 </p>
                 <Link href="/admin" className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl">
                     Tenter de rafraîchir
