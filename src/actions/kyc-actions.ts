@@ -97,7 +97,7 @@ export async function triggerAssistedKYC(documentId: string) {
                 verifiedByUserId: isAutoVerifiable ? "SYSTEM_AI" : null,
                 fullName: doc.fullName || analysis.extractedData.fullName,
                 metadata: {
-                    aiAnalysis: analysis
+                    aiAnalysis: analysis as any
                 }
             }
         })

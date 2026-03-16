@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { getLeaseProceduralState, transitionArrearsPhase, ARREARS_PHASE_CONFIG } from "@/lib/arrears-engine"
 import { Role } from "@prisma/client"
+import { logAction } from "./audit"
 
 /**
  * Part 11.3: Trigger Automated Recovery Scan for a Lease
