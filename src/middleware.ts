@@ -4,11 +4,8 @@ import { authConfig } from "./auth.config"
 export const { auth: middleware } = NextAuth(authConfig)
 
 export const config = {
-    // Protect all routes under /dashboard, /locataire and /admin
+    // Protect all routes globally except static assets and images
     matcher: [
-        "/dashboard/:path*", 
-        "/locataire/:path*", 
-        "/admin/:path*",
-        "/onboarding/:path*"
+        '/((?!api|_next/static|_next/image|favicon.ico|images|logo.png).*)'
     ]
 }

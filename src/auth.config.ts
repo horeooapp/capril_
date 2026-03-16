@@ -35,28 +35,36 @@ export const authConfig = {
         },
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-            const isOnLocataire = nextUrl.pathname.startsWith("/locataire");
-            const isOnOnboarding = nextUrl.pathname.startsWith("/onboarding");
-            const isOnAdmin = nextUrl.pathname.startsWith("/admin");
+            const pathname = nextUrl.pathname;
 
-            // Avoid infinite redirects on login pages
-            const isLoginPath = nextUrl.pathname.endsWith("/login");
-            if (isLoginPath) return true;
+            // --- PUBLIC ROUTES (No Auth Required) ---
+            const isRoot = pathname === "/";
+            const isLoginPath = pathname.endsWith("/login");
+            const isPublicLegal = pathname === "/cgu" || pathname === "/confidentialite" || pathname === "/contact";
+            const isApiPublic = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/public");
 
+            if (isRoot || isLoginPath || isPublicLegal || isApiPublic) {
+                return true;
+            }
+
+            // --- PRIVATE ROUTES ---
             if (isLoggedIn) {
+                // Potential role-based redirects could stay here
                 return true;
             } else {
-                if (isOnAdmin) {
+                // Redirect to specialized login or landing page
+                if (pathname.startsWith("/admin")) {
                     return Response.redirect(new URL("/admin/login", nextUrl));
                 }
-                if (isOnDashboard || isOnOnboarding) {
+                if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
                     return Response.redirect(new URL("/dashboard/login", nextUrl));
                 }
-                if (isOnLocataire) {
+                if (pathname.startsWith("/locataire")) {
                     return Response.redirect(new URL("/locataire/login", nextUrl));
                 }
-                return true;
+                
+                // For everything else (other pages), redirect to the premium landing page (lock)
+                return Response.redirect(new URL("/", nextUrl));
             }
         },
     },
