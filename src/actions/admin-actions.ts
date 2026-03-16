@@ -184,3 +184,59 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
         return { error: "Erreur lors de la création de l'utilisateur." }
     }
 }
+
+/**
+ * Met à jour le mot de passe d'un administrateur
+ */
+export async function updateAdminPassword(userId: string, newPassword: string) {
+    const session = await auth()
+    if (!session || !session.user) {
+        throw new Error("Authentification requise")
+    }
+
+    const requesterId = session.user.id
+    const requesterRole = session.user.role
+
+    // Sécurité : Un ADMIN ne peut changer QUE son propre mot de passe.
+    // Un SUPER_ADMIN peut changer le sien ou celui d'un autre ADMIN.
+    if (requesterRole !== Role.SUPER_ADMIN && requesterId !== userId) {
+        throw new Error("Vous n'avez pas l'autorisation de modifier ce mot de passe.")
+    }
+
+    try {
+        const { hash } = await import("bcrypt-ts")
+        const hashedPassword = await hash(newPassword, 12)
+
+        const targetUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: true, fullName: true, email: true }
+        })
+
+        if (!targetUser) return { error: "Utilisateur non trouvé" }
+
+        // S'assurer que la cible est bien un admin (on ne change pas les pass des tenants ici par sécurité)
+        if (targetUser.role !== Role.ADMIN && targetUser.role !== Role.SUPER_ADMIN) {
+            return { error: "Cette action est réservée aux comptes administratifs." }
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword }
+        })
+
+        // Log d'audit
+        await prisma.auditLog.create({
+            data: {
+                userId: requesterId,
+                action: `Modification du mot de passe de ${targetUser.fullName || targetUser.email}`,
+                module: "AUTH",
+                entityId: userId,
+            }
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error("Erreur updateAdminPassword:", error)
+        return { error: "Erreur lors de la mise à jour du mot de passe." }
+    }
+}
