@@ -204,7 +204,7 @@ export default async function AdminDashboardOverview() {
                 </div>
             </div>
         )
-    } catch (error) {
+    } catch (error: any) {
         console.error("[ADMIN DASHBOARD] Critical render error:", error)
         return (
             <div className="p-8 bg-red-50 border-2 border-red-100 rounded-[2.5rem] flex flex-col items-center text-center">
@@ -212,9 +212,14 @@ export default async function AdminDashboardOverview() {
                     <AlertCircle size={32} />
                 </div>
                 <h2 className="text-2xl font-black text-gray-900 mb-2">Erreur de Supervision</h2>
-                <p className="text-gray-600 max-w-md mb-8">
-                    Une erreur critique est survenue lors de la récupération des données de supervision nationale.
-                    Le service technique a été alerté.
+                <div className="bg-white/50 p-4 rounded-xl border border-red-100 mb-8 max-w-2xl overflow-auto">
+                    <p className="text-red-800 font-mono text-xs text-left whitespace-pre-wrap">
+                        {error?.message || String(error)}
+                        {error?.stack && `\n\nStack Trace:\n${error.stack.split('\n').slice(0, 3).join('\n')}`}
+                    </p>
+                </div>
+                <p className="text-gray-600 max-w-md mb-8 italic text-sm">
+                    Cette erreur indique un décalage entre le code et la base de données (ex: table manquante ou champ renommé).
                 </p>
                 <Link href="/admin" className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl">
                     Tenter de rafraîchir
