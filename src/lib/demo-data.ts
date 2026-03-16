@@ -79,89 +79,105 @@ export const getDemoData = () => {
                 user: { fullName: "Moteur AI QAPRIL", role: "SYSTEM", email: "kyc@qapril.ci" },
                 ipAddress: "127.0.0.1",
                 userAgent: "OCR-Engine"
-            },
-            {
-                id: "demo-log-4",
-                action: "MISE_EN_CONSIGNATION_CDC [DEMO]",
-                module: "CDC",
-                createdAt: new Date(Date.now() - 120 * 60000),
-                user: { fullName: "Admin Central", role: "ADMIN", email: "admin@qapril.com" },
-                ipAddress: "197.214.22.4",
-                userAgent: "Chrome/Windows"
-            },
-            {
-                id: "demo-log-5",
-                action: "QUITTANCE_GENERE_MA_POSTE [DEMO]",
-                module: "LOGISTICS",
-                createdAt: new Date(Date.now() - 180 * 60000),
-                user: { fullName: "Système", role: "SYSTEM", email: "post@qapril.ci" },
-                ipAddress: "10.0.0.5",
-                userAgent: "MaPoste-Webhook"
             }
         ],
 
         // Validations en attente (Page Validation)
         pendingValidations: [
             {
-                id: "demo-v-1",
-                fullName: "Koffi Kouassi",
-                email: "koffi@agencepro.ci",
+                id: "demo-agency-1",
+                fullName: "Bakary Traoré [DEMO]",
+                email: "agence.demo@qapril.ci",
                 role: "AGENCY",
                 createdAt: new Date(Date.now() - 86400000 * 2),
-                legalEntity: { companyName: "AGENCE PRO IMMO [DEMO]" }
+                legalEntity: { companyName: "IVORY IMMO SERVICES [DEMO]" }
             },
             {
                 id: "demo-v-2",
-                fullName: "Aminata Diallo",
+                fullName: "Aminata Diallo [DEMO]",
                 email: "aminat@experts.ci",
-                role: "AGENT",
+                role: "NON_CERTIFIED_AGENT",
                 createdAt: new Date(Date.now() - 86400000 * 3),
                 legalEntity: null
-            },
-            {
-                id: "demo-v-3",
-                fullName: "Bakary Coulibaly",
-                email: "bakary@ivoryrent.ci",
-                role: "ADMIN",
-                createdAt: new Date(Date.now() - 86400000 * 1),
-                legalEntity: { companyName: "IVORY RENT SAS [DEMO]" }
             }
         ],
 
         // Liste des Utilisateurs (Page Users)
         users: [
             {
-                id: "demo-u-1",
-                fullName: "Yacouba Touré [DEMO]",
-                email: "yacou@qapril.ci",
-                role: "SUPER_ADMIN",
+                id: "demo-u-landlord",
+                fullName: "Yao Kouassi (BAILLEUR DEMO)",
+                email: "bailleur.demo@qapril.ci",
+                role: "LANDLORD",
                 kycLevel: 4,
                 kycStatus: "verified",
                 status: "active",
                 createdAt: new Date(2025, 0, 1),
-                phone: "+225 0707070707"
+                phone: "+225 0101010101"
             },
             {
-                id: "demo-u-2",
-                fullName: "Mariam Diallo [DEMO]",
-                email: "mariam@exemple.com",
-                role: "LANDLORD",
+                id: "demo-u-tenant",
+                fullName: "Awa Koné (LOCATAIRE DEMO)",
+                email: "locataire.demo@qapril.ci",
+                role: "TENANT",
                 kycLevel: 2,
                 kycStatus: "verified",
                 status: "active",
                 createdAt: new Date(2025, 1, 15),
-                phone: "+225 0505050505"
+                phone: "+225 0202020202"
             },
             {
-                id: "demo-u-3",
-                fullName: "Christian Koffi [DEMO]",
-                email: "chris@tenant.ci",
-                role: "TENANT",
-                kycLevel: 1,
-                kycStatus: "pending",
+                id: "demo-u-agency",
+                fullName: "Bakary Traoré (AGENCE DEMO)",
+                email: "agence.demo@qapril.ci",
+                role: "AGENCY",
+                kycLevel: 4,
+                kycStatus: "verified",
                 status: "active",
                 createdAt: new Date(2025, 2, 10),
-                phone: "+225 0101010101"
+                phone: "+225 0303030303"
+            }
+        ],
+
+        // Propriétés DEMO
+        properties: [
+            {
+                id: "demo-p-1",
+                propertyCode: "DEMO-PRO-001",
+                name: "Villa Prestige Cocody [DEMO]",
+                address: "Riviera Bonoumin",
+                city: "Abidjan",
+                commune: "Cocody",
+                propertyType: "villa",
+                status: "active",
+                declaredRentFcfa: 750000,
+                owner: { fullName: "Yao Kouassi [DEMO]" }
+            },
+            {
+                id: "demo-p-2",
+                propertyCode: "DEMO-PRO-002",
+                name: "Appartement Standing Plateau [DEMO]",
+                address: "Avenue Delafosse",
+                city: "Abidjan",
+                commune: "Plateau",
+                propertyType: "apartment",
+                status: "active",
+                declaredRentFcfa: 450000,
+                owner: { fullName: "Yao Kouassi [DEMO]" }
+            }
+        ],
+
+        // Baux DEMO
+        leases: [
+            {
+                id: "demo-l-1",
+                leaseReference: "BAIL-DEMO-2026-001",
+                status: "ACTIVE",
+                rentAmount: 750000,
+                startDate: new Date('2026-01-01'),
+                property: { name: "Villa Prestige Cocody [DEMO]" },
+                tenant: { fullName: "Awa Koné [DEMO]" },
+                landlord: { fullName: "Yao Kouassi [DEMO]" }
             }
         ]
     }

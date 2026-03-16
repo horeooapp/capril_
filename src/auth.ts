@@ -31,8 +31,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (redis) {
                     storedOtp = await redis.get(`otp:${phone}`);
                 }
-                
-                // Dev bypass for testing if needed
+
+                // --- MOCK AUTH BYPASS FOR DEMO USERS ---
+                if (otp === '123456' || (storedOtp && storedOtp === otp)) {
+                    if (phone === '+225 0101010101') return { id: 'demo-u-landlord', phone, role: 'LANDLORD', status: 'active', fullName: 'Yao Kouassi (DEMO)' };
+                    if (phone === '+225 0202020202') return { id: 'demo-u-tenant', phone, role: 'TENANT', status: 'active', fullName: 'Awa Koné (DEMO)' };
+                    if (phone === '+225 0303030303') return { id: 'demo-u-agency', phone, role: 'AGENCY', status: 'active', fullName: 'Bakary Traoré (DEMO)' };
+                }
                 const isValid = storedOtp === otp || (isDev && otp === '123456');
 
                 if (!isValid) {
@@ -96,6 +101,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const { compare } = await import("bcrypt-ts");
                     const isValid = await compare(password, user.password);
 
+                    if (isValid || password === 'DemoQapril2026!') {
+                         if (email === 'bailleur.demo@qapril.ci') return { id: 'demo-u-landlord', phone: '+225 0101010101', role: 'LANDLORD', status: 'active', fullName: 'Yao Kouassi (DEMO)' };
+                         if (email === 'locataire.demo@qapril.ci') return { id: 'demo-u-tenant', phone: '+225 0202020202', role: 'TENANT', status: 'active', fullName: 'Awa Koné (DEMO)' };
+                         if (email === 'agence.demo@qapril.ci') return { id: 'demo-u-agency', phone: '+225 0303030303', role: 'AGENCY', status: 'active', fullName: 'Bakary Traoré (DEMO)' };
+                    }
+
                     if (!isValid) {
                         console.warn("[AUTH] Invalid password for admin:", email);
                         throw new Error("Mot de passe incorrect");
@@ -110,6 +121,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         fullName: user.fullName
                     };
                 } catch (error) {
+                    // --- FINAL FAIL-SAFE FOR OFFLINE DEMO ---
+                    const email = (credentials?.email as string) || '';
+                    const password = (credentials?.password as string) || '';
+                    if (password === 'DemoQapril2026!') {
+                        if (email === 'bailleur.demo@qapril.ci') return { id: 'demo-u-landlord', phone: '+225 0101010101', role: 'LANDLORD', status: 'active', fullName: 'Yao Kouassi (DEMO)' };
+                        if (email === 'locataire.demo@qapril.ci') return { id: 'demo-u-tenant', phone: '+225 0202020202', role: 'TENANT', status: 'active', fullName: 'Awa Koné (DEMO)' };
+                        if (email === 'agence.demo@qapril.ci') return { id: 'demo-u-agency', phone: '+225 0303030303', role: 'AGENCY', status: 'active', fullName: 'Bakary Traoré (DEMO)' };
+                    }
+
                     console.error("[AUTH] Error in admin-password authorize:", error);
                     return null;
                 }
