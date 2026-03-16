@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { generatePropertyCode } from "@/lib/property"
 import { revalidatePath } from "next/cache"
-import { serializeProperty } from "@/lib/serialize"
+import { serializeProperty, serializeLease } from "@/lib/serialize"
 
 /**
  * Part 5: List Owner Properties

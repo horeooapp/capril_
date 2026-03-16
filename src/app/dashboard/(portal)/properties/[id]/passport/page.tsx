@@ -83,7 +83,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                         ) : (
                             <div className="flow-root">
                                 <ul className="-mb-8">
-                                    {property.leases.map((lease, idx) => (
+                                    {property.leases.map((lease: any, idx: number) => (
                                         <li key={lease.id}>
                                             <div className="relative pb-8">
                                                 {idx !== property.leases.length - 1 && (
