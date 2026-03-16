@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from "next-auth"
-
+import { Role } from "@prisma/client"
 
 export const authConfig = {
     session: { 
@@ -17,7 +17,7 @@ export const authConfig = {
             if (user) {
                 token.id = user.id
                 token.phone = user.phone
-                token.role = user.role?.toString() // Ensure string
+                token.role = user.role as Role
                 token.status = user.status
             }
             return token
@@ -26,7 +26,7 @@ export const authConfig = {
             if (session.user) {
                 session.user.id = token.id as string
                 session.user.phone = token.phone as string
-                session.user.role = (token.role as string) || 'TENANT' // Safe fallback
+                session.user.role = (token.role as Role) || 'TENANT'
                 session.user.status = token.status as any
             }
             return session
