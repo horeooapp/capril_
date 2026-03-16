@@ -147,7 +147,7 @@ export default function MobileMenu({
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link 
-                                        href={session.user.role === 'TENANT' ? "/locataire" : "/dashboard"}
+                                        href={session.user.role === 'TENANT' ? "/locataire" : (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-center bg-gray-900 dark:bg-white dark:text-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-black/10"
                                     >

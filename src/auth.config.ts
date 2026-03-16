@@ -17,7 +17,7 @@ export const authConfig = {
             if (user) {
                 token.id = user.id
                 token.phone = user.phone
-                token.role = user.role
+                token.role = user.role?.toString() // Ensure string
                 token.status = user.status
             }
             return token
@@ -26,9 +26,7 @@ export const authConfig = {
             if (session.user) {
                 session.user.id = token.id as string
                 session.user.phone = token.phone as string
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                session.user.role = token.role as any
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                session.user.role = (token.role as string) || 'TENANT' // Safe fallback
                 session.user.status = token.status as any
             }
             return session

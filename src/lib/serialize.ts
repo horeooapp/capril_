@@ -35,8 +35,9 @@ export const serializeProperty = (property: any) => {
 /**
  * Helper to serialize BigInt/Decimal and relations for Leases
  */
-export const serializeLease = (lease: RawLease | null) => {
+export const serializeLease = (lease: any) => {
     if (!lease) return null
+    
     const tenantData = lease.tenant ? {
         id: lease.tenant.id || null,
         fullName: lease.tenant.fullName,
@@ -46,10 +47,21 @@ export const serializeLease = (lease: RawLease | null) => {
 
     return {
         ...lease,
-        rentAmount: Number(lease.rentAmount),
-        depositAmount: lease.depositAmount ? Number(lease.depositAmount) : 0,
-        chargesAmount: lease.chargesAmount ? Number(lease.chargesAmount) : 0,
-        tenant: tenantData
+        rentAmount: Number(lease.rentAmount || 0),
+        depositAmount: Number(lease.depositAmount || 0),
+        chargesAmount: Number(lease.chargesAmount || 0),
+        tenant: tenantData,
+        cdcDeposits: (lease.cdcDeposits || []).map((dep: any) => ({
+            ...dep,
+            amount: Number(dep.amount || 0)
+        })),
+        receipts: (lease.receipts || []).map((rec: any) => ({
+            ...rec,
+            rentAmount: Number(rec.rentAmount || 0),
+            chargesAmount: Number(rec.chargesAmount || 0),
+            totalAmount: Number(rec.totalAmount || 0),
+            paidAt: rec.paidAt instanceof Date ? rec.paidAt.toISOString() : rec.paidAt
+        }))
     }
 }
 
@@ -73,9 +85,16 @@ export const serializeReceipt = (receipt: RawReceipt | null) => {
 export const serializeUser = (user: any) => {
     if (!user) return null
     return {
-        ...user,
+        id: user.id,
+        phone: user.phone,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
         kycLevel: user.kycLevel ? Number(user.kycLevel) : 0,
-        // Ensure no other problematic fields
+        kycStatus: user.kycStatus,
+        status: user.status,
+        isCertified: user.isCertified,
+        notificationPrefs: user.notificationPrefs
     }
 }
 
