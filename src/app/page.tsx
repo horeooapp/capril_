@@ -107,16 +107,6 @@ export default async function Home() {
           </div>
         </div>
       </footer>
-
-      <style jsx global>{`
-        @keyframes pulse-slow {
-          0%, 100% { transform: scale(1.05); }
-          50% { transform: scale(1.1); }
-        }
-        .animate-pulse-slow {
-          animation: pulse-slow 20s infinite ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

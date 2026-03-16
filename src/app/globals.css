@@ -90,3 +90,13 @@ body {
     radial-gradient(at 50% 0%, hsla(158,100%,95%,1) 0, transparent 50%), 
     radial-gradient(at 100% 0%, hsla(25,100%,95%,1) 0, transparent 50%);
 }
+
+/* Custom Animations */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1.05); }
+  50% { transform: scale(1.1); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 20s infinite ease-in-out;
+}
