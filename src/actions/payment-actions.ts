@@ -11,6 +11,7 @@ export type PaymentOperator = 'orange' | 'mtn' | 'moov' | 'wave';
 export type CreatePaymentIntentInput = {
     leaseId: string;
     amount: number;
+    monthsCount: number; // Required to check legal approval for prepayments
     operator: PaymentOperator;
     payerPhone: string;
     receiptId?: string; // Optional if existing receipt
@@ -18,17 +19,37 @@ export type CreatePaymentIntentInput = {
 
 interface PaymentIntentMetadata {
     receiptId?: string;
+    monthsCount?: number;
     [key: string]: any;
 }
 
 /**
  * Part 10.1: Create Payment Intent (MM Integration)
  * Standardizes the initial step for all MM operators.
+ * Now includes mandatory check for multi-month prepayment approval.
  */
 export async function createMMIntent(input: CreatePaymentIntentInput) {
     const session = await auth();
     if (!session || !session.user || !session.user.id) {
         throw new Error("Authentification requise.");
+    }
+
+    // --- NEW: Prepayment Legal Check (Part 10.1a) ---
+    if (input.monthsCount > 1) {
+        const approvedRequest = await prisma.prepaymentRequest.findFirst({
+            where: {
+                leaseId: input.leaseId,
+                tenantId: session.user.id,
+                monthsCount: input.monthsCount,
+                status: 'APPROVED'
+            }
+        });
+
+        if (!approvedRequest) {
+            return { 
+                error: "Droit de refus du propriétaire : Pour payer plusieurs mois d'avance, vous devez d'abord obtenir l'approbation du propriétaire." 
+            };
+        }
     }
 
     // Generate Idempotency Key
@@ -45,7 +66,10 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
                 operator: input.operator,
                 payerPhone: input.payerPhone,
                 status: 'PENDING',
-                metadata: { receiptId: input.receiptId }
+                metadata: { 
+                    receiptId: input.receiptId,
+                    monthsCount: input.monthsCount
+                }
             }
         });
 
@@ -54,8 +78,8 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
             transaction_id: intent.id,
             amount: input.amount,
             currency: "XOF",
-            description: `Règlement Loyer - Contrat ${input.leaseId}`,
-            customer_name: session.user.name || "Locataire",
+            description: `Règlement Loyer - Contrat ${input.leaseId} (${input.monthsCount} mois)`,
+            customer_name: session.user.name || session.user.fullName || "Locataire",
             customer_surname: "QAPRIL",
             customer_email: session.user.email || "client@qapril.ci",
             customer_phone_number: input.payerPhone,
@@ -70,6 +94,18 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
                 data: { status: 'FAILED', metadata: { ...(intent.metadata as any), error: paymentResult.message } }
             });
             return { error: paymentResult.message };
+        }
+
+        // --- Mark Prepayment Request as COMPLETED if it was used ---
+        if (input.monthsCount > 1) {
+            await prisma.prepaymentRequest.updateMany({
+                where: {
+                    leaseId: input.leaseId,
+                    monthsCount: input.monthsCount,
+                    status: 'APPROVED'
+                },
+                data: { status: 'COMPLETED' }
+            });
         }
 
         revalidatePath("/dashboard/payments");

@@ -10,6 +10,7 @@ declare module "next-auth" {
             status?: string
             kycLevel: number
             kycStatus: string
+            fullName?: string | null
         } & DefaultSession["user"]
     }
 
@@ -19,6 +20,7 @@ declare module "next-auth" {
         status?: string | null
         kycLevel?: number
         kycStatus?: string
+        fullName?: string | null
     }
 }
 
@@ -30,6 +32,7 @@ declare module "next-auth/jwt" {
         status?: string
         kycLevel?: number
         kycStatus?: string
+        fullName?: string | null
     }
 }
 
@@ -40,5 +43,6 @@ declare module "@auth/core/adapters" {
         status?: string | null
         kycLevel?: number
         kycStatus?: string
+        fullName?: string | null
     }
 }

@@ -85,6 +85,16 @@ enum DisputeStatus {
   RESOLVED
   ESCALATED
   CLOSED
+  @map("DISPUTE_STATUS")
+}
+
+enum PrepaymentRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+  @map("PREPAYMENT_REQUEST_STATUS")
 }
 
 enum FiscalStatus {
@@ -140,6 +150,8 @@ model User {
   mandates                Mandate[]         @relation("AgentMandates")
   propertiesManaged       Property[]        @relation("AgentProperties")
   mediationMessages       MediationMessage[]
+  prepaymentRequests      PrepaymentRequest[] @relation("TenantPrepayments")
+  prepaymentValidations   PrepaymentRequest[] @relation("LandlordValidations")
 
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
@@ -312,6 +324,7 @@ model Lease {
   mediation         Mediation?
   paymentIntents    PaymentIntent[]
   fiscalDossiers    FiscalDossier[]
+  prepaymentRequests PrepaymentRequest[]
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -783,5 +796,33 @@ model CertificatFiscal {
   status            String        @default("VALIDE")
 
   @@map("certificats_fiscaux")
+}
+
+model PrepaymentRequest {
+  id              String                  @id @default(uuid())
+  leaseId         String                  @map("lease_id")
+  lease           Lease                   @relation(fields: [leaseId], references: [id])
+  tenantId        String                  @map("tenant_id")
+  tenant          User                    @relation("TenantPrepayments", fields: [tenantId], references: [id])
+  landlordId      String                  @map("landlord_id")
+  landlord        User                    @relation("LandlordValidations", fields: [landlordId], references: [id])
+  
+  monthsCount     Int                     @map("months_count")
+  totalAmount     Int                     @map("total_amount")
+  reason          String?                 @db.Text
+  status          PrepaymentRequestStatus @default(PENDING)
+  
+  rejectionReason String?                 @map("rejection_reason") @db.Text
+  approvedAt      DateTime?               @map("approved_at")
+  rejectedAt      DateTime?               @map("rejected_at")
+
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+
+  @@map("prepayment_requests")
+  @@index([leaseId])
+  @@index([tenantId])
+  @@index([landlordId])
+  @@index([status])
 }
 
