@@ -85,7 +85,6 @@ enum DisputeStatus {
   RESOLVED
   ESCALATED
   CLOSED
-  @map("DISPUTE_STATUS")
 }
 
 enum PrepaymentRequestStatus {
@@ -94,7 +93,6 @@ enum PrepaymentRequestStatus {
   REJECTED
   COMPLETED
   CANCELLED
-  @map("PREPAYMENT_REQUEST_STATUS")
 }
 
 enum FiscalStatus {
