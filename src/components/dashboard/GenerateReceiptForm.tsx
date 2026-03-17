@@ -165,6 +165,7 @@ export default function GenerateReceiptForm({
                                         <CinetPayCheckout 
                                             leaseId={leaseId}
                                             amount={amountFcfa}
+                                            monthsCount={Math.max(1, Math.round(amountFcfa / Number(monthlyRentFcfa)))}
                                             onError={(msg) => setError(msg)}
                                         />
                                         <p className="mt-3 text-[8px] text-gray-400 text-center italic">

@@ -6,6 +6,7 @@ import { createMMIntent } from "@/actions/payment-actions"
 interface CinetPayCheckoutProps {
     leaseId: string;
     amount: number;
+    monthsCount: number;
     receiptId?: string;
     onSuccess?: (intentId: string) => void;
     onError?: (message: string) => void;
@@ -14,6 +15,7 @@ interface CinetPayCheckoutProps {
 export default function CinetPayCheckout({
     leaseId,
     amount,
+    monthsCount,
     receiptId,
     onSuccess,
     onError
@@ -27,6 +29,7 @@ export default function CinetPayCheckout({
             const result = await createMMIntent({
                 leaseId,
                 amount,
+                monthsCount,
                 operator: 'orange', 
                 payerPhone: "00000000", // placeholder, CinetPay will ask for real one
                 receiptId
