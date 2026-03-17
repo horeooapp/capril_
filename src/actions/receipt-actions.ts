@@ -54,11 +54,11 @@ export async function createReceipt(input: CreateReceiptInput) {
         if (input.isDeposit) {
             await prisma.cDCDeposit.upsert({
                 where: { leaseId: lease.id },
-                update: { amount: totalAmount, status: 'AWAITING_PAYMENT' },
+                update: { amount: totalAmount, status: "AWAITING_PAYMENT" },
                 create: {
                     leaseId: lease.id,
                     amount: totalAmount,
-                    status: 'AWAITING_PAYMENT'
+                    status: "AWAITING_PAYMENT"
                 }
             });
         }
@@ -92,7 +92,7 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
             const r = await tx.receipt.update({
                 where: { id: receiptId },
                 data: {
-                    status: 'PAID',
+                    status: "PAID",
                     paidAt,
                     paymentRef,
                     qrToken
@@ -117,11 +117,11 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
                 where: { leaseId: r.leaseId }
             });
 
-            if (cdcDeposit && cdcDeposit.status === 'AWAITING_PAYMENT') {
+            if (cdcDeposit && cdcDeposit.status === "AWAITING_PAYMENT") {
                 await tx.cDCDeposit.update({
                     where: { leaseId: r.leaseId },
                     data: { 
-                        status: 'PENDING',
+                        status: "PENDING",
                         consignedAt: paidAt
                     }
                 });

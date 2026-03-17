@@ -70,7 +70,7 @@ export async function createReceipt(data: {
                 paymentRef: data.paymentReference,
                 paidAt: new Date(),
                 receiptHash: documentHash,
-                status: "paid"
+                status: "PAID"
             }
         })
 

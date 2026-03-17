@@ -18,15 +18,12 @@ export async function getCurrentUser() {
 
 export async function getUserTrustData() {
     const session = await auth()
-    // @ts-ignore
     const userId = session?.user?.id
     if (!userId) throw new Error("Unauthorized")
 
-    const db = prisma as any;
-
-    const reliabilityScores = await db.reliabilityScore.findMany({
+    const reliabilityScores = await prisma.reliabilityScore.findMany({
         where: { userId },
-        orderBy: { calculatedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         take: 20
     });
 
@@ -40,12 +37,9 @@ export async function getUserTrustData() {
 }
 export async function logScoreConsultation(targetUserId: string, reason: string) {
     const session = await auth()
-    // @ts-ignore
     const viewerId = session?.user?.id
     if (!viewerId) throw new Error("Unauthorized")
 
-    // In a real app, logic would verify authorization (e.g., active lease app)
-    
     await prisma.auditLog.create({
         data: {
             userId: viewerId,

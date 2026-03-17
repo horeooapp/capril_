@@ -13,7 +13,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
 
     // Fetch all active leases with their property data
     const activeLeases = await prisma.lease.findMany({
-        where: { status: 'active' as any },
+        where: { status: "ACTIVE" },
         include: {
             property: true
         }
@@ -21,7 +21,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
 
     // Filter by commune and property type in JS (avoids nested Prisma filter complexity)
     const filtered = activeLeases.filter(
-        l => (l.property as any).commune === commune && (l.property as any).propertyType === propertyType
+        l => l.property?.commune === commune && l.property?.propertyType === propertyType
     );
 
     if (filtered.length < 3) {
@@ -41,7 +41,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
         : amounts[mid];
 
     // Trend: compare to previous period snapshot
-    const previousPeriod = await (prisma as any).observatorySnapshot.findFirst({
+    const previousPeriod = await prisma.observatorySnapshot.findFirst({
         where: { commune, propertyType },
         orderBy: { createdAt: 'desc' }
     });
@@ -50,7 +50,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
         ? parseFloat(((avgRent - previousPeriod.avgRent) / previousPeriod.avgRent * 100).toFixed(2))
         : 0;
 
-    return await (prisma as any).observatorySnapshot.create({
+    return await prisma.observatorySnapshot.create({
         data: {
             commune,
             propertyType,
@@ -69,7 +69,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
  * Part 17.2: Get Market Report for a Commune
  */
 export async function getCommuneMarketReport(commune: string) {
-    return await (prisma as any).observatorySnapshot.findMany({
+    return await prisma.observatorySnapshot.findMany({
         where: { commune },
         orderBy: { createdAt: 'desc' },
         take: 10

@@ -2,7 +2,7 @@
 import { prisma } from "./prisma";
 import { generateQRToken } from "./financial-utils";
 
-const db = prisma as any; // Bypass stale generated client until next `prisma generate`
+
 
 /**
  * Part 14.1: Generate CNL Reference
@@ -13,7 +13,7 @@ export async function generateCNLRef(userId: string): Promise<string> {
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
     
-    const count = await db.certificate.count({
+    const count = await prisma.certificate.count({
         where: {
             certType: 'CNL',
             issuedAt: {
@@ -32,7 +32,7 @@ export async function generateCNLRef(userId: string): Promise<string> {
  * Part 14.2: Issue Digital Tenant Certificate (CNL)
  */
 export async function issueCNL(userId: string) {
-    const latestScore = await db.reliabilityScore.findFirst({
+    const latestScore = await prisma.reliabilityScore.findFirst({
         where: { userId },
         orderBy: { createdAt: 'desc' }
     });
@@ -48,7 +48,7 @@ export async function issueCNL(userId: string) {
     }
 
     // Check for existing valid certificate
-    const existingCert = await db.certificate.findFirst({
+    const existingCert = await prisma.certificate.findFirst({
         where: {
             userId,
             certType: 'CNL',
@@ -64,7 +64,7 @@ export async function issueCNL(userId: string) {
     const expiresAt = new Date();
     expiresAt.setMonth(expiresAt.getMonth() + 6); // 6 months validity
 
-    return await db.certificate.create({
+    return await prisma.certificate.create({
         data: {
             userId,
             certType: 'CNL',
