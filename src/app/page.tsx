@@ -12,6 +12,8 @@ import { getActiveNews } from "@/actions/news-actions";
 import { isFeatureEnabled } from "@/lib/features";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   let session = null;
   let dbNews: any[] = [];

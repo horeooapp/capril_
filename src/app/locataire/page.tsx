@@ -1,4 +1,6 @@
 import { getReceiptsForTenant } from "@/actions/receipts"
+
+export const dynamic = "force-dynamic"
 import { 
     FileText, 
     Download, 
