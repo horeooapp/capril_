@@ -212,6 +212,8 @@ model User {
   prepaymentRequests      PrepaymentRequest[] @relation("TenantPrepayments")
   prepaymentValidations   PrepaymentRequest[] @relation("LandlordValidations")
 
+  colocataires            Colocataire[]
+  mandateHistory          MandateHistory[] @relation("MandateHistoryAgent")
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
@@ -545,6 +547,7 @@ model MandateHistory {
   mandateId       String      @map("mandate_id")
   mandate         Mandate     @relation(fields: [mandateId], references: [id])
   agentUserId     String?     @map("agent_id")
+  agent           User?       @relation("MandateHistoryAgent", fields: [agentUserId], references: [id])
   mandateType     MandateType @map("type_mandat")
   startDate       DateTime    @map("periode_debut")
   endDate         DateTime?   @map("periode_fin")
