@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+export const dynamic = "force-dynamic"
 import { redirect } from "next/navigation"
 import { logout } from "@/actions/auth"
 import AdminHeader from "@/components/admin/AdminHeader"

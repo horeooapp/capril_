@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
- 
-export const metadata: Metadata = {
-  title: "À Propos",
-  description: "Découvrez QAPRIL, l'institution technologique dédiée à la normalisation et la sécurisation du marché locatif en Côte d'Ivoire.",
-};
 
 export default function AboutPage() {
   return (

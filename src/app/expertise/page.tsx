@@ -1,13 +1,9 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import SectionHeading from "@/components/SectionHeading";
 import { motion } from "framer-motion";
- 
-export const metadata: Metadata = {
-  title: "Expertise Technologique",
-  description: "L'expertise QAPRIL : fusion entre ingénierie logicielle avancée et cadre législatif immobilier ivoirien pour une sécurité totale.",
-};
 
 export default function ExpertisePage() {
   return (
