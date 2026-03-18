@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { logout } from "@/actions/auth"
@@ -8,7 +9,12 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    const session = await auth()
+    let session = null;
+    try {
+        session = await auth()
+    } catch (e) {
+        console.error("[ADMIN LAYOUT] Auth crash:", e);
+    }
 
     if (!session?.user) {
         redirect("/admin/login")
