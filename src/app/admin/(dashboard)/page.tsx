@@ -19,8 +19,6 @@ import { getDemoData } from "@/lib/demo-data"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
 
-export const dynamic = "force-dynamic"
-
 export default async function AdminDashboard() {
     const isDemoMode = await getDemoMode()
     
