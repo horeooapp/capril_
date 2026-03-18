@@ -32,9 +32,9 @@ export default async function AdminDashboard() {
                 prisma.user.count().catch(() => 0),
                 prisma.property.count().catch(() => 0),
                 prisma.lease.count().catch(() => 0),
-                (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0) || 0,
-                (prisma as any).colocataire?.count({ where: { status: "ACTIF" } }).catch(() => 0) || 0,
-                (prisma as any).landLeaseInfo?.count().catch(() => 0) || 0
+                (prisma as any).mandate ? (prisma as any).mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0) : Promise.resolve(0),
+                (prisma as any).colocataire ? (prisma as any).colocataire.count({ where: { status: "ACTIF" } }).catch(() => 0) : Promise.resolve(0),
+                (prisma as any).landLeaseInfo ? (prisma as any).landLeaseInfo.count().catch(() => 0) : Promise.resolve(0)
             ])
             
             const fiscalStats = await prisma.fiscalDossier.aggregate({
@@ -333,9 +333,9 @@ export default async function AdminDashboard() {
                     <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em]">Synchronisation Base de Données requise</p>
                      <div className="flex gap-4">
                         <DemoToggle initialEnabled={isDemoMode} />
-                        <button onClick={() => window.location.reload()} className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-2xl active:scale-95">
+                        <Link href="/admin" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-2xl active:scale-95">
                             Relancer l&apos;audit
-                        </button>
+                        </Link>
                      </div>
                 </div>
             </div>
