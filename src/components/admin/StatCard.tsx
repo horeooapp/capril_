@@ -6,7 +6,7 @@ import { ArrowUpRight, LucideIcon } from "lucide-react"
 interface StatCardProps {
     title: string
     value: string
-    icon: LucideIcon
+    icon: React.ReactNode
     color: string
     trend?: string
     delay?: number
@@ -30,7 +30,7 @@ export default function StatCard({ title, value, icon: Icon, color, trend, delay
             <div className="absolute top-0 right-0 w-32 h-32 bg-current opacity-[0.03] -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
             
             <div className={`w-14 h-14 rounded-2xl ${colors[color] || colors.orange} border flex items-center justify-center mb-8 shadow-inner group-hover:rotate-6 transition-transform`}>
-                {typeof Icon === 'function' ? <Icon size={28} /> : Icon}
+                {Icon}
             </div>
             
             <div className="space-y-1 relative z-10 transition-transform group-hover:translate-x-1 duration-300">
