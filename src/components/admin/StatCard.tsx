@@ -24,17 +24,13 @@ export default function StatCard({ title, value, icon: Icon, color, trend, delay
     }
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay, duration: 0.5, ease: "easeOut" }}
+        <div 
             className="glass-card-premium p-8 rounded-[2.5rem] relative overflow-hidden group hover:scale-[1.02] transition-all duration-300"
         >
             <div className="absolute top-0 right-0 w-32 h-32 bg-current opacity-[0.03] -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
             
             <div className={`w-14 h-14 rounded-2xl ${colors[color] || colors.orange} border flex items-center justify-center mb-8 shadow-inner group-hover:rotate-6 transition-transform`}>
-                <Icon size={28} />
+                {typeof Icon === 'function' ? <Icon size={28} /> : Icon}
             </div>
             
             <div className="space-y-1 relative z-10 transition-transform group-hover:translate-x-1 duration-300">
@@ -50,6 +46,6 @@ export default function StatCard({ title, value, icon: Icon, color, trend, delay
                     {trend}
                 </div>
             )}
-        </motion.div>
+        </div>
     )
 }
