@@ -80,22 +80,7 @@ export default async function AdminDashboard() {
                 orderBy: { createdAt: 'desc' }
             }).catch(() => []) : []
 
-            const recentAuditLogs = (prisma as any).auditLog ? await (prisma as any).auditLog.findMany({
-                select: {
-                    id: true,
-                    action: true,
-                    module: true,
-                    createdAt: true,
-                    user: {
-                        select: {
-                            fullName: true,
-                            role: true
-                        }
-                    }
-                },
-                take: 5,
-                orderBy: { createdAt: 'desc' }
-            }).catch(() => []) : []
+            const recentAuditLogs = [] as any[]
 
             data = {
                 totalUsers, totalProperties, totalLeases,
@@ -192,96 +177,10 @@ export default async function AdminDashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2 space-y-10">
-                        <section className="glass-panel rounded-[2.5rem] overflow-hidden border border-white/40 shadow-xl">
-                            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-red-100 rounded-xl text-red-600">
-                                        <AlertTriangle size={20} />
-                                    </div>
-                                    <h3 className="font-black text-gray-900 uppercase tracking-tighter text-xl">
-                                        Anomalies & Vérifications
-                                    </h3>
-                                </div>
-                                <Link href="/admin/validation" className="label-tech hover:text-primary transition-colors">Voir tout</Link>
-                            </div>
-                            <div className="divide-y divide-gray-100">
-                                {(data.documentsUnderReview || []).length > 0 ? data.documentsUnderReview.map((doc: any) => (
-                                    <div key={doc.id} className="p-6 flex justify-between items-center hover:bg-white/50 transition-all group">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 font-black text-xl shadow-inner border border-white">
-                                                {doc.user?.fullName?.charAt(0) || "?"}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900 group-hover:text-primary transition-colors">{doc.user?.fullName || "Inconnu"}</p>
-                                                <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mt-1">ID: {doc.docType} • FLAG_REVIEW</p>
-                                            </div>
-                                        </div>
-                                        <Link href={`/admin/validation`} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-900 hover:text-white transition-all shadow-sm">
-                                            <ArrowUpRight size={18} />
-                                        </Link>
-                                    </div>
-                                )) : (
-                                    <div className="p-20 text-center">
-                                        <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
-                                            <CheckCircle2 size={32} />
-                                        </div>
-                                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune anomalie critique</p>
-                                    </div>
-                                )}
-                            </div>
-                        </section>
-
-                        <section className="glass-panel rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl shadow-gray-200/50">
-                            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
-                                        <Activity size={20} />
-                                    </div>
-                                    <h3 className="font-black text-gray-900 uppercase tracking-tighter text-xl">
-                                        Flux d&apos;Audit système
-                                    </h3>
-                                </div>
-                                <Link href="/admin/audit" className="label-tech hover:text-blue-600 transition-colors">Logs complets</Link>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead className="bg-gray-50/50 text-[10px] uppercase font-black text-gray-400 tracking-[0.2em]">
-                                        <tr>
-                                            <th className="px-8 py-4">Horodatage</th>
-                                            <th className="px-8 py-4">Action</th>
-                                            <th className="px-8 py-4">Opérateur</th>
-                                            <th className="px-8 py-4 text-right">Module</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100/50">
-                                        {(data.recentAuditLogs || []).map((log: any) => (
-                                            <tr key={log.id} className="hover:bg-white/40 transition-colors">
-                                                <td className="px-8 py-5 text-gray-400 font-mono text-[11px]">
-                                                    <div className="flex items-center gap-2">
-                                                        <Clock size={12} />
-                                                        {log.createdAt ? new Date(log.createdAt).toLocaleTimeString('fr-FR') : "-"}
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-5">
-                                                    <span className="font-bold text-gray-900 text-sm">{(log.action || "CORE_EVENT").replace(/_/g, ' ')}</span>
-                                                </td>
-                                                <td className="px-8 py-5">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-bold text-gray-700">{log.user?.fullName || "SYSTEM"}</span>
-                                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">{log.user?.role || "AUTO"}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-5 text-right">
-                                                    <span className="px-3 py-1 bg-gray-900 text-white text-[9px] font-black rounded-lg uppercase tracking-widest shadow-lg shadow-gray-900/10">
-                                                        {log.module}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </section>
+                        {/* Sections d'Audit et Anomalies temporairement désactivées pour débogage */}
+                        <div className="glass-panel p-20 text-center rounded-[2.5rem] border border-dashed border-gray-200">
+                           <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">Flux de Données en cours de Diagnostic</p>
+                        </div>
                     </div>
 
                     <div className="space-y-10">
