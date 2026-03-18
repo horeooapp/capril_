@@ -1,4 +1,16 @@
 import { getReceiptsForTenant } from "@/actions/receipts"
+
+export const dynamic = "force-dynamic"
+import { 
+    FileText, 
+    Download, 
+    MapPin, 
+    User, 
+    CheckCircle2, 
+    Clock,
+    ArrowUpRight,
+    SearchX
+} from "lucide-react"
 import Link from "next/link"
 
 interface TenantReceipt {
@@ -21,77 +33,129 @@ export default async function LocataireDashboard() {
     const receipts = await getReceiptsForTenant() as unknown as TenantReceipt[]
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <h1 className="text-3xl font-bold text-gray-900">Mes Quittances de Loyer</h1>
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase mb-4">
+                        Mes Quittances.
+                    </h1>
+                    <p className="text-gray-500 font-medium tracking-wide">
+                        Historique consolidé de vos paiements <span className="text-primary font-bold">QAPRIL Secure</span>.
+                    </p>
+                </div>
+                {receipts.length > 0 && (
+                    <div className="flex items-center gap-3 px-4 py-2 bg-green-50 rounded-2xl border border-green-100">
+                        <CheckCircle2 size={16} className="text-green-600" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-green-700">Comptabilité à jour</span>
+                    </div>
+                )}
             </div>
 
-            <div className="bg-white shadow overflow-hidden sm:rounded-md mt-6 shadow-sm border border-gray-100">
+            {/* Content Area */}
+            <div className="grid grid-cols-1 gap-6">
                 {receipts.length === 0 ? (
-                    <div className="text-center py-16 px-4">
-                        <div className="mx-auto h-16 w-16 text-gray-300 fill-current mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2ZM13 3.5L18.5 9H14C13.4477 9 13 8.55228 13 8V3.5ZM18 20H6V4H11V8C11 9.65685 12.3431 11 14 11H18V20ZM8 14H16V16H8V14ZM8 18H13V20H8V18Z"></path></svg>
+                    <div className="glass-panel rounded-[3rem] py-32 px-10 text-center border border-white/40 shadow-xl flex flex-col items-center">
+                        <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-[2rem] flex items-center justify-center mb-8 border border-gray-100 rotate-3 group-hover:rotate-0 transition-transform">
+                            <SearchX size={40} />
                         </div>
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">Aucune quittance disponible</h3>
-                        <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            Il semble que votre propriétaire n&apos;ait pas encore généré de quittance électronique pour vous sur la plateforme QAPRIL.
+                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">Aucun document archivé</h3>
+                        <p className="text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+                            Il semble que votre bailleur n&apos;ait pas encore émis de quittance électronique. <br />
+                            <span className="text-xs font-black uppercase tracking-widest text-primary mt-4 block">Vérification en cours...</span>
                         </p>
                     </div>
                 ) : (
-                    <ul className="divide-y divide-gray-200">
-                        {receipts.map((receipt) => (
-                            <li key={receipt.id} className="p-6 transition-colors hover:bg-orange-50/30">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-
-                                    <div className="flex-1">
-                                        <div className="flex items-center space-x-3">
-                                            <h4 className="text-base font-semibold text-gray-900">
-                                                Période : {receipt.periodMonth}
-                                            </h4>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                Payé
-                                            </span>
+                    <div className="space-y-6">
+                        {receipts.map((receipt, index) => (
+                            <div 
+                                key={receipt.id} 
+                                className="glass-card-premium p-8 rounded-[2.5rem] border border-white/40 shadow-xl hover:scale-[1.01] transition-all group relative overflow-hidden"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[50px] -mr-20 -mt-20 group-hover:opacity-100 opacity-50 transition-opacity"></div>
+                                
+                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+                                    <div className="flex-1 space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-3 transition-transform">
+                                                <FileText size={28} />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <h4 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+                                                        {receipt.periodMonth}
+                                                    </h4>
+                                                    <span className="px-3 py-1 bg-green-500/10 text-green-600 text-[9px] font-black uppercase tracking-widest rounded-lg border border-green-200/50">
+                                                        Certifié Payé
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Réf: {receipt.receiptRef}</p>
+                                            </div>
                                         </div>
-                                        <div className="mt-2 text-sm text-gray-500 flex flex-col sm:flex-row sm:space-x-6">
-                                            <span className="flex items-center">
-                                                <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                                </svg>
-                                                {receipt.lease.property.address}
-                                            </span>
-                                            <span className="flex items-center mt-2 sm:mt-0">
-                                                <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                </svg>
-                                                Bailleur : {receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}
-                                            </span>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="flex items-start gap-3">
+                                                <div className="p-2 bg-gray-50 rounded-lg text-gray-400">
+                                                    <MapPin size={16} />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Localisation</span>
+                                                    <span className="text-xs font-bold text-gray-700">{receipt.lease.property.address}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-3">
+                                                <div className="p-2 bg-gray-50 rounded-lg text-gray-400">
+                                                    <User size={16} />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Bailleur</span>
+                                                    <span className="text-xs font-bold text-gray-700">{receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 sm:mt-0 flex flex-col items-end space-y-3 w-full sm:w-auto">
-                                        <span className="text-lg font-bold text-primary">
-                                            {Number(receipt.totalAmount).toLocaleString('fr-FR')} FCFA
-                                        </span>
+                                    <div className="flex flex-col md:flex-row lg:flex-col items-center gap-6 lg:items-end w-full lg:w-auto pt-6 lg:pt-0 border-t lg:border-t-0 border-gray-100">
+                                        <div className="text-center lg:text-right w-full lg:w-auto">
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant Acquitté</p>
+                                            <p className="text-4xl font-black text-gray-900 tracking-tighter">
+                                                {Number(receipt.totalAmount).toLocaleString('fr-FR')} <span className="text-xl">FCFA</span>
+                                            </p>
+                                        </div>
+                                        
                                         <Link 
                                             href={`/receipts/${receipt.id}`}
                                             target="_blank"
-                                            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-secondary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                                            className="w-full lg:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary transition-all shadow-2xl active:scale-95 group/btn"
                                         >
-                                            <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Voir la Quittance
+                                            <Download size={16} className="group-hover/btn:translate-y-0.5 transition-transform" />
+                                            <span>Télécharger PDF</span>
+                                            <ArrowUpRight size={14} className="opacity-40 group-hover/btn:opacity-100 transition-opacity" />
                                         </Link>
-                                        <p className="text-xs text-gray-400">
-                                            Réf: {receipt.receiptRef}
-                                        </p>
                                     </div>
-
                                 </div>
-                            </li>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 )}
+            </div>
+
+            {/* Bottom Insight */}
+            <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-orange-400"></div>
+                <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner border border-blue-100">
+                        <Clock size={32} />
+                    </div>
+                    <div>
+                        <h5 className="font-black text-gray-900 uppercase tracking-tight text-lg">Mise à jour AutomatiqueIA</h5>
+                        <p className="text-xs font-medium text-gray-500">Votre archivage est synchronisé en temps réel avec le grand livre du bailleur.</p>
+                    </div>
+                </div>
+                <Link href="/locataire/leases" className="px-8 py-4 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm">
+                    Gérer mes contrats
+                </Link>
             </div>
         </div>
     )

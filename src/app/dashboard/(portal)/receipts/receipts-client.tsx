@@ -2,8 +2,20 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { 
+    Receipt, 
+    FileText, 
+    Calendar, 
+    Printer, 
+    MapPin, 
+    CheckCircle2, 
+    SearchX,
+    ChevronRight,
+    Search,
+    Filter
+} from "lucide-react"
 
-interface Receipt {
+interface ReceiptItem {
     id: string;
     receiptRef: string;
     createdAt: Date | string;
@@ -22,17 +34,17 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05
     }
   }
 }
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0 }
 }
 
-export default function ReceiptsClient({ receipts }: { receipts: Receipt[] }) {
+export default function ReceiptsClient({ receipts }: { receipts: ReceiptItem[] }) {
     return (
         <motion.div 
             variants={container}
@@ -40,90 +52,117 @@ export default function ReceiptsClient({ receipts }: { receipts: Receipt[] }) {
             animate="show"
             className="space-y-12"
         >
+            {/* Header section with refined glass branding */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
                     <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase">
                         Quittances.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide">
-                        Archives certifiées et historique infalsifiable de vos revenus locatifs.
+                    <p className="text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        <Receipt size={14} className="text-primary" />
+                        Archives certifiées et historique infalsifiable de vos revenus <span className="text-gray-900 font-bold">QAPRIL Secure</span>.
                     </p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors shadow-sm active:scale-95">
+                        <Search size={20} />
+                    </button>
+                    <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors shadow-sm active:scale-95">
+                        <Filter size={20} />
+                    </button>
                 </div>
             </div>
 
             {receipts.length === 0 ? (
-                <motion.div variants={item} className="glass-panel rounded-[3rem] p-20 text-center flex flex-col items-center">
-                    <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner border border-white">
-                        <span className="text-4xl grayscale opacity-50">🧾</span>
+                <motion.div variants={item} className="glass-panel rounded-[3rem] p-24 text-center border border-white/40 shadow-2xl flex flex-col items-center">
+                    <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner border border-white rotate-3">
+                        <SearchX size={48} className="text-gray-300" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">Historique vierge</h3>
+                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4 italic">Historique vierge</h3>
                     <p className="text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
-                        Les quittances certifiées seront générées automatiquement lors de la validation des paiements de vos locataires.
+                        Les quittances certifiées seront générées automatiquement lors de la validation des paiements de vos locataires. <br />
+                        <span className="text-[10px] uppercase font-black tracking-widest text-primary mt-4 block">Protocole d&apos;archivage actif</span>
                     </p>
                 </motion.div>
             ) : (
-                <motion.div variants={item} className="glass-panel rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-2xl shadow-gray-200/50">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50/50">
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction / Datation</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Affectation Patrimoniale</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Flux Financiers</th>
-                                    <th className="px-10 py-6 text-right"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {receipts.map((receipt) => receipt && (
-                                    <tr key={receipt.id} className="hover:bg-white transition-all group">
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-black text-orange-600 mb-2 uppercase tracking-tighter">{receipt.receiptRef}</span>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                                        ÉMISE LE {new Date(receipt.createdAt).toLocaleDateString('fr-FR')}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-black text-gray-900 mb-1">{receipt.lease?.leaseRef || 'BAIL-CERTIFIÉ'}</span>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] line-clamp-1">
-                                                    📍 {receipt.lease?.property?.addressLine1 || 'Localisation certifiée'}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-baseline gap-1 mb-2">
-                                                    <span className="text-lg font-black text-gray-900 tracking-tighter">{parseInt(String(receipt.amountFcfa)).toLocaleString()}</span>
-                                                    <span className="text-[10px] font-bold text-gray-400">FCFA</span>
-                                                </div>
-                                                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100 w-fit">
-                                                    {new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8 text-right">
-                                            <Link 
-                                                href={`/receipts/${receipt.id}`} 
-                                                target="_blank"
-                                                className="inline-flex items-center gap-3 px-6 py-2.5 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-orange-600 transition-all shadow-lg active:scale-95 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-                                            >
-                                                <span>Imprimer</span>
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                                </svg>
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <div className="space-y-6">
+                    {/* Simplified Header for Table Simulation */}
+                    <div className="hidden lg:grid grid-cols-12 gap-6 px-10 py-4">
+                        <div className="col-span-4 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Transaction / Datation</div>
+                        <div className="col-span-4 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Affectation Patrimoniale</div>
+                        <div className="col-span-3 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Flux Financiers</div>
+                        <div className="col-span-1"></div>
                     </div>
-                </motion.div>
+
+                    <div className="space-y-4">
+                        {receipts.map((receipt) => receipt && (
+                            <motion.div 
+                                key={receipt.id} 
+                                variants={item}
+                                className="glass-card-premium rounded-[2.2rem] p-8 lg:grid lg:grid-cols-12 lg:items-center gap-6 border border-white/40 shadow-xl hover:scale-[1.01] transition-all group"
+                            >
+                                <div className="col-span-4 space-y-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-black text-primary mb-2 uppercase tracking-tight italic">
+                                            {receipt.receiptRef}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></div>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                                Certifiée le {new Date(receipt.createdAt).toLocaleDateString('fr-FR')}
+                                                <CheckCircle2 size={10} className="text-emerald-500" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-4 mt-6 lg:mt-0 space-y-4 lg:border-l lg:border-gray-100 lg:pl-6">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <FileText size={14} className="text-gray-300" />
+                                            <span className="text-sm font-black text-gray-800 uppercase tracking-tight italic">
+                                                {receipt.lease?.leaseRef || 'BAIL-CERTIFIÉ'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <MapPin size={10} className="text-primary opacity-60" />
+                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest line-clamp-1">
+                                                {receipt.lease?.property?.addressLine1 || 'Localisation certifiée'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-3 mt-6 lg:mt-0 lg:border-l lg:border-gray-100 lg:pl-6">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-baseline gap-1 mb-2">
+                                            <span className="text-2xl font-black text-gray-900 tracking-tighter leading-none italic">
+                                                {Number(receipt.amountFcfa).toLocaleString('fr-FR')}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">FCFA</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Calendar size={12} className="text-emerald-500 opacity-60" />
+                                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                                {new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-1 mt-6 lg:mt-0 flex justify-end">
+                                    <Link 
+                                        href={`/receipts/${receipt.id}`} 
+                                        target="_blank"
+                                        className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-xl hover:shadow-gray-200 active:scale-95"
+                                    >
+                                        <Printer size={22} className="group-hover:rotate-6 transition-transform" />
+                                    </Link>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
             )}
         </motion.div>
     )

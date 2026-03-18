@@ -2,6 +2,19 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { 
+    ClipboardList, 
+    Plus, 
+    Building2, 
+    User, 
+    Calendar, 
+    ArrowRight,
+    Search,
+    Filter,
+    FileText,
+    CheckCircle2,
+    Clock
+} from "lucide-react"
 
 interface Lease {
     id: string;
@@ -20,14 +33,14 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05
     }
   }
 }
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0 }
 }
 
 export default function LeasesClient({ leases }: { leases: Lease[] }) {
@@ -38,115 +51,126 @@ export default function LeasesClient({ leases }: { leases: Lease[] }) {
             animate="show"
             className="space-y-12"
         >
+            {/* Header section with refined glass branding */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
                     <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase">
                         Contrats.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide">
-                        Registre centralisé des baux digitaux et conformité locative.
+                    <p className="text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        <ClipboardList size={14} className="text-primary" />
+                        Registre centralisé des baux digitaux et conformité locative <span className="text-gray-900 font-bold">QAPRIL Secure</span>.
                     </p>
                 </div>
                 <Link 
                     href="/dashboard/leases/new" 
-                    className="px-8 py-4 bg-orange-500 text-white rounded-[1.5rem] font-bold uppercase tracking-widest text-xs hover:bg-orange-600 transition-all shadow-xl shadow-orange-100 flex items-center gap-3 active:scale-95 group"
+                    className="px-8 py-4 bg-primary text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] hover:bg-orange-600 transition-all shadow-2xl flex items-center gap-3 active:scale-95 group"
                 >
+                    <Plus size={16} />
                     <span>Créer un bail digital</span>
-                    <svg className="w-5 h-5 group-hover:translate-y-[-2px] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                    </svg>
                 </Link>
             </div>
 
             {leases.length === 0 ? (
-                <motion.div variants={item} className="glass-panel rounded-[3rem] p-20 text-center flex flex-col items-center">
-                    <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner border border-white">
-                        <span className="text-4xl grayscale opacity-50">📄</span>
+                <motion.div variants={item} className="glass-panel rounded-[3rem] p-24 text-center border border-white/40 shadow-2xl flex flex-col items-center">
+                    <div className="w-24 h-24 bg-blue-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner border border-white rotate-3">
+                        <FileText size={48} className="text-blue-300" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">Aucun contrat actif</h3>
+                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4 italic">Aucun contrat actif</h3>
                     <p className="text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
-                        Établissez votre premier bail numérique pour sécuriser vos revenus et automatiser vos quittances.
+                        Établissez votre premier bail numérique pour sécuriser vos revenus et automatiser vos quittances. <br />
+                        <span className="text-[10px] uppercase font-black tracking-widest text-primary mt-4 block">Génération IA de contrats disponible</span>
                     </p>
-                    <Link href="/dashboard/leases/new" className="px-10 py-4 bg-gray-900 text-white font-black rounded-2xl shadow-xl shadow-gray-200 hover:bg-orange-500 transition-all uppercase tracking-widest text-xs">
+                    <Link href="/dashboard/leases/new" className="px-10 py-5 bg-gray-900 text-white font-black rounded-2xl shadow-xl hover:bg-primary transition-all uppercase tracking-widest text-[10px]">
                         Initier un contrat
                     </Link>
                 </motion.div>
             ) : (
-                <motion.div variants={item} className="glass-panel rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-2xl shadow-gray-200/50">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50/50">
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Référence / Patrimoine</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Parties Prenantes</th>
-                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Engagements</th>
-                                    <th className="px-10 py-6 text-right"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {leases.map((lease) => (
-                                    <tr key={lease.id} className="hover:bg-white transition-all group">
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-black text-orange-600 mb-2 uppercase tracking-tighter">{lease.leaseReference || 'REF-PENDING'}</span>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center text-sm shadow-inner border border-white">🏢</div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-black text-gray-900 leading-none mb-1">{lease.propertyName}</span>
-                                                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{lease.propertyCode} • {lease.propertyCommune}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col gap-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center text-xs border border-white shadow-sm">👤</div>
-                                                    <span className="text-sm font-extrabold text-gray-800">
-                                                        {lease.tenant?.fullName || lease.tenant?.phone || "En attente"}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset ${
-                                                        lease.status === 'ACTIVE' 
-                                                        ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                                                        : 'bg-orange-50 text-orange-700 ring-orange-600/20'
-                                                    }`}>
-                                                        {lease.status === 'ACTIVE' ? 'Actif' : 'En Validation'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex flex-col">
-                                                <div className="flex items-baseline gap-1 mb-2">
-                                                    <span className="text-lg font-black text-gray-900 tracking-tighter">{Number(lease.rentAmount || 0).toLocaleString()}</span>
-                                                    <span className="text-[10px] font-bold text-gray-400">FCFA</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">
-                                                        DEPUIS LE {new Date(lease.startDate).toLocaleDateString('fr-FR')}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-10 py-8 text-right">
-                                            <Link 
-                                                href={`/dashboard/leases/${lease.id}`} 
-                                                className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all shadow-inner border border-white"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <div className="space-y-6">
+                    {/* Simplified Header for Table Simulation */}
+                    <div className="hidden lg:grid grid-cols-12 gap-6 px-10 py-4">
+                        <div className="col-span-4 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Contrat / Patrimoine</div>
+                        <div className="col-span-4 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Parties Prenantes</div>
+                        <div className="col-span-3 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none italic">Flux Financiers</div>
+                        <div className="col-span-1"></div>
                     </div>
-                </motion.div>
+
+                    <div className="space-y-4">
+                        {leases.map((lease) => (
+                            <motion.div 
+                                key={lease.id} 
+                                variants={item}
+                                className="glass-card-premium rounded-[2.2rem] p-8 lg:grid lg:grid-cols-12 lg:items-center gap-6 border border-white/40 shadow-xl hover:scale-[1.01] transition-all group"
+                            >
+                                <div className="col-span-4 space-y-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-black text-primary mb-2 uppercase tracking-tight italic">
+                                            {lease.leaseReference || 'REF-PENDING'}
+                                        </span>
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-gray-400 shadow-lg group-hover:bg-gray-900 group-hover:text-white transition-all">
+                                                <Building2 size={24} />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-black text-gray-900 leading-none mb-1 group-hover:text-primary transition-colors">{lease.propertyName}</span>
+                                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{lease.propertyCode} • {lease.propertyCommune}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-4 mt-6 lg:mt-0 space-y-4 lg:border-l lg:border-gray-100 lg:pl-6">
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 border border-white shadow-sm">
+                                                <User size={14} />
+                                            </div>
+                                            <span className="text-[11px] font-black text-gray-800 uppercase tracking-tight">
+                                                {lease.tenant?.fullName || lease.tenant?.phone || "En attente"}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset ${
+                                                lease.status === 'ACTIVE' 
+                                                ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' 
+                                                : 'bg-orange-50 text-orange-700 ring-orange-600/20'
+                                            }`}>
+                                                {lease.status === 'ACTIVE' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
+                                                {lease.status === 'ACTIVE' ? 'Certifié Actif' : 'Validation...'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-3 mt-6 lg:mt-0 lg:border-l lg:border-gray-100 lg:pl-6">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-baseline gap-1 mb-2">
+                                            <span className="text-2xl font-black text-gray-900 tracking-tighter leading-none italic">
+                                                {Number(lease.rentAmount || 0).toLocaleString('fr-FR')}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">FCFA</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Calendar size={12} className="text-primary opacity-60" />
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider">
+                                                Depuis le {new Date(lease.startDate).toLocaleDateString('fr-FR')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-span-1 mt-6 lg:mt-0 flex justify-end">
+                                    <Link 
+                                        href={`/dashboard/leases/${lease.id}`} 
+                                        className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-xl hover:shadow-gray-200"
+                                    >
+                                        <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
             )}
         </motion.div>
     )

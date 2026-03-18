@@ -8,7 +8,9 @@ import { revalidatePath } from "next/cache"
  */
 export async function getDemoMode() {
     try {
-        const config = await prisma.systemConfig.findUnique({
+        if (!(prisma as any).systemConfig) return false;
+        
+        const config = await (prisma as any).systemConfig.findUnique({
             where: { key: "DEMO_MODE" }
         })
         return config?.value === true
@@ -23,7 +25,9 @@ export async function getDemoMode() {
  */
 export async function toggleDemoMode(enabled: boolean) {
     try {
-        await prisma.systemConfig.upsert({
+        if (!(prisma as any).systemConfig) throw new Error("Configuration system not initialized");
+
+        await (prisma as any).systemConfig.upsert({
             where: { key: "DEMO_MODE" },
             update: { value: enabled },
             create: { key: "DEMO_MODE", value: enabled }

@@ -5,15 +5,20 @@ import { prisma } from "@/lib/prisma"
 import { serializeUser } from "@/lib/serialize"
 
 export async function getCurrentUser() {
-    const session = await auth()
-    const userId = session?.user?.id
-    if (!userId) return null
+    try {
+        const session = await auth()
+        const userId = session?.user?.id
+        if (!userId) return null
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId }
-    })
-    
-    return serializeUser(user)
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        })
+        
+        return serializeUser(user)
+    } catch (error) {
+        console.error("[ACTION] getCurrentUser error:", error)
+        return null
+    }
 }
 
 export async function getUserTrustData() {

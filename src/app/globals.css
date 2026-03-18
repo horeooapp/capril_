@@ -86,9 +86,52 @@ body {
 .bg-mesh {
   background-color: #F8FAFC;
   background-image: 
-    radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(158,100%,95%,1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(25,100%,95%,1) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(25,100%,96%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(158,100%,96%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(25,100%,96%,1) 0, transparent 50%),
+    radial-gradient(at 50% 100%, hsla(210,100%,96%,1) 0, transparent 50%);
+}
+
+.bg-mesh-dark {
+  background-color: #0F172A;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(25,100%,10%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 100%, hsla(158,100%,10%,1) 0, transparent 50%);
+}
+
+/* Glow Effects */
+.glow-primary {
+  box-shadow: 0 0 20px -5px rgba(255, 130, 0, 0.3);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px -5px rgba(0, 158, 96, 0.3);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px -5px rgba(255, 130, 0, 0.4);
+}
+
+/* Enhanced Glass-Card */
+.glass-card-premium {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03),
+    inset 0 0 20px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass-card-premium:hover {
+  transform: translateY(-8px) scale(1.01);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--color-ivoire-orange);
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.1),
+    0 0 20px -5px rgba(255, 130, 0, 0.2);
 }
 
 /* Custom Animations */

@@ -1,10 +1,9 @@
-import Link from "next/link"
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import NotificationCenter from "@/components/dashboard/NotificationCenter"
-import ProtectedLogo from "@/components/ProtectedLogo"
-import MobileMenu from "@/components/MobileMenu"
+
+export const dynamic = "force-dynamic"
 import { logout } from "@/actions/auth"
+import LocataireHeader from "@/components/locataire/LocataireHeader"
 
 export default async function LocataireLayout({
     children,
@@ -17,74 +16,34 @@ export default async function LocataireLayout({
         redirect("/dashboard")
     }
 
-    const navLinks = [
-        { href: "/", label: "Accueil", icon: "🏠" },
-        { href: "/locataire", label: "Mes Quittances", icon: "📜" },
-        { href: "/locataire/leases", label: "Mes Contrats", icon: "📋" },
-        { href: "/locataire/trust", label: "Indice de Confiance", icon: "⭐" },
-    ];
+    const handleLogout = async () => {
+        "use server"
+        await logout()
+    }
 
     return (
-        <div className="min-h-screen bg-transparent flex flex-col relative overflow-hidden">
-            <div className="bg-ivory-pattern"></div>
-            {/* Navbar Locataire */}
-            <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
-                            <Link href="/locataire" className="flex items-center space-x-4 group">
-                                <ProtectedLogo 
-                                    src="/logo.png" 
-                                    alt="QAPRIL Logo" 
-                                    className="h-16 w-auto border border-gray-200 rounded shadow-sm group-hover:scale-105 transition-transform" 
-                                />
-                                <span className="font-bold text-2xl text-gray-900 hidden sm:inline">QAPRIL <span className="text-sm font-normal text-gray-500">| Portail Locataire</span></span>
-                            </Link>
-                        </div>
-
-                        <div className="flex items-center space-x-4">
-                            <nav className="hidden md:flex space-x-6 items-center">
-                                <Link href="/" className="text-gray-500 hover:text-gray-900 transition-colors flex items-center group">
-                                    <svg className="h-5 w-5 mr-1 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                    </svg>
-                                    <span>Accueil</span>
-                                </Link>
-                                <div className="h-4 w-px bg-gray-200"></div>
-                                <Link href="/locataire" className="text-gray-900 border-b-2 border-primary px-1 py-1.5 text-sm font-medium">Mes Quittances</Link>
-                                <Link href="/locataire/leases" className="text-gray-500 hover:text-gray-900 px-1 py-1.5 text-sm font-medium transition-colors">Mes Contrats</Link>
-                                <Link href="/locataire/trust" className="text-gray-500 hover:text-gray-900 px-1 py-2 text-sm font-medium flex items-center">
-                                    <span className="mr-1">⭐</span> Indice de Confiance
-                                </Link>
-                            </nav>
-
-                            <MobileMenu links={navLinks} session={session} variant="light" onLogout={logout} />
-
-                            <div className="hidden md:flex items-center space-x-4">
-                                <NotificationCenter />
-                                {session?.user && (
-                                    <>
-                                        <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{session.user.email}</span>
-                                        <form action={async () => {
-                                            "use server"
-                                            await signOut({ redirectTo: "/" })
-                                        }}>
-                                            <button type="submit" className="text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md font-medium transition-colors shadow-sm">
-                                                Déconnexion
-                                            </button>
-                                        </form>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
+        <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
+            {/* Mesh Background */}
+            <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
+            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
+            
+            <LocataireHeader session={session} onLogout={handleLogout} />
 
             {/* Main Content */}
-            <main className="flex-1 w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 {children}
             </main>
+            
+            {/* Footer de courtoisie Premium */}
+            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100 mt-12">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">© 2024 QAPRIL • Systèmes de Gestion Immobilière de Précision</p>
+                    <div className="flex gap-8">
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Support Prioritaire</span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mentions Légales</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     )
 }
