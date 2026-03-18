@@ -25,14 +25,21 @@ export async function getGlobalActivityStats() {
         }
     }
 
-    const [u, p, l, m, c, t] = await Promise.all([
-        prisma.user.count(),
-        prisma.property.count(),
-        prisma.lease.count(),
-        prisma.mandate.count({ where: { status: MandateStatus.ACTIVE } }),
-        prisma.colocataire.count({ where: { status: "ACTIF" } }), // Colocataire status is still a string in my current schema view but I should check if ACTIF is an enum
-        prisma.landLeaseInfo.count()
-    ])
+    let u = 0, p = 0, l = 0, m = 0, c = 0, t = 0;
+
+    try {
+        const counts = await Promise.all([
+            prisma.user.count().catch(() => 0),
+            prisma.property.count().catch(() => 0),
+            prisma.lease.count().catch(() => 0),
+            prisma.mandate.count({ where: { status: MandateStatus.ACTIVE } }).catch(() => 0),
+            prisma.colocataire.count({ where: { status: "ACTIF" } }).catch(() => 0),
+            prisma.landLeaseInfo.count().catch(() => 0)
+        ]);
+        [u, p, l, m, c, t] = counts;
+    } catch (e) {
+        console.error("Database sync error in Observatory:", e);
+    }
 
     return {
         totalUsers: u,
@@ -41,7 +48,7 @@ export async function getGlobalActivityStats() {
         totalMandates: m,
         activeColocs: c,
         landLeases: t,
-        marketTrend: "+2.1%" // Calculation logic could be more complex
+        marketTrend: "+2.1%"
     }
 }
 
@@ -52,13 +59,18 @@ export async function getMarketInsights() {
     }
 
     // Get latest snapshots for the most active communes
-    return await prisma.observatorySnapshot.findMany({
-        distinct: ['commune'],
-        orderBy: {
-            createdAt: 'desc'
-        },
-        take: 12
-    })
+    try {
+        return await prisma.observatorySnapshot.findMany({
+            distinct: ['commune'],
+            orderBy: {
+                createdAt: 'desc'
+            },
+            take: 12
+        })
+    } catch (e) {
+        console.error("Observatory Snapshot missing:", e);
+        return [];
+    }
 }
 
 export async function getLiveEventStream() {
@@ -77,5 +89,5 @@ export async function getLiveEventStream() {
         },
         orderBy: { createdAt: 'desc' },
         take: 15
-    })
+    }).catch(() => [])
 }

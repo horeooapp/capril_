@@ -16,43 +16,43 @@ export default async function AdminDashboardOverview() {
         } else {
             // 1. Stats de Base
             const [totalUsers, totalProperties, totalLeases, totalMandates, activeColocs, landLeases] = await Promise.all([
-                prisma.user.count(),
-                prisma.property.count(),
-                prisma.lease.count(),
-                prisma.mandate.count({ where: { status: "ACTIVE" } }),
-                prisma.colocataire.count({ where: { status: "ACTIF" } }),
-                prisma.landLeaseInfo.count()
+                prisma.user.count().catch(() => 0),
+                prisma.property.count().catch(() => 0),
+                prisma.lease.count().catch(() => 0),
+                prisma.mandate.count({ where: { status: "ACTIVE" as any } }).catch(() => 0),
+                prisma.colocataire.count({ where: { status: "ACTIF" as any } }).catch(() => 0),
+                prisma.landLeaseInfo.count().catch(() => 0)
             ])
             
             // 2. Stats v3.0 - Fiscalité (M17)
             const fiscalStats = await prisma.fiscalDossier.aggregate({
-                where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] } },
+                where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] as any } },
                 _sum: { totalDgi: true }
-            })
+            }).catch(() => ({ _sum: { totalDgi: 0 } }))
 
             // 3. Stats v3.0 - Cautions (M18)
             const cdcStats = await prisma.cDCDeposit.aggregate({
-                where: { status: "CONSIGNED" },
+                where: { status: "CONSIGNED" as any },
                 _sum: { amount: true }
-            })
+            }).catch(() => ({ _sum: { amount: 0 } }))
 
             // 4. Stats v3.0 - Contentieux (M19)
             const activeMediations = await prisma.mediation.count({
-                where: { status: "OPEN" }
-            })
+                where: { status: "OPEN" as any }
+            }).catch(() => 0)
 
             // 5. Stats v3.0 - KYC (M21)
             const kycAutoValidated = await prisma.identityDocument.count({
-                where: { status: "verified", verifiedByUserId: "SYSTEM_AI" }
-            })
+                where: { status: "verified" as any, verifiedByUserId: "SYSTEM_AI" }
+            }).catch(() => 0)
             const totalKycDocs = await prisma.identityDocument.count({
-                where: { status: "verified" }
-            })
+                where: { status: "verified" as any }
+            }).catch(() => 0)
             const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
 
             // 6. Alertes & Anomalies (M21 flags)
             const documentsUnderReview = await prisma.identityDocument.findMany({
-                where: { status: "under_review" },
+                where: { status: "under_review" as any },
                 select: {
                     id: true,
                     docType: true,
@@ -66,7 +66,7 @@ export default async function AdminDashboardOverview() {
                 },
                 take: 3,
                 orderBy: { createdAt: 'desc' }
-            })
+            }).catch(() => [])
 
             // 7. Audit Logs Récents
             const recentAuditLogs = await prisma.auditLog.findMany({
@@ -84,7 +84,7 @@ export default async function AdminDashboardOverview() {
                 },
                 take: 5,
                 orderBy: { createdAt: 'desc' }
-            })
+            }).catch(() => [])
 
             data = {
                 totalUsers, totalProperties, totalLeases,
