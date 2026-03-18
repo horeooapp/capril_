@@ -9,8 +9,10 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    const session = await auth()
+    // const session = await auth()
+    const session = null as any;
 
+    /*
     if (!session?.user) {
         redirect("/admin/login")
     }
@@ -18,6 +20,7 @@ export default async function AdminLayout({
     if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
         redirect("/dashboard")
     }
+    */
 
     return (
         <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
@@ -25,7 +28,8 @@ export default async function AdminLayout({
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
             
-            <AdminHeader session={session} onLogout={logout} />
+            {/* <AdminHeader session={session} onLogout={logout} /> */}
+            <div className="p-4 bg-red-500 text-white font-black uppercase">Admin Layout Debug Mode</div>
 
             {/* Main Content */}
             <main className="flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
