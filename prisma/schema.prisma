@@ -397,9 +397,8 @@ model Lease {
   prepayments       PrepaymentRequest[]
   pgwPayments       PaymentPgw[]
 
-  pgwPayment         PaymentPgw[]
-
   colocataires      Colocataire[]
+
   synthesesLoyer    MonthlyRentSynthesis[]
   landInfo          LandLeaseInfo?
 
@@ -450,6 +449,8 @@ model Receipt {
   receiptHash       String?  @map("receipt_hash") // SHA256 of contents
   status            String   @default("pending") // pending|paid|cancelled|disputed
   declarative       Boolean  @default(false) @map("declarative")
+  pgwPayments       PaymentPgw[]
+
   
   digitalDeliveryId String?  @map("digital_delivery_id")
   delivery          DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
