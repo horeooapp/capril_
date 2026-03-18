@@ -22,6 +22,8 @@ import StatCard from "@/components/admin/StatCard"
 export default async function AdminDashboard() {
     const isDemoMode = await getDemoMode()
     
+    // Using a super-resilient data fetching pattern to prevent crashes 
+    // when certain database models or schema entities are not fully synchronized.
     try {
         let data: any;
 
@@ -37,29 +39,29 @@ export default async function AdminDashboard() {
                 (prisma as any).landLeaseInfo ? (prisma as any).landLeaseInfo.count().catch(() => 0) : Promise.resolve(0)
             ])
             
-            const fiscalStats = await prisma.fiscalDossier.aggregate({
+            const fiscalStats = (prisma as any).fiscalDossier ? await (prisma as any).fiscalDossier.aggregate({
                 where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] as any } },
                 _sum: { totalDgi: true }
-            }).catch(() => ({ _sum: { totalDgi: 0 } }))
+            }).catch(() => ({ _sum: { totalDgi: 0 } })) : { _sum: { totalDgi: 0 } }
 
-            const cdcStats = await prisma.cDCDeposit.aggregate({
+            const cdcStats = (prisma as any).cDCDeposit ? await (prisma as any).cDCDeposit.aggregate({
                 where: { status: "CONSIGNED" as any },
                 _sum: { amount: true }
-            }).catch(() => ({ _sum: { amount: 0 } }))
+            }).catch(() => ({ _sum: { amount: 0 } })) : { _sum: { amount: 0 } }
 
-            const activeMediations = await prisma.mediation.count({
+            const activeMediations = (prisma as any).mediation ? await (prisma as any).mediation.count({
                 where: { status: "OPEN" as any }
-            }).catch(() => 0)
+            }).catch(() => 0) : 0
 
-            const kycAutoValidated = await prisma.identityDocument.count({
+            const kycAutoValidated = (prisma as any).identityDocument ? await (prisma as any).identityDocument.count({
                 where: { status: "verified" as any, verifiedByUserId: "SYSTEM_AI" }
-            }).catch(() => 0)
-            const totalKycDocs = await prisma.identityDocument.count({
+            }).catch(() => 0) : 0
+            const totalKycDocs = (prisma as any).identityDocument ? await (prisma as any).identityDocument.count({
                 where: { status: "verified" as any }
-            }).catch(() => 0)
+            }).catch(() => 0) : 0
             const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
 
-            const documentsUnderReview = await prisma.identityDocument.findMany({
+            const documentsUnderReview = (prisma as any).identityDocument ? await (prisma as any).identityDocument.findMany({
                 where: { status: "under_review" as any },
                 select: {
                     id: true,
@@ -74,9 +76,9 @@ export default async function AdminDashboard() {
                 },
                 take: 3,
                 orderBy: { createdAt: 'desc' }
-            }).catch(() => [])
+            }).catch(() => []) : []
 
-            const recentAuditLogs = await prisma.auditLog.findMany({
+            const recentAuditLogs = (prisma as any).auditLog ? await (prisma as any).auditLog.findMany({
                 select: {
                     id: true,
                     action: true,
@@ -91,7 +93,7 @@ export default async function AdminDashboard() {
                 },
                 take: 5,
                 orderBy: { createdAt: 'desc' }
-            }).catch(() => [])
+            }).catch(() => []) : []
 
             data = {
                 totalUsers, totalProperties, totalLeases,
