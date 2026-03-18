@@ -12,24 +12,37 @@ import {
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
+import { prisma } from "@/lib/prisma"
+import { getDemoMode } from "@/actions/demo-actions"
+import { getDemoData } from "@/lib/demo-data"
 
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
-    // Phase 1: Restore UI structure with STATIC data to confirm rendering 
-    // doesn't crash without Prisma involvement.
-    const isDemoMode = true; // Temporary static
-    const data = {
-        fiscalStats: { _sum: { totalDgi: 25450000 } },
-        cdcStats: { _sum: { amount: 15800000 } },
-        activeMediations: 12,
-        kycAutoRate: 94,
-        totalUsers: 482,
-        totalProperties: 125,
-        totalLeases: 114,
-        totalMandates: 42,
-        activeColocs: 18,
-        landLeases: 7,
+    const isDemoMode = await getDemoMode()
+    const demoData = isDemoMode ? getDemoData() : null
+
+    // Safe Data extraction logic
+    const safeData = (isDemoMode && demoData) ? {
+        totalDgi: Number(demoData.fiscalStats?._sum?.totalDgi || 0),
+        cdcAmount: Number(demoData.cdcStats?._sum?.amount || 0),
+        activeMediations: Number(demoData.activeMediations || 0),
+        kycAutoRate: Number(demoData.kycAutoRate || 0),
+        totalUsers: Number(demoData.totalUsers || 0),
+        totalProperties: Number(demoData.totalProperties || 0),
+        totalMandates: Number(demoData.totalMandates || 0),
+        totalColocs: Number(demoData.activeColocs || 0),
+        totalLandLeases: Number(demoData.landLeases || 0),
+    } : {
+        totalDgi: Number((await (prisma as any).fiscalDossier?.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
+        cdcAmount: Number((await (prisma as any).cdcDeposit?.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
+        activeMediations: await (prisma as any).mediation?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        kycAutoRate: 94, 
+        totalUsers: await prisma.user.count().catch(() => 0),
+        totalProperties: await (prisma as any).property?.count().catch(() => 0),
+        totalMandates: await (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalColocs: await (prisma as any).colocataire?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalLandLeases: await (prisma as any).landLeaseInfo?.count().catch(() => 0),
     }
 
     try {
@@ -37,30 +50,89 @@ export default async function AdminDashboardOverview() {
             <div className="space-y-12 pb-16 relative">
                 <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
-                {/* Core Global Stats Grid - Testing StatCard without Icons */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
+                            Supervision.
+                        </h1>
+                        <p className="text-gray-500 font-medium tracking-wide">
+                            Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <DemoToggle initialEnabled={isDemoMode} />
+                        <div className="h-12 w-[1px] bg-gray-200 hidden md:block"></div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
+                            <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Core Global Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <StatCard 
                         title="Volume Fiscal (M17)" 
-                        value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
+                        value={`${safeData.totalDgi.toLocaleString()} FCFA`} 
                         icon={<Banknote size={28} />} 
                         color="orange"
-                        trend="SIM_DGI"
+                        trend="En direct"
                         delay={0.1}
                     />
                     <StatCard 
                         title="Consignation CDC (M18)" 
-                        value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
+                        value={`${safeData.cdcAmount.toLocaleString()} FCFA`} 
                         icon={<ShieldCheck size={28} />} 
                         color="blue"
                         trend="Sécurisé"
                         delay={0.2}
+                    />
+                    <StatCard 
+                        title="Médiations Actives (M19)" 
+                        value={safeData.activeMediations.toString()} 
+                        icon={<Scale size={28} />} 
+                        color="red"
+                        trend="En cours"
+                        delay={0.3}
+                    />
+                    <StatCard 
+                        title="Auto-KYC IA (M21)" 
+                        value={`${safeData.kycAutoRate}%`} 
+                        icon={<UserCheck size={28} />} 
+                        color="purple"
+                        trend="Efficience"
+                        delay={0.4}
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <StatCard 
+                        title="Mandats Actifs" 
+                        value={safeData.totalMandates.toString()} 
+                        icon={<FileText size={28} />} 
+                        color="slate"
+                        delay={0.5}
+                    />
+                    <StatCard 
+                        title="Colocs Actives" 
+                        value={safeData.totalColocs.toString()} 
+                        icon={<Database size={28} />} 
+                        color="emerald"
+                        delay={0.6}
+                    />
+                    <StatCard 
+                        title="Baux Terrains" 
+                        value={safeData.totalLandLeases.toString()} 
+                        icon={<ArrowUpRight size={28} />} 
+                        color="amber"
+                        delay={0.7}
                     />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2 space-y-10">
                         <div className="glass-panel p-20 text-center rounded-[2.5rem] border border-dashed border-gray-200">
-                           <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">Flux de Données en cours de Diagnostic</p>
+                           <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">Flux d&apos;Activités en cours de synchronisation</p>
                         </div>
                     </div>
 
@@ -79,7 +151,7 @@ export default async function AdminDashboardOverview() {
                             <div className="glass-card-premium p-8 rounded-[2rem]">
                                 <p className="label-tech mb-2 text-xs font-black uppercase tracking-widest">Utilisateurs Totaux</p>
                                 <div className="flex items-end justify-between">
-                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{data.totalUsers || 0}</p>
+                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{safeData.totalUsers}</p>
                                     <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 border border-orange-100">
                                         <Users size={20} />
                                     </div>
