@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion"
 import MandateActions from "@/components/dashboard/MandateActions"
+import { MandateStatus, MandateType } from "@prisma/client"
 
 interface Mandate {
     id: string;
-    status: string;
-    mandateType: string;
+    status: MandateStatus;
+    mandateType: MandateType;
     startDate: Date | string;
     endDate: Date | string | null;
     property: {
