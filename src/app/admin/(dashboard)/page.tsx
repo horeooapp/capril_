@@ -1,11 +1,25 @@
 import { prisma } from "@/lib/prisma"
-import { AlertCircle, ArrowUpRight, Banknote, ShieldCheck, Scale, History, UserCheck, FileText, Sparkles, Database } from "lucide-react"
+import { 
+    Banknote, 
+    ShieldCheck, 
+    Scale, 
+    UserCheck, 
+    FileText, 
+    Database, 
+    ArrowUpRight,
+    Activity,
+    AlertTriangle,
+    CheckCircle2,
+    Clock,
+    Users
+} from "lucide-react"
 import Link from "next/link"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
 import DemoToggle from "@/components/admin/DemoToggle"
+import StatCard from "@/components/admin/StatCard"
 
-export default async function AdminDashboardOverview() {
+export default async function AdminDashboard() {
     const isDemoMode = await getDemoMode()
     
     try {
@@ -14,34 +28,29 @@ export default async function AdminDashboardOverview() {
         if (isDemoMode) {
             data = getDemoData()
         } else {
-            // 1. Stats de Base
             const [totalUsers, totalProperties, totalLeases, totalMandates, activeColocs, landLeases] = await Promise.all([
                 prisma.user.count().catch(() => 0),
                 prisma.property.count().catch(() => 0),
                 prisma.lease.count().catch(() => 0),
-                prisma.mandate.count({ where: { status: "ACTIVE" as any } }).catch(() => 0),
-                prisma.colocataire.count({ where: { status: "ACTIF" as any } }).catch(() => 0),
-                prisma.landLeaseInfo.count().catch(() => 0)
+                (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0) || 0,
+                (prisma as any).colocataire?.count({ where: { status: "ACTIF" } }).catch(() => 0) || 0,
+                (prisma as any).landLeaseInfo?.count().catch(() => 0) || 0
             ])
             
-            // 2. Stats v3.0 - Fiscalité (M17)
             const fiscalStats = await prisma.fiscalDossier.aggregate({
                 where: { statut: { in: ["PAYE_CONFIRME", "PAIEMENT_PARTIEL"] as any } },
                 _sum: { totalDgi: true }
             }).catch(() => ({ _sum: { totalDgi: 0 } }))
 
-            // 3. Stats v3.0 - Cautions (M18)
             const cdcStats = await prisma.cDCDeposit.aggregate({
                 where: { status: "CONSIGNED" as any },
                 _sum: { amount: true }
             }).catch(() => ({ _sum: { amount: 0 } }))
 
-            // 4. Stats v3.0 - Contentieux (M19)
             const activeMediations = await prisma.mediation.count({
                 where: { status: "OPEN" as any }
             }).catch(() => 0)
 
-            // 5. Stats v3.0 - KYC (M21)
             const kycAutoValidated = await prisma.identityDocument.count({
                 where: { status: "verified" as any, verifiedByUserId: "SYSTEM_AI" }
             }).catch(() => 0)
@@ -50,7 +59,6 @@ export default async function AdminDashboardOverview() {
             }).catch(() => 0)
             const kycAutoRate = totalKycDocs > 0 ? Math.round((kycAutoValidated / totalKycDocs) * 100) : 0
 
-            // 6. Alertes & Anomalies (M21 flags)
             const documentsUnderReview = await prisma.identityDocument.findMany({
                 where: { status: "under_review" as any },
                 select: {
@@ -68,7 +76,6 @@ export default async function AdminDashboardOverview() {
                 orderBy: { createdAt: 'desc' }
             }).catch(() => [])
 
-            // 7. Audit Logs Récents
             const recentAuditLogs = await prisma.auditLog.findMany({
                 select: {
                     id: true,
@@ -95,29 +102,54 @@ export default async function AdminDashboardOverview() {
         }
 
         return (
-            <div className="space-y-8 pb-12">
-                {/* ... (Keep banners and header as is) */}
+            <div className="space-y-12 pb-16 relative">
+                <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
+                            Supervision.
+                        </h1>
+                        <p className="text-gray-500 font-medium tracking-wide">
+                            Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <DemoToggle initialEnabled={isDemoMode} />
+                        <div className="h-12 w-[1px] bg-gray-200 hidden md:block"></div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
+                            <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Core Global Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <StatCard 
                         title="Volume Fiscal (M17)" 
                         value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
                         icon={Banknote} 
                         color="orange"
-                        trend={isDemoMode ? "SIM_DGI" : "+12%"}
+                        trend={isDemoMode ? "SIM_DGI" : "+12.4%"}
+                        delay={0.1}
                     />
                     <StatCard 
                         title="Consignation CDC (M18)" 
                         value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
                         icon={ShieldCheck} 
                         color="blue"
+                        trend="Sécurisé"
+                        delay={0.2}
                     />
                     <StatCard 
                         title="Médiations Actives (M19)" 
                         value={(data.activeMediations || 0).toString()} 
                         icon={Scale} 
                         color="red"
+                        trend="En cours"
+                        delay={0.3}
                     />
                     <StatCard 
                         title="Auto-KYC IA (M21)" 
@@ -125,106 +157,118 @@ export default async function AdminDashboardOverview() {
                         icon={UserCheck} 
                         color="purple"
                         trend="Efficience"
+                        delay={0.4}
                     />
                 </div>
 
                 {/* New Modules Activity Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <StatCard 
                         title="Mandats Actifs" 
                         value={(data.totalMandates || 0).toString()} 
                         icon={FileText} 
                         color="slate"
+                        delay={0.5}
                     />
                     <StatCard 
                         title="Colocs Actives" 
                         value={(data.activeColocs || 0).toString()} 
                         icon={Database} 
                         color="emerald"
+                        delay={0.6}
                     />
                     <StatCard 
                         title="Baux Terrains" 
                         value={(data.landLeases || 0).toString()} 
                         icon={ArrowUpRight} 
                         color="amber"
+                        delay={0.7}
                     />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Alerts & Systems */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Critical Alerts KYC */}
-                        <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                                <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                    <AlertCircle className="text-red-500" size={18} />
-                                    Anomalies & Vérifications requises
-                                </h3>
-                                <Link href="/admin/validation" className="text-xs text-orange-600 font-bold hover:underline">Voir tout</Link>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="lg:col-span-2 space-y-10">
+                        <section className="glass-panel rounded-[2.5rem] overflow-hidden border border-white/40 shadow-xl">
+                            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-red-100 rounded-xl text-red-600">
+                                        <AlertTriangle size={20} />
+                                    </div>
+                                    <h3 className="font-black text-gray-900 uppercase tracking-tighter text-xl">
+                                        Anomalies & Vérifications
+                                    </h3>
+                                </div>
+                                <Link href="/admin/validation" className="label-tech hover:text-primary transition-colors">Voir tout</Link>
                             </div>
                             <div className="divide-y divide-gray-100">
                                 {(data.documentsUnderReview || []).length > 0 ? data.documentsUnderReview.map((doc: any) => (
-                                    <div key={doc.id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                                    <div key={doc.id} className="p-6 flex justify-between items-center hover:bg-white/50 transition-all group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 font-black text-xl shadow-inner border border-white">
                                                 {doc.user?.fullName?.charAt(0) || "?"}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm text-gray-900">{doc.user?.fullName || "Inconnu"}</p>
-                                                <p className="text-xs text-gray-500">Document: {doc.docType} • Flag AI</p>
+                                                <p className="font-bold text-gray-900 group-hover:text-primary transition-colors">{doc.user?.fullName || "Inconnu"}</p>
+                                                <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mt-1">ID: {doc.docType} • FLAG_REVIEW</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {isDemoMode && <span className="bg-orange-100 text-orange-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Demo</span>}
-                                            <Link href={`/admin/validation`} className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
-                                                <ArrowUpRight size={18} className="text-gray-400" />
-                                            </Link>
-                                        </div>
+                                        <Link href={`/admin/validation`} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-900 hover:text-white transition-all shadow-sm">
+                                            <ArrowUpRight size={18} />
+                                        </Link>
                                     </div>
                                 )) : (
-                                    <div className="p-12 text-center text-gray-400 text-sm italic">
-                                        Aucune anomalie détectée par le moteur IA.
+                                    <div className="p-20 text-center">
+                                        <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+                                            <CheckCircle2 size={32} />
+                                        </div>
+                                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune anomalie critique</p>
                                     </div>
                                 )}
                             </div>
                         </section>
 
-                        {/* Audit Trail */}
-                        <section className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                                <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                    <History className="text-blue-500" size={18} />
-                                    Journal d&apos;Audit Sécurisé
-                                </h3>
-                                <Link href="/admin/audit" className="text-xs text-blue-600 font-bold hover:underline">Accéder au Log</Link>
+                        <section className="glass-panel rounded-[2.5rem] overflow-hidden border border-white/40 shadow-2xl shadow-gray-200/50">
+                            <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                                        <Activity size={20} />
+                                    </div>
+                                    <h3 className="font-black text-gray-900 uppercase tracking-tighter text-xl">
+                                        Flux d&apos;Audit système
+                                    </h3>
+                                </div>
+                                <Link href="/admin/audit" className="label-tech hover:text-blue-600 transition-colors">Logs complets</Link>
                             </div>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
-                                    <thead className="bg-gray-50 text-[10px] uppercase font-black text-gray-400 tracking-widest">
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-50/50 text-[10px] uppercase font-black text-gray-400 tracking-[0.2em]">
                                         <tr>
-                                            <th className="px-6 py-3">Timestamp</th>
-                                            <th className="px-6 py-3">Action</th>
-                                            <th className="px-6 py-3">Utilisateur</th>
-                                            <th className="px-6 py-3 text-right">Module</th>
+                                            <th className="px-8 py-4">Horodatage</th>
+                                            <th className="px-8 py-4">Action</th>
+                                            <th className="px-8 py-4">Opérateur</th>
+                                            <th className="px-8 py-4 text-right">Module</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-gray-100/50">
                                         {(data.recentAuditLogs || []).map((log: any) => (
-                                            <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
-                                                <td className="px-6 py-4 font-mono text-[10px] text-gray-400">
-                                                    {log.createdAt ? new Date(log.createdAt).toLocaleString('fr-FR') : "-"}
-                                                </td>
-                                                <td className="px-6 py-4">
+                                            <tr key={log.id} className="hover:bg-white/40 transition-colors">
+                                                <td className="px-8 py-5 text-gray-400 font-mono text-[11px]">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-gray-900">{(log.action || "ACTION_INCONNUE").replace(/_/g, ' ')}</span>
-                                                        {isDemoMode && <span className="text-[8px] bg-orange-100 text-orange-600 px-1 rounded font-black italic">DEMO</span>}
+                                                        <Clock size={12} />
+                                                        {log.createdAt ? new Date(log.createdAt).toLocaleTimeString('fr-FR') : "-"}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-gray-500">
-                                                    {log.user?.fullName || "Système"}
+                                                <td className="px-8 py-5">
+                                                    <span className="font-bold text-gray-900 text-sm">{(log.action || "CORE_EVENT").replace(/_/g, ' ')}</span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold">
+                                                <td className="px-8 py-5">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-bold text-gray-700">{log.user?.fullName || "SYSTEM"}</span>
+                                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">{log.user?.role || "AUTO"}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-5 text-right">
+                                                    <span className="px-3 py-1 bg-gray-900 text-white text-[9px] font-black rounded-lg uppercase tracking-widest shadow-lg shadow-gray-900/10">
                                                         {log.module}
                                                     </span>
                                                 </td>
@@ -236,28 +280,35 @@ export default async function AdminDashboardOverview() {
                         </section>
                     </div>
 
-                    {/* Right Column: Key Links & Snapshots */}
-                    <div className="space-y-8">
-                        <section className="bg-gray-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group">
-                            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <FileText size={160} />
-                            </div>
-                            <h4 className="text-orange-400 font-bold text-xs uppercase tracking-widest mb-4">Moteur Fiscal (M17)</h4>
-                            <p className="text-xl font-bold mb-6">Générer le rapport consolidé DGI</p>
-                            <Link href="/admin/fiscal" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                                <span>Ouvrir l&apos;interface</span>
-                                <ArrowUpRight size={18} />
+                    <div className="space-y-10">
+                        <section className="bg-gray-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600 blur-[130px] opacity-20 -mr-40 -mt-40 group-hover:opacity-40 transition-opacity"></div>
+                            <h4 className="label-tech text-primary mb-6 text-xs font-black uppercase tracking-widest">Moteur Fiscal Consolidated</h4>
+                            <p className="text-2xl font-black mb-10 leading-tight">Consolider tous les flux <br /><span className="text-orange-400">DGI Côte d&apos;Ivoire</span>.</p>
+                            <Link href="/admin/fiscal" className="flex items-center justify-between w-full p-6 bg-white/10 hover:bg-primary transition-all rounded-2xl border border-white/10 hover:border-transparent group/btn">
+                                <span className="font-black uppercase tracking-widest text-[10px]">Lancer le rapport</span>
+                                <ArrowUpRight size={20} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                             </Link>
                         </section>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Users</p>
-                                <p className="text-2xl font-black text-gray-900">{data.totalUsers || 0}</p>
+                        <div className="grid grid-cols-1 gap-6">
+                            <div className="glass-card-premium p-8 rounded-[2rem]">
+                                <p className="label-tech mb-2 text-xs font-black uppercase tracking-widest">Utilisateurs Totaux</p>
+                                <div className="flex items-end justify-between">
+                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{data.totalUsers || 0}</p>
+                                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 border border-orange-100">
+                                        <Users size={20} />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-tighter mb-1">Properties</p>
-                                <p className="text-2xl font-black text-gray-900">{data.totalProperties || 0}</p>
+                            <div className="glass-card-premium p-8 rounded-[2rem]">
+                                <p className="label-tech mb-2 text-xs font-black uppercase tracking-widest">Patrimoine National</p>
+                                <div className="flex items-end justify-between">
+                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{data.totalProperties || 0}</p>
+                                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 border border-blue-100">
+                                        <Database size={20} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -267,56 +318,27 @@ export default async function AdminDashboardOverview() {
     } catch (error: any) {
         console.error("[ADMIN DASHBOARD] Critical render error:", error)
         return (
-            <div className="p-8 bg-red-50 border-2 border-red-100 rounded-[2.5rem] flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
-                    <AlertCircle size={32} />
+            <div className="p-12 bg-red-50/50 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center backdrop-blur-xl">
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-red-200/50 rotate-3">
+                    <AlertTriangle size={36} />
                 </div>
-                <h2 className="text-2xl font-black text-gray-900 mb-2">Erreur de Supervision</h2>
-                <div className="bg-white/80 p-6 rounded-[2rem] border border-red-200 mb-8 max-w-2xl w-full shadow-inner text-[10px]">
+                <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tighter uppercase">Interruption Supervision.</h2>
+                <div className="bg-white p-8 rounded-[2.5rem] border border-red-200 mb-10 max-w-2xl w-full shadow-2xl shadow-red-100/50 text-[11px]">
                     <p className="text-red-900 font-mono text-left whitespace-pre-wrap leading-relaxed">
-                        <span className="font-black text-red-600 uppercase block mb-1">Diagnostic Technique :</span>
+                        <span className="font-black text-red-600 uppercase block mb-3 border-b border-red-100 pb-2">Diagnostic Technique QAPRIL-OS:</span>
                         {error?.message || String(error)}
                     </p>
                 </div>
-                <div className="flex flex-col items-center gap-4">
-                    <p className="text-gray-500 text-[10px] italic">Accrocs détectés côté base de données.</p>
+                <div className="flex flex-col items-center gap-6">
+                    <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em]">Synchronisation Base de Données requise</p>
                      <div className="flex gap-4">
                         <DemoToggle initialEnabled={isDemoMode} />
-                        <Link href="/admin" className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl">
-                            Rafraîchir
-                        </Link>
+                        <button onClick={() => window.location.reload()} className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-2xl active:scale-95">
+                            Relancer l&apos;audit
+                        </button>
                      </div>
                 </div>
             </div>
         )
     }
-}
-
-function StatCard({ title, value, icon: Icon, color, trend }: any) {
-    const colors: any = {
-        orange: "bg-orange-500/10 text-orange-600",
-        blue: "bg-blue-500/10 text-blue-600",
-        red: "bg-red-500/10 text-red-600",
-        purple: "bg-purple-500/10 text-purple-600",
-        slate: "bg-slate-500/10 text-slate-600",
-        emerald: "bg-emerald-500/10 text-emerald-600",
-        amber: "bg-amber-500/10 text-amber-600"
-    }
-
-    return (
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-            <div className={`w-12 h-12 rounded-2xl ${colors[color] || colors.orange} flex items-center justify-center mb-4`}>
-                <Icon size={24} />
-            </div>
-            <div className="space-y-1">
-                <p className="text-xs font-bold text-gray-500 tracking-tight uppercase">{title}</p>
-                <h3 className="text-2xl font-black text-gray-900">{value}</h3>
-            </div>
-            {trend && (
-                <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-1 text-[10px] font-black text-green-600 uppercase">
-                    <ArrowUpRight size={12} /> {trend}
-                </div>
-            )}
-        </div>
-    )
 }

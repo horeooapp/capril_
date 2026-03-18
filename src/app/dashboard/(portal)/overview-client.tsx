@@ -3,6 +3,19 @@
 import { motion } from "framer-motion"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
+import { 
+    Building2, 
+    ClipboardList, 
+    ShieldCheck, 
+    Zap, 
+    Plus, 
+    ArrowRight,
+    Search,
+    ChevronRight,
+    TrendingUp,
+    MapPin,
+    Users
+} from "lucide-react"
 
 interface DashboardProperty {
     id: string;
@@ -64,112 +77,190 @@ export default function DashboardOverviewClient({
         })
     })
 
+    const stats = [
+        { label: "Logements gérés", value: totalProperties, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
+        { label: "Contrats actifs", value: totalLeases, unit: "Baux", icon: ClipboardList, color: "text-emerald-600 bg-emerald-50", glow: "shadow-emerald-200/40" },
+        { label: "Sécurisé (CDC)", value: totalSecuredFunds, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
+        { label: "Performance / Mois", value: receiptsThisMonth, unit: "Paiements", icon: Zap, color: "text-violet-600 bg-violet-50", glow: "shadow-violet-200/40" },
+    ]
+
     return (
         <motion.div 
             variants={container}
             initial="hidden"
             animate="show"
-            className="space-y-12"
+            className="space-y-16"
         >
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase">
+            {/* Page Header */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div className="space-y-2">
+                    <h1 className="text-5xl lg:text-7xl font-black text-gray-900 tracking-tighter uppercase leading-none">
                         Patrimoine.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide">
-                        Bienvenue, <span className="text-gray-900 font-bold">{user?.name || user?.email || "Gestionnaire"}</span>. État actuel de vos actifs.
+                    <p className="text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        Bienvenue, <span className="text-gray-900 font-black">{user?.name || user?.email?.split('@')[0]}</span> 
+                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">Vue d&apos;ensemble consolidée</span>
                     </p>
                 </div>
-                {user && <ReliabilityBadge score={750} />}
+                <div className="shrink-0 flex items-center gap-4">
+                    <button className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm">
+                        <TrendingUp size={14} className="text-primary" />
+                        Rapports d&apos;activité
+                    </button>
+                    {user && <ReliabilityBadge score={88.4} />}
+                </div>
             </div>
 
             {regularizationAlert}
 
-            {/* Premium Stats Cards */}
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                    { label: "Logements gérés", value: totalProperties, accent: "bg-orange-500", icon: "🏢" },
-                    { label: "Contrats actifs", value: totalLeases, accent: "bg-green-500", icon: "📋" },
-                    { label: "Sécurisé (CDC)", value: `${totalSecuredFunds.toLocaleString()} FCFA`, accent: "bg-blue-600", icon: "🛡️" },
-                    { label: "Performance / Mois", value: receiptsThisMonth, accent: "bg-purple-600", icon: "⚡" },
-                ].map((stat, i) => (
+            {/* Premium Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {stats.map((stat, i) => (
                     <motion.div 
                         key={i}
                         variants={item}
-                        className="glass-card p-8 rounded-[2rem] flex flex-col justify-between min-h-[200px]"
+                        className={`glass-card-premium p-10 rounded-[3rem] border border-white/40 shadow-2xl ${stat.glow} flex flex-col justify-between min-h-[240px] relative group hover:scale-[1.02] transition-all`}
                     >
-                        <div className="flex justify-between items-start">
-                            <span className="label-tech text-[9px]">{stat.label}</span>
-                            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl shadow-sm border border-white">
-                                {stat.icon}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gray-900/5 blur-[40px] -mr-16 -mt-16 rounded-full group-hover:opacity-100 transition-opacity"></div>
+                        
+                        <div className="flex justify-between items-start relative z-10">
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1 leading-none">{stat.label}</span>
+                                <div className="h-1 w-8 bg-gray-900/10 rounded-full"></div>
+                            </div>
+                            <div className={`w-14 h-14 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform`}>
+                                <stat.icon size={28} />
                             </div>
                         </div>
-                        <div className="mt-8 flex items-end justify-between">
-                            <dd className="text-3xl font-black text-gray-900 tracking-tighter leading-none">{stat.value}</dd>
-                            <div className={`h-2.5 w-2.5 rounded-full ${stat.accent} shadow-lg ring-4 ring-white`}></div>
+
+                        <div className="relative z-10 mt-12">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-black text-gray-900 tracking-tighter leading-none">
+                                    {stat.isCurrency ? stat.value.toLocaleString() : stat.value}
+                                </span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.unit}</span>
+                            </div>
+                            <div className="mt-4 flex items-center gap-2">
+                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Mise à jour réelle</span>
+                            </div>
                         </div>
                     </motion.div>
                 ))}
             </div>
 
-            {/* Actions & Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            {/* Actions & Activity Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 
-                {/* Visual Action Panel */}
-                <motion.section variants={item} className="lg:col-span-1 glass-card p-10 rounded-[2.5rem] bg-gray-900 text-white overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600 blur-[120px] opacity-20 -mr-40 -mt-40 group-hover:opacity-30 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col h-full">
-                        <h2 className="text-3xl font-black mb-10 leading-none">Commandes<br/>Rapides.</h2>
+                {/* Command Panel (Propriétaire Focus) */}
+                <motion.section 
+                    variants={item} 
+                    className="lg:col-span-4 glass-card-premium p-10 rounded-[3rem] bg-gray-900 text-white overflow-hidden relative group border-none shadow-orange-950/20 shadow-2xl"
+                >
+                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-orange-600 blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+                    <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-blue-600 blur-[100px] opacity-10 group-hover:opacity-30 transition-opacity duration-700"></div>
+                    
+                    <div className="relative z-10 flex flex-col h-full space-y-12">
+                        <div>
+                            <h2 className="text-4xl font-black mb-4 leading-none uppercase tracking-tighter italic">Actions.<br/>Directes</h2>
+                            <p className="text-xs font-medium text-gray-400 leading-relaxed max-w-[200px]">Commandes ultra-rapides pour la gestion de votre parc immobilier.</p>
+                        </div>
+                        
                         <div className="space-y-4 mt-auto">
-                            <Link href="/dashboard/properties" className="flex items-center justify-between p-6 bg-white/5 hover:bg-white/10 rounded-2xl transition-all group/link border border-white/5 hover:border-white/20">
-                                <span className="font-bold tracking-tight text-sm uppercase">Nouveau Logement</span>
-                                <svg className="w-5 h-5 group-hover/link:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                </svg>
+                            <Link href="/dashboard/properties/new" className="flex items-center justify-between p-7 bg-white/5 hover:bg-white/10 rounded-[2rem] transition-all group/link border border-white/5 hover:border-white/20 active:scale-95">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/10 rounded-xl group-hover/link:bg-white/20 transition-colors">
+                                        <Plus size={20} />
+                                    </div>
+                                    <span className="font-black tracking-[0.1em] text-[10px] uppercase">Nouveau Logement</span>
+                                </div>
+                                <ArrowRight size={18} className="opacity-40 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all" />
                             </Link>
-                            <Link href="/dashboard/leases" className="flex items-center justify-between p-6 bg-orange-500 hover:bg-orange-600 rounded-2xl transition-all group/link shadow-xl shadow-orange-950/20">
-                                <span className="font-bold tracking-tight text-sm uppercase">Générer Quittance</span>
-                                <svg className="w-5 h-5 group-hover/link:translate-y-[-2px] group-hover/link:translate-x-[2px] transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                                </svg>
+                            
+                            <Link href="/dashboard/receipts" className="flex items-center justify-between p-7 bg-primary hover:bg-orange-600 rounded-[2.2rem] transition-all group/link shadow-2xl shadow-orange-950/40 active:scale-95">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/20 rounded-xl">
+                                        <Zap size={20} />
+                                    </div>
+                                    <span className="font-black tracking-[0.1em] text-[10px] uppercase">Générer Quittance</span>
+                                </div>
+                                <ChevronRight size={18} className="group-hover/link:translate-x-1 transition-transform" />
                             </Link>
                         </div>
                     </div>
                 </motion.section>
 
-                {/* Modern List View */}
-                <motion.section variants={item} className="lg:col-span-2 glass-panel p-10 rounded-[2.5rem]">
-                    <div className="flex items-center justify-between mb-10">
+                {/* Patrimoine Actif List */}
+                <motion.section 
+                    variants={item} 
+                    className="lg:col-span-8 glass-panel p-12 rounded-[3.5rem] border border-white/50 shadow-2xl shadow-gray-100"
+                >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-12 gap-6">
                         <div className="flex flex-col">
-                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Patrimoine Actif.</h3>
-                            <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Dernières mises à jour</span>
+                            <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic">Patrimoine Actif.</h3>
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Index de vos 4 derniers actifs</span>
+                                <span className="h-[1px] w-8 bg-gray-200"></span>
+                            </div>
                         </div>
-                        <Link href="/dashboard/properties" className="label-tech py-2 px-4 bg-gray-50 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all border border-gray-100">Explorer</Link>
+                        <Link href="/dashboard/properties" className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all border border-gray-100 shadow-sm group">
+                            Voir tout le parc
+                            <Search size={14} className="group-hover:rotate-12 transition-transform" />
+                        </Link>
                     </div>
-                    <div className="space-y-4">
-                        {properties.slice(0, 4).map((prop) => (
-                            <div key={prop.id} className="flex items-center justify-between p-5 hover:bg-white rounded-2xl transition-all border border-transparent hover:border-gray-50 group hover:shadow-xl hover:shadow-gray-100/50">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-14 h-14 bg-gray-50 flex items-center justify-center rounded-2xl text-xl shadow-inner border border-white group-hover:bg-orange-50 transition-colors">🏢</div>
-                                    <div>
-                                        <p className="font-extrabold text-gray-900 leading-none mb-2 text-lg">{prop.name || prop.address}</p>
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{prop.city} — {prop.neighborhood}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right flex items-center gap-8">
-                                    <div className="hidden sm:block">
-                                        <p className="text-sm font-black text-gray-900">{(prop.leases?.length || 0)} UNITÉS</p>
-                                        <div className="h-1.5 w-full bg-gray-100 rounded-full mt-1.5 overflow-hidden">
-                                            <div className="h-full bg-green-500 w-full opacity-80"></div>
+
+                    <div className="space-y-6">
+                        {properties.slice(0, 4).map((prop, index) => (
+                            <motion.div 
+                                key={prop.id} 
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="group p-8 bg-gray-50/30 hover:bg-white rounded-[2.5rem] transition-all border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/40 relative overflow-hidden"
+                            >
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-20 h-20 bg-white flex items-center justify-center rounded-[1.8rem] text-2xl shadow-xl shadow-gray-200/50 border border-gray-50 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                                            <Building2 size={32} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-3">
+                                                <p className="font-black text-gray-900 text-2xl tracking-tighter leading-none uppercase">{prop.name || "Immeuble SS1"}</p>
+                                                <span className="px-2 py-0.5 bg-orange-50 text-primary text-[8px] font-black uppercase tracking-widest rounded border border-orange-100">Actif</span>
+                                            </div>
+                                            <div className="flex items-center gap-4 text-gray-400">
+                                                <div className="flex items-center gap-1.5">
+                                                    <MapPin size={12} className="text-gray-300" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">{prop.city}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <Users size={12} className="text-gray-300" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">{(prop.leases?.length || 0)} Locataires</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all">
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
+                                    
+                                    <div className="flex items-center gap-6 self-end md:self-center">
+                                        <div className="hidden sm:flex flex-col items-end">
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-1.5 w-24 bg-gray-200/50 rounded-full overflow-hidden shadow-inner">
+                                                    <div className="h-full bg-emerald-500 w-[92%] shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
+                                                </div>
+                                                <span className="text-[10px] font-black text-emerald-600">92%</span>
+                                            </div>
+                                        </div>
+                                        <Link 
+                                            href={`/dashboard/properties/${prop.id}`}
+                                            className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all shadow-sm group/btn"
+                                        >
+                                            <ArrowRight size={24} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </motion.section>

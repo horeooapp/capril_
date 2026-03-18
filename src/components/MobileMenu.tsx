@@ -137,12 +137,19 @@ export default function MobileMenu({
                     <div className={`p-6 border-t ${s.border} ${s.footer}`}>
                         {session?.user ? (
                             <div className="space-y-4">
-                                <div className="px-5 py-4 bg-white/50 dark:bg-black/20 rounded-2xl border border-black/5 dark:border-white/5">
-                                    <p className="text-[9px] uppercase font-black text-gray-400 tracking-wider mb-1">Identité</p>
-                                    <p className="text-xs font-bold truncate text-gray-900 dark:text-white">{session.user.email}</p>
-                                    <div className="mt-2 flex items-center">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-primary italic">{session.user.role}</span>
+                                <div className="px-6 py-6 bg-white/50 backdrop-blur-xl dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/10 shadow-inner">
+                                    <p className="text-[8px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20">
+                                            {session.user.role?.charAt(0)}
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <p className="text-[11px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
+                                            <div className="flex items-center">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-primary italic leading-none">{session.user.role}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">

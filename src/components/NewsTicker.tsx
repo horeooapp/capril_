@@ -22,12 +22,12 @@ export default function NewsTicker({ items }: NewsTickerProps) {
         <div className="relative w-full overflow-hidden bg-gray-900 border-b border-white/5 py-2.5 z-[60]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
                 {/* Fixed Label */}
-                <div className="flex-shrink-0 flex items-center bg-primary px-3 py-1 rounded-lg mr-6 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">QAPRIL News</span>
-                    <span className="flex h-2 w-2 ml-2">
-                        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-white opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                <div className="flex-shrink-0 flex items-center bg-gray-950/40 backdrop-blur-md px-4 py-1.5 rounded-xl mr-6 border border-white/10 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white italic">QAPRIL <span className="text-primary">Live</span></span>
+                    <span className="flex h-1.5 w-1.5 ml-3">
+                        <span className="animate-ping absolute inline-flex h-1.5 w-1.5 rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
                     </span>
                 </div>
 
