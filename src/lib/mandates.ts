@@ -1,9 +1,11 @@
+import { MandateStatus } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export const MANDATE_TYPES = {
-    RENTAL: "rental",
-    MANAGEMENT_SIMPLE: "management_simple",
-    MANAGEMENT_EXTENDED: "management_extended",
+    EXCLUSIVE: "EXCLUSIVE",
+    SIMPLE: "SIMPLE",
+    CO_EXCLUSIVE: "CO_EXCLUSIVE",
+    DIRECT: "DIRECT",
 };
 
 /**
@@ -52,7 +54,7 @@ export async function isPropertyAuthorized(propertyId: string) {
         const activeMandate = await prisma.mandate.findFirst({
             where: {
                 propertyId,
-                status: 'active',
+                status: MandateStatus.ACTIVE,
                 endDate: { gt: new Date() }
             }
         });

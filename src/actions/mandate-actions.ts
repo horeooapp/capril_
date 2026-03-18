@@ -4,12 +4,12 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { generateMandateRef, validateCommission, MANDATE_TYPES } from "@/lib/mandates"
-import { Role } from "@prisma/client"
+import { Role, MandateType, MandateStatus } from "@prisma/client"
 
 export type CreateMandateInput = {
     propertyId: string;
     agentId: string;
-    mandateType: string;
+    mandateType: MandateType;
     commissionPct: number;
     startDate: string;
     endDate: string;
@@ -40,7 +40,7 @@ export async function createMandate(input: CreateMandateInput) {
                 commissionPct: input.commissionPct,
                 startDate: new Date(input.startDate),
                 endDate: new Date(input.endDate),
-                status: 'DRAFT'
+                status: MandateStatus.DRAFT
             }
         });
 
@@ -64,7 +64,7 @@ export async function signMandate(mandateId: string) {
         const mandate = await prisma.mandate.update({
             where: { id: mandateId },
             data: {
-                status: 'ACTIVE',
+                status: MandateStatus.ACTIVE,
                 signedAt: new Date(),
             }
         });
@@ -87,7 +87,7 @@ export async function signMandate(mandateId: string) {
  */
 export async function getAgencyRevenueForecast(agentId: string) {
     const mandates = await prisma.mandate.findMany({
-        where: { agentUserId: agentId, status: 'ACTIVE' },
+        where: { agentUserId: agentId, status: MandateStatus.ACTIVE },
         include: {
             leases: {
                 where: { status: 'ACTIVE' }

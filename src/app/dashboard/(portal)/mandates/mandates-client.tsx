@@ -102,11 +102,11 @@ export default function MandatesClient({ mandates }: { mandates: Mandate[] }) {
                                             <div className="flex flex-col gap-3">
                                                 <div className="flex items-center">
                                                     <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset ${
-                                                        mandate.mandateType === 'management_extended' 
+                                                        mandate.mandateType === 'EXCLUSIVE' 
                                                             ? 'bg-purple-50 text-purple-700 ring-purple-600/20' 
                                                             : 'bg-blue-50 text-blue-700 ring-blue-600/20'
                                                     }`}>
-                                                        {mandate.mandateType === 'management_extended' ? 'Mandat Exclusif' : 'Mandat Simple'}
+                                                        {mandate.mandateType === 'EXCLUSIVE' ? 'Mandat Exclusif' : 'Mandat Simple'}
                                                     </span>
                                                 </div>
                                                 <div className="flex flex-col text-[10px] font-bold text-gray-400 uppercase tracking-wider">

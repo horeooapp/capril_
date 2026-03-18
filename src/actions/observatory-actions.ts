@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { MandateStatus } from "@prisma/client"
 import { getDemoMode } from "./demo-actions"
 import { getDemoData } from "@/lib/demo-data"
 
@@ -28,8 +29,8 @@ export async function getGlobalActivityStats() {
         prisma.user.count(),
         prisma.property.count(),
         prisma.lease.count(),
-        prisma.mandate.count({ where: { status: "ACTIVE" } }),
-        prisma.colocataire.count({ where: { status: "ACTIF" } }),
+        prisma.mandate.count({ where: { status: MandateStatus.ACTIVE } }),
+        prisma.colocataire.count({ where: { status: "ACTIF" } }), // Colocataire status is still a string in my current schema view but I should check if ACTIF is an enum
         prisma.landLeaseInfo.count()
     ])
 
