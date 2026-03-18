@@ -37,16 +37,24 @@ export default async function AdminDashboardOverview() {
             <div className="space-y-12 pb-16 relative">
                 <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
-                {/* Core Global Stats Grid - Simplified to plain HTML */}
+                {/* Core Global Stats Grid - Testing StatCard without Icons */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div className="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-2">Volume Fiscal</p>
-                        <p className="text-3xl font-black text-gray-900">{Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA</p>
-                    </div>
-                    <div className="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-2">Cdc Consignation</p>
-                        <p className="text-3xl font-black text-gray-900">{Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA</p>
-                    </div>
+                    <StatCard 
+                        title="Volume Fiscal (M17)" 
+                        value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
+                        icon={() => <span>💰</span> as any} 
+                        color="orange"
+                        trend="SIM_DGI"
+                        delay={0.1}
+                    />
+                    <StatCard 
+                        title="Consignation CDC (M18)" 
+                        value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
+                        icon={() => <span>🏦</span> as any} 
+                        color="blue"
+                        trend="Sécurisé"
+                        delay={0.2}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
