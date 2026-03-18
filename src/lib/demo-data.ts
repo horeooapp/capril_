@@ -23,11 +23,16 @@ export const getDemoData = () => {
         
         // Comptes de base
         totalUsers: 482,
+        totalTenants: 345,
+        totalLandlords: 122,
+        totalAgencies: 15,
         totalProperties: 125,
-        totalLeases: 114, // Incremented
+        totalLeases: 114, 
         totalMandates: 42,
         activeColocs: 18,
         landLeases: 7,
+        totalCertificates: 284, // CNL + Fiscal
+        totalPayments: 142500000, // Total des quittances payées (FCFA)
 
         // Alertes KYC Fictives (Overview)
         documentsUnderReview: [

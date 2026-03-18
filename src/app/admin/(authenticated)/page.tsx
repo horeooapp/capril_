@@ -7,7 +7,9 @@ import {
     Database, 
     ArrowUpRight,
     Users,
-    AlertTriangle
+    AlertTriangle,
+    Building2,
+    Award
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -30,10 +32,16 @@ export default async function AdminDashboardOverview() {
         activeMediations: Number(demoData.activeMediations || 0),
         kycAutoRate: Number(demoData.kycAutoRate || 0),
         totalUsers: Number(demoData.totalUsers || 0),
+        totalTenants: Number(demoData.totalTenants || 0),
+        totalLandlords: Number(demoData.totalLandlords || 0),
+        totalAgencies: Number(demoData.totalAgencies || 0),
         totalProperties: Number(demoData.totalProperties || 0),
         totalMandates: Number(demoData.totalMandates || 0),
         totalColocs: Number(demoData.activeColocs || 0),
         totalLandLeases: Number(demoData.landLeases || 0),
+        totalLeases: Number(demoData.totalLeases || 0),
+        totalCertificates: Number(demoData.totalCertificates || 0),
+        totalPayments: Number(demoData.totalPayments || 0),
         recentAuditLogs: demoData.recentAuditLogs || [],
         documentsUnderReview: demoData.documentsUnderReview || []
     } : {
@@ -42,10 +50,19 @@ export default async function AdminDashboardOverview() {
         activeMediations: await (prisma as any).mediation?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
         kycAutoRate: 94, 
         totalUsers: await prisma.user.count().catch(() => 0),
+        totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
+        totalLandlords: await prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
+        totalAgencies: await prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
         totalProperties: await (prisma as any).property?.count().catch(() => 0),
         totalMandates: await (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
         totalColocs: await (prisma as any).colocataire?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
         totalLandLeases: await (prisma as any).landLeaseInfo?.count().catch(() => 0),
+        totalLeases: await (prisma as any).lease?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalCertificates: await (prisma as any).certificate?.count({ where: { status: "valid" } }).catch(() => 0),
+        totalPayments: Number((await (prisma as any).receipt?.aggregate({ 
+            _sum: { totalAmount: true },
+            where: { status: "paid" }
+        }).catch(() => null))?._sum?.totalAmount || 0),
         recentAuditLogs: await (prisma as any).auditLog?.findMany({
             take: 10,
             orderBy: { createdAt: 'desc' },
@@ -118,28 +135,67 @@ export default async function AdminDashboardOverview() {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatCard 
-                        title="Mandats Actifs" 
-                        value={safeData.totalMandates.toString()} 
-                        icon={<FileText size={28} />} 
-                        color="slate"
-                        delay={0.5}
-                    />
-                    <StatCard 
-                        title="Colocs Actives" 
-                        value={safeData.totalColocs.toString()} 
-                        icon={<Database size={28} />} 
-                        color="emerald"
-                        delay={0.6}
-                    />
-                    <StatCard 
-                        title="Baux Terrains" 
-                        value={safeData.totalLandLeases.toString()} 
-                        icon={<ArrowUpRight size={28} />} 
-                        color="amber"
-                        delay={0.7}
-                    />
+                {/* Vision Opérationnelle (Nouveau) */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 px-2">Indicateurs de Performance Opérationnelle</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Locataires Certifiés" 
+                            value={safeData.totalTenants.toLocaleString()} 
+                            icon={<Users size={28} />} 
+                            color="emerald"
+                            trend="+12% ce mois"
+                            delay={0.5}
+                        />
+                        <StatCard 
+                            title="Propriétaires & Agences" 
+                            value={(safeData.totalLandlords + safeData.totalAgencies).toLocaleString()} 
+                            icon={<Building2 size={28} />} 
+                            color="slate"
+                            trend="Actifs"
+                            delay={0.6}
+                        />
+                        <StatCard 
+                            title="Contrats de Bail Actifs" 
+                            value={safeData.totalLeases.toLocaleString()} 
+                            icon={<FileText size={28} />} 
+                            color="amber"
+                            trend="Sécurisés"
+                            delay={0.7}
+                        />
+                        <StatCard 
+                            title="Licences & Certificats" 
+                            value={safeData.totalCertificates.toLocaleString()} 
+                            icon={<Award size={28} />} 
+                            color="indigo"
+                            trend="Conformes"
+                            delay={0.8}
+                        />
+                    </div>
+                </div>
+
+                {/* Montant Total des Transactions */}
+                <div className="glass-card-premium p-10 rounded-[3rem] bg-gray-900 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary blur-[150px] opacity-20 -mr-40 -mt-40 group-hover:opacity-30 transition-opacity"></div>
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div>
+                            <p className="label-tech text-primary mb-4 text-xs font-black uppercase tracking-widest">Flux Transactionnel Total (Reçus Certifiés)</p>
+                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-2">
+                                {safeData.totalPayments.toLocaleString()} <span className="text-2xl text-primary/60 font-bold uppercase tracking-tighter">FCFA</span>
+                            </h2>
+                            <p className="text-white/40 font-medium">Cumul des loyers et frais sécurisés par le protocole QAPRIL.</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="p-8 bg-white/5 rounded-[2rem] border border-white/10 text-center">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Colocataires</p>
+                                <p className="text-2xl font-black">{safeData.totalColocs}</p>
+                            </div>
+                            <div className="p-8 bg-white/5 rounded-[2rem] border border-white/10 text-center">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Mandats</p>
+                                <p className="text-2xl font-black">{safeData.totalMandates}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -159,27 +215,21 @@ export default async function AdminDashboardOverview() {
                             <LiveActivityStream logs={safeData.recentAuditLogs} />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <StatCard 
-                                title="Mandats Actifs" 
-                                value={safeData.totalMandates.toString()} 
-                                icon={<FileText size={28} />} 
-                                color="slate"
-                                delay={0.5}
-                            />
-                            <StatCard 
-                                title="Colocs Actives" 
-                                value={safeData.totalColocs.toString()} 
-                                icon={<Database size={28} />} 
-                                color="emerald"
-                                delay={0.6}
-                            />
+                        {/* Infos Système Complémentaires */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <StatCard 
                                 title="Baux Terrains" 
                                 value={safeData.totalLandLeases.toString()} 
                                 icon={<ArrowUpRight size={28} />} 
                                 color="amber"
-                                delay={0.7}
+                                delay={0.9}
+                            />
+                            <StatCard 
+                                title="Utilisateurs Plateforme" 
+                                value={safeData.totalUsers.toString()} 
+                                icon={<Users size={28} />} 
+                                color="slate"
+                                delay={1.0}
                             />
                         </div>
                     </div>
@@ -232,17 +282,7 @@ export default async function AdminDashboardOverview() {
                             </Link>
                         </section>
 
-                        <div className="grid grid-cols-1 gap-6">
-                            <div className="glass-card-premium p-8 rounded-[2rem]">
-                                <p className="label-tech mb-2 text-xs font-black uppercase tracking-widest">Utilisateurs Totaux</p>
-                                <div className="flex items-end justify-between">
-                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{safeData.totalUsers}</p>
-                                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 border border-orange-100">
-                                        <Users size={20} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
