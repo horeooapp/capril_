@@ -13,9 +13,18 @@ import { isFeatureEnabled } from "@/lib/features";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const session = await auth();
-  const dbNews = await getActiveNews();
-  const isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE");
+  let session = null;
+  let dbNews: any[] = [];
+  let isLandingPageRestricted = true;
+
+  try {
+    session = await auth();
+    dbNews = await getActiveNews();
+    isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE");
+  } catch (error) {
+    console.error("[HOME] Error during initial data fetch:", error);
+  }
+
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
 
   // --- 1. DATA PREPARATION ---

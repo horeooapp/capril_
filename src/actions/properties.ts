@@ -10,24 +10,29 @@ import { serializeProperty, serializeLease } from "@/lib/serialize"
  * Part 5: List Owner Properties
  */
 export async function getProperties() {
-    const session = await auth()
-    if (!session || !session.user || !session.user.id) {
-        throw new Error("Unauthorized")
-    }
+    try {
+        const session = await auth()
+        if (!session || !session.user || !session.user.id) {
+            throw new Error("Unauthorized")
+        }
 
-    const properties = await prisma.property.findMany({
-        where: { ownerUserId: session.user.id },
-        include: {
-            leases: {
-                include: {
-                    tenant: { select: { fullName: true, phone: true } }
+        const properties = await prisma.property.findMany({
+            where: { ownerUserId: session.user.id },
+            include: {
+                leases: {
+                    include: {
+                        tenant: { select: { fullName: true, phone: true } }
+                    }
                 }
-            }
-        },
-        orderBy: { createdAt: 'desc' }
-    })
+            },
+            orderBy: { createdAt: 'desc' }
+        })
 
-    return properties.map(serializeProperty)
+        return properties.map(serializeProperty)
+    } catch (error) {
+        console.error("[ACTION] getProperties error:", error)
+        return []
+    }
 }
 
 /**
