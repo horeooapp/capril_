@@ -1,6 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
+import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/Footer";
+ 
+export const metadata: Metadata = {
+  title: "Contact & Support",
+  description: "Contactez l'assistance institutionnelle de QAPRIL. Équipe dédiée pour propriétaires, locataires et partenaires immobiliers.",
+};
 
 export default function ContactPage() {
   return (

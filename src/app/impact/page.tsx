@@ -1,7 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
+import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import SectionHeading from "@/components/SectionHeading";
+ 
+export const metadata: Metadata = {
+  title: "Impact & Transformation",
+  description: "Comment QAPRIL redéfinit l'économie locative ivoirienne par la transparence et la sécurité institutionnelle.",
+};
 
 export default function ImpactPage() {
   return (
