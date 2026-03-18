@@ -12,7 +12,7 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     noStore();
-    let session = await auth();
+    const session = await auth();
 
     if (!session?.user) {
         redirect("/admin/login")
