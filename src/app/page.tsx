@@ -7,6 +7,8 @@ import NewsTicker from "@/components/NewsTicker";
 import MobileMenu from "@/components/MobileMenu";
 import HeroSlider from "@/components/HeroSlider";
 import SectionHeading from "@/components/SectionHeading";
+import AppDepthCards from "@/components/AppDepthCards";
+import Footer from "@/components/Footer";
 import { logout } from "@/actions/auth";
 
 export const dynamic = "force-dynamic";
@@ -51,17 +53,20 @@ export default async function Home() {
       <section className="relative min-h-[60vh] flex items-center overflow-hidden">
         <HeroSlider />
         <div className="relative z-10 p-10 max-w-2xl">
-           <h2 className="text-5xl font-black text-white drop-shadow-2xl">Hero Slider Debug.</h2>
-           <p className="text-white/80 mt-4 font-medium">Si vous voyez le slider bouger, c&apos;est parfait.</p>
+           <h2 className="text-5xl font-black text-white drop-shadow-2xl uppercase">Expertise.</h2>
         </div>
       </section>
 
       <section className="py-20">
-         <SectionHeading subtitle="Expertise Digitale" title="Un registre pour tous." />
-         <div className="text-center mt-10">
-            <p className="text-gray-500">DEBUG STEP: HeroSlider and SectionHeading reintroduced.</p>
-         </div>
+         <SectionHeading subtitle="Profondeur Applicative" title="Un registre pour tous." />
+         <AppDepthCards />
       </section>
+
+      <Footer />
+      
+      <div className="text-center py-4 bg-gray-50 border-t">
+        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">DEBUG STEP: Final Components reintroduced.</p>
+      </div>
     </main>
   );
 }
