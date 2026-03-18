@@ -47,7 +47,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                             <ProtectedLogo 
                                 src="/logo.png" 
                                 alt="QAPRIL Logo" 
-                                className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-lg shadow-lg border border-white/50" 
+                                className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500" 
                             />
                             <div className="absolute -inset-2 bg-primary/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>

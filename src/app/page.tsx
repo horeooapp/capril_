@@ -60,7 +60,7 @@ export default async function Home() {
               <Link href="/" className="flex items-center space-x-5 group">
                 <div className="relative">
                     <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full scale-110"></div>
-                    <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto relative z-10 drop-shadow-2xl group-hover:scale-105 transition-transform duration-500" />
+                    <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto relative z-10 group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-black text-4xl tracking-tighter uppercase leading-none italic">QAPRIL.</span>
@@ -156,7 +156,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-3 group">
-              <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto drop-shadow-sm group-hover:scale-110 transition-transform" />
+              <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto group-hover:scale-110 transition-transform" />
               <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase leading-none">QAPRIL</span>
             </Link>
 
