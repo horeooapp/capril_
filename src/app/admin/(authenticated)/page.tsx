@@ -1,42 +1,164 @@
-import { AlertTriangle } from "lucide-react"
+import { 
+    Banknote, 
+    ShieldCheck, 
+    Scale, 
+    UserCheck, 
+    FileText, 
+    Database, 
+    ArrowUpRight,
+    Users,
+    AlertTriangle
+} from "lucide-react"
+import Link from "next/link"
+import DemoToggle from "@/components/admin/DemoToggle"
+import StatCard from "@/components/admin/StatCard"
 
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
+    // Phase 1: Restore UI structure with STATIC data to confirm rendering 
+    // doesn't crash without Prisma involvement.
+    const isDemoMode = true; // Temporary static
+    const data = {
+        fiscalStats: { _sum: { totalDgi: 25450000 } },
+        cdcStats: { _sum: { amount: 15800000 } },
+        activeMediations: 12,
+        kycAutoRate: 94,
+        totalUsers: 482,
+        totalProperties: 125,
+        totalLeases: 114,
+        totalMandates: 42,
+        activeColocs: 18,
+        landLeases: 7,
+    }
+
     try {
         return (
-            <div className="p-12 bg-white rounded-[3rem] shadow-2xl border border-gray-100 text-center animate-in fade-in duration-1000">
-                <div className="w-20 h-20 bg-green-50 text-green-600 rounded-3xl flex items-center justify-center mb-10 border border-green-100 shadow-sm mx-auto rotate-3">
-                     <span className="text-3xl">🛡️</span>
-                </div>
+            <div className="space-y-12 pb-16 relative">
+                <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
-                <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-4 italic">
-                    Diagnostic Système <span className="text-primary italic">QAPRIL</span>.
-                </h1>
-                
-                <p className="text-gray-500 font-bold uppercase text-xs tracking-[0.2em] mb-12">
-                    Niveau de Service: <span className="text-green-600">OPTIMAL</span>
-                </p>
-                
-                <div className="flex flex-col items-center gap-4">
-                    <div className="inline-flex items-center gap-3 px-6 py-3 bg-green-50 text-green-600 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-green-100">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Moteur de Rendu Opérationnel
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
+                            Supervision.
+                        </h1>
+                        <p className="text-gray-500 font-medium tracking-wide">
+                            Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
+                        </p>
                     </div>
-                    <p className="text-[10px] text-gray-400 font-medium max-w-xs leading-relaxed">
-                        Si vous voyez ce panneau, le Layout et le Header fonctionnent correctement. 
-                        L&apos;erreur provient donc des données dynamiques du dashboard original.
-                    </p>
+                    <div className="flex items-center gap-4">
+                        <DemoToggle initialEnabled={isDemoMode} />
+                        <div className="h-12 w-[1px] bg-gray-200 hidden md:block"></div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
+                            <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Core Global Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <StatCard 
+                        title="Volume Fiscal (M17)" 
+                        value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
+                        icon={Banknote} 
+                        color="orange"
+                        trend="SIM_DGI"
+                        delay={0.1}
+                    />
+                    <StatCard 
+                        title="Consignation CDC (M18)" 
+                        value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
+                        icon={ShieldCheck} 
+                        color="blue"
+                        trend="Sécurisé"
+                        delay={0.2}
+                    />
+                    <StatCard 
+                        title="Médiations Actives (M19)" 
+                        value={(data.activeMediations || 0).toString()} 
+                        icon={Scale} 
+                        color="red"
+                        trend="En cours"
+                        delay={0.3}
+                    />
+                    <StatCard 
+                        title="Auto-KYC IA (M21)" 
+                        value={`${data.kycAutoRate}%`} 
+                        icon={UserCheck} 
+                        color="purple"
+                        trend="Efficience"
+                        delay={0.4}
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <StatCard 
+                        title="Mandats Actifs" 
+                        value={(data.totalMandates || 0).toString()} 
+                        icon={FileText} 
+                        color="slate"
+                        delay={0.5}
+                    />
+                    <StatCard 
+                        title="Colocs Actives" 
+                        value={(data.activeColocs || 0).toString()} 
+                        icon={Database} 
+                        color="emerald"
+                        delay={0.6}
+                    />
+                    <StatCard 
+                        title="Baux Terrains" 
+                        value={(data.landLeases || 0).toString()} 
+                        icon={ArrowUpRight} 
+                        color="amber"
+                        delay={0.7}
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div className="lg:col-span-2 space-y-10">
+                        <div className="glass-panel p-20 text-center rounded-[2.5rem] border border-dashed border-gray-200">
+                           <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">Flux de Données en cours de Diagnostic</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-10">
+                        <section className="bg-gray-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600 blur-[130px] opacity-20 -mr-40 -mt-40 group-hover:opacity-40 transition-opacity"></div>
+                            <h4 className="label-tech text-primary mb-6 text-xs font-black uppercase tracking-widest">Moteur Fiscal Consolidated</h4>
+                            <p className="text-2xl font-black mb-10 leading-tight">Consolider tous les flux <br /><span className="text-orange-400">DGI Côte d&apos;Ivoire</span>.</p>
+                            <Link href="/admin/fiscal" className="flex items-center justify-between w-full p-6 bg-white/10 hover:bg-primary transition-all rounded-2xl border border-white/10 hover:border-transparent group/btn">
+                                <span className="font-black uppercase tracking-widest text-[10px]">Lancer le rapport</span>
+                                <ArrowUpRight size={20} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                            </Link>
+                        </section>
+
+                        <div className="grid grid-cols-1 gap-6">
+                            <div className="glass-card-premium p-8 rounded-[2rem]">
+                                <p className="label-tech mb-2 text-xs font-black uppercase tracking-widest">Utilisateurs Totaux</p>
+                                <div className="flex items-end justify-between">
+                                    <p className="text-4xl font-black text-gray-900 tracking-tighter">{data.totalUsers || 0}</p>
+                                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 border border-orange-100">
+                                        <Users size={20} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
-    } catch (err: any) {
+    } catch (error: any) {
         return (
-            <div className="p-12 bg-red-50 border-2 border-red-100 rounded-[3rem] text-center">
-                <AlertTriangle className="mx-auto text-red-500 mb-6" size={48} />
-                <h2 className="text-2xl font-black text-gray-900 uppercase mb-4">Erreur de Diagnostic</h2>
-                <code className="text-xs bg-white p-4 rounded-xl border border-red-100 block text-left overflow-auto">
-                    {String(err)}
+            <div className="p-12 bg-red-50/50 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center backdrop-blur-xl">
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-red-200/50 rotate-3">
+                    <AlertTriangle size={36} />
+                </div>
+                <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tighter uppercase italic">Interruption Supervision.</h2>
+                <code className="text-[10px] text-red-700 bg-white p-6 rounded-2xl border border-red-200 max-w-full overflow-auto">
+                    {String(error)}
                 </code>
             </div>
         )
