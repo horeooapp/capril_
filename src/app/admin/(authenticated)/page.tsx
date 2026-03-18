@@ -42,7 +42,7 @@ export default async function AdminDashboardOverview() {
                     <StatCard 
                         title="Volume Fiscal (M17)" 
                         value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
-                        icon={null as any} 
+                        icon={Banknote} 
                         color="orange"
                         trend="SIM_DGI"
                         delay={0.1}
@@ -50,7 +50,7 @@ export default async function AdminDashboardOverview() {
                     <StatCard 
                         title="Consignation CDC (M18)" 
                         value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
-                        icon={null as any} 
+                        icon={ShieldCheck} 
                         color="blue"
                         trend="Sécurisé"
                         delay={0.2}
