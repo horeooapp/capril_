@@ -76,12 +76,22 @@ export async function createReceipt(data: {
 
         // 5. Update scoring (ICL) if it's a rent payment
         if (data.receiptType === "RENT") {
-            // Scoring logic needs update for periodMonth (Part 13)
-            // For now, simple mock or skip
             try {
-                await scoreRentPayment(lease.tenantId!, 0, receipt.id)
+                // PART 13: Calculate punctuality based on periodMonth
+                const [year, month] = data.periodMonth.split('-').map(Number);
+                const dueDate = new Date(year, month - 1, 5); // 5th of the month
+                const today = new Date();
+                
+                // Normalize dates to midnight for day calculation
+                const d1 = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+                const d2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                
+                const diffTime = d2.getTime() - d1.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                await scoreRentPayment(lease.tenantId!, diffDays, receipt.id);
             } catch (e) {
-                console.warn("[SCORING] Skipping score update due to schema mismatch")
+                console.warn("[SCORING] Error updating score:", e);
             }
         }
 

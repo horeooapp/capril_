@@ -5,10 +5,14 @@ import { ShieldCheck, ArrowLeft, Lock, Globe } from "lucide-react"
 
 export default function AdminLoginPage() {
     return (
-        <div className="min-h-screen bg-ivory-pattern bg-mesh flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-white">
+            {/* Background Layers */}
+            <div className="fixed inset-0 bg-mesh opacity-60 z-0"></div>
+            <div className="fixed inset-0 bg-ivory-pattern opacity-10 z-0 pointer-events-none"></div>
+            
             {/* Ambient background glows */}
-            <div className="absolute top-0 -right-20 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-            <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
+            <div className="absolute top-0 -right-20 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+            <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
                 <Link href="/" className="inline-flex items-center justify-center space-x-4 mb-12 group">
