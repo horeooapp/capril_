@@ -214,6 +214,10 @@ model User {
 
   colocataires            Colocataire[]
   mandateHistory          MandateHistory[] @relation("MandateHistoryAgent")
+  
+  pgwPayerTransactions      PaymentPgw[] @relation("PayerTransactions")
+  pgwBeneficiaryTransactions PaymentPgw[] @relation("BeneficiaryTransactions")
+
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
@@ -390,7 +394,11 @@ model Lease {
   mediation         Mediation?
   paymentIntents    PaymentIntent[]
   fiscalDossiers    FiscalDossier[]
-  prepaymentRequests PrepaymentRequest[]
+  prepayments       PrepaymentRequest[]
+  pgwPayments       PaymentPgw[]
+
+  pgwPayment         PaymentPgw[]
+
   colocataires      Colocataire[]
   synthesesLoyer    MonthlyRentSynthesis[]
   landInfo          LandLeaseInfo?
@@ -992,4 +1000,108 @@ model PrepaymentRequest {
   @@index([landlordId])
   @@index([status])
 }
+
+// ═══════════════════════════════════════════════════════
+// MODULE M-PGW — PAYMENT GATEWAY (ABSTRACTION)
+// ═══════════════════════════════════════════════════════
+
+model PaymentPgw {
+  id              String             @id @default(uuid()) @map("payment_id")
+  leaseId         String             @map("lease_id")
+  lease           Lease              @relation(fields: [leaseId], references: [id])
+  moisConcerne    DateTime           @map("mois_concerne") @db.Date
+  montant         Decimal            @db.Decimal(12, 0)
+  
+  payeurId        String             @map("payeur_id")
+  payeur          User               @relation("PayerTransactions", fields: [payeurId], references: [id])
+  beneficiaireId  String             @map("beneficiaire_id")
+  beneficiaire    User               @relation("BeneficiaryTransactions", fields: [beneficiaireId], references: [id])
+  
+  canal           PaymentCanal
+  msisdnPayeur    String?            @map("msisdn_payeur")
+  msisdnBeneficiaire String?         @map("msisdn_beneficiaire")
+  
+  statut          PaymentPgwStatus   @default(INITIEE)
+  
+  refInterne      String             @unique @map("ref_interne")
+  refOperateur    String?            @map("ref_operateur")
+  refCinetpay     String?            @map("ref_cinetpay")
+  
+  webhookPayload  Json?              @map("webhook_payload")
+  webhookReceivedAt DateTime?        @map("webhook_received_at")
+  
+  quittanceId     String?            @map("quittance_id")
+  quittance       Receipt?           @relation(fields: [quittanceId], references: [id])
+  
+  webhooks        PgwWebhook[]
+  
+  tentatives      Int                @default(0)
+  expiresAt       DateTime?          @map("expires_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("payments_pgw")
+  @@index([leaseId, moisConcerne])
+  @@index([statut, expiresAt])
+  @@index([refInterne])
+}
+
+enum PaymentCanal {
+  ORANGE
+  MTN
+  WAVE
+  MOOV
+  CINETPAY_M17
+  SMS_DECLARATIF
+}
+
+enum PaymentPgwStatus {
+  INITIEE
+  EN_ATTENTE_PAIEMENT
+  CONFIRMEE
+  ECHEC
+  EXPIREE
+  DECLAREE
+}
+
+model PgwWebhook {
+  id              String        @id @default(uuid()) @map("webhook_id")
+  canal           PaymentCanal
+  refOperateur    String?       @map("ref_operateur")
+  payload         Json
+  signatureValide Boolean       @map("signature_valid")
+  traite          Boolean       @default(false)
+  paymentId       String?       @map("payment_id")
+  payment         PaymentPgw?   @relation(fields: [paymentId], references: [id])
+  receivedAt      DateTime      @default(now()) @map("received_at")
+
+  @@map("pgw_webhooks")
+  @@index([refOperateur, canal])
+}
+
+model PgwMsisdnLookup {
+  prefixe    String   @id @map("prefixe")
+  operateur  PaymentCanal
+  actif      Boolean  @default(true)
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("pgw_msisdn_lookup")
+}
+
+model PgwReconciliation {
+  id                     String       @id @default(uuid()) @map("recon_id")
+  dateRecon              DateTime     @map("date_recon") @db.Date
+  canal                  PaymentCanal
+  nbTransactionsQapril   Int          @map("nb_transactions_qapril")
+  nbTransactionsOperateur Int?         @map("nb_transactions_operateur")
+  montantTotalQapril     Decimal      @map("montant_total_qapril") @db.Decimal(14, 0)
+  montantTotalOperateur  Decimal?     @map("montant_total_operateur") @db.Decimal(14, 0)
+  nbEcarts               Int          @default(0) @map("nb_ecarts")
+  ecartsDetail           Json?        @map("ecarts_detail")
+  statut                 String       @default("EN_COURS")
+  createdAt              DateTime     @default(now()) @map("created_at")
+
+  @@map("pgw_reconciliation")
+}
+
 
