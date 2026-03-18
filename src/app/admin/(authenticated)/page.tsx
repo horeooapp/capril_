@@ -37,84 +37,16 @@ export default async function AdminDashboardOverview() {
             <div className="space-y-12 pb-16 relative">
                 <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
-                            Supervision.
-                        </h1>
-                        <p className="text-gray-500 font-medium tracking-wide">
-                            Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <DemoToggle initialEnabled={isDemoMode} />
-                        <div className="h-12 w-[1px] bg-gray-200 hidden md:block"></div>
-                        <div className="flex flex-col items-end">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
-                            <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Core Global Stats Grid */}
+                {/* Core Global Stats Grid - Simplified to plain HTML */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <StatCard 
-                        title="Volume Fiscal (M17)" 
-                        value={`${Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA`} 
-                        icon={Banknote} 
-                        color="orange"
-                        trend="SIM_DGI"
-                        delay={0.1}
-                    />
-                    <StatCard 
-                        title="Consignation CDC (M18)" 
-                        value={`${Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA`} 
-                        icon={ShieldCheck} 
-                        color="blue"
-                        trend="Sécurisé"
-                        delay={0.2}
-                    />
-                    <StatCard 
-                        title="Médiations Actives (M19)" 
-                        value={(data.activeMediations || 0).toString()} 
-                        icon={Scale} 
-                        color="red"
-                        trend="En cours"
-                        delay={0.3}
-                    />
-                    <StatCard 
-                        title="Auto-KYC IA (M21)" 
-                        value={`${data.kycAutoRate}%`} 
-                        icon={UserCheck} 
-                        color="purple"
-                        trend="Efficience"
-                        delay={0.4}
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <StatCard 
-                        title="Mandats Actifs" 
-                        value={(data.totalMandates || 0).toString()} 
-                        icon={FileText} 
-                        color="slate"
-                        delay={0.5}
-                    />
-                    <StatCard 
-                        title="Colocs Actives" 
-                        value={(data.activeColocs || 0).toString()} 
-                        icon={Database} 
-                        color="emerald"
-                        delay={0.6}
-                    />
-                    <StatCard 
-                        title="Baux Terrains" 
-                        value={(data.landLeases || 0).toString()} 
-                        icon={ArrowUpRight} 
-                        color="amber"
-                        delay={0.7}
-                    />
+                    <div className="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-2">Volume Fiscal</p>
+                        <p className="text-3xl font-black text-gray-900">{Number(data.fiscalStats?._sum?.totalDgi || 0).toLocaleString()} FCFA</p>
+                    </div>
+                    <div className="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-2">Cdc Consignation</p>
+                        <p className="text-3xl font-black text-gray-900">{Number(data.cdcStats?._sum?.amount || 0).toLocaleString()} FCFA</p>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
