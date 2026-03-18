@@ -108,6 +108,67 @@ enum FiscalStatus {
   RENOUVELE
 }
 
+enum MandateType {
+  EXCLUSIVE
+  SIMPLE
+  CO_EXCLUSIVE
+  DIRECT
+}
+
+enum MandateStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+  DRAFT
+}
+
+enum ManagementMode {
+  AGENCY
+  DIRECT
+  MIXED
+}
+
+enum ColocRole {
+  PRINCIPAL
+  SECONDAIRE
+}
+
+enum ColocMode {
+  GROUPE
+  INDIVIDUEL
+  LIBRE
+}
+
+enum LoyerStatut {
+  EN_ATTENTE
+  PARTIEL
+  COMPLET
+  EXCEDENT
+  IMPAYE
+}
+
+enum TerrainUsage {
+  PARKING_VEHICULES
+  PARKING_CAMIONS
+  COMMERCE_TEMPORAIRE
+  STOCKAGE
+  AGRICULTURE
+  EVENEMENTIEL
+  INDUSTRIEL
+  AUTRE
+}
+
+enum Periodicite {
+  JOURNALIER
+  HEBDOMADAIRE
+  MENSUEL
+  TRIMESTRIEL
+  SEMESTRIEL
+  ANNUEL
+  FORFAIT
+}
+
 // ═══════════════════════════════════════════════════════
 // USERS (Part 4 & 5)
 // ═══════════════════════════════════════════════════════
@@ -250,6 +311,11 @@ model Property {
   managedByUserId   String?   @map("managed_by")
   manager           User?     @relation("AgentProperties", fields: [managedByUserId], references: [id])
 
+  managementMode    ManagementMode @default(DIRECT) @map("management_mode")
+  superficieM2      Decimal?       @map("superficie_m2") @db.Decimal(12, 2)
+  usageTerrain      TerrainUsage?  @map("usage_terrain")
+  referenceCadastre String?        @map("reference_cadastre")
+
   leases            Lease[]
   mandates          Mandate[]
   passports         Passport[]
@@ -323,6 +389,9 @@ model Lease {
   paymentIntents    PaymentIntent[]
   fiscalDossiers    FiscalDossier[]
   prepaymentRequests PrepaymentRequest[]
+  colocataires      Colocataire[]
+  synthesesLoyer    MonthlyRentSynthesis[]
+  landInfo          LandLeaseInfo?
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -439,27 +508,124 @@ model CDCDeposit {
 // MANDATES (Part 12)
 // ═══════════════════════════════════════════════════════
 model Mandate {
-  id                String   @id @default(uuid())
-  mandateRef        String   @unique @map("mandate_ref")
-  propertyId        String   @map("property_id")
-  property          Property @relation(fields: [propertyId], references: [id])
-  agentUserId       String   @map("agent_id")
-  agent             User     @relation("AgentMandates", fields: [agentUserId], references: [id])
-  mandateType       String   @map("mandate_type") // management_simple|management_extended|rental|sale
-  commissionPct     Decimal  @map("commission_pct") @db.Decimal(5, 2) // max 15.00
-  startDate         DateTime @map("start_date") @db.Date
-  endDate           DateTime? @map("end_date") @db.Date
-  status            String   @default("draft") // draft|active|expired|terminated
-  signedAt          DateTime? @map("signed_at")
-  proofHash         String?  @map("proof_hash")
-  pdfUrl            String?  @map("pdf_url")
+  id                String        @id @default(uuid())
+  mandateRef        String        @unique @map("mandate_ref")
+  propertyId        String        @map("property_id")
+  property          Property      @relation(fields: [propertyId], references: [id])
+  agentUserId       String?       @map("agent_id")
+  agent             User?         @relation("AgentMandates", fields: [agentUserId], references: [id])
+  mandateType       MandateType
+  commissionPct     Decimal?      @map("commission_pct") @db.Decimal(5, 2)
+  commissionFixed   Int?          @map("commission_fixed")
+  startDate         DateTime      @map("start_date") @db.Date
+  endDate           DateTime?     @map("end_date") @db.Date
+  status            MandateStatus @default(DRAFT)
+  scope             Json?         @default("{}") // List of units or total
+  
+  signedAt          DateTime?     @map("signed_at")
+  cancelledAt       DateTime?     @map("cancelled_at")
+  cancelledByUserId String?       @map("cancelled_by")
+  cancelReason      String?       @map("cancel_reason")
+  
+  proofHash         String?       @map("proof_hash")
+  pdfUrl            String?       @map("pdf_url")
   
   leases            Lease[]
+  history           MandateHistory[]
   
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
 
   @@map("mandates")
+}
+
+model MandateHistory {
+  id              String      @id @default(uuid())
+  propertyId      String      @map("property_id")
+  mandateId       String      @map("mandate_id")
+  mandate         Mandate     @relation(fields: [mandateId], references: [id])
+  agentUserId     String?     @map("agent_id")
+  mandateType     MandateType @map("type_mandat")
+  startDate       DateTime    @map("periode_debut")
+  endDate         DateTime?   @map("periode_fin")
+  bailsTransferred Int?       @map("baux_actifs_transferes")
+  
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  @@map("mandate_history")
+}
+
+model Colocataire {
+  id            String    @id @default(uuid()) @map("coloc_id")
+  leaseId       String    @map("bail_id")
+  lease         Lease     @relation(fields: [leaseId], references: [id])
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
+  role          ColocRole @default(SECONDAIRE)
+  partLoyer     Int?      @map("part_loyer")
+  pctLoyer      Decimal?  @map("pct_loyer") @db.Decimal(5, 2)
+  modePaiement  ColocMode @default(INDIVIDUEL) @map("mode_paiement")
+  dateEntree    DateTime  @map("date_entree") @db.Date
+  dateSortie    DateTime? @map("date_sortie") @db.Date
+  status        String    @default("ACTIF") // ACTIF | SORTI | EXCLU
+  
+  payments      ColocPayment[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("colocataires")
+  @@index([leaseId])
+  @@index([userId])
+}
+
+model ColocPayment {
+  id                String      @id @default(uuid()) @map("id")
+  leaseId           String      @map("bail_id")
+  colocataireId     String      @map("coloc_id")
+  colocataire       Colocataire @relation(fields: [colocataireId], references: [id])
+  month             String      @map("mois_concerne") // YYYY-MM
+  amount            Int         @map("montant_paye")
+  method            String      @map("canal_paiement")
+  status            String      @default("CONFIRMED")
+  operatorRef       String?     @map("reference_mobile")
+  receiptId         String?     @map("quittance_ind_id")
+  
+  paidAt            DateTime    @default(now()) @map("paid_at")
+
+  @@map("coloc_payments")
+  @@index([leaseId, month])
+}
+
+model MonthlyRentSynthesis {
+  id              String      @id @default(uuid()) @map("synthese_id")
+  leaseId         String      @map("bail_id")
+  lease           Lease       @relation(fields: [leaseId], references: [id])
+  month           String      @map("mois_concerne") // YYYY-MM
+  totalExpected   Int         @map("loyer_total_du")
+  amountCollected Int         @default(0) @map("montant_collecte")
+  status          LoyerStatut @default(EN_ATTENTE) @map("statut_mois")
+  globalReceiptId String?     @map("quittance_glob_id")
+  completedAt     DateTime?   @map("completed_at")
+
+  @@unique([leaseId, month])
+  @@map("monthly_rent_synthesis")
+}
+
+model LandLeaseInfo {
+  id                String       @id @default(uuid())
+  leaseId           String       @unique @map("bail_id")
+  lease             Lease        @relation(fields: [leaseId], references: [id])
+  superficieLouee   Decimal      @map("superficie_louee_m2") @db.Decimal(12, 2)
+  usage             TerrainUsage @map("usage_declare")
+  periodicity       Periodicite  @default(MENSUEL) @map("periodicite_loyer")
+  eventEndDate      DateTime?    @map("date_evenement_fin") @db.Date
+  annualIndexation  Decimal?     @default(0) @map("indexation_annuelle") @db.Decimal(5, 2)
+  conditions        String?      @map("conditions_usage") @db.Text
+  hasEntryInventory Boolean      @default(false) @map("etat_des_lieux_entree")
+  hasExitInventory  Boolean      @default(false) @map("etat_des_lieux_sortie")
+  
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  @@map("land_lease_info")
 }
 
 // ═══════════════════════════════════════════════════════

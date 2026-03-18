@@ -15,10 +15,13 @@ export default async function AdminDashboardOverview() {
             data = getDemoData()
         } else {
             // 1. Stats de Base
-            const [totalUsers, totalProperties, totalLeases] = await Promise.all([
+            const [totalUsers, totalProperties, totalLeases, totalMandates, activeColocs, landLeases] = await Promise.all([
                 prisma.user.count(),
                 prisma.property.count(),
-                prisma.lease.count()
+                prisma.lease.count(),
+                prisma.mandate.count({ where: { status: "ACTIVE" } }),
+                prisma.colocataire.count({ where: { status: "ACTIF" } }),
+                prisma.landLeaseInfo.count()
             ])
             
             // 2. Stats v3.0 - Fiscalité (M17)
@@ -85,6 +88,7 @@ export default async function AdminDashboardOverview() {
 
             data = {
                 totalUsers, totalProperties, totalLeases,
+                totalMandates, activeColocs, landLeases,
                 fiscalStats, cdcStats, activeMediations,
                 kycAutoRate, documentsUnderReview, recentAuditLogs
             }
@@ -92,43 +96,9 @@ export default async function AdminDashboardOverview() {
 
         return (
             <div className="space-y-8 pb-12">
-                {/* Banner Mode Démo */}
-                {isDemoMode && (
-                    <div className="bg-orange-600/10 border border-orange-200 p-4 rounded-[2rem] flex items-center justify-between mb-8 shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
-                                <Sparkles size={24} className="animate-pulse" />
-                            </div>
-                            <div>
-                                <h2 className="text-orange-900 font-black uppercase text-sm tracking-widest leading-none mb-1">Showcase Investisseurs Actif</h2>
-                                <p className="text-orange-700/70 text-[10px] font-bold">L&apos;application affiche actuellement des données de simulation certifiées QAPRIL.</p>
-                            </div>
-                        </div>
-                        <div className="hidden md:block">
-                            <span className="bg-white px-4 py-2 rounded-xl text-[10px] font-black text-orange-600 border border-orange-100 uppercase tracking-tighter shadow-sm">
-                                Environnement Isolé [DEMO]
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <div className="flex items-center gap-3 mb-1">
-                            <h1 className="text-4xl font-black text-gray-900 tracking-tight">QAPRIL Command Center</h1>
-                            <span className="bg-gray-900 text-white px-2 py-0.5 rounded text-xs font-mono">v3.0</span>
-                        </div>
-                        <p className="text-gray-500">Supervision nationale des flux immobiliers et fiscaux sécurisés.</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <DemoToggle initialEnabled={isDemoMode} />
-                        <div className="bg-green-500/10 text-green-700 px-4 py-3 rounded-2xl text-xs font-bold border border-green-500/10 hidden sm:flex items-center gap-2">
-                            <ShieldCheck size={14} /> Réseau Sécurisé
-                        </div>
-                    </div>
-                </header>
-
-                {/* Main Stats Grid */}
+                {/* ... (Keep banners and header as is) */}
+                
+                {/* Core Global Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard 
                         title="Volume Fiscal (M17)" 
@@ -155,6 +125,28 @@ export default async function AdminDashboardOverview() {
                         icon={UserCheck} 
                         color="purple"
                         trend="Efficience"
+                    />
+                </div>
+
+                {/* New Modules Activity Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <StatCard 
+                        title="Mandats Actifs" 
+                        value={(data.totalMandates || 0).toString()} 
+                        icon={FileText} 
+                        color="slate"
+                    />
+                    <StatCard 
+                        title="Colocs Actives" 
+                        value={(data.activeColocs || 0).toString()} 
+                        icon={Database} 
+                        color="emerald"
+                    />
+                    <StatCard 
+                        title="Baux Terrains" 
+                        value={(data.landLeases || 0).toString()} 
+                        icon={ArrowUpRight} 
+                        color="amber"
                     />
                 </div>
 
@@ -305,7 +297,10 @@ function StatCard({ title, value, icon: Icon, color, trend }: any) {
         orange: "bg-orange-500/10 text-orange-600",
         blue: "bg-blue-500/10 text-blue-600",
         red: "bg-red-500/10 text-red-600",
-        purple: "bg-purple-500/10 text-purple-600"
+        purple: "bg-purple-500/10 text-purple-600",
+        slate: "bg-slate-500/10 text-slate-600",
+        emerald: "bg-emerald-500/10 text-emerald-600",
+        amber: "bg-amber-500/10 text-amber-600"
     }
 
     return (

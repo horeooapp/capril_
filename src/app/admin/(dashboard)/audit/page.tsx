@@ -110,6 +110,9 @@ export default function AuditPage() {
                                         <span className={`px-2 py-1 rounded-md text-xs font-bold border ${
                                             log.module === 'SYSTEM' ? 'bg-indigo-900/30 border-indigo-700 text-indigo-300' :
                                             log.module === 'AUTH' ? 'bg-emerald-900/30 border-emerald-700 text-emerald-300' :
+                                            log.module === 'MANDATE' ? 'bg-slate-900/30 border-slate-700 text-slate-300' :
+                                            log.module === 'COLOC' ? 'bg-emerald-900/30 border-emerald-700 text-emerald-300' :
+                                            log.module === 'TERRAIN' ? 'bg-amber-900/30 border-amber-700 text-amber-300' :
                                             'bg-gray-700/30 border-gray-600 text-gray-400'
                                         }`}>
                                             {log.module}

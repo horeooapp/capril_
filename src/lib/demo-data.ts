@@ -24,7 +24,10 @@ export const getDemoData = () => {
         // Comptes de base
         totalUsers: 482,
         totalProperties: 125,
-        totalLeases: 89,
+        totalLeases: 114, // Incremented
+        totalMandates: 42,
+        activeColocs: 18,
+        landLeases: 7,
 
         // Alertes KYC Fictives (Overview)
         documentsUnderReview: [
@@ -55,30 +58,39 @@ export const getDemoData = () => {
         recentAuditLogs: [
             {
                 id: "demo-log-1",
-                action: "PAIEMENT_LOYER_CONFIRME [DEMO]",
-                module: "PAYMENT",
+                action: "ADD_COLOCATAIRE [DEMO]",
+                module: "COLOC",
                 createdAt: new Date(),
-                user: { fullName: "Système IA QAPRIL", role: "SUPER_ADMIN", email: "ai@qapril.com" },
-                ipAddress: "192.168.1.1",
-                userAgent: "QAPRIL Engine v3.0"
+                user: { fullName: "Agence Ivory Immo", role: "AGENCY", email: "agency@ivory.ci" },
+                ipAddress: "41.202.200.15",
+                userAgent: "Desktop Chrome"
             },
             {
                 id: "demo-log-2",
-                action: "SIGNATURE_BAIL_ELECTRONIQUE [DEMO]",
-                module: "LEASE",
+                action: "CREATE_MANDATE [DEMO]",
+                module: "MANDATE",
                 createdAt: new Date(Date.now() - 15 * 60000),
-                user: { fullName: "Jean Koffi", role: "TENANT", email: "jean@exemple.ci" },
-                ipAddress: "41.202.200.12",
+                user: { fullName: "Bakary Traoré", role: "AGENCY", email: "bakary@qapril.ci" },
+                ipAddress: "197.214.15.12",
                 userAgent: "Safari/Mobile"
             },
             {
                 id: "demo-log-3",
-                action: "VERIFICATION_KYC_AUTOMATE [DEMO]",
-                module: "KYC",
+                action: "PAIEMENT_LOYER_CONFIRME [DEMO]",
+                module: "PAYMENT",
                 createdAt: new Date(Date.now() - 45 * 60000),
-                user: { fullName: "Moteur AI QAPRIL", role: "SYSTEM", email: "kyc@qapril.ci" },
+                user: { fullName: "Système IA QAPRIL", role: "SUPER_ADMIN", email: "ai@qapril.com" },
                 ipAddress: "127.0.0.1",
-                userAgent: "OCR-Engine"
+                userAgent: "QAPRIL Engine v3.0"
+            },
+            {
+                id: "demo-log-4",
+                action: "CREATE_LAND_LEASE_INFO [DEMO]",
+                module: "TERRAIN",
+                createdAt: new Date(Date.now() - 120 * 60000),
+                user: { fullName: "Admin QAPRIL", role: "ADMIN", email: "admin@qapril.ci" },
+                ipAddress: "41.202.200.12",
+                userAgent: "Windows/Edge"
             }
         ],
 

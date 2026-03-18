@@ -13,6 +13,9 @@ export type AppFeature =
     | "USSD_PORTAL"
     | "NEWS_TICKER"
     | "LANDING_PAGE"
+    | "M_MANDAT"
+    | "M_COLOC"
+    | "M_TERRAIN"
 
 /**
  * Checks if a feature is enabled in the system config.

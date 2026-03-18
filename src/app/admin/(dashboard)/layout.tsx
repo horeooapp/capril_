@@ -23,6 +23,7 @@ export default async function AdminLayout({
     const navLinks = [
         { href: "/", label: "Accueil", icon: "🏠" },
         { href: "/admin", label: "Vue Globale", icon: "🌍" },
+        { href: "/admin/observatory", label: "Observatoire", icon: "🔭" },
         { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
         { href: "/admin/validation", label: "Validations Agences", icon: "🏢" },
         { href: "/admin/news", label: "Actualités", icon: "📢" },
@@ -58,6 +59,7 @@ export default async function AdminLayout({
                                 </Link>
                                 <div className="h-4 w-px bg-gray-700"></div>
                                 <Link href="/admin" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Vue Globale</Link>
+                                <Link href="/admin/observatory" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Observatoire</Link>
                                 <Link href="/admin/users" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Utilisateurs</Link>
                                 <Link href="/admin/validation" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Validations</Link>
                                 <Link href="/admin/news" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Actualités</Link>

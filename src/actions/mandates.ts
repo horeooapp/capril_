@@ -2,11 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-// These are plain string fields in the schema (no Prisma enums generated)
-type MandateStatus = string
-type MandateType = string
-const MandateStatus = { VALIDATED: 'active', PENDING: 'draft', REJECTED: 'terminated' } as const
-const MandateType = { EXCLUSIVE: 'management_extended', NON_EXCLUSIVE: 'management_simple', RENTAL: 'rental' } as const
+import { MandateStatus, MandateType } from "@prisma/client"
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
 import { generateProofHash } from "@/lib/proof"
@@ -17,7 +13,10 @@ export async function createMandate(data: {
     type: MandateType,
     startDate: Date,
     endDate?: Date,
-    documentUrl?: string
+    documentUrl?: string,
+    commissionPct?: number,
+    commissionFixed?: number,
+    scope?: any
 }) {
     const session = await auth()
     const agentId = session?.user?.id
@@ -29,20 +28,21 @@ export async function createMandate(data: {
     // Enforce QAPRIL Regularization
     await enforceAgentActive()
 
-    // Check for conflicting mandates (non-exclusive allows multiple, exclusive blocks others)
-    const existingMandates = await prisma.mandate.findMany({
-        where: {
-            propertyId: data.propertyId,
-            status: MandateStatus.VALIDATED,
-            OR: [
-                { mandateType: MandateType.EXCLUSIVE },
-                { mandateType: data.type === MandateType.EXCLUSIVE ? MandateType.NON_EXCLUSIVE : undefined }
-            ].filter((cond) => cond.mandateType !== undefined)
-        }
-    })
+    // Rule MM-01: Check for conflicting mandates
+    // One active EXCLUSIVE mandate per property
+    if (data.type === MandateType.EXCLUSIVE) {
+        const existingExclusive = await prisma.mandate.findFirst({
+            where: {
+                propertyId: data.propertyId,
+                status: MandateStatus.ACTIVE,
+                mandateType: MandateType.EXCLUSIVE
+            },
+            include: { agent: { select: { fullName: true } } }
+        })
 
-    if (existingMandates.length > 0 && data.type === MandateType.EXCLUSIVE) {
-        throw new Error("Une gestion exclusive est déjà en cours pour ce bien.")
+        if (existingExclusive) {
+            throw new Error(`Ce bien a déjà un mandat exclusif actif avec ${existingExclusive.agent?.fullName || 'une autre agence'}.`)
+        }
     }
 
     const proofHash = generateProofHash({
@@ -59,11 +59,14 @@ export async function createMandate(data: {
             propertyId: data.propertyId,
             agentUserId: agentId,
             mandateType: data.type,
-            commissionPct: 10, // Default 10% for the simplified action
+            commissionPct: data.commissionPct || (data.type === MandateType.DIRECT ? 0 : 10),
+            commissionFixed: data.commissionFixed || 0,
             startDate: data.startDate,
             endDate: data.endDate || null,
-            status: MandateStatus.PENDING,
-            proofHash
+            status: MandateStatus.DRAFT,
+            scope: data.scope || {},
+            proofHash,
+            pdfUrl: data.documentUrl
         }
     })
 
@@ -96,17 +99,36 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
 
     const updatedMandate = await prisma.mandate.update({
         where: { id: mandateId },
-        data: { status }
+        data: { status, signedAt: status === MandateStatus.ACTIVE ? new Date() : undefined }
     })
 
-    // Update Agent Reliability Score
-    await scoreAgentCompliance(mandate.agentUserId, status === MandateStatus.VALIDATED)
+    // Update Agent Reliability Score if applicable
+    if (mandate.agentUserId) {
+        await scoreAgentCompliance(mandate.agentUserId, status === MandateStatus.ACTIVE)
+    }
 
-    // If validated, update property manager
-    if (status === MandateStatus.VALIDATED) {
+    // If validated, update property manager and mode
+    if (status === MandateStatus.ACTIVE) {
+        const managementMode = mandate.mandateType === MandateType.DIRECT ? 'DIRECT' : 'AGENCY'
+        
         await prisma.property.update({
             where: { id: mandate.propertyId },
-            data: { managedByUserId: mandate.agentUserId }
+            data: { 
+                managedByUserId: mandate.agentUserId,
+                managementMode: managementMode as any // ManagementMode enum
+            }
+        })
+
+        // Create initial history record
+        await prisma.mandateHistory.create({
+            data: {
+                propertyId: mandate.propertyId,
+                mandateId: mandate.id,
+                agentUserId: mandate.agentUserId,
+                mandateType: mandate.mandateType,
+                startDate: mandate.startDate,
+                endDate: mandate.endDate,
+            }
         })
     }
 
@@ -115,6 +137,47 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
         module: "MANDATE",
         entityId: mandateId,
         newValues: { status }
+    })
+
+    return updatedMandate
+}
+
+export async function terminateMandate(mandateId: string, reason: string) {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) throw new Error("Unauthorized")
+
+    const mandate = await prisma.mandate.findUnique({
+        where: { id: mandateId },
+        include: { property: true }
+    })
+
+    if (!mandate || (mandate.property.ownerUserId !== userId && mandate.agentUserId !== userId)) {
+        throw new Error("Unauthorized")
+    }
+
+    const updatedMandate = await prisma.mandate.update({
+        where: { id: mandateId },
+        data: { 
+            status: MandateStatus.CANCELLED,
+            cancelledAt: new Date(),
+            cancelledByUserId: userId,
+            cancelReason: reason
+        }
+    })
+
+    // Update history
+    await prisma.mandateHistory.updateMany({
+        where: { mandateId: mandate.id, propertyId: mandate.propertyId },
+        data: { endDate: new Date() }
+    })
+
+    await logAction({
+        action: "TERMINATE_MANDATE",
+        module: "MANDATE",
+        entityId: mandateId,
+        newValues: { status: MandateStatus.CANCELLED, reason }
     })
 
     return updatedMandate
@@ -146,6 +209,7 @@ export async function getMandatesByAgent() {
         orderBy: { createdAt: 'desc' }
     })
 }
+
 export async function getLandlordMandates() {
     const session = await auth()
     const userId = session?.user?.id

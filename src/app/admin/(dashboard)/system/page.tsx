@@ -56,6 +56,21 @@ const FEATURES: { key: AppFeature; label: string; description: string }[] = [
         label: "Page d'Accueil Marketing", 
         description: "Active ou désactive la Landing Page marketing pour les utilisateurs connectés." 
     },
+    { 
+        key: "M_MANDAT", 
+        label: "Gestion Multi-Mandats", 
+        description: "Permet aux propriétaires de confier leurs biens à plusieurs agences simultanément." 
+    },
+    { 
+        key: "M_COLOC", 
+        label: "Colocation Native", 
+        description: "Gestion des occupants multiples, parts de loyer et quittances individuelles." 
+    },
+    { 
+        key: "M_TERRAIN", 
+        label: "Location Terrains Nus", 
+        description: "Module spécifique pour les parcelles non bâties (parking, stockage, maraîchage)." 
+    },
 ]
 
 export default function SystemPage() {
@@ -110,7 +125,14 @@ export default function SystemPage() {
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-3 bg-gray-700/50 rounded-lg">
                                     <span className="text-2xl">
-                                        {feature.key.includes("FISCAL") ? "🏦" : feature.key.includes("SMS") ? "📱" : "⚙️"}
+                                        {
+                                            feature.key.includes("FISCAL") ? "🏦" : 
+                                            feature.key.includes("SMS") ? "📱" : 
+                                            feature.key === "M_MANDAT" ? "📋" :
+                                            feature.key === "M_COLOC" ? "👥" :
+                                            feature.key === "M_TERRAIN" ? "🌳" :
+                                            "⚙️"
+                                        }
                                     </span>
                                 </div>
                                 <button
