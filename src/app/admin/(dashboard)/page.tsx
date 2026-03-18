@@ -5,6 +5,8 @@ import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
 import DemoToggle from "@/components/admin/DemoToggle"
 
+export const dynamic = "force-dynamic"
+
 export default async function AdminDashboardOverview() {
     const isDemoMode = await getDemoMode()
     

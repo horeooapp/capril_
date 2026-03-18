@@ -1,4 +1,5 @@
 import Link from "next/link"
+export const dynamic = "force-dynamic"
 import { auth, signOut } from "@/auth"
 import { redirect } from "next/navigation"
 import ProtectedLogo from "@/components/ProtectedLogo"
@@ -10,7 +11,12 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    const session = await auth()
+    let session = null;
+    try {
+        session = await auth()
+    } catch (e) {
+        console.error("[ADMIN LAYOUT] Erreur de session:", e);
+    }
 
     if (!session?.user) {
         redirect("/admin/login")
