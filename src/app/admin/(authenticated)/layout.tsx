@@ -33,7 +33,18 @@ export default async function AdminLayout({
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
             
-            <AdminHeader session={session} onLogout={logout} />
+            {/* Sanitize session before passing to Client Component to avoid serialization issues */}
+            <AdminHeader 
+                session={session ? {
+                    user: {
+                        id: session.user.id,
+                        email: session.user.email,
+                        role: session.user.role,
+                        fullName: session.user.fullName
+                    }
+                } : null} 
+                onLogout={logout} 
+            />
 
             {/* Main Content */}
             <main className="flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
