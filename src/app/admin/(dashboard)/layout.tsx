@@ -9,13 +9,7 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    let session;
-    try {
-        session = await auth()
-    } catch (e) {
-        console.error("Session retrieval crash in AdminLayout:", e);
-        redirect("/admin/login")
-    }
+    const session = await auth()
 
     if (!session?.user) {
         redirect("/admin/login")
@@ -25,18 +19,13 @@ export default async function AdminLayout({
         redirect("/dashboard")
     }
 
-    const handleLogout = async () => {
-        "use server"
-        await logout()
-    }
-
     return (
         <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
             {/* Mesh Background */}
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
             
-            <AdminHeader session={session} onLogout={handleLogout} />
+            <AdminHeader session={session} onLogout={logout} />
 
             {/* Main Content */}
             <main className="flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
