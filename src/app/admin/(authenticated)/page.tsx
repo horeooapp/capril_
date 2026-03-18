@@ -12,6 +12,7 @@ import {
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
+import LiveActivityStream from "@/components/admin/LiveActivityStream"
 import { prisma } from "@/lib/prisma"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
@@ -33,6 +34,8 @@ export default async function AdminDashboardOverview() {
         totalMandates: Number(demoData.totalMandates || 0),
         totalColocs: Number(demoData.activeColocs || 0),
         totalLandLeases: Number(demoData.landLeases || 0),
+        recentAuditLogs: demoData.recentAuditLogs || [],
+        documentsUnderReview: demoData.documentsUnderReview || []
     } : {
         totalDgi: Number((await (prisma as any).fiscalDossier?.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
         cdcAmount: Number((await (prisma as any).cdcDeposit?.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
@@ -43,6 +46,16 @@ export default async function AdminDashboardOverview() {
         totalMandates: await (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
         totalColocs: await (prisma as any).colocataire?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
         totalLandLeases: await (prisma as any).landLeaseInfo?.count().catch(() => 0),
+        recentAuditLogs: await (prisma as any).auditLog?.findMany({
+            take: 10,
+            orderBy: { createdAt: 'desc' },
+            include: { user: { select: { fullName: true } } }
+        }).catch(() => []),
+        documentsUnderReview: await (prisma as any).identityDocument?.findMany({
+            where: { status: "pending" },
+            take: 5,
+            include: { user: { select: { fullName: true } } }
+        }).catch(() => [])
     }
 
     try {
@@ -131,12 +144,84 @@ export default async function AdminDashboardOverview() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2 space-y-10">
-                        <div className="glass-panel p-20 text-center rounded-[2.5rem] border border-dashed border-gray-200">
-                           <p className="text-gray-400 font-bold uppercase text-xs tracking-[0.2em]">Flux d&apos;Activités en cours de synchronisation</p>
+                        {/* Stream Principal */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between px-2">
+                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">Activités Réseau Temps Réel</h3>
+                                <div className="flex items-center gap-2">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    </span>
+                                    <span className="text-[9px] font-bold text-green-600 uppercase tracking-widest">Live Sync</span>
+                                </div>
+                            </div>
+                            <LiveActivityStream logs={safeData.recentAuditLogs} />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <StatCard 
+                                title="Mandats Actifs" 
+                                value={safeData.totalMandates.toString()} 
+                                icon={<FileText size={28} />} 
+                                color="slate"
+                                delay={0.5}
+                            />
+                            <StatCard 
+                                title="Colocs Actives" 
+                                value={safeData.totalColocs.toString()} 
+                                icon={<Database size={28} />} 
+                                color="emerald"
+                                delay={0.6}
+                            />
+                            <StatCard 
+                                title="Baux Terrains" 
+                                value={safeData.totalLandLeases.toString()} 
+                                icon={<ArrowUpRight size={28} />} 
+                                color="amber"
+                                delay={0.7}
+                            />
                         </div>
                     </div>
 
                     <div className="space-y-10">
+                        {/* Section Validation Identité */}
+                        <div className="glass-card-premium p-8 rounded-[2.5rem] border border-orange-100 shadow-xl shadow-orange-500/5">
+                            <div className="flex items-center justify-between mb-8">
+                                <h4 className="label-tech text-orange-600 text-[10px] font-black uppercase tracking-widest">Validation Identité</h4>
+                                <div className="px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full text-[8px] font-black uppercase tracking-tighter animate-pulse">
+                                    {safeData.documentsUnderReview.length} En attente
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {safeData.documentsUnderReview.length === 0 ? (
+                                    <p className="text-[10px] text-gray-400 italic text-center py-4">Tous les KYC sont à jour.</p>
+                                ) : (
+                                    safeData.documentsUnderReview.map((doc: any) => (
+                                        <div key={doc.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:bg-orange-50 transition-colors">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-[10px] font-black text-gray-900 truncate max-w-[120px]">{doc.user?.fullName}</span>
+                                                <span className="text-[8px] font-bold text-gray-400 uppercase">{new Date(doc.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-bold text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg uppercase tracking-widest">
+                                                    {doc.docType}
+                                                </span>
+                                                <Link href={`/admin/validation/${doc.id}`} className="text-[9px] font-black text-primary hover:underline uppercase tracking-widest opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                                    Vérifier →
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            
+                            <Link href="/admin/validation" className="block w-full text-center mt-6 p-4 border border-dashed border-gray-200 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-gray-50 transition-colors">
+                                Gérer tout le KYC
+                            </Link>
+                        </div>
+
                         <section className="bg-gray-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600 blur-[130px] opacity-20 -mr-40 -mt-40 group-hover:opacity-40 transition-opacity"></div>
                             <h4 className="label-tech text-primary mb-6 text-xs font-black uppercase tracking-widest">Moteur Fiscal Consolidated</h4>
