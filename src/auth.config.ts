@@ -10,7 +10,7 @@ export const authConfig = {
     secret: process.env.AUTH_SECRET,
     pages: {
         signIn: '/dashboard/login',
-        error: '/dashboard/login', // Redirect back to login on error for now
+        error: '/dashboard/login',
     },
     callbacks: {
         async jwt({ token, user }) {
@@ -51,7 +51,9 @@ export const authConfig = {
                 "/verify-request"
             ];
             
-            const isPublicPath = publicPaths.includes(pathname);
+            const isPublicPath = publicPaths.some(path => 
+                pathname === path || pathname === `${path}/`
+            );
             const isApiPublic = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/public");
 
             if (isPublicPath || isApiPublic) {
@@ -63,18 +65,23 @@ export const authConfig = {
                 return true;
             } else {
                 // Not logged in: Redirect to appropriate landing page
-                // IMPORTANT: Ensure we don't redirect if already on a login page (safety double-check)
-                if (pathname === "/admin/login") return true;
                 
+                // 1. ADMIN PROTECTION
                 if (pathname.startsWith("/admin")) {
+                    // Evite la boucle si on est déjà sur /admin/login ou /admin/login/
+                    if (pathname.startsWith("/admin/login")) return true;
                     return Response.redirect(new URL("/admin/login", nextUrl));
                 }
                 
+                // 2. DASHBOARD PROTECTION
                 if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
+                    if (pathname.startsWith("/dashboard/login")) return true;
                     return Response.redirect(new URL("/dashboard/login", nextUrl));
                 }
                 
+                // 3. LOCATAIRE PROTECTION
                 if (pathname.startsWith("/locataire")) {
+                    if (pathname.startsWith("/locataire/login")) return true;
                     return Response.redirect(new URL("/locataire/login", nextUrl));
                 }
                 
