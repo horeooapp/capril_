@@ -10,17 +10,9 @@ import { logout } from "@/actions/auth";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let session = null;
-  let dbNews = [];
-  let isLandingPageRestricted = true;
-  
-  try {
-    session = await auth();
-    dbNews = await getActiveNews();
-    isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE");
-  } catch (e: any) {
-    console.error("Data fetch error:", e);
-  }
+  const session = await auth().catch(() => null);
+  const dbNews: any[] = await getActiveNews().catch(() => []);
+  const isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE").catch(() => true);
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
 
@@ -55,6 +47,7 @@ export default async function Home() {
       <div className="flex-1 flex flex-col items-center justify-center p-10 text-center">
         <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter">QAPRIL - COMPONENTS TEST</h1>
         <p className="text-green-500 mt-4">Le Ticker et le MobileMenu sont affichés.</p>
+        <p className="mt-8 text-gray-400 text-xs italic">DEBUG STEP: Components reintroduced (fixed TS).</p>
       </div>
     </main>
   );
