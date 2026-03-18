@@ -7,8 +7,8 @@ export default function AdminLoginPage() {
     return (
         <div className="min-h-screen bg-ivory-pattern bg-mesh flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Ambient background glows */}
-            <div className="absolute top-0 -right-20 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full"></div>
-            <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full"></div>
+            <div className="absolute top-0 -right-20 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
                 <Link href="/" className="inline-flex items-center justify-center space-x-4 mb-12 group">
@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
 
             <div className="mt-12 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="glass-card-premium py-12 px-10 rounded-[3.5rem] border border-white/40 shadow-2xl shadow-gray-200/50 relative overflow-hidden">
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-gray-50/5 blur-2xl rounded-full"></div>
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-gray-50/5 blur-2xl rounded-full pointer-events-none"></div>
                     <AdminLoginForm />
                 </div>
                 

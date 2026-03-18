@@ -8,7 +8,7 @@ export default function TenantLoginPage() {
         <div className="min-h-screen bg-white flex relative overflow-hidden">
             {/* Background Mesh with green/secondary tint */}
             <div className="absolute inset-0 bg-mesh opacity-30 pointer-events-none"></div>
-            <div className="absolute top-0 right-1/2 w-96 h-96 bg-secondary/5 blur-[100px] rounded-full"></div>
+            <div className="absolute top-0 right-1/2 w-96 h-96 bg-secondary/5 blur-[100px] rounded-full pointer-events-none"></div>
 
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
