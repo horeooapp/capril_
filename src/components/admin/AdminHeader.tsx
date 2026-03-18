@@ -108,14 +108,14 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                         </div>
                     )}
                     
-                    <div className="flex xl:hidden">
+                    {/* <div className="flex xl:hidden">
                         <MobileMenu 
-                            links={navLinks.map(l => ({ ...l, icon: undefined }))} // MobileMenu uses string icons usually or we adjust
+                            links={navLinks.map(l => ({ ...l, icon: undefined }))} 
                             session={session} 
                             variant="light" 
                             onLogout={onLogout} 
                         />
-                    </div>
+                    </div> */}
 
                     <button 
                         onClick={onLogout}
