@@ -328,6 +328,7 @@ export async function getBDQByToken(token: string) {
             statut: true,
             confirmationAt: true,
             hashBdqFinal: true,
+            hashDeclaration: true,
             bailleur: { select: { fullName: true } }
         }
     })
