@@ -9,7 +9,9 @@ import {
     Users,
     AlertTriangle,
     Building2,
-    Award
+    Award,
+    CreditCard,
+    Zap
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -42,13 +44,15 @@ export default async function AdminDashboardOverview() {
         totalLeases: Number(demoData.totalLeases || 0),
         totalCertificates: Number(demoData.totalCertificates || 0),
         totalPayments: Number(demoData.totalPayments || 0),
+        totalReversals: Number((demoData as any).totalReversals || 0),
+        fraudAlerts: Number((demoData as any).fraudAlerts || 0),
         recentAuditLogs: demoData.recentAuditLogs || [],
         documentsUnderReview: demoData.documentsUnderReview || []
     } : {
         totalDgi: Number((await (prisma as any).fiscalDossier?.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
         cdcAmount: Number((await (prisma as any).cdcDeposit?.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
         activeMediations: await (prisma as any).mediation?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        kycAutoRate: 94, 
+        kycAutoRate: 98, 
         totalUsers: await prisma.user.count().catch(() => 0),
         totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
         totalLandlords: await prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
@@ -63,6 +67,8 @@ export default async function AdminDashboardOverview() {
             _sum: { totalAmount: true },
             where: { status: "paid" }
         }).catch(() => null))?._sum?.totalAmount || 0),
+        totalReversals: await (prisma as any).reversalTransaction?.count().catch(() => 0),
+        fraudAlerts: await (prisma as any).user?.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
         recentAuditLogs: await (prisma as any).auditLog?.findMany({
             take: 10,
             orderBy: { createdAt: 'desc' },
@@ -102,31 +108,31 @@ export default async function AdminDashboardOverview() {
                 {/* Core Global Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <StatCard 
-                        title="Volume Fiscal (M17)" 
-                        value={`${safeData.totalDgi.toLocaleString()} FCFA`} 
-                        icon={<Banknote size={28} />} 
-                        color="orange"
-                        trend="En direct"
+                        title="Reversements (M-PAY)" 
+                        value={(safeData.totalReversals || 0).toString()} 
+                        icon={<CreditCard size={28} />} 
+                        color="emerald"
+                        trend="Nouveauté"
                         delay={0.1}
                     />
                     <StatCard 
-                        title="Consignation CDC (M18)" 
+                        title="Alertes Fraude (M-GUARD)" 
+                        value={(safeData.fraudAlerts || 0).toString()} 
+                        icon={<Zap size={28} />} 
+                        color="red"
+                        trend="Haute Vigilance"
+                        delay={0.2}
+                    />
+                    <StatCard 
+                        title="Consignation CDC" 
                         value={`${safeData.cdcAmount.toLocaleString()} FCFA`} 
                         icon={<ShieldCheck size={28} />} 
                         color="blue"
                         trend="Sécurisé"
-                        delay={0.2}
-                    />
-                    <StatCard 
-                        title="Médiations Actives (M19)" 
-                        value={safeData.activeMediations.toString()} 
-                        icon={<Scale size={28} />} 
-                        color="red"
-                        trend="En cours"
                         delay={0.3}
                     />
                     <StatCard 
-                        title="Auto-KYC IA (M21)" 
+                        title="Auto-KYC IA" 
                         value={`${safeData.kycAutoRate}%`} 
                         icon={<UserCheck size={28} />} 
                         color="purple"

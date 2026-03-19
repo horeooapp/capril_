@@ -33,6 +33,8 @@ export const getDemoData = () => {
         landLeases: 7,
         totalCertificates: 284, // CNL + Fiscal
         totalPayments: 142500000, // Total des quittances payées (FCFA)
+        totalReversals: 84, // Reversements automatiques effectués
+        fraudAlerts: 3, // Tentatives suspectes bloquées par M-GUARD
 
         // Alertes KYC Fictives (Overview)
         documentsUnderReview: [
