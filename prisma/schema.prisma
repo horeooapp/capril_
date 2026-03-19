@@ -1443,20 +1443,3 @@ enum AgendaType {
   ECHEANCE_BAIL
   AUTRE
 }
-
-model Authenticator {
-  credentialID         String  @id
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, credentialID])
-}
-
-
