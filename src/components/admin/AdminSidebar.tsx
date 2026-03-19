@@ -16,7 +16,8 @@ import {
     ShieldCheck, 
     Newspaper,
     LogOut,
-    ChevronRight
+    ChevronRight,
+    Bot
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -35,6 +36,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/reports", label: "Rapports & Stats", icon: <BarChart3 size={20} /> },
         { href: "/admin/news", label: "Actualités Ticker", icon: <Newspaper size={20} />, active: true },
         { href: "/admin/compliance", label: "Conformité KYC", icon: <ShieldAlert size={20} /> },
+        { href: "/admin/system/ai-monitoring", label: "Supervision IA", icon: <Bot size={20} /> },
         { href: "/admin/settings/features", label: "Modules Core", icon: <Settings2 size={20} /> },
         { href: "/admin/users", label: "Utilisateurs", icon: <Users size={20} /> },
         { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },

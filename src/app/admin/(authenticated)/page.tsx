@@ -12,7 +12,10 @@ import {
     Award,
     CreditCard,
     Zap,
-    Settings2
+    Settings2,
+    MessageSquare,
+    Bot,
+    FileSignature
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -55,6 +58,13 @@ export default async function AdminDashboardOverview() {
         }).catch(() => null))?._sum?.totalAmount || 0),
         totalReversals: await (prisma as any).reversalTransaction.count().catch(() => 0),
         fraudAlerts: await prisma.user.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
+        
+        // ADD-06/08 Stats
+        totalBdqs: await (prisma as any).bailDeclaratif.count().catch(() => 0),
+        confirmedBdqs: await (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+        totalAiConv: await (prisma as any).bdqConversationState.count().catch(() => 0),
+        totalAiCost: Number((await (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null))?._sum?.coutEstimeFcfa || 0),
+
         recentAuditLogs: await prisma.auditLog.findMany({
             take: 10,
             orderBy: { createdAt: 'desc' },
@@ -125,6 +135,45 @@ export default async function AdminDashboardOverview() {
                         trend="Efficience"
                         delay={0.4}
                     />
+                </div>
+
+                {/* ADD-06/08: Innovation & IA Monitoring */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary px-2">Innovation & Transition Digitale (ADD-06/08)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Bails Déclaratifs (BDQ)" 
+                            value={safeData.totalBdqs.toLocaleString()} 
+                            icon={<FileSignature size={28} />} 
+                            color="orange"
+                            trend={`${safeData.confirmedBdqs} Confirmés`}
+                            delay={0.45}
+                        />
+                        <StatCard 
+                            title="Conversations IA" 
+                            value={safeData.totalAiConv.toLocaleString()} 
+                            icon={<MessageSquare size={28} />} 
+                            color="emerald"
+                            trend="Activité"
+                            delay={0.5}
+                        />
+                        <StatCard 
+                            title="Coût API Assistant" 
+                            value={`${safeData.totalAiCost.toLocaleString()} FCFA`} 
+                            icon={<Bot size={28} />} 
+                            color="indigo"
+                            trend="Claude 3.5 Sonnet"
+                            delay={0.55}
+                        />
+                        <StatCard 
+                            title="TVA Collectée (Logement)" 
+                            value="Calcul en cours..." 
+                            icon={<Banknote size={28} />} 
+                            color="amber"
+                            trend="M-TVA 18%"
+                            delay={0.6}
+                        />
+                    </div>
                 </div>
 
                 {/* Vision Opérationnelle (Nouveau) */}

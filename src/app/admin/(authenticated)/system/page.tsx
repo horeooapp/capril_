@@ -71,6 +71,16 @@ const FEATURES: { key: AppFeature; label: string; description: string }[] = [
         label: "Location Terrains Nus", 
         description: "Module spécifique pour les parcelles non bâties (parking, stockage, maraîchage)." 
     },
+    { 
+        key: "BDQ_VERBAL", 
+        label: "Bail Déclaratif (BDQ)", 
+        description: "Permet la formalisation des baux verbaux via déclaration unilatérale et confirmation SMS." 
+    },
+    { 
+        key: "AI_ASSISTANT", 
+        label: "Assistant IA (Claude)", 
+        description: "Assistant conversationnel pour la rédaction assistée des baux et le support utilisateur." 
+    },
 ]
 
 export default function SystemPage() {

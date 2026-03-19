@@ -41,6 +41,8 @@ export const FEATURES = {
   ANNONCES: "M-ANNONCES",
   COMPTABILITE: "M-COMPTA",
   AGENDA: "M-AGENDA",
+  BDQ_VERBAL: "M-BAIL-VERBAL",
+  AI_ASSISTANT: "ADD-08-AI",
 } as const;
 
 export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES] | string;
