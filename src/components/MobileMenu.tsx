@@ -103,7 +103,7 @@ export default function MobileMenu({
                             <img src={logoSrc} alt="Logo" className="h-10 w-auto" />
                             <div className="flex flex-col">
                                 <span className="font-black text-xl tracking-tighter uppercase leading-none">{brandName}</span>
-                                <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-primary mt-0.5">Navigation</span>
+                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-[#1F4E79] mt-0.5">Navigation</span>
                             </div>
                         </div>
                         <button 
@@ -125,10 +125,10 @@ export default function MobileMenu({
                                 onClick={() => setIsOpen(false)}
                                 className={`flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-200 group ${s.link}`}
                             >
-                                <span className="text-xl group-hover:scale-110 transition-transform">
-                                    {link.icon || <span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>}
+                                <span className="text-2xl group-hover:scale-110 transition-transform">
+                                    {link.icon || <span className="w-2 h-2 rounded-full bg-[#1F4E79]/40"></span>}
                                 </span>
-                                <span className="text-[11px] font-black uppercase tracking-widest">{link.label}</span>
+                                <span className="text-[16px] font-bold uppercase tracking-widest">{link.label}</span>
                             </Link>
                         ))}
                     </nav>
@@ -138,16 +138,16 @@ export default function MobileMenu({
                         {session?.user ? (
                             <div className="space-y-4">
                                 <div className="px-6 py-6 bg-white/50 backdrop-blur-xl dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/10 shadow-inner">
-                                    <p className="text-[8px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
+                                    <p className="text-[12px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20">
+                                        <div className="w-12 h-12 rounded-full bg-[#1F4E79]/10 flex items-center justify-center text-[#1F4E79] font-black text-sm border border-[#1F4E79]/20">
                                             {session.user.role?.charAt(0)}
                                         </div>
                                         <div className="flex flex-col min-w-0">
-                                            <p className="text-[11px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
+                                            <p className="text-[14px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
                                             <div className="flex items-center">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-primary italic leading-none">{session.user.role}</span>
+                                                <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none">{session.user.role}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -176,14 +176,14 @@ export default function MobileMenu({
                                 <Link 
                                     href="/dashboard/login"
                                     onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                                    className="block w-full text-center bg-[#1F4E79] text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
                                 >
                                     Accès Propriétaire
                                 </Link>
                                 <Link 
                                     href="/locataire/login"
                                     onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-primary text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                    className="block w-full text-center bg-[#C55A11] text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all"
                                 >
                                     Accès Locataire
                                 </Link>

@@ -64,56 +64,58 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {features.map((feature) => (
         <div 
           key={feature.id}
-          className={`p-6 rounded-3xl border transition-all duration-300 ${
+          className={`p-8 rounded-[32px] border transition-all duration-300 ${
             feature.enabled 
-              ? "bg-white/80 border-black/5 shadow-sm" 
-              : "bg-gray-50/50 border-gray-100 opacity-60 grayscale"
+              ? "bg-white border-[#1F4E79]/10 shadow-sm" 
+              : "bg-[#F2F2F2] border-gray-200 opacity-70 grayscale"
           }`}
         >
-          <div className="flex items-start justify-between mb-4">
-            <div className={`p-3 rounded-2xl ${feature.enabled ? "bg-black text-white" : "bg-gray-200 text-gray-500"}`}>
+          <div className="flex items-start justify-between mb-6">
+            <div className={`p-4 rounded-2xl ${feature.enabled ? "bg-[#1F4E79] text-white" : "bg-gray-300 text-gray-600"}`}>
               {getIcon(feature.id)}
             </div>
+            {/* Zone de Tap Géreuse P03 (Min 48x48) */}
             <button
               onClick={() => handleToggle(feature.id, feature.enabled)}
               disabled={loading === feature.id}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                feature.enabled ? "bg-green-500" : "bg-gray-300"
-              }`}
+              className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-4 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                feature.enabled ? "bg-[#375623]" : "bg-gray-400"
+              } min-h-[48px] min-w-[64px] items-center px-1`}
             >
               <span className="sr-only">Toggle {feature.name}</span>
               <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  feature.enabled ? "translate-x-5" : "translate-x-0"
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  feature.enabled ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </button>
           </div>
           
-          <div className="space-y-1">
-            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+          <div className="space-y-3">
+            <h4 className="text-[20px] font-bold text-[#1F4E79] flex items-wrap items-center gap-2 leading-tight">
               {feature.name}
-              <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase tracking-tighter">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-[#D6E4F0] text-[#1F4E79] uppercase tracking-tighter">
                 {feature.id}
               </span>
             </h4>
-            <p className="text-sm text-gray-500 leading-relaxed">
+            {/* P02 - Taille minimum 16sp */}
+            <p className="text-[16px] text-gray-600 leading-relaxed font-medium">
               {feature.description}
             </p>
           </div>
 
-          <div className="mt-6 flex items-center justify-between">
-            <span className={`text-[10px] font-black uppercase tracking-widest ${feature.enabled ? "text-green-600" : "text-gray-400"}`}>
-              {feature.enabled ? "Actif" : "Désactivé"}
+          <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+            <span className={`text-[12px] font-black uppercase tracking-[0.2em] ${feature.enabled ? "text-[#375623]" : "text-gray-400"}`}>
+              {feature.enabled ? "Module Actif" : "Désactivé"}
             </span>
             {feature.enabled ? (
-              <ShieldCheck className="w-4 h-4 text-green-500" />
+              <ShieldCheck className="w-5 h-5 text-[#375623]" />
             ) : (
-              <ShieldAlert className="w-4 h-4 text-gray-400" />
+              <ShieldAlert className="w-5 h-5 text-gray-400" />
             )}
           </div>
         </div>

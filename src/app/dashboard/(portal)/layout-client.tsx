@@ -13,11 +13,14 @@ import {
     LogOut,
     User,
     ChevronRight,
-    Search
+    Search,
+    Receipt,
+    Bell
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
+import BottomNav from "@/components/BottomNav"
 import { signOut } from "next-auth/react"
 
 export default function DashboardLayoutClient({
@@ -62,8 +65,8 @@ export default function DashboardLayoutClient({
                                 <div className="absolute -inset-2 bg-primary/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-black text-2xl tracking-tighter text-gray-900 leading-none uppercase">QAPRIL</span>
-                                <span className="text-[8px] font-black tracking-[0.3em] text-primary mt-1 uppercase">Gestionnaire de Patrimoine</span>
+                                <span className="font-black text-2xl tracking-tighter text-[#1F4E79] leading-none uppercase">QAPRIL</span>
+                                <span className="text-[12px] font-black tracking-[0.3em] text-[#C55A11] mt-1 uppercase">Gestionnaire de Patrimoine</span>
                             </div>
                         </Link>
 
@@ -74,8 +77,8 @@ export default function DashboardLayoutClient({
                                     <Link 
                                         key={link.href} 
                                         href={link.href}
-                                        className={`relative px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all rounded-xl flex items-center gap-2 group/nav ${
-                                            isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-900"
+                                        className={`relative px-5 py-2.5 text-[14px] font-bold uppercase tracking-[0.1em] transition-all rounded-xl flex items-center gap-2 group/nav ${
+                                            isActive ? "text-[#1F4E79]" : "text-gray-400 hover:text-[#1F4E79]"
                                         }`}
                                     >
                                         {isActive && (
@@ -106,8 +109,8 @@ export default function DashboardLayoutClient({
                         {session?.user && (
                             <div className="hidden lg:flex items-center gap-3">
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-black tracking-widest text-gray-900 uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
-                                    <span className="text-[9px] font-bold text-primary uppercase tracking-tighter">Propriétaire Certifié</span>
+                                    <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
+                                    <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">Propriétaire Certifié</span>
                                 </div>
                                 <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
                                     <User size={20} />
@@ -144,15 +147,32 @@ export default function DashboardLayoutClient({
                 >
                     {children}
                 </motion.div>
+                
+                <BottomNav items={
+                    session.user.role === 'TENANT' 
+                        ? [
+                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
+                            { href: "/dashboard/payments", label: "Payer", icon: <Receipt size={24} /> },
+                            { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
+                            { href: "/account", label: "Compte", icon: <User size={24} /> },
+                          ]
+                        : [
+                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
+                            { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
+                            { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
+                            { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
+                            { href: "/account", label: "Compte", icon: <User size={24} /> },
+                          ]
+                } />
             </main>
 
             {/* Footer de courtoisie Premium */}
-            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-10">
+            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2024 QAPRIL • Excellence en Gestion Immobilière</p>
+                    <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2024 QAPRIL • Excellence en Gestion Immobilière</p>
                     <div className="flex gap-10">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Centre d&apos;aide</span>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Sécurité</span>
+                        <span className="text-[14px] font-black text-[#1F4E79] uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Centre d'aide</span>
+                        <span className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Sécurité</span>
                     </div>
                 </div>
             </footer>

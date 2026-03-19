@@ -30,32 +30,35 @@ export default async function FeaturesPage() {
   }
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* Header Premium */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-black/40 text-[10px] font-black uppercase tracking-[0.2em]">
-            <Settings2 className="w-3 h-3" />
+    <div className="space-y-10 pb-12">
+      {/* Header Premium - Alignement Charte P01/P02 */}
+      <div className="flex flex-col gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-[#C55A11] text-[12px] font-black uppercase tracking-[0.3em]">
+            <Settings2 className="w-4 h-4" />
             <span>Paramètres Système</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
-            Gestion du <span className="text-black">Cœur</span>
+          {/* H1 Charte : 24sp / Bleu Nuit #1F4E79 */}
+          <h1 className="text-[24sp] md:text-[32px] font-black tracking-tight text-[#1F4E79] uppercase">
+            Gestion du <span className="text-[#C55A11]">Cœur</span>
           </h1>
-          <p className="text-lg text-gray-400 max-w-2xl font-medium">
+          {/* Body Charte : 16sp */}
+          <p className="text-[16px] text-gray-500 max-w-2xl font-medium leading-relaxed">
             Activez ou désactivez les modules applicatifs en temps réel. Ces changements affectent l'ensemble de la plateforme.
           </p>
         </div>
       </div>
 
-      {/* Alerte Information */}
-      <div className="bg-amber-50/50 border border-amber-100 p-6 rounded-3xl flex items-start gap-4">
-        <div className="p-2 bg-amber-100 rounded-xl text-amber-600 self-start">
-          <Info className="w-5 h-5" />
+      {/* Alerte Information - Couleurs Charte (Bleu Ciel Info #D6E4F0) */}
+      <div className="bg-[#D6E4F0]/30 border border-[#D6E4F0] p-8 rounded-[32px] flex items-start gap-5">
+        <div className="p-3 bg-[#1F4E79] rounded-2xl text-white self-start shadow-md">
+          <Info className="w-6 h-6" />
         </div>
-        <div className="space-y-1">
-          <h4 className="font-bold text-amber-900">Précaution d'Usage</h4>
-          <p className="text-sm text-amber-700/80 leading-relaxed">
-            La désactivation d'un module (ex: M04) masquera les interfaces correspondantes pour tous les utilisateurs (Locataires, Propriétaires, Agences) mais ne supprimera pas les données en base.
+        <div className="space-y-2">
+          {/* H2 Charte : 20sp / Orange #C55A11 */}
+          <h4 className="text-[20px] font-bold text-[#C55A11]">Précaution d'Usage</h4>
+          <p className="text-[16px] text-[#1F4E79]/80 leading-relaxed font-medium">
+            La désactivation d'un module masquera les interfaces correspondantes pour tous les utilisateurs (Locataires, Propriétaires, Agences) mais ne supprimera pas les données en base.
           </p>
         </div>
       </div>

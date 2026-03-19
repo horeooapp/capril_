@@ -51,19 +51,19 @@ export default function PropertiesClient({ properties }: { properties: Property[
             {/* Header section with refined glass branding */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div>
-                    <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter leading-none mb-4 uppercase">
                         Patrimoine.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide flex items-center gap-2">
-                        <Compass size={14} className="text-primary" />
-                        Gestion certifiée de votre parc immobilier et suivi de conformité <span className="text-gray-900 font-bold">QAPRIL Secure</span>.
+                    <p className="text-[16px] text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        <Compass size={16} className="text-[#C55A11]" />
+                        Gestion certifiée de votre parc mobilier et suivi de conformité <span className="text-[#1F4E79] font-bold">QAPRIL Secure</span>.
                     </p>
                 </div>
                 <Link 
                     href="/dashboard/properties/new" 
-                    className="px-8 py-4 bg-gray-900 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[10px] hover:bg-primary transition-all shadow-2xl flex items-center gap-3 active:scale-95 group"
+                    className="px-8 py-4 bg-[#1F4E79] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[14px] hover:bg-[#163a5a] transition-all shadow-2xl flex items-center gap-3 active:scale-95 group"
                 >
-                    <Plus size={16} />
+                    <Plus size={18} />
                     <span>Enregistrer un bien</span>
                 </Link>
             </div>
@@ -73,12 +73,12 @@ export default function PropertiesClient({ properties }: { properties: Property[
                     <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner border border-white rotate-3 group-hover:rotate-0 transition-transform">
                         <SearchX size={48} className="text-gray-300" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4 italic">Aucun actif détecté</h3>
-                    <p className="text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
+                    <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter mb-4 italic">Aucun actif détecté</h3>
+                    <p className="text-[16px] text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
                         Digitalisez votre premier bien immobilier pour bénéficier de la gestion automatisée et certifiée. <br />
-                        <span className="text-[10px] uppercase font-black tracking-widest text-primary mt-4 block">Protocole de sécurité activé</span>
+                        <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11] mt-4 block">Protocole de sécurité activé</span>
                     </p>
-                    <Link href="/dashboard/properties/new" className="px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-xl hover:bg-orange-600 transition-all uppercase tracking-widest text-[10px]">
+                    <Link href="/dashboard/properties/new" className="px-10 py-5 bg-[#C55A11] text-white font-black rounded-2xl shadow-xl hover:bg-[#A54A0D] transition-all uppercase tracking-widest text-[14px]">
                         Commencer maintenant
                     </Link>
                 </motion.div>
@@ -94,14 +94,14 @@ export default function PropertiesClient({ properties }: { properties: Property[
                             
                             <div className="p-10 relative z-10">
                                 <div className="flex justify-between items-start mb-10">
-                                    <div className={`px-4 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-[0.2em] shadow-sm border border-white ${
+                                    <div className={`px-4 py-1.5 rounded-xl text-[12px] font-black uppercase tracking-[0.2em] shadow-sm border border-white ${
                                         property.propertyCategory === 'RESIDENTIAL' 
                                         ? 'bg-blue-50 text-blue-600' 
                                         : 'bg-violet-50 text-violet-600'
                                     }`}>
                                         {property.propertyCategory === 'RESIDENTIAL' ? 'Résidentiel' : 'Commercial'}
                                     </div>
-                                    <span className="text-[10px] font-black text-gray-300 group-hover:text-primary transition-colors tracking-widest uppercase">
+                                    <span className="text-[14px] font-black text-gray-300 group-hover:text-[#C55A11] transition-colors tracking-widest uppercase">
                                         #{property.propertyCode}
                                     </span>
                                 </div>
@@ -115,17 +115,17 @@ export default function PropertiesClient({ properties }: { properties: Property[
                                     </h3>
                                 </div>
                                 <div className="flex items-center gap-2 mb-12">
-                                    <MapPin size={12} className="text-primary" />
-                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.1em] line-clamp-1">
+                                    <MapPin size={12} className="text-[#C55A11]" />
+                                    <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.1em] line-clamp-1">
                                         {property.addressLine1}
                                     </p>
                                 </div>
 
                                 <div className="flex items-end justify-between pt-8 border-t border-gray-100">
                                     <div>
-                                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Loyer de Base</p>
-                                        <p className="text-3xl font-black text-gray-900 tracking-tighter leading-none">
-                                            {Number(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-[10px] font-bold text-gray-300 ml-1">FCFA</span>
+                                        <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Loyer de Base</p>
+                                        <p className="text-3xl font-black text-[#1F4E79] tracking-tighter leading-none">
+                                            {Number(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-[14px] font-bold text-gray-300 ml-1">FCFA</span>
                                         </p>
                                     </div>
                                     <Link 

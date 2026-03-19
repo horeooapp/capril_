@@ -94,19 +94,19 @@ export default function DashboardOverviewClient({
             {/* Page Header */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                 <div className="space-y-2">
-                    <h1 className="text-5xl lg:text-7xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+                    <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
                         Patrimoine.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide flex items-center gap-2">
-                        Bienvenue, <span className="text-gray-900 font-black">{user?.name || user?.email?.split('@')[0]}</span> 
+                    <p className="text-[16px] text-gray-500 font-medium tracking-wide flex items-center gap-2">
+                        Bienvenue, <span className="text-[#1F4E79] font-black">{user?.name || user?.email?.split('@')[0]}</span> 
                         <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">Vue d&apos;ensemble consolidée</span>
+                        <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11]">Vue d'ensemble</span>
                     </p>
                 </div>
                 <div className="shrink-0 flex items-center gap-4">
-                    <button className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm">
-                        <TrendingUp size={14} className="text-primary" />
-                        Rapports d&apos;activité
+                    <button className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-2xl text-[14px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm text-[#1F4E79]">
+                        <TrendingUp size={16} className="text-[#C55A11]" />
+                        Rapports d'activité
                     </button>
                     {user && <ReliabilityBadge score={88.4} />}
                 </div>
@@ -126,8 +126,8 @@ export default function DashboardOverviewClient({
                         
                         <div className="flex justify-between items-start relative z-10">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1 leading-none">{stat.label}</span>
-                                <div className="h-1 w-8 bg-gray-900/10 rounded-full"></div>
+                                <span className="text-[14px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1 leading-none">{stat.label}</span>
+                                <div className="h-1 w-8 bg-[#1F4E79]/10 rounded-full"></div>
                             </div>
                             <div className={`w-14 h-14 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform`}>
                                 <stat.icon size={28} />
@@ -136,14 +136,14 @@ export default function DashboardOverviewClient({
 
                         <div className="relative z-10 mt-12">
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-gray-900 tracking-tighter leading-none">
+                                <span className="text-4xl font-black text-[#1F4E79] tracking-tighter leading-none">
                                     {stat.isCurrency ? stat.value.toLocaleString() : stat.value}
                                 </span>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.unit}</span>
+                                <span className="text-[14px] font-black uppercase tracking-widest text-gray-400">{stat.unit}</span>
                             </div>
                             <div className="mt-4 flex items-center gap-2">
                                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Mise à jour réelle</span>
+                                <span className="text-[12px] font-black uppercase tracking-widest text-[#375623]">Mise à jour réelle</span>
                             </div>
                         </div>
                     </motion.div>
@@ -173,17 +173,17 @@ export default function DashboardOverviewClient({
                                     <div className="p-3 bg-white/10 rounded-xl group-hover/link:bg-white/20 transition-colors">
                                         <Plus size={20} />
                                     </div>
-                                    <span className="font-black tracking-[0.1em] text-[10px] uppercase">Nouveau Logement</span>
+                                    <span className="font-black tracking-[0.1em] text-[14px] uppercase">Nouveau Logement</span>
                                 </div>
                                 <ArrowRight size={18} className="opacity-40 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all" />
                             </Link>
                             
-                            <Link href="/dashboard/receipts" className="flex items-center justify-between p-7 bg-primary hover:bg-orange-600 rounded-[2.2rem] transition-all group/link shadow-2xl shadow-orange-950/40 active:scale-95">
+                            <Link href="/dashboard/receipts" className="flex items-center justify-between p-7 bg-[#C55A11] hover:bg-[#A54A0D] rounded-[2.2rem] transition-all group/link shadow-2xl shadow-orange-950/40 active:scale-95">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-white/20 rounded-xl">
                                         <Zap size={20} />
                                     </div>
-                                    <span className="font-black tracking-[0.1em] text-[10px] uppercase">Générer Quittance</span>
+                                    <span className="font-black tracking-[0.1em] text-[14px] uppercase">Générer Quittance</span>
                                 </div>
                                 <ChevronRight size={18} className="group-hover/link:translate-x-1 transition-transform" />
                             </Link>
@@ -200,13 +200,13 @@ export default function DashboardOverviewClient({
                         <div className="flex flex-col">
                             <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic">Patrimoine Actif.</h3>
                             <div className="flex items-center gap-2 mt-2">
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Index de vos 4 derniers actifs</span>
+                                <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest">Index de vos 4 derniers actifs</span>
                                 <span className="h-[1px] w-8 bg-gray-200"></span>
                             </div>
                         </div>
-                        <Link href="/dashboard/properties" className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all border border-gray-100 shadow-sm group">
+                        <Link href="/dashboard/properties" className="flex items-center gap-3 px-8 py-4 bg-[#F2F2F2] hover:bg-gray-100 text-[#1F4E79] rounded-2xl text-[14px] font-black uppercase tracking-[0.2em] transition-all border border-gray-100 shadow-sm group">
                             Voir tout le parc
-                            <Search size={14} className="group-hover:rotate-12 transition-transform" />
+                            <Search size={16} className="group-hover:rotate-12 transition-transform" />
                         </Link>
                     </div>
 
@@ -226,17 +226,17 @@ export default function DashboardOverviewClient({
                                         </div>
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-3">
-                                                <p className="font-black text-gray-900 text-2xl tracking-tighter leading-none uppercase">{prop.name || "Immeuble SS1"}</p>
-                                                <span className="px-2 py-0.5 bg-orange-50 text-primary text-[8px] font-black uppercase tracking-widest rounded border border-orange-100">Actif</span>
+                                                <p className="font-black text-[#1F4E79] text-2xl tracking-tighter leading-none uppercase">{prop.name || "Immeuble SS1"}</p>
+                                                <span className="px-2 py-0.5 bg-orange-50 text-[#C55A11] text-[12px] font-black uppercase tracking-widest rounded border border-orange-100">Actif</span>
                                             </div>
                                             <div className="flex items-center gap-4 text-gray-400">
                                                 <div className="flex items-center gap-1.5">
                                                     <MapPin size={12} className="text-gray-300" />
-                                                    <span className="text-[9px] font-black uppercase tracking-widest">{prop.city}</span>
+                                                    <span className="text-[14px] font-black uppercase tracking-widest">{prop.city}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
                                                     <Users size={12} className="text-gray-300" />
-                                                    <span className="text-[9px] font-black uppercase tracking-widest">{(prop.leases?.length || 0)} Locataires</span>
+                                                    <span className="text-[14px] font-black uppercase tracking-widest">{(prop.leases?.length || 0)} Locataires</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -244,12 +244,12 @@ export default function DashboardOverviewClient({
                                     
                                     <div className="flex items-center gap-6 self-end md:self-center">
                                         <div className="hidden sm:flex flex-col items-end">
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
+                                            <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
                                             <div className="flex items-center gap-2">
                                                 <div className="h-1.5 w-24 bg-gray-200/50 rounded-full overflow-hidden shadow-inner">
                                                     <div className="h-full bg-emerald-500 w-[92%] shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
                                                 </div>
-                                                <span className="text-[10px] font-black text-emerald-600">92%</span>
+                                                <span className="text-[14px] font-black text-emerald-600">92%</span>
                                             </div>
                                         </div>
                                         <Link 

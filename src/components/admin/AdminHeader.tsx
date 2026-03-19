@@ -56,8 +56,8 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                             <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black text-2xl tracking-tighter text-gray-900 leading-none uppercase">QAPRIL</span>
-                            <span className="text-[8px] font-black tracking-[0.3em] text-gray-400 mt-1 uppercase">Administration Centrale</span>
+                            <span className="font-black text-2xl tracking-tighter text-[#1F4E79] leading-none uppercase">QAPRIL</span>
+                            <span className="text-[12px] font-black tracking-[0.3em] text-[#C55A11] mt-1 uppercase">Administration Centrale</span>
                         </div>
                     </Link>
 
@@ -68,8 +68,8 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                                 <Link 
                                     key={link.href} 
                                     href={link.href}
-                                    className={`relative px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all rounded-xl flex items-center gap-2 group/nav ${
-                                        isActive ? "text-white" : "text-gray-500 hover:text-gray-900"
+                                    className={`relative px-5 py-2.5 text-[14px] font-bold uppercase tracking-[0.1em] transition-all rounded-xl flex items-center gap-2 group/nav ${
+                                        isActive ? "text-white" : "text-gray-500 hover:text-[#1F4E79]"
                                     }`}
                                 >
                                     {isActive && (
@@ -101,10 +101,10 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                     {session?.user && (
                         <div className="hidden lg:flex items-center gap-3">
                             <div className="flex flex-col items-end">
-                                <span className="text-[10px] font-black tracking-widest text-gray-900 uppercase">
+                                <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">
                                     {session.user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
                                 </span>
-                                <span className="text-[9px] font-bold text-primary uppercase tracking-tighter">{session.user.email}</span>
+                                <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">{session.user.email}</span>
                             </div>
                             <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer border border-gray-800">
                                 <User size={20} />

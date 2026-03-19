@@ -36,12 +36,12 @@ export default function AdminLoginForm() {
     return (
         <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-[14px] font-bold mb-6">
                     {error}
                 </div>
             )}
             <div>
-                <label htmlFor="email" className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">
+                <label htmlFor="email" className="block text-[12px] font-black uppercase text-gray-400 tracking-widest mb-2 ml-1">
                     Email administratif
                 </label>
                 <div className="mt-1">
@@ -53,14 +53,14 @@ export default function AdminLoginForm() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300"
+                        className="w-full px-5 py-4 rounded-xl border-2 border-gray-100 focus:border-[#1F4E79] focus:ring-4 focus:ring-[#1F4E79]/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300 text-[16px]"
                         placeholder="admin@qapril.net"
                     />
                 </div>
             </div>
 
             <div>
-                <label htmlFor="password" className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">
+                <label htmlFor="password" className="block text-[12px] font-black uppercase text-gray-400 tracking-widest mb-2 ml-1">
                     Mot de passe
                 </label>
                 <div className="mt-1">
@@ -72,7 +72,7 @@ export default function AdminLoginForm() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300"
+                        className="w-full px-5 py-4 rounded-xl border-2 border-gray-100 focus:border-[#1F4E79] focus:ring-4 focus:ring-[#1F4E79]/10 outline-none transition-all font-medium text-gray-900 placeholder-gray-300 text-[16px]"
                         placeholder="••••••••"
                     />
                 </div>
@@ -82,15 +82,15 @@ export default function AdminLoginForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-black uppercase tracking-widest text-white bg-gray-900 hover:bg-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all active:scale-95 disabled:opacity-50"
+                    className="w-full flex justify-center py-5 px-4 border border-transparent rounded-2xl shadow-xl text-[14px] font-black uppercase tracking-widest text-white bg-[#1F4E79] hover:bg-[#C55A11] focus:outline-none focus:ring-4 focus:ring-[#1F4E79]/20 transition-all active:scale-95 disabled:opacity-50 min-h-[48px]"
                 >
                     {isPending ? 'Vérification...' : 'Accéder à la console'}
                 </button>
             </div>
 
-            <div className="mt-4 p-3 bg-indigo-50 border border-indigo-100 rounded-md">
-                <p className="text-xs text-indigo-700">
-                    <strong>Accès Restreint :</strong> Cette zone est réservée au personnel autorisé de QAPRIL.
+            <div className="mt-8 p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+                <p className="text-[12px] text-indigo-700 font-bold leading-relaxed">
+                    <strong className="text-[#1F4E79] uppercase tracking-widest text-[10px] block mb-1">Accès Restreint :</strong> Cette zone est réservée au personnel autorisé de QAPRIL.
                 </p>
             </div>
         </form>

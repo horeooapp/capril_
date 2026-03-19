@@ -37,17 +37,17 @@ export default async function LocataireDashboard() {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase mb-4">
                         Mes Quittances.
                     </h1>
-                    <p className="text-gray-500 font-medium tracking-wide">
-                        Historique consolidé de vos paiements <span className="text-primary font-bold">QAPRIL Secure</span>.
+                    <p className="text-[16px] text-gray-500 font-medium tracking-wide">
+                        Historique consolidé de vos paiements <span className="text-[#1F4E79] font-bold">QAPRIL Secure</span>.
                     </p>
                 </div>
                 {receipts.length > 0 && (
-                    <div className="flex items-center gap-3 px-4 py-2 bg-green-50 rounded-2xl border border-green-100">
-                        <CheckCircle2 size={16} className="text-green-600" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-green-700">Comptabilité à jour</span>
+                    <div className="flex items-center gap-3 px-4 py-2 bg-[#375623]/10 rounded-2xl border border-[#375623]/20">
+                        <CheckCircle2 size={18} className="text-[#375623]" />
+                        <span className="text-[14px] font-black uppercase tracking-widest text-[#375623]">Comptabilité à jour</span>
                     </div>
                 )}
             </div>
@@ -59,10 +59,10 @@ export default async function LocataireDashboard() {
                         <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-[2rem] flex items-center justify-center mb-8 border border-gray-100 rotate-3 group-hover:rotate-0 transition-transform">
                             <SearchX size={40} />
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter mb-4">Aucun document archivé</h3>
-                        <p className="text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
-                            Il semble que votre bailleur n&apos;ait pas encore émis de quittance électronique. <br />
-                            <span className="text-xs font-black uppercase tracking-widest text-primary mt-4 block">Vérification en cours...</span>
+                        <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter mb-4">Aucun document archivé</h3>
+                        <p className="text-[16px] text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+                            Il semble que votre bailleur n'ait pas encore émis de quittance électronique. <br />
+                            <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11] mt-4 block">Vérification en cours...</span>
                         </p>
                     </div>
                 ) : (
@@ -83,14 +83,14 @@ export default async function LocataireDashboard() {
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
-                                                    <h4 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+                                                    <h4 className="text-xl font-black text-[#1F4E79] uppercase tracking-tight">
                                                         {receipt.periodMonth}
                                                     </h4>
-                                                    <span className="px-3 py-1 bg-green-500/10 text-green-600 text-[9px] font-black uppercase tracking-widest rounded-lg border border-green-200/50">
+                                                    <span className="px-3 py-1 bg-[#375623]/10 text-[#375623] text-[12px] font-black uppercase tracking-widest rounded-lg border border-[#375623]/20">
                                                         Certifié Payé
                                                     </span>
                                                 </div>
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Réf: {receipt.receiptRef}</p>
+                                                <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em]">Réf: {receipt.receiptRef}</p>
                                             </div>
                                         </div>
 
@@ -100,8 +100,8 @@ export default async function LocataireDashboard() {
                                                     <MapPin size={16} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Localisation</span>
-                                                    <span className="text-xs font-bold text-gray-700">{receipt.lease.property.address}</span>
+                                                    <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1">Localisation</span>
+                                                    <span className="text-[14px] font-bold text-gray-700">{receipt.lease.property.address}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-3">
@@ -109,8 +109,8 @@ export default async function LocataireDashboard() {
                                                     <User size={16} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Bailleur</span>
-                                                    <span className="text-xs font-bold text-gray-700">{receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}</span>
+                                                    <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1">Bailleur</span>
+                                                    <span className="text-[14px] font-bold text-gray-700">{receipt.lease.property.owner.fullName || receipt.lease.property.owner.email}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -118,8 +118,8 @@ export default async function LocataireDashboard() {
 
                                     <div className="flex flex-col md:flex-row lg:flex-col items-center gap-6 lg:items-end w-full lg:w-auto pt-6 lg:pt-0 border-t lg:border-t-0 border-gray-100">
                                         <div className="text-center lg:text-right w-full lg:w-auto">
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant Acquitté</p>
-                                            <p className="text-4xl font-black text-gray-900 tracking-tighter">
+                                            <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant Acquitté</p>
+                                            <p className="text-4xl font-black text-[#1F4E79] tracking-tighter">
                                                 {Number(receipt.totalAmount).toLocaleString('fr-FR')} <span className="text-xl">FCFA</span>
                                             </p>
                                         </div>
@@ -127,11 +127,11 @@ export default async function LocataireDashboard() {
                                         <Link 
                                             href={`/receipts/${receipt.id}`}
                                             target="_blank"
-                                            className="w-full lg:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary transition-all shadow-2xl active:scale-95 group/btn"
+                                            className="w-full lg:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-[#163a5a] transition-all shadow-2xl active:scale-95 group/btn"
                                         >
-                                            <Download size={16} className="group-hover/btn:translate-y-0.5 transition-transform" />
+                                            <Download size={18} className="group-hover/btn:translate-y-0.5 transition-transform" />
                                             <span>Télécharger PDF</span>
-                                            <ArrowUpRight size={14} className="opacity-40 group-hover/btn:opacity-100 transition-opacity" />
+                                            <ArrowUpRight size={16} className="opacity-40 group-hover/btn:opacity-100 transition-opacity" />
                                         </Link>
                                     </div>
                                 </div>
@@ -149,11 +149,11 @@ export default async function LocataireDashboard() {
                         <Clock size={32} />
                     </div>
                     <div>
-                        <h5 className="font-black text-gray-900 uppercase tracking-tight text-lg">Mise à jour AutomatiqueIA</h5>
-                        <p className="text-xs font-medium text-gray-500">Votre archivage est synchronisé en temps réel avec le grand livre du bailleur.</p>
+                        <h5 className="font-black text-[#1F4E79] uppercase tracking-tight text-lg">Mise à jour Automatique</h5>
+                        <p className="text-[14px] font-medium text-gray-500">Votre archivage est synchronisé en temps réel avec le grand livre du bailleur.</p>
                     </div>
                 </div>
-                <Link href="/locataire/leases" className="px-8 py-4 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm">
+                <Link href="/locataire/leases" className="px-8 py-4 bg-white border border-gray-100 rounded-2xl text-[14px] font-black uppercase tracking-widest text-[#1F4E79] hover:bg-gray-50 transition-colors shadow-sm">
                     Gérer mes contrats
                 </Link>
             </div>
