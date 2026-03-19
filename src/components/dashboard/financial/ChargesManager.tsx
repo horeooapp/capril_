@@ -99,15 +99,15 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t border-gray-800">
-               {CHARGE_TYPES.map(cat => (
-                 <div key={cat.id} className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-gray-500">
-                       {cat.icon}
-                       <span className="text-[10px] font-black uppercase tracking-widest">{cat.label}</span>
-                    </div>
-                    <p className="text-white font-bold">{Math.floor(Math.random() * 150000).toLocaleString()} FCFA</p>
-                 </div>
-               ))}
+                {CHARGE_TYPES.map((cat, idx) => (
+                  <div key={cat.id} className="flex flex-col gap-2">
+                     <div className="flex items-center gap-2 text-gray-500">
+                        {cat.icon}
+                        <span className="text-[10px] font-black uppercase tracking-widest">{cat.label}</span>
+                     </div>
+                     <p className="text-white font-bold">{((idx + 1) * 25000).toLocaleString()} FCFA</p>
+                  </div>
+                ))}
             </div>
          </div>
 
