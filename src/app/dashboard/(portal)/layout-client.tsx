@@ -17,7 +17,8 @@ import {
     Receipt,
     Bell,
     BarChart3,
-    FileCheck2
+    FileCheck2,
+    Bot
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -44,6 +45,7 @@ export default function DashboardLayoutClient({
             : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
         ),
         { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
+        { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
     ];
 
     return (

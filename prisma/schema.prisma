@@ -266,6 +266,8 @@ model User {
   bailsDeclaratifsAsBailleur BailDeclaratif[] @relation("BdqBailleur")
   bailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")
   bailsDeclaratifsAsAgent    BailDeclaratif[] @relation("BdqAgent")
+  
+  bdqConversations      BdqConversationState[] @relation("BdqConvBailleur")
 
   // Relations ADD-03
   agentEdls             EtatsDesLieux[]   @relation("AgentEdls")
@@ -301,6 +303,9 @@ model LegalEntity {
   bankAccount       String?  @map("bank_account")
   status            String   @default("pending")
   
+  bdqConversations      BdqConversationState[] @relation("BdqConvLegalEntity")
+
+  ownedLeases           Lease[]          @relation("LandlordLeases")
   users             User[]
   leases            Lease[]           @relation("LeaseTenantEntity")
   documents         IdentityDocument[]
@@ -430,6 +435,8 @@ model Lease {
   property          Property @relation(fields: [propertyId], references: [id])
   landlordId        String   @map("landlord_id")
   landlord          User     @relation("LeaseLandlord", fields: [landlordId], references: [id])
+  landlordEntityId  String?  @map("landlord_entity_id")
+  landlordEntity    LegalEntity? @relation("LandlordLeases", fields: [landlordEntityId], references: [id])
   tenantId          String?  @map("tenant_id")
   tenant            User?    @relation("LeaseTenant", fields: [tenantId], references: [id])
   tenantEntityId    String?  @map("tenant_entity_id")
@@ -1806,6 +1813,14 @@ enum BdqStatut {
   ARCHIVE
 }
 
+enum BdqConvStatut {
+  EN_COURS
+  EN_PAUSE
+  COMPLETE
+  ABANDONNE
+  EXPIRE
+}
+
 // ═══════════════════════════════════════════════════════
 // BAILS DÉCLARATIFS (ADD-06 M-BAIL-VERBAL)
 // ═══════════════════════════════════════════════════════
@@ -1849,6 +1864,8 @@ model BailDeclaratif {
   bailFormelId          String?   @unique @map("bail_formel_id")
   bailFormel            Lease?    @relation("BdqFormalise", fields: [bailFormelId], references: [id])
 
+  bdqConversationState  BdqConversationState? @relation("BdqConv")
+
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
 
@@ -1886,4 +1903,46 @@ model BdqHistoriqueLoyer {
   createdAt            DateTime       @default(now()) @map("created_at")
 
   @@map("bdq_historique_loyer")
+}
+
+model BdqConversationState {
+  id                    String           @id @default(uuid())
+  bailleurId            String           @map("bailleur_id")
+  bailleur              User             @relation("BdqConvBailleur", fields: [bailleurId], references: [id])
+  legalEntityId         String?          @map("legal_entity_id")
+  legalEntity           LegalEntity?     @relation("BdqConvLegalEntity", fields: [legalEntityId], references: [id])
+  canal                 String           // WHATSAPP | APP_CHAT
+  canalRef              String?          @unique @map("canal_ref")
+  statut                BdqConvStatut    @default(EN_COURS)
+  
+  // Extracted fields
+  nomLocataireExtrait      String?       @map("nom_locataire_extrait")
+  telephoneExtrait          String?       @map("telephone_extrait")
+  descriptionLogementExtrait String?       @map("description_logement_extrait")
+  loyerExtrait              Decimal?      @map("loyer_extrait") @db.Decimal(12, 0)
+  dateEntreeExtraite       DateTime?     @map("date_entree_extraite")
+  precisionDate             String        @default("APPROXIMATIVE") @map("precision_date")
+  telephoneManquant         Boolean       @default(false) @map("telephone_manquant")
+  identiteIncomplete        Boolean       @default(false) @map("identite_incomplete")
+
+  // History
+  messagesHistory           Json          @default("[]") @map("messages_history")
+  nbEchanges                Int           @default(0) @map("nb_echanges")
+  champEnAttente            String?       @map("champ_en_attente")
+  pauseReason               String?       @map("pause_reason")
+  
+  bdqCreeId                 String?       @unique @map("bdq_cree_id")
+  bdqCree                   BailDeclaratif? @relation("BdqConv", fields: [bdqCreeId], references: [id])
+
+  // Costs
+  tokensEntreeTotal         Int           @default(0) @map("tokens_entree_total")
+  tokensSortieTotal         Int           @default(0) @map("tokens_sortie_total")
+  coutEstimeFcfa            Decimal       @default(0) @map("cout_estime_fcfa") @db.Decimal(8, 2)
+
+  createdAt                 DateTime       @default(now()) @map("created_at")
+  updatedAt                 DateTime       @updatedAt @map("updated_at")
+  expireAt                  DateTime?      @map("expire_at")
+  completedAt               DateTime?      @map("completed_at")
+
+  @@map("bdq_conversation_states")
 }
