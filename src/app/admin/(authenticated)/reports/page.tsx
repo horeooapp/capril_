@@ -32,10 +32,15 @@ export default async function ReportsAdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 italic font-black">
-        <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center italic font-black">
-            <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic font-black">Aperçu du Rapport Financier Global</h1>
-            <div className="text-xs font-bold text-gray-400 italic font-black">Généré le {new Date().toLocaleDateString()}</div>
+    <div className="min-h-screen bg-slate-50 py-12 px-4">
+        <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center">
+            <div className="space-y-1">
+                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Rapports Financiers</h1>
+                <p className="text-sm text-gray-500">Synthèse consolidée du parc immobilier</p>
+            </div>
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
+                Généré le {new Date().toLocaleDateString()}
+            </div>
         </div>
         <ManagementReport data={reportData} />
     </div>
