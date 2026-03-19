@@ -1,6 +1,6 @@
 import { getRecentPayments } from "@/actions/reversal-admin";
-import { retryReversal } from "@/actions/reversal";
 import { CheckCircle2, AlertCircle, RefreshCcw, ArrowRightLeft } from "lucide-react";
+import ReversalRetryButton from "@/components/admin/reversals/ReversalRetryButton";
 
 export default async function ReversalsAdminPage() {
     let payments = [];
@@ -68,13 +68,7 @@ export default async function ReversalsAdminPage() {
                                 </td>
                                 <td className="p-5">
                                     {payment.reversalStatus !== "REVERSED" && (
-                                        <button 
-                                            className="p-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-indigo-200 text-gray-400 hover:text-indigo-600 transition-all"
-                                            title="Réessayer le reversement"
-                                            // Normalement via un onClick côté client, ici on simplifie
-                                        >
-                                            <RefreshCcw size={16} />
-                                        </button>
+                                        <ReversalRetryButton paymentId={payment.id} />
                                     )}
                                 </td>
                             </tr>

@@ -1,36 +1,43 @@
 import ManagementReport from "@/components/reports/ManagementReport";
+import { getGlobalFinancialReport } from "@/actions/report-actions";
 
-export default function ReportsAdminPage() {
-  // Mock data for demo
-  const mockData = {
-    leaseRef: "BAIL-2026-R-0892",
-    landlordName: "M. Bakary DIALLO",
-    propertyAddress: "Résidence Ebony, Appt 4B, Cocody Riviera 3, Abidjan",
-    period: "Mars 2026",
+export default async function ReportsAdminPage() {
+  const res = await getGlobalFinancialReport();
+  
+  if (!res.success || !res.data) {
+    return (
+      <div className="p-20 text-center">
+        <h1 className="text-xl font-bold text-red-600">Erreur de chargement des rapports</h1>
+        <p className="text-gray-500">{res.error || "Impossible de récupérer les données financières."}</p>
+      </div>
+    );
+  }
+
+  const { financials, performance } = res.data;
+
+  // Adapter les données pour le composant ManagementReport
+  const reportData = {
+    leaseRef: "SYNTHESE-GLOBALE-QAPRIL",
+    landlordName: "ADMINISTRATION QAPRIL",
+    propertyAddress: "Ensemble du Parc Immobilier Sécurisé",
+    period: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
     financials: {
-      rentReceived: 450000,
-      agencyFees: 45000,
-      qaprilFees: 9000,
-      tva: 1620,
-      netToLandlord: 394380,
+      rentReceived: financials.rentReceived,
+      agencyFees: financials.agencyFees,
+      qaprilFees: financials.qaprilFees,
+      tva: financials.tva,
+      netToLandlord: financials.netToLandlords
     },
-    performance: [
-      { month: "Oct", amount: 450000 },
-      { month: "Nov", amount: 450000 },
-      { month: "Déc", amount: 450000 },
-      { month: "Jan", amount: 420000 },
-      { month: "Fév", amount: 450000 },
-      { month: "Mar", amount: 450000 },
-    ]
+    performance: performance
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center">
-            <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Aperçu du Rapport Billeterie</h1>
-            <div className="text-xs font-bold text-gray-400">Généré le {new Date().toLocaleDateString()}</div>
+    <div className="min-h-screen bg-slate-50 py-12 px-4 italic font-black">
+        <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center italic font-black">
+            <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic font-black">Aperçu du Rapport Financier Global</h1>
+            <div className="text-xs font-bold text-gray-400 italic font-black">Généré le {new Date().toLocaleDateString()}</div>
         </div>
-        <ManagementReport data={mockData} />
+        <ManagementReport data={reportData} />
     </div>
   );
 }

@@ -39,6 +39,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
         { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={18} /> },
         { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={18} /> },
         { href: "/admin/compliance", label: "Conformité", icon: <ShieldAlert size={18} /> },
+        { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
         { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
         { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={18} /> },
     ]

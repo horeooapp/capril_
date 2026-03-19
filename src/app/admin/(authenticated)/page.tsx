@@ -11,7 +11,8 @@ import {
     Building2,
     Award,
     CreditCard,
-    Zap
+    Zap,
+    Settings2
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -59,7 +60,9 @@ export default async function AdminDashboardOverview() {
             where: { status: "pending" },
             take: 5,
             include: { user: { select: { fullName: true } } }
-        }).catch(() => [])
+        }).catch(() => []),
+        activeModules: await (prisma as any).featureFlag?.count({ where: { enabled: true } }).catch(() => 0),
+        totalModules: await (prisma as any).featureFlag?.count().catch(() => 0),
     }
 
     try {
@@ -215,6 +218,14 @@ export default async function AdminDashboardOverview() {
                                 icon={<Users size={28} />} 
                                 color="slate"
                                 delay={1.0}
+                            />
+                            <StatCard 
+                                title="Modules Système" 
+                                value={`${safeData.activeModules}/${safeData.totalModules}`} 
+                                icon={<Settings2 size={28} />} 
+                                color="indigo"
+                                trend="Configuration"
+                                delay={1.1}
                             />
                         </div>
                     </div>
