@@ -263,6 +263,10 @@ model User {
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
+  bailsDeclaratifsAsBailleur BailDeclaratif[] @relation("BdqBailleur")
+  bailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")
+  bailsDeclaratifsAsAgent    BailDeclaratif[] @relation("BdqAgent")
+
   // Relations ADD-03
   agentEdls             EtatsDesLieux[]   @relation("AgentEdls")
   locataireEdls         EtatsDesLieux[]   @relation("LocataireEdls")
@@ -378,6 +382,7 @@ model Property {
   referenceCadastre String?        @map("reference_cadastre")
 
   leases            Lease[]
+  bailsDeclaratifs  BailDeclaratif[]
   mandates          Mandate[]
   passports         Passport[]
   images            PropertyImage[]
@@ -473,6 +478,7 @@ model Lease {
   pgwPayments       PaymentPgw[]
 
   colocataires      Colocataire[]
+  bdq               BailDeclaratif? @relation("BdqFormalise")
 
   // Relations ADD-03
   etatsDesLieux         EtatsDesLieux[]
@@ -1788,3 +1794,96 @@ enum ReminderType {
   LEGAL_NOTICE
 }
 
+enum BdqStatut {
+  PENDING_LOCATAIRE
+  CONFIRME
+  CONFIRME_AGENT
+  CONFIRME_MEDIATION
+  DECLARATIF_SANS_REPONSE
+  DECLARATIF_UNILATERAL
+  CONTESTE
+  FORMALISE
+  ARCHIVE
+}
+
+// ═══════════════════════════════════════════════════════
+// BAILS DÉCLARATIFS (ADD-06 M-BAIL-VERBAL)
+// ═══════════════════════════════════════════════════════
+
+model BailDeclaratif {
+  id                    String    @id @default(uuid()) @map("bdq_id")
+  bailleurId            String    @map("bailleur_id")
+  bailleur              User      @relation("BdqBailleur", fields: [bailleurId], references: [id])
+  locataireId           String?   @map("locataire_id")
+  locataire             User?     @relation("BdqLocataire", fields: [locataireId], references: [id])
+  propertyId            String?   @map("property_id")
+  property              Property? @relation(fields: [propertyId], references: [id])
+
+  nomLocataireDeclare     String    @map("nom_locataire_declare")
+  prenomLocataireDeclare  String?   @map("prenom_locataire_declare")
+  telephoneLocataire       String    @map("telephone_locataire")
+  descriptionLogement      String    @map("description_logement")
+  adresseLibre             String?   @map("adresse_libre")
+  loyerDeclareMensuel     Decimal   @map("loyer_declare_mensuel") @db.Decimal(12, 2)
+  dateEntreeEstimee       DateTime? @map("date_entree_estimee") @db.Date
+  precisionDateEntree     String    @default("EXACTE") @map("precision_date_entree")
+
+  statut                BdqStatut @default(PENDING_LOCATAIRE)
+  confirmationLocataire  Boolean?  @map("confirmation_locataire")
+  confirmationAt        DateTime? @map("confirmation_at")
+  contrePropositionLoyer Decimal?  @map("contre_proposition_loyer") @db.Decimal(12, 2)
+  motifRefus            String?   @map("motif_refus")
+
+  agentConfirmantId     String?   @map("agent_confirmant_id")
+  agentConfirmant       User?     @relation("BdqAgent", fields: [agentConfirmantId], references: [id])
+  confirmationAgentAt   DateTime? @map("confirmation_agent_at")
+  agentConfirmationMode String?   @map("agent_confirmation_mode")
+
+  hashDeclaration       String    @map("hash_declaration") @db.VarChar(64)
+  hashBdqFinal          String?   @map("hash_bdq_final") @db.VarChar(64)
+  qrToken               String?   @unique @map("qr_token")
+
+  smsLogs               BdqSmsLog[]
+  historiqueLoyer       BdqHistoriqueLoyer[]
+
+  bailFormelId          String?   @unique @map("bail_formel_id")
+  bailFormel            Lease?    @relation("BdqFormalise", fields: [bailFormelId], references: [id])
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("bails_declaratifs")
+  @@index([bailleurId])
+  @@index([telephoneLocataire])
+}
+
+model BdqSmsLog {
+  id            String         @id @default(uuid()) @map("sms_id")
+  bdqId         String         @map("bdq_id")
+  bdq           BailDeclaratif @relation(fields: [bdqId], references: [id])
+  typeSms       String         @map("type_sms")
+  destinataire  String
+  roleDest      String         @map("role_dest")
+  contenu       String
+  statutEnvoi   String         @default("ENVOYE") @map("statut_envoi")
+  reponseRecue  String?        @map("reponse_recue")
+  sentAt        DateTime       @default(now()) @map("sent_at")
+
+  @@map("bdq_sms_log")
+}
+
+model BdqHistoriqueLoyer {
+  id                   String         @id @default(uuid()) @map("hist_id")
+  bdqId                String         @map("bdq_id")
+  bdq                  BailDeclaratif @relation(fields: [bdqId], references: [id])
+  ancienLoyer          Decimal        @map("ancien_loyer") @db.Decimal(12, 2)
+  nouveauLoyer         Decimal        @map("nouveau_loyer") @db.Decimal(12, 2)
+  motif                String?
+  confirmationLocataire Boolean?       @map("confirmation_locataire")
+  modifieParId         String?        @map("modifie_par")
+  effectiveLe          DateTime       @map("effective_le") @db.Date
+  hashModification     String         @map("hash_modification") @db.VarChar(64)
+  createdAt            DateTime       @default(now()) @map("created_at")
+
+  @@map("bdq_historique_loyer")
+}

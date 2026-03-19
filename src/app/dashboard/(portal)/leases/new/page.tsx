@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { createLease } from "@/actions/leases"
+import { createBDQ } from "@/actions/bdq"
 import { getProperties } from "@/actions/properties"
 import { TypeBail } from "@prisma/client"
 
@@ -17,6 +18,8 @@ export default function LeaseRegistrationPage() {
     const [typeBail, setTypeBail] = useState<TypeBail>(TypeBail.ECRIT)
     const [propertyId, setPropertyId] = useState("")
     const [tenantPhone, setTenantPhone] = useState("")
+    const [tenantName, setTenantName] = useState("")
+    const [propertyDescription, setPropertyDescription] = useState("")
     const [rentAmount, setRentAmount] = useState<number>(0)
     const [chargesAmount, setChargesAmount] = useState<number>(0)
     const [depositAmount, setDepositAmount] = useState<number>(0)
@@ -58,7 +61,20 @@ export default function LeaseRegistrationPage() {
         }
 
         startTransition(async () => {
-            const result = await createLease(data)
+            let result
+            if (typeBail === TypeBail.DECLARATIF_BDQ) {
+                result = await createBDQ({
+                    propertyId: propertyId || undefined,
+                    nomLocataire: tenantName,
+                    telephoneLocataire: tenantPhone,
+                    descriptionLogement: propertyDescription || properties.find(p => p.id === propertyId)?.address || "Logement non spécifié",
+                    loyerMensuel: rentAmount,
+                    dateEntree: new Date(startDate)
+                })
+            } else {
+                result = await createLease(data)
+            }
+
             if (result.error) {
                 setError(result.error)
             } else {
@@ -131,6 +147,16 @@ export default function LeaseRegistrationPage() {
                                         </select>
                                     </div>
                                     <div className="space-y-2">
+                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Locataire (Nom)</label>
+                                        <input 
+                                            required 
+                                            value={tenantName}
+                                            onChange={(e) => setTenantName(e.target.value)}
+                                            placeholder="Nom complet" 
+                                            className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none" 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Locataire (Mobile)</label>
                                         <input 
                                             required type="tel" 
@@ -140,6 +166,18 @@ export default function LeaseRegistrationPage() {
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none" 
                                         />
                                     </div>
+                                    {typeBail === TypeBail.DECLARATIF_BDQ && !propertyId && (
+                                        <div className="md:col-span-2 space-y-2">
+                                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Description du Logement</label>
+                                            <textarea 
+                                                required 
+                                                value={propertyDescription}
+                                                onChange={(e) => setPropertyDescription(e.target.value)}
+                                                placeholder="Ex: Chambre 3, Cour Bamba, Niangon..." 
+                                                className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none h-24"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
