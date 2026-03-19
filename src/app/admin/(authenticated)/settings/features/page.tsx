@@ -17,10 +17,17 @@ export default async function FeaturesPage() {
     redirect("/admin");
   }
 
-  // Récupérer les flags de la DB (avec fallback si vide)
-  const features = await (prisma as any).featureFlag.findMany({
-    orderBy: { id: "asc" }
-  });
+  // Récupérer les flags de la DB (avec fallback si vide ou table manquante)
+  let features = [];
+  try {
+    if ((prisma as any).featureFlag) {
+      features = await (prisma as any).featureFlag.findMany({
+        orderBy: { id: "asc" }
+      });
+    }
+  } catch (e) {
+    console.error("[FeaturesPage] Impossible d'accéder à la table FeatureFlag :", e);
+  }
 
   return (
     <div className="space-y-8 pb-12">

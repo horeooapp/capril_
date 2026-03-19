@@ -59,8 +59,12 @@ export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
   if (!featuresCache || (now - lastFetch) > CACHE_TTL) {
     try {
       // 1. Tenter la nouvelle table FeatureFlag
-      const flags = await (prisma as any).featureFlag.findMany();
-      if (flags.length > 0) {
+      let flags: any[] = [];
+      if ((prisma as any).featureFlag) {
+        flags = await (prisma as any).featureFlag.findMany();
+      }
+      
+      if (flags && flags.length > 0) {
         featuresCache = flags.reduce((acc: any, flag: any) => {
           acc[flag.id] = flag.enabled;
           return acc;

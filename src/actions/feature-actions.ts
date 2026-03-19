@@ -15,6 +15,10 @@ export async function toggleFeature(id: string, enabled: boolean) {
       throw new Error("Accès refusé");
     }
 
+    if (!(prisma as any).featureFlag) {
+      throw new Error("Le système de modules n'est pas encore initialisé sur ce serveur (table manquante).");
+    }
+
     await (prisma as any).featureFlag.update({
       where: { id },
       data: { enabled },
