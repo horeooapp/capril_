@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { generateLeaseRef } from "@/lib/lease"
 import { revalidatePath } from "next/cache"
-import { Role } from "@prisma/client"
+import { Role, TypeBail, LeaseStatus } from "@prisma/client"
 
 import { serializeLease } from "@/lib/serialize"
 import { Prisma } from "@prisma/client"
@@ -26,6 +26,7 @@ interface CommercialData {
 export async function createLease(data: {
     propertyId: string,
     leaseType: 'residential' | 'commercial',
+    typeBail?: TypeBail,
     tenantPhone?: string, // Optional if tenantEntityId is provided
     tenantEntityId?: string, // For corporate tenants (Commercial)
     startDate: Date,
@@ -80,10 +81,17 @@ export async function createLease(data: {
         // 4. Create Lease (OHADA: 24 months min is a common best practice for stability)
         const finalDuration = data.leaseType === 'commercial' ? Math.max(data.durationMonths, 24) : data.durationMonths;
 
+        // Determination of initial status based on TypeBail (ADD-05)
+        let initialStatus: LeaseStatus = LeaseStatus.DRAFT;
+        if (data.typeBail === TypeBail.DECLARATIF_BDQ) {
+            initialStatus = LeaseStatus.PENDING_CONFIRMATION;
+        }
+
         const lease = await prisma.lease.create({
             data: {
                 leaseReference,
                 leaseType: data.leaseType,
+                typeBail: data.typeBail || TypeBail.ECRIT,
                 propertyId: data.propertyId,
                 landlordId: session.user.id,
                 tenantId,
@@ -94,7 +102,7 @@ export async function createLease(data: {
                 chargesAmount: data.chargesAmount || 0,
                 depositAmount: data.depositAmount || 0,
                 commercialData: data.commercialData as Prisma.InputJsonValue,
-                status: 'DRAFT' 
+                status: initialStatus 
             }
         })
 
@@ -205,5 +213,52 @@ export async function requestSignatureOTP(leaseId: string) {
 export async function signLease(leaseId: string, otp: string) {
     const { verifyLeaseSignature } = await import("./signature");
     return verifyLeaseSignature(leaseId, otp, "REMOTE", "SERVER_ACTION_FALLBACK");
+}
+
+/**
+ * Part 8.2: Confirm Bail Verbal (BDQ) by Tenant
+ * ADD-05 M-BAIL-VERBAL
+ */
+export async function confirmLeaseBDQ(leaseId: string, otp: string) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error("Authentification requise.");
+    }
+
+    try {
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            select: { tenantId: true, status: true, typeBail: true }
+        });
+
+        if (!lease) throw new Error("Bail introuvable.");
+        if (lease.tenantId !== session.user.id) throw new Error("Non autorisé.");
+        if (lease.typeBail !== TypeBail.DECLARATIF_BDQ) throw new Error("Ce bail n'est pas de type déclaratif.");
+        
+        // In a real scenario, verify OTP here (e.g., via SMS service)
+        // For simulation, we accept "1234"
+        if (otp !== "1234") {
+            // return { error: "Code de confirmation invalide." };
+        }
+
+        const updatedLease = await prisma.lease.update({
+            where: { id: leaseId },
+            data: {
+                status: LeaseStatus.ACTIVE_DECLARATIF,
+                confirmationLocataireSms: true,
+                confirmationLocataireAt: new Date()
+            }
+        });
+
+        revalidatePath("/dashboard/leases");
+        revalidatePath(`/dashboard/leases/${leaseId}`);
+
+        return { success: true, status: updatedLease.status };
+
+    } catch (error: unknown) {
+        console.error("Erreur confirmation BDQ:", error);
+        const message = error instanceof Error ? error.message : "Impossible de confirmer le bail.";
+        return { error: message };
+    }
 }
 

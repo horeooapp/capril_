@@ -33,6 +33,21 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   position: relative;
+  /* ADD-05 R01: Police minimum 16px sur mobile */
+  font-size: 16px; 
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 14px; /* On can keep it 14px on desktop if preferred, but the rule says min 16px on mobile */
+  }
+}
+
+/* ADD-05 R02: Boutons larges >= 48px de hauteur */
+button, 
+select, 
+input:not([type="checkbox"]):not([type="radio"]) {
+  min-height: 48px;
 }
 
 /* Premium Glassmorphism */

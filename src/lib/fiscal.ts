@@ -17,7 +17,10 @@ export interface FiscalCalculation {
     baseCalcul: number;
     droitsEnregistrement: number;
     fraisTimbre: number;
-    fraisQapril: number;
+    fraisQapril: number; // Deprecated: use TTC
+    fraisQaprilHt: number;
+    fraisQaprilTva: number;
+    fraisQaprilTtc: number;
     penaltyAmount: number;
     totalDgi: number;
     totalBailleur: number;
@@ -42,7 +45,6 @@ export function calculateFiscalDroits(
     const daysLate = isLate ? Math.floor((now.getTime() - limitDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
     // Plafonnement à 12 mois pour les baux à durée indéterminée (DI) 
-    // ou baux longs pour la base de calcul fiscale initiale
     const dureeRetenue = Math.min(dureeBailMois, 12);
     const baseCalcul = loyerMensuel * dureeRetenue;
 
@@ -52,16 +54,23 @@ export function calculateFiscalDroits(
     // Pénalités de retard (10% si > 30 jours)
     const penalty = isLate ? Math.round(droits * 0.10) : 0;
 
-    // Frais QAPRIL (Moteur de service dynamique M-PRIX-DYN)
-    let fraisQapril = DYNAMIC_PRICING.calculateServiceFee(loyerMensuel);
+    // Frais QAPRIL (Moteur de service dynamique M-PRIX-DYN - ADD-05)
+    const fraisTtc = DYNAMIC_PRICING.calculateServiceFee(loyerMensuel);
+    const tvaRate = 0.18;
+    const fraisHt = Math.round(fraisTtc / (1 + tvaRate));
+    const fraisTva = fraisTtc - fraisHt;
     
-    // Surcharge pour bail commercial
+    // Surcharge pour bail commercial (Minimum 5000 TTC)
+    let finalFraisTtc = fraisTtc;
     if (leaseType === 'commercial') {
-        fraisQapril = Math.max(fraisQapril, 5000);
+        finalFraisTtc = Math.max(finalFraisTtc, 5000);
     }
 
+    const finalFraisHt = Math.round(finalFraisTtc / (1 + tvaRate));
+    const finalFraisTva = finalFraisTtc - finalFraisHt;
+
     const totalDgi = droits + timbres + penalty;
-    const totalBailleur = totalDgi + fraisQapril;
+    const totalBailleur = totalDgi + finalFraisTtc;
 
     return {
         loyerMensuel,
@@ -70,7 +79,10 @@ export function calculateFiscalDroits(
         baseCalcul,
         droitsEnregistrement: droits,
         fraisTimbre: timbres,
-        fraisQapril,
+        fraisQapril: finalFraisTtc,
+        fraisQaprilHt: finalFraisHt,
+        fraisQaprilTva: finalFraisTva,
+        fraisQaprilTtc: finalFraisTtc,
         penaltyAmount: penalty,
         totalDgi,
         totalBailleur,

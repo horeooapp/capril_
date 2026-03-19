@@ -4,13 +4,36 @@
  */
 
 export const DYNAMIC_PRICING = {
-    // Frais fixes ou pourcentage selon le loyer mensuel TTC
-    calculateServiceFee: (rentAmount: number) => {
-        if (rentAmount <= 50000) return 1000; // Social/Populaire
-        if (rentAmount <= 150000) return 3000; // Standard (Prix actuel)
-        
-        // Premium : 2% du loyer avec un minimum de 3000
-        const percentageFee = Math.round(rentAmount * 0.02);
-        return Math.max(3000, percentageFee);
+    /**
+     * Frais d'enregistrement de bail (M-PRIX-DYN)
+     */
+    getRegistrationFee: (rent: number) => {
+        if (rent <= 50000) return 3000;
+        if (rent <= 150000) return 5000;
+        if (rent <= 400000) return 8000;
+        if (rent <= 1000000) return 15000;
+        return 25000;
+    },
+
+    /**
+     * Frais de renouvellement de bail
+     */
+    getRenewalFee: (rent: number) => {
+        if (rent <= 50000) return 1500;
+        if (rent <= 150000) return 2500;
+        if (rent <= 400000) return 4000;
+        if (rent <= 1000000) return 7500;
+        return 12500;
+    },
+
+    /**
+     * Frais de service M17 (QAPRIL Service)
+     */
+    calculateServiceFee: (rent: number) => {
+        if (rent <= 50000) return 3000;
+        if (rent <= 150000) return 4000;
+        if (rent <= 400000) return 5000;
+        if (rent <= 1000000) return 8000;
+        return 15000;
     }
 }

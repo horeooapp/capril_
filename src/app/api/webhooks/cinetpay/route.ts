@@ -4,6 +4,7 @@ import { cinetpay } from "@/lib/cinetpay";
 import { createReceipt } from "@/actions/receipts";
 import { PRICING } from "@/constants/pricing";
 import { Decimal } from "@prisma/client/runtime/library";
+import { PaymentCanal, PaymentPgwStatus } from "@prisma/client";
 
 /**
  * CinetPay Webhook Handler
@@ -78,6 +79,25 @@ export async function POST(req: NextRequest) {
                 });
             }
 
+            // --- ADD-05: M-PGW Integration ---
+            // Create the unified PaymentPgw record
+            const pgw = await tx.paymentPgw.create({
+                data: {
+                    leaseId: intent.leaseId,
+                    moisConcerne: new Date(),
+                    montant: new Decimal(intent.amount),
+                    payeurId: intent.lease.tenantId || "SYSTEM",
+                    beneficiaireId: intent.lease.landlordId,
+                    canal: PaymentCanal.CINETPAY_M17,
+                    statut: PaymentPgwStatus.CONFIRMEE,
+                    refInterne: intent.id,
+                    refCinetpay: transaction_id,
+                    refOperateur: verification.operator_id,
+                    webhookPayload: verification as any,
+                    webhookReceivedAt: new Date()
+                }
+            });
+
             // --- ADD-05: M-TVA Ventilation ---
             const montantTtc = new Decimal(intent.amount);
             const montantHt = montantTtc.div(1.18);
@@ -85,10 +105,10 @@ export async function POST(req: NextRequest) {
             
             await tx.tvaTransaction.create({
                 data: {
-                    paymentId: intent.id, // ID must match the relation
+                    paymentId: pgw.id, 
                     serviceType: metadata?.serviceType || "LOYER",
                     montantHt,
-                    tauxTva: 18.00,
+                    tauxTva: new Decimal(18.00),
                     montantTva,
                     montantTtc,
                     periodeFiscale: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
