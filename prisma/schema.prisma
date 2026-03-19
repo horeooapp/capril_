@@ -49,6 +49,20 @@ enum LeaseStatus {
   ARCHIVED
 }
 
+enum TypeBail {
+  ECRIT
+  DECLARATIF_BDQ
+  DECLARATIF_EN_COURS_FORMALISATION
+}
+
+enum PlanTier {
+  LOCATAIRE
+  ESSENTIEL
+  PRO
+  PREMIUM
+  INSTITUTIONNEL
+}
+
 enum PlanStatus {
   PROPOSED
   ACCEPTED
@@ -217,6 +231,30 @@ model User {
   
   pgwPayerTransactions      PaymentPgw[] @relation("PayerTransactions")
   pgwBeneficiaryTransactions PaymentPgw[] @relation("BeneficiaryTransactions")
+  coopGroups                 CoopGroup[]  @relation("CoopMembers")
+
+  // ADD-05 Diaspora & KYC
+  paysResidence       String?   @map("pays_residence") @db.Char(3)
+  fuseauHoraire       String    @default("Africa/Abidjan") @map("fuseau_horaire")
+  emailRapportMensuel  String?   @map("email_rapport_mensuel")
+  deviceFingerprint   String?   @map("device_fingerprint") @db.VarChar(64)
+  fraudScore          Int       @default(0) @map("fraud_score") @db.SmallInt
+  fraudFlags          Json?     @map("fraud_flags")
+
+  // ADD-05 B2B & White Label
+  whiteLabelConfig    Json?     @map("white_label_config")
+  companyRegNumber    String?   @map("company_reg_number")
+  taxId               String?   @map("tax_id")
+
+  procurationsDonnees   ProcurationNumerique[] @relation("Mandant")
+  procurationsRecues    ProcurationNumerique[] @relation("Mandataire")
+  fraudRecords          FraudBlacklist[]       @relation("UserFraud")
+  blacklistAuthored     FraudBlacklist[]       @relation("BlacklistAuthor")
+
+  // ADD-05 Freemium
+  activePlanTier      PlanTier  @default(LOCATAIRE) @map("active_plan_tier")
+  planExpiresAt       DateTime? @map("plan_expires_at")
+  subscriptionAudits  SubscriptionAudit[]
 
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
@@ -340,6 +378,10 @@ model Property {
   passports         Passport[]
   images            PropertyImage[]
 
+  // ADD-05 Horeoo
+  isHoreoo         Boolean   @default(false) @map("is_horeoo")
+  horeooDiscount   Decimal?  @map("horeoo_discount") @db.Decimal(5, 2)
+
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
@@ -397,6 +439,12 @@ model Lease {
   status            LeaseStatus @default(DRAFT)
   importMode        Boolean  @default(false) @map("import_mode")
   
+  // ADD-05 BDQ
+  typeBail              TypeBail  @default(ECRIT) @map("type_bail")
+  confirmationLocataireSms Boolean   @default(false) @map("confirmation_locataire_sms")
+  confirmationLocataireAt  DateTime? @map("confirmation_locataire_at")
+  preavisRequisMois      Int?      @default(1) @map("preavis_requis_mois") @db.SmallInt
+  
   signedAt          DateTime? @map("signed_at")
   terminatedAt      DateTime? @map("terminated_at")
   terminationReason String?   @map("termination_reason") @db.Text
@@ -427,6 +475,8 @@ model Lease {
 
   synthesesLoyer    MonthlyRentSynthesis[]
   landInfo          LandLeaseInfo?
+  legalProcedures   LegalProcedure[]
+  coopGroup         CoopGroup?
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -1061,6 +1111,7 @@ model PaymentPgw {
   quittance       Receipt?           @relation(fields: [quittanceId], references: [id])
   
   webhooks        PgwWebhook[]
+  tvaTransactions TvaTransaction[]
   
   tentatives      Int                @default(0)
   expiresAt       DateTime?          @map("expires_at")
@@ -1442,4 +1493,103 @@ enum AgendaType {
   TRAVAUX
   ECHEANCE_BAIL
   AUTRE
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-05 NEW MODELS
+// ═══════════════════════════════════════════════════════
+
+model TvaTransaction {
+  id              String   @id @default(uuid()) @map("tva_id")
+  paymentId       String   @map("payment_id")
+  payment         PaymentPgw @relation(fields: [paymentId], references: [id])
+  serviceType     String   @map("service_type")
+  montantHt       Decimal  @map("montant_ht") @db.Decimal(12, 2)
+  tauxTva         Decimal  @default(18.00) @map("taux_tva") @db.Decimal(5, 2)
+  montantTva      Decimal  @map("montant_tva") @db.Decimal(12, 2)
+  montantTtc      Decimal  @map("montant_ttc") @db.Decimal(12, 2)
+  periodeFiscale  DateTime @map("periode_fiscale") @db.Date
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("tva_transactions")
+}
+
+model ProcurationNumerique {
+  id              String   @id @default(uuid()) @map("proc_id")
+  mandantId       String   @map("mandant_id")
+  mandant         User     @relation("Mandant", fields: [mandantId], references: [id])
+  mandataireId    String   @map("mandataire_id")
+  mandataire      User     @relation("Mandataire", fields: [mandataireId], references: [id])
+  droits          Json     @map("droits")
+  dateDebut       DateTime @map("date_debut") @db.Date
+  dateFin         DateTime? @map("date_fin") @db.Date
+  actif           Boolean  @default(true)
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("procurations_numeriques")
+}
+
+model FraudBlacklist {
+  id           String   @id @default(uuid()) @map("bl_id")
+  userId       String?  @map("user_id")
+  user         User?    @relation("UserFraud", fields: [userId], references: [id])
+  documentHash String?  @map("document_hash") @db.VarChar(64)
+  motif        String
+  ajouteParId  String?  @map("ajoute_par")
+  ajoutePar    User?    @relation("BlacklistAuthor", fields: [ajouteParId], references: [id])
+  
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("fraud_blacklist")
+}
+
+model SubscriptionAudit {
+  id              String   @id @default(uuid()) @map("sub_audit_id")
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  oldTier         PlanTier @map("old_tier")
+  newTier         PlanTier @map("new_tier")
+  reason          String?
+  executedById    String?  @map("executed_by")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("subscription_audits")
+}
+
+model LegalProcedure {
+  id              String   @id @default(uuid()) @map("procedure_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  type            LegalType
+  status          String   @default("OPEN") // OPEN, SERVED, CLOSED
+  description     String?  @db.Text
+  servedAt        DateTime? @map("served_at")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("legal_procedures")
+}
+
+enum LegalType {
+  PRE_NOTICE
+  COMMAND_TO_PAY
+  TERMINATION_NOTICE
+  EVICTION_ORDER
+}
+
+model CoopGroup {
+  id              String   @id @default(uuid()) @map("coop_id")
+  leaseId         String   @unique @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  name            String
+  totalTarget     Decimal  @map("total_target") @db.Decimal(12, 0)
+  
+  members         User[]   @relation("CoopMembers")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("coop_groups")
 }

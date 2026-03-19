@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logAction } from "@/actions/audit";
+import { Decimal } from "@prisma/client/runtime/library";
 
 /**
  * PGW-WEBHOOK: Réception des notifications Wave
@@ -27,6 +28,23 @@ export async function POST(req: Request) {
           statut: "CONFIRMEE",
           refOperateur: checkoutSessionId,
           updatedAt: new Date(),
+        },
+      });
+
+      // --- ADD-05: M-TVA Ventilation ---
+      const montantTtc = new Decimal(payment.montant);
+      const montantHt = montantTtc.div(1.18);
+      const montantTva = montantTtc.minus(montantHt);
+
+      await (prisma as any).tvaTransaction.create({
+        data: {
+          paymentId: paymentId,
+          serviceType: payment.motif || "LOYER",
+          montantHt,
+          tauxTva: 18.00,
+          montantTva,
+          montantTtc,
+          periodeFiscale: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
         },
       });
 

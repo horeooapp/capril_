@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cinetpay } from "@/lib/cinetpay";
 import { createReceipt } from "@/actions/receipts";
+import { PRICING } from "@/constants/pricing";
+import { Decimal } from "@prisma/client/runtime/library";
 
 /**
  * CinetPay Webhook Handler
@@ -75,6 +77,23 @@ export async function POST(req: NextRequest) {
                     }
                 });
             }
+
+            // --- ADD-05: M-TVA Ventilation ---
+            const montantTtc = new Decimal(intent.amount);
+            const montantHt = montantTtc.div(1.18);
+            const montantTva = montantTtc.minus(montantHt);
+            
+            await tx.tvaTransaction.create({
+                data: {
+                    paymentId: intent.id, // ID must match the relation
+                    serviceType: metadata?.serviceType || "LOYER",
+                    montantHt,
+                    tauxTva: 18.00,
+                    montantTva,
+                    montantTtc,
+                    periodeFiscale: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+                }
+            });
         });
 
         return NextResponse.json({ status: "success" });

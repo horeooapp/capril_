@@ -3,6 +3,8 @@
  * Fondement légal : Article 550 alinéa 1 CGI Côte d'Ivoire
  */
 
+import { DYNAMIC_PRICING } from "@/constants/pricing-dynamic";
+
 export const FISCAL_TAX_RATE = 0.025; // 2.5%
 export const STAMP_DUTY_PER_PAGE = 500;
 export const DEFAULT_PAGES_COUNT = 2;
@@ -50,12 +52,12 @@ export function calculateFiscalDroits(
     // Pénalités de retard (10% si > 30 jours)
     const penalty = isLate ? Math.round(droits * 0.10) : 0;
 
-    // Frais QAPRIL (Moteur de service)
-    let fraisQapril = 4000;
+    // Frais QAPRIL (Moteur de service dynamique M-PRIX-DYN)
+    let fraisQapril = DYNAMIC_PRICING.calculateServiceFee(loyerMensuel);
+    
+    // Surcharge pour bail commercial
     if (leaseType === 'commercial') {
-        fraisQapril = 5000;
-    } else if (loyerMensuel < 100000) {
-        fraisQapril = 3000;
+        fraisQapril = Math.max(fraisQapril, 5000);
     }
 
     const totalDgi = droits + timbres + penalty;
