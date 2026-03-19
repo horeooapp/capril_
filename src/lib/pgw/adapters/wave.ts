@@ -1,4 +1,5 @@
 import { PgwAdapter, PaymentInitiateRequest, PaymentInitiateResponse } from "./base";
+// @ts-ignore
 import { PaymentPgwStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 

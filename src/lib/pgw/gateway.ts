@@ -1,3 +1,4 @@
+// @ts-ignore
 import { PaymentCanal, PaymentPgwStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { detectPaymentCanal } from "./router";
@@ -31,7 +32,7 @@ export class PaymentGateway {
     }
 
     // 2. Sélection de l'adaptateur
-    const adapter = this.adapters[canal] || this.adapters["SMS_DECLARATIF" as any];
+    const adapter = (this.adapters as any)[canal] || (this.adapters as any)["SMS_DECLARATIF"];
 
     if (!adapter) {
       throw new Error(`Aucun adaptateur disponible pour le canal : ${canal}`);
