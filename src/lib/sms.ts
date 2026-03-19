@@ -17,6 +17,10 @@ export class TwilioService implements SMSService {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     this.from = process.env.TWILIO_SENDER_NUMBER || '';
 
+    console.log("[SMS][Twilio] SID present:", !!accountSid);
+    console.log("[SMS][Twilio] Token present:", !!authToken);
+    console.log("[SMS][Twilio] Sender present:", !!this.from);
+
     if (accountSid && authToken) {
       this.client = twilio(accountSid, authToken);
     }
