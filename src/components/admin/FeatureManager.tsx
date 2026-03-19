@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { toggleFeature } from "@/actions/feature-actions";
-import { ShieldCheck, ShieldAlert, Cpu, Settings2, Fingerprint, FileText, Wrench, Scale, Banknote, Landmark, ShieldHalf, LifeBuoy, Home } from "lucide-react";
+import { 
+  ShieldCheck, ShieldAlert, Cpu, Settings2, Fingerprint, FileText, Wrench, Scale, 
+  Banknote, Landmark, ShieldHalf, LifeBuoy, Home, Users, Newspaper, Antenna, 
+  Smartphone, UserCheck, Briefcase, Users2, TreePine 
+} from "lucide-react";
 
 interface Feature {
   id: string;
@@ -26,9 +30,11 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
 
   const getIcon = (id: string) => {
     switch (id) {
-      case "M01-M03": return <Fingerprint className="w-5 h-5" />;
+      case "M01-M03": 
+      case "KYC_VERIFICATION": return <UserCheck className="w-5 h-5" />;
       case "M04": return <FileText className="w-5 h-5" />;
-      case "M05": return <Settings2 className="w-5 h-5" />;
+      case "M05": 
+      case "M_MANDAT": return <Briefcase className="w-5 h-5" />;
       case "M06-M09": return <Wrench className="w-5 h-5" />;
       case "M10-M11": 
       case "MEDIATION_CENTER": return <Scale className="w-5 h-5" />;
@@ -38,6 +44,12 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
       case "CDC_CONSIGNATION": return <ShieldHalf className="w-5 h-5" />;
       case "ASSURANCE_LOYER": return <LifeBuoy className="w-5 h-5" />;
       case "LANDING_PAGE": return <Home className="w-5 h-5" />;
+      case "M16_ANAH": return <ShieldCheck className="w-5 h-5" />;
+      case "SMS_NOTIFICATIONS": return <Smartphone className="w-5 h-5" />;
+      case "USSD_PORTAL": return <Antenna className="w-5 h-5" />;
+      case "NEWS_TICKER": return <Newspaper className="w-5 h-5" />;
+      case "M_COLOC": return <Users2 className="w-5 h-5" />;
+      case "M_TERRAIN": return <TreePine className="w-5 h-5" />;
       default: return <Cpu className="w-5 h-5" />;
     }
   };

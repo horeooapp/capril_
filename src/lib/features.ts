@@ -6,17 +6,23 @@ import { prisma } from "./prisma";
  */
 
 export const FEATURES = {
-  // Nouveaux Modules (M-PGW)
-  PAYMENT_GATEWAY: "M-PGW",
-  
-  // Modules existants identifiés
+  // Modules Identifiés dans SystemPage
   M17_FISCAL: "M17_FISCAL",
+  M16_ANAH: "M16_ANAH",
   CDC_CONSIGNATION: "CDC_CONSIGNATION",
   ASSURANCE_LOYER: "ASSURANCE_LOYER",
   MEDIATION_CENTER: "MEDIATION_CENTER",
+  KYC_VERIFICATION: "KYC_VERIFICATION",
+  SMS_NOTIFICATIONS: "SMS_NOTIFICATIONS",
+  USSD_PORTAL: "USSD_PORTAL",
+  NEWS_TICKER: "NEWS_TICKER",
   LANDING_PAGE: "LANDING_PAGE",
-  
-  // Mappage CDC v3.0
+  M_MANDAT: "M_MANDAT",
+  M_COLOC: "M_COLOC",
+  M_TERRAIN: "M_TERRAIN",
+
+  // Nouveaux Modules & Mappage CDC v3.0
+  PAYMENT_GATEWAY: "M-PGW",
   KYC: "M01-M03",
   LEASES: "M04",
   MANDATES: "M05",
@@ -25,7 +31,7 @@ export const FEATURES = {
   FISCALITY: "M16",
 } as const;
 
-export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES];
+export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES] | string;
 export type FeatureKey = AppFeature;
 
 /**
@@ -40,20 +46,25 @@ export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
   
   if (!featuresCache || (now - lastFetch) > CACHE_TTL) {
     try {
-      // Tenter de lire depuis la nouvelle table FeatureFlag
+      // 1. Tenter la nouvelle table FeatureFlag
       const flags = await (prisma as any).featureFlag.findMany();
       if (flags.length > 0) {
         featuresCache = flags.reduce((acc: any, flag: any) => {
           acc[flag.id] = flag.enabled;
           return acc;
         }, {});
-      } else {
-        // Fallback sur l'ancien système systemConfig si la table est vide
-        const config = await (prisma as any).systemConfig.findUnique({
-          where: { key: "feature_flags" }
-        });
-        featuresCache = config?.value as Record<string, boolean> || {};
       }
+      
+      // 2. Fusionner avec l'ancien système systemConfig (feature_flags key)
+      const config = await (prisma as any).systemConfig.findUnique({
+        where: { key: "feature_flags" }
+      });
+      if (config?.value) {
+        const oldFlags = config.value as Record<string, boolean>;
+        featuresCache = { ...oldFlags, ...(featuresCache || {}) };
+      }
+
+      if (!featuresCache) featuresCache = {};
       lastFetch = now;
     } catch (error) {
       console.error("[Features] Erreur chargement :", error);
@@ -61,7 +72,6 @@ export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
     }
   }
 
-  // Vérifier par ID (M-PGW) ou par Clé (M17_FISCAL)
   return featuresCache?.[key as string] ?? true;
 }
 
