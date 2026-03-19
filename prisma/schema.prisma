@@ -1105,4 +1105,14 @@ model PgwReconciliation {
   @@map("pgw_reconciliation")
 }
 
+model FeatureFlag {
+  id          String   @id @map("flag_id")
+  name        String   @unique
+  description String?
+  enabled     Boolean  @default(true)
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("feature_flags")
+}
+
 

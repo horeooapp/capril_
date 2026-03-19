@@ -12,7 +12,8 @@ import {
     FileText, 
     LogOut, 
     User,
-    Activity
+    Activity,
+    Settings2
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -30,6 +31,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
         { href: "/admin", label: "Vue Globale", icon: <LayoutDashboard size={18} /> },
         { href: "/admin/observatory", label: "Observatoire", icon: <Telescope size={18} /> },
         { href: "/admin/users", label: "Utilisateurs", icon: <Users size={18} /> },
+        { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
         { href: "/admin/audit", label: "Audit Log", icon: <ShieldCheck size={18} /> },
         { href: "/admin/system", label: "Système", icon: <Settings size={18} /> },
     ]
