@@ -31,9 +31,9 @@ export async function getGlobalActivityStats() {
             prisma.user.count().catch(() => 0),
             prisma.property.count().catch(() => 0),
             prisma.lease.count().catch(() => 0),
-            (prisma as any).mandate ? (prisma as any).mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0) : Promise.resolve(0),
-            (prisma as any).colocataire ? (prisma as any).colocataire.count({ where: { status: "ACTIF" } }).catch(() => 0) : Promise.resolve(0),
-            (prisma as any).landLeaseInfo ? (prisma as any).landLeaseInfo.count().catch(() => 0) : Promise.resolve(0)
+            prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+            prisma.colocataire.count({ where: { status: "ACTIF" } }).catch(() => 0),
+            prisma.landLeaseInfo.count().catch(() => 0)
         ]);
         [u, p, l, m, c, t] = counts;
     } catch (e) {

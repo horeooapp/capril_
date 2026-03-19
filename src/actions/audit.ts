@@ -36,15 +36,20 @@ export async function getAuditLogs(filters?: {
     // Simple check: only admins or auditors can see all logs
     // Users might see their own logs (implementation detail for later)
 
-    return await prisma.auditLog.findMany({
+    const logs = await prisma.auditLog.findMany({
         where: filters,
         include: {
             user: {
-                select: { fullName: true, email: true }
+                select: {
+                    fullName: true,
+                    role: true
+                }
             }
         },
         orderBy: {
             createdAt: 'desc'
-        }
+        },
+        take: 100
     })
+    return logs
 }

@@ -18,6 +18,7 @@ import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
 import LiveActivityStream from "@/components/admin/LiveActivityStream"
+import { Role, MediationStatus } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
@@ -30,39 +31,42 @@ export default async function AdminDashboardOverview() {
     const demoData = null
 
     // Production Data extraction
+    const totalUsers = await prisma.user.count().catch(() => 0)
+    const verifiedUsers = await prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0)
+    
     const safeData = {
-        totalDgi: Number((await (prisma as any).fiscalDossier?.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
-        cdcAmount: Number((await (prisma as any).cdcDeposit?.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
-        activeMediations: await (prisma as any).mediation?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        kycAutoRate: 98, 
-        totalUsers: await prisma.user.count().catch(() => 0),
+        totalDgi: Number((await prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
+        cdcAmount: Number((await prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
+        activeMediations: await prisma.mediation.count({ where: { status: MediationStatus.OPEN } }).catch(() => 0),
+        kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0, 
+        totalUsers,
         totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
         totalLandlords: await prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
         totalAgencies: await prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
-        totalProperties: await (prisma as any).property?.count().catch(() => 0),
-        totalMandates: await (prisma as any).mandate?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalColocs: await (prisma as any).colocataire?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalLandLeases: await (prisma as any).landLeaseInfo?.count().catch(() => 0),
-        totalLeases: await (prisma as any).lease?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalCertificates: await (prisma as any).certificate?.count({ where: { status: "valid" } }).catch(() => 0),
-        totalPayments: Number((await (prisma as any).receipt?.aggregate({ 
+        totalProperties: await prisma.property.count().catch(() => 0),
+        totalMandates: await prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalColocs: await prisma.colocataire.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalLandLeases: await prisma.landLeaseInfo.count().catch(() => 0),
+        totalLeases: await prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        totalCertificates: await prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
+        totalPayments: Number((await prisma.receipt.aggregate({ 
             _sum: { totalAmount: true },
             where: { status: "paid" }
         }).catch(() => null))?._sum?.totalAmount || 0),
-        totalReversals: await (prisma as any).reversalTransaction?.count().catch(() => 0),
-        fraudAlerts: await (prisma as any).user?.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
-        recentAuditLogs: await (prisma as any).auditLog?.findMany({
+        totalReversals: await (prisma as any).reversalTransaction.count().catch(() => 0),
+        fraudAlerts: await prisma.user.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
+        recentAuditLogs: await prisma.auditLog.findMany({
             take: 10,
             orderBy: { createdAt: 'desc' },
             include: { user: { select: { fullName: true } } }
         }).catch(() => []),
-        documentsUnderReview: await (prisma as any).identityDocument?.findMany({
+        documentsUnderReview: await prisma.identityDocument.findMany({
             where: { status: "pending" },
             take: 5,
             include: { user: { select: { fullName: true } } }
         }).catch(() => []),
-        activeModules: await (prisma as any).featureFlag?.count({ where: { enabled: true } }).catch(() => 0),
-        totalModules: await (prisma as any).featureFlag?.count().catch(() => 0),
+        activeModules: await prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
+        totalModules: await prisma.featureFlag.count().catch(() => 0),
     }
 
     try {

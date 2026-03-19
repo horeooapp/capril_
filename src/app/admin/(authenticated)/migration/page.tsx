@@ -3,14 +3,14 @@ import { prisma } from "@/lib/prisma"
 import MigrationUpload from "@/components/admin/MigrationUpload"
 
 export default async function MigrationPage() {
-    const sessions = await (prisma as any).migrationSession?.findMany({
+    const sessions = await prisma.migrationSession.findMany({
         orderBy: { createdAt: 'desc' },
         take: 10
     }).catch(() => [])
 
-    const totalSessions = await (prisma as any).migrationSession?.count().catch(() => 0)
-    const pendingSessions = await (prisma as any).migrationSession?.count({ where: { statut: { in: ["UPLOADE", "EN_ANALYSE"] } } }).catch(() => 0)
-    const committedSessions = await (prisma as any).migrationSession?.count({ where: { statut: "COMMITE" } }).catch(() => 0)
+    const totalSessions = await prisma.migrationSession.count().catch(() => 0)
+    const pendingSessions = await prisma.migrationSession.count({ where: { statut: { in: ["UPLOADE", "EN_ANALYSE"] } } }).catch(() => 0)
+    const committedSessions = await prisma.migrationSession.count({ where: { statut: "COMMITE" } }).catch(() => 0)
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700">

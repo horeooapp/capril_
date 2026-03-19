@@ -122,7 +122,7 @@ export async function approveDocument(docId: string) {
     const session = await auth()
     
     try {
-        await (prisma as any).identityDocument.update({
+        await prisma.identityDocument.update({
             where: { id: docId },
             data: {
                 status: "verified",
@@ -145,7 +145,7 @@ export async function rejectDocument(docId: string, reason: string) {
     await ensureAdmin()
     
     try {
-        await (prisma as any).identityDocument.update({
+        await prisma.identityDocument.update({
             where: { id: docId },
             data: {
                 status: "rejected",

@@ -7,9 +7,25 @@ import LiveActivityStream from "@/components/admin/LiveActivityStream"
 import { motion } from "framer-motion"
 import { Activity, TrendingUp, Map as MapIcon, ShieldCheck } from "lucide-react"
 
+interface ObservatoryStats {
+    totalUsers: number
+    totalProperties: number
+    totalLeases: number
+    totalMandates: number
+    activeColocs: number
+    landLeases: number
+    marketTrend: string
+}
+
+interface MarketInsight {
+    commune: string
+    avgRent: number
+    sampleCount: number
+}
+
 export default function ObservatoryPage() {
-    const [stats, setStats] = useState<any>(null)
-    const [insights, setInsights] = useState<any[]>([])
+    const [stats, setStats] = useState<ObservatoryStats | null>(null)
+    const [insights, setInsights] = useState<MarketInsight[]>([])
     const [logs, setLogs] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -123,7 +139,7 @@ export default function ObservatoryPage() {
     )
 }
 
-function InsightBox({ label, value, color }: any) {
+function InsightBox({ label, value, color }: { label: string, value: number | undefined, color: string }) {
     return (
         <div className="flex flex-col">
             <span className="text-[10px] font-black text-gray-500 uppercase tracking-tighter mb-1">{label}</span>
