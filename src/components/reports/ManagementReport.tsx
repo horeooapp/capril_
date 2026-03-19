@@ -23,9 +23,16 @@ interface ManagementReportProps {
 export default function ManagementReport({ data }: ManagementReportProps) {
   const maxPerformance = Math.max(...data.performance.map(p => p.amount), 1);
   
-  const transactionId = useMemo(() => 
-    Math.random().toString(36).substring(7).toUpperCase(), 
-  []);
+  const transactionId = useMemo(() => {
+    const seed = `${data.leaseRef}-${data.period}`;
+    // Simple pure deterministic hash for display
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash |= 0;
+    }
+    return `TX-${Math.abs(hash).toString(36).toUpperCase()}`;
+  }, [data.leaseRef, data.period]);
 
   return (
     <div id="management-report" className="bg-white p-12 max-w-[210mm] mx-auto shadow-2xl border border-gray-100 font-sans text-gray-900 print:shadow-none print:border-0">
