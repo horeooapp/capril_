@@ -7,37 +7,38 @@ import Link from "next/link"
 export const dynamic = "force-dynamic"
 
 export default async function AiMonitoringPage() {
-    // Fetch stats
-    const totalConv = await prisma.bdqConversationState.count()
-    const statsByStatus = await prisma.bdqConversationState.groupBy({
-        by: ['statut'],
-        _count: true
-    })
+    try {
+        // Fetch stats
+        const totalConv = await prisma.bdqConversationState.count().catch(() => 0)
+        const statsByStatus = await prisma.bdqConversationState.groupBy({
+            by: ['statut'],
+            _count: true
+        }).catch(() => [])
 
-    const costAgg = await prisma.bdqConversationState.aggregate({
-        _sum: {
-            coutEstimeFcfa: true,
-            tokensEntreeTotal: true,
-            tokensSortieTotal: true
-        }
-    })
+        const costAgg = await prisma.bdqConversationState.aggregate({
+            _sum: {
+                coutEstimeFcfa: true,
+                tokensEntreeTotal: true,
+                tokensSortieTotal: true
+            }
+        }).catch(() => ({ _sum: { coutEstimeFcfa: null, tokensEntreeTotal: null, tokensSortieTotal: null } }))
 
-    const recentConvs = await prisma.bdqConversationState.findMany({
-        take: 10,
-        orderBy: { updatedAt: 'desc' },
-        include: { 
-            bailleur: { select: { fullName: true, phone: true } },
-            bdqCree: { select: { id: true } }
-        }
-    })
+        const recentConvs = await prisma.bdqConversationState.findMany({
+            take: 10,
+            orderBy: { updatedAt: 'desc' },
+            include: { 
+                bailleur: { select: { fullName: true, phone: true } },
+                bdqCree: { select: { id: true } }
+            }
+        }).catch(() => [])
 
-    const totalCost = Number(costAgg._sum?.coutEstimeFcfa || 0)
-    const totalTokens = (costAgg._sum?.tokensEntreeTotal || 0) + (costAgg._sum?.tokensSortieTotal || 0)
-    
-    const completeCount = statsByStatus.find(s => s.statut === "COMPLETE")?._count || 0
-    const conversionRate = totalConv > 0 ? Math.round((completeCount / totalConv) * 100) : 0
+        const totalCost = Number(costAgg._sum?.coutEstimeFcfa || 0)
+        const totalTokens = (Number(costAgg._sum?.tokensEntreeTotal) || 0) + (Number(costAgg._sum?.tokensSortieTotal) || 0)
+        
+        const completeCount = (statsByStatus as any[]).find(s => s.statut === "COMPLETE")?._count || 0
+        const conversionRate = totalConv > 0 ? Math.round((completeCount / totalConv) * 100) : 0
 
-    return (
+        return (
         <div className="space-y-10 pb-20 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -206,7 +207,24 @@ export default async function AiMonitoringPage() {
                 </div>
             </div>
         </div>
-    )
+        )
+    } catch (error: any) {
+        return (
+            <div className="p-12 bg-red-50 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-red-200/50 rotate-3 animate-pulse">
+                    <Bot size={36} />
+                </div>
+                <h2 className="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tighter">Erreur Supervision IA</h2>
+                <p className="text-gray-500 max-w-md mx-auto mb-8 font-medium font-inter">
+                    Une erreur critique s'est produite lors de la récupération des données de monitoring IA. 
+                    Veuillez contacter l'administrateur système.
+                </p>
+                <code className="text-[10px] text-red-700 bg-white p-6 rounded-2xl border border-red-200 max-w-full overflow-auto text-left shadow-inner">
+                    {String(error)}
+                </code>
+            </div>
+        )
+    }
 }
 
 function Settings2(props: any) {
