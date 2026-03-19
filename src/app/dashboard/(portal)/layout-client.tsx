@@ -15,7 +15,9 @@ import {
     ChevronRight,
     Search,
     Receipt,
-    Bell
+    Bell,
+    BarChart3,
+    FileCheck2
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -37,7 +39,10 @@ export default function DashboardLayoutClient({
         { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} /> },
         { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
         { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },
-        { href: "/dashboard/mandates", label: "Mandats", icon: <Handshake size={18} /> },
+        ...(session?.user?.role === 'TENANT' 
+            ? [{ href: "/dashboard/certificates", label: "Passeport", icon: <FileCheck2 size={18} /> }]
+            : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
+        ),
         { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
     ];
 

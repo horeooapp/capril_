@@ -7,8 +7,8 @@ import {
   Droplet, Zap, Flame, Wrench, PenTool, 
   AlertCircle, Save, X
 } from "lucide-react";
-import { EDL_ROOMS, EDL_STATES, EdlPiece, EdlMeter, EdlEquipment } from "@/lib/edl";
-import { createEdl } from "@/actions/edl-actions";
+import { EDL_ROOMS, EDL_STATES, EdlPiece, EdlMeter } from "@/lib/edl";
+import { createInspection, addInspectionRoom, calculateInspectionScore } from "@/actions/edl";
 
 interface EdlFormProps {
   leaseId: string;
@@ -45,17 +45,29 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const result = await createEdl({
-      leaseId,
-      typeEdl,
-      pieces,
-      compteurs: meters,
-    });
-    
-    if (result.success) {
-      onClose();
+    try {
+      // 1. Create the Inspection record
+      const inspectionRes = await createInspection(leaseId, typeEdl === "SORTIE" ? "EXIT" : "ENTRY", new Date());
+      
+      if (inspectionRes.success && inspectionRes.inspectionId) {
+        const inspectionId = inspectionRes.inspectionId;
+
+        // 2. Add each room
+        for (const piece of pieces) {
+          const roomLabel = EDL_ROOMS.find(r => r.id === piece.room)?.label || piece.room;
+          await addInspectionRoom(inspectionId, roomLabel, piece.state as any, piece.comment);
+        }
+
+        // 3. Finalize and calculate score
+        await calculateInspectionScore(inspectionId);
+        
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error submitting EDL:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

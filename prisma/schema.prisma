@@ -232,6 +232,8 @@ model User {
   pgwPayerTransactions      PaymentPgw[] @relation("PayerTransactions")
   pgwBeneficiaryTransactions PaymentPgw[] @relation("BeneficiaryTransactions")
   coopGroups                 CoopGroup[]  @relation("CoopMembers")
+  migrationSessions         MigrationSession[]
+  reversalTransactions      ReversalTransaction[]
 
   // ADD-05 Diaspora & KYC
   paysResidence       String?   @map("pays_residence") @db.Char(3)
@@ -392,6 +394,9 @@ model Property {
   annonces              Annonce[]
   agendaEvents          AgendaEvenement[]
 
+  sourceMigrationId String?  @map("source_migration_id")
+  sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
+
   @@map("properties")
   @@index([ownerUserId])
   @@index([commune])
@@ -478,8 +483,23 @@ model Lease {
   legalProcedures   LegalProcedure[]
   coopGroup         CoopGroup?
 
+  // M-SIG-ELEC
+  isSignedElectronically Boolean   @default(false) @map("is_signed_electronically")
+  signedAt               DateTime? @map("signed_at")
+  signingOtp            String?   @map("signing_otp")
+  signatureContext      Json?     @map("signature_context") // {ip, ua, loc}
+
+  // M-EDL
+  inspections            Inspection[]
+  
+  // M-RECOUVREMENT
+  reminders              ReminderLog[]
+
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
+
+  sourceMigrationId String?  @map("source_migration_id")
+  sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
 
   @@map("leases")
   @@index([propertyId])
@@ -1113,15 +1133,57 @@ model PaymentPgw {
   webhooks        PgwWebhook[]
   tvaTransactions TvaTransaction[]
   
+  sourceMigrationId String?  @map("source_migration_id")
+  sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
+  
   tentatives      Int                @default(0)
   expiresAt       DateTime?          @map("expires_at")
   createdAt       DateTime           @default(now()) @map("created_at")
   updatedAt       DateTime           @updatedAt @map("updated_at")
 
+  // M-PAY-AUTO
+  reversalStatus  ReversalStatus     @default(PENDING) @map("reversal_status")
+  honorairesAgence Decimal?          @map("honoraires_agence") @db.Decimal(12, 0)
+  reversals       ReversalTransaction[]
+
   @@map("payments_pgw")
   @@index([leaseId, moisConcerne])
   @@index([statut, expiresAt])
   @@index([refInterne])
+}
+
+  ORANGE
+  WAVE
+  MTN
+  MOOV
+  CARD
+}
+
+enum ReversalStatus {
+  PENDING
+  REVERSED
+  FAILED
+}
+
+model ReversalTransaction {
+  id              String           @id @default(uuid()) @map("reversal_id")
+  paymentId       String           @map("payment_id")
+  payment         PaymentPgw       @relation(fields: [paymentId], references: [id])
+  recipientId     String           @map("recipient_id")
+  recipient       User             @relation(fields: [recipientId], references: [id])
+  type            ReversalType
+  amount          Decimal          @db.Decimal(12, 0)
+  status          String           @default("SUCCESS") // SUCCESS, FAILED
+  referencePgw    String?          @map("reference_pgw")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("reversal_transactions")
+}
+
+enum ReversalType {
+  AGENCY_COMMISSION
+  LANDLORD_RENT
 }
 
 enum PaymentCanal {
@@ -1593,3 +1655,147 @@ model CoopGroup {
 
   @@map("coop_groups")
 }
+
+model MigrationSession {
+  id              String           @id @default(uuid()) @map("session_id")
+  agenceId        String           @map("agence_id")
+  agence          User             @relation(fields: [agenceId], references: [id])
+  fichierNom      String           @map("fichier_nom")
+  fichierFormat   String           @map("fichier_format") // EXCEL|CSV|PDF|MANUAL
+  sourceLogiciel  String?          @map("source_logiciel")
+  statut          MigrationStatus  @default(UPLOADE)
+  
+  nbLogements     Int              @default(0) @map("nb_logements")
+  nbLocataires    Int              @default(0) @map("nb_locataires")
+  nbBaux          Int              @default(0) @map("nb_baux")
+  nbPaiements     Int              @default(0) @map("nb_paiements")
+  nbErreurs       Int              @default(0) @map("nb_erreurs")
+  nbWarnings      Int              @default(0) @map("nb_warnings")
+  
+  rapportPdfUrl   String?          @map("rapport_pdf_url")
+  validationToken String?          @unique @map("validation_token")
+  
+  stagingData     MigrationStaging[]
+  
+  // Relations inverses pour taggage
+  logements       Property[]
+  leases          Lease[]
+  payments        PaymentPgw[]
+  
+  validatedAt     DateTime?        @map("validated_at")
+  committedAt     DateTime?        @map("committed_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  @@map("migration_sessions")
+}
+
+model MigrationStaging {
+  id              String           @id @default(uuid()) @map("staging_id")
+  sessionId       String           @map("session_id")
+  session         MigrationSession @relation(fields: [sessionId], references: [id])
+  agenceId        String           @map("agence_id")
+  entityType      String           @map("entity_type") // LOGEMENT|LOCATAIRE|BAIL|PAIEMENT|PROPRIETAIRE
+  
+  rawData         Json             @map("raw_data")
+  mappedData      Json?            @map("mapped_data")
+  
+  validationStatus String          @default("PENDING") @map("validation_status") // PENDING|VALID|WARNING|ERROR
+  errors          Json?
+  warnings        Json?
+  committed       Boolean          @default(false)
+  
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  @@map("migration_staging")
+}
+
+enum MigrationStatus {
+  UPLOADE
+  EN_ANALYSE
+  RAPPORT_GENERE
+  COMMITE
+  ERREUR
+}
+
+// ═══════════════════════════════════════════════════════
+// FINAL SPRINT MODELS (EDL, SIG, RECOUVREMENT)
+// ═══════════════════════════════════════════════════════
+
+model Inspection {
+  id              String           @id @default(uuid()) @map("insp_id")
+  leaseId         String           @map("lease_id")
+  lease           Lease            @relation(fields: [leaseId], references: [id])
+  type            InspectionType
+  status          String           @default("PLANIFIEE") // PLANIFIEE|EN_COURS|TERMINEE
+  date            DateTime
+  generalScore    Int?             @map("general_score") // 0-100
+  comments        String?          @db.Text
+  
+  rooms           InspectionRoom[]
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("inspections")
+}
+
+enum InspectionType {
+  ENTRY
+  EXIT
+}
+
+model InspectionRoom {
+  id              String           @id @default(uuid()) @map("room_id")
+  inspectionId    String           @map("inspection_id")
+  inspection      Inspection       @relation(fields: [inspectionId], references: [id])
+  name            String           // Salon, Chambre 1, etc.
+  status          RoomStatus       @default(GOOD)
+  comments        String?          @db.Text
+  
+  photos          InspectionPhoto[]
+  
+  @@map("inspection_rooms")
+}
+
+enum RoomStatus {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
+
+model InspectionPhoto {
+  id              String           @id @default(uuid()) @map("photo_id")
+  inspectionRoomId String          @map("room_id")
+  room            InspectionRoom   @relation(fields: [inspectionRoomId], references: [id])
+  url             String
+  caption         String?
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("inspection_photos")
+}
+
+model ReminderLog {
+  id              String           @id @default(uuid()) @map("log_id")
+  leaseId         String           @map("lease_id")
+  lease           Lease            @relation(fields: [leaseId], references: [id])
+  type            ReminderType
+  sentAt          DateTime         @default(now()) @map("sent_at")
+  status          String           @default("SENT")
+  
+  @@map("reminder_logs")
+}
+
+enum ReminderType {
+  D_MINUS_5
+  D_DAY
+  D_PLUS_5
+  LEGAL_NOTICE
+}
+  RAPPORT_GENERE
+  VALIDE
+  COMMITE
+  ANNULE
+}
+

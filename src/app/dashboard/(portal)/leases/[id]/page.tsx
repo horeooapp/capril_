@@ -12,6 +12,7 @@ import { LeaseStatus } from "@prisma/client"
 import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
 import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
 import { isFeatureEnabled } from "@/lib/features"
+import { AlertCircle } from "lucide-react"
 import { getLeaseProceduralState } from "@/lib/arrears-engine"
 import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
 import CDCRestitutionBox from "@/components/CDCRestitutionBox"
@@ -39,6 +40,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
         mediation: any;
         cdcDeposits: any[];
         insurance: any;
+        reminders: any[];
     }
 
     if (!lease) {
@@ -231,6 +233,28 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     {showEdl && (
                         <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
                             <EdlManager leaseId={tLease.id} initialEdls={edls} />
+                        </div>
+                    )}
+
+                    {/* Reminders History (M-RECOUVREMENT) */}
+                    {tLease.reminders?.length > 0 && (
+                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 italic">
+                            <h2 className="text-lg font-black text-gray-800 mb-4 flex items-center">
+                                <span className="mr-2">📢</span> Historique des Relances
+                            </h2>
+                            <div className="space-y-3">
+                                {tLease.reminders.map((rem: any, idx: number) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-1.5 bg-gray-200 rounded-lg text-gray-600">
+                                                <AlertCircle size={14} />
+                                            </div>
+                                            <span className="text-xs font-bold text-gray-700 uppercase tracking-tighter">{rem.type}</span>
+                                        </div>
+                                        <span className="text-[10px] text-gray-400 font-mono">{new Date(rem.sentAt).toLocaleDateString()}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

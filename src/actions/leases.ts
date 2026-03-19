@@ -127,7 +127,14 @@ export async function getLeaseById(id: string) {
                 include: { messages: true }
             },
             cdcDeposits: true, // plural in schema
-            insurance: true
+            insurance: true,
+            inspections: {
+                orderBy: { date: 'desc' },
+                include: { rooms: true }
+            },
+            reminders: {
+                orderBy: { sentAt: 'desc' }
+            }
         }
     })
 
@@ -187,102 +194,16 @@ export async function triggerIndexation(leaseId: string) {
  * Part 14: Request Signature OTP (2FA)
  */
 export async function requestSignatureOTP(leaseId: string) {
-    const session = await auth()
-    if (!session || !session.user || !session.user.id) {
-        return { error: "Non autorisé" }
-    }
-
-    try {
-        const lease = await prisma.lease.findUnique({
-            where: { id: leaseId },
-            include: { tenant: true }
-        })
-
-        if (!lease || !lease.tenant?.phone) {
-            return { error: "Locataire ou numéro de téléphone introuvable." }
-        }
-
-        // Generate 6-digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Save to DB (reusing a simple field or a dedicated table)
-        // For v3.0, we'll store it in a temporary meta field in commercialData or a dedicated OTP table
-        // Let's check if we have an OTP table or if we should add one. 
-        // For now, let's use a simple system_config or a dedicated table if exists.
-        // Actually, let's use the 'webhook_events' payload as a temporary store or just log it for the simulator.
-        console.log(`[SIGNATURE_OTP] Le OTP pour le bail ${lease.leaseReference} est: ${otp}`);
-        
-        const { sendSMS } = await import("@/lib/sms");
-        await sendSMS(lease.tenant.phone, `Votre code de signature QAPRIL est: ${otp}`);
-
-        // Store OTP in commercialData (encrypted/hashed in prod, clear for demo)
-        const commData = (lease.commercialData as unknown as CommercialData) || {}
-        await prisma.lease.update({
-            where: { id: leaseId },
-            data: {
-                commercialData: {
-                    ...commData,
-                    pendingSignatureOTP: otp,
-                    otpGeneratedAt: new Date()
-                } as Prisma.InputJsonValue
-            }
-        })
-
-        return { success: true }
-    } catch (error) {
-        return { error: "Échec de l'envoi de l'OTP." }
-    }
+    const { initiateLeaseSignature } = await import("./signature");
+    return initiateLeaseSignature(leaseId);
 }
 
 /**
  * Part 14: Sign Lease with 2FA OTP
+ * @deprecated Use verifyLeaseSignature from signature.ts directly for client-side capture
  */
 export async function signLease(leaseId: string, otp: string) {
-    const session = await auth()
-    if (!session || !session.user || !session.user.id) {
-        return { error: "Non autorisé" }
-    }
-
-    try {
-        const lease = await prisma.lease.findUnique({
-            where: { id: leaseId }
-        })
-
-        if (!lease) return { error: "Bail introuvable." }
-        
-        const commData = (lease.commercialData as unknown as CommercialData) || {}
-        if (commData.pendingSignatureOTP !== otp) {
-            return { error: "Code OTP invalide." }
-        }
-
-        // OTP Valid, sign lease
-        await prisma.lease.update({
-            where: { id: leaseId },
-            data: { 
-                status: 'ACTIVE',
-                signedAt: new Date(),
-                commercialData: {
-                    ...commData,
-                    pendingSignatureOTP: null, // Clear OTP
-                    signatureVerifiedAt: new Date()
-                } as Prisma.InputJsonValue
-            }
-        })
-
-        const { writeAuditLog } = await import("@/lib/audit");
-        await writeAuditLog({
-            userId: session.user.id,
-            action: "LEASE_SIGNED_2FA",
-            module: "LEASE",
-            entityId: leaseId
-        });
-
-        revalidatePath("/dashboard/leases")
-        revalidatePath(`/dashboard/leases/${leaseId}`)
-        return { success: true }
-    } catch (error) {
-        console.error("Sign error:", error);
-        return { error: "Échec de la signature." }
-    }
+    const { verifyLeaseSignature } = await import("./signature");
+    return verifyLeaseSignature(leaseId, otp, "REMOTE", "SERVER_ACTION_FALLBACK");
 }
 

@@ -68,7 +68,10 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
         setLoading(true)
         setError(null)
         try {
-            const res = await signLease(leaseId, otp)
+            // Get basic metadata (will be refined server-side)
+            const ua = typeof window !== 'undefined' ? window.navigator.userAgent : 'Unknown'
+            const res = await signLease(leaseId, otp) // signLease in leases.ts is now a wrapper
+            
             if (res.success) {
                 setStep('success')
             } else {

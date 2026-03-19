@@ -14,7 +14,10 @@ import {
     ChevronRight,
     TrendingUp,
     MapPin,
-    Users
+    Users,
+    GraduationCap,
+    FileCheck,
+    ShieldAlert
 } from "lucide-react"
 
 interface DashboardProperty {
@@ -101,14 +104,26 @@ export default function DashboardOverviewClient({
                         Bienvenue, <span className="text-[#1F4E79] font-black">{user?.name || user?.email?.split('@')[0]}</span> 
                         <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                         <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11]">Vue d'ensemble</span>
+                        {user?.isHoreoo && (
+                            <span className="flex items-center gap-1 px-3 py-1 bg-[#1F4E79] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-blue-900/20">
+                                <GraduationCap size={12} />
+                                Programme Horeoo
+                            </span>
+                        )}
                     </p>
                 </div>
-                <div className="shrink-0 flex items-center gap-4">
+                <div className="shrink-0 flex flex-col sm:flex-row items-center gap-4">
                     <button className="hidden sm:flex items-center gap-3 px-6 py-3 bg-white border border-gray-100 rounded-2xl text-[14px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm text-[#1F4E79]">
                         <TrendingUp size={16} className="text-[#C55A11]" />
                         Rapports d'activité
                     </button>
-                    {user && <ReliabilityBadge score={88.4} />}
+                    {user?.fraudScore < 20 && (
+                        <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                             <FileCheck size={18} className="text-emerald-600" />
+                             <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Certifié Bon Payeur</span>
+                        </div>
+                    )}
+                    {user && <ReliabilityBadge score={100 - (user?.fraudScore || 15)} />}
                 </div>
             </div>
 

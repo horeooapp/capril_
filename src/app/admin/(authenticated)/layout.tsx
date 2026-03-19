@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 import { logout } from "@/actions/auth"
 import AdminHeader from "@/components/admin/AdminHeader"
 import BottomNav from "@/components/BottomNav"
-import { LayoutDashboard, Briefcase, Users, Settings2, ShieldCheck } from "lucide-react"
+import { LayoutDashboard, Briefcase, Users, Settings2, ShieldCheck, Database, ShieldAlert } from "lucide-react"
 import { unstable_noStore as noStore } from 'next/cache';
 
 export default async function AdminLayout({
@@ -47,6 +47,8 @@ export default async function AdminLayout({
                 { href: "/admin", label: "Accueil", icon: <LayoutDashboard size={24} /> },
                 { href: "/admin/agency", label: "Agence", icon: <Briefcase size={24} /> },
                 { href: "/admin/users", label: "Users", icon: <Users size={24} /> },
+                { href: "/admin/migration", label: "Migration", icon: <Database size={24} /> },
+                { href: "/admin/compliance", label: "Compliance", icon: <ShieldAlert size={24} /> },
                 { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={24} /> },
                 { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={24} /> },
             ]} />

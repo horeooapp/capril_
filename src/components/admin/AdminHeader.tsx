@@ -14,7 +14,9 @@ import {
     User,
     Activity,
     Settings2,
-    Briefcase
+    Briefcase,
+    Database,
+    ShieldAlert
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -31,10 +33,10 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
     const navLinks = [
         { href: "/admin", label: "Vue Globale", icon: <LayoutDashboard size={18} /> },
         { href: "/admin/agency", label: "Agence", icon: <Briefcase size={18} /> },
-        { href: "/admin/observatory", label: "Observatoire", icon: <Telescope size={18} /> },
-        { href: "/admin/users", label: "Utilisateurs", icon: <Users size={18} /> },
-        { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
-        { href: "/admin/audit", label: "Audit Log", icon: <ShieldCheck size={18} /> },
+        { href: "/admin/migration", label: "Migration", icon: <Database size={18} /> },
+        { href: "/admin/compliance", label: "Conformité", icon: <ShieldAlert size={18} /> },
+        { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
+        { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={18} /> },
         { href: "/admin/system", label: "Système", icon: <Settings size={18} /> },
     ]
 
@@ -101,9 +103,16 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                     {session?.user && (
                         <div className="hidden lg:flex items-center gap-3">
                             <div className="flex flex-col items-end">
-                                <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">
-                                    {session.user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">
+                                        {session.user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
+                                    </span>
+                                    {session.user.activePlanTier && (
+                                        <span className="text-[9px] font-black bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200 uppercase tracking-tighter">
+                                            {session.user.activePlanTier}
+                                        </span>
+                                    )}
+                                </div>
                                 <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">{session.user.email}</span>
                             </div>
                             <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer border border-gray-800">

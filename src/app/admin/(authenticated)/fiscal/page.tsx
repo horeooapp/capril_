@@ -1,5 +1,5 @@
 import { getFiscalStats } from "@/actions/fiscal-actions"
-import { Shield, TrendingUp, Users, DollarSign, Clock } from "lucide-react"
+import { Shield, TrendingUp, Users, DollarSign, Clock, Hash, Zap } from "lucide-react"
 
 export default async function DGIDashboardPage() {
     const res = await getFiscalStats()
@@ -35,6 +35,8 @@ export default async function DGIDashboardPage() {
                     { label: "Baux Déclarés", val: stats.totalDossiers, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
                     { label: "Taux de Conformité", val: `${stats.complianceRate.toFixed(1)}%`, icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
                     { label: "Droits Collectés", val: `${stats.totalCollected.toLocaleString()} FCFA`, icon: DollarSign, color: "text-orange-600", bg: "bg-orange-50" },
+                    { label: "TVA Collectée (18%)", val: `${(stats.totalCollected * 0.18).toLocaleString()} FCFA`, icon: Hash, color: "text-purple-600", bg: "bg-purple-50" },
+                    { label: "Frais Service (Dynamique)", val: `2.0% Moy.`, icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
                     { label: "Pénalités", val: `${stats.totalPenalties.toLocaleString()} FCFA`, icon: Clock, color: "text-red-600", bg: "bg-red-50" },
                 ].map((s, idx) => (
                     <div key={idx} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-100/50 hover:translate-y-[-5px] transition-all group">
