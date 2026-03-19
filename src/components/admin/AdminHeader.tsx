@@ -16,7 +16,9 @@ import {
     Settings2,
     Briefcase,
     Database,
-    ShieldAlert
+    ShieldAlert,
+    ArrowRightLeft,
+    BarChart3
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -34,10 +36,11 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
         { href: "/admin", label: "Vue Globale", icon: <LayoutDashboard size={18} /> },
         { href: "/admin/agency", label: "Agence", icon: <Briefcase size={18} /> },
         { href: "/admin/migration", label: "Migration", icon: <Database size={18} /> },
+        { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={18} /> },
+        { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={18} /> },
         { href: "/admin/compliance", label: "Conformité", icon: <ShieldAlert size={18} /> },
         { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
         { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={18} /> },
-        { href: "/admin/system", label: "Système", icon: <Settings size={18} /> },
     ]
 
     return (
@@ -63,7 +66,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                         </div>
                     </Link>
 
-                    <nav className="hidden xl:flex items-center gap-1 bg-gray-900/5 p-1.5 rounded-2xl border border-gray-100">
+                    <nav className="hidden lg:flex items-center gap-1 bg-gray-900/5 p-1 rounded-2xl border border-gray-100 overflow-x-auto max-w-[50vw] no-scrollbar">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href
                             return (
@@ -121,7 +124,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                         </div>
                     )}
                     
-                    <div className="flex xl:hidden">
+                    <div className="flex lg:hidden">
                         <MobileMenu 
                             links={navLinks.map(l => ({ ...l, icon: undefined }))} 
                             session={session} 
