@@ -1,13 +1,68 @@
+import twilio from 'twilio';
+
 /**
  * Interface for SMS Gateway implementations as per v2.0 Specification Part 3
  */
 export interface SMSService {
   sendOTP(phone: string, otp: string): Promise<{ success: boolean; messageId?: string; error?: string }>;
+  sendMessage(phone: string, message: string): Promise<{ success: boolean; messageId?: string; error?: string }>;
+}
+
+export class TwilioService implements SMSService {
+  private client: twilio.Twilio | null = null;
+  private from: string;
+
+  constructor() {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    this.from = process.env.TWILIO_SENDER_NUMBER || '';
+
+    if (accountSid && authToken) {
+      this.client = twilio(accountSid, authToken);
+    }
+  }
+
+  async sendOTP(phone: string, otp: string) {
+    const message = `Votre code de vérification QAPRIL est: ${otp}. Il est valable 10 minutes.`;
+    return this.sendMessage(phone, message);
+  }
+
+  async sendMessage(phone: string, message: string) {
+    console.log(`[SMS][Twilio] Sending to ${phone}: ${message.substring(0, 40)}...`);
+    
+    if (!this.client) {
+      console.error("[SMS][Twilio] Client not initialized. Missing TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN");
+      return { success: false, error: 'Twilio credentials missing' };
+    }
+
+    try {
+      const result = await this.client.messages.create({
+        body: message,
+        from: this.from,
+        to: phone.startsWith('+') ? phone : `+${phone}`
+      });
+
+      return { success: true, messageId: result.sid };
+    } catch (error: any) {
+      console.error("[SMS][Twilio] Error:", error.message);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 export class OrangeCIService implements SMSService {
+  async sendMessage(phone: string, message: string) {
+    // Port existing sendOTP logic to generic sendMessage
+    return this.sendOTPRequest(phone, message);
+  }
+
   async sendOTP(phone: string, otp: string) {
-    console.log(`[SMS] Sending OTP ${otp} via Orange CI to ${phone}`);
+    const message = `Votre code de vérification QAPRIL est: ${otp}. Il est valable 10 minutes.`;
+    return this.sendOTPRequest(phone, message);
+  }
+
+  private async sendOTPRequest(phone: string, message: string) {
+    console.log(`[SMS][Orange] Sending to ${phone}`);
     
     // Default to the developer phone number if SMS_SENDER_NAME isn't a valid phone
     const senderAddress = process.env.SMS_SENDER_NAME || '00000000';
@@ -33,14 +88,12 @@ export class OrangeCIService implements SMSService {
 
         if (!tokenRes.ok) {
             const errText = await tokenRes.text();
-            console.error('[SMS] Orange Auth failed:', errText);
-            return { success: false, error: `Orange API Auth failed (${tokenRes.status}): ${errText}` };
+            return { success: false, error: `Orange API Auth failed: ${errText}` };
         }
 
         const { access_token } = await tokenRes.json();
 
         // 2. Send the SMS
-        // Note: For Orange API, senderAddress in the URL path must be URL-encoded, e.g., tel%3A%2B22500000000
         const safeSender = senderAddress.replace('+', '');
         const outBoundUrl = `https://api.orange.com/smsmessaging/v1/outbound/tel%3A%2B${safeSender}/requests`;
         const phoneFormat = phone.startsWith('+') ? phone : `+${phone}`;
@@ -56,17 +109,14 @@ export class OrangeCIService implements SMSService {
                     address: `tel:${phoneFormat}`,
                     senderAddress: `tel:+${safeSender}`,
                     senderName: 'QAPRIL',
-                    outboundSMSTextMessage: {
-                        message: `Votre code de vérification QAPRIL est: ${otp}. Il est valable 10 minutes.`
-                    }
+                    outboundSMSTextMessage: { message }
                 }
             })
         });
 
         if (!smsRes.ok) {
             const errText = await smsRes.text();
-            console.error('[SMS] Orange Send failed:', errText);
-            return { success: false, error: 'Orange API Send SMS failed' };
+            return { success: false, error: `Orange API Send failed: ${errText}` };
         }
 
         const smsData = await smsRes.json();
@@ -81,9 +131,12 @@ export class OrangeCIService implements SMSService {
 
 export class AfricaTalkingService implements SMSService {
   async sendOTP(phone: string, otp: string) {
-    console.log(`[SMS] Sending OTP ${otp} via Africa's Talking to ${phone}`);
-    // TODO: Implement actual Africa's Talking API call
-    return { success: true, messageId: 'msg_at_123' };
+    const message = `Votre code de vérification QAPRIL est: ${otp}`;
+    return this.sendMessage(phone, message);
+  }
+  async sendMessage(phone: string, message: string) {
+    console.log(`[SMS][Africa's Talking] Sending to ${phone}`);
+    return { success: true, messageId: 'msg_at_mock' };
   }
 }
 
@@ -91,21 +144,22 @@ export class AfricaTalkingService implements SMSService {
  * Generic SMS sender (non-OTP messages: alerts, reminders, notifications)
  */
 export async function sendSMS(phone: string, message: string): Promise<boolean> {
-    console.log(`[SMS] Sending to ${phone}: ${message.substring(0, 80)}...`);
-    // TODO: Integrate with getSMSService() provider
-    return true;
+    const service = getSMSService();
+    const result = await service.sendMessage(phone, message);
+    return result.success;
 }
 
 export function getSMSService(): SMSService {
-  const provider = process.env.SMS_GATEWAY_PROVIDER || 'ORANGE_CI';
+  const provider = process.env.SMS_GATEWAY_PROVIDER || 'TWILIO';
   
   switch (provider) {
+    case 'TWILIO':
+      return new TwilioService();
     case 'AFRICA_TALKING':
       return new AfricaTalkingService();
-    case 'INFOBIP':
-      // return new InfobipService();
     case 'ORANGE_CI':
-    default:
       return new OrangeCIService();
+    default:
+      return new TwilioService();
   }
 }
