@@ -4,7 +4,7 @@ import { User, ShieldCheck, MapPin, Calendar, FileText, ArrowLeft } from "lucide
 import Link from "next/link"
 import ValidationActions from "../ValidationActions"
 
-export default async function DocumentValidationPage({ params }: { params: { id: string } }) {
+export default async function DocumentValidationPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     
     const doc = await (prisma as any).identityDocument.findUnique({
