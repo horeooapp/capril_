@@ -2,11 +2,10 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { BdqStatut, TypeBail, LeaseStatus, Role } from "@prisma/client"
+import { BdqStatut, TypeBail, LeaseStatus, Role, Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { generateProofHash } from "@/lib/proof"
 import { sendSMS } from "@/lib/sms"
-import { Decimal } from "@prisma/client/runtime/library"
 
 export type CreateBdqInput = {
     propertyId?: string
@@ -17,6 +16,9 @@ export type CreateBdqInput = {
     adresseLibre?: string
     loyerMensuel: number
     dateEntree?: Date
+    precisionDateEntree?: string
+    identiteIncomplete?: boolean
+    sourceCreation?: string
 }
 
 /**
@@ -62,8 +64,11 @@ export async function createBDQ(data: CreateBdqInput) {
                 telephoneLocataire: data.telephoneLocataire,
                 descriptionLogement: data.descriptionLogement,
                 adresseLibre: data.adresseLibre,
-                loyerDeclareMensuel: new Decimal(data.loyerMensuel),
+                loyerDeclareMensuel: new Prisma.Decimal(data.loyerMensuel),
                 dateEntreeEstimee: data.dateEntree,
+                precisionDateEntree: data.precisionDateEntree || "EXACTE",
+                identiteIncomplete: data.identiteIncomplete || false,
+                sourceCreation: data.sourceCreation || "FORM",
                 statut: BdqStatut.PENDING_LOCATAIRE,
                 hashDeclaration: hash,
             }
@@ -266,7 +271,7 @@ export async function updateBDQRent(bdqId: string, nouveauLoyer: number, motif: 
                 data: {
                     bdqId: bdq.id,
                     ancienLoyer: bdq.loyerDeclareMensuel,
-                    nouveauLoyer: new Decimal(nouveauLoyer),
+                    nouveauLoyer: new Prisma.Decimal(nouveauLoyer),
                     motif: motif,
                     effectiveLe: effectiveLe,
                     hashModification: hashMod
@@ -275,7 +280,7 @@ export async function updateBDQRent(bdqId: string, nouveauLoyer: number, motif: 
             prisma.bailDeclaratif.update({
                 where: { id: bdqId },
                 data: {
-                    loyerDeclareMensuel: new Decimal(nouveauLoyer),
+                    loyerDeclareMensuel: new Prisma.Decimal(nouveauLoyer),
                     statut: BdqStatut.PENDING_LOCATAIRE // Reset to pending for confirmation of new rent
                 }
             })

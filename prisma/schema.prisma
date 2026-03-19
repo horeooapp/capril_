@@ -1842,6 +1842,8 @@ model BailDeclaratif {
   loyerDeclareMensuel     Decimal   @map("loyer_declare_mensuel") @db.Decimal(12, 2)
   dateEntreeEstimee       DateTime? @map("date_entree_estimee") @db.Date
   precisionDateEntree     String    @default("EXACTE") @map("precision_date_entree")
+  identiteIncomplete      Boolean   @default(false) @map("identite_incomplete")
+  sourceCreation          String    @default("FORM") @map("source_creation")
 
   statut                BdqStatut @default(PENDING_LOCATAIRE)
   confirmationLocataire  Boolean?  @map("confirmation_locataire")
