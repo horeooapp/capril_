@@ -18,7 +18,8 @@ import {
     Database,
     ShieldAlert,
     ArrowRightLeft,
-    BarChart3
+    BarChart3,
+    Newspaper
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -38,6 +39,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
         { href: "/admin/migration", label: "Migration", icon: <Database size={18} /> },
         { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={18} /> },
         { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={18} /> },
+        { href: "/admin/news", label: "Actualités", icon: <Newspaper size={18} /> },
         { href: "/admin/compliance", label: "Conformité", icon: <ShieldAlert size={18} /> },
         { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
         { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
@@ -52,47 +54,25 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                 className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-950/20"
             >
                 <div className="flex items-center gap-8">
-                    <Link href="/admin" className="flex items-center space-x-4 group">
-                        <div className="relative">
-                            <ProtectedLogo 
-                                src="/logo.png" 
-                                alt="QAPRIL Logo" 
-                                className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-[0.8rem] shadow-xl border border-white/40 ring-1 ring-black/5" 
-                            />
-                            <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                        </div>
+                    {/* Logo - Hidden on large screens where sidebar is visible */}
+                    <Link href="/admin" className="flex lg:hidden items-center space-x-4 group">
+                        <ProtectedLogo 
+                            src="/logo.png" 
+                            alt="QAPRIL Logo" 
+                            className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-[0.8rem] shadow-xl border border-white/40 ring-1 ring-black/5" 
+                        />
                         <div className="flex flex-col">
                             <span className="font-black text-2xl tracking-tighter text-[#1F4E79] leading-none uppercase">QAPRIL</span>
-                            <span className="text-[12px] font-black tracking-[0.3em] text-[#C55A11] mt-1 uppercase">Administration Centrale</span>
                         </div>
                     </Link>
 
-                    <nav className="hidden lg:flex items-center gap-1 bg-gray-900/5 p-1 rounded-2xl border border-gray-100 overflow-x-auto max-w-[50vw] no-scrollbar">
-                        {navLinks.map((link) => {
-                            const isActive = pathname === link.href
-                            return (
-                                <Link 
-                                    key={link.href} 
-                                    href={link.href}
-                                    className={`relative px-5 py-2.5 text-[14px] font-bold uppercase tracking-[0.1em] transition-all rounded-xl flex items-center gap-2 group/nav ${
-                                        isActive ? "text-white" : "text-gray-500 hover:text-[#1F4E79]"
-                                    }`}
-                                >
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="nav-pill-admin"
-                                            className="absolute inset-0 bg-gray-900 shadow-xl shadow-gray-950/20 rounded-xl"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                    <span className={`relative z-10 transition-transform ${isActive ? "scale-110" : "group-hover/nav:scale-110"}`}>
-                                        {link.icon}
-                                    </span>
-                                    <span className="relative z-10">{link.label}</span>
-                                </Link>
-                            )
-                        })}
-                    </nav>
+                    {/* Breadcrumb or Title for Desktop */}
+                    <div className="hidden lg:flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#C55A11]"></div>
+                        <span className="text-[12px] font-black tracking-[0.3em] text-[#1F4E79] uppercase">
+                            {navLinks.find(l => l.href === pathname)?.label || "Administration"}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4">
