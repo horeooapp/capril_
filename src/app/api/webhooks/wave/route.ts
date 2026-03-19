@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
         const payment = await (prisma as any).paymentPgw.update({
             where: { id: paymentId },
             data: {
-                statut: "SUCCES",
+                statut: "CONFIRMEE",
                 webhookPayload: body,
                 webhookReceivedAt: new Date(),
                 refOperateur: id, // Wave event ID

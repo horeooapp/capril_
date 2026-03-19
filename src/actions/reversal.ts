@@ -21,7 +21,7 @@ export async function processSplitPayment(paymentId: string) {
       }
     });
 
-    if (!payment || payment.statut !== "SUCCES") {
+    if (!payment || payment.statut !== "CONFIRMEE") {
       return { error: "Paiement non éligible au reversement." };
     }
 
@@ -39,7 +39,7 @@ export async function processSplitPayment(paymentId: string) {
 
     // 2. Identify Recipients
     const agencyId = payment.lease.landlordId; // Simplification for demo: landlord is the agency user context
-    const landlordId = payment.lease.property?.ownerId; // Real owner
+    const landlordId = payment.lease.property?.ownerUserId; // Real owner
 
     if (!landlordId) throw new Error("Propriétaire introuvable pour ce bien.");
 
