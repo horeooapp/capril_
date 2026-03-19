@@ -485,7 +485,6 @@ model Lease {
 
   // M-SIG-ELEC
   isSignedElectronically Boolean   @default(false) @map("is_signed_electronically")
-  signedAt               DateTime? @map("signed_at")
   signingOtp            String?   @map("signing_otp")
   signatureContext      Json?     @map("signature_context") // {ip, ua, loc}
 
