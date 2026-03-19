@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toggleFeature } from "@/actions/feature-actions";
-import { ShieldCheck, ShieldAlert, Cpu, Settings2, Fingerprint, FileText, Wrench, Scale, Banknote } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Cpu, Settings2, Fingerprint, FileText, Wrench, Scale, Banknote, Landmark, ShieldHalf, LifeBuoy, Home } from "lucide-react";
 
 interface Feature {
   id: string;
@@ -30,9 +30,14 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
       case "M04": return <FileText className="w-5 h-5" />;
       case "M05": return <Settings2 className="w-5 h-5" />;
       case "M06-M09": return <Wrench className="w-5 h-5" />;
-      case "M10-M11": return <Scale className="w-5 h-5" />;
-      case "M16": return <ShieldCheck className="w-5 h-5" />;
+      case "M10-M11": 
+      case "MEDIATION_CENTER": return <Scale className="w-5 h-5" />;
+      case "M16": 
+      case "M17_FISCAL": return <Landmark className="w-5 h-5" />;
       case "M-PGW": return <Banknote className="w-5 h-5" />;
+      case "CDC_CONSIGNATION": return <ShieldHalf className="w-5 h-5" />;
+      case "ASSURANCE_LOYER": return <LifeBuoy className="w-5 h-5" />;
+      case "LANDING_PAGE": return <Home className="w-5 h-5" />;
       default: return <Cpu className="w-5 h-5" />;
     }
   };
