@@ -1,6 +1,17 @@
-import { Database, Upload, AlertCircle, CheckCircle, Clock } from "lucide-react"
+import { Database, AlertCircle, CheckCircle, Clock } from "lucide-react"
+import { prisma } from "@/lib/prisma"
+import MigrationUpload from "@/components/admin/MigrationUpload"
 
-export default function MigrationPage() {
+export default async function MigrationPage() {
+    const sessions = await (prisma as any).migrationSession?.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 10
+    }).catch(() => [])
+
+    const totalSessions = await (prisma as any).migrationSession?.count().catch(() => 0)
+    const pendingSessions = await (prisma as any).migrationSession?.count({ where: { statut: { in: ["UPLOADE", "EN_ANALYSE"] } } }).catch(() => 0)
+    const committedSessions = await (prisma as any).migrationSession?.count({ where: { statut: "COMMITE" } }).catch(() => 0)
+
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
             {/* Header */}
@@ -19,18 +30,15 @@ export default function MigrationPage() {
                     </p>
                 </div>
                 
-                <button className="px-8 py-4 bg-[#C55A11] text-white font-black rounded-2xl shadow-xl shadow-[#C55A11]/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm">
-                    <Upload size={20} />
-                    Nouvel Import
-                </button>
+                <MigrationUpload />
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: "Sessions Totales", value: "12", icon: <Database size={24} />, color: "bg-blue-50 text-blue-600" },
-                    { label: "En Attente", value: "2", icon: <Clock size={24} />, color: "bg-amber-50 text-amber-600" },
-                    { label: "Validées", value: "10", icon: <CheckCircle size={24} />, color: "bg-emerald-50 text-emerald-600" },
+                    { label: "Sessions Totales", value: totalSessions.toString(), icon: <Database size={24} />, color: "bg-blue-50 text-blue-600" },
+                    { label: "En Attente", value: pendingSessions.toString(), icon: <Clock size={24} />, color: "bg-amber-50 text-amber-600" },
+                    { label: "Validées / Commitées", value: committedSessions.toString(), icon: <CheckCircle size={24} />, color: "bg-emerald-50 text-emerald-600" },
                 ].map((stat, i) => (
                     <div key={i} className="p-6 rounded-[2.5rem] bg-white/50 border border-white/50 backdrop-blur-xl shadow-sm hover:shadow-md transition-all group">
                         <div className="flex justify-between items-start mb-4">
@@ -51,13 +59,44 @@ export default function MigrationPage() {
                     <span className="px-4 py-2 bg-white/60 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border border-white/50">Derniers 30 jours</span>
                 </div>
 
-                <div className="space-y-4 text-center py-20 bg-gray-50/50 rounded-[2rem] border border-dashed border-gray-200">
-                    <div className="flex justify-center mb-4 text-gray-300">
-                        <AlertCircle size={48} strokeWidth={1} />
+                {sessions.length === 0 ? (
+                    <div className="space-y-4 text-center py-20 bg-gray-50/50 rounded-[2rem] border border-dashed border-gray-200">
+                        <div className="flex justify-center mb-4 text-gray-300">
+                            <AlertCircle size={48} strokeWidth={1} />
+                        </div>
+                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Aucune session active pour le moment</p>
+                        <p className="text-gray-400/60 text-xs italic">Uploadez un fichier CSV pour démarrer le pipeline M-MIGRATION</p>
                     </div>
-                    <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">Aucune session active pour le moment</p>
-                    <p className="text-gray-400/60 text-xs italic">Uploadez un fichier Excel pour démarrer le pipeline M-MIGRATION</p>
-                </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-separate border-spacing-y-3">
+                            <thead>
+                                <tr className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                    <th className="px-6 py-4">Fichier</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4">Erreurs</th>
+                                    <th className="px-6 py-4">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sessions.map((session: any) => (
+                                    <tr key={session.id} className="bg-white/60 hover:bg-white transition-colors group">
+                                        <td className="px-6 py-4 rounded-l-2xl font-bold text-gray-700">{session.fichierNom}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                                                session.statut === 'COMMITE' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
+                                            }`}>
+                                                {session.statut}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 font-black text-red-500">{session.nbErreurs}</td>
+                                        <td className="px-6 py-4 rounded-r-2xl text-xs text-gray-400">{session.createdAt.toLocaleDateString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     )

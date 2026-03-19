@@ -24,31 +24,12 @@ import { getDemoData } from "@/lib/demo-data"
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
-    const isDemoMode = await getDemoMode()
-    const demoData = isDemoMode ? getDemoData() : null
+    // Production Mode: Force real data by default
+    const isDemoMode = false
+    const demoData = null
 
-    // Safe Data extraction logic
-    const safeData = (isDemoMode && demoData) ? {
-        totalDgi: Number(demoData.fiscalStats?._sum?.totalDgi || 0),
-        cdcAmount: Number(demoData.cdcStats?._sum?.amount || 0),
-        activeMediations: Number(demoData.activeMediations || 0),
-        kycAutoRate: Number(demoData.kycAutoRate || 0),
-        totalUsers: Number(demoData.totalUsers || 0),
-        totalTenants: Number(demoData.totalTenants || 0),
-        totalLandlords: Number(demoData.totalLandlords || 0),
-        totalAgencies: Number(demoData.totalAgencies || 0),
-        totalProperties: Number(demoData.totalProperties || 0),
-        totalMandates: Number(demoData.totalMandates || 0),
-        totalColocs: Number(demoData.activeColocs || 0),
-        totalLandLeases: Number(demoData.landLeases || 0),
-        totalLeases: Number(demoData.totalLeases || 0),
-        totalCertificates: Number(demoData.totalCertificates || 0),
-        totalPayments: Number(demoData.totalPayments || 0),
-        totalReversals: Number((demoData as any).totalReversals || 0),
-        fraudAlerts: Number((demoData as any).fraudAlerts || 0),
-        recentAuditLogs: demoData.recentAuditLogs || [],
-        documentsUnderReview: demoData.documentsUnderReview || []
-    } : {
+    // Production Data extraction
+    const safeData = {
         totalDgi: Number((await (prisma as any).fiscalDossier?.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
         cdcAmount: Number((await (prisma as any).cdcDeposit?.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
         activeMediations: await (prisma as any).mediation?.count({ where: { status: "ACTIVE" } }).catch(() => 0),
@@ -96,8 +77,6 @@ export default async function AdminDashboardOverview() {
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <DemoToggle initialEnabled={isDemoMode} />
-                        <div className="h-12 w-[1px] bg-gray-200 hidden md:block"></div>
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
                             <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>

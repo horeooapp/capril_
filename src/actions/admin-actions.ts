@@ -115,6 +115,52 @@ export async function certifyAgency(userId: string) {
 }
 
 /**
+ * Approuve un document d'identité (KYC)
+ */
+export async function approveDocument(docId: string) {
+    await ensureAdmin()
+    const session = await auth()
+    
+    try {
+        await (prisma as any).identityDocument.update({
+            where: { id: docId },
+            data: {
+                status: "verified",
+                verifiedAt: new Date(),
+                verifiedByUserId: session?.user?.id
+            }
+        })
+        revalidatePath("/admin")
+        revalidatePath(`/admin/validation/${docId}`)
+        return { success: true }
+    } catch (error) {
+        return { error: "Échec de l'approbation du document." }
+    }
+}
+
+/**
+ * Rejette un document d'identité (KYC)
+ */
+export async function rejectDocument(docId: string, reason: string) {
+    await ensureAdmin()
+    
+    try {
+        await (prisma as any).identityDocument.update({
+            where: { id: docId },
+            data: {
+                status: "rejected",
+                rejectionReason: reason
+            }
+        })
+        revalidatePath("/admin")
+        revalidatePath(`/admin/validation/${docId}`)
+        return { success: true }
+    } catch (error) {
+        return { error: "Échec du rejet du document." }
+    }
+}
+
+/**
  * Supprime un utilisateur (Action radicale d'admin)
  */
 export async function deleteUser(userId: string) {

@@ -7,17 +7,8 @@ import { revalidatePath } from "next/cache"
  * Récupère l'état du mode Démo depuis la configuration système
  */
 export async function getDemoMode() {
-    try {
-        if (!(prisma as any).systemConfig) return false;
-        
-        const config = await (prisma as any).systemConfig.findUnique({
-            where: { key: "DEMO_MODE" }
-        })
-        return config?.value === true
-    } catch (error) {
-        console.error("Erreur lecture DEMO_MODE:", error)
-        return false
-    }
+    // Production Lockdown: Demo Mode is strictly disabled
+    return false
 }
 
 /**
