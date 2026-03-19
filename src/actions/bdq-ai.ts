@@ -121,7 +121,7 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string)
 
     history.push({ role: "assistant", content: data.content });
 
-    let finalResponse = assistantMessage;
+    const finalResponse = assistantMessage;
 
     // 3. Handle Tool Calls
     if (toolUse) {
