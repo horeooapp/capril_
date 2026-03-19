@@ -11,7 +11,7 @@ import { auth } from "@/auth";
 export async function toggleFeature(id: string, enabled: boolean) {
   try {
     const session = await auth();
-    if (session?.user?.role !== "SUPER_ADMIN") {
+    if (session?.user?.role !== "SUPER_ADMIN" && session?.user?.role !== "ADMIN") {
       throw new Error("Accès refusé");
     }
 

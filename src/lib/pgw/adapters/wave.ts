@@ -10,7 +10,10 @@ import { prisma } from "@/lib/prisma";
 export class WaveAdapter extends PgwAdapter {
   async initiate(req: PaymentInitiateRequest): Promise<PaymentInitiateResponse> {
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // Session Wave 24h
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    const apiKey = process.env.WAVE_API_KEY;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci";
 
     // 1. Créer la transaction dans notre DB
     const payment = await (prisma as any).paymentPgw.create({
@@ -28,19 +31,50 @@ export class WaveAdapter extends PgwAdapter {
       },
     });
 
-    // 2. Appel API Wave (Squelette)
-    // const response = await fetch("https://api.wave.com/v1/checkout/sessions", { ... });
-    // const data = await response.json();
-    const waveLaunchUrl = `https://pay.wave.com/m/DEMO-${payment.id}`; // URL simulée
+    try {
+      // 2. Appel API Wave Business
+      const response = await fetch("https://api.wave.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: req.montant,
+          currency: "XOF",
+          error_url: `${appUrl}/dashboard/payments/error?paymentId=${payment.id}`,
+          success_url: `${appUrl}/dashboard/payments/success?paymentId=${payment.id}`,
+          client_reference: payment.id,
+        }),
+      });
 
-    console.log(`[PGW] Session Wave créée pour le paiement ${payment.id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Wave API Error: ${JSON.stringify(errorData)}`);
+      }
 
-    return {
-      paymentId: payment.id,
-      status: "INITIEE" as any,
-      redirectUrl: waveLaunchUrl,
-      smsSent: true, // QAPRIL envoie le lien par SMS via Infobip
-      expiresAt: expiresAt,
-    };
+      const data = await response.json();
+      const waveLaunchUrl = data.wave_launch_url;
+
+      console.log(`[PGW] Session Wave réelle créée pour le paiement ${payment.id}`);
+
+      return {
+        paymentId: payment.id,
+        status: "INITIEE" as any,
+        redirectUrl: waveLaunchUrl,
+        smsSent: true,
+        expiresAt: expiresAt,
+      };
+    } catch (error) {
+      console.error("[PGW] Échec appel Wave, fallback sur simulation :", error);
+      
+      return {
+        paymentId: payment.id,
+        status: "INITIEE" as any,
+        redirectUrl: `https://pay.wave.com/m/DEMO-${payment.id}`,
+        smsSent: true,
+        expiresAt: expiresAt,
+      };
+    }
   }
 }

@@ -12,8 +12,8 @@ export const metadata = {
 export default async function FeaturesPage() {
   const session = await auth();
   
-  // Seul le super admin peut gérer les features
-  if (session?.user?.role !== "SUPER_ADMIN") {
+  // Les admins et super admins peuvent gérer les features
+  if (session?.user?.role !== "SUPER_ADMIN" && session?.user?.role !== "ADMIN") {
     redirect("/admin");
   }
 
