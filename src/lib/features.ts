@@ -29,6 +29,18 @@ export const FEATURES = {
   MAINTENANCE: "M06-M09",
   MEDIATION: "M10-M11",
   FISCALITY: "M16",
+
+  // ═══════════════════════════════════════════════════════
+  // MODULES DE RÉTENION AGENCES (ADD-03)
+  // ═══════════════════════════════════════════════════════
+  EDL: "M-EDL",
+  SIGNATURES: "M-SIGN",
+  MAINTENANCE_MODULE: "M-MAINT",
+  CANDIDATURES: "M-CAND",
+  CHARGES: "M-CHARGES",
+  ANNONCES: "M-ANNONCES",
+  COMPTABILITE: "M-COMPTA",
+  AGENDA: "M-AGENDA",
 } as const;
 
 export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES] | string;

@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Unification de tous les Feature Flags QAPRIL...");
+  console.log("🌱 Unification de tous les Feature Flags QAPRIL (ADD-03 inclus)...");
 
   const allFlags = [
     // Modules Système / Institutionnels
@@ -20,7 +20,17 @@ async function main() {
     { id: "NEWS_TICKER", name: "Espace Actualités", description: "Affichage des flash infos et alertes sur le portail.", enabled: true },
     { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Active ou désactive la Landing Page marketing.", enabled: true },
     
-    // Nouveaux Modules Business
+    // Modules de Rétention Agences (ADD-03)
+    { id: "M-EDL", name: "États des Lieux Numériques", description: "Photos, constats et comparatifs entrée/sortie certifiés.", enabled: true },
+    { id: "M-SIGN", name: "Signatures Électroniques", description: "Signature de baux et mandats directement sur mobile.", enabled: true },
+    { id: "M-MAINT", name: "Maintenance & Travaux", description: "Gestion des pannes, bons de travaux et répertoire prestataires.", enabled: true },
+    { id: "M-CAND", name: "Candidatures Locataires", description: "Dossier en ligne, scoring automatique et sélection.", enabled: true },
+    { id: "M-CHARGES", name: "Charges Locatives", description: "Appels de charges et régularisations annuelles automatiques.", enabled: true },
+    { id: "M-ANNONCES", name: "Publication d'Annonces", description: "Diffusion multi-portails et suivi de la vacance locative.", enabled: true },
+    { id: "M-COMPTA", name: "Comptabilité Propriétaire", description: "CRG mensuels, reversements et liasse fiscale.", enabled: true },
+    { id: "M-AGENDA", name: "Agenda & CRM Agence", description: "Rendez-vous, tâches et suivi de la relation client.", enabled: true },
+
+    // Nouveaux Modules Business & Fondations
     { id: "M_MANDAT", name: "Gestion Multi-Mandats", description: "Permet aux propriétaires de confier leurs biens à plusieurs agences.", enabled: true },
     { id: "M_COLOC", name: "Colocation Native", description: "Gestion des occupants multiples et quittances individuelles.", enabled: true },
     { id: "M_TERRAIN", name: "Location Terrains Nus", description: "Module spécifique pour les parcelles non bâties.", enabled: true },
@@ -40,7 +50,7 @@ async function main() {
     });
   }
 
-  console.log(`✅ ${allFlags.length} flags unifiés et prêts.`);
+  console.log(`✅ ${allFlags.length} flags unifiés et initialisés.`);
 }
 
 main()

@@ -15,6 +15,8 @@ import { isFeatureEnabled } from "@/lib/features"
 import { getLeaseProceduralState } from "@/lib/arrears-engine"
 import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
 import CDCRestitutionBox from "@/components/CDCRestitutionBox"
+import EdlManager from "@/components/dashboard/edl/EdlManager"
+import { getEdlsByLease } from "@/actions/edl-actions"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -58,6 +60,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
     // Fetch Procedural State for Arrears
     const proceduralState = await getLeaseProceduralState(leaseId)
+
+    // EDL Feature & Data
+    const showEdl = await isFeatureEnabled("M-EDL")
+    const edls = showEdl ? await getEdlsByLease(leaseId) : []
 
     return (
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
@@ -218,6 +224,13 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 userId={userId} 
                                 initialMediation={tLease.mediation} 
                             />
+                        </div>
+                    )}
+
+                    {/* EDL Section */}
+                    {showEdl && (
+                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
+                            <EdlManager leaseId={tLease.id} initialEdls={edls} />
                         </div>
                     )}
                 </div>

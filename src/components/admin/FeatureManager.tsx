@@ -5,7 +5,8 @@ import { toggleFeature } from "@/actions/feature-actions";
 import { 
   ShieldCheck, ShieldAlert, Cpu, Settings2, Fingerprint, FileText, Wrench, Scale, 
   Banknote, Landmark, ShieldHalf, LifeBuoy, Home, Users, Newspaper, Antenna, 
-  Smartphone, UserCheck, Briefcase, Users2, TreePine 
+  Smartphone, UserCheck, Briefcase, Users2, TreePine, Camera, PenTool, 
+  UserPlus, Calculator, Megaphone, BookOpen, Calendar 
 } from "lucide-react";
 
 interface Feature {
@@ -35,7 +36,8 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
       case "M04": return <FileText className="w-5 h-5" />;
       case "M05": 
       case "M_MANDAT": return <Briefcase className="w-5 h-5" />;
-      case "M06-M09": return <Wrench className="w-5 h-5" />;
+      case "M06-M09": 
+      case "M-MAINT": return <Wrench className="w-5 h-5" />;
       case "M10-M11": 
       case "MEDIATION_CENTER": return <Scale className="w-5 h-5" />;
       case "M16": 
@@ -50,6 +52,13 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
       case "NEWS_TICKER": return <Newspaper className="w-5 h-5" />;
       case "M_COLOC": return <Users2 className="w-5 h-5" />;
       case "M_TERRAIN": return <TreePine className="w-5 h-5" />;
+      case "M-EDL": return <Camera className="w-5 h-5" />;
+      case "M-SIGN": return <PenTool className="w-5 h-5" />;
+      case "M-CAND": return <UserPlus className="w-5 h-5" />;
+      case "M-CHARGES": return <Calculator className="w-5 h-5" />;
+      case "M-ANNONCES": return <Megaphone className="w-5 h-5" />;
+      case "M-COMPTA": return <BookOpen className="w-5 h-5" />;
+      case "M-AGENDA": return <Calendar className="w-5 h-5" />;
       default: return <Cpu className="w-5 h-5" />;
     }
   };

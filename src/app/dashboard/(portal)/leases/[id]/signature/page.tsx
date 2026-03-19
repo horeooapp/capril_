@@ -2,7 +2,7 @@
 import { auth } from "@/auth"
 import { getLeaseById } from "@/actions/leases"
 import { notFound } from "next/navigation"
-import LeaseSignatureUI from "@/components/dashboard/LeaseSignatureUI"
+import SignatureFlow from "@/components/dashboard/signature/SignatureFlow"
 
 export default async function LandlordLeaseSignaturePage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
@@ -21,7 +21,15 @@ export default async function LandlordLeaseSignaturePage({ params }: { params: P
 
     return (
         <div className="max-w-5xl mx-auto py-12">
-            <LeaseSignatureUI leaseId={lease.id} leaseRef={lease.leaseReference} />
+            <SignatureFlow 
+                documentId={lease.id} 
+                documentType="BAIL" 
+                documentRef={lease.leaseReference || "Bail en cours"} 
+                signataireId={userId}
+                onComplete={() => {
+                  window.location.href = `/dashboard/leases/${lease.id}`;
+                }}
+            />
         </div>
     )
 }

@@ -221,6 +221,20 @@ model User {
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
+  // Relations ADD-03
+  agentEdls             EtatsDesLieux[]   @relation("AgentEdls")
+  locataireEdls         EtatsDesLieux[]   @relation("LocataireEdls")
+  signatures            SignatureElectronique[]
+  maintenanceDeclarant  TicketMaintenance[] @relation("MaintenanceDeclarant")
+  userCandidatures      Candidature[]     @relation("UserCandidatures")
+  agenceAnnonces        Annonce[]         @relation("AgenceAnnonces")
+  proprietaireCrgs      CrgMensuel[]      @relation("ProprietaireCrgs")
+  agenceCrgs            CrgMensuel[]      @relation("AgenceCrgs")
+  agenceEvents          AgendaEvenement[] @relation("AgenceEvents")
+  agentEvents           AgendaEvenement[] @relation("AgentEvents")
+  eventContact          AgendaEvenement[] @relation("EventContact")
+  authenticators        Authenticator[]
+
   @@map("users")
   @@index([phone])
   @@index([role])
@@ -330,6 +344,13 @@ model Property {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
+  // Relations ADD-03
+  ticketsMaintenance    TicketMaintenance[]
+  candidatures          Candidature[]
+  chargesParametrage    ChargeParametrage[]
+  annonces              Annonce[]
+  agendaEvents          AgendaEvenement[]
+
   @@map("properties")
   @@index([ownerUserId])
   @@index([commune])
@@ -398,6 +419,12 @@ model Lease {
   pgwPayments       PaymentPgw[]
 
   colocataires      Colocataire[]
+
+  // Relations ADD-03
+  etatsDesLieux         EtatsDesLieux[]
+  ticketsMaintenance    TicketMaintenance[]
+  regularisationsCharges RegularisationCharges[]
+  agendaEvents          AgendaEvenement[]
 
   synthesesLoyer    MonthlyRentSynthesis[]
   landInfo          LandLeaseInfo?
@@ -1113,6 +1140,324 @@ model FeatureFlag {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("feature_flags")
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULES DE RÉTENION AGENCES (ADD-03)
+// ═══════════════════════════════════════════════════════
+
+// M-EDL — États des Lieux
+model EtatsDesLieux {
+  id                String       @id @default(uuid()) @map("edl_id")
+  leaseId           String       @map("lease_id")
+  lease             Lease        @relation(fields: [leaseId], references: [id])
+  typeEdl           EdlType      @map("type_edl")
+  statut            String       @default("EN_COURS")
+  agentId           String?      @map("agent_id")
+  agent             User?        @relation("AgentEdls", fields: [agentId], references: [id])
+  locataireId       String?      @map("locataire_id")
+  locataire         User?        @relation("LocataireEdls", fields: [locataireId], references: [id])
+  
+  pieces            Json         // array pièces avec états et photos_urls
+  compteurs         Json?        // relevés compteurs
+  equipements       Json?        // liste équipements
+  
+  signatureAgent    String?      @map("signature_agent") @db.Text
+  signatureLocataire String?     @map("signature_locataire") @db.Text
+  
+  hashSha256        String?      @map("hash_sha256") @db.VarChar(64)
+  pdfUrl            String?      @map("pdf_url")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  @@map("etats_des_lieux")
+}
+
+enum EdlType {
+  ENTREE
+  SORTIE
+  INVENTAIRE
+}
+
+// M-SIGN — Signatures Électroniques
+model SignatureElectronique {
+  id              String        @id @default(uuid()) @map("sig_id")
+  documentType    SigDoc        @map("document_type")
+  documentId      String        @map("document_id")
+  signataireId    String        @map("signataire_id")
+  signataire      User          @relation(fields: [signataireId], references: [id])
+  statut          SigStatut     @default(EN_ATTENTE)
+  
+  methode         String?       @db.VarChar(20) // OTP_SMS | DESSIN | BIOMETRIQUE
+  otpUtilise      String?       @map("otp_utilise") @db.VarChar(6)
+  ipAddress       String?       @map("ip_address")
+  userAgent       String?       @map("user_agent")
+  hashDocument    String?       @map("hash_document") @db.VarChar(64)
+  
+  signedAt        DateTime?     @map("signed_at")
+  expiresAt       DateTime?     @map("expires_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@map("signatures_electroniques")
+}
+
+enum SigDoc {
+  BAIL
+  BAIL_COMMERCIAL
+  MANDAT
+  EDL
+  ACCORD_MEDIATION
+  AVENANT
+}
+
+enum SigStatut {
+  EN_ATTENTE
+  SIGNE
+  REFUSE
+  EXPIRE
+}
+
+// M-MAINT — Maintenance & Travaux
+model TicketMaintenance {
+  id              String        @id @default(uuid()) @map("ticket_id")
+  logementId      String        @map("unite_id")
+  logement        Property  @relation(fields: [logementId], references: [id])
+  leaseId         String?       @map("lease_id")
+  lease           Lease?        @relation(fields: [leaseId], references: [id])
+  declarantId     String        @map("declarant_id")
+  declarant       User          @relation("MaintenanceDeclarant", fields: [declarantId], references: [id])
+  
+  categorie       MaintCat
+  description     String        @db.Text
+  photosUrls      Json?         @map("photos_urls")
+  urgence         String        @default("NORMALE") // URGENTE|NORMALE|BASSE
+  statut          MaintStatut   @default(OUVERT)
+  
+  prestataireId   String?       @map("prestataire_id")
+  prestataire     Prestataire?  @relation(fields: [prestataireId], references: [id])
+  
+  devisMontant    Decimal?      @map("devis_montant") @db.Decimal(12, 0)
+  coutFinal       Decimal?      @map("cout_final") @db.Decimal(12, 0)
+  dateIntervention DateTime?    @map("date_intervention") @db.Date
+  
+  noteLocataire    Int?         @map("note_locataire") @db.SmallInt
+  notePrestataire  Int?         @map("note_prestataire") @db.SmallInt
+  
+  createdAt       DateTime      @default(now()) @map("created_at")
+  closedAt        DateTime?     @map("closed_at")
+
+  @@map("tickets_maintenance")
+}
+
+model Prestataire {
+  id              String        @id @default(uuid()) @map("prestataire_id")
+  nom             String
+  specialite      MaintCat
+  telephone       String
+  email           String?
+  adresse         String?
+  noteMoyenne     Decimal?      @map("note_moyenne") @db.Decimal(3, 2)
+  
+  tickets         TicketMaintenance[]
+  
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@map("prestataires")
+}
+
+enum MaintCat {
+  PLOMBERIE
+  ELECTRICITE
+  MENUISERIE
+  TOITURE
+  PEINTURE
+  SERRURERIE
+  AUTRE
+}
+
+enum MaintStatut {
+  OUVERT
+  EN_COURS
+  CLOS
+  REFUSE
+}
+
+// M-CAND — Candidatures
+model Candidature {
+  id              String        @id @default(uuid()) @map("cand_id")
+  logementId      String        @map("logement_id")
+  logement        Property  @relation(fields: [logementId], references: [id])
+  candidatId      String?       @map("candidat_id")
+  candidat        User?         @relation("UserCandidatures", fields: [candidatId], references: [id])
+  
+  nom             String        @db.VarChar(100)
+  prenom          String        @db.VarChar(100)
+  telephone       String        @db.VarChar(20)
+  revenuMensuel   Decimal?      @map("revenu_mensuel") @db.Decimal(12, 0)
+  employeur       String?       @db.VarChar(200)
+  scoreQapril     Int?          @map("score_qapril") @db.SmallInt
+  tauxEffort      Decimal?      @map("taux_effort") @db.Decimal(5, 2)
+  docsJsonb       Json?         @map("docs_jsonb")
+  
+  statut          CandStatut    @default(SOUMISE)
+  noteAgence      String?       @map("note_agence") @db.Text
+  
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@map("candidatures")
+}
+
+enum CandStatut {
+  SOUMISE
+  EN_ETUDE
+  ACCEPTEE
+  REFUSEE
+  CONVERTIE_LOCATAIRE
+}
+
+// M-CHARGES — Charges Locatives
+model ChargeParametrage {
+  id              String        @id @default(uuid()) @map("charge_id")
+  logementId      String        @map("logement_id")
+  logement        Property  @relation(fields: [logementId], references: [id])
+  typeCharge      ChargeType    @map("type_charge")
+  mode            String        @default("FORFAIT") // FORFAIT | PROVISION_REELLE
+  montantMensuel  Decimal       @map("montant_mensuel") @db.Decimal(10, 0)
+  cleRepartition  Decimal?      @map("cle_repartition") @db.Decimal(7, 4)
+  actif           Boolean       @default(true)
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@map("charges_parametrage")
+}
+
+model RegularisationCharges {
+  id              String        @id @default(uuid()) @map("reg_id")
+  leaseId         String        @map("bail_id")
+  lease           Lease         @relation(fields: [leaseId], references: [id])
+  annee           Int           @db.SmallInt
+  provisionsCollectees Decimal  @map("provisions_collectees") @db.Decimal(12, 0)
+  chargesReelles  Decimal       @map("charges_reelles") @db.Decimal(12, 0)
+  solde           Decimal       @db.Decimal(12, 0)
+  statut          String        @default("CALCULE")
+  notifieAt       DateTime?     @map("notifie_at")
+  regleAt         DateTime?     @map("regle_at")
+
+  @@map("regularisations_charges")
+}
+
+enum ChargeType {
+  EAU
+  ELECTRICITE_COMMUNE
+  GARDIENNAGE
+  NETTOYAGE
+  TOM // Taxe Ordures Ménagères
+  AUTRE
+}
+
+// M-ANNONCES — Vacance Locative
+model Annonce {
+  id              String        @id @default(uuid()) @map("annonce_id")
+  logementId      String        @map("logement_id")
+  logement        Property  @relation(fields: [logementId], references: [id])
+  agenceId        String        @map("agence_id")
+  agence          User          @relation("AgenceAnnonces", fields: [agenceId], references: [id])
+  
+  titre           String        @db.VarChar(200)
+  description     String        @db.Text
+  loyerDemande    Decimal       @map("loyer_demande") @db.Decimal(12, 0)
+  charges         Decimal       @default(0) @db.Decimal(10, 0)
+  photosUrls      Json          @map("photos_urls")
+  criteres        Json?
+  
+  statut          String        @default("ACTIVE") // ACTIVE|SUSPENDUE|ARCHIVEE
+  diffusions      Json?         // {jumia: true, whatsapp: true, expat: false}
+  nbContacts      Int           @default(0) @map("nb_contacts")
+  nbVisites       Int           @default(0) @map("nb_visites")
+  nbCandidatures  Int           @default(0) @map("nb_candidatures")
+  coutVacance     Decimal?      @map("cout_vacance") @db.Decimal(12, 0)
+  
+  publieeAt       DateTime?     @map("publiee_at")
+  archiveeAt      DateTime?     @map("archivee_at")
+
+  @@map("annonces")
+}
+
+// M-COMPTA — Comptabilité Propriétaire
+model CrgMensuel {
+  id              String        @id @default(uuid()) @map("crg_id")
+  proprietaireId  String        @map("proprietaire_id")
+  proprietaire    User          @relation("ProprietaireCrgs", fields: [proprietaireId], references: [id])
+  agenceId        String        @map("agence_id")
+  agence          User          @relation("AgenceCrgs", fields: [agenceId], references: [id])
+  
+  mois            DateTime      @db.Date
+  loyersEncaisses Decimal       @default(0) @map("loyers_encaisses") @db.Decimal(14, 0)
+  chargesDeduites Decimal       @default(0) @map("charges_deduites") @db.Decimal(14, 0)
+  travauxDeduits  Decimal       @default(0) @map("travaux_deduits") @db.Decimal(14, 0)
+  honorairesAgence Decimal      @default(0) @map("honoraires_agence") @db.Decimal(14, 0)
+  reversementNet  Decimal       @map("reversement_net") @db.Decimal(14, 0)
+  
+  reversementEffectueAt DateTime? @map("reversement_effectue_at")
+  pdfUrl          String?       @map("pdf_url")
+  hashSha256      String?       @map("hash_sha256") @db.VarChar(64)
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@unique([proprietaireId, agenceId, mois])
+  @@map("crg_mensuel")
+}
+
+// M-AGENDA — Agenda & CRM
+model AgendaEvenement {
+  id              String        @id @default(uuid()) @map("event_id")
+  agenceId        String        @map("agence_id")
+  agence          User          @relation("AgenceEvents", fields: [agenceId], references: [id])
+  agentId         String?       @map("agent_id")
+  agent           User?         @relation("AgentEvents", fields: [agentId], references: [id])
+  
+  typeEvent       AgendaType    @map("type_event")
+  titre           String        @db.VarChar(200)
+  description     String?       @db.Text
+  
+  contactId       String?       @map("contact_id")
+  contact         User?         @relation("EventContact", fields: [contactId], references: [id])
+  logementId      String?       @map("logement_id")
+  logement        Property? @relation(fields: [logementId], references: [id])
+  leaseId         String?       @map("lease_id")
+  lease           Lease?        @relation(fields: [leaseId], references: [id])
+  
+  debutAt         DateTime      @map("debut_at")
+  finAt           DateTime?     @map("fin_at")
+  rappelMinutes   Int           @default(30) @map("rappel_minutes")
+  statut          String        @default("PLANIFIE")
+  gcalEventId     String?       @map("gcal_event_id") @db.VarChar(100)
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@map("agenda_evenements")
+}
+
+enum AgendaType {
+  VISITE
+  EDL_ENTREE
+  EDL_SORTIE
+  REMISE_CLES
+  REUNION_PROPRIO
+  TRAVAUX
+  ECHEANCE_BAIL
+  AUTRE
+}
+
+model Authenticator {
+  credentialID         String  @id
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, credentialID])
 }
 
 
