@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react";
 import { FileText, Download, TrendingUp, ShieldCheck, MapPin } from "lucide-react";
 
 interface ManagementReportProps {
@@ -21,6 +22,10 @@ interface ManagementReportProps {
 
 export default function ManagementReport({ data }: ManagementReportProps) {
   const maxPerformance = Math.max(...data.performance.map(p => p.amount), 1);
+  
+  const transactionId = useMemo(() => 
+    Math.random().toString(36).substring(7).toUpperCase(), 
+  []);
 
   return (
     <div id="management-report" className="bg-white p-12 max-w-[210mm] mx-auto shadow-2xl border border-gray-100 font-sans text-gray-900 print:shadow-none print:border-0">
@@ -137,7 +142,7 @@ export default function ManagementReport({ data }: ManagementReportProps) {
                     <ShieldCheck size={12} />
                 </div>
                 <p className="text-[10px] font-black text-primary uppercase italic">Approuvé FinTech UEMOA</p>
-                <p className="text-[8px] text-gray-400 text-center mt-1">Transaction ID: {Math.random().toString(36).substring(7).toUpperCase()}</p>
+                <p className="text-[8px] text-gray-400 text-center mt-1">Transaction ID: {transactionId}</p>
             </div>
         </div>
         <p className="text-[10px] text-gray-400 italic">
