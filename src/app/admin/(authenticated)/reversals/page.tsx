@@ -3,7 +3,12 @@ import { retryReversal } from "@/actions/reversal";
 import { CheckCircle2, AlertCircle, RefreshCcw, ArrowRightLeft } from "lucide-react";
 
 export default async function ReversalsAdminPage() {
-    const payments = await getRecentPayments();
+    let payments = [];
+    try {
+        payments = await getRecentPayments();
+    } catch (e) {
+        console.error("Critical error in ReversalsPage fetch:", e);
+    }
 
     return (
         <div className="p-8 space-y-8">
@@ -37,7 +42,9 @@ export default async function ReversalsAdminPage() {
                                     <div className="text-[10px] text-gray-500 font-mono">{payment.lease?.landlord?.fullName}</div>
                                 </td>
                                 <td className="p-5">
-                                    <span className="text-lg font-black text-slate-900">{Number(payment.montant).toLocaleString()} FCFA</span>
+                                    <span className="text-lg font-black text-slate-900">
+                                        {Number(payment.montant || 0).toLocaleString()} FCFA
+                                    </span>
                                 </td>
                                 <td className="p-5 text-indigo-600 font-bold">
                                     {payment.honorairesAgence ? `${Number(payment.honorairesAgence).toLocaleString()} FCFA` : "---"}
