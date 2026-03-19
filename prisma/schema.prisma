@@ -233,7 +233,6 @@ model User {
   agenceEvents          AgendaEvenement[] @relation("AgenceEvents")
   agentEvents           AgendaEvenement[] @relation("AgentEvents")
   eventContact          AgendaEvenement[] @relation("EventContact")
-  authenticators        Authenticator[]
 
   @@map("users")
   @@index([phone])

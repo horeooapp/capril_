@@ -19,8 +19,6 @@
     "@capacitor/core": "^8.2.0",
     "@capacitor/ios": "^8.2.0",
     "@libsql/client": "^0.8.0",
-    "@simplewebauthn/browser": "^9.0.1",
-    "@simplewebauthn/server": "^9.0.3",
     "@prisma/adapter-libsql": "6.4.1",
     "@prisma/client": "6.4.1",
     "@types/qrcode": "^1.5.6",

@@ -5,11 +5,10 @@ import {
   Wrench, Droplet, Zap, Flame, 
   Home, ShieldAlert, Camera, Send, 
   AlertCircle, CheckCircle2, X,
-  Loader2, Sparkles, BrainCircuit
+  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createMaintenanceTicket } from "@/actions/maintenance-actions";
-import { analyzeMaintenanceImage } from "@/actions/maintenance-ai-actions";
 
 interface MaintenanceTicketFormProps {
   logementId: string;
@@ -33,26 +32,8 @@ export default function MaintenanceTicketForm({ logementId, leaseId, declarantId
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [aiResult, setAiResult] = useState<any | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const handleAiScan = async () => {
-    if (!imageUrl) return;
-    setAnalyzing(true);
-    setAiResult(null);
-    try {
-      const res = await analyzeMaintenanceImage(imageUrl);
-      if (res.success) {
-        setAiResult(res.data);
-        if (res.data.type === "FUITE_EAU") setCategory("PLUMBING");
-        if (res.data.type === "COURT_CIRCUIT") setCategory("ELECTRICITY");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    setAnalyzing(false);
-  };
 
   const handleSubmit = async () => {
     if (!category || !description) return;
@@ -158,38 +139,22 @@ export default function MaintenanceTicketForm({ logementId, leaseId, declarantId
                       </div>
                     </div>
 
-                    {imageUrl && (
-                      <div className="mt-4">
-                        <button
-                          onClick={handleAiScan}
-                          disabled={analyzing}
-                          className="w-full py-4 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-indigo-500/20 transition-all disabled:opacity-50"
-                        >
-                          {analyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
-                          {analyzing ? "Analyse en cours..." : "Lancer le Diagnostic IA"}
-                        </button>
-
-                        <AnimatePresence>
-                          {aiResult && (
-                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} className="mt-4 p-5 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl overflow-hidden">
-                              <div className="flex items-start gap-4 text-left">
-                                <div className="p-2 bg-indigo-500 rounded-lg flex-shrink-0"><Sparkles className="w-4 h-4 text-white" /></div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex justify-between items-center mb-1">
-                                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Aide au Diagnostic</h4>
-                                    <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-black uppercase">{aiResult.gravity}</span>
-                                  </div>
-                                  <p className="text-indigo-300 text-[11px] leading-tight mb-3 italic">"{aiResult.analysis}"</p>
-                                  <p className="text-white text-[10px] font-bold uppercase tracking-tighter border-t border-indigo-500/20 pt-2 flex items-center gap-2">
-                                    <ShieldAlert className="w-3 h-3" /> {aiResult.suggestion}
-                                  </p>
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                    <div className="grid grid-cols-2 gap-4 pt-4">
+                      <button 
+                        onClick={() => setImageUrl("dummy-url")}
+                        className={`aspect-square border-2 border-dashed rounded-3xl flex flex-col items-center justify-center transition-all ${imageUrl ? "bg-indigo-500/10 border-indigo-500 text-indigo-500" : "bg-gray-800/40 border-gray-700 text-gray-500 hover:text-indigo-500 hover:border-indigo-500"}`}
+                      >
+                        <Camera className="w-8 h-8 mb-2" />
+                        <span className="text-[10px] font-black uppercase">{imageUrl ? "Photo Prête" : "Photos"}</span>
+                      </button>
+                      <div className="p-4 bg-gray-950/50 rounded-3xl border border-gray-800 flex flex-col justify-center">
+                         <div className="flex items-center gap-2 text-amber-500 mb-2">
+                           <AlertCircle className="w-4 h-4" />
+                           <span className="text-[10px] font-black uppercase">Urgence</span>
+                         </div>
+                         <p className="text-[9px] text-gray-600 leading-tight">Si l'incident présente un danger immédiat, contactez les secours avant de remplir ce formulaire.</p>
                       </div>
-                    )}
+                    </div>
 
                     <button
                       onClick={handleSubmit}

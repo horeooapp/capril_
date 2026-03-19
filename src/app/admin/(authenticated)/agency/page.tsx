@@ -19,7 +19,7 @@ import { getPropertyTickets } from "@/actions/maintenance-actions";
 import { getPropertyCandidatures } from "@/actions/candidature-actions";
 
 export default function AgencyDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"PLANNING" | "CRM" | "KPI" | "MAINT" | "CAND" | "FINANCE" | "ANNONCES">("PLANNING");
+  const [activeTab, setActiveTab] = useState<"PLANNING" | "CRM" | "KPI" | "MAINT" | "CAND">("PLANNING");
   const [events, setEvents] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [maintenanceTickets, setMaintenanceTickets] = useState<any[]>([]);
@@ -75,8 +75,6 @@ export default function AgencyDashboardPage() {
     { id: "CRM", label: "CRM Contacts", icon: <Users className="w-4 h-4" /> },
     { id: "MAINT", label: "Maintenance", icon: <Settings2 className="w-4 h-4" /> },
     { id: "CAND", label: "Candidatures", icon: <Briefcase className="w-4 h-4" /> },
-    { id: "FINANCE", label: "Finances & Charges", icon: <DollarSign className="w-4 h-4" /> },
-    { id: "ANNONCES", label: "Annonces", icon: <Bell className="w-4 h-4" /> },
     { id: "KPI", label: "Performance", icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
@@ -151,21 +149,6 @@ export default function AgencyDashboardPage() {
               {activeTab === "CRM" && <ContactBoard contacts={contacts} />}
               {activeTab === "MAINT" && <MaintenanceAgencyDash initialTickets={maintenanceTickets} />}
               {activeTab === "CAND" && <CandidatManager initialCandidatures={candidatures} loyerLoyer={350000} />}
-              {activeTab === "FINANCE" && (
-                <div className="space-y-12">
-                   <ChargesManager leaseId="mock-lease" provisionMontant={45000} />
-                   <div className="border-t border-gray-800 pt-12">
-                     <h3 className="text-2xl font-black text-white mb-8 tracking-tighter uppercase">Dernier Compte-Rendu (CRG)</h3>
-                     <LandlordStatement data={statementData} />
-                   </div>
-                </div>
-              )}
-              {activeTab === "ANNONCES" && (
-                 <div className="py-20 text-center bg-gray-900 border border-gray-800 rounded-3xl border-dashed">
-                    <Bell className="w-16 h-16 text-gray-800 mx-auto mb-4" />
-                    <p className="text-gray-500 font-medium tracking-tight">Le module de multidiffusion des annonces est en cours de synchronisation.</p>
-                 </div>
-              )}
               {activeTab === "KPI" && <AgencyKpiDash data={kpiData} />}
             </motion.div>
           </AnimatePresence>

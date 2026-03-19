@@ -4,13 +4,10 @@ import { useState } from "react";
 import { 
   User, Briefcase, DollarSign, FileUp, 
   CheckCircle2, ArrowRight, AlertCircle, 
-  Building2, ShieldCheck, HelpCircle,
-  Loader2, Scan, Fingerprint, Lock,
-  ShieldEllipsis
+  Building2, ShieldCheck, HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { submitCandidature } from "@/actions/candidature-actions";
-import { verifyCandidateIdentity, checkSolvencyFintech } from "@/actions/cand-kyc-actions";
 
 interface CandidatureFormProps {
   logementId: string;
@@ -28,26 +25,6 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
     documents: [] as string[]
   });
 
-  const [verifyingKyc, setVerifyingKyc] = useState(false);
-  const [kycResult, setKycResult] = useState<any | null>(null);
-  const [fintechResult, setFintechResult] = useState<any | null>(null);
-
-  const handleKycVerification = async () => {
-    setVerifyingKyc(true);
-    const res = await verifyCandidateIdentity("mock-url");
-    if (res.success) {
-      setKycResult(res.data);
-    }
-    setVerifyingKyc(false);
-  };
-
-  const handleNextWithScoring = async () => {
-    if (step === 2) {
-      const scoring = await checkSolvencyFintech(formData.revenuMensuel, loyerLoyer);
-      setFintechResult(scoring);
-    }
-    handleNext();
-  };
 
   const scoringRatio = formData.revenuMensuel / loyerLoyer;
   const isSolvent = scoringRatio >= 3;
@@ -178,7 +155,7 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
 
             <div className="flex gap-4 mt-10">
               <button onClick={handlePrev} className="flex-1 py-5 bg-gray-800 text-white rounded-2xl font-black uppercase tracking-widest text-xs transition-all">Retour</button>
-              <button onClick={handleNextWithScoring} disabled={!formData.revenuMensuel} className="flex-[2] py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-30">
+              <button onClick={handleNext} disabled={!formData.revenuMensuel} className="flex-[2] py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-30">
                 Suivant <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -194,47 +171,6 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-               <div className="p-6 bg-gray-950 border border-gray-800 rounded-3xl flex items-center justify-between hover:border-gray-700 transition-all relative overflow-hidden group">
-                  {verifyingKyc && <motion.div initial={{ x: "-100%" }} animate={{ x: "100%" }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} className="absolute inset-0 bg-indigo-500/10 pointer-events-none" />}
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gray-800 rounded-xl text-indigo-500"><Scan className="w-5 h-5" /></div>
-                    <div>
-                      <span className="text-sm font-bold text-gray-300 block">Pièce d'Identité</span>
-                      <span className="text-[10px] text-gray-600 font-bold uppercase">Recto / Verso</span>
-                    </div>
-                  </div>
-                  {kycResult ? (
-                    <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
-                       <ShieldCheck className="w-4 h-4" />
-                       <span className="text-[10px] font-black uppercase tracking-widest">Vérifié par IA</span>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={handleKycVerification}
-                      disabled={verifyingKyc}
-                      className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-white bg-indigo-500/5 px-6 py-3 rounded-xl border border-indigo-500/20 hover:bg-indigo-600 transition-all flex items-center gap-2"
-                    >
-                      {verifyingKyc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-3 h-3" />}
-                      {verifyingKyc ? "Analyse KYC..." : "Vérification Instantanée"}
-                    </button>
-                  )}
-               </div>
-
-               {kycResult && (
-                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl">
-                    <div className="flex gap-4">
-                       <img src="/mock-id-icon.png" className="w-12 h-12 rounded bg-gray-800 grayscale" alt="" />
-                       <div className="flex-1">
-                          <p className="text-[10px] font-black text-white uppercase tracking-tighter">{kycResult.firstName} {kycResult.lastName}</p>
-                          <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{kycResult.idNumber}</p>
-                       </div>
-                       <div className="text-right">
-                          <p className="text-[8px] text-gray-600 font-bold uppercase">Confiance KYC</p>
-                          <p className="text-xs font-black text-indigo-500">{(kycResult.score * 100).toFixed(0)}%</p>
-                       </div>
-                    </div>
-                 </motion.div>
-               )}
 
                {["Justificatifs de Revenus", "Contrat de Travail"].map((doc, idx) => (
                  <div key={idx} className="p-6 bg-gray-950 border border-gray-800 rounded-3xl flex items-center justify-between hover:border-gray-700 transition-all">

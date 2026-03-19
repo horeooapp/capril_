@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { 
   FileText, ShieldCheck, Clock, CheckCircle2, 
-  ArrowRight, Landmark, User, PenTool, Fingerprint 
+  ArrowRight, Landmark, User, PenTool
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import SignaturePad from "./SignaturePad";
 import OtpVerification from "./OtpVerification";
-import BiometricSignature from "./BiometricSignature";
 import { initiateSignature } from "@/actions/signature-actions";
 
 interface SignatureFlowProps {
@@ -20,7 +19,7 @@ interface SignatureFlowProps {
 }
 
 export default function SignatureFlow({ documentId, documentType, documentRef, signataireId, onComplete }: SignatureFlowProps) {
-  const [step, setStep] = useState<"REVIEW" | "SIGNING" | "OTP" | "BIOMETRIC" | "SUCCESS">("REVIEW");
+  const [step, setStep] = useState<"REVIEW" | "SIGNING" | "OTP" | "SUCCESS">("REVIEW");
   const [signatureId, setSignatureId] = useState<string | null>(null);
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
 
@@ -137,22 +136,6 @@ export default function SignatureFlow({ documentId, documentType, documentRef, s
               onSuccess={handleOtpSuccess} 
               onCancel={() => setStep("SIGNING")} 
             />
-            <div className="mt-8 pt-8 border-t border-gray-800 text-center max-w-md mx-auto">
-               <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-4">Ou utilisez la biométrie (QAPRIL v3.1)</p>
-               <button 
-                onClick={() => setStep("BIOMETRIC")}
-                className="flex items-center gap-2 mx-auto text-[10px] font-black text-indigo-500 hover:text-white hover:bg-indigo-600/10 px-6 py-3 rounded-xl border border-indigo-500/20 transition-all"
-               >
-                 <Fingerprint className="w-4 h-4" /> Passer à la signature par FaceID
-               </button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === "BIOMETRIC" && (
-          <motion.div key="biometric" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-10 max-w-xl mx-auto">
-             <BiometricSignature userId={signataireId} onSuccess={handleOtpSuccess} />
-             <button onClick={() => setStep("OTP")} className="w-full mt-6 text-xs text-gray-500 font-bold uppercase hover:text-white transition-colors tracking-widest">Utiliser le code SMS plutôt</button>
           </motion.div>
         )}
 
