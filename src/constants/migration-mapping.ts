@@ -1,5 +1,3 @@
-"use server"
-
 /**
  * QAPRIL - Module M-MIGRATION
  * Dictionnaire de normalisation des en-têtes Excel/CSV.

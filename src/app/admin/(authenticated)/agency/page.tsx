@@ -17,6 +17,7 @@ import { getAgencyEvents } from "@/actions/agenda-actions";
 import { getCrmContacts } from "@/actions/crm-actions";
 import { getPropertyTickets } from "@/actions/maintenance-actions";
 import { getPropertyCandidatures } from "@/actions/candidature-actions";
+import { getAgencyKpis, getMyAgencyId } from "@/actions/agency-actions";
 
 export default function AgencyDashboardPage() {
   const [activeTab, setActiveTab] = useState<"PLANNING" | "CRM" | "KPI" | "MAINT" | "CAND">("PLANNING");
@@ -24,47 +25,31 @@ export default function AgencyDashboardPage() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [maintenanceTickets, setMaintenanceTickets] = useState<any[]>([]);
   const [candidatures, setCandidatures] = useState<any[]>([]);
+  const [kpiData, setKpiData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
-  // Mock data for demo
-  const kpiData = {
-    occupancyRate: 94,
-    expectedRent: 12500000,
-    collectedRent: 11200000,
-    recoveryRate: 89.6,
-    outstandingArrears: 1300000,
-    monthlyFees: 937000,
-    leaseExpirations: 4
-  };
-
-  const statementData = {
-    period: "Mars 2026",
-    grossRent: 850000,
-    commissions: 85000,
-    technicalExpenses: 45000,
-    insurance: 15000,
-    netToPay: 705000,
-    generatedAt: new Date()
-  };
 
   useEffect(() => {
     async function loadData() {
+      const agencyId = await getMyAgencyId() || "current-agency";
+      
       const start = new Date();
       start.setMonth(start.getMonth() - 1);
       const end = new Date();
       end.setMonth(end.getMonth() + 2);
 
-      const [eventsRes, contactsRes, ticketsRes, candidaturesRes] = await Promise.all([
-        getAgencyEvents("current-agency", start, end),
-        getCrmContacts("current-agency"),
+      const [eventsRes, contactsRes, ticketsRes, candidaturesRes, kpisRes] = await Promise.all([
+        getAgencyEvents(agencyId, start, end),
+        getCrmContacts(agencyId),
         getPropertyTickets("all"),
-        getPropertyCandidatures("all")
+        getPropertyCandidatures("all"),
+        getAgencyKpis(agencyId)
       ]);
 
       setEvents(eventsRes);
       setContacts(contactsRes);
       setMaintenanceTickets(ticketsRes);
       setCandidatures(candidaturesRes);
+      setKpiData(kpisRes);
       setLoading(false);
     }
     loadData();
@@ -149,7 +134,7 @@ export default function AgencyDashboardPage() {
               {activeTab === "CRM" && <ContactBoard contacts={contacts} />}
               {activeTab === "MAINT" && <MaintenanceAgencyDash initialTickets={maintenanceTickets} />}
               {activeTab === "CAND" && <CandidatManager initialCandidatures={candidatures} loyerLoyer={350000} />}
-              {activeTab === "KPI" && <AgencyKpiDash data={kpiData} />}
+              {activeTab === "KPI" && kpiData && <AgencyKpiDash data={kpiData} />}
             </motion.div>
           </AnimatePresence>
         )}
@@ -161,7 +146,7 @@ export default function AgencyDashboardPage() {
           <ShieldCheck className="w-5 h-5 text-green-500" />
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Temps réel certifié par QAPRIL Gateway</span>
         </div>
-        <div className="text-[10px] font-mono text-gray-500">SESSION_ID: 882-901-XQ | MARCH 2026</div>
+        <div className="text-[10px] font-mono text-gray-500 uppercase">SESSION_ID: PROD-{new Date().getFullYear()}-CORE</div>
       </div>
     </div>
   );
