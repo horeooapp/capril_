@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { serializeUser } from "@/lib/serialize"
 import { ensureAuthenticated } from "./auth-helpers"
+import { revalidatePath } from "next/cache"
 
 export async function getCurrentUser() {
     try {
@@ -55,4 +56,30 @@ export async function logScoreConsultation(targetUserId: string, reason: string)
     })
     
     return { success: true }
+}
+
+export async function updateProfile(data: { fullName?: string, email?: string, role?: string }) {
+    const session = await auth()
+
+    if (!session || !session.user || !session.user.id) {
+        return { error: "Non autorisé" }
+    }
+
+    try {
+        await prisma.user.update({
+            where: { id: session.user.id },
+            data: {
+                ...data,
+                status: 'ACTIVE' 
+            } as any
+        })
+
+        revalidatePath("/dashboard")
+        revalidatePath("/locataire")
+        
+        return { success: true }
+    } catch (error) {
+        console.error("[SERVER ACTION] Error updating user profile:", error)
+        return { error: "Impossible de mettre à jour le profil. Veuillez réessayer." }
+    }
 }

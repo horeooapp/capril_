@@ -19,16 +19,16 @@ export type CreateMandateInput = {
  * Part 12.4: Create a New Mandate
  */
 export async function createMandate(input: CreateMandateInput) {
-    const session = await auth();
-    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'AGENCY')) {
-        throw new Error("Action réservée aux agences ou administrateurs.");
-    }
-
-    if (!validateCommission(input.commissionPct)) {
-        throw new Error("La commission ne peut excéder 15%.");
-    }
-
     try {
+        const session = await auth();
+        if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'AGENCY')) {
+            return { error: "Action réservée aux agences ou administrateurs." };
+        }
+
+        if (!validateCommission(input.commissionPct)) {
+            return { error: "La commission ne peut excéder 15%." };
+        }
+
         const mandateRef = await generateMandateRef(input.agentId);
         
         const mandate = await prisma.mandate.create({
@@ -57,10 +57,10 @@ export async function createMandate(input: CreateMandateInput) {
  * Part 12.5: Sign Mandate (Simulation via SMS/2FA)
  */
 export async function signMandate(mandateId: string) {
-    const session = await auth();
-    if (!session) throw new Error("Non authentifié.");
-
     try {
+        const session = await auth();
+        if (!session) return { error: "Non authentifié." };
+
         const mandate = await prisma.mandate.update({
             where: { id: mandateId },
             data: {

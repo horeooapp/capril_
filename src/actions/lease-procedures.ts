@@ -9,12 +9,12 @@ import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers";
  * Passe le bail au statut LOYER_IMPAYE et enregistre la phase 1.
  */
 export async function declareUnpaidRent(leaseId: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-    
-    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+        
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
         const lease = await prisma.lease.update({
             where: { id: leaseId },
             data: { status: LeaseStatus.LOYER_IMPAYE },
@@ -40,9 +40,10 @@ export async function declareUnpaidRent(leaseId: string) {
         });
 
         return { success: true, lease };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error declaring unpaid rent:", error);
-        return { success: false, error: "Failed to declare unpaid rent" };
+        const message = error instanceof Error ? error.message : "Erreur lors du signalement de l'impayé.";
+        return { success: false, error: message };
     }
 }
 
@@ -50,12 +51,12 @@ export async function declareUnpaidRent(leaseId: string) {
  * Phase 3: Mise en demeure
  */
 export async function sendFormalNotice(leaseId: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-
-    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
         const lease = await prisma.lease.update({
             where: { id: leaseId },
             data: { status: LeaseStatus.MISE_EN_DEMEURE },
@@ -80,9 +81,10 @@ export async function sendFormalNotice(leaseId: string) {
         });
 
         return { success: true, lease };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error sending formal notice:", error);
-        return { success: false, error: "Failed to send formal notice" };
+        const message = error instanceof Error ? error.message : "Erreur lors de l'envoi de la mise en demeure.";
+        return { success: false, error: message };
     }
 }
 
@@ -90,12 +92,12 @@ export async function sendFormalNotice(leaseId: string) {
  * Phase 5: Option de clémence (Proposition d'un échéancier par le propriétaire)
  */
 export async function proposeClemency(leaseId: string, details: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-
-    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
         const lease = await prisma.lease.update({
             where: { id: leaseId },
             data: { status: LeaseStatus.CLEMENCE_EN_COURS },
@@ -128,9 +130,10 @@ export async function proposeClemency(leaseId: string, details: string) {
         });
 
         return { success: true, repaymentPlan };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error proposing clemency:", error);
-        return { success: false, error: "Failed to propose clemency" };
+        const message = error instanceof Error ? error.message : "Erreur lors de la proposition de clémence.";
+        return { success: false, error: message };
     }
 }
 
@@ -138,15 +141,15 @@ export async function proposeClemency(leaseId: string, details: string) {
  * Phase 5 (suite) : Le locataire accepte ou refuse la clémence
  */
 export async function respondToClemency(planId: string, accepted: boolean, tenantSignature: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-
-    const plan = await prisma.repaymentPlan.findUnique({ where: { id: planId } });
-    if (!plan) throw new Error("Plan non trouvé.");
-    
-    await ensureLeaseAccess(plan.leaseId, [Role.TENANT]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        const plan = await prisma.repaymentPlan.findUnique({ where: { id: planId } });
+        if (!plan) return { error: "Plan non trouvé." };
+        
+        await ensureLeaseAccess(plan.leaseId, [Role.TENANT]);
+
         const planResponse = await prisma.repaymentPlan.update({
             where: { id: planId },
             data: {
@@ -166,9 +169,10 @@ export async function respondToClemency(planId: string, accepted: boolean, tenan
         });
 
         return { success: true, plan: planResponse };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error responding to clemency:", error);
-        return { success: false, error: "Failed to respond to clemency" };
+        const message = error instanceof Error ? error.message : "Erreur lors de la réponse à la clémence.";
+        return { success: false, error: message };
     }
 }
 
@@ -176,12 +180,12 @@ export async function respondToClemency(planId: string, accepted: boolean, tenan
  * Phase 6: Reprise automatique si non-respect de la clémence
  */
 export async function breakClemency(planId: string, leaseId: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-
-    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
         const plan = await prisma.repaymentPlan.update({
             where: { id: planId },
             data: { status: PlanStatus.BROKEN },
@@ -211,9 +215,10 @@ export async function breakClemency(planId: string, leaseId: string) {
         });
 
         return { success: true, lease, plan };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error breaking clemency:", error);
-        return { success: false, error: "Failed to break clemency" };
+        const message = error instanceof Error ? error.message : "Erreur lors de la rupture de l'échéancier.";
+        return { success: false, error: message };
     }
 }
 
@@ -221,12 +226,12 @@ export async function breakClemency(planId: string, leaseId: string) {
  * Phase 7 & 8: Demande de résiliation (sans effet automatique) & Constitution dossier
  */
 export async function initiateTermination(leaseId: string) {
-    const session = await ensureAuthenticated();
-    const userId = session.user.id;
-
-    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
-
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
         const lease = await prisma.lease.update({
             where: { id: leaseId },
             data: { status: LeaseStatus.DEMANDE_RESILIATION },
@@ -251,8 +256,9 @@ export async function initiateTermination(leaseId: string) {
         });
 
         return { success: true, lease };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error initiating termination:", error);
-        return { success: false, error: "Failed to initiate termination" };
+        const message = error instanceof Error ? error.message : "Erreur serveur.";
+        return { success: false, error: message };
     }
 }

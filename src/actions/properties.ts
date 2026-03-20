@@ -81,68 +81,78 @@ export async function registerProperty(data: {
  * Part 5: Get Property Details
  */
 export async function getPropertyById(id: string) {
-    await ensurePropertyAccess(id)
+    try {
+        await ensurePropertyAccess(id)
 
-    const property = await prisma.property.findUnique({
-        where: { id },
-        include: {
-            leases: {
-                include: {
-                    tenant: {
-                        select: { fullName: true, phone: true }
+        const property = await prisma.property.findUnique({
+            where: { id },
+            include: {
+                leases: {
+                    include: {
+                        tenant: {
+                            select: { fullName: true, phone: true }
+                        }
                     }
                 }
             }
-        }
-    })
+        })
 
-    if (!property) return null
+        if (!property) return null
 
-    return serializeProperty(property)
+        return serializeProperty(property)
+    } catch (error) {
+        console.error("[ACTION] getPropertyById error:", error)
+        return null
+    }
 }
 
 /**
  * Part 6.3: Get Property Passport (Digital Identity)
  */
 export async function getPropertyPassport(id: string) {
-    await ensurePropertyAccess(id)
+    try {
+        await ensurePropertyAccess(id)
 
-    const property = await prisma.property.findUnique({
-        where: { id },
-        include: {
-            leases: {
-                include: {
-                    tenant: {
-                        select: { fullName: true, email: true }
+        const property = await prisma.property.findUnique({
+            where: { id },
+            include: {
+                leases: {
+                    include: {
+                        tenant: {
+                            select: { fullName: true, email: true }
+                        },
+                        incidentLogs: true
                     },
-                    incidentLogs: true
-                },
-                orderBy: { startDate: 'desc' }
+                    orderBy: { startDate: 'desc' }
+                }
             }
-        }
-    })
+        })
 
-    if (!property) return null
+        if (!property) return null
 
-    // Transform for UI (Passport page expects specific names)
-    const serialized = serializeProperty(property);
-    return {
-        ...serialized,
-        type: (property as any).propertyType,
-        surface: (property as any).areaSqm ? Number((property as any).areaSqm) : null,
-        leases: (property.leases || []).map((lease: any) => ({
-            ...serializeLease(lease),
-            tenant: lease.tenant ? {
-                name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
-                email: lease.tenant.email
-            } : { name: "Inconnu", email: null },
-            incidents: (lease.incidentLogs || []).map((inc: any) => ({
-                id: inc.id,
-                type: inc.type,
-                severity: inc.severity,
-                description: inc.description,
-                createdAt: inc.createdAt
+        // Transform for UI (Passport page expects specific names)
+        const serialized = serializeProperty(property);
+        return {
+            ...serialized,
+            type: (property as any).propertyType,
+            surface: (property as any).areaSqm ? Number((property as any).areaSqm) : null,
+            leases: (property.leases || []).map((lease: any) => ({
+                ...serializeLease(lease),
+                tenant: lease.tenant ? {
+                    name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
+                    email: lease.tenant.email
+                } : { name: "Inconnu", email: null },
+                incidents: (lease.incidentLogs || []).map((inc: any) => ({
+                    id: inc.id,
+                    type: inc.type,
+                    severity: inc.severity,
+                    description: inc.description,
+                    createdAt: inc.createdAt
+                }))
             }))
-        }))
+        }
+    } catch (error) {
+        console.error("[ACTION] getPropertyPassport error:", error)
+        return null
     }
 }

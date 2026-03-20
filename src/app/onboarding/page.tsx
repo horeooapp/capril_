@@ -3,7 +3,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { updateProfile } from "@/actions/user"
+import { updateProfile } from "@/actions/users"
 
 type Step = 'ROLE' | 'PROFILE' | 'KYC' | 'COMPLETE'
 
