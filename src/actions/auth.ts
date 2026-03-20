@@ -7,7 +7,6 @@ import { redis } from '@/lib/redis';
 import { getSMSService } from '@/lib/sms';
 
 function generateOTP(): string {
-  if (process.env.NODE_ENV === 'development') return '123456';
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 

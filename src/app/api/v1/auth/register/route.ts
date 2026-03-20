@@ -9,7 +9,6 @@ import crypto from 'crypto';
  * Generates a 6-digit code.
  */
 function generateOTP(): string {
-  if (process.env.NODE_ENV === 'development') return '123456';
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 

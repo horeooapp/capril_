@@ -28,8 +28,6 @@ class MockRedis {
 
 let redis: any = null;
 
-console.log("[Redis] Initialization - URL present:", !!process.env.REDIS_URL);
-
 if (process.env.REDIS_URL) {
     try {
         const redisGlobal = global as typeof globalThis & {
@@ -57,10 +55,11 @@ if (process.env.REDIS_URL) {
         }
     } catch (e) {
         console.error('[Redis] Failed to initialize client:', e);
-        redis = new MockRedis();
+        if (process.env.ENABLE_REDIS_MOCK === 'true') {
+            redis = new MockRedis();
+        }
     }
-} else {
-    console.warn('[Redis] No REDIS_URL found - Using MockRedis (In-memory)');
+} else if (process.env.ENABLE_REDIS_MOCK === 'true') {
     redis = new MockRedis();
 }
 

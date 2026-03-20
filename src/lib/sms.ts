@@ -17,10 +17,6 @@ export class TwilioService implements SMSService {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     this.from = process.env.TWILIO_SENDER_NUMBER || '';
 
-    console.log("[SMS][Twilio] SID present:", !!accountSid);
-    console.log("[SMS][Twilio] Token present:", !!authToken);
-    console.log("[SMS][Twilio] Sender present:", !!this.from);
-
     if (accountSid && authToken) {
       this.client = twilio(accountSid, authToken);
     }
@@ -140,7 +136,7 @@ export class AfricaTalkingService implements SMSService {
   }
   async sendMessage(phone: string, message: string) {
     console.log(`[SMS][Africa's Talking] Sending to ${phone}`);
-    return { success: true, messageId: 'msg_at_mock' };
+    return { success: true, messageId: 'msg_' + Math.random().toString(36).substring(7) };
   }
 }
 
