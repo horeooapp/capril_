@@ -26,7 +26,7 @@ export default function TenantClemencyModal({ planId, details }: TenantClemencyM
 
         setLoading(true);
         try {
-            const result = await respondToClemency(planId, accepted, signature, "user_id_demo");
+            const result = await respondToClemency(planId, accepted, signature);
             if (result.success) {
                 alert(accepted ? "Échéancier accepté et signé." : "Échéancier refusé.");
                 window.location.reload();

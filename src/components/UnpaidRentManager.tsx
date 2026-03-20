@@ -15,13 +15,12 @@ export default function UnpaidRentManager({ leaseId, currentStatus }: UnpaidRent
     const [showClemencyForm, setShowClemencyForm] = useState(false);
 
     const handleAction = async <T extends any[]>(
-        actionFn: (leaseId: string, ...args: [...T, string]) => Promise<{ success: boolean }>,
+        actionFn: (leaseId: string, ...args: T) => Promise<{ success: boolean }>,
         ...args: T
     ) => {
         setLoading(true);
         try {
-            // Pour la démo on passe "user_id_demo"
-            const result = await actionFn(leaseId, ...args, "user_id_demo");
+            const result = await actionFn(leaseId, ...args);
             if (result.success) {
                 alert("Action réussie. La page va se recharger.");
                 window.location.reload();

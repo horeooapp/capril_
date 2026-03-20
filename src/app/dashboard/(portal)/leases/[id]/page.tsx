@@ -326,7 +326,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Procedure Actions Sidebar */}
                     <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 shadow-red-100/50">
-                        <LeaseProcedureActions leaseId={leaseId} currentStatus={tLease.status} userId={userId} />
+                        <LeaseProcedureActions leaseId={leaseId} currentStatus={tLease.status} />
                     </div>
                 </div>
             </div>

@@ -12,18 +12,18 @@ interface LeaseProcedureActionsProps {
     userId: string
 }
 
-export default function LeaseProcedureActions({ leaseId, currentStatus, userId }: LeaseProcedureActionsProps) {
+export default function LeaseProcedureActions({ leaseId, currentStatus }: { leaseId: string, currentStatus: LeaseStatus }) {
     const [loading, setLoading] = useState(false)
     const [showClemencyModal, setShowClemencyModal] = useState(false)
     const [clemencyDetails, setClemencyDetails] = useState("")
     const router = useRouter()
 
-    const handleAction = async (actionFn: (id: string, uid: string) => Promise<any>) => {
+    const handleAction = async (actionFn: (id: string) => Promise<any>) => {
         if (!confirm("Êtes-vous sûr de vouloir engager cette phase de procédure ? Cette action sera journalisée avec une valeur probante.")) return
         
         setLoading(true)
         try {
-            const result = await actionFn(leaseId, userId)
+            const result = await actionFn(leaseId)
             if (result.success) {
                 router.refresh()
             } else {
@@ -40,7 +40,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus, userId }
         if (!clemencyDetails.trim()) return
         setLoading(true)
         try {
-            const result = await proposeClemency(leaseId, clemencyDetails, userId)
+            const result = await proposeClemency(leaseId, clemencyDetails)
             if (result.success) {
                 setShowClemencyModal(false)
                 router.refresh()
