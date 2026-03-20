@@ -5,6 +5,8 @@ import { useEffect, useState } from "react"
 import { getReceiptById } from "@/actions/receipts"
 import { notFound } from "next/navigation"
 import { QRCodeSVG } from "qrcode.react"
+import Image from "next/image"
+import { ShieldCheck } from "lucide-react"
 
 export default function ReceiptVerificationPage({ params }: { params: Promise<{ id: string }> }) {
     const [receipt, setReceipt] = useState<any>(null)
@@ -37,9 +39,14 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                 
                 {/* Official Header */}
                 <div className="flex justify-between items-start mb-16 relative z-10">
-                    <div>
-                        <h2 className="text-4xl font-black text-gray-900 tracking-tighter mb-1">QAPRIL</h2>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Digital Property Registry - RCI</p>
+                    <div className="flex items-center gap-4">
+                        <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+                             <Image src="/logo.png" alt="QAPRIL" width={50} height={50} />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-0.5 leading-none">QAPRIL</h2>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Digital Property Registry - RCI</p>
+                        </div>
                     </div>
                     <div className="text-right">
                         <div className="bg-gray-900 text-white px-6 py-2 rounded-2xl inline-block mb-3">
@@ -127,11 +134,17 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                             Toute falsification est passible de poursuites pénales conformément à la loi sur les transactions électroniques.
                         </p>
                         <div className="mt-8 flex items-center gap-4">
-                            <div className="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-                                <p className="text-[9px] text-gray-400 font-mono leading-none mb-1 uppercase font-bold tracking-tighter">Hash (SHA-256)</p>
-                                <p className="text-[10px] text-gray-900 font-mono font-black break-all uppercase">
-                                    {receipt.receiptHash}
-                                </p>
+                            <div className="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <p className="text-[9px] text-gray-400 font-mono leading-none mb-1 uppercase font-bold tracking-tighter">Hash (SHA-256)</p>
+                                    <p className="text-[10px] text-gray-900 font-mono font-black break-all uppercase">
+                                        {receipt.receiptHash}
+                                    </p>
+                                </div>
+                                <div className="pl-4 border-l border-gray-200 flex flex-col items-center">
+                                     <ShieldCheck className="text-primary w-6 h-6 mb-1" />
+                                     <span className="text-[8px] font-black text-primary uppercase whitespace-nowrap">Signature Active</span>
+                                </div>
                             </div>
                         </div>
                     </div>

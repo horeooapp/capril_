@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { ShieldCheck, Calendar, MapPin, User, FileText, Hash, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
 import { getBDQByToken } from "@/actions/bdq"
+import Image from "next/image"
 
 export default async function VerifyBDQPage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params
@@ -43,12 +44,15 @@ export default async function VerifyBDQPage({ params }: { params: Promise<{ toke
                 {/* Header - Security Vibe */}
                 <div className="bg-slate-900 p-8 text-center relative">
                     <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                    <div className="relative z-10">
-                        <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl ${getStatusColor(bdq.statut)}`}>
+                    <div className="relative z-10 flex flex-col items-center">
+                        <div className="mb-4 bg-white p-2 rounded-2xl shadow-lg">
+                            <Image src="/logo.png" alt="QAPRIL" width={60} height={60} />
+                        </div>
+                        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-xl ${getStatusColor(bdq.statut)}`}>
                             {getStatusIcon(bdq.statut)}
                         </div>
-                        <h1 className="text-xl font-black text-white uppercase tracking-widest">Bail Déclaratif QAPRIL</h1>
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Module M-BAIL-VERBAL · Réf {token}</p>
+                        <h1 className="text-xl font-black text-white uppercase tracking-widest leading-none">Bail Déclaratif QAPRIL</h1>
+                        <p className="text-slate-400 text-[9px] font-bold uppercase tracking-[0.2em] mt-2">Module M-BAIL-VERBAL · Réf {token}</p>
                     </div>
                 </div>
 
@@ -133,10 +137,29 @@ export default async function VerifyBDQPage({ params }: { params: Promise<{ toke
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 bg-slate-50 text-center border-t border-slate-100">
-                    <p className="text-[9px] text-slate-400 font-medium">
-                        Propulsé par QAPRIL Technologies SA — CDC Global v3.0
-                    </p>
+                <div className="p-8 bg-slate-50 border-t border-slate-100 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 flex items-center justify-center pt-8 pr-8">
+                         <ShieldCheck className="text-primary/20 w-16 h-16 -rotate-12" />
+                    </div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 border border-primary/30 rounded-lg">
+                                <ShieldCheck className="text-primary w-5 h-5" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-slate-900 uppercase">Signature Numérique QAPRIL</p>
+                                <p className="text-[8px] font-bold text-slate-400 uppercase">Certificat d&apos;authenticité actif</p>
+                            </div>
+                        </div>
+                        
+                        <p className="text-[9px] text-slate-400 font-medium italic mb-2">
+                             Ce document est certifié par QAPRIL Technologies SA. 
+                        </p>
+                        <p className="text-[8px] text-slate-300 font-mono tracking-tighter uppercase">
+                            Digital Fingerprint: {bdq.hashBdqFinal?.substring(0, 32) || token}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
