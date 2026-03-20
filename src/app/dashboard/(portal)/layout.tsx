@@ -1,7 +1,6 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import DashboardLayoutClient from "./layout-client"
-import MarketTickerAI from "@/components/MarketTickerAI"
 
 export const dynamic = "force-dynamic"
 
@@ -25,11 +24,8 @@ export default async function DashboardLayout({
     }
 
     return (
-        <>
-            <DashboardLayoutClient session={session}>
-                {children}
-            </DashboardLayoutClient>
-            <MarketTickerAI />
-        </>
+        <DashboardLayoutClient session={session}>
+            {children}
+        </DashboardLayoutClient>
     )
 }
