@@ -48,7 +48,7 @@ export default async function LocataireLayout({
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-[14px] font-black text-gray-400 uppercase tracking-widest">© 2024 QAPRIL • Systèmes de Gestion Immobilière de Précision</p>
                     <div className="flex gap-8">
-                        <span className="text-[14px] font-black text-[#1F4E79] uppercase tracking-widest">Support Prioritaire</span>
+                        <span className="text-[14px] font-black text-ivoire-dark uppercase tracking-widest">Support Prioritaire</span>
                         <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest">Mentions Légales</span>
                     </div>
                 </div>

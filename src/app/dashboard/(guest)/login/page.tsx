@@ -7,21 +7,25 @@ export default function LandlordLoginPage() {
     return (
         <div className="min-h-screen bg-white flex relative overflow-hidden">
             {/* Background Mesh for the whole page */}
-            <div className="absolute inset-0 bg-mesh opacity-40 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-mesh opacity-60 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-ivory-pattern opacity-15 pointer-events-none"></div>
 
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
-                    <Link href="/" className="flex items-center space-x-4 mb-12 group">
+                    <Link href="/" className="flex items-center space-x-5 mb-12 group">
                         <div className="relative">
-                            <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full scale-125 group-hover:bg-primary/40 transition-all"></div>
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto relative z-10 group-hover:rotate-3 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-125 group-hover:bg-primary/40 transition-all duration-700"></div>
+                            <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto relative z-10 group-hover:scale-105 transition-transform duration-700 rounded-xl border border-white/40 shadow-xl" />
                         </div>
-                        <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase">QAPRIL</span>
+                        <div className="flex flex-col">
+                            <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none">QAPRIL</span>
+                            <span className="text-[10px] font-black tracking-[0.3em] text-ivoire-orange mt-1.5 uppercase opacity-80">Patrimoine Excellence</span>
+                        </div>
                     </Link>
 
-                    <div className="mb-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-50 text-primary text-[9px] font-black uppercase tracking-[0.2em] shadow-sm border border-orange-100/50">
-                            <Building2 size={12} />
+                    <div className="mb-10 text-center lg:text-left">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-ivoire-dark text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-gray-900/10">
+                            <Building2 size={12} className="text-ivoire-orange" />
                             Espace Propriétaire Certifié
                         </div>
                     </div>

@@ -7,22 +7,22 @@ export default function AdminLoginPage() {
     return (
         <div className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-white">
             {/* Background Layers */}
-            <div className="fixed inset-0 bg-mesh opacity-60 z-0"></div>
-            <div className="fixed inset-0 bg-ivory-pattern opacity-10 z-0 pointer-events-none"></div>
+            <div className="fixed inset-0 bg-mesh opacity-70 z-0"></div>
+            <div className="fixed inset-0 bg-ivory-pattern opacity-15 z-0 pointer-events-none"></div>
             
             {/* Ambient background glows */}
             <div className="absolute top-0 -right-20 w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
             <div className="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
-                <Link href="/" className="inline-flex items-center justify-center space-x-4 mb-12 group">
+                <Link href="/" className="inline-flex items-center justify-center space-x-5 mb-12 group">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-150 group-hover:bg-primary/40 transition-all"></div>
-                        <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto relative z-10 drop-shadow-2xl group-hover:scale-105 transition-transform duration-500" />
+                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150 group-hover:bg-primary/40 transition-all duration-700"></div>
+                        <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 rounded-2xl border border-white/40 shadow-xl" />
                     </div>
                     <div className="flex flex-col items-start leading-none uppercase">
-                        <span className="font-black text-4xl tracking-tighter text-gray-900 leading-none">QAPRIL.</span>
-                        <span className="text-[10px] font-black tracking-[0.4em] text-gray-400 mt-1">Registry Admin</span>
+                        <span className="font-black text-5xl tracking-tighter text-ivoire-dark leading-none">QAPRIL.</span>
+                        <span className="text-[11px] font-black tracking-[0.4em] text-ivoire-orange mt-2 opacity-80">Registry Admin</span>
                     </div>
                 </Link>
                 

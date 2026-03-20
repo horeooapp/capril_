@@ -59,7 +59,7 @@ export default async function AdminLayout({
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2024 QAPRIL • Excellence en Administration Centrale</p>
                         <div className="flex gap-10">
-                            <span className="text-[14px] font-black text-[#1F4E79] uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Centre de Commande</span>
+                            <span className="text-[14px] font-black text-ivoire-dark uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Centre de Commande</span>
                             <span className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Audit Certifié</span>
                         </div>
                     </div>

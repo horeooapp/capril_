@@ -57,14 +57,14 @@ export default async function Home() {
 
           <header className="relative z-20 w-full px-8 py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-white">
-              <Link href="/" className="flex items-center space-x-5 group">
+              <Link href="/" className="flex items-center space-x-6 group">
                 <div className="relative">
-                    <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full scale-110"></div>
-                    <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto relative z-10 rounded-2xl shadow-2xl border border-white/20 group-hover:scale-110 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full scale-110"></div>
+                    <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto relative z-10 rounded-2xl shadow-2xl border border-white/20 group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-black text-4xl tracking-tighter uppercase leading-none italic">QAPRIL.</span>
-                  <span className="text-[9px] font-black uppercase tracking-[0.5em] text-primary mt-1">Infrastructure Nationale</span>
+                  <span className="font-black text-5xl tracking-tighter text-white leading-none italic">QAPRIL.</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.5em] text-ivoire-orange mt-2">Infrastructure Nationale</span>
                 </div>
               </Link>
               <div className="hidden md:flex items-center gap-4">
@@ -83,9 +83,9 @@ export default async function Home() {
                     Protocole de Gestion Immobilier <span className="text-primary italic">Souverain</span>
                 </span>
               </div>
-              <h1 className="text-6xl md:text-[7.5rem] font-black text-white leading-[0.85] tracking-tighter mb-12 animate-in fade-in slide-in-from-bottom duration-1000 delay-200 uppercase italic">
+              <h1 className="text-6xl md:text-[8rem] font-black text-white leading-[0.8] tracking-[calc(-0.05em)] mb-12 animate-in fade-in slide-in-from-bottom duration-1000 delay-200 uppercase italic">
                 Registre <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-400 to-white">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-ivoire-orange via-orange-400 to-white">
                     National.
                 </span>
               </h1>
@@ -155,9 +155,12 @@ export default async function Home() {
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-[41px] z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto rounded-xl shadow-xl border border-gray-100 group-hover:scale-110 transition-transform" />
-              <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase leading-none">QAPRIL</span>
+            <Link href="/" className="flex items-center space-x-4 group">
+              <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto rounded-2xl shadow-2xl border border-gray-100 group-hover:scale-105 transition-transform duration-700" />
+              <div className="flex flex-col">
+                <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none uppercase">QAPRIL</span>
+                <span className="text-[9px] font-black tracking-[0.2em] text-ivoire-orange mt-1 uppercase opacity-80">Infrastructure</span>
+              </div>
             </Link>
 
             <nav className="hidden xl:flex space-x-8 items-center">

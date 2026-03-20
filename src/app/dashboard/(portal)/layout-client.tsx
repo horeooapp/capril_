@@ -61,19 +61,19 @@ export default function DashboardLayoutClient({
                     animate={{ y: 0, opacity: 1 }}
                     className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-200/50"
                 >
-                    <div className="flex items-center gap-8">
-                        <Link href="/dashboard" className="flex items-center space-x-4 group">
+                    <div className="flex items-center gap-10">
+                        <Link href="/dashboard" className="flex items-center space-x-5 group">
                             <div className="relative">
                                 <ProtectedLogo 
                                     src="/logo.png" 
                                     alt="QAPRIL Logo" 
-                                    className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-lg shadow-lg border border-white/50" 
+                                    className="h-11 w-auto group-hover:scale-105 transition-transform duration-700 rounded-xl shadow-2xl border border-white/60" 
                                 />
-                                <div className="absolute -inset-2 bg-primary/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-black text-2xl tracking-tighter text-[#1F4E79] leading-none uppercase">QAPRIL</span>
-                                <span className="text-[12px] font-black tracking-[0.3em] text-[#C55A11] mt-1 uppercase">Gestionnaire de Patrimoine</span>
+                                <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none">QAPRIL</span>
+                                <span className="text-[11px] font-black tracking-[0.4em] text-ivoire-orange mt-1.5 uppercase opacity-90">Patrimoine Excellence</span>
                             </div>
                         </Link>
 
