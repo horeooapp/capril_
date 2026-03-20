@@ -1,33 +1,67 @@
 import Redis from 'ioredis';
 
-let redis: Redis | null = null;
+// Mock simple pour le développement ou les cas où Redis est HS
+class MockRedis {
+    private store = new Map<string, { value: string, expiry: number }>();
+    status = 'mock';
+
+    async set(key: string, value: string, mode?: string, duration?: number) {
+        const expiry = Date.now() + (duration ? duration * 1000 : 3600000);
+        this.store.set(key, { value, expiry });
+        return 'OK';
+    }
+
+    async get(key: string) {
+        const item = this.store.get(key);
+        if (!item || item.expiry < Date.now()) {
+            this.store.delete(key);
+            return null;
+        }
+        return item.value;
+    }
+
+    async del(key: string) {
+        this.store.delete(key);
+        return 1;
+    }
+}
+
+let redis: any = null;
+
+console.log("[Redis] Initialization - URL present:", !!process.env.REDIS_URL);
 
 if (process.env.REDIS_URL) {
     try {
         const redisGlobal = global as typeof globalThis & {
-            redis: Redis | undefined;
+            redis: any;
         };
+        
         const redisOptions = {
-            maxRetriesPerRequest: 3,
-            commandTimeout: 5000,
-            retryStrategy(times: number) {
-                if (times > 3) {
-                    return null; // Stop retrying and throw error
-                }
-                const delay = Math.min(times * 50, 2000);
-                return delay;
-            },
+            maxRetriesPerRequest: 1,
+            commandTimeout: 2000,
+            retryStrategy: (times: number) => (times > 1 ? null : 50),
             tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
         };
 
-        redis = redisGlobal.redis ?? new Redis(process.env.REDIS_URL, redisOptions);
-            
-        if (process.env.NODE_ENV !== 'production') {
-            redisGlobal.redis = redis;
+        if (redisGlobal.redis) {
+            redis = redisGlobal.redis;
+        } else {
+            const client = new Redis(process.env.REDIS_URL, redisOptions);
+            client.on('error', (err) => {
+                console.error('[Redis] Connection Error:', err.message);
+            });
+            redis = client;
+            if (process.env.NODE_ENV !== 'production') {
+                redisGlobal.redis = redis;
+            }
         }
-    } catch {
-        console.warn('[Redis] ioredis not available — Redis features disabled.');
+    } catch (e) {
+        console.error('[Redis] Failed to initialize client:', e);
+        redis = new MockRedis();
     }
+} else {
+    console.warn('[Redis] No REDIS_URL found - Using MockRedis (In-memory)');
+    redis = new MockRedis();
 }
 
 export { redis };
