@@ -9,9 +9,10 @@ interface NewsItem {
 
 interface NewsTickerProps {
     items: NewsItem[]
+    duration?: number
 }
 
-export default function NewsTicker({ items }: NewsTickerProps) {
+export default function NewsTicker({ items, duration = 40 }: NewsTickerProps) {
     if (!items || items.length === 0) return null
 
     // Duplicate items to ensure smooth infinite loop
@@ -34,7 +35,10 @@ export default function NewsTicker({ items }: NewsTickerProps) {
 
                 {/* News Content */}
                 <div className="flex-1 overflow-hidden relative">
-                    <div className="flex whitespace-nowrap animate-ticker translate-z-0">
+                    <div 
+                        className="flex whitespace-nowrap animate-ticker translate-z-0"
+                        style={{ animationDuration: `${duration}s` }}
+                    >
                         {duplicatedItems.map((item, idx) => (
                             <div key={`${item.id}-${idx}`} className="inline-flex items-center px-10 border-r border-white/5 last:border-0">
                                 <span className="text-primary/60 text-lg mr-4 drop-shadow-[0_0_8px_rgba(255,130,0,0.4)]">✦</span>
