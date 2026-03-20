@@ -1,22 +1,17 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { getLeaseProceduralState, transitionArrearsPhase, ARREARS_PHASE_CONFIG } from "@/lib/arrears-engine"
 import { Role } from "@prisma/client"
 import { logAction } from "./audit"
+import { ensureAuthenticated, ensureRole, ensureAdmin, ensureLeaseAccess } from "./auth-helpers"
 
 /**
  * Part 11.3: Trigger Automated Recovery Scan for a Lease
  */
 export async function scanLeaseForArrears(leaseId: string) {
-    const session = await auth();
-    const authorizedRoles: Role[] = [Role.ADMIN, Role.ANAH_AGENT, Role.AGENCY];
-
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
-        throw new Error("Action réservée aux administrateurs ou agents.");
-    }
+    await ensureRole([Role.ADMIN, Role.ANAH_AGENT, Role.AGENCY]);
 
     try {
         const state = await getLeaseProceduralState(leaseId);
@@ -53,10 +48,7 @@ export async function scanLeaseForArrears(leaseId: string) {
  * Part 11.4: Reset Procedure (On Full Payment)
  */
 export async function resetLeaseProcedure(leaseId: string) {
-    const session = await auth();
-    if (!session || !session.user || session.user.role !== Role.ADMIN) {
-        throw new Error("Action réservée aux administrateurs.");
-    }
+    await ensureAdmin();
 
     try {
         await prisma.procedurePhase.deleteMany({ where: { leaseId } });
@@ -71,10 +63,7 @@ export async function resetLeaseProcedure(leaseId: string) {
  * Part 11.5: Landlord-initiated Procedural Phase (Hybrid Automation)
  */
 export async function initiateProceduralPhase(leaseId: string, phaseName: string) {
-    const session = await auth();
-    if (!session || !session.user || !session.user.id) {
-        throw new Error("Authentification requise.");
-    }
+    const session = await ensureAuthenticated();
 
     try {
         const lease = await prisma.lease.findUnique({
@@ -85,11 +74,7 @@ export async function initiateProceduralPhase(leaseId: string, phaseName: string
         if (!lease) throw new Error("Bail introuvable.");
 
         // Verification: Only owner (or Admin) can trigger
-        const isOwner = session.user.id === lease.landlordId;
-        const isAdmin = session.user.role === Role.ADMIN;
-        if (!isOwner && !isAdmin) {
-            throw new Error("Seul le propriétaire peut valider cette action.");
-        }
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY])
 
         // Verify state is eligible for this phase
         const state = await getLeaseProceduralState(leaseId);

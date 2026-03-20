@@ -1,10 +1,11 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import crypto from "node:crypto"
 import { cinetpay } from "@/lib/cinetpay"
+import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
+import { Role } from "@prisma/client"
 
 export type PaymentOperator = 'orange' | 'mtn' | 'moov' | 'wave';
 
@@ -29,10 +30,11 @@ interface PaymentIntentMetadata {
  * Now includes mandatory check for multi-month prepayment approval.
  */
 export async function createMMIntent(input: CreatePaymentIntentInput) {
-    const session = await auth();
-    if (!session || !session.user || !session.user.id) {
-        throw new Error("Authentification requise.");
-    }
+    const session = await ensureAuthenticated();
+    
+    // --- NEW: Ownership/Lease Check (Part 10.0) ---
+    // Only the tenant or an admin can initiate a payment for a lease
+    await ensureLeaseAccess(input.leaseId, [Role.TENANT, Role.ADMIN, Role.SUPER_ADMIN])
 
     // --- NEW: Prepayment Legal Check (Part 10.1a) ---
     if (input.monthsCount > 1) {

@@ -3,10 +3,11 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { serializeUser } from "@/lib/serialize"
+import { ensureAuthenticated } from "./auth-helpers"
 
 export async function getCurrentUser() {
     try {
-        const session = await auth()
+        const session = await auth() // Use auth() here to avoid throwing error for non-logged in users if serialized return is expected
         const userId = session?.user?.id
         if (!userId) return null
 
@@ -22,9 +23,8 @@ export async function getCurrentUser() {
 }
 
 export async function getUserTrustData() {
-    const session = await auth()
-    const userId = session?.user?.id
-    if (!userId) throw new Error("Unauthorized")
+    const session = await ensureAuthenticated()
+    const userId = session.user.id
 
     const reliabilityScores = await prisma.reliabilityScore.findMany({
         where: { userId },
@@ -41,9 +41,8 @@ export async function getUserTrustData() {
     }
 }
 export async function logScoreConsultation(targetUserId: string, reason: string) {
-    const session = await auth()
-    const viewerId = session?.user?.id
-    if (!viewerId) throw new Error("Unauthorized")
+    const session = await ensureAuthenticated()
+    const viewerId = session.user.id
 
     await prisma.auditLog.create({
         data: {

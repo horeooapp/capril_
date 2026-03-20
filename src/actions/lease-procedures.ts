@@ -1,13 +1,19 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { LeaseStatus, PlanStatus } from "@prisma/client";
+import { LeaseStatus, PlanStatus, Role } from "@prisma/client";
+import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers";
 
 /**
  * Phase 1 & 2: Détection automatique / Signalement manuel d'impayé
  * Passe le bail au statut LOYER_IMPAYE et enregistre la phase 1.
  */
-export async function declareUnpaidRent(leaseId: string, userId: string) {
+export async function declareUnpaidRent(leaseId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+    
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
     try {
         const lease = await prisma.lease.update({
             where: { id: leaseId },
@@ -43,7 +49,12 @@ export async function declareUnpaidRent(leaseId: string, userId: string) {
 /**
  * Phase 3: Mise en demeure
  */
-export async function sendFormalNotice(leaseId: string, userId: string) {
+export async function sendFormalNotice(leaseId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
     try {
         const lease = await prisma.lease.update({
             where: { id: leaseId },
@@ -78,7 +89,12 @@ export async function sendFormalNotice(leaseId: string, userId: string) {
 /**
  * Phase 5: Option de clémence (Proposition d'un échéancier par le propriétaire)
  */
-export async function proposeClemency(leaseId: string, details: string, userId: string) {
+export async function proposeClemency(leaseId: string, details: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
     try {
         const lease = await prisma.lease.update({
             where: { id: leaseId },
@@ -121,7 +137,15 @@ export async function proposeClemency(leaseId: string, details: string, userId: 
 /**
  * Phase 5 (suite) : Le locataire accepte ou refuse la clémence
  */
-export async function respondToClemency(planId: string, accepted: boolean, tenantSignature: string, userId: string) {
+export async function respondToClemency(planId: string, accepted: boolean, tenantSignature: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+
+    const plan = await prisma.repaymentPlan.findUnique({ where: { id: planId } });
+    if (!plan) throw new Error("Plan non trouvé.");
+    
+    await ensureLeaseAccess(plan.leaseId, [Role.TENANT]);
+
     try {
         const planResponse = await prisma.repaymentPlan.update({
             where: { id: planId },
@@ -151,7 +175,12 @@ export async function respondToClemency(planId: string, accepted: boolean, tenan
 /**
  * Phase 6: Reprise automatique si non-respect de la clémence
  */
-export async function breakClemency(planId: string, leaseId: string, userId: string) {
+export async function breakClemency(planId: string, leaseId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
     try {
         const plan = await prisma.repaymentPlan.update({
             where: { id: planId },
@@ -191,7 +220,12 @@ export async function breakClemency(planId: string, leaseId: string, userId: str
 /**
  * Phase 7 & 8: Demande de résiliation (sans effet automatique) & Constitution dossier
  */
-export async function initiateTermination(leaseId: string, userId: string) {
+export async function initiateTermination(leaseId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
     try {
         const lease = await prisma.lease.update({
             where: { id: leaseId },

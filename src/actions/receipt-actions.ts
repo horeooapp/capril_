@@ -1,10 +1,10 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { generateReceiptRef, generateQRToken, calculateReceiptHash } from "@/lib/financial-utils"
 import { Role } from "@prisma/client"
+import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
 
 export type CreateReceiptInput = {
     leaseId: string;
@@ -20,10 +20,10 @@ export type CreateReceiptInput = {
  * Part 9.1: Create Receipt
  */
 export async function createReceipt(input: CreateReceiptInput) {
-    const session = await auth();
-    if (!session || !session.user || !session.user.id) {
-        throw new Error("Authentification requise.");
-    }
+    const session = await ensureAuthenticated();
+    
+    // Only Landlords or Agencies can create receipts
+    await ensureLeaseAccess(input.leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
 
     try {
         const lease = await prisma.lease.findUnique({
@@ -77,12 +77,13 @@ export async function createReceipt(input: CreateReceiptInput) {
  * Part 9.2: Confirm Payment & Generate Certified Quittance
  */
 export async function confirmReceiptPayment(receiptId: string, paymentRef: string) {
-    const session = await auth();
-    const authorizedRoles: Role[] = [Role.ADMIN, Role.LANDLORD, Role.AGENCY, Role.LANDLORD_PRO];
+    const session = await ensureAuthenticated();
     
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as Role)) {
-        throw new Error("Accès non autorisé.");
-    }
+    const receipt = await prisma.receipt.findUnique({ where: { id: receiptId } });
+    if (!receipt) throw new Error("Quittance introuvable.");
+
+    // Only Landlords or Agencies can confirm payment
+    await ensureLeaseAccess(receipt.leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY, Role.ADMIN, Role.SUPER_ADMIN]);
 
     try {
         const paidAt = new Date();

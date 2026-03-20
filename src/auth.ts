@@ -109,15 +109,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         fullName: user.fullName
                     };
                 } catch (error) {
-                    // --- FINAL FAIL-SAFE FOR OFFLINE DEMO ---
-                    const email = (credentials?.email as string) || '';
-                    const password = (credentials?.password as string) || '';
-                    if (password === 'DemoQapril2026!') {
-                        if (email === 'bailleur.demo@qapril.ci') return { id: 'demo-u-landlord', phone: '+225 0101010101', role: 'LANDLORD', status: 'active', fullName: 'Yao Kouassi (DEMO)' };
-                        if (email === 'locataire.demo@qapril.ci') return { id: 'demo-u-tenant', phone: '+225 0202020202', role: 'TENANT', status: 'active', fullName: 'Awa Koné (DEMO)' };
-                        if (email === 'agence.demo@qapril.ci') return { id: 'demo-u-agency', phone: '+225 0303030303', role: 'AGENCY', status: 'active', fullName: 'Bakary Traoré (DEMO)' };
-                    }
-
                     console.error("[AUTH] Error in admin-password authorize:", error);
                     return null;
                 }

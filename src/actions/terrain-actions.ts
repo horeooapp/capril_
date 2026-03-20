@@ -1,9 +1,9 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { TerrainUsage, Periodicite } from "@prisma/client"
+import { TerrainUsage, Periodicite, Role } from "@prisma/client"
 import { logAction } from "./audit"
+import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
 
 export async function createLandLease(data: {
     leaseId: string,
@@ -14,8 +14,11 @@ export async function createLandLease(data: {
     annualIndexation?: number,
     conditions?: string
 }) {
-    const session = await auth()
-    if (!session?.user?.id) throw new Error("Unauthorized")
+    // 1. Authentification
+    await ensureAuthenticated()
+    
+    // 2. Vérification d'accès au bail (Bailleur ou Agent seulement pour créer l'info terrain)
+    await ensureLeaseAccess(data.leaseId, [Role.LANDLORD, Role.AGENCY, Role.LANDLORD_PRO])
 
     // Check if property is of type supporting land leases (optional but recommended)
     // Here we just create the info record
@@ -42,8 +45,8 @@ export async function createLandLease(data: {
 }
 
 export async function updateLandLeaseInventory(leaseId: string, type: 'entry' | 'exit', status: boolean) {
-    const session = await auth()
-    if (!session?.user?.id) throw new Error("Unauthorized")
+    await ensureAuthenticated()
+    await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.AGENCY, Role.LANDLORD_PRO])
 
     const updateData = type === 'entry' 
         ? { hasEntryInventory: status } 

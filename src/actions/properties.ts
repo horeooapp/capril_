@@ -1,20 +1,19 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { generatePropertyCode } from "@/lib/property"
 import { revalidatePath } from "next/cache"
 import { serializeProperty, serializeLease } from "@/lib/serialize"
+import { ensureAuthenticated, ensurePropertyAccess } from "./auth-helpers"
+import { Role } from "@prisma/client"
 
 /**
  * Part 5: List Owner Properties
  */
 export async function getProperties() {
     try {
-        const session = await auth()
-        if (!session || !session.user || !session.user.id) {
-            throw new Error("Unauthorized")
-        }
+        const session = await ensureAuthenticated()
+        const userId = session.user.id
 
         const properties = await prisma.property.findMany({
             where: { ownerUserId: session.user.id },
@@ -47,10 +46,8 @@ export async function registerProperty(data: {
     rooms?: number,
     areaSqm?: number
 }) {
-    const session = await auth()
-    if (!session || !session.user || !session.user.id) {
-        return { error: "Non autorisé" }
-    }
+    const session = await ensureAuthenticated()
+    const userId = session.user.id
 
     try {
         const propertyCode = await generatePropertyCode(data.leaseType)
@@ -84,6 +81,8 @@ export async function registerProperty(data: {
  * Part 5: Get Property Details
  */
 export async function getPropertyById(id: string) {
+    await ensurePropertyAccess(id)
+
     const property = await prisma.property.findUnique({
         where: { id },
         include: {
@@ -106,6 +105,8 @@ export async function getPropertyById(id: string) {
  * Part 6.3: Get Property Passport (Digital Identity)
  */
 export async function getPropertyPassport(id: string) {
+    await ensurePropertyAccess(id)
+
     const property = await prisma.property.findUnique({
         where: { id },
         include: {

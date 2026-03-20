@@ -1,11 +1,11 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
 import { analyzeIdentityDocument, calculateNextKYCLevel } from "@/lib/kyc-engine"
 import { logAction } from "./audit"
+import { ensureAuthenticated, ensureRole } from "./auth-helpers"
 
 /**
  * Part 5.3: Manual Verification by ANAH/CDC Agent
@@ -17,13 +17,7 @@ export async function verifyUserIdentity(
     action: 'verify' | 'reject', 
     rejectionReason?: string
 ) {
-    const session = await auth()
-    
-    // Security: Only Admin or ANAH/CDC Agents can verify identities
-    const authorizedRoles: Role[] = [Role.SUPER_ADMIN, Role.ADMIN, Role.ANAH_AGENT, Role.CDC_AGENT]
-    if (!session || !session.user || !authorizedRoles.includes(session.user.role as any)) {
-        throw new Error("Accès non autorisé : Droits de vérification requis.")
-    }
+    const session = await ensureRole([Role.SUPER_ADMIN, Role.ADMIN, Role.ANAH_AGENT, Role.CDC_AGENT]);
 
     try {
         const isVerified = action === 'verify'
@@ -69,8 +63,7 @@ export async function verifyUserIdentity(
  * Part 21.1: Automated KYC Screening (Hybrid)
  */
 export async function triggerAssistedKYC(documentId: string) {
-    const session = await auth()
-    if (!session?.user) throw new Error("Non authentifié")
+    const session = await ensureAuthenticated()
 
     try {
         const doc = await prisma.identityDocument.findUnique({

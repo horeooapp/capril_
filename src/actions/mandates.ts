@@ -1,12 +1,12 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { MandateStatus, MandateType } from "@prisma/client"
+import { MandateStatus, MandateType, Role } from "@prisma/client"
 import { logAction } from "./audit"
 import { enforceAgentActive } from "@/lib/agents"
 import { generateProofHash } from "@/lib/proof"
 import { scoreAgentCompliance } from "@/lib/scoring"
+import { ensureAuthenticated, ensureRole, ensurePropertyAccess } from "./auth-helpers"
 
 export async function createMandate(data: {
     propertyId: string,
@@ -18,12 +18,11 @@ export async function createMandate(data: {
     commissionFixed?: number,
     scope?: any
 }) {
-    const session = await auth()
-    const agentId = session?.user?.id
-
-    if (!agentId) {
-        throw new Error("Unauthorized")
-    }
+    const session = await ensureAuthenticated()
+    const agentId = session.user.id
+    
+    // Safety check: only agents or landlords (for direct mandates)
+    await ensureRole([Role.AGENCY, Role.NON_CERTIFIED_AGENT, Role.LANDLORD, Role.LANDLORD_PRO, Role.ADMIN, Role.SUPER_ADMIN])
 
     // Enforce QAPRIL Regularization
     await enforceAgentActive()
@@ -81,12 +80,8 @@ export async function createMandate(data: {
 }
 
 export async function validateMandate(mandateId: string, status: MandateStatus) {
-    const session = await auth()
-    const userId = session?.user?.id
-
-    if (!userId) {
-        throw new Error("Unauthorized")
-    }
+    const session = await ensureAuthenticated()
+    const userId = session.user.id
 
     const mandate = await prisma.mandate.findUnique({
         where: { id: mandateId },
@@ -143,10 +138,8 @@ export async function validateMandate(mandateId: string, status: MandateStatus) 
 }
 
 export async function terminateMandate(mandateId: string, reason: string) {
-    const session = await auth()
-    const userId = session?.user?.id
-
-    if (!userId) throw new Error("Unauthorized")
+    const session = await ensureAuthenticated()
+    const userId = session.user.id
 
     const mandate = await prisma.mandate.findUnique({
         where: { id: mandateId },
@@ -184,6 +177,8 @@ export async function terminateMandate(mandateId: string, reason: string) {
 }
 
 export async function getMandatesByProperty(propertyId: string) {
+    await ensurePropertyAccess(propertyId)
+
     return await prisma.mandate.findMany({
         where: { propertyId },
         include: {
@@ -196,10 +191,8 @@ export async function getMandatesByProperty(propertyId: string) {
 }
 
 export async function getMandatesByAgent() {
-    const session = await auth()
-    const agentId = session?.user?.id
-
-    if (!agentId) return []
+    const session = await ensureAuthenticated()
+    const agentId = session.user.id
 
     return await prisma.mandate.findMany({
         where: { agentUserId: agentId },
@@ -211,10 +204,8 @@ export async function getMandatesByAgent() {
 }
 
 export async function getLandlordMandates() {
-    const session = await auth()
-    const userId = session?.user?.id
-
-    if (!userId) return []
+    const session = await ensureAuthenticated()
+    const userId = session.user.id
 
     return await prisma.mandate.findMany({
         where: {
