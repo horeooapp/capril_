@@ -6,6 +6,7 @@ import { logout } from "@/actions/auth"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
 import { Home, Receipt, Bell, User } from "lucide-react"
+import MarketTickerAI from "@/components/MarketTickerAI"
 
 export default async function LocataireLayout({
     children,
@@ -53,6 +54,8 @@ export default async function LocataireLayout({
                     </div>
                 </div>
             </footer>
+            
+            <MarketTickerAI />
         </div>
     )
 }
