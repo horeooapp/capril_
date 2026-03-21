@@ -5,10 +5,9 @@ import { redirect } from "next/navigation"
 import { logout } from "@/actions/auth"
 import AdminHeader from "@/components/admin/AdminHeader"
 import BottomNav from "@/components/BottomNav"
-import { LayoutDashboard, Briefcase, Users, Settings2, ShieldCheck, Database, ShieldAlert, ArrowRightLeft, BarChart3, Newspaper } from "lucide-react"
-import { unstable_noStore as noStore } from 'next/cache';
-
 import AdminSidebar from "@/components/admin/AdminSidebar"
+import { LayoutDashboard, Briefcase, Users, Settings2, ShieldCheck, Database, ShieldAlert, ArrowRightLeft, BarChart3, Newspaper, Scale, Bot } from "lucide-react"
+import { unstable_noStore as noStore } from 'next/cache';
 
 export default async function AdminLayout({
     children,
@@ -74,8 +73,11 @@ export default async function AdminLayout({
                     { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={24} /> },
                     { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={24} /> },
                     { href: "/admin/news", label: "News", icon: <Newspaper size={24} /> },
-                    { href: "/admin/users", label: "Users", icon: <Users size={24} /> },
                     { href: "/admin/compliance", label: "KYC", icon: <ShieldAlert size={24} /> },
+                    { href: "/admin/disputes", label: "Litiges", icon: <Scale size={24} /> },
+                    { href: "/admin/system/ai-monitoring", label: "IA", icon: <Bot size={24} /> },
+                    { href: "/admin/users", label: "Users", icon: <Users size={24} /> },
+                    { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={24} /> },
                 ]} />
             </div>
         </div>

@@ -30,15 +30,15 @@ export default function BottomNav({ items }: BottomNavProps) {
     const navItems = items || defaultItems
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-[100] xl:hidden">
-            <div className="bg-white/80 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-around px-2 pb-6 pt-3 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden">
+            <div className="bg-white/80 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-start overflow-x-auto no-scrollbar px-4 pb-6 pt-3 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] gap-2">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
                     return (
                         <Link 
                             key={item.href}
                             href={item.href}
-                            className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-2xl transition-all relative ${
+                            className={`flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl transition-all relative shrink-0 min-w-[70px] ${
                                 isActive ? "text-[#1F4E79]" : "text-gray-400"
                             }`}
                         >
