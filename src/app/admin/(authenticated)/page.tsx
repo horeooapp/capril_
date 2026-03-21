@@ -25,6 +25,8 @@ import { Role } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
+import { getOverdueStats } from "@/actions/reminder-actions"
+import { ShieldAlert } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -36,12 +38,13 @@ export default async function AdminDashboardOverview() {
     // Production Data extraction
     const totalUsers = await prisma.user.count().catch(() => 0)
     const verifiedUsers = await prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0)
-    
+
     const safeData = {
         totalDgi: Number((await prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
         cdcAmount: Number((await prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
         activeMediations: await prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
-        kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0, 
+        kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0,
+        overdueStats: await getOverdueStats().catch(() => ({ count: 0, totalAmount: 0 })),
         totalUsers,
         totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
         totalLandlords: await prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
@@ -142,6 +145,14 @@ export default async function AdminDashboardOverview() {
                         color="orange"
                         trend="Médiation"
                         delay={0.45}
+                    />
+                    <StatCard 
+                        title="Impayés (Rappels)" 
+                        value={`${safeData.overdueStats.count}`} 
+                        icon={<ShieldAlert size={28} />} 
+                        color="red"
+                        trend="Relances Auto."
+                        delay={0.5}
                     />
                 </div>
 

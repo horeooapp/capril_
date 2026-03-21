@@ -17,6 +17,7 @@ import {
     Terminal,
     AlertCircle
 } from "lucide-react"
+import AuditChart from "@/components/admin/AuditChart"
 
 export default function AuditPage() {
     const [logs, setLogs] = useState<any[]>([])
@@ -59,21 +60,26 @@ export default function AuditPage() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header section with Premium Ivory Style */}
-            <div className="relative p-8 rounded-3xl overflow-hidden bg-white/50 border border-white/80 shadow-2xl backdrop-blur-md">
-                <div className="absolute top-0 right-0 p-8 opacity-10">
-                    <ShieldCheck size={120} className="text-ivoire-dark" />
-                </div>
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-ivoire-dark/10 rounded-xl">
-                            <Lock className="text-ivoire-dark" size={24} />
-                        </div>
-                        <span className="text-xs font-black uppercase tracking-[0.3em] text-ivoire-dark/60">Sécurité & Gouvernance</span>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 relative p-8 rounded-[2.5rem] overflow-hidden bg-white/50 border border-white/80 shadow-2xl backdrop-blur-md flex flex-col justify-center">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <ShieldCheck size={80} className="text-ivoire-dark" />
                     </div>
-                    <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">Registre d'Audit <span className="text-ivoire-dark font-light underline decoration-ivoire-dark/20 underline-offset-8">Certifié</span></h1>
-                    <p className="text-gray-500 text-lg max-w-2xl font-medium leading-relaxed">
-                        Traçabilité cryptographique immuable pour la conformité DGI/CDC-CI. Chaque action est chaînée et auditée en temps réel.
-                    </p>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-ivoire-dark/10 rounded-xl">
+                                <Lock className="text-ivoire-dark" size={24} />
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-[0.3em] text-ivoire-dark/60">Gouvernance</span>
+                        </div>
+                        <h1 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Registre d'Audit</h1>
+                        <p className="text-gray-500 text-sm font-medium leading-relaxed">
+                            Traçabilité immuable SHA-256 active pour la conformité QAPRIL.
+                        </p>
+                    </div>
+                </div>
+                <div className="lg:col-span-2">
+                    <AuditChart logs={logs} />
                 </div>
             </div>
 

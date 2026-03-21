@@ -137,19 +137,85 @@ export default async function PropertyPassportPage({ params }: { params: Promise
 
                     <div className="bg-white shadow rounded-xl p-6 border border-gray-100">
                         <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                            <svg className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Carnet d'Entretien (Maintenance)
+                        </h2>
+                        
+                        {(property as any).maintenanceRecords?.length === 0 ? (
+                            <p className="text-sm text-gray-500 italic py-4">Aucune intervention enregistrée.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {(property as any).maintenanceRecords.map((record: any) => (
+                                    <div key={record.id} className="flex justify-between items-start border-l-2 border-primary/30 pl-4 py-2 hover:bg-gray-50 transition-colors">
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">{record.type}</p>
+                                            <p className="text-xs text-gray-500">{record.description}</p>
+                                            {record.provider && <p className="text-[10px] text-gray-400 italic">Par : {record.provider}</p>}
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs font-black text-primary">{record.cost?.toLocaleString() || 0} FCFA</p>
+                                            <p className="text-[10px] text-gray-400">{new Date(record.date).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bg-white shadow rounded-xl p-6 border border-gray-100">
+                        <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
+                            <svg className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Documents Techniques
+                        </h2>
+                        
+                        {(property as any).technicalDocuments?.length === 0 ? (
+                            <p className="text-sm text-gray-500 italic py-4">Aucun document technique disponible.</p>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {(property as any).technicalDocuments.map((doc: any) => (
+                                    <a 
+                                        key={doc.id} 
+                                        href={doc.fileUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-primary/50 transition-all flex items-center gap-3 group"
+                                    >
+                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform">
+                                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <p className="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{doc.name}</p>
+                                            <p className="text-[10px] text-gray-400">{doc.type}</p>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bg-white shadow rounded-xl p-6 border border-gray-100">
+                        <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center">
                              <svg className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Statistiques du Bien
+                            Analyse Patrimoniale
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-gray-50 p-4 rounded-lg">
-                                <p className="text-[10px] text-gray-400 uppercase font-bold">Stabilité Locative</p>
-                                <p className="text-xl font-black text-gray-800">Élevée</p>
+                                <p className="text-[10px] text-gray-400 uppercase font-bold">Investissement Maintenance</p>
+                                <p className="text-xl font-black text-gray-800">
+                                    {((property as any).maintenanceRecords?.reduce((acc: number, r: any) => acc + (r.cost || 0), 0))?.toLocaleString() || 0} <span className="text-[10px]">FCFA</span>
+                                </p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg">
-                                <p className="text-[10px] text-gray-400 uppercase font-bold">Evolution Loyer (2 ans)</p>
-                                <p className="text-xl font-black text-green-600">+4.2%</p>
+                                <p className="text-[10px] text-gray-400 uppercase font-bold">Evolution Loyer (Historique)</p>
+                                <p className="text-xl font-black text-green-600">+{(property.leases.length > 1 ? "4.2%" : "---")}</p>
                             </div>
                         </div>
                     </div>

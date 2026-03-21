@@ -407,6 +407,10 @@ model Property {
   annonces              Annonce[]
   agendaEvents          AgendaEvenement[]
 
+  // Phase 10: Assets & Intelligence
+  maintenanceRecords    PropertyMaintenance[]
+  technicalDocuments    PropertyDocument[]
+
   sourceMigrationId String?  @map("source_migration_id")
   sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
 
@@ -1949,4 +1953,39 @@ model BdqConversationState {
   completedAt               DateTime?      @map("completed_at")
 
   @@map("bdq_conversation_states")
+}
+
+// ═══════════════════════════════════════════════════════
+// Phase 10: Advanced Property Assets & Maintenance
+// ═══════════════════════════════════════════════════════
+
+model PropertyMaintenance {
+  id            String   @id @default(uuid())
+  propertyId    String   @map("property_id")
+  property      Property @relation(fields: [propertyId], references: [id])
+  type          String   // e.g., "REPAIR", "CLEANING", "RENOVATION"
+  description   String   @db.Text
+  cost          Float?
+  date          DateTime @default(now())
+  provider      String?  // Name of the company/craftsman
+  attachments   String[] // Links to invoices/photos
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("property_maintenance")
+}
+
+model PropertyDocument {
+  id            String   @id @default(uuid())
+  propertyId    String   @map("property_id")
+  property      Property @relation(fields: [propertyId], references: [id])
+  name          String
+  type          String   // e.g., "TITLE_DEED", "PLAN", "INSURANCE"
+  fileUrl       String   @map("file_url")
+  expiryDate    DateTime? @map("expiry_date")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("property_documents")
 }

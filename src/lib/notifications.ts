@@ -108,3 +108,17 @@ export async function broadcastNotification(
         userIds.map(userId => sendNotification({ userId, content, title, channels }))
     );
 }
+/**
+ * Part 20.3: Automated Payment Reminder
+ */
+export async function sendPaymentReminder(userId: string, rentAmount: number, month: string): Promise<void> {
+    const title = "⚠️ RAPPEL DE PAIEMENT QAPRIL";
+    const content = `Votre loyer de ${rentAmount.toLocaleString()} FCFA pour le mois de ${month} est en attente. Merci de régulariser au plus vite sur votre portail locataire.`;
+    
+    await sendNotification({
+        userId,
+        title,
+        content,
+        channels: ['PUSH', 'SMS', 'EMAIL']
+    });
+}

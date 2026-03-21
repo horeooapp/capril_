@@ -124,6 +124,12 @@ export async function getPropertyPassport(id: string) {
                         incidentLogs: true
                     },
                     orderBy: { startDate: 'desc' }
+                },
+                maintenanceRecords: {
+                    orderBy: { date: 'desc' }
+                },
+                technicalDocuments: {
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         })
