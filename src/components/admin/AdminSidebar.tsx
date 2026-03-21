@@ -18,7 +18,8 @@ import {
     LogOut,
     ChevronRight,
     Bot,
-    Scale
+    Scale,
+    BookOpen
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -42,6 +43,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/settings/features", label: "Modules Core", icon: <Settings2 size={20} /> },
         { href: "/admin/users", label: "Utilisateurs", icon: <Users size={20} /> },
         { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },
+        { href: "/admin/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
     ]
 
     return (

@@ -19,7 +19,8 @@ import {
     ShieldAlert,
     ArrowRightLeft,
     BarChart3,
-    Newspaper
+    Newspaper,
+    BookOpen
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -44,6 +45,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
         { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
         { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
         { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={18} /> },
+        { href: "/admin/manual", label: "Manuel", icon: <BookOpen size={18} /> },
     ]
 
     return (
