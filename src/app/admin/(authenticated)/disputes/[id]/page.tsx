@@ -18,8 +18,8 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { notFound } from 'next/navigation'
 
-export default async function DisputeDetailPage({ params }: { params: { id: string } }) {
-    const { id } = params
+export default async function DisputeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const dispute = await getDisputeDetails(id)
     const timeline = await getDisputeTimeline(id)
 
