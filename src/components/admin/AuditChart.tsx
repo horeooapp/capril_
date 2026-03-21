@@ -16,7 +16,10 @@ export default function AuditChart({ logs }: AuditChartProps) {
     }).reverse()
 
     const data = days.map(day => {
-        const count = logs.filter(l => l.createdAt.startsWith(day)).length
+        const count = logs.filter(l => {
+            const dateStr = typeof l.createdAt === 'string' ? l.createdAt : l.createdAt.toISOString()
+            return dateStr.startsWith(day)
+        }).length
         return { day, count }
     })
 
