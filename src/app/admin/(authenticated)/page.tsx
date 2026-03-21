@@ -21,7 +21,7 @@ import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
 import LiveActivityStream from "@/components/admin/LiveActivityStream"
-import { Role, MediationStatus } from "@prisma/client"
+import { Role } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
@@ -40,7 +40,7 @@ export default async function AdminDashboardOverview() {
     const safeData = {
         totalDgi: Number((await prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
         cdcAmount: Number((await prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
-        activeMediations: await prisma.mediation.count({ where: { status: MediationStatus.OPEN } }).catch(() => 0),
+        activeMediations: await prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
         kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0, 
         totalUsers,
         totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
@@ -134,6 +134,14 @@ export default async function AdminDashboardOverview() {
                         color="purple"
                         trend="Efficience"
                         delay={0.4}
+                    />
+                    <StatCard 
+                        title="Litiges Ouverts" 
+                        value={safeData.activeMediations.toString()} 
+                        icon={<Scale size={28} />} 
+                        color="orange"
+                        trend="Médiation"
+                        delay={0.45}
                     />
                 </div>
 
