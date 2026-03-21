@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getGlobalActivityStats, getMarketInsights, getLiveEventStream } from "@/actions/observatory-actions"
+import { getGlobalActivityStats, getMarketInsights, getLiveEventStream, getCommunalStats } from "@/actions/observatory-actions"
 import CommunalActivityMap from "@/components/admin/CommunalActivityMap"
 import LiveActivityStream from "@/components/admin/LiveActivityStream"
 import { motion } from "framer-motion"
-import { Activity, TrendingUp, Map as MapIcon, ShieldCheck } from "lucide-react"
+import { Activity, TrendingUp, Map as MapIcon, ShieldCheck, ChevronUp, ChevronDown } from "lucide-react"
 
 interface ObservatoryStats {
     totalUsers: number
@@ -23,27 +23,37 @@ interface MarketInsight {
     sampleCount: number
 }
 
+interface CommunalStat {
+    name: string
+    leaseCount: number
+    avgRent: number
+    trend: string
+}
+
 export default function ObservatoryPage() {
     const [stats, setStats] = useState<ObservatoryStats | null>(null)
     const [insights, setInsights] = useState<MarketInsight[]>([])
+    const [communalStats, setCommunalStats] = useState<CommunalStat[]>([])
     const [logs, setLogs] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
     async function refreshData() {
-        const [s, i, l] = await Promise.all([
+        const [s, i, l, c] = await Promise.all([
             getGlobalActivityStats(),
             getMarketInsights(),
-            getLiveEventStream()
+            getLiveEventStream(),
+            getCommunalStats()
         ])
         setStats(s)
         setInsights(i)
         setLogs(l)
+        setCommunalStats(c)
         setLoading(false)
     }
 
     useEffect(() => {
         refreshData()
-        const interval = setInterval(refreshData, 10000) // Polling every 10s
+        const interval = setInterval(refreshData, 15000) // Polling every 15s
         return () => clearInterval(interval)
     }, [])
 
@@ -91,19 +101,25 @@ export default function ObservatoryPage() {
                             <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                                 <MapIcon size={14} /> Répartition Communale
                             </h3>
-                            <div className="space-y-4">
-                                {insights.slice(0, 5).map((insight, idx) => (
-                                    <div key={idx} className="bg-gray-900/50 p-4 rounded-2xl border border-gray-800 hover:border-indigo-500/30 transition-all">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="font-bold text-white">{insight.commune}</span>
-                                            <span className="text-xs font-mono text-indigo-400">{insight.avgRent.toLocaleString()} FCFA</span>
+                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
+                                {communalStats.length === 0 ? (
+                                    <p className="text-gray-500 italic text-xs">Calcul des données en cours...</p>
+                                ) : communalStats.map((stat, idx) => (
+                                    <div key={idx} className="bg-gray-900/50 p-4 rounded-2xl border border-gray-800 hover:border-indigo-500/30 transition-all flex justify-between items-center group">
+                                        <div className="flex flex-col">
+                                            <span className="font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-widest text-[11px]">{stat.name}</span>
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase">{stat.leaseCount} Baux Actifs</span>
                                         </div>
-                                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                                            <motion.div 
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${Math.min(100, (insight.sampleCount / 20) * 100)}%` }}
-                                                className="bg-indigo-500 h-full"
-                                            />
+                                        <div className="flex flex-col items-end">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-mono font-black text-white">{stat.avgRent.toLocaleString()} FCFA</span>
+                                                {stat.trend === "up" ? (
+                                                    <ChevronUp size={12} className="text-emerald-500" />
+                                                ) : (
+                                                    <ChevronDown size={12} className="text-rose-500" />
+                                                )}
+                                            </div>
+                                            <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Moy. Mensuelle</span>
                                         </div>
                                     </div>
                                 ))}

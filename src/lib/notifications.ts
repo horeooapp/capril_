@@ -55,11 +55,11 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
 
                 case 'EMAIL':
                     if (user.email) {
-                        const { sendEmail } = await import("./email");
+                        const { sendEmail, wrapInPremiumTemplate } = await import("./email");
                         const result = await sendEmail({
                             to: user.email,
                             subject: payload.title || "Notification QAPRIL",
-                            html: `<p>${payload.content}</p>`
+                            html: wrapInPremiumTemplate(`<p>${payload.content}</p>`, payload.title)
                         });
                         delivered = result.success;
                     }

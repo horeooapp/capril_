@@ -17,32 +17,36 @@ export interface KYCDocumentAnalysis {
 
 export async function analyzeIdentityDocument(s3Key: string): Promise<KYCDocumentAnalysis> {
     // In a real scenario, this would call an OCR/IA API (Google Cloud Vision, AWS Textract)
-    // Here we simulate the AI analysis
+    // Here we simulate the AI analysis with predictable outcomes for demonstration
     
     // Simulate latency
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-    const isSuspicious = Math.random() > 0.8 // 20% chance of anomaly
+    const isFraud = s3Key.toLowerCase().includes("fraud") || s3Key.toLowerCase().includes("fake")
+    const isFail = s3Key.toLowerCase().includes("blur") || s3Key.toLowerCase().includes("fail")
 
-    if (isSuspicious) {
+    if (isFraud || isFail) {
         return {
             isValid: false,
-            confidence: 0.45,
+            confidence: isFraud ? 0.32 : 0.55,
             extractedData: {
-                fullName: "Koffi Kouadio",
-                docNumber: "CI001234567"
+                fullName: isFraud ? "DOSSIER SUSPECT" : "NOM ILLISIBLE",
+                docNumber: "XXXXXXXXXXX"
             },
-            flags: ["NOM_INCOHERENT", "MRZ_MANQUANT", "BASSE_RESOLUTION"]
+            flags: isFraud 
+                ? ["TENTATIVE_FRAUDE", "MRZ_NON_CONFORME", "PIXEL_ANOMALY"]
+                : ["IMAGE_FLOU", "BASSE_RESOLUTION", "CHAMPS_MANQUANTS"]
         }
     }
 
+    // Default Success Simulation
     return {
         isValid: true,
-        confidence: 0.98,
+        confidence: 0.99,
         extractedData: {
-            fullName: "Amah Kone",
-            docNumber: "CI098765432",
-            expiryDate: "2030-12-31",
+            fullName: "Amah Koné",
+            docNumber: "CI" + Math.floor(Math.random() * 1000000000),
+            expiryDate: "2032-06-15",
             nationality: "CIV"
         },
         flags: []

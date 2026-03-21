@@ -90,3 +90,44 @@ export async function getLiveEventStream() {
         take: 15
     }).catch(() => [])
 }
+
+export async function getCommunalStats() {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
+        throw new Error("Unauthorized")
+    }
+
+    // Agrégation par commune : Nombre de baux et Loyer moyen
+    // Note: Prisma ne permet pas directement groupby sur une relation lointaine facilement avec aggregations complexes
+    // On va faire une requête brute ou récupérer et traiter (pour la démo, on traite en JS)
+    
+    const properties = await prisma.property.findMany({
+        select: {
+            commune: true,
+            leases: {
+                select: {
+                    rentAmount: true,
+                    status: true
+                }
+            }
+        }
+    });
+
+    const statsMap: Record<string, { count: number, totalRent: number }> = {};
+
+    properties.forEach(p => {
+        if (!p.commune) return;
+        if (!statsMap[p.commune]) statsMap[p.commune] = { count: 0, totalRent: 0 };
+        
+        const activeLeases = p.leases.filter(l => l.status === "ACTIVE" || l.status === "ACTIVE_DECLARATIF");
+        statsMap[p.commune].count += activeLeases.length;
+        statsMap[p.commune].totalRent += activeLeases.reduce((acc, l) => acc + Number(l.rentAmount), 0);
+    });
+
+    return Object.entries(statsMap).map(([name, data]) => ({
+        name,
+        leaseCount: data.count,
+        avgRent: data.count > 0 ? Math.round(data.totalRent / data.count) : 0,
+        trend: Math.random() > 0.5 ? "up" : "down" // Simulated trend
+    })).sort((a, b) => b.leaseCount - a.leaseCount);
+}
