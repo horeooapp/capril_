@@ -198,7 +198,7 @@ export async function getDisputeTimeline(disputeId: string) {
     const timeline: TimelineEvent[] = [];
 
     // 1. Add Messages
-    dispute.messages.forEach(msg => {
+    dispute.messages.forEach((msg: any) => {
         timeline.push({
             type: 'MESSAGE',
             date: msg.createdAt,
@@ -218,7 +218,7 @@ export async function getDisputeTimeline(disputeId: string) {
     });
 
     // 3. Add Recent Payments
-    dispute.lease.receipts.forEach(r => {
+    dispute.lease.receipts.forEach((r: any) => {
         timeline.push({
             type: 'PAYMENT',
             date: r.paidAt || r.createdAt,
@@ -228,7 +228,7 @@ export async function getDisputeTimeline(disputeId: string) {
     });
 
     // 4. Add Inventory Reports (EDL)
-    dispute.lease.etatsDesLieux.forEach(edl => {
+    dispute.lease.etatsDesLieux.forEach((edl: any) => {
         timeline.push({
             type: 'EDL',
             date: edl.createdAt,
