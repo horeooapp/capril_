@@ -134,18 +134,127 @@ export async function resolveDispute(disputeId: string, resolution: string) {
 }
 
 /**
- * Part 16.4: Get Dispute Thread
+ * Part 16.4: Get Dispute Details
  */
 export async function getDisputeDetails(disputeId: string) {
     return await prisma.dispute.findUnique({
         where: { id: disputeId },
         include: {
             lease: {
-                select: { leaseReference: true, leaseType: true }
+                select: { 
+                    leaseReference: true, 
+                    leaseType: true,
+                    landlord: { select: { fullName: true } },
+                    tenant: { select: { fullName: true } }
+                }
             },
             messages: {
                 orderBy: { createdAt: 'asc' }
             }
         }
+    });
+}
+
+/**
+ * Part 16.5: Get Complete Mediation Timeline
+ * Aggregates messages, logs, and related entity events (EDL, Receipts)
+ */
+export async function getDisputeTimeline(disputeId: string) {
+    const dispute: any = await prisma.dispute.findUnique({
+        where: { id: disputeId },
+        include: {
+            messages: {
+                include: { sender: { select: { fullName: true, role: true } } },
+                orderBy: { createdAt: 'asc' }
+            },
+            lease: {
+                include: {
+                    property: true,
+                    receipts: {
+                        where: { status: 'PAID' },
+                        orderBy: { createdAt: 'desc' },
+                        take: 3
+                    },
+                    etatsDesLieux: {
+                        orderBy: { createdAt: 'desc' },
+                        take: 2
+                    }
+                }
+            }
+        }
+    });
+
+    if (!dispute) return null;
+
+    type TimelineEvent = {
+        type: 'MESSAGE' | 'SYSTEM' | 'PAYMENT' | 'EDL';
+        date: Date;
+        title: string;
+        content?: string;
+        sender?: string;
+        meta?: any;
+    };
+
+    const timeline: TimelineEvent[] = [];
+
+    // 1. Add Messages
+    dispute.messages.forEach(msg => {
+        timeline.push({
+            type: 'MESSAGE',
+            date: msg.createdAt,
+            title: `Message de ${msg.sender.fullName}`,
+            content: msg.content,
+            sender: msg.sender.fullName,
+            meta: { role: msg.sender.role, attachments: msg.attachments }
+        });
+    });
+
+    // 2. Add System Creation Event
+    timeline.push({
+        type: 'SYSTEM',
+        date: dispute.createdAt,
+        title: "Ouverture du litige",
+        content: dispute.description
+    });
+
+    // 3. Add Recent Payments
+    dispute.lease.receipts.forEach(r => {
+        timeline.push({
+            type: 'PAYMENT',
+            date: r.paidAt || r.createdAt,
+            title: `Loyer payé - ${r.month}/${r.year}`,
+            content: `Montant: ${r.amount} FCFA`
+        });
+    });
+
+    // 4. Add Inventory Reports (EDL)
+    dispute.lease.etatsDesLieux.forEach(edl => {
+        timeline.push({
+            type: 'EDL',
+            date: edl.createdAt,
+            title: `État des Lieux (${edl.typeEdl})`,
+            content: `Réalisé le ${edl.createdAt.toLocaleDateString()}`
+        });
+    });
+
+    return timeline.sort((a, b) => a.date.getTime() - b.date.getTime());
+}
+
+/**
+ * Part 16.6: Get All Disputes (Admin)
+ */
+export async function getDisputes() {
+    return await prisma.dispute.findMany({
+        include: {
+            lease: {
+                select: { 
+                    leaseReference: true, 
+                    property: { select: { commune: true } },
+                    landlord: { select: { fullName: true } },
+                    tenant: { select: { fullName: true } }
+                }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
     });
 }

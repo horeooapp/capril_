@@ -20,6 +20,10 @@ interface Mandate {
         fullName: string | null;
         email: string | null;
     };
+    analytics?: {
+        collectionRate: number;
+        totalLeases: number;
+    };
 }
 
 const container = {
@@ -73,6 +77,7 @@ export default function MandatesClient({ mandates }: { mandates: Mandate[] }) {
                             <thead>
                                 <tr className="bg-gray-50/50">
                                     <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Actif Immobilier</th>
+                                    <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Performance</th>
                                     <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Opérateur Certifié</th>
                                     <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Nature & Durée</th>
                                     <th className="px-10 py-6 text-right">Arbitrage</th>
@@ -89,6 +94,25 @@ export default function MandatesClient({ mandates }: { mandates: Mandate[] }) {
                                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{mandate.property.city} • {mandate.property.commune}</span>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-10 py-8">
+                                            {mandate.analytics && (
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-black text-gray-900">{mandate.analytics.collectionRate}%</span>
+                                                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                            <div 
+                                                                className={`h-full rounded-full ${
+                                                                    mandate.analytics.collectionRate > 90 ? 'bg-emerald-500' : 
+                                                                    mandate.analytics.collectionRate > 70 ? 'bg-amber-500' : 'bg-red-500'
+                                                                }`}
+                                                                style={{ width: `${mandate.analytics.collectionRate}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Taux d'encaissement</span>
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-10 py-8">
                                             <div className="flex flex-col gap-1">

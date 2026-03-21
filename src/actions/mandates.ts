@@ -207,7 +207,7 @@ export async function getLandlordMandates() {
     const session = await ensureAuthenticated()
     const userId = session.user.id
 
-    return await prisma.mandate.findMany({
+    const mandates = await prisma.mandate.findMany({
         where: {
             property: {
                 ownerUserId: userId
@@ -217,8 +217,38 @@ export async function getLandlordMandates() {
             property: true,
             agent: {
                 select: { fullName: true, email: true, role: true }
+            },
+            leases: {
+                include: {
+                    receipts: true
+                }
             }
         },
         orderBy: { createdAt: 'desc' }
     })
+
+    // Add performance analytics for each mandate
+    return mandates.map(mandate => {
+        let totalExpected = 0;
+        let totalCollected = 0;
+        
+        mandate.leases.forEach(lease => {
+            lease.receipts.forEach(r => {
+                totalExpected += r.totalAmount;
+                if (r.status === 'paid' || r.status === 'PAID') {
+                    totalCollected += r.totalAmount;
+                }
+            });
+        });
+
+        const collectionRate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
+        
+        return {
+            ...mandate,
+            analytics: {
+                collectionRate,
+                totalLeases: mandate.leases.length
+            }
+        };
+    });
 }

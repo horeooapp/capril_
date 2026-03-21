@@ -107,3 +107,57 @@ export async function getAgencyRevenueForecast(agentId: string) {
 
     return { totalProjected, mandateCount: mandates.length };
 }
+
+/**
+ * Part 12.7: Get Mandate Performance Analytics (M11.2)
+ * Calculates KPIs for rent collection, occupancy and stability
+ */
+export async function getMandateAnalytics(mandateId: string) {
+    const mandate = await prisma.mandate.findUnique({
+        where: { id: mandateId },
+        include: {
+            leases: {
+                include: {
+                    receipts: true,
+                    arrears: true
+                }
+            }
+        }
+    });
+
+    if (!mandate) return null;
+
+    let totalExpected = 0;
+    let totalCollected = 0;
+    let occupancyDays = 0;
+    const now = new Date();
+
+    mandate.leases.forEach(lease => {
+        // Rent Collection
+        lease.receipts.forEach(r => {
+            totalExpected += r.totalAmount;
+            if (r.status === 'paid' || r.status === 'PAID') {
+                totalCollected += r.totalAmount;
+            }
+        });
+
+        // Occupancy (rough estimate)
+        const start = new Date(lease.startDate);
+        const end = lease.terminatedAt ? new Date(lease.terminatedAt) : (lease.endDate ? new Date(lease.endDate) : now);
+        const diff = end.getTime() - start.getTime();
+        occupancyDays += Math.max(0, diff / (1000 * 3600 * 24));
+    });
+
+    const collectionRate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
+    const efficiencyScore = collectionRate; // Basis for performance
+
+    return {
+        collectionRate,
+        totalCollected,
+        totalExpected,
+        occupancyDays: Math.round(occupancyDays),
+        efficiencyScore,
+        leaseCount: mandate.leases.length,
+        status: mandate.status
+    };
+}
