@@ -55,9 +55,13 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
 
                 case 'EMAIL':
                     if (user.email) {
-                        // Placeholder: integrate with Resend
-                        console.log(`[EMAIL] → ${user.email}: ${payload.title} | ${payload.content}`);
-                        delivered = true;
+                        const { sendEmail } = await import("./email");
+                        const result = await sendEmail({
+                            to: user.email,
+                            subject: payload.title || "Notification QAPRIL",
+                            html: `<p>${payload.content}</p>`
+                        });
+                        delivered = result.success;
                     }
                     break;
 

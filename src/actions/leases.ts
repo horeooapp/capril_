@@ -8,6 +8,7 @@ import { Role, TypeBail, LeaseStatus } from "@prisma/client"
 
 import { serializeLease } from "@/lib/serialize"
 import { Prisma } from "@prisma/client"
+import { writeAuditLog } from "@/lib/audit"
 
 interface CommercialData {
     indexationType: 'fixed' | 'ipc';
@@ -107,6 +108,16 @@ export async function createLease(data: {
         })
 
         revalidatePath("/dashboard/leases")
+
+        // 5. Audit Log
+        await writeAuditLog({
+            userId: session.user.id,
+            action: "LEASE_CREATED",
+            module: "LEASE",
+            entityId: lease.id,
+            newValues: { reference: lease.leaseReference, type: lease.leaseType }
+        });
+
         return { success: true, leaseId: lease.id, leaseReference: lease.leaseReference }
 
     } catch (error: unknown) {
@@ -252,6 +263,14 @@ export async function confirmLeaseBDQ(leaseId: string, otp: string) {
 
         revalidatePath("/dashboard/leases");
         revalidatePath(`/dashboard/leases/${leaseId}`);
+
+        // Audit Log
+        await writeAuditLog({
+            userId: session.user.id,
+            action: "LEASE_BDQ_CONFIRMED",
+            module: "LEASE",
+            entityId: leaseId
+        });
 
         return { success: true, status: updatedLease.status };
 

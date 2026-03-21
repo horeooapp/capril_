@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { generateReceiptRef, generateQRToken, calculateReceiptHash } from "@/lib/financial-utils"
 import { Role } from "@prisma/client"
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
+import { writeAuditLog } from "@/lib/audit"
 
 export type CreateReceiptInput = {
     leaseId: string;
@@ -64,6 +65,16 @@ export async function createReceipt(input: CreateReceiptInput) {
         }
 
         revalidatePath("/dashboard/receipts");
+
+        // Audit Log
+        await writeAuditLog({
+            userId: session.user.id,
+            action: "RECEIPT_CREATED",
+            module: "RECEIPT",
+            entityId: receipt.id,
+            newValues: { reference: receiptRef, period: input.periodMonth }
+        });
+
         return { success: true, receiptId: receipt.id, receiptRef };
 
     } catch (error: unknown) {
@@ -132,6 +143,16 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
         });
 
         revalidatePath("/dashboard/receipts");
+
+        // Audit Log
+        await writeAuditLog({
+            userId: session.user.id,
+            action: "RECEIPT_PAYMENT_CONFIRMED",
+            module: "RECEIPT",
+            entityId: receiptId,
+            newValues: { reference: receipt.receiptRef }
+        });
+
         return { success: true, receiptRef: receipt.receiptRef, qrToken: receipt.qrToken };
 
     } catch (error: unknown) {

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { loginAdmin } from "@/actions/admin-auth"
@@ -76,6 +77,12 @@ export default function AdminLoginForm() {
                         placeholder="••••••••"
                     />
                 </div>
+            </div>
+
+            <div className="flex justify-end pr-1">
+                <Link href="/auth/forgot-password" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#1F4E79] transition-all">
+                    Mot de passe oublié ?
+                </Link>
             </div>
 
             <div>

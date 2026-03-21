@@ -47,6 +47,13 @@ export async function verifyUserIdentity(
 
         revalidatePath("/admin/validation")
         revalidatePath(`/admin/users/${userId}`)
+
+        await logAction({
+            action: isVerified ? "KYC_VERIFIED_MANUAL" : "KYC_REJECTED_MANUAL",
+            module: "KYC",
+            entityId: userId,
+            newValues: { documentId, reason: rejectionReason }
+        })
         
         return { 
             success: true, 

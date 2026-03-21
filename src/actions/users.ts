@@ -76,6 +76,14 @@ export async function updateProfile(data: { fullName?: string, email?: string, r
 
         revalidatePath("/dashboard")
         revalidatePath("/locataire")
+
+        const { logAction } = await import("./audit")
+        await logAction({
+            action: "UPDATE_PROFILE",
+            module: "USER",
+            entityId: session.user.id,
+            newValues: data
+        })
         
         return { success: true }
     } catch (error) {
