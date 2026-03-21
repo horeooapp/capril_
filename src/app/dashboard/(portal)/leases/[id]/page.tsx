@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { getLeaseById } from "@/actions/leases"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"

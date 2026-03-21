@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+ 
 import { auth } from "@/auth"
 import { getLeaseById } from "@/actions/leases"
 import { notFound } from "next/navigation"

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 import Link from "next/link"
 import AuthForm from "@/components/auth/AuthForm"
 import { Building2, ArrowLeft, ShieldCheck } from "lucide-react"

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+ 
 import { prisma } from "./prisma";
 import { generateQRToken } from "./financial-utils";
 

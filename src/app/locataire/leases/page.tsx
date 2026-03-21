@@ -29,7 +29,7 @@ export default async function TenantLeasesPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {leases.map((lease: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+                    {leases.map((lease: any) => {  
                         if (!lease) return null;
                         return (
                             <div key={lease.id} className="group relative bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500">

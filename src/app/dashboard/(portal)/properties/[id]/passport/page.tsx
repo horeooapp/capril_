@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react/no-unescaped-entities */
+ 
 import { getPropertyPassport } from "@/actions/properties"
 import { notFound } from "next/navigation"
 import Link from "next/link"

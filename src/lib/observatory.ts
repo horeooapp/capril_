@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { prisma } from "./prisma";
 import { Decimal } from "@prisma/client/runtime/library";
 

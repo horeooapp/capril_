@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     // 3. Envoyer le code OTP par SMS ou directement sur WhatsApp pour vérifier le numéro
     
     // Stub
-    let prefs = await prisma.notificationPreference.findUnique({
+    const prefs = await prisma.notificationPreference.findUnique({
       where: { userId: session.user.id }
     });
 
