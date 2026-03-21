@@ -124,11 +124,12 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
                 data: { receiptHash }
             });
 
-            // Check if this receipt was linked to a CDC Deposit
+            // --- AUTOMATISATION M11.5: CDC-CI Consignation ---
             const cdcDeposit = await tx.cDCDeposit.findUnique({
                 where: { leaseId: r.leaseId }
             });
 
+            // If a deposit was explicitly linked, update it
             if (cdcDeposit && cdcDeposit.status === "AWAITING_PAYMENT") {
                 await tx.cDCDeposit.update({
                     where: { leaseId: r.leaseId },
@@ -137,6 +138,32 @@ export async function confirmReceiptPayment(receiptId: string, paymentRef: strin
                         consignedAt: paidAt
                     }
                 });
+            } else if (!cdcDeposit) {
+                // Check if we should auto-create it (First payment with depositAmount > 0)
+                const lease = await tx.lease.findUnique({
+                    where: { id: r.leaseId },
+                    select: { depositAmount: true }
+                });
+
+                if (lease && lease.depositAmount > 0) {
+                    await tx.cDCDeposit.create({
+                        data: {
+                            leaseId: r.leaseId,
+                            amount: lease.depositAmount,
+                            status: "PENDING",
+                            consignedAt: paidAt
+                        }
+                    });
+
+                    // Log the auto-consignation
+                    await writeAuditLog({
+                        userId: session.user.id,
+                        action: "CDC_CONSIGNATION_AUTO",
+                        module: "CDC",
+                        entityId: r.leaseId,
+                        newValues: { amount: lease.depositAmount, reason: "First payment trigger" }
+                    });
+                }
             }
 
             return finalReceipt;

@@ -1,5 +1,6 @@
 import { getFiscalStats } from "@/actions/fiscal-actions"
 import { Shield, TrendingUp, Users, DollarSign, Clock, Hash, Zap } from "lucide-react"
+import FiscalReminderButton from "@/components/admin/FiscalReminderButton"
 
 export default async function DGIDashboardPage() {
     const res = await getFiscalStats()
@@ -21,7 +22,8 @@ export default async function DGIDashboardPage() {
                     </div>
                     <p className="text-slate-400 text-sm font-bold uppercase tracking-widest ml-14">Observatoire de l&apos;Enregistrement Fiscal des Baux · Module M17</p>
                 </div>
-                <div className="hidden lg:block">
+                <div className="hidden lg:flex items-center gap-6">
+                    <FiscalReminderButton />
                     <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dernière Mise à Jour</span>
                         <span className="text-sm font-black text-white">{new Date().toLocaleDateString('fr-FR')}</span>
