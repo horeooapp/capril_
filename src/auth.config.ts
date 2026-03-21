@@ -48,7 +48,9 @@ export const authConfig = {
                 "/cgu", 
                 "/confidentialite", 
                 "/contact",
-                "/verify-request"
+                "/verify-request",
+                "/auth/forgot-password",
+                "/auth/reset-password"
             ];
             
             const isPublicPath = publicPaths.some(path => 
