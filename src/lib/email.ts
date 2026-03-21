@@ -1,6 +1,17 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.AUTH_RESEND_KEY);
+let resendInstance: Resend | null = null;
+
+function getResend() {
+  if (!resendInstance) {
+    const key = process.env.AUTH_RESEND_KEY;
+    if (!key) {
+      return null;
+    }
+    resendInstance = new Resend(key);
+  }
+  return resendInstance;
+}
 
 export async function sendEmail({
   to,
@@ -11,6 +22,14 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
+  console.log(`[Email] Sending to ${to}: ${subject}`);
+  
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[Email] Resend API key missing. Email not sent, logged to console instead.");
+    return { success: true, mock: true };
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "noreply@qapril.net",
