@@ -301,6 +301,14 @@ model User {
   gardeFousLogs      GardeFousLog[]   @relation("UserGardeFous")
   adminGardeFousLogs GardeFousLog[]   @relation("AdminGardeFous")
 
+  // ADD-12 Tarifs
+  configTarifsModifies ConfigTarif[]       @relation("ConfigTarifModifier")
+  offresModifiees      OffreAbonnement[]   @relation("OffreModifier")
+  promosCrees          CodePromo[]         @relation("PromoCreator")
+  tarifsNegocies       TarifNegocie[]      @relation("UserTarifNegocie")
+  tarifsNegociesCrees  TarifNegocie[]      @relation("TarifNegocieCreator")
+  configTarifsAudits   ConfigTarifsAudit[] @relation("ConfigTarifAuditAuthor")
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -2238,4 +2246,117 @@ model SmsDeclaration {
 
   @@index([statut, createdAt])
   @@map("sms_declarations")
+}
+// ═══════════════════════════════════════════════════════
+// ADD-12 : Configuration Tarifaire Admin
+// ═══════════════════════════════════════════════════════
+enum PromoType {
+  MOIS_GRATUITS
+  REMISE_POURCENTAGE
+  REMISE_MONTANT
+  PRIX_FIXE
+  ESSAI_ETENDU
+}
+
+enum NegocieType {
+  ABONNEMENT_DEROGATOIRE
+  QUITTANCE_DEROGATOIRE
+  ENREGISTREMENT_DEROGATOIRE
+}
+
+model ConfigTarif {
+  id               String       @id @default(uuid()) @map("tarif_id")
+  cle              String       @unique @db.VarChar(80)
+  valeur           Decimal      @db.Decimal(12, 2)
+  description      String       @db.Text
+  modifiable       Boolean      @default(true)
+  dateEffet        DateTime     @default(now()) @map("date_effet") @db.Date
+  modifieParId     String?      @map("modifie_par")
+  modifieAt        DateTime?    @default(now()) @map("modifie_at")
+  valeurPrecedente Decimal?     @map("valeur_precedente") @db.Decimal(12, 2)
+  noteModification String?      @map("note_modification") @db.Text
+
+  modifiePar       User?        @relation("ConfigTarifModifier", fields: [modifieParId], references: [id])
+
+  @@map("config_tarifs")
+}
+
+model OffreAbonnement {
+  id                String       @id @default(uuid()) @map("offre_id")
+  code              String       @unique @db.VarChar(30)
+  nomAffichage      String       @map("nom_affichage") @db.VarChar(100)
+  description       String?      @db.Text
+  prixBaseTtc       Decimal      @map("prix_base_ttc") @db.Decimal(12, 2)
+  quittancesInclus  Int          @default(0) @map("quittances_inclus") // 0 = illimité
+  prixUniteTtc      Decimal?     @default(0) @map("prix_unite_ttc") @db.Decimal(12, 2)
+  modules           Json         @default("{}")
+  actif             Boolean      @default(true)
+  visibleSignup     Boolean      @default(true) @map("visible_signup")
+  ordreAffichage    Int          @default(0) @map("ordre_affichage")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  modifieParId      String?      @map("modifie_par")
+  modifieAt         DateTime?    @map("modifie_at")
+
+  modifiePar        User?        @relation("OffreModifier", fields: [modifieParId], references: [id])
+  codesPromo        CodePromo[]
+  tarifsNegocies    TarifNegocie[]
+
+  @@map("offres_abonnements")
+}
+
+model CodePromo {
+  id               String          @id @default(uuid()) @map("promo_id")
+  code             String          @unique @db.VarChar(30)
+  typeRemise       PromoType       @map("type_remise")
+  valeurRemise     Decimal         @map("valeur_remise") @db.Decimal(12, 2)
+  offreCibleId     String?         @map("offre_cible")
+  cibleProfil      String          @default("TOUS") @map("cible_profil") @db.VarChar(20) // TOUS, AGENCE, PARTICULIER
+  dateDebut        DateTime        @default(now()) @map("date_debut") @db.Date
+  dateFin          DateTime?       @map("date_fin") @db.Date
+  maxUtilisations  Int?            @map("max_utilisations")
+  nbUtilisations   Int             @default(0) @map("nb_utilisations")
+  actif            Boolean         @default(true)
+  createdParId     String?         @map("created_par")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  note             String?         @db.Text
+
+  offreCible       OffreAbonnement? @relation(fields: [offreCibleId], references: [id])
+  createdPar       User?            @relation("PromoCreator", fields: [createdParId], references: [id])
+
+  @@map("codes_promo")
+}
+
+model TarifNegocie {
+  id               String          @id @default(uuid()) @map("neg_id")
+  userId           String          @map("user_id")
+  type             NegocieType
+  offreId          String?         @map("offre_id")
+  prixNegocieTtc   Decimal         @map("prix_negocie_ttc") @db.Decimal(12, 2)
+  dateDebut        DateTime        @default(now()) @map("date_debut") @db.Date
+  dateFin          DateTime?       @map("date_fin") @db.Date
+  autoRenouveler   Boolean         @default(false) @map("auto_renouveler")
+  createdParId     String?         @map("created_par")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  note             String          @db.Text
+
+  user             User            @relation("UserTarifNegocie", fields: [userId], references: [id])
+  offre            OffreAbonnement? @relation(fields: [offreId], references: [id])
+  createdPar       User?            @relation("TarifNegocieCreator", fields: [createdParId], references: [id])
+
+  @@map("tarifs_negocie")
+}
+
+model ConfigTarifsAudit {
+  id               String          @id @default(uuid()) @map("audit_id")
+  tableCible       String          @map("table_cible") @db.VarChar(50)
+  enregistrementId String          @map("enregistrement_id")
+  action           String          @db.VarChar(20) // INSERT, UPDATE, DELETE
+  avant            Json?
+  apres            Json?
+  modifieParId     String?         @map("modifie_par")
+  createdAt        DateTime        @default(now()) @map("created_at")
+
+  modifiePar       User?           @relation("ConfigTarifAuditAuthor", fields: [modifieParId], references: [id])
+
+  @@map("config_tarifs_audit")
 }
