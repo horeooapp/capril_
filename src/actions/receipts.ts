@@ -124,18 +124,39 @@ export async function createReceipt(data: {
             }
         }
 
-        // 6. Trigger Multi-Channel Notification (ADD-09)
+        // 6. Trigger Multi-Channel Notification (ADD-09) & PDF Backend Generation
         if (lease.tenantId) {
+            const { generateReceiptPDF } = await import('@/lib/pdf-generator');
+            
+            const pdfBuffer = await generateReceiptPDF({
+                receiptRef,
+                leaseRef: lease.leaseReference,
+                periodMonth: data.periodMonth,
+                rentAmount: data.rentAmount,
+                chargesAmount: data.chargesAmount,
+                totalAmount: data.rentAmount + data.chargesAmount,
+                paymentMethod: data.paymentChannel,
+                paidAt: new Date(),
+                tenantName: lease.tenant?.fullName || 'Locataire',
+                propertyAddress: lease.property.address,
+                landlordName: creator.fullName || 'Propriétaire QAPRIL',
+                declarative: data.receiptType === 'DECLARATIVE'
+            }).catch((e: any) => {
+                console.error("PDF Gen Failed", e);
+                return undefined;
+            });
+
             // FIRE AND FORGET - do not await to avoid blocking the user flow
             NotificationService.envoyerNotification(
                 lease.tenantId,
                 "QUITTANCE_GENEREE",
                 {
-                    referenceId: receipt.id,
+                    referenceId: receiptRef,
+                    receiptBuffer: pdfBuffer,
                     payload: {
                         parameters: [lease.tenant?.fullName || "Locataire", lease.property.address || "Propriété"],
                         smsText: `Votre quittance de loyer pour ${data.periodMonth} est disponible sur QAPRIL. Montant: ${data.rentAmount + data.chargesAmount} FCFA.`,
-                        html: `<p>Bonjour,</p><p>Votre quittance pour le mois de ${data.periodMonth} a été générée avec succès.</p><p>Montant total : <strong>${data.rentAmount + data.chargesAmount} FCFA</strong></p>`
+                        html: `<p>Bonjour,</p><p>Votre quittance certifiée pour le mois de ${data.periodMonth} a été générée avec succès.</p><p>Veuillez la trouver en <strong>pièce jointe</strong> de ce message.</p><p>Montant total : <strong>${data.rentAmount + data.chargesAmount} FCFA</strong></p>`
                     }
                 }
             ).catch(err => console.error("[NOTIF_TRIGGER] Failed QUITTANCE_GENEREE", err));

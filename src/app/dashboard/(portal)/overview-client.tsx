@@ -118,11 +118,20 @@ export default function DashboardOverviewClient({
                         Rapports d'activité
                     </button>
                     {user?.fraudScore < 20 && (
-                        <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                        <div className="hidden md:flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-2xl">
                              <FileCheck size={18} className="text-emerald-600" />
-                             <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Certifié Bon Payeur</span>
+                             <span className="text-[11px] font-black text-emerald-700 uppercase tracking-widest">Certifié</span>
                         </div>
                     )}
+                    <div className="flex flex-col items-end px-4 py-2 bg-gray-50 border border-gray-100 rounded-2xl">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Wallet QAPRIL</span>
+                        <div className="flex items-center gap-3">
+                            <span className="text-[16px] font-black text-[#1F4E79] leading-none">{user?.walletBalance !== undefined ? user.walletBalance.toLocaleString() : '0'} <span className="text-[12px]">FCFA</span></span>
+                            <button className="p-1 bg-[#C55A11] text-white rounded-md hover:bg-[#A54A0D] transition-colors shadow-sm" title="Recharger">
+                                <Plus size={14} />
+                            </button>
+                        </div>
+                    </div>
                     {user && <ReliabilityBadge score={100 - (user?.fraudScore || 15)} />}
                 </div>
             </div>

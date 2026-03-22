@@ -18,6 +18,7 @@ interface NotificationData {
   referenceId?: string
   templateId?: string
   payload?: any
+  receiptBuffer?: Buffer
 }
 
 /**
@@ -136,10 +137,21 @@ export class NotificationService {
       
       const { wrapInPremiumTemplate } = await import("@/lib/email");
       
+      let attachments;
+      if (data.receiptBuffer) {
+        attachments = [{
+          content: data.receiptBuffer.toString('base64'),
+          filename: `Quittance_QAPRIL_${data.referenceId || "Loyer"}.pdf`,
+          type: 'application/pdf',
+          disposition: 'attachment',
+        }];
+      }
+
       const result = await sendEmail({
         to: email,
         subject,
-        html: wrapInPremiumTemplate(htmlContent, "Alert QAPRIL")
+        html: wrapInPremiumTemplate(htmlContent, "Alert QAPRIL"),
+        attachments
       });
 
       await this.logNotification(

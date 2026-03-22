@@ -13,10 +13,12 @@ export async function sendEmail({
   to,
   subject,
   html,
+  attachments,
 }: {
   to: string;
   subject: string;
   html: string;
+  attachments?: any[];
 }) {
   console.log(`[Email] Sending to ${to}: ${subject}`);
   
@@ -32,6 +34,7 @@ export async function sendEmail({
       from: process.env.EMAIL_FROM || "noreply@qapril.net",
       subject,
       html,
+      attachments,
     };
     
     const [response] = await sgMail.send(msg);
