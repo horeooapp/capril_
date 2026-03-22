@@ -104,6 +104,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     console.log("[AUTH] Admin login success:", email);
                     return {
                         id: user.id,
+                        email: user.email,
                         phone: user.phone,
                         role: user.role,
                         status: user.status,

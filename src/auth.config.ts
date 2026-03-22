@@ -16,9 +16,11 @@ export const authConfig = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id
+                token.email = user.email
                 token.phone = user.phone
                 token.role = user.role as Role
                 token.status = user.status
+                token.fullName = (user as any).fullName
                 token.onboardingComplete = (user as any).onboardingComplete
             }
             return token
@@ -26,9 +28,11 @@ export const authConfig = {
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string
+                session.user.email = token.email as string
                 session.user.phone = token.phone as string
                 session.user.role = (token.role as Role) || 'TENANT'
                 session.user.status = token.status as any
+                session.user.fullName = token.fullName as string
                 session.user.onboardingComplete = token.onboardingComplete as boolean
             }
             return session
