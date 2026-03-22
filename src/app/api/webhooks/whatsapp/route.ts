@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { prisma } from "@/lib/prisma";
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN;
 const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
@@ -45,14 +46,33 @@ export async function POST(req: NextRequest) {
         const from = body.entry[0].changes[0].value.messages[0].from; 
         const msg_body = body.entry[0].changes[0].value.messages[0].text.body; 
 
-        console.log(`[WhatsApp Inbound] Received message from ${from}: ${msg_body}`);
+        console.log(`[WhatsApp Inbound] Message from ${from}: ${msg_body}`);
 
-        // TODO: ADD-08 Integration
-        // Router ce message vers l'Agent-BDQ pour analyse d'intention
-        // const intent = await analyzeWithAI(msg_body);
-        // ...
+        // 1. Trouver l'utilisateur QAPRIL par son numéro
+        const user = await prisma.user.findUnique({ where: { phone: from } });
+        if (!user) {
+            // Optionnel: Réponse automatique pour les inconnus
+            return NextResponse.json({ success: true });
+        }
+
+        // 2. Traiter avec l'Agent IA (M-WA-RECLAMATION / BDQ)
+        const { processAiBdqMessage } = await import("@/actions/bdq-ai");
+        const aiResponse = await processAiBdqMessage(`wa_${from}`, msg_body, user.id);
+
+        // 3. Envoyer la réponse via l'API Meta
+        const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+        if (WHATSAPP_TOKEN && aiResponse.message) {
+            await fetch(`https://graph.facebook.com/v17.0/${phone_number_id}/messages`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${WHATSAPP_TOKEN}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    messaging_product: "whatsapp",
+                    to: from,
+                    text: { body: aiResponse.message }
+                })
+            });
+        }
       }
-      
       return NextResponse.json({ success: true }, { status: 200 });
     } else {
       return NextResponse.json({ error: "Not a WhatsApp API event" }, { status: 404 });

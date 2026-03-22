@@ -289,6 +289,12 @@ model User {
   notificationPreference NotificationPreference?
   notificationLogs       NotificationLog[]
 
+  // ADD-11
+  propertyRoles      PropertyAccess[] @relation("UserRoles")
+  invitedRoles       PropertyAccess[] @relation("InvitedRoles")
+  smsDeclarations    SmsDeclaration[] @relation("TenantDeclarations")
+  smsConfirmations   SmsDeclaration[] @relation("ManagerConfirmations")
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -420,6 +426,9 @@ model Property {
   sourceMigrationId String?           @map("source_migration_id")
   sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
 
+  // ADD-11
+  accessRoles PropertyAccess[] @relation("PropertyRoles")
+
   @@index([ownerUserId])
   @@index([commune])
   @@index([status])
@@ -525,6 +534,9 @@ model Lease {
 
   sourceMigrationId String?           @map("source_migration_id")
   sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
+
+  // ADD-11
+  smsDeclarations SmsDeclaration[] @relation("LeaseDeclarations")
 
   @@index([propertyId])
   @@index([tenantId])
@@ -2065,4 +2077,65 @@ model NotificationLog {
   @@index([userId, createdAt(sort: Desc)])
   @@index([statut, createdAt])
   @@map("notification_logs")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-11 : Rôles & Réclamations
+// ═══════════════════════════════════════════════════════
+enum BienRole {
+  OWNER
+  MANAGER
+  FIELD_AGENT
+}
+
+enum DeclStatut {
+  EN_ATTENTE
+  CONFIRME
+  CONTESTE
+  EXPIRE
+  AUTO_GENERE
+}
+
+model PropertyAccess {
+  id         String    @id @default(uuid()) @map("acces_id")
+  propertyId String    @map("bien_id")
+  userId     String    @map("user_id")
+  role       BienRole
+  statut     String    @default("ACTIF") // ACTIF | SUSPENDU | REVOQUE
+  invitedById String?  @map("invite_par")
+  invitedAt  DateTime? @default(now()) @map("invite_at")
+  acceptedAt DateTime? @map("accepte_at")
+  revokedAt  DateTime? @map("revoque_at")
+  note       String?   @db.Text
+
+  property   Property @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User     @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy  User?    @relation("InvitedRoles", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@unique([propertyId, userId])
+  @@map("bien_acces")
+}
+
+model SmsDeclaration {
+  id              String      @id @default(uuid()) @map("decl_id")
+  leaseId         String      @map("bail_id")
+  tenantId        String      @map("locataire_id")
+  montantDeclare  Decimal     @map("montant_declare") @db.Decimal(12,0)
+  canal           String      @default("SMS") // SMS | WHATSAPP | APP
+  statut          DeclStatut  @default(EN_ATTENTE)
+  confirmeParId   String?     @map("confirme_par")
+  confirmeAt      DateTime?   @map("confirme_at")
+  receiptId       String?     @map("quittance_id")
+  rappel1At       DateTime?   @map("rappel_1_at")
+  alerteProprioAt DateTime?   @map("alerte_proprio_at")
+  smsBrut         String?     @map("sms_brut") @db.Text
+  createdAt       DateTime    @default(now()) @map("created_at")
+  expireAt        DateTime?   @map("expire_at")
+
+  lease       Lease   @relation("LeaseDeclarations", fields: [leaseId], references: [id], onDelete: Cascade)
+  tenant      User    @relation("TenantDeclarations", fields: [tenantId], references: [id], onDelete: Cascade)
+  confirmePar User?   @relation("ManagerConfirmations", fields: [confirmeParId], references: [id], onDelete: SetNull)
+
+  @@index([statut, createdAt])
+  @@map("sms_declarations")
 }
