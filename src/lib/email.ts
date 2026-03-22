@@ -1,6 +1,13 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.AUTH_RESEND_KEY);
+let _resend: Resend | null = null;
+
+function getResend() {
+  const key = process.env.AUTH_RESEND_KEY;
+  if (!key) return null;
+  if (!_resend) _resend = new Resend(key);
+  return _resend;
+}
 
 export async function sendEmail({
   to,
@@ -15,7 +22,8 @@ export async function sendEmail({
 }) {
   console.log(`[Email] Sending to ${to}: ${subject}`);
   
-  if (!process.env.AUTH_RESEND_KEY) {
+  const resend = getResend();
+  if (!resend) {
     console.warn("[Email] AUTH_RESEND_KEY missing. Email not sent, logged to console instead.");
     return { success: true, mock: true };
   }

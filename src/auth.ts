@@ -61,7 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     role: user.role,
                     status: user.status,
                     fullName: user.fullName,
-                    onboardingComplete: user.onboardingComplete
+                    onboardingComplete: (user as any).onboardingComplete
                 };
             }
         }),
@@ -108,7 +108,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         role: user.role,
                         status: user.status,
                         fullName: user.fullName,
-                        onboardingComplete: user.onboardingComplete
+                        onboardingComplete: (user as any).onboardingComplete
                     };
                 } catch (error) {
                     console.error("[AUTH] Error in admin-password authorize:", error);
