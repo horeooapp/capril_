@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     creator: "@qapril_ci",
   },
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/icon-192.png",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
