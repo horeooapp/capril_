@@ -10,15 +10,16 @@ import * as bcrypt from "bcrypt-ts";
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const email = searchParams.get("email");
+  const email = searchParams.get("email")?.trim();
   const password = searchParams.get("password");
-  const pin = searchParams.get("pin");
+  const providedPin = searchParams.get("pin")?.trim().toUpperCase();
 
-  // PIN DE SÉCURITÉ TEMPORAIRE (À changer ou configurer dans .env)
-  const SECURITY_PIN = "QAPRIL-2026-EMERGENCY";
+  // PIN SIMPLIFIÉ POUR ÉVITER LES ERREURS DE TYPAGE (DASHES/SPACES/CASE)
+  const SECURITY_PIN = "QAPRIL2026";
 
-  if (pin !== SECURITY_PIN) {
-    return NextResponse.json({ error: "Unauthorized: Invalid Security PIN" }, { status: 401 });
+  if (providedPin !== SECURITY_PIN) {
+    console.warn(`[EMERGENCY-ADMIN] Access attempt with invalid PIN: ${providedPin}`);
+    return NextResponse.json({ error: "Unauthorized: Invalid Security PIN. Expected simplified PIN." }, { status: 401 });
   }
 
   if (!email || !password) {
