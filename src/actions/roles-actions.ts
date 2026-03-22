@@ -3,20 +3,30 @@
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
-import { BienRole } from "@prisma/client"
+import { BienRole, ProfilInterm } from "@prisma/client"
 import { sendSMS } from "@/lib/sms"
 import { logAction } from "./audit"
+import { createMandatGestion } from "./mandates-gestion"
+import { checkGuardrails } from "./guardrails"
 
 /**
  * M-ROLES : Inviter un gestionnaire ou un agent terrain sur un bien
  */
-export async function inviteManager(propertyId: string, phone: string, role: BienRole, note?: string) {
+export async function inviteManager(propertyId: string, phone: string, role: BienRole, profil?: ProfilInterm, note?: string) {
     const session = await auth()
     if (!session || !session.user || session.user.role !== "LANDLORD") {
         return { success: false, error: "Non autorisé. Seul le propriétaire peut inviter." }
     }
 
     try {
+        // M-GARDE-FOUS : Vérification des seuils
+        if (profil) {
+            const guard = await checkGuardrails(phone, profil);
+            if (!guard.success) {
+                return { success: false, error: guard.error };
+            }
+        }
+
         // Vérifier si le propriétaire détient bien le bien
         const property = await prisma.property.findUnique({
             where: { id: propertyId, ownerUserId: session.user.id }
@@ -40,8 +50,20 @@ export async function inviteManager(propertyId: string, phone: string, role: Bie
         }
         inviteeId = invitee.id;
 
+        // M-MANDAT : Créer le projet de mandat si c'est un intermédiaire
+        let mandatId = null;
+        if (role === "INTERMEDIAIRE" && profil) {
+            const mandat = await createMandatGestion({
+                proprietaireId: session.user.id,
+                intermediaireId: inviteeId,
+                profil: profil,
+                biensConcernes: [propertyId]
+            });
+            mandatId = mandat.id;
+        }
+
         // Créer l'accès
-        const access = await prisma.propertyAccess.upsert({
+        const access = await (prisma as any).propertyAccess.upsert({
             where: {
                 propertyId_userId: { propertyId, userId: inviteeId }
             },
@@ -49,33 +71,37 @@ export async function inviteManager(propertyId: string, phone: string, role: Bie
                 propertyId,
                 userId: inviteeId,
                 role,
-                statut: "ACTIF",
+                profil,
+                statut: "EN_ATTENTE", // Require mandate acceptance
                 invitedById: session.user.id,
+                mandatId,
                 note
             },
             update: {
                 role,
-                statut: "ACTIF",
+                profil,
+                statut: "EN_ATTENTE",
                 invitedById: session.user.id,
                 invitedAt: new Date(),
+                mandatId,
                 note
             }
         })
 
         // Envoi du SMS
         const ownerName = session.user.fullName || "Un propriétaire"
-        const smsMsg = `${ownerName} vous invite à gérer ses biens sur QAPRIL. Téléchargez l'app et connectez-vous avec ce numéro pour accepter l'invitation.`
+        const smsMsg = `${ownerName} vous confie la gestion de ses biens sur QAPRIL. Connectez-vous avec ce numéro pour signer le mandat et accepter.`
         await sendSMS(phone, smsMsg).catch(console.error)
 
         await logAction({
             action: "INVITE_MANAGER",
             module: "M_ROLES",
             entityId: access.id,
-            newValues: { role, phone }
+            newValues: { role, profil, phone, mandatId }
         })
 
         revalidatePath(`/dashboard/properties/${propertyId}`)
-        return { success: true, message: "Invitation envoyée avec succès." }
+        return { success: true, message: "Invitation et projet de mandat envoyés." }
 
     } catch (error) {
         console.error("[M-ROLES] Invite Error:", error)
@@ -91,7 +117,7 @@ export async function acceptManagerRole(accessId: string) {
     if (!session || !session.user) return { success: false, error: "Non autorisé" }
 
     try {
-        const access = await prisma.propertyAccess.findUnique({
+        const access = await (prisma as any).propertyAccess.findUnique({
             where: { id: accessId }
         })
 
@@ -99,7 +125,7 @@ export async function acceptManagerRole(accessId: string) {
             return { success: false, error: "Invitation invalide." }
         }
 
-        await prisma.propertyAccess.update({
+        await (prisma as any).propertyAccess.update({
             where: { id: accessId },
             data: { acceptedAt: new Date(), statut: "ACTIF" }
         })
@@ -120,7 +146,7 @@ export async function getAssignedProperties() {
     if (!session || !session.user) return []
 
     try {
-        const accesses = await prisma.propertyAccess.findMany({
+        const accesses = await (prisma as any).propertyAccess.findMany({
             where: {
                 userId: session.user.id,
                 statut: "ACTIF",
@@ -132,7 +158,7 @@ export async function getAssignedProperties() {
                 }
             }
         })
-        return accesses.map(a => ({ ...a.property, roleAssignee: a.role }))
+        return accesses.map((a: any) => ({ ...a.property, roleAssignee: a.role }))
     } catch (error) {
         console.error("[M-ROLES] Get Assigned:", error)
         return []
@@ -147,7 +173,7 @@ export async function revokeManagerRole(accessId: string) {
     if (!session || !session.user || session.user.role !== "LANDLORD") return { success: false, error: "Non autorisé." }
 
     try {
-        const access = await prisma.propertyAccess.findUnique({
+        const access = await (prisma as any).propertyAccess.findUnique({
             where: { id: accessId },
             include: { property: true }
         })
@@ -156,7 +182,7 @@ export async function revokeManagerRole(accessId: string) {
             return { success: false, error: "Accès refusé." }
         }
 
-        await prisma.propertyAccess.update({
+        await (prisma as any).propertyAccess.update({
             where: { id: accessId },
             data: { statut: "REVOQUE", revokedAt: new Date() }
         })

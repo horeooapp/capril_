@@ -295,6 +295,12 @@ model User {
   smsDeclarations    SmsDeclaration[] @relation("TenantDeclarations")
   smsConfirmations   SmsDeclaration[] @relation("ManagerConfirmations")
 
+  mandatsDonnes      MandatGestion[]  @relation("MandatsDonnes")
+  mandatsRecus       MandatGestion[]  @relation("MandatsRecus")
+  regularisation     AgencesRegularisation?
+  gardeFousLogs      GardeFousLog[]   @relation("UserGardeFous")
+  adminGardeFousLogs GardeFousLog[]   @relation("AdminGardeFous")
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -2084,8 +2090,24 @@ model NotificationLog {
 // ═══════════════════════════════════════════════════════
 enum BienRole {
   OWNER
-  MANAGER
+  INTERMEDIAIRE
+  AGENCE
   FIELD_AGENT
+}
+
+enum ProfilInterm {
+  PARENT_AMI
+  NOTAIRE
+  HUISSIER
+  AVOCAT
+}
+
+enum RegStatut {
+  EN_COURS
+  PROLONGE_RECEPISSE
+  PROLONGE_FORMATION
+  REGULARISE
+  BASCULE
 }
 
 enum DeclStatut {
@@ -2097,23 +2119,101 @@ enum DeclStatut {
 }
 
 model PropertyAccess {
-  id         String    @id @default(uuid()) @map("acces_id")
-  propertyId String    @map("bien_id")
-  userId     String    @map("user_id")
-  role       BienRole
-  statut     String    @default("ACTIF") // ACTIF | SUSPENDU | REVOQUE
-  invitedById String?  @map("invite_par")
-  invitedAt  DateTime? @default(now()) @map("invite_at")
-  acceptedAt DateTime? @map("accepte_at")
-  revokedAt  DateTime? @map("revoque_at")
-  note       String?   @db.Text
+  id                  String        @id @default(uuid()) @map("acces_id")
+  propertyId          String        @map("bien_id")
+  userId              String        @map("user_id")
+  role                BienRole
+  profil              ProfilInterm? @map("profil_intermediaire")
+  statut              String        @default("EN_ATTENTE") // EN_ATTENTE | ACTIF | SUSPENDU | REVOQUE | EXPIRE
+  
+  justificatifType    String?       @map("justificatif_type")
+  justificatifNumero  String?       @map("justificatif_numero")
+  justificatifValide  Boolean       @default(false) @map("justificatif_valide")
+  justificatifVerifieAt DateTime?   @map("justificatif_verifie_at")
+  
+  invitedById         String?       @map("invite_par")
+  invitedAt           DateTime?     @default(now()) @map("invite_at")
+  acceptedAt          DateTime?     @map("accepte_at")
+  revokedAt           DateTime?     @map("revoque_at")
+  mandatId            String?       @map("mandat_id")
+  
+  dateDebut           DateTime?     @default(now()) @map("date_debut")
+  dateFin             DateTime?     @map("date_fin")
+  note                String?       @db.Text
 
-  property   Property @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
-  user       User     @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
-  invitedBy  User?    @relation("InvitedRoles", fields: [invitedById], references: [id], onDelete: SetNull)
+  property            Property      @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
+  user                User          @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy           User?         @relation("InvitedRoles", fields: [invitedById], references: [id], onDelete: SetNull)
+  mandat              MandatGestion? @relation(fields: [mandatId], references: [id])
 
   @@unique([propertyId, userId])
   @@map("bien_acces")
+}
+
+model MandatGestion {
+  id                String       @id @default(uuid()) @map("mandat_id")
+  proprietaireId    String       @map("proprietaire_id")
+  intermediaireId   String       @map("intermediaire_id")
+  profil            ProfilInterm
+  biensConcernes    String[]     @map("biens_concernes") // IDs des biens
+  dateDebut         DateTime     @default(now()) @map("date_debut")
+  dateFin           DateTime?    @map("date_fin")
+  remuneration      String?      @default("GRATUIT")
+  permissions       Json         @map("permissions")
+  statut            String       @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | REVOQUE | EXPIRE
+  signatureProprio  DateTime?    @map("signature_proprio")
+  signatureInterm   DateTime?    @map("signature_interm")
+  hashSha256        String?      @map("hash_sha256")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  proprietaire      User         @relation("MandatsDonnes", fields: [proprietaireId], references: [id])
+  intermediaire     User         @relation("MandatsRecus", fields: [intermediaireId], references: [id])
+  propertyAccesses  PropertyAccess[]
+
+  @@map("mandats_gestion")
+}
+
+model AgencesRegularisation {
+  id                  String      @id @default(uuid()) @map("reg_id")
+  userId              String      @unique @map("user_id")
+  statut              RegStatut   @default(EN_COURS)
+  dateInscription     DateTime    @default(now()) @map("date_inscription")
+  dateLimiteInitiale  DateTime    @map("date_limite_initiale")
+  dateLimiteActuelle  DateTime    @map("date_limite_actuelle")
+  nbBiensBascule      Int?        @map("nb_biens_bascule")
+  nbPropriosBascule   Int?        @map("nb_proprietaires_bascule")
+  recepisseCdaim      String?     @map("recepissse_cdaim") // URL/Path
+  recepisseDate       DateTime?   @map("recepissse_date")
+  
+  rappel_j30_at       DateTime?   @map("rappel_j30_at")
+  rappel_j90_at       DateTime?   @map("rappel_j90_at")
+  rappel_j180_at      DateTime?   @map("rappel_j180_at")
+  rappel_j240_at      DateTime?   @map("rappel_j240_at")
+  rappel_j270_at      DateTime?   @map("rappel_j270_at")
+  
+  basculeAt           DateTime?   @map("bascule_at")
+  regulariseAt        DateTime?   @map("regularise_at")
+  notesAdmin          String?     @map("notes_admin") @db.Text
+
+  user                User        @relation(fields: [userId], references: [id])
+
+  @@map("agences_regularisation")
+}
+
+model GardeFousLog {
+  id          String   @id @default(uuid()) @map("log_id")
+  userId      String   @map("user_id")
+  typeSignal  String   @map("type_signal")
+  detail      String?  @db.Text
+  actionPrise String?  @map("action_prise")
+  traite      Boolean  @default(false)
+  traiteParId String?  @map("traite_par")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation("UserGardeFous", fields: [userId], references: [id])
+  traitePar   User?    @relation("AdminGardeFous", fields: [traiteParId], references: [id])
+
+  @@map("garde_fous_logs")
 }
 
 model SmsDeclaration {

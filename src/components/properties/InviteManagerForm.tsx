@@ -7,7 +7,7 @@ import { Plus, X, UserPlus, Loader2 } from "lucide-react"
 export default function InviteManagerForm({ propertyId }: { propertyId: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const [phone, setPhone] = useState("")
-    const [role, setRole] = useState<"MANAGER" | "FIELD_AGENT">("MANAGER")
+    const [selection, setSelection] = useState<string>("PARENT_AMI")
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState("")
 
@@ -16,7 +16,18 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
         setLoading(true)
         setMessage("")
 
-        const res = await inviteManager(propertyId, phone, role)
+        let finalRole: any = "INTERMEDIAIRE"
+        let finalProfil: any = selection
+
+        if (selection === "AGENCE") {
+            finalRole = "AGENCE"
+            finalProfil = undefined
+        } else if (selection === "FIELD_AGENT") {
+            finalRole = "FIELD_AGENT"
+            finalProfil = undefined
+        }
+
+        const res = await inviteManager(propertyId, phone, finalRole, finalProfil)
         setLoading(false)
 
         if (res.success) {
@@ -38,32 +49,32 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
                 className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A54A0D] transition-all shadow-lg active:scale-95"
             >
                 <Plus size={16} />
-                Inviter un gestionnaire
+                Inviter un collaborateur
             </button>
         )
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 relative border border-gray-100 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
+            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 my-auto relative border border-gray-100 animate-in fade-in zoom-in duration-300">
                 <button 
                     onClick={() => setIsOpen(false)}
-                    className="absolute top-8 right-8 text-gray-300 hover:text-gray-900 transition-colors"
+                    className="absolute top-6 right-6 text-gray-300 hover:text-gray-900 transition-colors bg-gray-50 rounded-full p-2"
                 >
-                    <X size={24} />
+                    <X size={20} />
                 </button>
 
-                <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#C55A11]">
                         <UserPlus size={24} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-[#1F4E79] uppercase italic tracking-tighter">Nouvelle Invitation</h3>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assigner un collaborateur au bien</p>
+                        <h3 className="text-lg font-black text-[#1F4E79] uppercase italic tracking-tighter">Nouvelle Invitation</h3>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mandater un collaborateur</p>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">Téléphone (WhatsApp)</label>
                         <input 
@@ -77,23 +88,62 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
                     </div>
 
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">Rôle assigné</label>
-                        <div className="grid grid-cols-2 gap-4">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">Statut du collaborateur</label>
+                        <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 pb-2">
+                            {/* Personnels */}
                             <button 
                                 type="button"
-                                onClick={() => setRole("MANAGER")}
-                                className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${role === 'MANAGER' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-400'}`}
+                                onClick={() => setSelection("PARENT_AMI")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'PARENT_AMI' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[12px] uppercase tracking-tighter italic">Gestionnaire</span>
-                                <span className="text-[9px] font-medium leading-none">Accès complet</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Parent / Ami</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Max 2 proprios / 10 biens</span>
                             </button>
+                            
                             <button 
                                 type="button"
-                                onClick={() => setRole("FIELD_AGENT")}
-                                className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${role === 'FIELD_AGENT' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-400'}`}
+                                onClick={() => setSelection("NOTAIRE")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'NOTAIRE' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[12px] uppercase tracking-tighter italic">Agent Terrain</span>
-                                <span className="text-[9px] font-medium leading-none">Visites & Constats</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Notaire</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Max 5 proprios / 25 biens</span>
+                            </button>
+
+                            <button 
+                                type="button"
+                                onClick={() => setSelection("HUISSIER")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'HUISSIER' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                            >
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Huissier</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Sur mandat judiciaire</span>
+                            </button>
+
+                            <button 
+                                type="button"
+                                onClick={() => setSelection("AVOCAT")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AVOCAT' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                            >
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Avocat</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Sur mandat judiciaire</span>
+                            </button>
+
+                            {/* Professionnels */}
+                            <button 
+                                type="button"
+                                onClick={() => setSelection("AGENCE")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AGENCE' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                            >
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Agence ou Pro</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Agrément CDAIM requis</span>
+                            </button>
+
+                            <button 
+                                type="button"
+                                onClick={() => setSelection("FIELD_AGENT")}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'FIELD_AGENT' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                            >
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Agent Terrain</span>
+                                <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Visites & constats</span>
                             </button>
                         </div>
                     </div>
@@ -106,9 +156,9 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
 
                     <button 
                         disabled={loading}
-                        className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#163a5a] transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#163a5a] transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
                     >
-                        {loading ? <Loader2 size={20} className="animate-spin" /> : "Envoyer l'invitation"}
+                        {loading ? <Loader2 size={20} className="animate-spin" /> : "Générer le mandat et inviter"}
                     </button>
                 </form>
             </div>
