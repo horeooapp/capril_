@@ -28,22 +28,31 @@ export async function GET(request: Request) {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.upsert({
-      where: { email },
-      update: {
-        password: hashedPassword,
-        role: "SUPER_ADMIN",
-        status: "active"
-      },
-      create: {
-        email,
-        phone: "+225000000000", // Numéro fictif pour l'admin de secours
-        fullName: "Administrateur de Secours",
-        password: hashedPassword,
-        role: "SUPER_ADMIN",
-        status: "active"
-      }
+    const existingUser = await prisma.user.findFirst({
+        where: { email }
     });
+
+    if (existingUser) {
+        await prisma.user.update({
+            where: { id: existingUser.id },
+            data: {
+                password: hashedPassword,
+                role: "SUPER_ADMIN",
+                status: "active"
+            }
+        });
+    } else {
+        await prisma.user.create({
+            data: {
+                email,
+                phone: `+225_TMP_${Date.now().toString().slice(-8)}`, // Unique temporary phone
+                fullName: "Administrateur de Secours",
+                password: hashedPassword,
+                role: "SUPER_ADMIN",
+                status: "active"
+            }
+        });
+    }
 
     return NextResponse.json({
       success: true,
