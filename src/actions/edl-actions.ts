@@ -25,7 +25,7 @@ export async function createEdl(data: {
     const count = await prisma.etatsDesLieux.count();
     const refEdl = `EDL-${year}-${(count + 1).toString().padStart(5, '0')}`;
 
-    const edl = await prisma.etatsDesLieux.create({
+    const edl = await (prisma as any).etatsDesLieux.create({
       data: {
         leaseId: data.leaseId,
         typeEdl: data.typeEdl,
@@ -59,7 +59,7 @@ export async function submitEdlToTenant(edlId: string) {
     const expireAt = new Date();
     expireAt.setHours(expireAt.getHours() + 48);
 
-    const edl = await prisma.etatsDesLieux.update({
+    const edl = await (prisma as any).etatsDesLieux.update({
       where: { id: edlId },
       data: {
         statut: "SOUMIS_LOCATAIRE",
@@ -89,7 +89,7 @@ export async function confirmEdlByTenant(edlId: string, confirm: boolean, reserv
   try {
     const status = confirm ? "CONFIRME" : "CONTESTE";
     
-    let updateData: any = {
+    const updateData: any = {
       statut: status,
       confirmeLocataire: confirm,
       confirmeLocataireAt: new Date(),
@@ -99,13 +99,13 @@ export async function confirmEdlByTenant(edlId: string, confirm: boolean, reserv
     // Si confirmé, on certifie (SHA-256)
     if (confirm) {
       updateData.statut = "CERTIFIE";
-      const edl = await prisma.etatsDesLieux.findUnique({ where: { id: edlId } });
+      const edl = await (prisma as any).etatsDesLieux.findUnique({ where: { id: edlId } });
       const contentToHash = JSON.stringify(edl?.sections) + edl?.refEdl;
       const hash = require('crypto').createHash('sha256').update(contentToHash).digest('hex');
       updateData.hashSha256 = hash;
     }
 
-    const edl = await prisma.etatsDesLieux.update({
+    const edl = await (prisma as any).etatsDesLieux.update({
       where: { id: edlId },
       data: updateData
     });

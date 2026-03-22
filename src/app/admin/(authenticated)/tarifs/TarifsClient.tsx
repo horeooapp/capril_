@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { 
     getConfigTarifs, 
     updateConfigTarif, 
@@ -32,7 +32,7 @@ export default function TarifsClient() {
         grille: [], offres: [], promos: [], negocies: [], audits: []
     })
 
-    const loadData = async (tab: ActiveTab) => {
+    const loadData = useCallback(async (tab: ActiveTab) => {
         setLoading(true)
         try {
             if (tab === ActiveTab.GRILLE) setData(d => ({ ...d, grille: [] }))
@@ -55,11 +55,11 @@ export default function TarifsClient() {
             console.error("Failed to load tariffs data", error)
         }
         setLoading(false)
-    }
+    }, [data.grille, data.offres, data.promos, data.negocies, data.audits])
 
     useEffect(() => {
         loadData(activeTab)
-    }, [activeTab])
+    }, [activeTab, loadData])
 
     return (
         <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 min-h-[600px] flex flex-col">

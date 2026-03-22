@@ -38,7 +38,7 @@ export async function generateOwnerMonthlyReport(ownerId: string, month: number,
     let totalPotentiel = 0;
     let totalEncaisse = 0;
     let nbImpayes = 0;
-    let detailsProperties: any[] = [];
+    const detailsProperties: any[] = [];
 
     leases.forEach(lease => {
       const montantMensuel = (lease.rentAmount || 0) + (lease.charges || 0);
