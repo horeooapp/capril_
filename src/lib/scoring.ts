@@ -90,3 +90,99 @@ export async function scoreAgentCompliance(agentId: string, isValidated: boolean
         await updateICLScore(agentId, -20, "Mandat rejeté ou expiré")
     }
 }
+
+// ═══════════════════════════════════════════════════════
+// ADD-13 : MOTEUR DE SCORE LOCATAIRE (M-LOC-SCORE)
+// ═══════════════════════════════════════════════════════
+
+export async function calculateUserScore(userId: string) {
+    let score = 0
+    let tauxPaiement12m = 0
+
+    // 1. Récupération des baux et quittances (40% régularité + 25% absence impayés = 65%)
+    const bails = await prisma.lease.findMany({
+        where: { tenantId: userId, status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] } }
+    })
+    
+    const bailIds = bails.map((b: any) => b.id)
+    const quittances = await prisma.receipt.findMany({
+        where: { leaseId: { in: bailIds } },
+        orderBy: { periodMonth: 'desc' },
+        take: 12
+    })
+
+    if (quittances.length > 0) {
+        let payesATemps = 0
+        let retards = 0
+        let impayes = 0
+
+        for (const quit of quittances) {
+            if (quit.status === 'paid') {
+                payesATemps++
+                // Chaque paiement à temps contribue à la base des 400 pts (Régularité)
+                score += (400 / quittances.length)
+            } else if (quit.status === 'late') {
+                retards++
+                score -= 20
+            } else {
+                impayes++
+                score -= 50
+            }
+        }
+
+        tauxPaiement12m = (payesATemps / quittances.length) * 100
+        
+        // Bonus Absence impayés (250 pts)
+        if (impayes === 0) {
+            score += 250
+        } else {
+            score -= (150 * impayes) 
+        }
+    } else {
+        // Nouveau locataire : Base neutre (Score B de départ ~ 600)
+        score += 600 
+    }
+
+    // 2. Durée du bail (20% = 200 pts)
+    for (const bail of bails) {
+        const months = Math.floor((new Date().getTime() - new Date(bail.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
+        if (months >= 36) score += 200
+        else if (months >= 24) score += 180
+        else if (months >= 12) score += 100
+        else score += (months * 8) 
+    }
+
+    // 3. Complétude KYC (10% = 100 pts)
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { identityDocuments: true }
+    })
+    if (user && user.identityDocuments.length > 0) {
+        const hasValidDoc = user.identityDocuments.some((d: any) => d.status === 'verified')
+        if (hasValidDoc) score += 100
+    }
+
+    // 4. Historique multi-bails (5% = 50 pts)
+    const profile = await (prisma as any).locataireProfile.findUnique({ where: { userId }})
+    if (profile && profile.nbBailsClos > 0) {
+        score += 50
+    }
+
+    // Normalisation 0-1000
+    score = Math.min(1000, Math.max(0, Math.round(score)))
+
+    return {
+        score,
+        badge: getScoreBadge(score),
+        tauxPaiement12m: Math.round(tauxPaiement12m * 10) / 10
+    }
+}
+
+export function getScoreBadge(score: number): 'A+' | 'A' | 'B' | 'C' | 'D' {
+    if (score >= 850) return 'A+'
+    if (score >= 700) return 'A'
+    if (score >= 550) return 'B'
+    if (score >= 400) return 'C'
+    return 'D'
+}
+

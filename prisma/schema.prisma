@@ -309,6 +309,13 @@ model User {
   tarifsNegociesCrees  TarifNegocie[]      @relation("TarifNegocieCreator")
   configTarifsAudits   ConfigTarifsAudit[] @relation("ConfigTarifAuditAuthor")
 
+  // ADD-13 Espace Locataire
+  locataireProfile       LocataireProfile?
+  signalements           SignalementLocataire[] @relation("UserSignalements")
+  preavis                PreavisBail[]          @relation("UserPreavis")
+  passeports             PasseportLocatif[]     @relation("UserPasseports")
+  alertesLoyer           AlerteLoyer[]          @relation("UserAlertesLoyer")
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -551,6 +558,12 @@ model Lease {
 
   // ADD-11
   smsDeclarations SmsDeclaration[] @relation("LeaseDeclarations")
+
+  // ADD-13 Espace Locataire
+  signalements           SignalementLocataire[]
+  caution                CautionBail?
+  preavis                PreavisBail[]
+  alertesLoyer           AlerteLoyer[]
 
   @@index([propertyId])
   @@index([tenantId])
@@ -2359,4 +2372,164 @@ model ConfigTarifsAudit {
   modifiePar       User?           @relation("ConfigTarifAuditAuthor", fields: [modifieParId], references: [id])
 
   @@map("config_tarifs_audit")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-13 : ESPACE LOCATAIRE COMPLET
+// ═══════════════════════════════════════════════════════
+
+model LocataireProfile {
+  id                String       @id @default(uuid()) @map("profil_id")
+  userId            String       @unique @map("user_id")
+  scoreActuel       Int          @default(0) @db.SmallInt @map("score_actuel")
+  scoreBadge        String       @default("D") @db.VarChar(2) @map("score_badge")
+  scoreCalculeAt    DateTime?    @map("score_calcule_at")
+  tauxPaiement12m   Decimal      @default(0) @db.Decimal(5, 2) @map("taux_paiement_12m")
+  nbBailsActifs     Int          @default(0) @db.SmallInt @map("nb_bails_actifs")
+  nbBailsClos       Int          @default(0) @db.SmallInt @map("nb_bails_clos")
+  alerteJ3Active    Boolean      @default(true) @map("alerte_j3_active")
+  alerteJ1Active    Boolean      @default(true) @map("alerte_j1_active")
+  canalAlertePref   String       @default("SMS") @db.VarChar(20) @map("canal_alerte_pref") // SMS | WHATSAPP | PUSH | TOUS
+  passeportGenereAt DateTime?    @map("passeport_genere_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  user              User         @relation(fields: [userId], references: [id])
+
+  @@map("locataire_profiles")
+}
+
+enum SignalCatEnum {
+  FUITE_EAU
+  ELECTRICITE
+  PORTE_SERRURE
+  NUISANCE
+  DEGRADATION
+  AUTRE
+}
+
+enum SignalStatutEnum {
+  ENVOYE
+  VU_PROPRIO
+  EN_COURS
+  RESOLU
+  NON_RESOLU_FERME
+}
+
+model SignalementLocataire {
+  id              String           @id @default(uuid()) @map("signal_id")
+  bailId          String           @map("bail_id")
+  locataireId     String           @map("locataire_id")
+  categorie       SignalCatEnum
+  description     String           @db.Text
+  urgence         String           @default("NORMAL") @db.VarChar(15) // NORMAL | URGENT | TRES_URGENT
+  photos          String[]         
+  statut          SignalStatutEnum @default(ENVOYE)
+  proprioVuAt     DateTime?        @map("proprio_vu_at")
+  resoluAt        DateTime?        @map("resolu_at")
+  resoluPar       String?          @db.VarChar(20) @map("resolu_par")
+  noteResolution  String?          @db.Text @map("note_resolution")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  bail            Lease            @relation(fields: [bailId], references: [id])
+  locataire       User             @relation("UserSignalements", fields: [locataireId], references: [id])
+
+  @@map("signalements_locataire")
+}
+
+enum CautionDestEnum {
+  PROPRIETAIRE
+  CDC_CI
+  AUTRE
+}
+
+model CautionBail {
+  id                String           @id @default(uuid()) @map("caution_id")
+  bailId            String           @unique @map("bail_id")
+  montantFcfa       Decimal          @map("montant_fcfa") @db.Decimal(12, 0)
+  dateVersement     DateTime         @map("date_versement") @db.Date
+  modeVersement     String?          @map("mode_versement") @db.VarChar(30) // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
+  destination       CautionDestEnum  @default(PROPRIETAIRE)
+  recepisseCdcCi    String?          @map("recepissse_cdc_ci") @db.VarChar(50)
+  conditionsRestit  String?          @map("conditions_restit") @db.Text
+  confirmeLocataire Boolean          @default(false) @map("confirme_locataire")
+  confirmeAt        DateTime?        @map("confirme_at")
+  certificatRef     String?          @unique @map("certificat_ref") @db.VarChar(30)
+  hashSha256        String?          @map("hash_sha256") @db.VarChar(64)
+  
+  // Restitution
+  restituee         Boolean          @default(false)
+  montantRestitue   Decimal?         @map("montant_restitue") @db.Decimal(12, 0)
+  dateRestitution   DateTime?        @map("date_restitution") @db.Date
+  motifRetenue      String?          @map("motif_retenue") @db.Text
+  createdAt         DateTime         @default(now()) @map("created_at")
+
+  bail              Lease            @relation(fields: [bailId], references: [id])
+
+  @@map("cautions_bail")
+}
+
+enum PreavisStatutEnum {
+  EMIS
+  ACCUSE
+  ETAT_LIEUX_PLANIFIE
+  CLOS
+}
+
+model PreavisBail {
+  id                  String             @id @default(uuid()) @map("preavis_id")
+  bailId              String             @map("bail_id")
+  locataireId         String             @map("locataire_id")
+  dateDeclaration     DateTime           @default(now()) @map("date_declaration") @db.Date
+  dateDepartPrevue    DateTime           @map("date_depart_prevue") @db.Date
+  dateDepartEffective DateTime?          @map("date_depart_effective") @db.Date
+  motif               String?            @db.Text
+  statut              PreavisStatutEnum  @default(EMIS)
+  proprioAccuseAt     DateTime?          @map("proprio_accuse_at")
+  etatLieuxPrevu      DateTime?          @map("etat_lieux_prevu") @db.Date
+  refPreavis          String?            @unique @map("ref_preavis") @db.VarChar(30)
+  hashSha256          String?            @map("hash_sha256") @db.VarChar(64)
+  createdAt           DateTime           @default(now()) @map("created_at")
+
+  bail                Lease              @relation(fields: [bailId], references: [id])
+  locataire           User               @relation("UserPreavis", fields: [locataireId], references: [id])
+
+  @@map("preavis_bails")
+}
+
+model PasseportLocatif {
+  id                   String       @id @default(uuid()) @map("passeport_id")
+  locataireId          String       @map("locataire_id")
+  refPasseport         String?      @unique @map("ref_passeport") @db.VarChar(30)
+  scoreGlobal          Int          @db.SmallInt @map("score_global")
+  tauxPaiementGlobal   Decimal      @db.Decimal(5, 2) @map("taux_paiement_global")
+  nbBailsInclus        Int          @db.SmallInt @map("nb_bails_inclus")
+  periodeCouverteDebut DateTime     @map("periode_couverte_debut") @db.Date
+  periodeCouverteFin   DateTime     @map("periode_couverte_fin") @db.Date
+  snapshotBails        Json         @map("snapshot_bails")
+  hashSha256           String?      @map("hash_sha256") @db.VarChar(64)
+  pdfUrl               String?      @map("pdf_url") @db.Text
+  nbConsultations      Int          @default(0) @map("nb_consultations")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  expireAt             DateTime?    @map("expire_at")
+
+  locataire            User         @relation("UserPasseports", fields: [locataireId], references: [id])
+
+  @@map("passeports_locatifs")
+}
+
+model AlerteLoyer {
+  id              String       @id @default(uuid()) @map("alerte_id")
+  bailId          String       @map("bail_id")
+  locataireId     String       @map("locataire_id")
+  typeAlerte      String       @map("type_alerte") @db.VarChar(20) // J_MOINS_3 | J_MOINS_1 | J_PLUS_1
+  datePrevue      DateTime     @map("date_prevue") @db.Date
+  envoyee         Boolean      @default(false)
+  envoyeeAt       DateTime?    @map("envoyee_at")
+  canal           String?      @db.VarChar(20) // SMS | WHATSAPP | PUSH
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  bail            Lease        @relation(fields: [bailId], references: [id])
+  locataire       User         @relation("UserAlertesLoyer", fields: [locataireId], references: [id])
+
+  @@map("alertes_loyer")
 }

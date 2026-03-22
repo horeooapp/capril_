@@ -17,10 +17,11 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
     const pathname = usePathname()
 
     const navLinks = [
-        { href: "/", label: "Accueil", icon: <Home size={20} /> },
-        { href: "/locataire", label: "Mes Quittances", icon: <FileText size={20} /> },
-        { href: "/locataire/leases", label: "Mes Contrats", icon: <ClipboardList size={20} /> },
-        { href: "/locataire/trust", label: "Indice de Confiance", icon: <Star size={20} /> },
+        { href: "/locataire", label: "Tableau de Bord", icon: <Home size={20} /> },
+        { href: "/locataire/signalements", label: "Signalements", icon: <ClipboardList size={20} /> },
+        { href: "/locataire/cautions", label: "Ma Caution", icon: <Star size={20} /> },
+        { href: "/locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
+        { href: "/locataire/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
     ]
 
     return (
