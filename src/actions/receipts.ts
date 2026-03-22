@@ -49,7 +49,7 @@ export async function createReceipt(data: {
         // ADD-09 Paywall check (Wallet QAPRIL)
         const creator = await prisma.user.findUnique({
             where: { id: userId },
-            select: { activePlanTier: true, walletBalance: true }
+            select: { activePlanTier: true, walletBalance: true, fullName: true }
         });
         
         if (!creator) return { error: "Utilisateur inconnu" };

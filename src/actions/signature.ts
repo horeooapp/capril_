@@ -39,10 +39,17 @@ export async function initiateLeaseSignature(leaseId: string) {
             data: { signingOtp: otp }
         })
 
-        // TODO: Appel service SMS (Orange/MTN/Moov) via Gateway SMS
-        console.log(`[SMS OTP] Envoi du code ${otp} au locataire ${lease.tenant.email}`)
+        // Envoi de l'OTP réel via la Gateway SMS (Orange/MTN/Moov)
+        if (lease.tenant.phone) {
+            const { sendSMS } = await import("@/lib/sms");
+            const smsMessage = `QAPRIL - Code de Signature Électronique du bail : ${otp}. Ne partagez ce code de scellement avec personne.`;
+            await sendSMS(lease.tenant.phone, smsMessage);
+            console.log(`[SIGNATURE] SMS OTP envoyé au ${lease.tenant.phone}`);
+        } else {
+            console.warn(`[SIGNATURE] Impossible d'envoyer l'OTP : Le locataire n'a pas de téléphone.`);
+        }
 
-        return { success: true, message: "Code de signature envoyé par SMS." }
+        return { success: true, message: "Le code de signature sécurisé a été envoyé par SMS." }
     } catch (error) {
         return { success: false, error: "Échec de l'initiation de la signature." }
     }

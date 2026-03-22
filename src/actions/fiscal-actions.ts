@@ -237,3 +237,69 @@ export async function getFiscalStats() {
         return { error: "Erreur lors de la récupération des statistiques" }
     }
 }
+
+/**
+ * Export DGI (M17) : Génère un rapport d'export des loyers soumis à la déclaration
+ * Seuls les baux dont l'accumulation annuelle ou la base dépasse 1 000 000 FCFA sont strictement déclarables selon M17.
+ * Retourne un contenu CSV prêt à être téléchargé.
+ */
+export async function exportDGIReport(year: number) {
+    await ensureFeatureEnabled("M17_FISCAL")
+    try {
+        const startOfYear = new Date(year, 0, 1)
+        const endOfYear = new Date(year + 1, 0, 1)
+
+        const dossiers = await prisma.fiscalDossier.findMany({
+            where: {
+                statut: { in: ["ENREGISTRE", "PAYE_CONFIRME", "EN_ATTENTE_DECLARATION"] },
+                createdAt: {
+                    gte: startOfYear,
+                    lt: endOfYear
+                }
+            },
+            include: {
+                lease: {
+                    include: {
+                        tenant: true,
+                        landlord: true,
+                        property: true
+                    }
+                }
+            }
+        });
+
+        // Filtrage des revenus annuels >= 1M FCFA
+        const SEUIL_DGI = 1000000;
+        const declarables = dossiers.filter(d => (d.loyerMensuel * d.dureeBailMois) >= SEUIL_DGI);
+
+        if (declarables.length === 0) {
+            return { success: true, csv: "Aucune déclaration fiscale DGI requise pour cette période." }
+        }
+
+        // CSV Header
+        let csvContent = "Reference Bail,Locataire,Proprietaire,Bien,Commune,Loyer Mensuel,Duree (Mois),Revenu Annuel,Droits Enregistrement DGI,Statut\n";
+
+        declarables.forEach(d => {
+            const locataire = d.lease.tenant?.fullName || 'N/A';
+            const proprietaire = d.lease.landlord.fullName || 'N/A';
+            const bien = d.lease.property.propertyCode;
+            const commune = d.lease.property.commune;
+            const revenuAnnuel = d.loyerMensuel * d.dureeBailMois;
+            const droits = d.droitsEnregistrement;
+            
+            csvContent += `"${d.lease.leaseReference}","${locataire}","${proprietaire}","${bien}","${commune}",${d.loyerMensuel},${d.dureeBailMois},${revenuAnnuel},${droits},${d.statut}\n`;
+        });
+
+        await logAction({
+            action: "EXPORT_DGI_CSV",
+            module: "M17_FISCAL",
+            entityId: `ANNEE_${year}`,
+            newValues: { recordCount: declarables.length }
+        });
+
+        return { success: true, csv: csvContent }
+    } catch (error) {
+        console.error("[ACTION] exportDGIReport error:", error)
+        return { success: false, error: "Erreur lors de la génération de l'export DGI." }
+    }
+}
