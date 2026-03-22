@@ -17,7 +17,9 @@ import {
     Bot,
     FileSignature,
     Handshake,
-    Send
+    Send,
+    Trophy,
+    ClipboardCheck
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -94,6 +96,17 @@ export default async function AdminDashboardOverview() {
         activeInvitations: await (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
         totalConsultations: await (prisma as any).consultationProfil.count().catch(() => 0),
         matchRate: await (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
+
+        // ADD-15 Stats
+        totalChampions: await (prisma as any).championProfile.count().catch(() => 0),
+        activeChampions: await (prisma as any).championProfile.count({ where: { statut: "ACTIF" } }).catch(() => 0),
+        pendingCommissions: Number((await (prisma as any).championCommission.aggregate({ 
+            _sum: { montantFcfa: true },
+            where: { statut: "EN_ATTENTE" }
+        }).catch(() => null))?._sum?.montantFcfa || 0),
+        totalEdls: await (prisma as any).etatsDesLieux.count().catch(() => 0),
+        certifiedEdls: await (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
+        totalMonthlyReports: await (prisma as any).rapportMensuel.count().catch(() => 0),
     }
 
     try {
@@ -127,6 +140,7 @@ export default async function AdminDashboardOverview() {
                         color="emerald"
                         trend="Nouveauté"
                         delay={0.1}
+                        href="/admin/reversals"
                     />
                     <StatCard 
                         title="Alertes Fraude (M-GUARD)" 
@@ -151,6 +165,7 @@ export default async function AdminDashboardOverview() {
                         color="purple"
                         trend="Efficience"
                         delay={0.4}
+                        href="/admin/compliance"
                     />
                     <StatCard 
                         title="Litiges Ouverts" 
@@ -159,6 +174,7 @@ export default async function AdminDashboardOverview() {
                         color="orange"
                         trend="Médiation"
                         delay={0.45}
+                        href="/admin/disputes"
                     />
                     <StatCard 
                         title="Impayés (Rappels)" 
@@ -214,13 +230,14 @@ export default async function AdminDashboardOverview() {
                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-orange-600 px-2">Supervision ADD-11 : Rôles & SMS</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <StatCard 
-                            title="Déclarations SMS" 
-                            value={safeData.totalSmsDeclarations.toLocaleString()} 
-                            icon={<MessageSquare size={28} />} 
-                            color="orange"
-                            trend={`${safeData.confirmedSmsDeclarations} Confirmées`}
-                            delay={0.1}
-                        />
+                        title="Déclarations SMS" 
+                        value={safeData.totalSmsDeclarations.toLocaleString()} 
+                        icon={<MessageSquare size={28} />} 
+                        color="orange"
+                        trend={`${safeData.confirmedSmsDeclarations} Confirmées`}
+                        delay={0.1}
+                        href="/admin/declarations"
+                    />
                         <StatCard 
                             title="Gestionnaires Actifs" 
                             value={safeData.totalManagers.toLocaleString()} 
@@ -253,21 +270,23 @@ export default async function AdminDashboardOverview() {
                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-600 px-2">Supervision ADD-14 : Profils & Matching</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <StatCard 
-                            title="Profils Publics" 
-                            value={safeData.totalPublicProfiles.toLocaleString()} 
-                            icon={<Users size={28} />} 
-                            color="emerald"
-                            trend="Locataires Autonomes"
-                            delay={0.1}
-                        />
-                        <StatCard 
-                            title="Invitations Actives" 
-                            value={safeData.activeInvitations.toLocaleString()} 
-                            icon={<Send size={28} />} 
-                            color="orange"
-                            trend="Propositions"
-                            delay={0.2}
-                        />
+                        title="Profils Publics" 
+                        value={safeData.totalPublicProfiles.toLocaleString()} 
+                        icon={<Users size={28} />} 
+                        color="emerald"
+                        trend="Locataires Autonomes"
+                        delay={0.1}
+                        href="/admin/users"
+                    />
+                    <StatCard 
+                        title="Invitations Actives" 
+                        value={safeData.activeInvitations.toLocaleString()} 
+                        icon={<Send size={28} />} 
+                        color="orange"
+                        trend="Propositions"
+                        delay={0.2}
+                        href="/admin/declarations"
+                    />
                         <StatCard 
                             title="Matchs Réussis" 
                             value={safeData.matchRate.toLocaleString()} 
@@ -283,6 +302,89 @@ export default async function AdminDashboardOverview() {
                             color="slate"
                             trend="Visibilité"
                             delay={0.4}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-15 : Réseau Champions */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600 px-2">Supervision ADD-15 : Réseau Champions</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Total Champions" 
+                            value={safeData.totalChampions.toLocaleString()} 
+                            icon={<Trophy size={28} />} 
+                            color="indigo"
+                            trend={`${safeData.activeChampions} Actifs`}
+                            delay={0.1}
+                            href="/admin/champions"
+                        />
+                        <StatCard 
+                            title="Commissions à Valider" 
+                            value={`${safeData.pendingCommissions.toLocaleString()} FCFA`} 
+                            icon={<CreditCard size={28} />} 
+                            color="orange"
+                            trend="En attente"
+                            delay={0.2}
+                            href="/admin/champions"
+                        />
+                        <StatCard 
+                            title="Objectifs Atteints" 
+                            value="84%" 
+                            icon={<Zap size={28} />} 
+                            color="emerald"
+                            trend="Efficience"
+                            delay={0.3}
+                        />
+                        <StatCard 
+                            title="Nouveaux Prospects" 
+                            value="+12" 
+                            icon={<Users size={28} />} 
+                            color="blue"
+                            trend="Ce mois"
+                            delay={0.4}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-15 : États des Lieux & Rapports */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-600 px-2">Supervision ADD-15 : États des Lieux & Rapports</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="États des Lieux" 
+                            value={safeData.totalEdls.toLocaleString()} 
+                            icon={<ClipboardCheck size={28} />} 
+                            color="slate"
+                            trend={`${safeData.certifiedEdls} Certifiés`}
+                            delay={0.5}
+                            href="/admin/edl"
+                        />
+                        <StatCard 
+                            title="Taux Certification" 
+                            value={safeData.totalEdls > 0 ? `${Math.round((safeData.certifiedEdls / safeData.totalEdls) * 100)}%` : "0%"} 
+                            icon={<ShieldCheck size={28} />} 
+                            color="emerald"
+                            trend="SHA-256"
+                            delay={0.6}
+                            href="/admin/edl"
+                        />
+                        <StatCard 
+                            title="Rapports Mensuels" 
+                            value={safeData.totalMonthlyReports.toLocaleString()} 
+                            icon={<FileText size={28} />} 
+                            color="blue"
+                            trend="Générés"
+                            delay={0.7}
+                            href="/admin/reports"
+                        />
+                        <StatCard 
+                            title="Délivrance Auto." 
+                            value="100%" 
+                            icon={<Zap size={28} />} 
+                            color="indigo"
+                            trend="Délivrés"
+                            delay={0.8}
                         />
                     </div>
                 </div>

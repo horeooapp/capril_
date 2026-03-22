@@ -19,7 +19,9 @@ import {
     ChevronRight,
     Bot,
     Scale,
-    BookOpen
+    BookOpen,
+    Trophy,
+    ClipboardCheck
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -43,6 +45,8 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/system/ai-monitoring", label: "Supervision IA", icon: <Bot size={20} /> },
         { href: "/admin/settings/features", label: "Modules Core", icon: <Settings2 size={20} /> },
         { href: "/admin/users", label: "Utilisateurs", icon: <Users size={20} /> },
+        { href: "/admin/champions", label: "Champions & Comms", icon: <Trophy size={20} /> },
+        { href: "/admin/edl", label: "États des Lieux", icon: <ClipboardCheck size={20} /> },
         { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },
         { href: "/admin/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
     ]

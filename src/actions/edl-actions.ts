@@ -147,3 +147,26 @@ export async function getEdlsByLease(leaseId: string) {
     return [];
   }
 }
+
+export async function getAllEdls() {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") return [];
+
+  try {
+    return await (prisma as any).etatsDesLieux.findMany({
+      include: {
+        lease: {
+          include: {
+            tenants: { select: { fullName: true } },
+            property: { select: { address: true } }
+          }
+        },
+        redigePar: { select: { fullName: true } }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+  } catch (error) {
+    console.error("[EDL] Admin Fetch Error:", error);
+    return [];
+  }
+}
