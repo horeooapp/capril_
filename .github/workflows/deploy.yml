@@ -117,13 +117,7 @@ jobs:
             --exclude='.github' \
             ./ $DEPLOY_DEST/
 
-      - name: 🗃️ Run Prisma Migrations
-        run: |
-          DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          cd $DEPLOY_DEST
-          export DATABASE_URL='${{ secrets.DATABASE_URL }}'
-          npx prisma@6.4.1 migrate deploy
+      # Handled inside the restart block for better permission consistency
 
       - name: 🔐 Create Production .env
         run: |
@@ -174,7 +168,9 @@ jobs:
           # We use -H 0.0.0.0 to listen on all interfaces, allowing external access.
           sudo su - github -c "
             cd $DEPLOY_DEST && \
+            export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
             npm ci --omit=dev && \
+            npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
             (pm2 reload capril --update-env || \
              pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000 -H 0.0.0.0) && \
