@@ -80,6 +80,12 @@ export default async function AdminDashboardOverview() {
         }).catch(() => []),
         activeModules: await prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
         totalModules: await prisma.featureFlag.count().catch(() => 0),
+
+        // ADD-11 Stats
+        totalSmsDeclarations: await (prisma as any).smsDeclaration.count().catch(() => 0),
+        confirmedSmsDeclarations: await (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+        totalManagers: await (prisma as any).propertyAccess.count({ where: { role: "MANAGER", statut: "ACTIF" } }).catch(() => 0),
+        totalAgents: await (prisma as any).propertyAccess.count({ where: { role: "FIELD_AGENT", statut: "ACTIF" } }).catch(() => 0),
     }
 
     try {
@@ -191,6 +197,45 @@ export default async function AdminDashboardOverview() {
                             color="amber"
                             trend="M-TVA 18%"
                             delay={0.6}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-11 : Rôles & Déclarations SMS */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-orange-600 px-2">Supervision ADD-11 : Rôles & SMS</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Déclarations SMS" 
+                            value={safeData.totalSmsDeclarations.toLocaleString()} 
+                            icon={<MessageSquare size={28} />} 
+                            color="orange"
+                            trend={`${safeData.confirmedSmsDeclarations} Confirmées`}
+                            delay={0.1}
+                        />
+                        <StatCard 
+                            title="Gestionnaires Actifs" 
+                            value={safeData.totalManagers.toLocaleString()} 
+                            icon={<Users size={28} />} 
+                            color="blue"
+                            trend="Intermédiaires"
+                            delay={0.2}
+                        />
+                        <StatCard 
+                            title="Agents de Terrain" 
+                            value={safeData.totalAgents.toLocaleString()} 
+                            icon={<ShieldCheck size={28} />} 
+                            color="emerald"
+                            trend="Vérification"
+                            delay={0.3}
+                        />
+                        <StatCard 
+                            title="Relances Auto." 
+                            value="Actif" 
+                            icon={<Zap size={28} />} 
+                            color="indigo"
+                            trend="H+2 / H+6"
+                            delay={0.4}
                         />
                     </div>
                 </div>

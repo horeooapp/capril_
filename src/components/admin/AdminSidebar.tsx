@@ -35,6 +35,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/agency", label: "Gestion Agence", icon: <Briefcase size={20} /> },
         { href: "/admin/migration", label: "Migration Data", icon: <Database size={20} /> },
         { href: "/admin/reversals", label: "Paiements PGW", icon: <ArrowRightLeft size={20} /> },
+        { href: "/admin/declarations", label: "Déclarations SMS/WA", icon: <ShieldAlert size={20} /> },
         { href: "/admin/reports", label: "Rapports & Stats", icon: <BarChart3 size={20} /> },
         { href: "/admin/news", label: "Actualités Ticker", icon: <Newspaper size={20} />, active: true },
         { href: "/admin/compliance", label: "Conformité KYC", icon: <ShieldAlert size={20} /> },

@@ -71,6 +71,7 @@ export default async function AdminLayout({
                     { href: "/admin/agency", label: "Agence", icon: <Briefcase size={24} /> },
                     { href: "/admin/migration", label: "Migration", icon: <Database size={24} /> },
                     { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={24} /> },
+                    { href: "/admin/declarations", label: "SMS", icon: <ShieldAlert size={24} /> },
                     { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={24} /> },
                     { href: "/admin/news", label: "News", icon: <Newspaper size={24} /> },
                     { href: "/admin/compliance", label: "KYC", icon: <ShieldAlert size={24} /> },
