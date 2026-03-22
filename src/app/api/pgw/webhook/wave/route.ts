@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logAction } from "@/actions/audit";
 import { Decimal } from "@prisma/client/runtime/library";
+import crypto from "crypto";
 
 /**
  * PGW-WEBHOOK: Réception des notifications Wave
@@ -9,12 +10,25 @@ import { Decimal } from "@prisma/client/runtime/library";
  */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+    const body = JSON.parse(rawBody);
     console.log("[WAVE WEBHOOK] Notification reçue:", body);
 
-    // 1. Validation de la signature (Optionnel selon le secret configuré)
-    // const signature = req.headers.get("wave-signature");
-    // TODO: Implémenter la validation réelle avec process.env.WAVE_WEBHOOK_SECRET
+    // 1. Validation de la signature cryptographique Wave
+    const waveSignature = req.headers.get("wave-signature");
+    const secret = process.env.WAVE_WEBHOOK_SECRET;
+
+    if (secret && waveSignature) {
+      // Wave docs usually mention HMAC-SHA256
+      const hmac = crypto.createHmac("sha256", secret);
+      hmac.update(rawBody);
+      const calculatedSignature = hmac.digest("hex");
+      
+      if (calculatedSignature !== waveSignature) {
+        console.error("[WAVE WEBHOOK] Signature Invalide !");
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      }
+    }
 
     const eventType = body.type;
     const checkoutSessionId = body.id;

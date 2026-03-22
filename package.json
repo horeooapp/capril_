@@ -34,6 +34,7 @@
     "next-auth": "^5.0.0-beta.30",
     "node-ssh": "^13.2.1",
     "nodemailer": "^7.0.7",
+    "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "19.2.3",

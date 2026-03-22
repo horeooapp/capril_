@@ -8,6 +8,7 @@ export type EventType =
   | "QUITTANCE_GENEREE"
   | "PAIEMENT_RECU"
   | "IMPAYE_DETECTE"
+  | "RAPPEL_ECHEANCE"
   | "BAIL_CONFIRME"
   | "RAPPORT_MENSUEL"
   | "WALLET_BAS"

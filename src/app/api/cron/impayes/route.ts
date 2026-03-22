@@ -54,6 +54,19 @@ export async function GET(request: Request) {
         // Aucune quittance ce mois-ci, donc impayé
         detectedCount++;
         
+        // Enregistrer l'impayé dans la base pour les statistiques
+        await prisma.monthlyRentSynthesis.upsert({
+          where: { leaseId_month: { leaseId: lease.id, month: periodMonth } },
+          update: { status: "IMPAYE" },
+          create: {
+            leaseId: lease.id,
+            month: periodMonth,
+            totalExpected: lease.rentAmount + lease.chargesAmount,
+            amountCollected: 0,
+            status: "IMPAYE"
+          }
+        });
+        
         // 4. Déclencher le Dispatcher de l'ADD-09
         await NotificationService.envoyerNotification(
             lease.tenantId,

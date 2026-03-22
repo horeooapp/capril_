@@ -46,6 +46,34 @@ export async function createReceipt(data: {
             return { error: "Action non autorisée sur ce contrat" }
         }
 
+        // ADD-09 Paywall check (Wallet QAPRIL)
+        const creator = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { activePlanTier: true, walletBalance: true }
+        });
+        
+        if (!creator) return { error: "Utilisateur inconnu" };
+
+        const RECEIPT_COST = 150; // Coût en FCFA pour une quittance
+        if (creator.activePlanTier === "ESSENTIEL") {
+            if (creator.walletBalance < RECEIPT_COST) {
+                return { 
+                    error: "INSUFFICIENT_FUNDS", 
+                    message: "Solde QAPRIL insuffisant pour générer cette quittance (Coût: 150 FCFA). Veuillez recharger votre Wallet." 
+                };
+            }
+            // Déduire du wallet
+            await prisma.user.update({
+                where: { id: userId },
+                data: { walletBalance: { decrement: RECEIPT_COST } }
+            });
+        } else if (creator.activePlanTier === "LOCATAIRE") {
+             return { 
+                 error: "PLAN_UPGRADE_REQUIRED", 
+                 message: "Un compte Locataire ne peut pas émettre de quittances. Veuillez passer au compte ESSENTIEL ou PRO." 
+             };
+        }
+
         // 2. Generate v2.0 Reference
         const receiptRef = await generateReceiptRef()
 
