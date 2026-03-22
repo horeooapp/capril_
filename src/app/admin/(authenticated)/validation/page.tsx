@@ -38,7 +38,7 @@ export default async function AdminValidationPage() {
                                             <div className="text-sm text-gray-600 space-y-1">
                                                 <p><span className="font-medium">Responsable :</span> {user.fullName}</p>
                                                 <p><span className="font-medium">E-mail :</span> {user.email}</p>
-                                                <p><span className="font-medium">Inscrit le :</span> {user.createdAt.toLocaleDateString()}</p>
+                                                <p><span className="font-medium">Inscrit le :</span> {new Date(user.createdAt).toLocaleDateString()}</p>
                                             </div>
                                         </div>
                                         <div className="ml-4">
