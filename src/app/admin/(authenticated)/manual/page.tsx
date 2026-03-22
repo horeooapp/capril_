@@ -32,12 +32,23 @@ export default function AdminManualPage() {
     return (
         <div className="max-w-7xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header / Cover */}
-            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white/60 border border-white/80 shadow-xl backdrop-blur-md mb-12">
-                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white/60 border border-white/80 shadow-xl backdrop-blur-md mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
+                <style dangerouslySetInnerHTML={{__html: `
+                    @media print {
+                        @page { margin: 2cm; }
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
+                        /* Force page breaks before major sections */
+                        h2 { page-break-before: always; break-before: page; margin-top: 0 !important; }
+                        /* Except the first one */
+                        #section-1 h2 { page-break-before: avoid; break-before: auto; }
+                    }
+                `}} />
+                
+                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none print:hidden">
                     <BookOpen size={240} className="text-ivoire-dark" />
                 </div>
                 
-                <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-left">
+                <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-left print:text-black">
                     <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
                         {/* We use standard img to avoid ProtectedLogo complex dependencies in case it's not adapted, but ProtectedLogo was used before so let's stick to standard img for simplicity here if ProtectedLogo is missing props or just standard img */}
                         <img src="/logo.png" alt="QAPRIL" className="h-20 w-auto rounded-3xl shadow-xl border-4 border-white" />
@@ -50,15 +61,15 @@ export default function AdminManualPage() {
                         </div>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-6 tracking-tighter uppercase leading-[1.1]">
-                        Application <span className="text-ivoire-dark">QAPRIL</span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-6 tracking-tighter uppercase leading-[1.1] print:text-5xl print:text-black">
+                        Application <span className="text-ivoire-dark print:text-black">QAPRIL</span>
                     </h1>
-                    <p className="text-gray-600 text-lg md:text-xl max-w-3xl font-medium leading-relaxed mb-8">
-                        Quittancement Autonome et Plateforme des Ressources Immobilières Locatives. <br className="hidden md:block"/>
+                    <p className="text-gray-600 text-lg md:text-xl max-w-3xl font-medium leading-relaxed mb-8 print:text-black">
+                        Quittancement Autonome et Plateforme des Ressources Immobilières Locatives. <br className="hidden md:block print:hidden"/>
                         Ce manuel est rédigé en français simple avec chaque action expliquée étape par étape.
                     </p>
 
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 print:hidden">
                         <div className="flex items-center gap-3 bg-white border border-gray-100 shadow-sm rounded-2xl px-5 py-3">
                             <Smartphone className="text-gray-400" size={20} />
                             <span className="text-[11px] font-bold text-gray-600 uppercase tracking-widest">
@@ -80,9 +91,9 @@ export default function AdminManualPage() {
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12">
+            <div className="flex flex-col lg:flex-row gap-12 print:gap-0">
                 {/* Table of Contents - Sidebar */}
-                <div className="lg:w-1/4 shrink-0">
+                <div className="lg:w-1/4 shrink-0 print:hidden">
                     <div className="sticky top-24 bg-white/60 border border-white/80 p-6 rounded-3xl shadow-lg backdrop-blur-md">
                         <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                             <Book size={18} className="text-ivoire-dark" /> Sommaire
@@ -120,22 +131,22 @@ export default function AdminManualPage() {
                 </div>
 
                 {/* Main Content */}
-                <div className="lg:w-3/4 space-y-16">
+                <div className="lg:w-3/4 space-y-16 print:w-full print:space-y-10">
                     
                     {/* SECTION 1 */}
-                    <div id="section-1" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase">1. Qu'est-ce que QAPRIL ?</h2>
-                        <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8">
-                            <p>QAPRIL est une application numérique qui permet aux propriétaires et locataires de gérer leurs locations de façon simple, sécurisée et officielle en Côte d'Ivoire.</p>
+                    <div id="section-1" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">1. Qu'est-ce que QAPRIL ?</h2>
+                        <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
+                            <p className="print:text-black">QAPRIL est une application numérique qui permet aux propriétaires et locataires de gestion leurs locations de façon simple, sécurisée et officielle en Côte d'Ivoire.</p>
                             
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4">1.1 Ce que QAPRIL fait pour vous</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full text-sm text-left text-gray-600 border border-gray-100 rounded-xl overflow-hidden">
-                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 font-black">
+                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4 print:mt-4 print:text-lg text-black">1.1 Ce que QAPRIL fait pour vous</h3>
+                                <div className="overflow-x-auto print:overflow-visible">
+                                    <table className="min-w-full text-sm text-left text-gray-600 border border-gray-100 rounded-xl overflow-hidden print:border-collapse print:border-gray-300">
+                                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 font-black print:bg-gray-100">
                                             <tr>
-                                                <th className="px-6 py-4 border-b">Si vous êtes...</th>
-                                                <th className="px-6 py-4 border-b">QAPRIL vous permet de...</th>
+                                                <th className="px-6 py-4 border-b print:border-gray-300">Si vous êtes...</th>
+                                                <th className="px-6 py-4 border-b print:border-gray-300">QAPRIL vous permet de...</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -160,9 +171,9 @@ export default function AdminManualPage() {
                                 </div>
                             </div>
 
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4">1.2 Les canaux d'accès</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="print:break-inside-avoid">
+                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4 print:mt-6 print:text-lg">1.2 Les canaux d'accès</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
                                     <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
                                         <div className="font-bold text-gray-900 mb-1">📱 Application Android</div>
                                         <p className="text-sm">Télécharger QAPRIL sur Google Play Store · Chercher 'QAPRIL CI'</p>
@@ -189,10 +200,10 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 2 */}
-                    <div id="section-2" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase">2. S'inscrire sur QAPRIL</h2>
-                        <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8">
-                            <p>L'inscription est gratuite. Vous avez besoin uniquement de votre numéro de téléphone ivoirien.</p>
+                    <div id="section-2" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">2. S'inscrire sur QAPRIL</h2>
+                        <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
+                            <p className="print:text-black">L'inscription est gratuite. Vous avez besoin uniquement de votre numéro de téléphone ivoirien.</p>
                             
                             <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -208,7 +219,7 @@ export default function AdminManualPage() {
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 6. Entrez votre nom et prénom complets</li>
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 7. Appuyez sur 'Valider' — votre compte est créé</li>
                                 </ul>
-                                <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm font-medium flex gap-3 items-start">
+                                <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm font-medium flex gap-3 items-start print:border print:border-blue-200">
                                     <Info className="shrink-0 mt-0.5" size={18} />
                                     <p>Astuce : Vous n'avez pas besoin de mot de passe — QAPRIL utilise votre numéro de téléphone et un code SMS pour vous identifier. C'est plus simple et plus sécurisé.</p>
                                 </div>
@@ -240,9 +251,9 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 3 */}
-                    <div id="section-3" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase">3. Guide du Propriétaire Bailleur</h2>
-                        <div className="space-y-10 text-gray-600">
+                    <div id="section-3" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">3. Guide du Propriétaire Bailleur</h2>
+                        <div className="space-y-10 text-gray-600 print:text-black">
                             
                             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">3.1 Ajouter un logement</h3>
@@ -326,9 +337,9 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 4 LOCATAIRE */}
-                    <div id="section-4" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase">4. Guide du Locataire</h2>
-                        <div className="space-y-8 text-gray-600 text-sm leading-relaxed">
+                    <div id="section-4" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">4. Guide du Locataire</h2>
+                        <div className="space-y-8 text-gray-600 text-sm leading-relaxed print:text-black">
                             <p className="text-lg font-medium text-gray-900">En tant que locataire, QAPRIL est entièrement GRATUIT. Vous ne payez rien pour recevoir vos quittances ou consulter votre historique.</p>
 
                             <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
@@ -364,10 +375,12 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 5, 6, 7, 8 MINI */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div id="section-5" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2"><Briefcase className="text-ivoire-dark"/> 5. Guide Agent</h2>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-4">L'application Android Agent fonctionne offline. Saisissez baux et confirmations terrain, tout se synchronise dès que le réseau revient.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:block print:space-y-8">
+                        <div id="section-5" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
+                                <Briefcase className="text-ivoire-dark print:hidden"/> 5. Guide Agent
+                            </h2>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">L'application Android Agent fonctionne offline. Saisissez baux et confirmations terrain, tout se synchronise dès que le réseau revient.</p>
                             <p className="text-sm text-gray-600 font-bold mb-2">Commissions Agent :</p>
                             <ul className="text-sm text-gray-600 space-y-1 ml-4 border-l-2 border-ivoire-dark/30 pl-3">
                                 <li>Enregistrement bail : 1 000 FCFA</li>
@@ -376,17 +389,21 @@ export default function AdminManualPage() {
                             </ul>
                         </div>
 
-                        <div id="section-6" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2"><Building className="text-ivoire-dark"/> 6. Guide Agence</h2>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-4">Des abonnements adaptés à votre taille, de gratuit à PRO (15 000 FCFA/mois) avec quittances illimitées.</p>
+                        <div id="section-6" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
+                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
+                                <Building className="text-ivoire-dark print:hidden"/> 6. Guide Agence
+                            </h2>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">Des abonnements adaptés à votre taille, de gratuit à PRO (15 000 FCFA/mois) avec quittances illimitées.</p>
                             <p className="text-sm text-gray-600 leading-relaxed">Possibilité de migrer vos données existantes via un tableau Excel QAPRIL (gratuit pour membres CDAIM).</p>
                         </div>
                     </div>
 
-                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3"><FileText className="text-ivoire-dark" size={32} /> 7. Réception des Quittances & Notifications</h2>
-                        <div className="space-y-6">
-                            <p className="text-gray-600 leading-relaxed">Une quittance QAPRIL est un document numérique certifié, impossible à falsifier grâce à un code de vérification SHA-256. N'importe qui peut vérifier son authenticité en scannant le QR code avec son téléphone.</p>
+                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
+                            <FileText className="text-ivoire-dark print:hidden" size={32} /> 7. Réception des Quittances & Notifications
+                        </h2>
+                        <div className="space-y-6 print:text-black">
+                            <p className="text-gray-600 leading-relaxed print:text-black">Une quittance QAPRIL est un document numérique certifié, impossible à falsifier grâce à un code de vérification SHA-256. N'importe qui peut vérifier son authenticité en scannant le QR code avec son téléphone.</p>
                             
                             <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4">Canaux de Communication (Architecture Multi-Canal)</h3>
                             <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
@@ -430,15 +447,19 @@ export default function AdminManualPage() {
                         </div>
                     </div>
 
-                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3"><FileCheck className="text-ivoire-dark" size={32} /> 8. Module M17 DGI</h2>
-                        <p className="text-gray-600 leading-relaxed">Enregistrement de votre bail à la Direction Générale des Impôts. Facultatif mais recommandé. Le paiement des frais DGI et des frais de service QAPRIL (ex: 3000 FCFA pour loyer &lt; 50k) est intégré, le récépissé est obtenu en 48-72h.</p>
+                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
+                            <FileCheck className="text-ivoire-dark print:hidden" size={32} /> 8. Module M17 DGI
+                        </h2>
+                        <p className="text-gray-600 leading-relaxed print:text-black">Enregistrement de votre bail à la Direction Générale des Impôts. Facultatif mais recommandé. Le paiement des frais DGI et des frais de service QAPRIL (ex: 3000 FCFA pour loyer &lt; 50k) est intégré, le récépissé est obtenu en 48-72h.</p>
                     </div>
 
                     {/* SECTION 9 */}
-                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase flex items-center gap-3"><HelpCircle className="text-ivoire-dark" size={32} /> 9. Questions Fréquentes</h2>
-                        <div className="space-y-6">
+                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
+                            <HelpCircle className="text-ivoire-dark print:hidden" size={32} /> 9. Questions Fréquentes
+                        </h2>
+                        <div className="space-y-6 print:space-y-4">
                             {[
                                 { q: "Est-ce que QAPRIL est légal ?", a: "Oui. Conforme à la loi n°2018-575 du 13 juin 2018. Les quittances sont valables devant les tribunaux." },
                                 { q: "Le locataire doit-il payer ?", a: "Non, réception, historique et score sont entièrement gratuits pour le locataire." },
@@ -455,9 +476,9 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 10 */}
-                    <div id="section-10" className="bg-ivoire-dark text-white p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24">
-                        <h2 className="text-3xl font-black tracking-tighter mb-8 uppercase">10. Glossaire Exclusif</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div id="section-10" className="bg-ivoire-dark text-white p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:text-black print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black tracking-tighter mb-8 uppercase print:text-2xl print:text-gray-900 print:mb-4">10. Glossaire Exclusif</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2 print:text-black">
                             {[
                                 { t: "BDQ", d: "Bail Déclaratif QAPRIL. Créé en 5 min sans contrat écrit. Gratuit." },
                                 { t: "Wallet QAPRIL", d: "Porte-monnaie interne (rechargeable via mobile money)." },
@@ -466,9 +487,9 @@ export default function AdminManualPage() {
                                 { t: "CLN", d: "Certificat Locatif Numérique - attestation de domicile QAPRIL." },
                                 { t: "SHA-256", d: "Code de sécurité cryptographique garantissant l'intégrité d'une quittance." },
                             ].map((item, i) => (
-                                <div key={i} className="border-b border-white/20 pb-4">
-                                    <h4 className="font-bold mb-1 text-white">{item.t}</h4>
-                                    <p className="text-white/80 text-sm leading-relaxed">{item.d}</p>
+                                <div key={i} className="border-b border-white/20 pb-4 print:border-gray-200 print:break-inside-avoid">
+                                    <h4 className="font-bold mb-1 text-white print:text-gray-900">{item.t}</h4>
+                                    <p className="text-white/80 text-sm leading-relaxed print:text-gray-600">{item.d}</p>
                                 </div>
                             ))}
                         </div>
