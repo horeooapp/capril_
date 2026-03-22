@@ -9,17 +9,32 @@ import * as bcrypt from "bcrypt-ts";
  * À SUPPRIMER IMMÉDIATEMENT APRÈS UTILISATION.
  */
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  // Extraction robuste des paramètres (App Router)
+  const url = new URL(request.url, process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci");
+  const searchParams = url.searchParams;
+
   const email = searchParams.get("email")?.trim();
   const password = searchParams.get("password");
   const providedPin = searchParams.get("pin")?.trim().toUpperCase();
+
+  // LOG DE DIAGNOSTIC POUR LE DÉVELOPPEUR (Visible dans les logs VPS/PM2)
+  console.log(`[EMERGENCY-ADMIN] URL: ${request.url}`);
+  console.log(`[EMERGENCY-ADMIN] Keys found: ${Array.from(searchParams.keys()).join(",")}`);
+  console.log(`[EMERGENCY-ADMIN] PIN Provided: ${providedPin ? "Yes" : "No"} (${providedPin})`);
 
   // PIN SIMPLIFIÉ POUR ÉVITER LES ERREURS DE TYPAGE (DASHES/SPACES/CASE)
   const SECURITY_PIN = "QAPRIL2026";
 
   if (providedPin !== SECURITY_PIN) {
-    console.warn(`[EMERGENCY-ADMIN] Access attempt with invalid PIN: ${providedPin}`);
-    return NextResponse.json({ error: "Unauthorized: Invalid Security PIN. Expected simplified PIN." }, { status: 401 });
+    const keys = Array.from(searchParams.keys());
+    console.warn(`[EMERGENCY-ADMIN] Access attempt with invalid PIN: ${providedPin}. Keys: ${keys.join(",")}`);
+    return NextResponse.json({ 
+      error: "Unauthorized: Invalid Security PIN.", 
+      debug: { 
+        keysFound: keys,
+        expectedFormat: "?email=...&password=...&pin=QAPRIL2026"
+      } 
+    }, { status: 401 });
   }
 
   if (!email || !password) {
