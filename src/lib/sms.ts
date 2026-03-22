@@ -66,11 +66,11 @@ export class OrangeCIService implements SMSService {
     
     // Default to the developer phone number if SMS_SENDER_NAME isn't a valid phone
     const senderAddress = process.env.SMS_SENDER_NAME || '00000000';
-    const authHeader = process.env.SMS_API_KEY;
+    const authHeader = process.env.SMS_GATEWAY_API_KEY || process.env.SMS_API_KEY;
 
     if (!authHeader) {
-        console.error("[SMS] Missing SMS_API_KEY in environment");
-        return { success: false, error: 'SMS_API_KEY is missing' };
+        console.error("[SMS] Missing SMS_GATEWAY_API_KEY in environment");
+        return { success: false, error: 'SMS_GATEWAY_API_KEY is missing' };
     }
 
     try {
