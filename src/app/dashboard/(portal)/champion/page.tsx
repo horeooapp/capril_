@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 
 export default async function ChampionPage() {
   const session = await auth();
-  if (!session?.user) redirect("/auth/login");
+  if (!session?.user) {
+    redirect("/auth/login");
+    return null;
+  }
 
   const profile = await getChampionProfile(session.user.id);
   const leaderboard = await getLeaderboard(profile?.zonePrincipale);

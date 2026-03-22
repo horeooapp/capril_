@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
     const user = await getCurrentUser()
+    if (!user) {
+        return null; // Or redirect
+    }
     const properties = await getProperties() as any
     const reports = await getMonthlyReports(user.id)
     const latestReport = reports[0] || null
