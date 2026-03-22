@@ -64,7 +64,7 @@ export async function resolveQuittancePrice(userId: string): Promise<number> {
 /**
  * Helpers pour la résolution tarifaire
  */
-async function getUserActiveSubscription(userId: string) {
+async function getUserActiveSubscription(userId: string): Promise<any> {
     // A implémenter : lier le User à une OffreAbonnement active via Subscription
     // Pour l'instant on retourne null.
     return null
