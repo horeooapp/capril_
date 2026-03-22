@@ -81,7 +81,8 @@ export async function acceptMandatGestion(mandatId: string) {
     })
 
     // Define accesses
-    for (const bienId of mandat.biensConcernes) {
+    const biensIds = (mandat.biensConcernes as string[]) || []
+    for (const bienId of biensIds) {
         await (prisma as any).propertyAccess.updateMany({
             where: { propertyId: bienId, userId: session.user.id, mandatId: mandat.id },
             data: { statut: "ACTIF", acceptedAt: new Date() }

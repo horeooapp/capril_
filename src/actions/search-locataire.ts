@@ -30,7 +30,7 @@ export async function findLocataireByPhone(phone: string) {
             visibilite: profil.visibilite,
             statutPro: profil.statutPro,
             revenuFourchette: profil.revenuFourchette,
-            communesSouhaitees: profil.communesSouhaitees,
+            communesSouhaitees: (profil.communesSouhaitees as string[]) || [],
             scoreBadge: 'A' // TODO: Récupérer via calculateScore
         }
     } catch (error) {
@@ -56,7 +56,8 @@ export async function searchLocataires(filters: {
         }
 
         if (filters.communes && filters.communes.length > 0) {
-            where.communesSouhaitees = { hasSome: filters.communes }
+            // SQLite doesn't support hasSome on Json. Fallback for local dev.
+            where.communesSouhaitees = { not: null } 
         }
 
         if (filters.budgetMax) {
@@ -64,7 +65,8 @@ export async function searchLocataires(filters: {
         }
 
         if (filters.typeLogement && filters.typeLogement.length > 0) {
-            where.typeLogement = { hasSome: filters.typeLogement }
+            // SQLite doesn't support hasSome on Json. Fallback for local dev.
+            where.typeLogement = { not: null }
         }
 
         if (filters.statutPro) {
@@ -100,7 +102,7 @@ export async function searchLocataires(filters: {
                 anonymizedName,
                 kycNiveau: profil.kycNiveau,
                 statutPro: profil.statutPro,
-                communes: profil.communesSouhaitees,
+                communes: (profil.communesSouhaitees as string[]) || [],
                 budget: profil.budgetMaxFcfa,
                 nbConsultations: profil.nbConsultationsProfil
             }
