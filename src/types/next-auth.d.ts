@@ -11,6 +11,7 @@ declare module "next-auth" {
             kycLevel: number
             kycStatus: string
             fullName?: string | null
+            onboardingComplete?: boolean
         } & DefaultSession["user"]
     }
 
@@ -21,6 +22,7 @@ declare module "next-auth" {
         kycLevel?: number
         kycStatus?: string
         fullName?: string | null
+        onboardingComplete?: boolean
     }
 }
 
@@ -33,6 +35,7 @@ declare module "next-auth/jwt" {
         kycLevel?: number
         kycStatus?: string
         fullName?: string | null
+        onboardingComplete?: boolean
     }
 }
 
@@ -44,5 +47,6 @@ declare module "@auth/core/adapters" {
         kycLevel?: number
         kycStatus?: string
         fullName?: string | null
+        onboardingComplete?: boolean
     }
 }

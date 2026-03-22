@@ -19,6 +19,7 @@ export const authConfig = {
                 token.phone = user.phone
                 token.role = user.role as Role
                 token.status = user.status
+                token.onboardingComplete = (user as any).onboardingComplete
             }
             return token
         },
@@ -28,6 +29,7 @@ export const authConfig = {
                 session.user.phone = token.phone as string
                 session.user.role = (token.role as Role) || 'TENANT'
                 session.user.status = token.status as any
+                session.user.onboardingComplete = token.onboardingComplete as boolean
             }
             return session
         },

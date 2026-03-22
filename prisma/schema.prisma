@@ -216,6 +216,7 @@ model User {
   status      String  @default("active") // active|suspended|inactive
   password    String?
   isCertified Boolean @default(false) @map("is_certified")
+  onboardingComplete Boolean @default(false) @map("onboarding_complete")
 
   legalEntityId String?      @map("legal_entity_id")
   legalEntity   LegalEntity? @relation(fields: [legalEntityId], references: [id])

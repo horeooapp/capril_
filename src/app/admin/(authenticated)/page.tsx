@@ -15,7 +15,9 @@ import {
     Settings2,
     MessageSquare,
     Bot,
-    FileSignature
+    FileSignature,
+    Handshake,
+    Send
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -86,6 +88,12 @@ export default async function AdminDashboardOverview() {
         confirmedSmsDeclarations: await (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
         totalManagers: await (prisma as any).propertyAccess.count({ where: { role: "MANAGER", statut: "ACTIF" } }).catch(() => 0),
         totalAgents: await (prisma as any).propertyAccess.count({ where: { role: "FIELD_AGENT", statut: "ACTIF" } }).catch(() => 0),
+        
+        // ADD-14 Stats
+        totalPublicProfiles: await (prisma as any).locataireProfilPublic.count().catch(() => 0),
+        activeInvitations: await (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
+        totalConsultations: await (prisma as any).consultationProfil.count().catch(() => 0),
+        matchRate: await (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
     }
 
     try {
@@ -235,6 +243,45 @@ export default async function AdminDashboardOverview() {
                             icon={<Zap size={28} />} 
                             color="indigo"
                             trend="H+2 / H+6"
+                            delay={0.4}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-14: Profils Autonomes & Matching */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-600 px-2">Supervision ADD-14 : Profils & Matching</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Profils Publics" 
+                            value={safeData.totalPublicProfiles.toLocaleString()} 
+                            icon={<Users size={28} />} 
+                            color="emerald"
+                            trend="Locataires Autonomes"
+                            delay={0.1}
+                        />
+                        <StatCard 
+                            title="Invitations Actives" 
+                            value={safeData.activeInvitations.toLocaleString()} 
+                            icon={<Send size={28} />} 
+                            color="orange"
+                            trend="Propositions"
+                            delay={0.2}
+                        />
+                        <StatCard 
+                            title="Matchs Réussis" 
+                            value={safeData.matchRate.toLocaleString()} 
+                            icon={<Handshake size={28} />} 
+                            color="indigo"
+                            trend="Baux Activés"
+                            delay={0.3}
+                        />
+                        <StatCard 
+                            title="Consultations Profil" 
+                            value={safeData.totalConsultations.toLocaleString()} 
+                            icon={<ShieldCheck size={28} />} 
+                            color="slate"
+                            trend="Visibilité"
                             delay={0.4}
                         />
                     </div>

@@ -18,6 +18,11 @@ export default async function LocataireLayout({
         redirect("/dashboard")
     }
 
+    // Force onboarding for tenants
+    if (session?.user?.role === "TENANT" && !session.user.onboardingComplete) {
+        redirect("/onboarding/tenant")
+    }
+
     const handleLogout = async () => {
         "use server"
         await logout()

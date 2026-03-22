@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma"
-import { NotifCanal, NotifStatut } from "@prisma/client"
 import { sendEmail } from "@/lib/email"
 import { sendSMS } from "@/lib/sms"
 import { sendWhatsAppTemplate } from "@/lib/whatsapp"
@@ -13,6 +12,7 @@ export type EventType =
   | "RAPPORT_MENSUEL"
   | "WALLET_BAS"
   | "BAIL_EXPIRANT"
+  | "INVITATION_BAIL_RECUE"
 
 interface NotificationData {
   referenceId?: string
@@ -36,7 +36,7 @@ export class NotificationService {
   static async envoyerNotification(userId: string, event: EventType, data: NotificationData) {
     try {
       // 1. Récupérer les préférences de l'utilisateur
-      const prefs = await prisma.notificationPreference.findUnique({
+      const prefs = await (prisma as any).notificationPreference.findUnique({
         where: { userId }
       });
 
@@ -113,16 +113,16 @@ export class NotificationService {
       
       await this.logNotification(
         userId, 
-        NotifCanal.WHATSAPP, 
+        "WHATSAPP", 
         event, 
         templateName, 
-        result.success ? NotifStatut.LIVRE : NotifStatut.ECHEC
+        result.success ? "LIVRE" : "ECHEC"
       );
       
       return result.success;
     } catch (e) {
       console.error("[NotificationService] WhatsApp failed", e);
-      await this.logNotification(userId, NotifCanal.WHATSAPP, event, templateName, NotifStatut.ECHEC);
+      await this.logNotification(userId, "WHATSAPP", event, templateName, "ECHEC");
       return false;
     }
   }
@@ -156,16 +156,16 @@ export class NotificationService {
 
       await this.logNotification(
         userId, 
-        NotifCanal.EMAIL, 
+        "EMAIL", 
         event, 
         data.templateId, 
-        result.success ? NotifStatut.ENVOYE : NotifStatut.ECHEC
+        result.success ? "ENVOYE" : "ECHEC"
       );
 
       return result.success;
     } catch (e) {
       console.error("[NotificationService] Email failed", e);
-      await this.logNotification(userId, NotifCanal.EMAIL, event, data.templateId, NotifStatut.ECHEC);
+      await this.logNotification(userId, "EMAIL", event, data.templateId, "ECHEC");
       return false;
     }
   }
@@ -181,15 +181,15 @@ export class NotificationService {
       
       await this.logNotification(
         userId, 
-        NotifCanal.SMS, 
+        "SMS", 
         event, 
         data.templateId, 
-        delivered ? NotifStatut.ENVOYE : NotifStatut.ECHEC
+        delivered ? "ENVOYE" : "ECHEC"
       );
 
     } catch (e) {
       console.error("[NotificationService] SMS failed", e);
-      await this.logNotification(userId, NotifCanal.SMS, event, data.templateId, NotifStatut.ECHEC);
+      await this.logNotification(userId, "SMS", event, data.templateId, "ECHEC");
     }
     return delivered;
   }
@@ -200,8 +200,8 @@ export class NotificationService {
 
   // ---- Utils ----
 
-  private static async logNotification(userId: string, canal: NotifCanal, event: string, templateId?: string, statut: NotifStatut = NotifStatut.ENVOYE) {
-    await prisma.notificationLog.create({
+  private static async logNotification(userId: string, canal: any, event: string, templateId?: string, statut: any = "ENVOYE") {
+    await (prisma as any).notificationLog.create({
       data: {
         userId,
         canal,

@@ -103,3 +103,41 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
         console.warn("Failed to log consultation:", error)
     }
 }
+
+export async function completeOnboarding(userId: string, data: {
+    fullName?: string,
+    email?: string,
+    profilData: any
+}) {
+    try {
+        // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
+        const updateData: any = { onboardingComplete: true }
+        if (data.fullName) updateData.fullName = data.fullName
+        if (data.email) updateData.email = data.email
+        
+        await prisma.user.update({
+            where: { id: userId },
+            data: updateData
+        })
+
+        // 2. Créer ou mettre à jour le profil public
+        const profil = await (prisma as any).locataireProfilPublic.upsert({
+            where: { userId },
+            create: {
+                userId,
+                ...data.profilData
+            },
+            update: {
+                ...data.profilData
+            }
+        })
+
+        revalidatePath("/locataire")
+        revalidatePath("/onboarding/tenant")
+        
+        return { success: true, profil }
+    } catch (error) {
+        console.error("Error completing onboarding:", error)
+        return { success: false, error: "Erreur lors de la finalisation de l'onboarding" }
+    }
+}
