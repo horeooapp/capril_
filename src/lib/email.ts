@@ -1,13 +1,6 @@
-import sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 
-function initSendGrid() {
-  const key = process.env.SENDGRID_API_KEY;
-  if (!key) {
-    return false;
-  }
-  sgMail.setApiKey(key);
-  return true;
-}
+const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
 export async function sendEmail({
   to,
@@ -22,32 +15,33 @@ export async function sendEmail({
 }) {
   console.log(`[Email] Sending to ${to}: ${subject}`);
   
-  const isSetup = initSendGrid();
-  if (!isSetup) {
-    console.warn("[Email] SENDGRID_API_KEY missing. Email not sent, logged to console instead.");
+  if (!process.env.AUTH_RESEND_KEY) {
+    console.warn("[Email] AUTH_RESEND_KEY missing. Email not sent, logged to console instead.");
     return { success: true, mock: true };
   }
 
   try {
-    const msg = {
+    const from = process.env.EMAIL_FROM || "noreply@qapril.net";
+    
+    const result = await resend.emails.send({
+      from,
       to,
-      from: process.env.EMAIL_FROM || "noreply@qapril.net",
       subject,
       html,
-      attachments,
-    };
-    
-    const [response] = await sgMail.send(msg);
+      attachments: attachments?.map(att => ({
+        filename: att.filename,
+        content: att.content,
+      })) as any,
+    });
 
-    // SendGrid returns 202 Accepted on success
-    if (response.statusCode === 202) {
-      return { success: true, data: response };
-    } else {
-      console.error("[Email] Unexpected response code:", response.statusCode);
-      return { success: false, error: response };
+    if (result.error) {
+        console.error("[Email] Resend error:", result.error);
+        return { success: false, error: result.error };
     }
+
+    return { success: true, data: result.data };
   } catch (error: any) {
-    console.error("[Email] SendGrid error:", error.response?.body || error);
+    console.error("[Email] Technical error:", error);
     return { success: false, error };
   }
 }

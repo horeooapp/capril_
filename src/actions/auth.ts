@@ -102,7 +102,7 @@ export async function requestPasswordReset(email: string) {
 
     try {
         // 1. Check if user exists (only admins/owners have passwords)
-        const user = await prisma.user.findFirst({
+        const user = await (prisma as any).user.findFirst({
             where: { email }
         });
 
@@ -165,10 +165,10 @@ export async function resetPassword(token: string, password: string) {
         const hashedPassword = await hash(password, 10);
 
         // 3. Update User
-        const existingUser = await prisma.user.findFirst({ where: { email } });
+        const existingUser = await (prisma as any).user.findFirst({ where: { email } });
         if (!existingUser) return { error: "Utilisateur non trouvé." };
 
-        const user = await prisma.user.update({
+        const user = await (prisma as any).user.update({
             where: { id: existingUser.id },
             data: { password: hashedPassword }
         });
