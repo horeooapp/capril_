@@ -31,61 +31,82 @@ async function ensureSuperAdmin() {
  * Récupère tous les utilisateurs pour l'administration
  */
 export async function getAllUsers() {
-    await ensureAdmin()
-    
-    if (await getDemoMode()) {
-        return getDemoData().users
-    }
-    
-    return await prisma.user.findMany({
-        orderBy: { createdAt: 'desc' },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-            kycLevel: true,
-            kycStatus: true,
-            status: true,
-            createdAt: true,
-            phone: true
+    try {
+        await ensureAdmin()
+        
+        if (await getDemoMode()) {
+            return getDemoData().users
         }
-    })
+        
+        const users = await prisma.user.findMany({
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                role: true,
+                kycLevel: true,
+                kycStatus: true,
+                status: true,
+                createdAt: true,
+                phone: true
+            }
+        })
+
+        // Ensure serialization and data safety
+        return users.map(user => ({
+            ...user,
+            createdAt: user.createdAt.toISOString()
+        }))
+    } catch (error) {
+        console.error("[getAllUsers] Critical Error:", error)
+        return [] // Return empty list to prevent page crash
+    }
 }
 
 /**
  * Récupère les demandes de validation (Agences non certifiées)
  */
 export async function getPendingValidations() {
-    await ensureAdmin()
-    
-    if (await getDemoMode()) {
-        return getDemoData().pendingValidations
-    }
-    
-    return await prisma.user.findMany({
-        where: {
-            OR: [
-                { role: Role.AGENCY },
-                { role: Role.NON_CERTIFIED_AGENT }
-            ],
-            kycLevel: { lt: 4 } // Level 4 is for verified legal entities/agencies
-        },
-        orderBy: { createdAt: 'desc' },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-            legalEntity: {
-                select: {
-                    companyName: true
-                }
-            },
-            createdAt: true,
-            kycStatus: true
+    try {
+        await ensureAdmin()
+        
+        if (await getDemoMode()) {
+            return getDemoData().pendingValidations
         }
-    })
+        
+        const users = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { role: Role.AGENCY },
+                    { role: Role.NON_CERTIFIED_AGENT }
+                ],
+                kycLevel: { lt: 4 } // Level 4 is for verified legal entities/agencies
+            },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                role: true,
+                legalEntity: {
+                    select: {
+                        companyName: true
+                    }
+                },
+                createdAt: true,
+                kycStatus: true
+            }
+        })
+
+        return users.map(user => ({
+            ...user,
+            createdAt: user.createdAt.toISOString()
+        }))
+    } catch (error) {
+        console.error("[getPendingValidations] Critical Error:", error)
+        return []
+    }
 }
 
 /**
@@ -204,16 +225,24 @@ export async function toggleAdminRole(userId: string) {
  * Récupère les logs d'audit globaux
  */
 export async function getGlobalAuditLogs() {
-    await ensureAdmin()
-    return await prisma.auditLog.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 100,
-        include: {
-            user: {
-                select: { fullName: true, email: true }
+    try {
+        await ensureAdmin()
+        return (await prisma.auditLog.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 100,
+            include: {
+                user: {
+                    select: { fullName: true, email: true }
+                }
             }
-        }
-    })
+        })).map(log => ({
+            ...log,
+            createdAt: log.createdAt.toISOString()
+        }))
+    } catch (error) {
+        console.error("[getGlobalAuditLogs] Critical Error:", error)
+        return []
+    }
 }
 
 /**
