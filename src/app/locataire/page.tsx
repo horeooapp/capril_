@@ -1,4 +1,5 @@
 import { getReceiptsForTenant } from "@/actions/receipts"
+import { NotificationSettings } from "@/components/notifications/NotificationSettings"
 
 export const dynamic = "force-dynamic"
 import { 
@@ -140,6 +141,9 @@ export default async function LocataireDashboard() {
                     </div>
                 )}
             </div>
+
+            {/* Préférences de Notification */}
+            <NotificationSettings />
 
             {/* Bottom Insight */}
             <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">

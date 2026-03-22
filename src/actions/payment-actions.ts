@@ -6,6 +6,7 @@ import crypto from "node:crypto"
 import { cinetpay } from "@/lib/cinetpay"
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
 import { Role } from "@prisma/client"
+import { NotificationService } from "@/lib/notification-service"
 
 export type PaymentOperator = 'orange' | 'mtn' | 'moov' | 'wave';
 
@@ -157,6 +158,40 @@ export async function processMMWebhook(payload: {
                 if (metadata?.receiptId) {
                     // Update existing pending receipt
                     // This logic would ideally call confirmation actions
+                }
+                
+                // Fetch lease to notify stakeholders
+                const lease = await tx.lease.findUnique({
+                    where: { id: intent.leaseId },
+                    include: { property: true }
+                });
+
+                if (lease?.property.ownerUserId) {
+                    NotificationService.envoyerNotification(
+                        lease.property.ownerUserId,
+                        "PAIEMENT_RECU",
+                        {
+                            referenceId: intent.id,
+                            payload: {
+                                smsText: `QAPRIL: Le paiement de ${intent.amount} FCFA a bien été reçu pour votre bien.`,
+                                html: `<p>Un paiement de ${intent.amount} FCFA a été reçu avec succès via Mobile Money.</p>`
+                            }
+                        }
+                    ).catch(err => console.error("[NOTIF_TRIGGER] Failed PAIEMENT_RECU Owner", err));
+                }
+
+                if (lease?.tenantId) {
+                    NotificationService.envoyerNotification(
+                        lease.tenantId,
+                        "PAIEMENT_RECU",
+                        {
+                            referenceId: intent.id,
+                            payload: {
+                                smsText: `QAPRIL: Votre paiement de ${intent.amount} FCFA a été traité avec succès. Merci.`,
+                                html: `<p>Votre paiement de <strong>${intent.amount} FCFA</strong> a été traité avec succès.</p>`
+                            }
+                        }
+                    ).catch(err => console.error("[NOTIF_TRIGGER] Failed PAIEMENT_RECU Tenant", err));
                 }
             }
 

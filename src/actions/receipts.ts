@@ -8,6 +8,7 @@ import { generateReceiptRef } from "@/lib/receipt"
 import { revalidatePath } from "next/cache"
 
 import { serializeReceipt } from "@/lib/serialize"
+import { NotificationService } from "@/lib/notification-service"
 
 /**
  * Part 8.1: Create/Generate Receipt
@@ -93,6 +94,23 @@ export async function createReceipt(data: {
             } catch (e) {
                 console.warn("[SCORING] Error updating score:", e);
             }
+        }
+
+        // 6. Trigger Multi-Channel Notification (ADD-09)
+        if (lease.tenantId) {
+            // FIRE AND FORGET - do not await to avoid blocking the user flow
+            NotificationService.envoyerNotification(
+                lease.tenantId,
+                "QUITTANCE_GENEREE",
+                {
+                    referenceId: receipt.id,
+                    payload: {
+                        parameters: [lease.tenant?.fullName || "Locataire", lease.property.address || "Propriété"],
+                        smsText: `Votre quittance de loyer pour ${data.periodMonth} est disponible sur QAPRIL. Montant: ${data.rentAmount + data.chargesAmount} FCFA.`,
+                        html: `<p>Bonjour,</p><p>Votre quittance pour le mois de ${data.periodMonth} a été générée avec succès.</p><p>Montant total : <strong>${data.rentAmount + data.chargesAmount} FCFA</strong></p>`
+                    }
+                }
+            ).catch(err => console.error("[NOTIF_TRIGGER] Failed QUITTANCE_GENEREE", err));
         }
 
         revalidatePath(`/dashboard/leases/${data.leaseId}`)
