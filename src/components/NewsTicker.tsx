@@ -33,14 +33,25 @@ export default function NewsTicker({ items }: NewsTickerProps) {
 
                 {/* News Content */}
                 <div className="flex-1 overflow-hidden relative">
-                    <div className="flex whitespace-nowrap animate-ticker translate-z-0">
+                    <motion.div 
+                        className="flex whitespace-nowrap"
+                        animate={{ x: [0, "-33.33%"] }}
+                        transition={{
+                            x: {
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                duration: 25,
+                                ease: "linear",
+                            },
+                        }}
+                    >
                         {duplicatedItems.map((item, idx) => (
                             <div key={`${item.id}-${idx}`} className="inline-flex items-center px-8 border-r border-white/10 last:border-0">
                                 <span className="text-white/40 mr-3">✦</span>
                                 <span className="text-[11px] font-bold text-gray-200 uppercase tracking-widest">{item.content}</span>
                             </div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             </div>
 
