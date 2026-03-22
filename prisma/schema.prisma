@@ -185,6 +185,23 @@ enum Periodicite {
   FORFAIT
 }
 
+enum VisibEnum {
+  INVISIBLE
+  INVITATION_PROPRIO
+  INVITATION_AGENCE
+  TOUS
+}
+
+enum InvitStatutEnum {
+  ENVOYEE
+  VUE
+  ACCEPTEE
+  REFUSEE
+  EXPIREE
+  ANNULEE
+}
+
+
 // ═══════════════════════════════════════════════════════
 // USERS (Part 4 & 5)
 // ═══════════════════════════════════════════════════════
@@ -316,6 +333,12 @@ model User {
   passeports             PasseportLocatif[]     @relation("UserPasseports")
   alertesLoyer           AlerteLoyer[]          @relation("UserAlertesLoyer")
 
+  // ADD-14
+  profilPublic           LocataireProfilPublic?
+  invitationsEnvoyees    InvitationBail[]       @relation("InvitantBail")
+  invitationsRecues      InvitationBail[]       @relation("LocataireInvite")
+  consultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -425,6 +448,7 @@ model Property {
   mandates         Mandate[]
   passports        Passport[]
   images           PropertyImage[]
+  invitations      InvitationBail[]
 
   // ADD-05 Horeoo
   isHoreoo       Boolean  @default(false) @map("is_horeoo")
@@ -2533,3 +2557,83 @@ model AlerteLoyer {
 
   @@map("alertes_loyer")
 }
+
+// ═══════════════════════════════════════════════════════
+// ADD-14 Profil Locataire Autonome
+// ═══════════════════════════════════════════════════════
+
+model LocataireProfilPublic {
+  id               String      @id @default(uuid()) @map("profil_id")
+  userId           String      @unique @map("user_id")
+  user             User        @relation(fields: [userId], references: [id])
+  
+  visibilite       VisibEnum   @default(INVISIBLE)
+  statutRecherche  String      @default("EN_RECHERCHE") @map("statut_recherche")
+  
+  statutPro        String?     @map("statut_pro") // SALARIE | INDEPENDANT | INFORMEL | SANS_EMPLOI
+  revenuFourchette String?     @map("revenu_fourchette")
+  employeurType    String?     @map("employeur_type")
+  
+  communesSouhaitees String[]  @map("communes_souhaitees")
+  budgetMaxFcfa      Int?      @map("budget_max_fcfa")
+  typeLogement       String[]  @map("type_logement")
+  disponibleAPartir  DateTime? @map("disponible_a_partir")
+  
+  kycNiveau          Int       @default(0) @map("kyc_niveau")
+  
+  nbInvitationsRecues  Int     @default(0) @map("nb_invitations_recues")
+  nbInvitationsRefusees Int     @default(0) @map("nb_invitations_refusees")
+  nbConsultationsProfil Int    @default(0) @map("nb_consultations_profil")
+
+  consultations        ConsultationProfil[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("locataire_profils_publics")
+}
+
+model InvitationBail {
+  id                String          @id @default(uuid()) @map("invitation_id")
+  propertyId        String?         @map("bien_id")
+  property          Property?       @relation(fields: [propertyId], references: [id])
+  
+  invitantId        String          @map("invitant_id")
+  invitant          User            @relation("InvitantBail", fields: [invitantId], references: [id])
+  invitantType      String          @map("invitant_type") // PROPRIETAIRE | AGENCE
+  
+  locataireId       String          @map("locataire_id")
+  locataire         User            @relation("LocataireInvite", fields: [locataireId], references: [id])
+  
+  methodeDecouverte String?         @map("methode_decouverte") // NUMERO | QR_CODE | LIEN | RECHERCHE_AGENCE
+  loyerPropose      Decimal?        @map("loyer_propose") @db.Decimal(12, 0)
+  dateDebutProposee DateTime?       @map("date_debut_proposee") @db.Date
+  messageInvitant   String?         @map("message_invitant")
+  
+  statut            InvitStatutEnum @default(ENVOYEE)
+  
+  vueAt             DateTime?       @map("vue_at")
+  reponduAt         DateTime?       @map("repondu_at")
+  leaseId           String?         @map("bail_id")
+  
+  expireAt          DateTime        @default(now()) @map("expire_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@map("invitations_bail")
+}
+
+model ConsultationProfil {
+  id                String               @id @default(uuid()) @map("consult_id")
+  locataireId       String               @map("locataire_id")
+  locataire         LocataireProfilPublic @relation(fields: [locataireId], references: [id])
+  
+  consultantId      String               @map("consultant_id")
+  consultant        User                 @relation("ConsultantProfil", fields: [consultantId], references: [id])
+  consultantType    String               @map("consultant_type") // PROPRIETAIRE | AGENCE
+  consultantNomAffiche String?           @map("consultant_nom_affiche")
+  
+  createdAt         DateTime             @default(now()) @map("created_at")
+
+  @@map("consultations_profil")
+}
+

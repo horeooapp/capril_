@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { Home, FileText, ClipboardList, Star, LogOut, User } from "lucide-react"
+import { Home, FileText, ClipboardList, Star, LogOut, User, Send } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
@@ -21,6 +21,8 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
         { href: "/locataire/signalements", label: "Signalements", icon: <ClipboardList size={20} /> },
         { href: "/locataire/cautions", label: "Ma Caution", icon: <Star size={20} /> },
         { href: "/locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
+        { href: "/locataire/profil-public", label: "Mon Profil Public", icon: <User size={20} /> },
+        { href: "/locataire/invitations", label: "Invitations", icon: <Send size={20} /> },
         { href: "/locataire/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
     ]
 
