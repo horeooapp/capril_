@@ -1,38 +1,32 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as bcrypt from "bcrypt-ts";
 
-/**
- * ENDPOINT DE SECOURS - CRÉATION D'ADMINISTRATEUR PRODUCTION
- * 
- * Sécurisé par un PIN de sécurité.
- * À SUPPRIMER IMMÉDIATEMENT APRÈS UTILISATION.
- */
-export async function GET(request: Request) {
-  // Extraction robuste des paramètres (App Router)
-  const url = new URL(request.url, process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci");
-  const searchParams = url.searchParams;
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
 
   const email = searchParams.get("email")?.trim();
   const password = searchParams.get("password");
-  const providedPin = searchParams.get("pin")?.trim().toUpperCase();
-
-  // LOG DE DIAGNOSTIC POUR LE DÉVELOPPEUR (Visible dans les logs VPS/PM2)
-  console.log(`[EMERGENCY-ADMIN] URL: ${request.url}`);
-  console.log(`[EMERGENCY-ADMIN] Keys found: ${Array.from(searchParams.keys()).join(",")}`);
-  console.log(`[EMERGENCY-ADMIN] PIN Provided: ${providedPin ? "Yes" : "No"} (${providedPin})`);
-
-  // PIN SIMPLIFIÉ POUR ÉVITER LES ERREURS DE TYPAGE (DASHES/SPACES/CASE)
+  
+  // PIN SIMPLIFIÉ
   const SECURITY_PIN = "QAPRIL2026";
 
+  // Fallback diagnostic : check headers too if query is empty
+  const headerPin = request.headers.get("x-security-pin")?.trim().toUpperCase();
+  const providedPin = (searchParams.get("pin")?.trim().toUpperCase() || headerPin);
+
+  // LOG DE DIAGNOSTIC
+  console.log(`[EMERGENCY-ADMIN] Path: ${request.nextUrl.pathname}`);
+  console.log(`[EMERGENCY-ADMIN] PIN Provided: ${providedPin ? "Yes" : "No"} (from ${searchParams.has("pin") ? "Query" : "Header"})`);
+  console.log(`[EMERGENCY-ADMIN] Params found: ${Array.from(searchParams.keys()).join(",")}`);
+
   if (providedPin !== SECURITY_PIN) {
-    const keys = Array.from(searchParams.keys());
-    console.warn(`[EMERGENCY-ADMIN] Access attempt with invalid PIN: ${providedPin}. Keys: ${keys.join(",")}`);
     return NextResponse.json({ 
       error: "Unauthorized: Invalid Security PIN.", 
       debug: { 
-        keysFound: keys,
-        expectedFormat: "?email=...&password=...&pin=QAPRIL2026"
+        keysFound: Array.from(searchParams.keys()),
+        headerPinFound: !!headerPin,
+        message: "Les paramètres d'URL semblent vides sur votre serveur (Hostinger). Utilisez un Header 'x-security-pin' si le lien échoue."
       } 
     }, { status: 401 });
   }
