@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -437,7 +437,7 @@ model Property {
   digitalPostalAddress String?  @map("digital_postal_address")
   gpsLatitude          Decimal? @map("gps_latitude")
   gpsLongitude         Decimal? @map("gps_longitude")
-  amenities            Json?    @default("[]")
+  amenities            String[] @default([])
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
   documents            Json?    @default("{}")
 
@@ -900,7 +900,7 @@ model DisputeMessage {
   senderId    String   @map("sender_id")
   sender      User     @relation("DisputeSender", fields: [senderId], references: [id])
   content     String
-  attachments Json? @default("[]")
+  attachments String[] @default([])
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1448,7 +1448,7 @@ model TicketMaintenance {
 
   categorie   MaintCat
   description String
-  photosUrls  Json?       @map("photos_urls")
+  photosUrls  String[] @default([]) @map("photos_urls")
   urgence     String      @default("NORMALE") // URGENTE|NORMALE|BASSE
   statut      MaintStatut @default(OUVERT)
 
@@ -1585,7 +1585,7 @@ model Annonce {
   description  String
   loyerDemande Decimal @map("loyer_demande")
   charges      Decimal @default(0)
-  photosUrls   Json    @map("photos_urls")
+  photosUrls   String[] @default([]) @map("photos_urls")
   criteres     Json?
 
   statut         String   @default("ACTIVE") // ACTIVE|SUSPENDUE|ARCHIVEE
@@ -2228,7 +2228,7 @@ model MandatGestion {
   proprietaireId    String       @map("proprietaire_id")
   intermediaireId   String       @map("intermediaire_id")
   profil            ProfilInterm
-  biensConcernes    Json?        @default("[]") @map("biens_concernes") // IDs des biens
+  biensConcernes    String[] @default([]) @map("biens_concernes") // IDs des biens
   dateDebut         DateTime     @default(now()) @map("date_debut")
   dateFin           DateTime?    @map("date_fin")
   remuneration      String?      @default("GRATUIT")
@@ -2474,7 +2474,7 @@ model SignalementLocataire {
   categorie       SignalCatEnum
   description     String
   urgence         String           @default("NORMAL") // NORMAL | URGENT | TRES_URGENT
-  photos          Json?            @default("[]")
+  photos          String[] @default([])
   statut          SignalStatutEnum @default(ENVOYE)
   proprioVuAt     DateTime?        @map("proprio_vu_at")
   resoluAt        DateTime?        @map("resolu_at")
@@ -2602,9 +2602,9 @@ model LocataireProfilPublic {
   revenuFourchette String?     @map("revenu_fourchette")
   employeurType    String?     @map("employeur_type")
   
-  communesSouhaitees Json?  @default("[]") @map("communes_souhaitees")
+  communesSouhaitees String[] @default([]) @map("communes_souhaitees")
   budgetMaxFcfa      Int?      @map("budget_max_fcfa")
-  typeLogement       Json?  @default("[]") @map("type_logement")
+  typeLogement       String[] @default([]) @map("type_logement")
   disponibleAPartir  DateTime? @map("disponible_a_partir")
   
   kycNiveau          Int       @default(0) @map("kyc_niveau")
@@ -2717,7 +2717,7 @@ model ChampionProfile {
   userId                 String    @unique @map("user_id")
   user                   User      @relation(fields: [userId], references: [id])
   zonePrincipale         String    @map("zone_principale")
-  zonesSecondaires       Json?  @default("[]") @map("zones_secondaires")
+  zonesSecondaires       String[] @default([]) @map("zones_secondaires")
   superviseurId          String?   @map("superviseur_id")
   superviseur            User?     @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
   statut                 String    @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
