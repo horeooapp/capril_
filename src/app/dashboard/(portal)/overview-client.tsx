@@ -17,8 +17,10 @@ import {
     Users,
     GraduationCap,
     FileCheck,
-    ShieldAlert
+    ShieldAlert,
+    BarChart3
 } from "lucide-react"
+import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
 interface DashboardProperty {
     id: string;
@@ -51,10 +53,12 @@ const item = {
 export default function DashboardOverviewClient({ 
     user, 
     properties,
+    latestReport,
     regularizationAlert
 }: { 
     user: any, 
     properties: any[],
+    latestReport?: any,
     regularizationAlert?: React.ReactNode
 }) {
     const totalProperties = properties.length
@@ -137,6 +141,12 @@ export default function DashboardOverviewClient({
             </div>
 
             {regularizationAlert}
+
+            {latestReport && (
+                <div className="mb-12">
+                   <MonthlyReportCard report={latestReport} />
+                </div>
+            )}
 
             {/* Premium Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

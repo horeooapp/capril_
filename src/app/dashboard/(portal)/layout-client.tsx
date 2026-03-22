@@ -18,7 +18,8 @@ import {
     Bell,
     BarChart3,
     FileCheck2,
-    Bot
+    Bot,
+    Trophy
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -47,6 +48,10 @@ export default function DashboardLayoutClient({
         ),
         { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
         { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
+        ...(session?.user?.role === 'CHAMPION' 
+            ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
+            : []
+        ),
     ];
 
     return (
@@ -118,7 +123,9 @@ export default function DashboardLayoutClient({
                             <div className="hidden lg:flex items-center gap-3">
                                 <div className="flex flex-col items-end">
                                     <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
-                                    <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">Propriétaire Certifié</span>
+                                    <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">
+                                        {session.user.role === 'CHAMPION' ? 'Champion QAPRIL' : 'Propriétaire Certifié'}
+                                    </span>
                                 </div>
                                 <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
                                     <User size={20} />

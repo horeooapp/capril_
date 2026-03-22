@@ -4,6 +4,8 @@ import { getLeaseById } from "@/actions/leases"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import ProtectedLogo from "@/components/ProtectedLogo"
+import { getEdlsByLease } from "@/actions/edl-actions"
+import TenantEdlManager from "@/components/dashboard/edl/TenantEdlManager"
 
 export default async function TenantLeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
@@ -18,6 +20,8 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
     if (lease.tenantId !== userId) {
         return <div className="p-8 text-center text-red-600 font-bold uppercase">Accès non autorisé.</div>
     }
+
+    const edls = await getEdlsByLease(id)
 
     const formatDate = (date: Date | string | null) => date ? new Date(date).toLocaleDateString('fr-FR') : '---';
 
@@ -146,6 +150,10 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                                 <p className="text-sm font-bold text-gray-800">{formatDate(lease.signedAt)}</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                        <TenantEdlManager leaseId={id} edls={edls} />
                     </div>
 
                     <div className="bg-gray-900 rounded-2xl p-6 text-white">

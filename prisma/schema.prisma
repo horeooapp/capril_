@@ -17,6 +17,7 @@ enum Role {
   AGENCY
   TENANT
   NON_CERTIFIED_AGENT
+  CHAMPION
 }
 
 enum CDCDepositStatus {
@@ -339,6 +340,13 @@ model User {
   invitationsEnvoyees    InvitationBail[]       @relation("InvitantBail")
   invitationsRecues      InvitationBail[]       @relation("LocataireInvite")
   consultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")
+
+  // ADD-15 Rapports & Champions
+  redactedEdls         EtatsDesLieux[]    @relation("RedacteurEdl")
+  rapportsMensuels     RapportMensuel[]
+  championProfile      ChampionProfile?
+  supervisedChampions  ChampionProfile[]  @relation("SuperviseurChampions")
+  prospectsConvertis   ChampionProspect[] @relation("ProspectConverti")
 
   @@index([phone])
   @@index([role])
@@ -1341,26 +1349,46 @@ model FeatureFlag {
 
 // M-EDL — États des Lieux
 model EtatsDesLieux {
-  id          String  @id @default(uuid()) @map("edl_id")
-  leaseId     String  @map("lease_id")
-  lease       Lease   @relation(fields: [leaseId], references: [id])
-  typeEdl     EdlType @map("type_edl")
-  statut      String  @default("EN_COURS")
-  agentId     String? @map("agent_id")
-  agent       User?   @relation("AgentEdls", fields: [agentId], references: [id])
-  locataireId String? @map("locataire_id")
-  locataire   User?   @relation("LocataireEdls", fields: [locataireId], references: [id])
-
-  pieces      Json // array pièces avec états et photos_urls
-  compteurs   Json? // relevés compteurs
-  equipements Json? // liste équipements
-
-  signatureAgent     String? @map("signature_agent") @db.Text
-  signatureLocataire String? @map("signature_locataire") @db.Text
-
-  hashSha256 String?  @map("hash_sha256") @db.VarChar(64)
-  pdfUrl     String?  @map("pdf_url")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id               String      @id @default(uuid()) @map("edl_id")
+  leaseId          String      @map("lease_id")
+  lease            Lease       @relation(fields: [leaseId], references: [id])
+  typeEdl          EdlType     @map("type_edl") // ENTREE | SORTIE
+  statut           EdlStatut   @default(EN_COURS)
+  
+  redigeParId      String      @map("redige_par")
+  redigePar        User        @relation("RedacteurEdl", fields: [redigeParId], references: [id])
+  
+  agentId          String?     @map("agent_id")
+  agent            User?       @relation("AgentEdls", fields: [agentId], references: [id])
+  locataireId      String?     @map("locataire_id")
+  locataire        User?       @relation("LocataireEdls", fields: [locataireId], references: [id])
+  
+  dateEdl          DateTime    @default(now()) @map("date_edl") @db.Date
+  sections         Json        @default("[]") // JSONB Sections/photos/etats
+  
+  indexEau         Decimal?    @map("index_eau") @db.Decimal(10,2)
+  indexElec        Decimal?    @map("index_elec") @db.Decimal(10,2)
+  
+  clesRemises      Int         @default(0) @map("cles_remises")
+  clesDetail       String?     @map("cles_detail") @db.Text
+  
+  reservesLocataire String?    @map("reserves_locataire") @db.Text
+  
+  confirmeProprio    Boolean   @default(false) @map("confirme_proprio")
+  confirmeLocataire  Boolean   @default(false) @map("confirme_locataire")
+  confirmeProprioAt  DateTime? @map("confirme_proprio_at")
+  confirmeLocataireAt DateTime? @map("confirme_locataire_at")
+  expireConfirmationAt DateTime? @map("expire_confirmation_at")
+  
+  refEdl           String?     @unique @map("ref_edl") @db.VarChar(30)
+  hashSha256       String?     @map("hash_sha256") @db.VarChar(64)
+  pdfUrl           String?     @map("pdf_url")
+  
+  edlEntreeId      String?     @map("edl_entree_id")
+  edlEntree        EtatsDesLieux? @relation("EdlEntreeSortie", fields: [edlEntreeId], references: [id])
+  edlSorties       EtatsDesLieux[] @relation("EdlEntreeSortie")
+  
+  createdAt        DateTime    @default(now()) @map("created_at")
 
   @@map("etats_des_lieux")
 }
@@ -1368,7 +1396,6 @@ model EtatsDesLieux {
 enum EdlType {
   ENTREE
   SORTIE
-  INVENTAIRE
 }
 
 // M-SIGN — Signatures Électroniques
@@ -2638,3 +2665,109 @@ model ConsultationProfil {
   @@map("consultations_profil")
 }
 
+
+// ═══════════════════════════════════════════════════════
+// ADD-15 : Modules Critiques (EDL, RPT, CHP)
+// ═══════════════════════════════════════════════════════
+
+enum EdlStatut {
+  EN_COURS
+  SOUMIS_LOCATAIRE
+  CONFIRME
+  CONTESTE
+  CERTIFIE
+}
+
+enum ProspectStatut {
+  A_RAPPELER
+  EN_DISCUSSION
+  INSCRIT
+  PAS_INTERESSE
+  PERDU
+}
+
+enum CommType {
+  BAIL_FORMEL
+  BDQ_CONFIRME
+  FORMALISATION
+  RECRUTEMENT
+  BONUS
+}
+
+model RapportMensuel {
+  id              String   @id @default(uuid()) @map("rapport_id")
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  periodeMois     Int      @map("periode_mois") @db.SmallInt
+  periodeAnnee    Int      @map("periode_annee") @db.SmallInt
+  typeRapport     String   @default("MENSUEL") @map("type_rapport") // MENSUEL | HEBDOMADAIRE | ANNUEL
+  dataRapport     Json     @map("data_rapport")
+  pdfUrl          String?  @map("pdf_url")
+  envoyeWhatsapp  Boolean  @default(false) @map("envoye_whatsapp")
+  envoyeEmail     Boolean  @default(false) @map("envoye_email")
+  envoyeAt        DateTime? @map("envoye_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, periodeMois, periodeAnnee, typeRapport])
+  @@map("rapports_mensuels")
+}
+
+model ChampionProfile {
+  id                     String    @id @default(uuid()) @map("champion_id")
+  userId                 String    @unique @map("user_id")
+  user                   User      @relation(fields: [userId], references: [id])
+  zonePrincipale         String    @map("zone_principale") @db.VarChar(50)
+  zonesSecondaires       String[]  @map("zones_secondaires")
+  superviseurId          String?   @map("superviseur_id")
+  superviseur            User?     @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
+  statut                 String    @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
+  dateDebut              DateTime  @default(now()) @map("date_debut") @db.Date
+  objectifMensuel        Int       @default(30) @map("objectif_mensuel")
+  totalInscriptions      Int       @default(0) @map("total_inscriptions")
+  totalCommissionsFcfa   Decimal   @default(0) @map("total_commissions_fcfa") @db.Decimal(12,0)
+  
+  prospects              ChampionProspect[]
+  commissions            ChampionCommission[]
+  
+  createdAt              DateTime  @default(now()) @map("created_at")
+
+  @@map("champions_profiles")
+}
+
+model ChampionProspect {
+  id                 String         @id @default(uuid()) @map("prospect_id")
+  championId         String         @map("champion_id")
+  champion           ChampionProfile @relation(fields: [championId], references: [id])
+  nom                String         @db.VarChar(200)
+  telephone          String?        @db.VarChar(20)
+  quartier           String?        @db.VarChar(100)
+  nbLogementsEstime  String?        @map("nb_logements_estime") @db.VarChar(20)
+  argumentCle        String?        @map("argument_cle") @db.VarChar(50)
+  statut             ProspectStatut @default(A_RAPPELER)
+  dateDernierContact DateTime?      @map("date_dernier_contact") @db.Date
+  dateRappelPrevu    DateTime?      @map("date_rappel_prevu") @db.Date
+  note               String?        @db.Text
+  userIdInscrit      String?        @map("user_id_inscrit")
+  userInscrit        User?          @relation("ProspectConverti", fields: [userIdInscrit], references: [id])
+  
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  @@map("champions_prospects")
+}
+
+model ChampionCommission {
+  id             String          @id @default(uuid()) @map("commission_id")
+  championId     String          @map("champion_id")
+  champion       ChampionProfile @relation(fields: [championId], references: [id])
+  typeAction     CommType        @map("type_action")
+  referenceId    String?         @map("reference_id")
+  montantFcfa    Decimal         @map("montant_fcfa") @db.Decimal(12,0)
+  statut         String          @default("EN_ATTENTE") // EN_ATTENTE | VALIDE | PAYE | ANNULE
+  valideAt       DateTime?       @map("valide_at")
+  payeAt         DateTime?       @map("paye_at")
+  modePaiement   String?         @map("mode_paiement") @db.VarChar(20)
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  @@map("champions_commissions")
+}
