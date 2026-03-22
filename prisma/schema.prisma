@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 enum Role {
@@ -257,11 +257,11 @@ model User {
   reversalTransactions       ReversalTransaction[]
 
   // ADD-05 Diaspora & KYC
-  paysResidence       String? @map("pays_residence") @db.Char(3)
+  paysResidence       String? @map("pays_residence")
   fuseauHoraire       String  @default("Africa/Abidjan") @map("fuseau_horaire")
   emailRapportMensuel String? @map("email_rapport_mensuel")
-  deviceFingerprint   String? @map("device_fingerprint") @db.VarChar(64)
-  fraudScore          Int     @default(0) @map("fraud_score") @db.SmallInt
+  deviceFingerprint   String? @map("device_fingerprint")
+  fraudScore          Int     @default(0) @map("fraud_score")
   fraudFlags          Json?   @map("fraud_flags")
 
   // ADD-05 B2B & White Label
@@ -397,10 +397,10 @@ model IdentityDocument {
   docNumber        String    @map("doc_number")
   docNumberHash    String    @unique @map("doc_number_hash")
   fullName         String?   @map("full_name")
-  birthDate        DateTime? @map("birth_date") @db.Date
-  nationality      String?   @db.Char(3)
-  issuingCountry   String?   @map("issuing_country") @db.Char(3)
-  expiryDate       DateTime? @map("expiry_date") @db.Date
+  birthDate        DateTime? @map("birth_date")
+  nationality      String?
+  issuingCountry   String?   @map("issuing_country")
+  expiryDate       DateTime? @map("expiry_date")
   mrzRawData       String?   @map("mrz_raw_data")
   scanS3Key        String?   @map("scan_s3_key")
   status           String    @default("pending") // pending|verified|under_review|expired|rejected
@@ -427,17 +427,17 @@ model Property {
   propertyType         String   @map("property_type") // apartment|house|studio|villa|room|commercial
   leaseType            String   @default("residential") @map("lease_type") // residential|commercial
   commune              String
-  address              String   @db.Text
-  areaSqm              Decimal? @map("area_sqm") @db.Decimal(8, 2)
-  rooms                Int?     @db.SmallInt
-  bedrooms             Int?     @db.SmallInt
+  address              String
+  areaSqm              Decimal? @map("area_sqm")
+  rooms                Int?
+  bedrooms             Int?
   name                 String?  @map("name")
   city                 String?  @map("city")
-  declaredRentFcfa     Decimal? @map("declared_rent_fcfa") @db.Decimal(12, 2)
+  declaredRentFcfa     Decimal? @map("declared_rent_fcfa")
   digitalPostalAddress String?  @map("digital_postal_address")
-  gpsLatitude          Decimal? @map("gps_latitude") @db.Decimal(10, 8)
-  gpsLongitude         Decimal? @map("gps_longitude") @db.Decimal(11, 8)
-  amenities            String[]
+  gpsLatitude          Decimal? @map("gps_latitude")
+  gpsLongitude         Decimal? @map("gps_longitude")
+  amenities            Json?    @default("[]")
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
   documents            Json?    @default("{}")
 
@@ -448,7 +448,7 @@ model Property {
   manager         User?   @relation("AgentProperties", fields: [managedByUserId], references: [id])
 
   managementMode    ManagementMode @default(DIRECT) @map("management_mode")
-  superficieM2      Decimal?       @map("superficie_m2") @db.Decimal(12, 2)
+  superficieM2      Decimal?       @map("superficie_m2")
   usageTerrain      TerrainUsage?  @map("usage_terrain")
   referenceCadastre String?        @map("reference_cadastre")
 
@@ -461,7 +461,7 @@ model Property {
 
   // ADD-05 Horeoo
   isHoreoo       Boolean  @default(false) @map("is_horeoo")
-  horeooDiscount Decimal? @map("horeoo_discount") @db.Decimal(5, 2)
+  horeooDiscount Decimal? @map("horeoo_discount")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -521,12 +521,12 @@ model Lease {
   mandate          Mandate?     @relation(fields: [mandateId], references: [id])
   leaseType        String       @default("residential") @map("lease_type") // residential|commercial
 
-  startDate      DateTime  @map("start_date") @db.Date
-  endDate        DateTime? @map("end_date") @db.Date
-  durationMonths Int       @map("duration_months") @db.SmallInt
+  startDate      DateTime  @map("start_date")
+  endDate        DateTime? @map("end_date")
+  durationMonths Int       @map("duration_months")
   rentAmount     Int       @map("rent_amount") // FCFA entiers
   chargesAmount  Int       @default(0) @map("charges_amount")
-  paymentDay     Int       @default(5) @map("payment_day") @db.SmallInt
+  paymentDay     Int       @default(5) @map("payment_day")
   depositAmount  Int       @default(0) @map("deposit_amount")
 
   status     LeaseStatus @default(DRAFT)
@@ -536,11 +536,11 @@ model Lease {
   typeBail                 TypeBail  @default(ECRIT) @map("type_bail")
   confirmationLocataireSms Boolean   @default(false) @map("confirmation_locataire_sms")
   confirmationLocataireAt  DateTime? @map("confirmation_locataire_at")
-  preavisRequisMois        Int?      @default(1) @map("preavis_requis_mois") @db.SmallInt
+  preavisRequisMois        Int?      @default(1) @map("preavis_requis_mois")
 
   signedAt          DateTime? @map("signed_at")
   terminatedAt      DateTime? @map("terminated_at")
-  terminationReason String?   @map("termination_reason") @db.Text
+  terminationReason String?   @map("termination_reason")
 
   commercialData Json? @map("commercial_data") // Indexation settings, company name, etc.
 
@@ -661,7 +661,7 @@ model LeaseArrear {
   id      String   @id @default(uuid())
   leaseId String   @map("lease_id")
   lease   Lease    @relation(fields: [leaseId], references: [id])
-  dueDate DateTime @map("due_date") @db.Date
+  dueDate DateTime @map("due_date")
   amount  Int
   status  String   @default("unpaid") // unpaid|paid|partial|waived
 
@@ -678,7 +678,7 @@ model ProcedurePhase {
   lease       Lease    @relation(fields: [leaseId], references: [id])
   phaseNumber Int      @map("phase_number")
   name        String
-  description String?  @db.Text
+  description String?
   actionDate  DateTime @default(now()) @map("action_date")
   metadata    Json?
 
@@ -717,10 +717,10 @@ model Mandate {
   agentUserId     String?       @map("agent_id")
   agent           User?         @relation("AgentMandates", fields: [agentUserId], references: [id])
   mandateType     MandateType
-  commissionPct   Decimal?      @map("commission_pct") @db.Decimal(5, 2)
+  commissionPct   Decimal?      @map("commission_pct")
   commissionFixed Int?          @map("commission_fixed")
-  startDate       DateTime      @map("start_date") @db.Date
-  endDate         DateTime?     @map("end_date") @db.Date
+  startDate       DateTime      @map("start_date")
+  endDate         DateTime?     @map("end_date")
   status          MandateStatus @default(DRAFT)
   scope           Json?         @default("{}") // List of units or total
 
@@ -766,10 +766,10 @@ model Colocataire {
   user         User      @relation(fields: [userId], references: [id])
   role         ColocRole @default(SECONDAIRE)
   partLoyer    Int?      @map("part_loyer")
-  pctLoyer     Decimal?  @map("pct_loyer") @db.Decimal(5, 2)
+  pctLoyer     Decimal?  @map("pct_loyer")
   modePaiement ColocMode @default(INDIVIDUEL) @map("mode_paiement")
-  dateEntree   DateTime  @map("date_entree") @db.Date
-  dateSortie   DateTime? @map("date_sortie") @db.Date
+  dateEntree   DateTime  @map("date_entree")
+  dateSortie   DateTime? @map("date_sortie")
   status       String    @default("ACTIF") // ACTIF | SORTI | EXCLU
 
   payments  ColocPayment[]
@@ -817,12 +817,12 @@ model LandLeaseInfo {
   id                String       @id @default(uuid())
   leaseId           String       @unique @map("bail_id")
   lease             Lease        @relation(fields: [leaseId], references: [id])
-  superficieLouee   Decimal      @map("superficie_louee_m2") @db.Decimal(12, 2)
+  superficieLouee   Decimal      @map("superficie_louee_m2")
   usage             TerrainUsage @map("usage_declare")
   periodicity       Periodicite  @default(MENSUEL) @map("periodicite_loyer")
-  eventEndDate      DateTime?    @map("date_evenement_fin") @db.Date
-  annualIndexation  Decimal?     @default(0) @map("indexation_annuelle") @db.Decimal(5, 2)
-  conditions        String?      @map("conditions_usage") @db.Text
+  eventEndDate      DateTime?    @map("date_evenement_fin")
+  annualIndexation  Decimal?     @default(0) @map("indexation_annuelle")
+  conditions        String?      @map("conditions_usage")
   hasEntryInventory Boolean      @default(false) @map("etat_des_lieux_entree")
   hasExitInventory  Boolean      @default(false) @map("etat_des_lieux_sortie")
 
@@ -880,10 +880,10 @@ model Dispute {
   leaseId         String        @map("lease_id")
   lease           Lease         @relation(fields: [leaseId], references: [id])
   title           String
-  description     String        @db.Text
+  description     String
   amountInDispute Int?          @map("amount_in_dispute")
   status          DisputeStatus @default(OPEN)
-  resolution      String?       @db.Text
+  resolution      String?
 
   messages DisputeMessage[]
 
@@ -899,8 +899,8 @@ model DisputeMessage {
   dispute     Dispute  @relation(fields: [disputeId], references: [id])
   senderId    String   @map("sender_id")
   sender      User     @relation("DisputeSender", fields: [senderId], references: [id])
-  content     String   @db.Text
-  attachments String[]
+  content     String
+  attachments Json? @default("[]")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -932,7 +932,7 @@ model Notification {
   user       User    @relation(fields: [userId], references: [id])
   channel    String  @default("PUSH") // SMS|PUSH|EMAIL|WHATSAPP|USSD_PUSH|COURRIER
   title      String?
-  content    String  @db.Text
+  content    String
   type       String  @default("INFO")
   link       String?
   status     String  @default("pending") // pending|sent|delivered|failed
@@ -954,7 +954,7 @@ model ObservatorySnapshot {
   minRent      Int     @map("min_rent")
   maxRent      Int     @map("max_rent")
   sampleCount  Int     @map("sample_count")
-  trendPct     Decimal @map("trend_pct") @db.Decimal(5, 2)
+  trendPct     Decimal @map("trend_pct")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1021,7 +1021,7 @@ model Incident {
   lease       Lease   @relation(fields: [leaseId], references: [id])
   type        String // Damage, late payment, early exit, etc.
   severity    String  @default("MEDIUM") // LOW|MEDIUM|HIGH|CRITICAL
-  description String  @db.Text
+  description String
   resolved    Boolean @default(false)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1063,7 +1063,7 @@ model RepaymentPlan {
   id              String     @id @default(uuid())
   leaseId         String     @map("lease_id")
   lease           Lease      @relation(fields: [leaseId], references: [id])
-  details         String     @db.Text
+  details         String
   status          PlanStatus @default(PROPOSED)
   tenantSignature String?    @map("tenant_signature")
 
@@ -1094,7 +1094,7 @@ model MediationMessage {
   mediation   Mediation @relation(fields: [mediationId], references: [id])
   senderId    String    @map("sender_id")
   sender      User      @relation(fields: [senderId], references: [id])
-  content     String    @db.Text
+  content     String
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1103,7 +1103,7 @@ model MediationMessage {
 
 model NewsTicker {
   id        String   @id @default(uuid()) @map("news_id")
-  content   String   @db.Text
+  content   String
   priority  Int      @default(0)
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
@@ -1124,7 +1124,7 @@ model FiscalDossier {
   dureeBailMois        Int     @map("duree_bail_mois")
   dureeRetenueMois     Int     @map("duree_retenue_mois")
   baseCalcul           Int     @map("base_calcul")
-  tauxApplique         Decimal @default(0.0250) @map("taux_applique") @db.Decimal(5, 4)
+  tauxApplique         Decimal @default(0.0250) @map("taux_applique")
   droitsEnregistrement Int     @map("droits_enregistrement")
   fraisTimbre          Int     @default(1000) @map("frais_timbre")
   fraisQapril          Int     @map("frais_qapril")
@@ -1177,10 +1177,10 @@ model PrepaymentRequest {
 
   monthsCount Int                     @map("months_count")
   totalAmount Int                     @map("total_amount")
-  reason      String?                 @db.Text
+  reason      String?
   status      PrepaymentRequestStatus @default(PENDING)
 
-  rejectionReason String?   @map("rejection_reason") @db.Text
+  rejectionReason String?   @map("rejection_reason")
   approvedAt      DateTime? @map("approved_at")
   rejectedAt      DateTime? @map("rejected_at")
 
@@ -1202,8 +1202,8 @@ model PaymentPgw {
   id           String   @id @default(uuid()) @map("payment_id")
   leaseId      String   @map("lease_id")
   lease        Lease    @relation(fields: [leaseId], references: [id])
-  moisConcerne DateTime @map("mois_concerne") @db.Date
-  montant      Decimal  @db.Decimal(12, 0)
+  moisConcerne DateTime @map("mois_concerne")
+  montant      Decimal
 
   payeurId       String @map("payeur_id")
   payeur         User   @relation("PayerTransactions", fields: [payeurId], references: [id])
@@ -1239,7 +1239,7 @@ model PaymentPgw {
 
   // M-PAY-AUTO
   reversalStatus   ReversalStatus        @default(PENDING) @map("reversal_status")
-  honorairesAgence Decimal?              @map("honoraires_agence") @db.Decimal(12, 0)
+  honorairesAgence Decimal?              @map("honoraires_agence")
   reversals        ReversalTransaction[]
 
   @@index([leaseId, moisConcerne])
@@ -1261,7 +1261,7 @@ model ReversalTransaction {
   recipientId  String       @map("recipient_id")
   recipient    User         @relation(fields: [recipientId], references: [id])
   type         ReversalType
-  amount       Decimal      @db.Decimal(12, 0)
+  amount       Decimal
   status       String       @default("SUCCESS") // SUCCESS, FAILED
   referencePgw String?      @map("reference_pgw")
 
@@ -1319,12 +1319,12 @@ model PgwMsisdnLookup {
 
 model PgwReconciliation {
   id                      String       @id @default(uuid()) @map("recon_id")
-  dateRecon               DateTime     @map("date_recon") @db.Date
+  dateRecon               DateTime     @map("date_recon")
   canal                   PaymentCanal
   nbTransactionsQapril    Int          @map("nb_transactions_qapril")
   nbTransactionsOperateur Int?         @map("nb_transactions_operateur")
-  montantTotalQapril      Decimal      @map("montant_total_qapril") @db.Decimal(14, 0)
-  montantTotalOperateur   Decimal?     @map("montant_total_operateur") @db.Decimal(14, 0)
+  montantTotalQapril      Decimal      @map("montant_total_qapril")
+  montantTotalOperateur   Decimal?     @map("montant_total_operateur")
   nbEcarts                Int          @default(0) @map("nb_ecarts")
   ecartsDetail            Json?        @map("ecarts_detail")
   statut                  String       @default("EN_COURS")
@@ -1363,16 +1363,16 @@ model EtatsDesLieux {
   locataireId      String?     @map("locataire_id")
   locataire        User?       @relation("LocataireEdls", fields: [locataireId], references: [id])
   
-  dateEdl          DateTime    @default(now()) @map("date_edl") @db.Date
+  dateEdl          DateTime    @default(now()) @map("date_edl")
   sections         Json        @default("[]") // JSONB Sections/photos/etats
   
-  indexEau         Decimal?    @map("index_eau") @db.Decimal(10,2)
-  indexElec        Decimal?    @map("index_elec") @db.Decimal(10,2)
+  indexEau         Decimal?    @map("index_eau")
+  indexElec        Decimal?    @map("index_elec")
   
   clesRemises      Int         @default(0) @map("cles_remises")
-  clesDetail       String?     @map("cles_detail") @db.Text
+  clesDetail       String?     @map("cles_detail")
   
-  reservesLocataire String?    @map("reserves_locataire") @db.Text
+  reservesLocataire String?    @map("reserves_locataire")
   
   confirmeProprio    Boolean   @default(false) @map("confirme_proprio")
   confirmeLocataire  Boolean   @default(false) @map("confirme_locataire")
@@ -1380,8 +1380,8 @@ model EtatsDesLieux {
   confirmeLocataireAt DateTime? @map("confirme_locataire_at")
   expireConfirmationAt DateTime? @map("expire_confirmation_at")
   
-  refEdl           String?     @unique @map("ref_edl") @db.VarChar(30)
-  hashSha256       String?     @map("hash_sha256") @db.VarChar(64)
+  refEdl           String?     @unique @map("ref_edl")
+  hashSha256       String?     @map("hash_sha256")
   pdfUrl           String?     @map("pdf_url")
   
   edlEntreeId      String?     @map("edl_entree_id")
@@ -1407,11 +1407,11 @@ model SignatureElectronique {
   signataire   User      @relation(fields: [signataireId], references: [id])
   statut       SigStatut @default(EN_ATTENTE)
 
-  methode      String? @db.VarChar(20) // OTP_SMS | DESSIN | BIOMETRIQUE
-  otpUtilise   String? @map("otp_utilise") @db.VarChar(6)
+  methode      String? // OTP_SMS | DESSIN | BIOMETRIQUE
+  otpUtilise   String? @map("otp_utilise")
   ipAddress    String? @map("ip_address")
   userAgent    String? @map("user_agent")
-  hashDocument String? @map("hash_document") @db.VarChar(64)
+  hashDocument String? @map("hash_document")
 
   signedAt  DateTime? @map("signed_at")
   expiresAt DateTime? @map("expires_at")
@@ -1447,7 +1447,7 @@ model TicketMaintenance {
   declarant   User     @relation("MaintenanceDeclarant", fields: [declarantId], references: [id])
 
   categorie   MaintCat
-  description String      @db.Text
+  description String
   photosUrls  Json?       @map("photos_urls")
   urgence     String      @default("NORMALE") // URGENTE|NORMALE|BASSE
   statut      MaintStatut @default(OUVERT)
@@ -1455,12 +1455,12 @@ model TicketMaintenance {
   prestataireId String?      @map("prestataire_id")
   prestataire   Prestataire? @relation(fields: [prestataireId], references: [id])
 
-  devisMontant     Decimal?  @map("devis_montant") @db.Decimal(12, 0)
-  coutFinal        Decimal?  @map("cout_final") @db.Decimal(12, 0)
-  dateIntervention DateTime? @map("date_intervention") @db.Date
+  devisMontant     Decimal?  @map("devis_montant")
+  coutFinal        Decimal?  @map("cout_final")
+  dateIntervention DateTime? @map("date_intervention")
 
-  noteLocataire   Int? @map("note_locataire") @db.SmallInt
-  notePrestataire Int? @map("note_prestataire") @db.SmallInt
+  noteLocataire   Int? @map("note_locataire")
+  notePrestataire Int? @map("note_prestataire")
 
   createdAt DateTime  @default(now()) @map("created_at")
   closedAt  DateTime? @map("closed_at")
@@ -1475,7 +1475,7 @@ model Prestataire {
   telephone   String
   email       String?
   adresse     String?
-  noteMoyenne Decimal? @map("note_moyenne") @db.Decimal(3, 2)
+  noteMoyenne Decimal? @map("note_moyenne")
 
   tickets TicketMaintenance[]
 
@@ -1509,17 +1509,17 @@ model Candidature {
   candidatId String?  @map("candidat_id")
   candidat   User?    @relation("UserCandidatures", fields: [candidatId], references: [id])
 
-  nom           String   @db.VarChar(100)
-  prenom        String   @db.VarChar(100)
-  telephone     String   @db.VarChar(20)
-  revenuMensuel Decimal? @map("revenu_mensuel") @db.Decimal(12, 0)
-  employeur     String?  @db.VarChar(200)
-  scoreQapril   Int?     @map("score_qapril") @db.SmallInt
-  tauxEffort    Decimal? @map("taux_effort") @db.Decimal(5, 2)
+  nom           String
+  prenom        String
+  telephone     String
+  revenuMensuel Decimal? @map("revenu_mensuel")
+  employeur     String?
+  scoreQapril   Int?     @map("score_qapril")
+  tauxEffort    Decimal? @map("taux_effort")
   docsJsonb     Json?    @map("docs_jsonb")
 
   statut     CandStatut @default(SOUMISE)
-  noteAgence String?    @map("note_agence") @db.Text
+  noteAgence String?    @map("note_agence")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1541,8 +1541,8 @@ model ChargeParametrage {
   logement       Property   @relation(fields: [logementId], references: [id])
   typeCharge     ChargeType @map("type_charge")
   mode           String     @default("FORFAIT") // FORFAIT | PROVISION_REELLE
-  montantMensuel Decimal    @map("montant_mensuel") @db.Decimal(10, 0)
-  cleRepartition Decimal?   @map("cle_repartition") @db.Decimal(7, 4)
+  montantMensuel Decimal    @map("montant_mensuel")
+  cleRepartition Decimal?   @map("cle_repartition")
   actif          Boolean    @default(true)
   createdAt      DateTime   @default(now()) @map("created_at")
 
@@ -1553,10 +1553,10 @@ model RegularisationCharges {
   id                   String    @id @default(uuid()) @map("reg_id")
   leaseId              String    @map("bail_id")
   lease                Lease     @relation(fields: [leaseId], references: [id])
-  annee                Int       @db.SmallInt
-  provisionsCollectees Decimal   @map("provisions_collectees") @db.Decimal(12, 0)
-  chargesReelles       Decimal   @map("charges_reelles") @db.Decimal(12, 0)
-  solde                Decimal   @db.Decimal(12, 0)
+  annee                Int
+  provisionsCollectees Decimal   @map("provisions_collectees")
+  chargesReelles       Decimal   @map("charges_reelles")
+  solde                Decimal
   statut               String    @default("CALCULE")
   notifieAt            DateTime? @map("notifie_at")
   regleAt              DateTime? @map("regle_at")
@@ -1581,10 +1581,10 @@ model Annonce {
   agenceId   String   @map("agence_id")
   agence     User     @relation("AgenceAnnonces", fields: [agenceId], references: [id])
 
-  titre        String  @db.VarChar(200)
-  description  String  @db.Text
-  loyerDemande Decimal @map("loyer_demande") @db.Decimal(12, 0)
-  charges      Decimal @default(0) @db.Decimal(10, 0)
+  titre        String
+  description  String
+  loyerDemande Decimal @map("loyer_demande")
+  charges      Decimal @default(0)
   photosUrls   Json    @map("photos_urls")
   criteres     Json?
 
@@ -1593,7 +1593,7 @@ model Annonce {
   nbContacts     Int      @default(0) @map("nb_contacts")
   nbVisites      Int      @default(0) @map("nb_visites")
   nbCandidatures Int      @default(0) @map("nb_candidatures")
-  coutVacance    Decimal? @map("cout_vacance") @db.Decimal(12, 0)
+  coutVacance    Decimal? @map("cout_vacance")
 
   publieeAt  DateTime? @map("publiee_at")
   archiveeAt DateTime? @map("archivee_at")
@@ -1609,16 +1609,16 @@ model CrgMensuel {
   agenceId       String @map("agence_id")
   agence         User   @relation("AgenceCrgs", fields: [agenceId], references: [id])
 
-  mois             DateTime @db.Date
-  loyersEncaisses  Decimal  @default(0) @map("loyers_encaisses") @db.Decimal(14, 0)
-  chargesDeduites  Decimal  @default(0) @map("charges_deduites") @db.Decimal(14, 0)
-  travauxDeduits   Decimal  @default(0) @map("travaux_deduits") @db.Decimal(14, 0)
-  honorairesAgence Decimal  @default(0) @map("honoraires_agence") @db.Decimal(14, 0)
-  reversementNet   Decimal  @map("reversement_net") @db.Decimal(14, 0)
+  mois             DateTime
+  loyersEncaisses  Decimal  @default(0) @map("loyers_encaisses")
+  chargesDeduites  Decimal  @default(0) @map("charges_deduites")
+  travauxDeduits   Decimal  @default(0) @map("travaux_deduits")
+  honorairesAgence Decimal  @default(0) @map("honoraires_agence")
+  reversementNet   Decimal  @map("reversement_net")
 
   reversementEffectueAt DateTime? @map("reversement_effectue_at")
   pdfUrl                String?   @map("pdf_url")
-  hashSha256            String?   @map("hash_sha256") @db.VarChar(64)
+  hashSha256            String?   @map("hash_sha256")
   createdAt             DateTime  @default(now()) @map("created_at")
 
   @@unique([proprietaireId, agenceId, mois])
@@ -1634,8 +1634,8 @@ model AgendaEvenement {
   agent    User?   @relation("AgentEvents", fields: [agentId], references: [id])
 
   typeEvent   AgendaType @map("type_event")
-  titre       String     @db.VarChar(200)
-  description String?    @db.Text
+  titre       String
+  description String?
 
   contactId  String?   @map("contact_id")
   contact    User?     @relation("EventContact", fields: [contactId], references: [id])
@@ -1648,7 +1648,7 @@ model AgendaEvenement {
   finAt         DateTime? @map("fin_at")
   rappelMinutes Int       @default(30) @map("rappel_minutes")
   statut        String    @default("PLANIFIE")
-  gcalEventId   String?   @map("gcal_event_id") @db.VarChar(100)
+  gcalEventId   String?   @map("gcal_event_id")
   createdAt     DateTime  @default(now()) @map("created_at")
 
   @@map("agenda_evenements")
@@ -1674,11 +1674,11 @@ model TvaTransaction {
   paymentId      String     @map("payment_id")
   payment        PaymentPgw @relation(fields: [paymentId], references: [id])
   serviceType    String     @map("service_type")
-  montantHt      Decimal    @map("montant_ht") @db.Decimal(12, 2)
-  tauxTva        Decimal    @default(18.00) @map("taux_tva") @db.Decimal(5, 2)
-  montantTva     Decimal    @map("montant_tva") @db.Decimal(12, 2)
-  montantTtc     Decimal    @map("montant_ttc") @db.Decimal(12, 2)
-  periodeFiscale DateTime   @map("periode_fiscale") @db.Date
+  montantHt      Decimal    @map("montant_ht")
+  tauxTva        Decimal    @default(18.00) @map("taux_tva")
+  montantTva     Decimal    @map("montant_tva")
+  montantTtc     Decimal    @map("montant_ttc")
+  periodeFiscale DateTime   @map("periode_fiscale")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1692,8 +1692,8 @@ model ProcurationNumerique {
   mandataireId String    @map("mandataire_id")
   mandataire   User      @relation("Mandataire", fields: [mandataireId], references: [id])
   droits       Json      @map("droits")
-  dateDebut    DateTime  @map("date_debut") @db.Date
-  dateFin      DateTime? @map("date_fin") @db.Date
+  dateDebut    DateTime  @map("date_debut")
+  dateFin      DateTime? @map("date_fin")
   actif        Boolean   @default(true)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1705,7 +1705,7 @@ model FraudBlacklist {
   id           String  @id @default(uuid()) @map("bl_id")
   userId       String? @map("user_id")
   user         User?   @relation("UserFraud", fields: [userId], references: [id])
-  documentHash String? @map("document_hash") @db.VarChar(64)
+  documentHash String? @map("document_hash")
   motif        String
   ajouteParId  String? @map("ajoute_par")
   ajoutePar    User?   @relation("BlacklistAuthor", fields: [ajouteParId], references: [id])
@@ -1735,7 +1735,7 @@ model LegalProcedure {
   lease       Lease     @relation(fields: [leaseId], references: [id])
   type        LegalType
   status      String    @default("OPEN") // OPEN, SERVED, CLOSED
-  description String?   @db.Text
+  description String?
   servedAt    DateTime? @map("served_at")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1755,7 +1755,7 @@ model CoopGroup {
   leaseId     String  @unique @map("lease_id")
   lease       Lease   @relation(fields: [leaseId], references: [id])
   name        String
-  totalTarget Decimal @map("total_target") @db.Decimal(12, 0)
+  totalTarget Decimal @map("total_target")
 
   members User[] @relation("CoopMembers")
 
@@ -1837,7 +1837,7 @@ model Inspection {
   status       String         @default("PLANIFIEE") // PLANIFIEE|EN_COURS|TERMINEE
   date         DateTime
   generalScore Int?           @map("general_score") // 0-100
-  comments     String?        @db.Text
+  comments     String?
 
   rooms InspectionRoom[]
 
@@ -1858,7 +1858,7 @@ model InspectionRoom {
   inspection   Inspection @relation(fields: [inspectionId], references: [id])
   name         String // Salon, Chambre 1, etc.
   status       RoomStatus @default(GOOD)
-  comments     String?    @db.Text
+  comments     String?
 
   photos InspectionPhoto[]
 
@@ -1940,8 +1940,8 @@ model BailDeclaratif {
   telephoneLocataire     String    @map("telephone_locataire")
   descriptionLogement    String    @map("description_logement")
   adresseLibre           String?   @map("adresse_libre")
-  loyerDeclareMensuel    Decimal   @map("loyer_declare_mensuel") @db.Decimal(12, 2)
-  dateEntreeEstimee      DateTime? @map("date_entree_estimee") @db.Date
+  loyerDeclareMensuel    Decimal   @map("loyer_declare_mensuel")
+  dateEntreeEstimee      DateTime? @map("date_entree_estimee")
   precisionDateEntree    String    @default("EXACTE") @map("precision_date_entree")
   identiteIncomplete     Boolean   @default(false) @map("identite_incomplete")
   sourceCreation         String    @default("FORM") @map("source_creation")
@@ -1949,7 +1949,7 @@ model BailDeclaratif {
   statut                 BdqStatut @default(PENDING_LOCATAIRE)
   confirmationLocataire  Boolean?  @map("confirmation_locataire")
   confirmationAt         DateTime? @map("confirmation_at")
-  contrePropositionLoyer Decimal?  @map("contre_proposition_loyer") @db.Decimal(12, 2)
+  contrePropositionLoyer Decimal?  @map("contre_proposition_loyer")
   motifRefus             String?   @map("motif_refus")
 
   agentConfirmantId     String?   @map("agent_confirmant_id")
@@ -1957,8 +1957,8 @@ model BailDeclaratif {
   confirmationAgentAt   DateTime? @map("confirmation_agent_at")
   agentConfirmationMode String?   @map("agent_confirmation_mode")
 
-  hashDeclaration String  @map("hash_declaration") @db.VarChar(64)
-  hashBdqFinal    String? @map("hash_bdq_final") @db.VarChar(64)
+  hashDeclaration String  @map("hash_declaration")
+  hashBdqFinal    String? @map("hash_bdq_final")
   qrToken         String? @unique @map("qr_token")
 
   smsLogs         BdqSmsLog[]
@@ -1996,13 +1996,13 @@ model BdqHistoriqueLoyer {
   id                    String         @id @default(uuid()) @map("hist_id")
   bdqId                 String         @map("bdq_id")
   bdq                   BailDeclaratif @relation(fields: [bdqId], references: [id])
-  ancienLoyer           Decimal        @map("ancien_loyer") @db.Decimal(12, 2)
-  nouveauLoyer          Decimal        @map("nouveau_loyer") @db.Decimal(12, 2)
+  ancienLoyer           Decimal        @map("ancien_loyer")
+  nouveauLoyer          Decimal        @map("nouveau_loyer")
   motif                 String?
   confirmationLocataire Boolean?       @map("confirmation_locataire")
   modifieParId          String?        @map("modifie_par")
-  effectiveLe           DateTime       @map("effective_le") @db.Date
-  hashModification      String         @map("hash_modification") @db.VarChar(64)
+  effectiveLe           DateTime       @map("effective_le")
+  hashModification      String         @map("hash_modification")
   createdAt             DateTime       @default(now()) @map("created_at")
 
   @@map("bdq_historique_loyer")
@@ -2022,7 +2022,7 @@ model BdqConversationState {
   nomLocataireExtrait        String?   @map("nom_locataire_extrait")
   telephoneExtrait           String?   @map("telephone_extrait")
   descriptionLogementExtrait String?   @map("description_logement_extrait")
-  loyerExtrait               Decimal?  @map("loyer_extrait") @db.Decimal(12, 0)
+  loyerExtrait               Decimal?  @map("loyer_extrait")
   dateEntreeExtraite         DateTime? @map("date_entree_extraite")
   precisionDate              String    @default("APPROXIMATIVE") @map("precision_date")
   telephoneManquant          Boolean   @default(false) @map("telephone_manquant")
@@ -2040,7 +2040,7 @@ model BdqConversationState {
   // Costs
   tokensEntreeTotal Int     @default(0) @map("tokens_entree_total")
   tokensSortieTotal Int     @default(0) @map("tokens_sortie_total")
-  coutEstimeFcfa    Decimal @default(0) @map("cout_estime_fcfa") @db.Decimal(8, 2)
+  coutEstimeFcfa    Decimal @default(0) @map("cout_estime_fcfa")
 
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -2059,11 +2059,11 @@ model PropertyMaintenance {
   propertyId  String   @map("property_id")
   property    Property @relation(fields: [propertyId], references: [id])
   type        String // e.g., "REPAIR", "CLEANING", "RENOVATION"
-  description String   @db.Text
+  description String
   cost        Float?
   date        DateTime @default(now())
   provider    String? // Name of the company/craftsman
-  attachments String[] // Links to invoices/photos
+  attachments Json? @default("[]") // Links to invoices/photos
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2111,22 +2111,22 @@ model NotificationPreference {
 
   // WhatsApp
   waActif   Boolean @default(true) @map("wa_actif")
-  waNumero  String? @map("wa_numero") @db.VarChar(20)
+  waNumero  String? @map("wa_numero")
   waVerifie Boolean @default(false) @map("wa_verifie")
 
   // Email
   emailActif   Boolean @default(false) @map("email_actif")
-  emailAdresse String? @map("email_adresse") @db.VarChar(200)
+  emailAdresse String? @map("email_adresse")
   emailVerifie Boolean @default(false) @map("email_verifie")
 
   // SMS & Push
   smsActif  Boolean @default(true) @map("sms_actif")
   pushActif Boolean @default(true) @map("push_actif")
-  pushToken String? @map("push_token") @db.Text
+  pushToken String? @map("push_token")
 
   // Plages horaires CI
-  heureDebut Int @default(7) @map("heure_debut") @db.SmallInt
-  heureFin   Int @default(21) @map("heure_fin") @db.SmallInt
+  heureDebut Int @default(7) @map("heure_debut")
+  heureFin   Int @default(21) @map("heure_fin")
 
   evenementsActifs Json? @default("{\"QUITTANCE_GENEREE\": [\"wa\",\"sms\",\"email\"], \"PAIEMENT_RECU\": [\"wa\",\"sms\"], \"IMPAYE_DETECTE\": [\"wa\",\"sms\"], \"BAIL_CONFIRME\": [\"wa\",\"sms\",\"email\"], \"RAPPORT_MENSUEL\": [\"wa\",\"email\"], \"WALLET_BAS\": [\"wa\",\"sms\"], \"BAIL_EXPIRANT\": [\"wa\",\"sms\"]}") @map("evenements_actifs")
 
@@ -2140,13 +2140,13 @@ model NotificationLog {
   userId         String      @map("user_id")
   user           User        @relation(fields: [userId], references: [id])
   canal          NotifCanal
-  typeEvenement  String      @map("type_evenement") @db.VarChar(50)
+  typeEvenement  String      @map("type_evenement")
   referenceId    String?     @map("reference_id")
-  templateId     String?     @map("template_id") @db.VarChar(60)
-  contenuPreview String?     @map("contenu_preview") @db.Text
+  templateId     String?     @map("template_id")
+  contenuPreview String?     @map("contenu_preview")
   statut         NotifStatut @default(EN_ATTENTE)
-  nbTentatives   Int         @default(0) @map("nb_tentatives") @db.SmallInt
-  erreurDetail   String?     @map("erreur_detail") @db.Text
+  nbTentatives   Int         @default(0) @map("nb_tentatives")
+  erreurDetail   String?     @map("erreur_detail")
 
   envoyeAt  DateTime? @map("envoye_at")
   livreAt   DateTime? @map("livre_at")
@@ -2212,7 +2212,7 @@ model PropertyAccess {
   
   dateDebut           DateTime?     @default(now()) @map("date_debut")
   dateFin             DateTime?     @map("date_fin")
-  note                String?       @db.Text
+  note                String?
 
   property            Property      @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
   user                User          @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
@@ -2228,7 +2228,7 @@ model MandatGestion {
   proprietaireId    String       @map("proprietaire_id")
   intermediaireId   String       @map("intermediaire_id")
   profil            ProfilInterm
-  biensConcernes    String[]     @map("biens_concernes") // IDs des biens
+  biensConcernes    Json?        @default("[]") @map("biens_concernes") // IDs des biens
   dateDebut         DateTime     @default(now()) @map("date_debut")
   dateFin           DateTime?    @map("date_fin")
   remuneration      String?      @default("GRATUIT")
@@ -2266,7 +2266,7 @@ model AgencesRegularisation {
   
   basculeAt           DateTime?   @map("bascule_at")
   regulariseAt        DateTime?   @map("regularise_at")
-  notesAdmin          String?     @map("notes_admin") @db.Text
+  notesAdmin          String?     @map("notes_admin")
 
   user                User        @relation(fields: [userId], references: [id])
 
@@ -2277,7 +2277,7 @@ model GardeFousLog {
   id          String   @id @default(uuid()) @map("log_id")
   userId      String   @map("user_id")
   typeSignal  String   @map("type_signal")
-  detail      String?  @db.Text
+  detail      String?
   actionPrise String?  @map("action_prise")
   traite      Boolean  @default(false)
   traiteParId String?  @map("traite_par")
@@ -2293,7 +2293,7 @@ model SmsDeclaration {
   id              String      @id @default(uuid()) @map("decl_id")
   leaseId         String      @map("bail_id")
   tenantId        String      @map("locataire_id")
-  montantDeclare  Decimal     @map("montant_declare") @db.Decimal(12,0)
+  montantDeclare  Decimal     @map("montant_declare")
   canal           String      @default("SMS") // SMS | WHATSAPP | APP
   statut          DeclStatut  @default(EN_ATTENTE)
   confirmeParId   String?     @map("confirme_par")
@@ -2301,7 +2301,7 @@ model SmsDeclaration {
   receiptId       String?     @map("quittance_id")
   rappel1At       DateTime?   @map("rappel_1_at")
   alerteProprioAt DateTime?   @map("alerte_proprio_at")
-  smsBrut         String?     @map("sms_brut") @db.Text
+  smsBrut         String?     @map("sms_brut")
   createdAt       DateTime    @default(now()) @map("created_at")
   expireAt        DateTime?   @map("expire_at")
 
@@ -2331,15 +2331,15 @@ enum NegocieType {
 
 model ConfigTarif {
   id               String       @id @default(uuid()) @map("tarif_id")
-  cle              String       @unique @db.VarChar(80)
-  valeur           Decimal      @db.Decimal(12, 2)
-  description      String       @db.Text
+  cle              String       @unique
+  valeur           Decimal
+  description      String
   modifiable       Boolean      @default(true)
-  dateEffet        DateTime     @default(now()) @map("date_effet") @db.Date
+  dateEffet        DateTime     @default(now()) @map("date_effet")
   modifieParId     String?      @map("modifie_par")
   modifieAt        DateTime?    @default(now()) @map("modifie_at")
-  valeurPrecedente Decimal?     @map("valeur_precedente") @db.Decimal(12, 2)
-  noteModification String?      @map("note_modification") @db.Text
+  valeurPrecedente Decimal?     @map("valeur_precedente")
+  noteModification String?      @map("note_modification")
 
   modifiePar       User?        @relation("ConfigTarifModifier", fields: [modifieParId], references: [id])
 
@@ -2348,12 +2348,12 @@ model ConfigTarif {
 
 model OffreAbonnement {
   id                String       @id @default(uuid()) @map("offre_id")
-  code              String       @unique @db.VarChar(30)
-  nomAffichage      String       @map("nom_affichage") @db.VarChar(100)
-  description       String?      @db.Text
-  prixBaseTtc       Decimal      @map("prix_base_ttc") @db.Decimal(12, 2)
+  code              String       @unique
+  nomAffichage      String       @map("nom_affichage")
+  description       String?
+  prixBaseTtc       Decimal      @map("prix_base_ttc")
   quittancesInclus  Int          @default(0) @map("quittances_inclus") // 0 = illimité
-  prixUniteTtc      Decimal?     @default(0) @map("prix_unite_ttc") @db.Decimal(12, 2)
+  prixUniteTtc      Decimal?     @default(0) @map("prix_unite_ttc")
   modules           Json         @default("{}")
   actif             Boolean      @default(true)
   visibleSignup     Boolean      @default(true) @map("visible_signup")
@@ -2371,19 +2371,19 @@ model OffreAbonnement {
 
 model CodePromo {
   id               String          @id @default(uuid()) @map("promo_id")
-  code             String          @unique @db.VarChar(30)
+  code             String          @unique
   typeRemise       PromoType       @map("type_remise")
-  valeurRemise     Decimal         @map("valeur_remise") @db.Decimal(12, 2)
+  valeurRemise     Decimal         @map("valeur_remise")
   offreCibleId     String?         @map("offre_cible")
-  cibleProfil      String          @default("TOUS") @map("cible_profil") @db.VarChar(20) // TOUS, AGENCE, PARTICULIER
-  dateDebut        DateTime        @default(now()) @map("date_debut") @db.Date
-  dateFin          DateTime?       @map("date_fin") @db.Date
+  cibleProfil      String          @default("TOUS") @map("cible_profil") // TOUS, AGENCE, PARTICULIER
+  dateDebut        DateTime        @default(now()) @map("date_debut")
+  dateFin          DateTime?       @map("date_fin")
   maxUtilisations  Int?            @map("max_utilisations")
   nbUtilisations   Int             @default(0) @map("nb_utilisations")
   actif            Boolean         @default(true)
   createdParId     String?         @map("created_par")
   createdAt        DateTime        @default(now()) @map("created_at")
-  note             String?         @db.Text
+  note             String?
 
   offreCible       OffreAbonnement? @relation(fields: [offreCibleId], references: [id])
   createdPar       User?            @relation("PromoCreator", fields: [createdParId], references: [id])
@@ -2396,13 +2396,13 @@ model TarifNegocie {
   userId           String          @map("user_id")
   type             NegocieType
   offreId          String?         @map("offre_id")
-  prixNegocieTtc   Decimal         @map("prix_negocie_ttc") @db.Decimal(12, 2)
-  dateDebut        DateTime        @default(now()) @map("date_debut") @db.Date
-  dateFin          DateTime?       @map("date_fin") @db.Date
+  prixNegocieTtc   Decimal         @map("prix_negocie_ttc")
+  dateDebut        DateTime        @default(now()) @map("date_debut")
+  dateFin          DateTime?       @map("date_fin")
   autoRenouveler   Boolean         @default(false) @map("auto_renouveler")
   createdParId     String?         @map("created_par")
   createdAt        DateTime        @default(now()) @map("created_at")
-  note             String          @db.Text
+  note             String
 
   user             User            @relation("UserTarifNegocie", fields: [userId], references: [id])
   offre            OffreAbonnement? @relation(fields: [offreId], references: [id])
@@ -2413,9 +2413,9 @@ model TarifNegocie {
 
 model ConfigTarifsAudit {
   id               String          @id @default(uuid()) @map("audit_id")
-  tableCible       String          @map("table_cible") @db.VarChar(50)
+  tableCible       String          @map("table_cible")
   enregistrementId String          @map("enregistrement_id")
-  action           String          @db.VarChar(20) // INSERT, UPDATE, DELETE
+  action           String // INSERT, UPDATE, DELETE
   avant            Json?
   apres            Json?
   modifieParId     String?         @map("modifie_par")
@@ -2433,15 +2433,15 @@ model ConfigTarifsAudit {
 model LocataireProfile {
   id                String       @id @default(uuid()) @map("profil_id")
   userId            String       @unique @map("user_id")
-  scoreActuel       Int          @default(0) @db.SmallInt @map("score_actuel")
-  scoreBadge        String       @default("D") @db.VarChar(2) @map("score_badge")
+  scoreActuel       Int          @default(0) @map("score_actuel")
+  scoreBadge        String       @default("D") @map("score_badge")
   scoreCalculeAt    DateTime?    @map("score_calcule_at")
-  tauxPaiement12m   Decimal      @default(0) @db.Decimal(5, 2) @map("taux_paiement_12m")
-  nbBailsActifs     Int          @default(0) @db.SmallInt @map("nb_bails_actifs")
-  nbBailsClos       Int          @default(0) @db.SmallInt @map("nb_bails_clos")
+  tauxPaiement12m   Decimal      @default(0) @map("taux_paiement_12m")
+  nbBailsActifs     Int          @default(0) @map("nb_bails_actifs")
+  nbBailsClos       Int          @default(0) @map("nb_bails_clos")
   alerteJ3Active    Boolean      @default(true) @map("alerte_j3_active")
   alerteJ1Active    Boolean      @default(true) @map("alerte_j1_active")
-  canalAlertePref   String       @default("SMS") @db.VarChar(20) @map("canal_alerte_pref") // SMS | WHATSAPP | PUSH | TOUS
+  canalAlertePref   String       @default("SMS") @map("canal_alerte_pref") // SMS | WHATSAPP | PUSH | TOUS
   passeportGenereAt DateTime?    @map("passeport_genere_at")
   createdAt         DateTime     @default(now()) @map("created_at")
 
@@ -2472,14 +2472,14 @@ model SignalementLocataire {
   bailId          String           @map("bail_id")
   locataireId     String           @map("locataire_id")
   categorie       SignalCatEnum
-  description     String           @db.Text
-  urgence         String           @default("NORMAL") @db.VarChar(15) // NORMAL | URGENT | TRES_URGENT
-  photos          String[]         
+  description     String
+  urgence         String           @default("NORMAL") // NORMAL | URGENT | TRES_URGENT
+  photos          Json?            @default("[]")
   statut          SignalStatutEnum @default(ENVOYE)
   proprioVuAt     DateTime?        @map("proprio_vu_at")
   resoluAt        DateTime?        @map("resolu_at")
-  resoluPar       String?          @db.VarChar(20) @map("resolu_par")
-  noteResolution  String?          @db.Text @map("note_resolution")
+  resoluPar       String? @map("resolu_par")
+  noteResolution  String? @map("note_resolution")
   createdAt       DateTime         @default(now()) @map("created_at")
 
   bail            Lease            @relation(fields: [bailId], references: [id])
@@ -2497,22 +2497,22 @@ enum CautionDestEnum {
 model CautionBail {
   id                String           @id @default(uuid()) @map("caution_id")
   bailId            String           @unique @map("bail_id")
-  montantFcfa       Decimal          @map("montant_fcfa") @db.Decimal(12, 0)
-  dateVersement     DateTime         @map("date_versement") @db.Date
-  modeVersement     String?          @map("mode_versement") @db.VarChar(30) // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
+  montantFcfa       Decimal          @map("montant_fcfa")
+  dateVersement     DateTime         @map("date_versement")
+  modeVersement     String?          @map("mode_versement") // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
   destination       CautionDestEnum  @default(PROPRIETAIRE)
-  recepisseCdcCi    String?          @map("recepissse_cdc_ci") @db.VarChar(50)
-  conditionsRestit  String?          @map("conditions_restit") @db.Text
+  recepisseCdcCi    String?          @map("recepissse_cdc_ci")
+  conditionsRestit  String?          @map("conditions_restit")
   confirmeLocataire Boolean          @default(false) @map("confirme_locataire")
   confirmeAt        DateTime?        @map("confirme_at")
-  certificatRef     String?          @unique @map("certificat_ref") @db.VarChar(30)
-  hashSha256        String?          @map("hash_sha256") @db.VarChar(64)
+  certificatRef     String?          @unique @map("certificat_ref")
+  hashSha256        String?          @map("hash_sha256")
   
   // Restitution
   restituee         Boolean          @default(false)
-  montantRestitue   Decimal?         @map("montant_restitue") @db.Decimal(12, 0)
-  dateRestitution   DateTime?        @map("date_restitution") @db.Date
-  motifRetenue      String?          @map("motif_retenue") @db.Text
+  montantRestitue   Decimal?         @map("montant_restitue")
+  dateRestitution   DateTime?        @map("date_restitution")
+  motifRetenue      String?          @map("motif_retenue")
   createdAt         DateTime         @default(now()) @map("created_at")
 
   bail              Lease            @relation(fields: [bailId], references: [id])
@@ -2531,15 +2531,15 @@ model PreavisBail {
   id                  String             @id @default(uuid()) @map("preavis_id")
   bailId              String             @map("bail_id")
   locataireId         String             @map("locataire_id")
-  dateDeclaration     DateTime           @default(now()) @map("date_declaration") @db.Date
-  dateDepartPrevue    DateTime           @map("date_depart_prevue") @db.Date
-  dateDepartEffective DateTime?          @map("date_depart_effective") @db.Date
-  motif               String?            @db.Text
+  dateDeclaration     DateTime           @default(now()) @map("date_declaration")
+  dateDepartPrevue    DateTime           @map("date_depart_prevue")
+  dateDepartEffective DateTime?          @map("date_depart_effective")
+  motif               String?
   statut              PreavisStatutEnum  @default(EMIS)
   proprioAccuseAt     DateTime?          @map("proprio_accuse_at")
-  etatLieuxPrevu      DateTime?          @map("etat_lieux_prevu") @db.Date
-  refPreavis          String?            @unique @map("ref_preavis") @db.VarChar(30)
-  hashSha256          String?            @map("hash_sha256") @db.VarChar(64)
+  etatLieuxPrevu      DateTime?          @map("etat_lieux_prevu")
+  refPreavis          String?            @unique @map("ref_preavis")
+  hashSha256          String?            @map("hash_sha256")
   createdAt           DateTime           @default(now()) @map("created_at")
 
   bail                Lease              @relation(fields: [bailId], references: [id])
@@ -2551,15 +2551,15 @@ model PreavisBail {
 model PasseportLocatif {
   id                   String       @id @default(uuid()) @map("passeport_id")
   locataireId          String       @map("locataire_id")
-  refPasseport         String?      @unique @map("ref_passeport") @db.VarChar(30)
-  scoreGlobal          Int          @db.SmallInt @map("score_global")
-  tauxPaiementGlobal   Decimal      @db.Decimal(5, 2) @map("taux_paiement_global")
-  nbBailsInclus        Int          @db.SmallInt @map("nb_bails_inclus")
-  periodeCouverteDebut DateTime     @map("periode_couverte_debut") @db.Date
-  periodeCouverteFin   DateTime     @map("periode_couverte_fin") @db.Date
+  refPasseport         String?      @unique @map("ref_passeport")
+  scoreGlobal          Int @map("score_global")
+  tauxPaiementGlobal   Decimal @map("taux_paiement_global")
+  nbBailsInclus        Int @map("nb_bails_inclus")
+  periodeCouverteDebut DateTime     @map("periode_couverte_debut")
+  periodeCouverteFin   DateTime     @map("periode_couverte_fin")
   snapshotBails        Json         @map("snapshot_bails")
-  hashSha256           String?      @map("hash_sha256") @db.VarChar(64)
-  pdfUrl               String?      @map("pdf_url") @db.Text
+  hashSha256           String?      @map("hash_sha256")
+  pdfUrl               String?      @map("pdf_url")
   nbConsultations      Int          @default(0) @map("nb_consultations")
   createdAt            DateTime     @default(now()) @map("created_at")
   expireAt             DateTime?    @map("expire_at")
@@ -2573,11 +2573,11 @@ model AlerteLoyer {
   id              String       @id @default(uuid()) @map("alerte_id")
   bailId          String       @map("bail_id")
   locataireId     String       @map("locataire_id")
-  typeAlerte      String       @map("type_alerte") @db.VarChar(20) // J_MOINS_3 | J_MOINS_1 | J_PLUS_1
-  datePrevue      DateTime     @map("date_prevue") @db.Date
+  typeAlerte      String       @map("type_alerte") // J_MOINS_3 | J_MOINS_1 | J_PLUS_1
+  datePrevue      DateTime     @map("date_prevue")
   envoyee         Boolean      @default(false)
   envoyeeAt       DateTime?    @map("envoyee_at")
-  canal           String?      @db.VarChar(20) // SMS | WHATSAPP | PUSH
+  canal           String? // SMS | WHATSAPP | PUSH
   createdAt       DateTime     @default(now()) @map("created_at")
 
   bail            Lease        @relation(fields: [bailId], references: [id])
@@ -2602,9 +2602,9 @@ model LocataireProfilPublic {
   revenuFourchette String?     @map("revenu_fourchette")
   employeurType    String?     @map("employeur_type")
   
-  communesSouhaitees String[]  @map("communes_souhaitees")
+  communesSouhaitees Json?  @default("[]") @map("communes_souhaitees")
   budgetMaxFcfa      Int?      @map("budget_max_fcfa")
-  typeLogement       String[]  @map("type_logement")
+  typeLogement       Json?  @default("[]") @map("type_logement")
   disponibleAPartir  DateTime? @map("disponible_a_partir")
   
   kycNiveau          Int       @default(0) @map("kyc_niveau")
@@ -2634,8 +2634,8 @@ model InvitationBail {
   locataire         User            @relation("LocataireInvite", fields: [locataireId], references: [id])
   
   methodeDecouverte String?         @map("methode_decouverte") // NUMERO | QR_CODE | LIEN | RECHERCHE_AGENCE
-  loyerPropose      Decimal?        @map("loyer_propose") @db.Decimal(12, 0)
-  dateDebutProposee DateTime?       @map("date_debut_proposee") @db.Date
+  loyerPropose      Decimal?        @map("loyer_propose")
+  dateDebutProposee DateTime?       @map("date_debut_proposee")
   messageInvitant   String?         @map("message_invitant")
   
   statut            InvitStatutEnum @default(ENVOYEE)
@@ -2698,8 +2698,8 @@ model RapportMensuel {
   id              String   @id @default(uuid()) @map("rapport_id")
   userId          String   @map("user_id")
   user            User     @relation(fields: [userId], references: [id])
-  periodeMois     Int      @map("periode_mois") @db.SmallInt
-  periodeAnnee    Int      @map("periode_annee") @db.SmallInt
+  periodeMois     Int      @map("periode_mois")
+  periodeAnnee    Int      @map("periode_annee")
   typeRapport     String   @default("MENSUEL") @map("type_rapport") // MENSUEL | HEBDOMADAIRE | ANNUEL
   dataRapport     Json     @map("data_rapport")
   pdfUrl          String?  @map("pdf_url")
@@ -2716,15 +2716,15 @@ model ChampionProfile {
   id                     String    @id @default(uuid()) @map("champion_id")
   userId                 String    @unique @map("user_id")
   user                   User      @relation(fields: [userId], references: [id])
-  zonePrincipale         String    @map("zone_principale") @db.VarChar(50)
-  zonesSecondaires       String[]  @map("zones_secondaires")
+  zonePrincipale         String    @map("zone_principale")
+  zonesSecondaires       Json?  @default("[]") @map("zones_secondaires")
   superviseurId          String?   @map("superviseur_id")
   superviseur            User?     @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
   statut                 String    @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
-  dateDebut              DateTime  @default(now()) @map("date_debut") @db.Date
+  dateDebut              DateTime  @default(now()) @map("date_debut")
   objectifMensuel        Int       @default(30) @map("objectif_mensuel")
   totalInscriptions      Int       @default(0) @map("total_inscriptions")
-  totalCommissionsFcfa   Decimal   @default(0) @map("total_commissions_fcfa") @db.Decimal(12,0)
+  totalCommissionsFcfa   Decimal   @default(0) @map("total_commissions_fcfa")
   
   prospects              ChampionProspect[]
   commissions            ChampionCommission[]
@@ -2738,15 +2738,15 @@ model ChampionProspect {
   id                 String         @id @default(uuid()) @map("prospect_id")
   championId         String         @map("champion_id")
   champion           ChampionProfile @relation(fields: [championId], references: [id])
-  nom                String         @db.VarChar(200)
-  telephone          String?        @db.VarChar(20)
-  quartier           String?        @db.VarChar(100)
-  nbLogementsEstime  String?        @map("nb_logements_estime") @db.VarChar(20)
-  argumentCle        String?        @map("argument_cle") @db.VarChar(50)
+  nom                String
+  telephone          String?
+  quartier           String?
+  nbLogementsEstime  String?        @map("nb_logements_estime")
+  argumentCle        String?        @map("argument_cle")
   statut             ProspectStatut @default(A_RAPPELER)
-  dateDernierContact DateTime?      @map("date_dernier_contact") @db.Date
-  dateRappelPrevu    DateTime?      @map("date_rappel_prevu") @db.Date
-  note               String?        @db.Text
+  dateDernierContact DateTime?      @map("date_dernier_contact")
+  dateRappelPrevu    DateTime?      @map("date_rappel_prevu")
+  note               String?
   userIdInscrit      String?        @map("user_id_inscrit")
   userInscrit        User?          @relation("ProspectConverti", fields: [userIdInscrit], references: [id])
   
@@ -2762,11 +2762,11 @@ model ChampionCommission {
   champion       ChampionProfile @relation(fields: [championId], references: [id])
   typeAction     CommType        @map("type_action")
   referenceId    String?         @map("reference_id")
-  montantFcfa    Decimal         @map("montant_fcfa") @db.Decimal(12,0)
+  montantFcfa    Decimal         @map("montant_fcfa")
   statut         String          @default("EN_ATTENTE") // EN_ATTENTE | VALIDE | PAYE | ANNULE
   valideAt       DateTime?       @map("valide_at")
   payeAt         DateTime?       @map("paye_at")
-  modePaiement   String?         @map("mode_paiement") @db.VarChar(20)
+  modePaiement   String?         @map("mode_paiement")
   createdAt      DateTime        @default(now()) @map("created_at")
 
   @@map("champions_commissions")
