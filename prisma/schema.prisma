@@ -2362,6 +2362,7 @@ model ConfigTarif {
   modifieAt        DateTime?    @default(now()) @map("modifie_at")
   valeurPrecedente Decimal?     @map("valeur_precedente")
   noteModification String?      @map("note_modification")
+  metadata         String?      @map("metadata")
 
   modifiePar       User?        @relation("ConfigTarifModifier", fields: [modifieParId], references: [id])
 

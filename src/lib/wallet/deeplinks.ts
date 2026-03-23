@@ -16,19 +16,10 @@ export async function generateDeepLink(
     where: { cle: configKey }
   });
 
-  let baseUrl = config?.valeur.toString();
-
-  // 2. Fallback si non trouvé
-  if (!baseUrl) {
-    const fallbackConfig = await prisma.configTarif.findUnique({
-      where: { cle: "wallet_deeplink_fallback" }
-    });
-    baseUrl = fallbackConfig?.valeur.toString() || "https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}";
-  }
-
   // 3. Substitution des variables
-  // Note: On utilise des Regex pour remplacer toutes les occurrences
-  const result = baseUrl
+  const baseUrlTemplate = config?.metadata || config?.valeur.toString() || "https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}";
+
+  const result = baseUrlTemplate
     .replace(/{amt}/g, amount.toString())
     .replace(/{ref}/g, reference)
     .replace(/{op}/g, operator);
