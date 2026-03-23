@@ -21,7 +21,8 @@ import {
     Scale,
     BookOpen,
     Trophy,
-    ClipboardCheck
+    ClipboardCheck,
+    User
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -49,6 +50,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/edl", label: "États des Lieux", icon: <ClipboardCheck size={20} /> },
         { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },
         { href: "/admin/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+        { href: "/admin/settings/profile", label: "Mon Profil", icon: <User size={20} /> },
     ]
 
     return (
