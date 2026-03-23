@@ -223,7 +223,7 @@ model User {
   legalEntity   LegalEntity? @relation(fields: [legalEntityId], references: [id])
 
   preferredLang     String? @default("fr") @map("preferred_lang")
-  notificationPrefs String[] @default([]) @map("notification_prefs")
+  notificationPrefs Json?   @map("notification_prefs")
 
   // MaPoste & Other
   maposteId String? @map("maposte_id")
@@ -408,7 +408,7 @@ model IdentityDocument {
   verifiedByUserId String?   @map("verified_by")
   verifier         User?     @relation("DocumentVerifier", fields: [verifiedByUserId], references: [id])
   rejectionReason  String?   @map("rejection_reason")
-  metadata         String[]  @default([])
+  metadata         Json?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -439,7 +439,7 @@ model Property {
   gpsLongitude         Decimal? @map("gps_longitude")
   amenities            String[] @default([])
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
-  documents            String[] @default([])
+  documents            Json?
 
   verifiedAt       DateTime? @map("verified_at")
   verifiedByUserId String?   @map("verified_by")
