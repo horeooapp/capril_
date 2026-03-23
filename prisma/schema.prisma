@@ -223,7 +223,7 @@ model User {
   legalEntity   LegalEntity? @relation(fields: [legalEntityId], references: [id])
 
   preferredLang     String? @default("fr") @map("preferred_lang")
-  notificationPrefs Json?   @default("{}") @map("notification_prefs")
+  notificationPrefs String[] @default([]) @map("notification_prefs")
 
   // MaPoste & Other
   maposteId String? @map("maposte_id")
@@ -408,7 +408,7 @@ model IdentityDocument {
   verifiedByUserId String?   @map("verified_by")
   verifier         User?     @relation("DocumentVerifier", fields: [verifiedByUserId], references: [id])
   rejectionReason  String?   @map("rejection_reason")
-  metadata         Json?     @default("{}")
+  metadata         String[]  @default([])
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -439,7 +439,7 @@ model Property {
   gpsLongitude         Decimal? @map("gps_longitude")
   amenities            String[] @default([])
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
-  documents            Json?    @default("{}")
+  documents            String[] @default([])
 
   verifiedAt       DateTime? @map("verified_at")
   verifiedByUserId String?   @map("verified_by")
@@ -722,7 +722,7 @@ model Mandate {
   startDate       DateTime      @map("start_date")
   endDate         DateTime?     @map("end_date")
   status          MandateStatus @default(DRAFT)
-  scope           Json?         @default("{}") // List of units or total
+  scope           String[]      @default([]) // List of units or total
 
   signedAt          DateTime? @map("signed_at")
   cancelledAt       DateTime? @map("cancelled_at")
@@ -1364,7 +1364,7 @@ model EtatsDesLieux {
   locataire        User?       @relation("LocataireEdls", fields: [locataireId], references: [id])
   
   dateEdl          DateTime    @default(now()) @map("date_edl")
-  sections         Json        @default("[]") // JSONB Sections/photos/etats
+  sections         Json? // Sections/photos/etats
   
   indexEau         Decimal?    @map("index_eau")
   indexElec        Decimal?    @map("index_elec")
@@ -2029,7 +2029,7 @@ model BdqConversationState {
   identiteIncomplete         Boolean   @default(false) @map("identite_incomplete")
 
   // History
-  messagesHistory Json    @default("[]") @map("messages_history")
+  messagesHistory String[]    @default([]) @map("messages_history")
   nbEchanges      Int     @default(0) @map("nb_echanges")
   champEnAttente  String? @map("champ_en_attente")
   pauseReason     String? @map("pause_reason")
@@ -2063,7 +2063,7 @@ model PropertyMaintenance {
   cost        Float?
   date        DateTime @default(now())
   provider    String? // Name of the company/craftsman
-  attachments Json? @default("[]") // Links to invoices/photos
+  attachments String[] @default([]) // Links to invoices/photos
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2128,7 +2128,7 @@ model NotificationPreference {
   heureDebut Int @default(7) @map("heure_debut")
   heureFin   Int @default(21) @map("heure_fin")
 
-  evenementsActifs Json? @default("{\"QUITTANCE_GENEREE\": [\"wa\",\"sms\",\"email\"], \"PAIEMENT_RECU\": [\"wa\",\"sms\"], \"IMPAYE_DETECTE\": [\"wa\",\"sms\"], \"BAIL_CONFIRME\": [\"wa\",\"sms\",\"email\"], \"RAPPORT_MENSUEL\": [\"wa\",\"email\"], \"WALLET_BAS\": [\"wa\",\"sms\"], \"BAIL_EXPIRANT\": [\"wa\",\"sms\"]}") @map("evenements_actifs")
+  evenementsActifs Json? @map("evenements_actifs")
 
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -2354,7 +2354,7 @@ model OffreAbonnement {
   prixBaseTtc       Decimal      @map("prix_base_ttc")
   quittancesInclus  Int          @default(0) @map("quittances_inclus") // 0 = illimité
   prixUniteTtc      Decimal?     @default(0) @map("prix_unite_ttc")
-  modules           Json         @default("{}")
+  modules           Json?
   actif             Boolean      @default(true)
   visibleSignup     Boolean      @default(true) @map("visible_signup")
   ordreAffichage    Int          @default(0) @map("ordre_affichage")

@@ -170,6 +170,7 @@ jobs:
             cd $DEPLOY_DEST && \
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
             npm ci --omit=dev && \
+            npx prisma@6.4.1 migrate resolve --rolled-back "20260322172550_init" || true && \
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
             (pm2 reload capril --update-env || \
