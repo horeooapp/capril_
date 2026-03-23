@@ -140,6 +140,14 @@ enum MandateStatus {
   DRAFT
 }
 
+enum DeclencheurEnum {
+  SOLDE_BAS
+  FIN_DE_MOIS
+  CREDIT_GENERE
+  RAPPEL_MENSUEL
+  MANUEL
+}
+
 enum ManagementMode {
   AGENCY
   DIRECT
@@ -281,6 +289,17 @@ model User {
 
   // ADD-09 Paywall (QAPRIL Wallet)
   walletBalance Int @default(0) @map("wallet_balance")
+
+  // ADD-07 v3 Rechargement Automatique
+  walletSeuilAlerte   Decimal? @default(500) @map("wallet_seuil_alerte")
+  walletRappelActif   Boolean  @default(false) @map("wallet_rappel_actif")
+  walletRappelJour    Int      @default(1) @map("wallet_rappel_jour")
+  walletRappelMontant Decimal? @map("wallet_rappel_montant")
+  walletOperateurPrefere String @default("WAVE") @map("wallet_operateur_prefere")
+  walletCanalAlertePref String @default("WHATSAPP") @map("wallet_canal_alerte_pref")
+
+  walletRechargeLinks  WalletRechargeLink[]
+  walletRechargeConfig WalletRechargeConfig?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2773,4 +2792,50 @@ model ChampionCommission {
   createdAt      DateTime        @default(now()) @map("created_at")
 
   @@map("champions_commissions")
+}
+
+model WalletRechargeLink {
+  id              String          @id @default(uuid()) @map("link_id")
+  userId          String          @map("user_id")
+  user            User            @relation(fields: [userId], references: [id])
+  declencheur     DeclencheurEnum
+  operateur       String          // WAVE | ORANGE | MTN | MOOV
+  montantSuggere  Decimal         @map("montant_suggere")
+  soldeAuMoment   Decimal         @map("solde_au_moment")
+  nbBailsActifs   Int             @map("nb_bails_actifs")
+  urlGeneree      String          @map("url_generee")
+  canalEnvoi      String          @map("canal_envoi") // WHATSAPP | SMS | PUSH
+  messageEnvoye   String?         @map("message_envoye")
+  
+  clique          Boolean         @default(false)
+  cliqueAt        DateTime?       @map("clique_at")
+  rechargeEffectuee Boolean       @default(false) @map("recharge_effectuee")
+  rechargeAt      DateTime?       @map("recharge_at")
+  montantRecharge Decimal?        @map("montant_recharge")
+  webhookRef      String?         @map("webhook_ref")
+  
+  createdAt       DateTime        @default(now()) @map("created_at")
+  expireAt        DateTime        @map("expire_at")
+
+  @@index([userId, createdAt])
+  @@map("wallet_recharge_links")
+}
+
+model WalletRechargeConfig {
+  id                String   @id @default(uuid()) @map("config_id")
+  userId            String   @unique @map("user_id")
+  user              User     @relation(fields: [userId], references: [id])
+  rappelActif       Boolean  @default(false) @map("rappel_actif")
+  jourDuMois        Int      @default(1) @map("jour_du_mois")
+  montantFixe       Decimal? @map("montant_fixe")
+  operateurPrefere  String   @default("WAVE") @map("operateur_prefere")
+  canalPrefere      String   @default("WHATSAPP") @map("canal_prefere")
+  dernierRappelAt   DateTime? @map("dernier_rappel_at")
+  nbRappelsEnvoyes  Int      @default(0) @map("nb_rappels_envoyes")
+  nbRechargements   Int      @default(0) @map("nb_rechargements")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("wallet_recharge_configs")
 }
