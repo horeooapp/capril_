@@ -61,23 +61,19 @@ export default function DashboardOverviewClient({
     latestReport?: any,
     regularizationAlert?: React.ReactNode
 }) {
-    const totalProperties = properties.length
-    const totalLeases = properties.reduce((acc: number, current: DashboardProperty) => acc + (current.leases?.length || 0), 0)
-
-    let totalSecuredFunds = 0
-    properties.forEach((p: DashboardProperty) => {
-        p.leases?.forEach((l) => {
-            if (l.cdcDeposits?.[0]?.amount) totalSecuredFunds += l.cdcDeposits[0].amount
-        })
-    })
-
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
+    let totalLeases = 0
+    let totalSecuredFunds = 0
     let receiptsThisMonth = 0
+
+    // Single pass optimization for all core stats
     properties.forEach((p: DashboardProperty) => {
+        totalLeases += (p.leases?.length || 0)
         p.leases?.forEach((l) => {
+            if (l.cdcDeposits?.[0]?.amount) totalSecuredFunds += l.cdcDeposits[0].amount
             if (l.receipts) {
                 receiptsThisMonth += l.receipts.filter((r) => r.paidAt && new Date(r.paidAt) >= startOfMonth).length
             }
@@ -85,7 +81,7 @@ export default function DashboardOverviewClient({
     })
 
     const stats = [
-        { label: "Logements gérés", value: totalProperties, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
+        { label: "Logements gérés", value: properties.length, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
         { label: "Contrats actifs", value: totalLeases, unit: "Baux", icon: ClipboardList, color: "text-emerald-600 bg-emerald-50", glow: "shadow-emerald-200/40" },
         { label: "Sécurisé (CDC)", value: totalSecuredFunds, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
         { label: "Performance / Mois", value: receiptsThisMonth, unit: "Paiements", icon: Zap, color: "text-violet-600 bg-violet-50", glow: "shadow-violet-200/40" },
@@ -276,24 +272,29 @@ export default function DashboardOverviewClient({
                                         </div>
                                     </div>
                                     
-                                    <div className="flex items-center gap-6 self-end md:self-center">
-                                        <div className="hidden sm:flex flex-col items-end">
-                                            <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-1.5 w-24 bg-gray-200/50 rounded-full overflow-hidden shadow-inner">
-                                                    <div className="h-full bg-emerald-500 w-[92%] shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
+                                        <div className="flex items-center gap-6 self-end md:self-center">
+                                            <div className="hidden sm:flex flex-col items-end">
+                                                <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-1.5 w-24 bg-gray-200/50 rounded-full overflow-hidden shadow-inner">
+                                                        <div 
+                                                            className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000" 
+                                                            style={{ width: `${Math.min(100, (prop.leases?.length || 0) * 25 + 50)}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <span className="text-[14px] font-black text-emerald-600">
+                                                        {Math.min(100, (prop.leases?.length || 0) * 25 + 50)}%
+                                                    </span>
                                                 </div>
-                                                <span className="text-[14px] font-black text-emerald-600">92%</span>
                                             </div>
+                                            <Link 
+                                                href={`/dashboard/properties/${prop.id}`}
+                                                className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all shadow-sm group/btn"
+                                            >
+                                                <ArrowRight size={24} className="group-hover/btn:translate-x-1 transition-transform" />
+                                            </Link>
                                         </div>
-                                        <Link 
-                                            href={`/dashboard/properties/${prop.id}`}
-                                            className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all shadow-sm group/btn"
-                                        >
-                                            <ArrowRight size={24} className="group-hover/btn:translate-x-1 transition-transform" />
-                                        </Link>
                                     </div>
-                                </div>
                             </motion.div>
                         ))}
                     </div>

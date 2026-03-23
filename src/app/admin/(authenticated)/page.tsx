@@ -39,74 +39,136 @@ export default async function AdminDashboardOverview() {
     const isDemoMode = false
     const demoData = null
 
-    // Production Data extraction
-    const totalUsers = await prisma.user.count().catch(() => 0)
-    const verifiedUsers = await prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0)
+    // Parallel data extraction for extreme performance
+    const [
+        totalUsers,
+        verifiedUsers,
+        totalDgiRes,
+        cdcAmountRes,
+        activeMediations,
+        overdueStats,
+        totalTenants,
+        totalLandlords,
+        totalAgencies,
+        totalProperties,
+        totalMandates,
+        totalColocs,
+        totalLandLeases,
+        totalLeases,
+        totalCertificates,
+        totalPaymentsRes,
+        totalReversals,
+        fraudAlerts,
+        totalBdqs,
+        confirmedBdqs,
+        totalAiConv,
+        totalAiCostRes,
+        recentAuditLogs,
+        documentsUnderReview,
+        activeModules,
+        totalModules,
+        totalSmsDeclarations,
+        confirmedSmsDeclarations,
+        totalManagers,
+        totalAgents,
+        totalPublicProfiles,
+        activeInvitations,
+        totalConsultations,
+        matchRate,
+        totalChampions,
+        activeChampions,
+        pendingCommissionsRes,
+        totalEdls,
+        certifiedEdls,
+        totalMonthlyReports
+    ] = await Promise.all([
+        prisma.user.count().catch(() => 0),
+        prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
+        prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null),
+        prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null),
+        prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
+        getOverdueStats().catch(() => ({ count: 0, totalAmount: 0 })),
+        prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
+        prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
+        prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
+        prisma.property.count().catch(() => 0),
+        prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        prisma.colocataire.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        prisma.landLeaseInfo.count().catch(() => 0),
+        prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+        prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
+        prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "paid" } }).catch(() => null),
+        (prisma as any).reversalTransaction.count().catch(() => 0),
+        prisma.user.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
+        (prisma as any).bailDeclaratif.count().catch(() => 0),
+        (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+        (prisma as any).bdqConversationState.count().catch(() => 0),
+        (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null),
+        prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' }, include: { user: { select: { fullName: true } } } }).catch(() => []),
+        prisma.identityDocument.findMany({ where: { status: "pending" }, take: 5, include: { user: { select: { fullName: true } } } }).catch(() => []),
+        prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
+        prisma.featureFlag.count().catch(() => 0),
+        (prisma as any).smsDeclaration.count().catch(() => 0),
+        (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+        (prisma as any).propertyAccess.count({ where: { role: "MANAGER", statut: "ACTIF" } }).catch(() => 0),
+        (prisma as any).propertyAccess.count({ where: { role: "FIELD_AGENT", statut: "ACTIF" } }).catch(() => 0),
+        (prisma as any).locataireProfilPublic.count().catch(() => 0),
+        (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
+        (prisma as any).consultationProfil.count().catch(() => 0),
+        (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
+        (prisma as any).championProfile.count().catch(() => 0),
+        (prisma as any).championProfile.count({ where: { statut: "ACTIF" } }).catch(() => 0),
+        (prisma as any).championCommission.aggregate({ _sum: { montantFcfa: true }, where: { statut: "EN_ATTENTE" } }).catch(() => null),
+        (prisma as any).etatsDesLieux.count().catch(() => 0),
+        (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
+        (prisma as any).rapportMensuel.count().catch(() => 0),
+    ]);
+    
+    // Formatting data
+    const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
 
     const safeData = {
-        totalDgi: Number((await prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null))?._sum?.totalDgi || 0),
-        cdcAmount: Number((await prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null))?._sum?.amount || 0),
-        activeMediations: await prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
+        totalDgi: Number(totalDgiRes?._sum?.totalDgi || 0),
+        cdcAmount: Number(cdcAmountRes?._sum?.amount || 0),
+        activeMediations,
         kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0,
-        overdueStats: await getOverdueStats().catch(() => ({ count: 0, totalAmount: 0 })),
+        overdueStats,
         totalUsers,
-        totalTenants: await prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
-        totalLandlords: await prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
-        totalAgencies: await prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
-        totalProperties: await prisma.property.count().catch(() => 0),
-        totalMandates: await prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalColocs: await prisma.colocataire.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalLandLeases: await prisma.landLeaseInfo.count().catch(() => 0),
-        totalLeases: await prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        totalCertificates: await prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
-        totalPayments: Number((await prisma.receipt.aggregate({ 
-            _sum: { totalAmount: true },
-            where: { status: "paid" }
-        }).catch(() => null))?._sum?.totalAmount || 0),
-        totalReversals: await (prisma as any).reversalTransaction.count().catch(() => 0),
-        fraudAlerts: await prisma.user.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
-        
-        // ADD-06/08 Stats
-        totalBdqs: await (prisma as any).bailDeclaratif.count().catch(() => 0),
-        confirmedBdqs: await (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
-        totalAiConv: await (prisma as any).bdqConversationState.count().catch(() => 0),
-        totalAiCost: Number((await (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null))?._sum?.coutEstimeFcfa || 0),
-
-        recentAuditLogs: await prisma.auditLog.findMany({
-            take: 10,
-            orderBy: { createdAt: 'desc' },
-            include: { user: { select: { fullName: true } } }
-        }).catch(() => []),
-        documentsUnderReview: await prisma.identityDocument.findMany({
-            where: { status: "pending" },
-            take: 5,
-            include: { user: { select: { fullName: true } } }
-        }).catch(() => []),
-        activeModules: await prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
-        totalModules: await prisma.featureFlag.count().catch(() => 0),
-
-        // ADD-11 Stats
-        totalSmsDeclarations: await (prisma as any).smsDeclaration.count().catch(() => 0),
-        confirmedSmsDeclarations: await (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
-        totalManagers: await (prisma as any).propertyAccess.count({ where: { role: "MANAGER", statut: "ACTIF" } }).catch(() => 0),
-        totalAgents: await (prisma as any).propertyAccess.count({ where: { role: "FIELD_AGENT", statut: "ACTIF" } }).catch(() => 0),
-        
-        // ADD-14 Stats
-        totalPublicProfiles: await (prisma as any).locataireProfilPublic.count().catch(() => 0),
-        activeInvitations: await (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
-        totalConsultations: await (prisma as any).consultationProfil.count().catch(() => 0),
-        matchRate: await (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
-
-        // ADD-15 Stats
-        totalChampions: await (prisma as any).championProfile.count().catch(() => 0),
-        activeChampions: await (prisma as any).championProfile.count({ where: { statut: "ACTIF" } }).catch(() => 0),
-        pendingCommissions: Number((await (prisma as any).championCommission.aggregate({ 
-            _sum: { montantFcfa: true },
-            where: { statut: "EN_ATTENTE" }
-        }).catch(() => null))?._sum?.montantFcfa || 0),
-        totalEdls: await (prisma as any).etatsDesLieux.count().catch(() => 0),
-        certifiedEdls: await (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
-        totalMonthlyReports: await (prisma as any).rapportMensuel.count().catch(() => 0),
+        totalTenants,
+        totalLandlords,
+        totalAgencies,
+        totalProperties,
+        totalMandates,
+        totalColocs,
+        totalLandLeases,
+        totalLeases,
+        totalCertificates,
+        totalPayments,
+        tvaCollectee: Math.floor(totalPayments * 0.18), // M-TVA 18% logic
+        totalReversals,
+        fraudAlerts,
+        totalBdqs,
+        confirmedBdqs,
+        totalAiConv,
+        totalAiCost: Number(totalAiCostRes?._sum?.coutEstimeFcfa || 0),
+        recentAuditLogs,
+        documentsUnderReview,
+        activeModules,
+        totalModules,
+        totalSmsDeclarations,
+        confirmedSmsDeclarations,
+        totalManagers,
+        totalAgents,
+        totalPublicProfiles,
+        activeInvitations,
+        totalConsultations,
+        matchRate,
+        totalChampions,
+        activeChampions,
+        pendingCommissions: Number(pendingCommissionsRes?._sum?.montantFcfa || 0),
+        totalEdls,
+        certifiedEdls,
+        totalMonthlyReports
     }
 
     try {
@@ -216,7 +278,7 @@ export default async function AdminDashboardOverview() {
                         />
                         <StatCard 
                             title="TVA Collectée (Logement)" 
-                            value="Calcul en cours..." 
+                            value={`${safeData.tvaCollectee.toLocaleString()} FCFA`} 
                             icon={<Banknote size={28} />} 
                             color="amber"
                             trend="M-TVA 18%"
