@@ -171,9 +171,8 @@ jobs:
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
             npm ci --omit=dev && \
             # FIX: Automated cleanup of invalid JSONB defaults in migration files
-            # We use || true to ensure deployment continues even if find/sed fails
-            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT {}/JSONB DEFAULT '{}'::jsonb/g\" {} \\; || true && \
-            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT \\[\\]/JSONB DEFAULT '[]'::jsonb/g\" {} \\; || true && \
+            # We use a standalone script to avoid shell quoting issues and find {} substitution errors
+            bash scripts/fix-migrations.sh || true && \
             npx prisma@6.4.1 migrate resolve --rolled-back \"20260322172550_init\" || true && \
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
