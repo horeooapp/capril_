@@ -171,9 +171,10 @@ jobs:
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
             npm ci --omit=dev && \
             # FIX: Automated cleanup of invalid JSONB defaults in migration files
-            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT {}/JSONB DEFAULT '{}'::jsonb/g\" {} + && \
-            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT \[\]/JSONB DEFAULT '[]'::jsonb/g\" {} + && \
-            npx prisma@6.4.1 migrate resolve --rolled-back "20260322172550_init" || true && \
+            # We use || true to ensure deployment continues even if find/sed fails
+            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT {}/JSONB DEFAULT '{}'::jsonb/g\" {} \\; || true && \
+            find prisma/migrations -name "migration.sql" -exec sed -i \"s/JSONB DEFAULT \\[\\]/JSONB DEFAULT '[]'::jsonb/g\" {} \\; || true && \
+            npx prisma@6.4.1 migrate resolve --rolled-back \"20260322172550_init\" || true && \
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
             (pm2 reload capril --update-env || \
