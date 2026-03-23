@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { linkId: string } }
+  { params }: { params: Promise<{ linkId: string }> }
 ) {
-  const { linkId } = params;
+  const { linkId } = await params;
 
   try {
     const link = await prisma.walletRechargeLink.findUnique({
