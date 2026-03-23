@@ -35,47 +35,61 @@ export async function GET(request: Request) {
     for (const lease of activeLeases) {
       if (!lease.tenantId || !lease.paymentDay) continue;
 
-      // Calculer la prochaine date de paiement
-      const nextPaymentDate = new Date(today.getFullYear(), today.getMonth(), lease.paymentDay);
-      nextPaymentDate.setHours(0, 0, 0, 0);
+      // 1. Current Month Due Date
+      const currentMonthDueDate = new Date(today.getFullYear(), today.getMonth(), lease.paymentDay);
+      currentMonthDueDate.setHours(0, 0, 0, 0);
       
-      // Si la date est déjà passée ce mois-ci, l'échéance est le mois prochain
-      if (nextPaymentDate < today) {
-        nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+      const periodMonth = `${currentMonthDueDate.getFullYear()}-${String(currentMonthDueDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      const diffTime = today.getTime() - currentMonthDueDate.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      // 2. Check if already paid
+      const isPaid = await prisma.receipt.findFirst({
+        where: { leaseId: lease.id, periodMonth: periodMonth, status: "PAID" }
+      });
+
+      if (isPaid) continue;
+
+      // 3. Dispatch based on diffDays
+      let notifType: string | null = null;
+      let msgSms = "";
+      let msgHtml = "";
+
+      if (diffDays === -3) {
+        notifType = "RAPPEL_ECHEANCE";
+        msgSms = `QAPRIL: Votre loyer (${periodMonth}) arrive à échéance dans 3 jours. Montant: ${lease.rentAmount + lease.chargesAmount} FCFA.`;
+        msgHtml = `<p>Votre loyer pour <strong>${periodMonth}</strong> arrive à échéance dans 3 jours.</p>`;
+      } 
+      else if (diffDays === 1) {
+        notifType = "RETARD_J1";
+        msgSms = `QAPRIL: ALERTE RETARD. Votre loyer (${periodMonth}) est impayé (échéance hier). Merci de régulariser immédiatement.`;
+        msgHtml = `<h3>ALERTE RETARD</h3><p>Votre loyer pour <strong>${periodMonth}</strong> est en retard de 1 jour.</p>`;
+      }
+      else if (diffDays === 5) {
+        notifType = "RETARD_J5";
+        msgSms = `QAPRIL: MISE EN DEMEURE. Votre loyer (${periodMonth}) est en retard de 5 jours. Des frais de recouvrement peuvent s'appliquer.`;
+        msgHtml = `<h3>MISE EN DEMEURE</h3><p>Retard de 5 jours constaté pour la période <strong>${periodMonth}</strong>.</p>`;
+      }
+      else if (diffDays === 10) {
+        notifType = "RETARD_J10";
+        msgSms = `QAPRIL: DERNIER AVERTISSEMENT. Défaut de paiement constaté (10 jours). Dossier transmis pour recouvrement forcé.`;
+        msgHtml = `<h3>DERNIER AVERTISSEMENT</h3><p>Retard critique de 10 jours pour <strong>${periodMonth}</strong>.</p>`;
       }
 
-      const diffTime = nextPaymentDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      // Si l'échéance est exactement dans 3 jours
-      if (diffDays === 3) {
-        // Vérifier s'il a déjà payé pour cette période (YYYY-MM de la date de paiement)
-        const periodMonth = `${nextPaymentDate.getFullYear()}-${String(nextPaymentDate.getMonth() + 1).padStart(2, '0')}`;
-        
-        const existingReceipt = await prisma.receipt.findFirst({
-          where: {
-            leaseId: lease.id,
-            periodMonth: periodMonth,
-            status: "PAID"
-          }
-        });
-
-        // S'il n'a pas encore payé
-        if (!existingReceipt) {
-          sentCount++;
-          
-          await NotificationService.envoyerNotification(
-            lease.tenantId,
-            "RAPPEL_ECHEANCE",
-            {
-               payload: {
-                   smsText: `QAPRIL: Bonjour ${lease.tenant?.fullName || "Locataire"}. Votre loyer pour le bien à ${lease.property.commune} expire dans 3 jours. Montant: ${lease.rentAmount + lease.chargesAmount} FCFA.`,
-                   html: `<p>Rappel de Loyer QAPRIL.</p><p>Votre loyer pour la période <strong>${periodMonth}</strong> arrive à échéance dans 3 jours. Montant à payer : <strong>${lease.rentAmount + lease.chargesAmount} FCFA</strong>.</p>`,
-                   parameters: []
-               }
+      if (notifType) {
+        sentCount++;
+        await NotificationService.envoyerNotification(
+          lease.tenantId,
+          notifType as any,
+          {
+            payload: {
+              smsText: msgSms,
+              html: msgHtml,
+              parameters: [lease.tenant?.fullName || "Locataire"]
             }
-          ).catch(err => console.error("[CRON_REMINDER] Notif Failed:", err));
-        }
+          }
+        ).catch(err => console.error(`[CRON_NOTIF_FAILED] ${notifType}:`, err));
       }
     }
 

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cinetpay } from "@/lib/cinetpay";
-import { createReceipt } from "@/actions/receipts";
-import { PRICING } from "@/constants/pricing";
+import { createAndNotifyReceipt } from "@/lib/receipt";
 import { Decimal } from "@prisma/client/runtime/library";
 import { PaymentCanal, PaymentPgwStatus } from "@prisma/client";
 
@@ -60,19 +59,36 @@ export async function POST(req: NextRequest) {
 
             const metadata = intent.metadata as any;
 
-            // Generate Receipt if it doesn't exist yet
-            if (!metadata?.receiptId) {
-                // We use the createReceipt server action logic but inside the transaction
-                // Note: createReceipt is a server action, here we might need a lib function
-                // For now, let's assume we have a lib function or we just call the action's core
+            // Generate Receipt if it doesn't exist yet (M-DOC-AUTO)
+            if (!metadata?.receiptId && metadata?.periodMonth) {
+                const receipt = await createAndNotifyReceipt({
+                    leaseId: intent.leaseId,
+                    periodMonth: metadata.periodMonth,
+                    rentAmount: intent.amount - (metadata.chargesAmount || 0),
+                    chargesAmount: metadata.chargesAmount || 0,
+                    paymentChannel: verification.payment_method || "MOBILE_MONEY",
+                    paymentReference: verification.operator_id || "CINETPAY",
+                    receiptType: "RENT",
+                    bypassPaywall: true // Payment already made via PGW
+                });
                 
-                // TODO: Ensure createReceipt is safe to call or extract its logic to a lib
-            } else {
+                // Update metadata with receipt info
+                await tx.paymentIntent.update({
+                    where: { id: intent.id },
+                    data: {
+                        metadata: {
+                            ...metadata,
+                            receiptId: receipt.id,
+                            receiptRef: (receipt as any).receiptRef
+                        }
+                    }
+                });
+            } else if (metadata?.receiptId) {
                 // Update existing receipt to 'paid'
                 await tx.receipt.update({
                     where: { id: metadata.receiptId },
                     data: {
-                        status: "paid",
+                        status: "PAID",
                         paidAt: new Date(),
                         paymentRef: verification.operator_id
                     }

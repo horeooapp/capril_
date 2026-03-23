@@ -2,16 +2,13 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { generateProofHash } from "@/lib/proof"
-import { scoreRentPayment } from "@/lib/scoring"
-import { generateReceiptRef } from "@/lib/receipt"
 import { revalidatePath } from "next/cache"
-
 import { serializeReceipt } from "@/lib/serialize"
-import { NotificationService } from "@/lib/notification-service"
+import { createAndNotifyReceipt } from "@/lib/receipt"
 
 /**
- * Part 8.1: Create/Generate Receipt
+ * Part 8.1: Create/Generate Receipt (Server Action)
+ * ADD-09 / ADD-12 Implementation
  */
 export async function createReceipt(data: {
     leaseId: string,
@@ -30,144 +27,53 @@ export async function createReceipt(data: {
     const userId = session.user.id
 
     try {
-        // 1. Verify lease access
-        const lease = await prisma.lease.findUnique({
-            where: { id: data.leaseId },
-            include: { 
-                property: true,
-                tenant: true
-            }
-        })
-
-        if (!lease) return { error: "Bail introuvable" }
-        
-        // Landlord or Agent check
-        if (lease.landlordId !== userId && lease.agentId !== userId) {
-            return { error: "Action non autorisée sur ce contrat" }
-        }
-
-        // ADD-09 Paywall check (Wallet QAPRIL)
+        // 1. Verify user and plan (Paywall)
         const creator = await prisma.user.findUnique({
             where: { id: userId },
-            select: { activePlanTier: true, walletBalance: true, fullName: true }
+            select: { activePlanTier: true, walletBalance: true, fullName: true, role: true }
         });
         
         if (!creator) return { error: "Utilisateur inconnu" };
 
-        const RECEIPT_COST = 150; // Coût en FCFA pour une quittance
+        if (creator.role === "TENANT") {
+            return { error: "Un locataire ne peut pas émettre de quittance." };
+        }
+
+        const RECEIPT_COST = 150; // 150 FCFA
+        
+        // ADD-09 Logic: Free 3 receipts for ESSENTIEL
         if (creator.activePlanTier === "ESSENTIEL") {
-            if (creator.walletBalance < RECEIPT_COST) {
-                return { 
-                    error: "INSUFFICIENT_FUNDS", 
-                    message: "Solde QAPRIL insuffisant pour générer cette quittance (Coût: 150 FCFA). Veuillez recharger votre Wallet." 
-                };
-            }
-            // Déduire du wallet
-            await prisma.user.update({
-                where: { id: userId },
-                data: { walletBalance: { decrement: RECEIPT_COST } }
-            });
-        } else if (creator.activePlanTier === "LOCATAIRE") {
-             return { 
-                 error: "PLAN_UPGRADE_REQUIRED", 
-                 message: "Un compte Locataire ne peut pas émettre de quittances. Veuillez passer au compte ESSENTIEL ou PRO." 
-             };
-        }
-
-        // 2. Generate v2.0 Reference
-        const receiptRef = await generateReceiptRef()
-
-        // 3. Document Proof Hash
-        const documentHash = generateProofHash({
-            receiptRef,
-            leaseId: data.leaseId,
-            totalAmount: data.rentAmount + data.chargesAmount,
-            period: data.periodMonth,
-            receiptType: data.receiptType
-        })
-
-        // 4. Create Receipt Record
-        const receipt = await prisma.receipt.create({
-            data: {
-                receiptRef,
-                leaseId: data.leaseId,
-                periodMonth: data.periodMonth,
-                rentAmount: data.rentAmount,
-                chargesAmount: data.chargesAmount,
-                totalAmount: data.rentAmount + data.chargesAmount,
-                paymentMethod: data.paymentChannel,
-                paymentRef: data.paymentReference,
-                paidAt: new Date(),
-                receiptHash: documentHash,
-                status: "PAID"
-            }
-        })
-
-        // 5. Update scoring (ICL) if it's a rent payment
-        if (data.receiptType === "RENT") {
-            try {
-                // PART 13: Calculate punctuality based on periodMonth
-                const [year, month] = data.periodMonth.split('-').map(Number);
-                const dueDate = new Date(year, month - 1, 5); // 5th of the month
-                const today = new Date();
-                
-                // Normalize dates to midnight for day calculation
-                const d1 = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
-                const d2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                
-                const diffTime = d2.getTime() - d1.getTime();
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-                await scoreRentPayment(lease.tenantId!, diffDays, receipt.id);
-            } catch (e) {
-                console.warn("[SCORING] Error updating score:", e);
-            }
-        }
-
-        // 6. Trigger Multi-Channel Notification (ADD-09) & PDF Backend Generation
-        if (lease.tenantId) {
-            const { generateReceiptPDF } = await import('@/lib/pdf-generator');
-            
-            const pdfBuffer = await generateReceiptPDF({
-                receiptRef,
-                leaseRef: lease.leaseReference,
-                periodMonth: data.periodMonth,
-                rentAmount: data.rentAmount,
-                chargesAmount: data.chargesAmount,
-                totalAmount: data.rentAmount + data.chargesAmount,
-                paymentMethod: data.paymentChannel,
-                paidAt: new Date(),
-                tenantName: lease.tenant?.fullName || 'Locataire',
-                propertyAddress: lease.property.address,
-                landlordName: creator.fullName || 'Propriétaire QAPRIL',
-                declarative: data.receiptType === 'DECLARATIVE'
-            }).catch((e: any) => {
-                console.error("PDF Gen Failed", e);
-                return undefined;
+            const usageCount = await prisma.receipt.count({
+                where: { lease: { landlordId: userId } }
             });
 
-            // FIRE AND FORGET - do not await to avoid blocking the user flow
-            NotificationService.envoyerNotification(
-                lease.tenantId,
-                "QUITTANCE_GENEREE",
-                {
-                    referenceId: receiptRef,
-                    receiptBuffer: pdfBuffer,
-                    payload: {
-                        parameters: [lease.tenant?.fullName || "Locataire", lease.property.address || "Propriété"],
-                        smsText: `Votre quittance de loyer pour ${data.periodMonth} est disponible sur QAPRIL. Montant: ${data.rentAmount + data.chargesAmount} FCFA.`,
-                        html: `<p>Bonjour,</p><p>Votre quittance certifiée pour le mois de ${data.periodMonth} a été générée avec succès.</p><p>Veuillez la trouver en <strong>pièce jointe</strong> de ce message.</p><p>Montant total : <strong>${data.rentAmount + data.chargesAmount} FCFA</strong></p>`
-                    }
+            if (usageCount >= 3) {
+                if (creator.walletBalance < RECEIPT_COST) {
+                    return { 
+                        error: "INSUFFICIENT_FUNDS", 
+                        message: `Limite de 3 quittances gratuites atteinte. Solde insuffisant pour la suivante (${RECEIPT_COST} FCFA).`
+                    };
                 }
-            ).catch(err => console.error("[NOTIF_TRIGGER] Failed QUITTANCE_GENEREE", err));
+                // Deduct from wallet
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { walletBalance: { decrement: RECEIPT_COST } }
+                });
+            }
         }
+
+        // 2. Delegate to shared library logic
+        const receipt = await createAndNotifyReceipt({
+            ...data,
+            creatorName: creator.fullName || undefined
+        });
 
         revalidatePath(`/dashboard/leases/${data.leaseId}`)
-        return { success: true, receipt: serializeReceipt(receipt) }
+        return { success: true, receipt: serializeReceipt(receipt as any) }
 
-    } catch (error) {
-        console.error("[RECEIPT] Error:", error)
-        return { error: "Erreur lors de la génération de la quittance" }
+    } catch (error: any) {
+        console.error("[RECEIPT_ACTION_ERROR]", error)
+        return { error: error.message || "Erreur lors de la génération de la quittance" }
     }
 }
 
