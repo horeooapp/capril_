@@ -84,7 +84,14 @@ export default function DashboardOverviewClient({
         { label: "Logements gérés", value: properties.length, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
         { label: "Contrats actifs", value: totalLeases, unit: "Baux", icon: ClipboardList, color: "text-emerald-600 bg-emerald-50", glow: "shadow-emerald-200/40" },
         { label: "Sécurisé (CDC)", value: totalSecuredFunds, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
-        { label: "Performance / Mois", value: receiptsThisMonth, unit: "Paiements", icon: Zap, color: "text-violet-600 bg-violet-50", glow: "shadow-violet-200/40" },
+        { 
+            label: "Performance / Mois", 
+            value: latestReport?.dataRapport?.metrics?.tauxRecouvrement ?? (totalLeases > 0 ? Math.round((receiptsThisMonth / totalLeases) * 100) : 0), 
+            unit: "%", 
+            icon: Zap, 
+            color: "text-violet-600 bg-violet-50", 
+            glow: "shadow-violet-200/40" 
+        },
     ]
 
     return (
@@ -274,16 +281,26 @@ export default function DashboardOverviewClient({
                                     
                                         <div className="flex items-center gap-6 self-end md:self-center">
                                             <div className="hidden sm:flex flex-col items-end">
-                                                <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Rentabilité</span>
+                                                <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Performance</span>
                                                 <div className="flex items-center gap-2">
                                                     <div className="h-1.5 w-24 bg-gray-200/50 rounded-full overflow-hidden shadow-inner">
                                                         <div 
-                                                            className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000" 
-                                                            style={{ width: `${Math.min(100, (prop.leases?.length || 0) * 25 + 50)}%` }}
+                                                            className={`h-full transition-all duration-1000 ${
+                                                                (prop.leases?.filter((l:any) => l.receipts?.some((r:any) => new Date(r.paidAt) >= startOfMonth)).length / (prop.leases?.length || 1)) * 100 > 80 
+                                                                ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]' 
+                                                                : 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)]'
+                                                            }`} 
+                                                            style={{ 
+                                                                width: `${prop.leases?.length ? Math.round((prop.leases.filter((l:any) => l.receipts?.some((r:any) => new Date(r.paidAt) >= startOfMonth)).length / prop.leases.length) * 100) : 0}%` 
+                                                            }}
                                                         ></div>
                                                     </div>
-                                                    <span className="text-[14px] font-black text-emerald-600">
-                                                        {Math.min(100, (prop.leases?.length || 0) * 25 + 50)}%
+                                                    <span className={`text-[14px] font-black ${
+                                                        (prop.leases?.filter((l:any) => l.receipts?.some((r:any) => new Date(r.paidAt) >= startOfMonth)).length / (prop.leases?.length || 1)) * 100 > 80 
+                                                        ? 'text-emerald-600' 
+                                                        : 'text-orange-600'
+                                                    }`}>
+                                                        {prop.leases?.length ? Math.round((prop.leases.filter((l:any) => l.receipts?.some((r:any) => new Date(r.paidAt) >= startOfMonth)).length / prop.leases.length) * 100) : 0}%
                                                     </span>
                                                 </div>
                                             </div>

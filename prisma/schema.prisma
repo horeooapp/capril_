@@ -1075,8 +1075,10 @@ model RepaymentPlan {
 
 model Mediation {
   id      String          @id @default(uuid())
-  leaseId String          @unique @map("lease_id")
-  lease   Lease           @relation(fields: [leaseId], references: [id])
+  leaseId String?         @unique @map("lease_id")
+  lease   Lease?           @relation(fields: [leaseId], references: [id])
+  bdqId   String?         @unique @map("bdq_id")
+  bdq     BailDeclaratif? @relation(fields: [bdqId], references: [id])
   subject String
   status  MediationStatus @default(OPEN)
 
@@ -1968,6 +1970,7 @@ model BailDeclaratif {
   bailFormel   Lease?  @relation("BdqFormalise", fields: [bailFormelId], references: [id])
 
   bdqConversationState BdqConversationState? @relation("BdqConv")
+  mediation            Mediation?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

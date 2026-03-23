@@ -235,14 +235,14 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </Link>
 
                     {/* Dossier Locatif Panel */}
-                    <div className="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg relative overflow-hidden group">
+                    <Link href="/locataire/passeport" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all">
                         <div className="absolute top-0 left-0 w-full h-1 bg-[#1F4E79]"></div>
                         <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Dossier de Location</h3>
                         <p className="text-[13px] text-gray-500 font-medium mb-4">Exportez votre dossier certifié QAPRIL pour vos futurs bails.</p>
-                        <button className="w-full py-3 bg-[#1F4E79] text-white rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all opacity-50 cursor-not-allowed">
-                            Bientôt Disponible
-                        </button>
-                    </div>
+                        <span className="block w-full py-3 bg-[#1F4E79] text-white text-center rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all shadow-lg active:scale-95">
+                            Voir & Exporter
+                        </span>
+                    </Link>
                 </div>
             </div>
         </div>

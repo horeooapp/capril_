@@ -80,7 +80,8 @@ export default async function AdminDashboardOverview() {
         pendingCommissionsRes,
         totalEdls,
         certifiedEdls,
-        totalMonthlyReports
+        totalMonthlyReports,
+        totalMandatesDraft
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -122,6 +123,7 @@ export default async function AdminDashboardOverview() {
         (prisma as any).etatsDesLieux.count().catch(() => 0),
         (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
         (prisma as any).rapportMensuel.count().catch(() => 0),
+        prisma.mandate.count({ where: { status: "DRAFT" } }).catch(() => 0),
     ]);
     
     // Formatting data
@@ -139,6 +141,7 @@ export default async function AdminDashboardOverview() {
         totalAgencies,
         totalProperties,
         totalMandates,
+        totalMandatesDraft,
         totalColocs,
         totalLandLeases,
         totalLeases,
@@ -166,6 +169,8 @@ export default async function AdminDashboardOverview() {
         totalChampions,
         activeChampions,
         pendingCommissions: Number(pendingCommissionsRes?._sum?.montantFcfa || 0),
+        newProspects: totalUsers > 0 ? await prisma.user.count({ where: { createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) } } }) : 0,
+        mandateSuccessRate: totalMandates > 0 ? Math.round((totalMandates / (totalMandates + (totalMandatesDraft || 0))) * 100) : 0,
         totalEdls,
         certifiedEdls,
         totalMonthlyReports
@@ -391,19 +396,19 @@ export default async function AdminDashboardOverview() {
                             href="/admin/champions"
                         />
                         <StatCard 
-                            title="Objectifs Atteints" 
-                            value="84%" 
+                            title="Mandats Validés" 
+                            value={`${safeData.mandateSuccessRate}%`} 
                             icon={<Zap size={28} />} 
                             color="emerald"
-                            trend="Efficience"
+                            trend="Taux de conversion"
                             delay={0.3}
                         />
                         <StatCard 
                             title="Nouveaux Prospects" 
-                            value="+12" 
+                            value={`+${safeData.newProspects}`} 
                             icon={<Users size={28} />} 
                             color="blue"
-                            trend="Ce mois"
+                            trend="Derniers 30j"
                             delay={0.4}
                         />
                     </div>

@@ -111,3 +111,10 @@ export async function getMediationByLease(leaseId: string) {
         include: { messages: { orderBy: { createdAt: 'asc' } } }
     })
 }
+
+export async function getMediationByBdq(bdqId: string) {
+    return await prisma.mediation.findUnique({
+        where: { bdqId },
+        include: { messages: { orderBy: { createdAt: 'asc' } } }
+    })
+}

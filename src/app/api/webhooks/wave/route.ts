@@ -18,8 +18,34 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing signature" }, { status: 401 });
         }
 
-        // TODO: Actual Ed25519 verification with WAVE_PUBLIC_KEY if provided
-        // const isValid = crypto.verify(null, Buffer.from(bodyText), WAVE_PUBLIC_KEY, Buffer.from(signature, 'base64'));
+        // Ed25519 verification with WAVE_PUBLIC_KEY
+        const WAVE_PUBLIC_KEY = process.env.WAVE_PUBLIC_KEY;
+        if (WAVE_PUBLIC_KEY && signature) {
+            try {
+                const isValid = crypto.verify(
+                    undefined,
+                    Buffer.from(bodyText),
+                    {
+                        key: Buffer.from(WAVE_PUBLIC_KEY, 'base64'),
+                        format: 'der',
+                        type: 'spki'
+                    },
+                    Buffer.from(signature, 'base64')
+                );
+                
+                if (!isValid) {
+                    console.error("[WAVE_WEBHOOK] Invalid signature detected");
+                    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+                }
+            } catch (vError) {
+                console.error("[WAVE_WEBHOOK] Verification error", vError);
+                if (process.env.NODE_ENV === "production") {
+                    return NextResponse.json({ error: "Verification failed" }, { status: 401 });
+                }
+            }
+        } else if (process.env.NODE_ENV === "production") {
+            console.warn("[WAVE_WEBHOOK] WAVE_PUBLIC_KEY missing in production! Security downgraded.");
+        }
 
         const body = JSON.parse(bodyText);
         const { id, type, data } = body;

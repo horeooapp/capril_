@@ -118,16 +118,43 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         if (otp === "000000") throw new Error("OTP Invalide.") // Test case
 
         if (reponse === "NON") {
-            await prisma.bailDeclaratif.update({
-                where: { id: bdqId },
+            await prisma.$transaction([
+                prisma.bailDeclaratif.update({
+                    where: { id: bdqId },
+                    data: {
+                        statut: BdqStatut.CONTESTE,
+                        confirmationLocataire: false,
+                        motifRefus: motif,
+                        confirmationAt: new Date()
+                    }
+                }),
+                prisma.mediation.create({
+                    data: {
+                        bdqId: bdqId,
+                        subject: `Contestation BDQ: ${motif || "Pas de motif spécifié"}`,
+                    }
+                })
+            ])
+
+            // Trigger M11 Mediation: Notify Admin / Support
+            await prisma.notification.create({
                 data: {
-                    statut: BdqStatut.CONTESTE,
-                    confirmationLocataire: false,
-                    motifRefus: motif,
-                    confirmationAt: new Date()
+                    userId: bdq.bailleurId, // Also notify landlord
+                    title: "BDQ Contesté - Médiation Requise",
+                    content: `Le locataire ${bdq.nomLocataireDeclare} (${bdq.telephoneLocataire}) a contesté votre déclaration pour ${bdq.descriptionLogement}. Un médiateur QAPRIL va intervenir.`,
+                    type: "WARNING"
                 }
             })
-            // TODO: Trigger M11 Mediation
+
+            // Log for Admin Audit
+            const { logAction } = await import("./audit")
+            await logAction({
+                action: "BDQ_CONTESTED_MEDIATION",
+                module: "BDQ",
+                entityId: bdqId,
+                newValues: { motif }
+            })
+
             return { success: true, status: "CONTESTE" }
         }
 
@@ -235,7 +262,7 @@ export async function relancerBDQ(bdqId: string) {
             throw new Error("Maximum de relances atteint. Statut passé en DECLARATIF_SANS_REPONSE.")
         }
 
-        const otp = "000000" // Should regenerate or retrieve
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
         const message = `QAPRIL : Rappel — votre logement ${bdq.descriptionLogement} attend confirmation. Répondez OUI ou NON avec le code ${otp}.`
         
         await sendSMS(bdq.telephoneLocataire, message)

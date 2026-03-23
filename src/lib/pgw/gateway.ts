@@ -5,6 +5,8 @@ import { detectPaymentCanal } from "./router";
 import { PaymentInitiateRequest, PaymentInitiateResponse, PgwAdapter } from "./adapters/base";
 import { SMSDeclaratifAdapter } from "./adapters/sms-declaratif";
 import { WaveAdapter } from "./adapters/wave";
+import { OrangeAdapter } from "./adapters/orange";
+import { MtnAdapter } from "./adapters/mtn";
 
 /**
  * QAPRIL Payment Gateway Service
@@ -14,7 +16,8 @@ export class PaymentGateway {
   private static adapters: Partial<Record<PaymentCanal, PgwAdapter>> = {
     SMS_DECLARATIF: new SMSDeclaratifAdapter(),
     WAVE: new WaveAdapter(),
-    // TODO: Autres adaptateurs à ajouter ici (Orange, MTN, etc.)
+    ORANGE: new OrangeAdapter(),
+    MTN: new MtnAdapter(),
   };
 
   /**

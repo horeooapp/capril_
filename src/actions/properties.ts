@@ -20,7 +20,12 @@ export async function getProperties() {
             include: {
                 leases: {
                     include: {
-                        tenant: { select: { fullName: true, phone: true } }
+                        tenant: { select: { fullName: true, phone: true } },
+                        receipts: {
+                            orderBy: { paidAt: 'desc' },
+                            take: 10
+                        },
+                        cdcDeposits: true
                     }
                 }
             },
