@@ -52,14 +52,28 @@ export async function addMediationMessage(mediationId: string, content: string) 
 
     const mediation = await prisma.mediation.findUnique({
         where: { id: mediationId },
-        include: { lease: { include: { property: true } } }
+        include: { 
+            lease: { include: { property: true } },
+            bdq: true
+        }
     })
 
     if (!mediation) throw new Error("Médiation introuvable")
 
     const userId = session.user.id
-    const lease = mediation.lease
-    if (lease.tenantId !== userId && lease.property.ownerUserId !== userId && lease.property.managedByUserId !== userId) {
+    const isAdmin = session.user.role === "ADMIN"
+
+    const isAuthorized = isAdmin || (
+        mediation.lease 
+            ? (mediation.lease.tenantId === userId || 
+               mediation.lease.property.ownerUserId === userId || 
+               mediation.lease.property.managedByUserId === userId)
+            : (mediation.bdq 
+                ? (mediation.bdq.bailleurId === userId || mediation.bdq.locataireId === userId)
+                : false)
+    )
+
+    if (!isAuthorized) {
         throw new Error("Accès non autorisé")
     }
 
