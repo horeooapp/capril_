@@ -19,7 +19,10 @@ import {
     Handshake,
     Send,
     Trophy,
-    ClipboardCheck
+    ClipboardCheck,
+    Wallet,
+    RefreshCw,
+    ExternalLink
 } from "lucide-react"
 import Link from "next/link"
 import DemoToggle from "@/components/admin/DemoToggle"
@@ -81,7 +84,11 @@ export default async function AdminDashboardOverview() {
         totalEdls,
         certifiedEdls,
         totalMonthlyReports,
-        totalMandatesDraft
+        totalMandatesDraft,
+        totalWalletLinks,
+        totalWalletClicks,
+        totalWalletConversions,
+        activeWalletConfigs
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -124,6 +131,10 @@ export default async function AdminDashboardOverview() {
         (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
         (prisma as any).rapportMensuel.count().catch(() => 0),
         prisma.mandate.count({ where: { status: "DRAFT" } }).catch(() => 0),
+        (prisma as any).walletRechargeLink.count().catch(() => 0),
+        (prisma as any).walletRechargeLink.count({ where: { clique: true } }).catch(() => 0),
+        (prisma as any).walletRechargeLink.count({ where: { rechargeEffectuee: true } }).catch(() => 0),
+        (prisma as any).walletRechargeConfig.count({ where: { rappelActif: true } }).catch(() => 0),
     ]);
     
     // Formatting data
@@ -173,7 +184,12 @@ export default async function AdminDashboardOverview() {
         mandateSuccessRate: totalMandates > 0 ? Math.round((totalMandates / (totalMandates + (totalMandatesDraft || 0))) * 100) : 0,
         totalEdls,
         certifiedEdls,
-        totalMonthlyReports
+        totalMonthlyReports,
+        totalWalletLinks,
+        totalWalletClicks,
+        totalWalletConversions,
+        activeWalletConfigs,
+        walletConversionRate: totalWalletLinks > 0 ? Math.round((totalWalletConversions / totalWalletLinks) * 100) : 0
     }
 
     try {
@@ -368,6 +384,45 @@ export default async function AdminDashboardOverview() {
                             icon={<ShieldCheck size={28} />} 
                             color="slate"
                             trend="Visibilité"
+                            delay={0.4}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-07 : Wallet & Rechargements */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-blue-600 px-2">Supervision ADD-07 : Wallet & Automatisations</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Liens Générés" 
+                            value={safeData.totalWalletLinks.toLocaleString()} 
+                            icon={<ExternalLink size={28} />} 
+                            color="blue"
+                            trend="Deep Links"
+                            delay={0.1}
+                        />
+                        <StatCard 
+                            title="Taux de Clics" 
+                            value={safeData.totalWalletLinks > 0 ? `${Math.round((safeData.totalWalletClicks / safeData.totalWalletLinks) * 100)}%` : "0%"} 
+                            icon={<Zap size={28} />} 
+                            color="orange"
+                            trend={`${safeData.totalWalletClicks} Clics`}
+                            delay={0.2}
+                        />
+                        <StatCard 
+                            title="Conversions" 
+                            value={`${safeData.walletConversionRate}%`} 
+                            icon={<Wallet size={28} />} 
+                            color="emerald"
+                            trend={`${safeData.totalWalletConversions} Rechargés`}
+                            delay={0.3}
+                        />
+                        <StatCard 
+                            title="Configs Actives" 
+                            value={safeData.activeWalletConfigs.toLocaleString()} 
+                            icon={<RefreshCw size={28} />} 
+                            color="indigo"
+                            trend="Rappels Auto."
                             delay={0.4}
                         />
                     </div>
