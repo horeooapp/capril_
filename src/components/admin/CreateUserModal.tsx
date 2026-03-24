@@ -12,7 +12,8 @@ export default function CreateUserModal() {
         phone: "",
         email: "",
         fullName: "",
-        role: "TENANT" as Role
+        role: "TENANT" as Role,
+        password: ""
     })
     const router = useRouter()
 
@@ -22,7 +23,7 @@ export default function CreateUserModal() {
         const result = await createUserByAdmin(formData)
         if (result.success) {
             setIsOpen(false)
-            setFormData({ phone: "", email: "", fullName: "", role: "TENANT" })
+            setFormData({ phone: "", email: "", fullName: "", role: "TENANT", password: "" })
             router.refresh()
         } else {
             alert(result.error)
@@ -104,6 +105,19 @@ export default function CreateUserModal() {
                             <option value="ADMIN">Administrateur</option>
                         </select>
                     </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe (Optionnel)</label>
+                        <input 
+                            type="password"
+                            value={formData.password}
+                            onChange={(e) => setFormData({...formData, password: e.target.value})}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-gray-900 outline-none"
+                            placeholder="Laissez vide pour configurer plus tard"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-1">Obligatoire pour une connexion immédiate de l'admin.</p>
+                    </div>
+
 
                     <div className="pt-4 flex space-x-3">
                         <button 

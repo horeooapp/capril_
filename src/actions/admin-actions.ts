@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
+import { writeAuditLog } from "@/lib/audit"
 
 /**
  * Sécurité : Vérifie si l'utilisateur actuel est un administrateur (Simple ou Super)
@@ -248,16 +249,26 @@ export async function getGlobalAuditLogs() {
 /**
  * Création d'un utilisateur par l'admin
  */
-export async function createUserByAdmin(data: { phone: string, email: string, fullName: string, role: Role }) {
+export async function createUserByAdmin(data: { phone: string, email: string, fullName: string, role: Role, password?: string }) {
     await ensureAdmin()
     
     try {
         const existing = await prisma.user.findUnique({ where: { phone: data.phone } })
         if (existing) return { error: "Un utilisateur avec ce numéro de téléphone existe déjà." }
         
+        // Hash password if provided, otherwise leave null (can be set later)
+        let hashedPassword = undefined
+        if (data.password) {
+            const { hash } = await import("bcrypt-ts")
+            hashedPassword = await hash(data.password, 10)
+        }
+
+        const { password, ...userData } = data;
+
         await prisma.user.create({
             data: {
-                ...data,
+                ...userData,
+                password: hashedPassword,
                 status: 'active',
                 isCertified: true,
                 kycLevel: 4,
@@ -268,7 +279,8 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
         revalidatePath("/admin/users")
         return { success: true }
     } catch (error) {
-        return { error: "Erreur lors de la création de l'utilisateur." }
+        console.error("[ACTION] createUserByAdmin error:", error)
+        return { error: error instanceof Error ? error.message : "Erreur lors de la création de l'utilisateur." }
     }
 }
 
@@ -276,54 +288,59 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
  * Met à jour le mot de passe d'un administrateur
  */
 export async function updateAdminPassword(userId: string, newPassword: string) {
-    const session = await auth()
-    if (!session || !session.user) {
-        throw new Error("Authentification requise")
-    }
-
-    const requesterId = session.user.id
-    const requesterRole = session.user.role
-
-    // Sécurité : Un ADMIN ne peut changer QUE son propre mot de passe.
-    // Un SUPER_ADMIN peut changer le sien ou celui d'un autre ADMIN.
-    if (requesterRole !== Role.SUPER_ADMIN && requesterId !== userId) {
-        throw new Error("Vous n'avez pas l'autorisation de modifier ce mot de passe.")
-    }
-
     try {
+        const session = await auth()
+        if (!session || !session.user) {
+            throw new Error("Non authentifié")
+        }
+        const requesterId = session.user.id
+        const requesterRole = session.user.role
+
+        // 1. Authorization: Only SUPER_ADMIN can change others' passwords. 
+        // ADMIN can change their own (though usually they do it via Profile page)
+        if (requesterRole !== Role.SUPER_ADMIN && requesterId !== userId) {
+            throw new Error("Vous n'avez pas l'autorisation de modifier ce mot de passe.");
+        }
+
+        if (newPassword.length < 8) {
+            throw new Error("Le mot de passe doit faire au moins 8 caractères.")
+        }
+
+        // 2. Standardize rounds to 10 (consistency and performance)
         const { hash } = await import("bcrypt-ts")
-        const hashedPassword = await hash(newPassword, 12)
+        const hashedPassword = await hash(newPassword, 10)
 
         const targetUser = await prisma.user.findUnique({
             where: { id: userId },
-            select: { role: true, fullName: true, email: true }
+            select: { id: true, role: true }
         })
 
-        if (!targetUser) return { error: "Utilisateur non trouvé" }
-
-        // S'assurer que la cible est bien un admin (on ne change pas les pass des tenants ici par sécurité)
-        if (targetUser.role !== Role.ADMIN && targetUser.role !== Role.SUPER_ADMIN) {
-            return { error: "Cette action est réservée aux comptes administratifs." }
+        if (!targetUser) {
+            throw new Error("Utilisateur cible introuvable.")
         }
 
+        const adminRoles: Role[] = [Role.ADMIN, Role.SUPER_ADMIN]
+        if (!adminRoles.includes(targetUser.role)) {
+            throw new Error("Cette action est réservée aux comptes administratifs.")
+        }
+
+        // 3. Update
         await prisma.user.update({
             where: { id: userId },
             data: { password: hashedPassword }
         })
 
-        // Log d'audit
-        await prisma.auditLog.create({
-            data: {
-                userId: requesterId,
-                action: `Modification du mot de passe de ${targetUser.fullName || targetUser.email}`,
-                module: "AUTH",
-                entityId: userId,
-            }
+        // 4. Audit Log
+        await writeAuditLog({
+            userId: requesterId,
+            action: "ADMIN_PASSWORD_UPDATED",
+            module: "ADMIN",
+            newValues: { targetUserId: userId }
         })
 
         return { success: true }
     } catch (error) {
-        console.error("Erreur updateAdminPassword:", error)
-        return { error: "Erreur lors de la mise à jour du mot de passe." }
+        console.error("[ACTION] updateAdminPassword error:", error)
+        return { error: error instanceof Error ? error.message : "Une erreur est survenue lors de la mise à jour du mot de passe." }
     }
 }

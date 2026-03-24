@@ -72,7 +72,7 @@ export async function changeAdminPassword(data: {
         const isValid = await compare(data.currentPassword, user.password);
 
         if (!isValid) {
-            return { error: "Mot de passe actuel incorrect" };
+            return { error: "Le mot de passe actuel est incorrect." };
         }
 
         // 3. Hash and Save new password (min 8 chars)
@@ -97,6 +97,7 @@ export async function changeAdminPassword(data: {
         return { success: true };
     } catch (error) {
         console.error("[SERVER ACTION] changeAdminPassword error:", error);
-        return { error: "Erreur lors du changement de mot de passe" };
+        return { error: error instanceof Error ? error.message : "Une erreur est survenue lors du changement de mot de passe." };
     }
 }
+
