@@ -21,9 +21,9 @@ export class RapportService {
           include: {
             leases: {
               where: { status: "ACTIVE" },
-              include: { payments: {
+              include: { pgwPayments: {
                 where: {
-                  status: "SUCCESSFUL",
+                  statut: "CONFIRMEE",
                 }
               }}
             }
@@ -63,15 +63,15 @@ export class RapportService {
         nbLeases++;
         totalPotentiel += Number(lease.rentAmount);
         
-        const paidThisMonth = lease.payments.length > 0;
+        const paidThisMonth = lease.pgwPayments.length > 0;
         if (paidThisMonth) {
-          totalEncaisse += Number(lease.payments[0].amount); // Simplification
+          totalEncaisse += Number(lease.pgwPayments[0].montant); // Simplification
         } else {
           nbImpayes++;
         }
 
         details.push({
-          address: property.address || property.ref,
+          address: property.address || property.propertyCode,
           status: paidThisMonth ? "paid" : "unpaid",
           amount: Number(lease.rentAmount)
         });

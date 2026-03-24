@@ -41,15 +41,15 @@ export class TariffService {
     }
 
     // 3. PRIORITÉ : OFFRE ABONNEMENT (Based on PlanTier)
-    const user = await prisma.user.findUnique({
+    const user = await (prisma as any).user.findUnique({
       where: { id: userId },
-      select: { planTier: true },
+      select: { activePlanTier: true },
     });
 
     if (user) {
       const offer = await prisma.offreAbonnement.findFirst({
         where: {
-          code: user.planTier, // Assuming codes match PlanTier names (GRATUIT, ESSENTIEL, etc.)
+          code: user.activePlanTier, // Assuming codes match PlanTier names (GRATUIT, ESSENTIEL, etc.)
           actif: true,
         },
       });
@@ -106,7 +106,7 @@ export class TariffService {
         where: {
           lease: {
             property: {
-              ownerId: userId // Or agencyId if applicable
+              ownerUserId: userId // Based on schema: ownerUserId
             }
           },
           createdAt: { gte: startOfMonth },

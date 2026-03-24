@@ -32,7 +32,7 @@ export class ReminderService {
     for (const lease of activeLeases) {
       try {
         // Default DLP is 5 if not set (DLP-001 fallback)
-        const dlp = lease.dateLimitePaiement || 5;
+        const dlp = (lease as any).dateLimitePaiement || 5;
         
         // Calculate reminder window
         const dates = NotificationService.calculateReminderDates(dlp, month, year);
@@ -65,14 +65,12 @@ export class ReminderService {
    * Check if a lease has already been paid for this month.
    */
   private static async isAlreadyPaid(leaseId: string, month: number, year: number) {
-    const payment = await prisma.paymentPgw.findFirst({
+    const firstOfMonth = new Date(year, month - 1, 1);
+    const payment = await (prisma as any).paymentPgw.findFirst({
       where: {
         leaseId,
-        metadata: {
-          path: ["periode"],
-          equals: `${month}/${year}`,
-        },
-        status: "SUCCESSFUL",
+        moisConcerne: firstOfMonth,
+        statut: "CONFIRMEE",
       },
     });
     return !!payment;
@@ -92,8 +90,8 @@ export class ReminderService {
       leaseReference: lease.leaseReference,
       amount: lease.rentAmount,
       timing,
-      smsText: `QAPRIL: Rappel paiement loyer ${lease.property.ref} (${timing}). Montant: ${lease.rentAmount} FCFA.`,
-      parameters: [lease.tenant.fullName, lease.property.ref, String(lease.rentAmount)]
+      smsText: `QAPRIL: Rappel paiement loyer ${lease.property.propertyCode} (${timing}). Montant: ${lease.rentAmount} FCFA.`,
+      parameters: [lease.tenant?.fullName || 'Client', lease.property.propertyCode, String(lease.rentAmount)]
     };
 
     await NotificationService.envoyerNotification(lease.tenantId, event, {

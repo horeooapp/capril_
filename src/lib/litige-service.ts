@@ -12,7 +12,7 @@ export class LitigeService {
    */
   static async generateDlc(leaseId: string, reclamationIds: string[]) {
     // 1. Fetch data for hashing
-    const lease = await prisma.lease.findUnique({
+    const lease = await (prisma.lease as any).findUnique({
       where: { id: leaseId },
       include: {
         property: true,
@@ -28,9 +28,9 @@ export class LitigeService {
     // 2. Create the data payload to hash (deterministic)
     const payload = JSON.stringify({
       lease_id: lease.id,
-      tenant_name: lease.tenant.fullName,
-      property_ref: lease.property.ref,
-      reclamations: lease.reclamations.map(r => ({
+      tenant_name: lease.tenant?.fullName || "N/A",
+      property_ref: lease.property.propertyCode,
+      reclamations: (lease.reclamations as any[]).map((r: any) => ({
         id: r.id,
         type: r.typeReclamation,
         description: r.description,
@@ -43,7 +43,7 @@ export class LitigeService {
     const hash = crypto.createHash('sha256').update(payload).digest('hex');
 
     // 4. Create DLC record
-    const dlc = await prisma.dossierLitigeCertifie.create({
+    const dlc = await (prisma as any).dossierLitigeCertifie.create({
       data: {
         leaseId: lease.id,
         hashSha256: hash,
@@ -63,7 +63,7 @@ export class LitigeService {
    * Update CACI status for a dossier.
    */
   static async updateCaciReference(dlcId: string, refCaci: string) {
-    return await prisma.dossierLitigeCertifie.update({
+    return await (prisma as any).dossierLitigeCertifie.update({
       where: { id: dlcId },
       data: {
         refCaci,
@@ -76,7 +76,7 @@ export class LitigeService {
    * Close a dossier with result.
    */
   static async closeDossier(dlcId: string, issue: string, notes?: string) {
-    return await prisma.dossierLitigeCertifie.update({
+    return await (prisma as any).dossierLitigeCertifie.update({
       where: { id: dlcId },
       data: {
         issue,
