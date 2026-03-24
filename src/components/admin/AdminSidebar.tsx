@@ -22,7 +22,8 @@ import {
     BookOpen,
     Trophy,
     ClipboardCheck,
-    User
+    User,
+    Home
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -73,6 +74,19 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
 
                 {/* Navigation Links */}
                 <nav className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar mt-4">
+                    {/* Public Home Link */}
+                    <Link 
+                        href="/"
+                        className="relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/5 border border-dashed border-gray-100 hover:border-ivoire-orange/30 mb-4"
+                    >
+                        <span className="relative z-10 transition-transform group-hover:scale-110">
+                            <Home size={20} />
+                        </span>
+                        <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] flex-1">
+                            Retour à l&apos;Accueil
+                        </span>
+                    </Link>
+
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href
                         return (

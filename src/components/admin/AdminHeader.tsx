@@ -20,7 +20,8 @@ import {
     ArrowRightLeft,
     BarChart3,
     Newspaper,
-    BookOpen
+    BookOpen,
+    Home
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -68,6 +69,17 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                         </div>
                     </Link>
 
+                    {/* Back to Home Link for Mobile and Small Screens */}
+                    <div className="flex lg:hidden items-center gap-2">
+                        <Link 
+                            href="/"
+                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/10 transition-colors border border-gray-100"
+                            title="Retour à l'Accueil"
+                        >
+                            <Home size={18} />
+                        </Link>
+                    </div>
+
                     {/* Breadcrumb or Title for Desktop */}
                     <div className="hidden lg:flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C55A11]"></div>
@@ -83,6 +95,13 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                              <Activity size={14} className="animate-pulse" />
                              <span className="text-[9px] font-black uppercase tracking-widest">Live Node: ABJ-01</span>
                         </div>
+                        <Link 
+                            href="/"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/10 transition-colors border border-gray-100"
+                            title="Retour à l'Accueil"
+                        >
+                            <Home size={18} />
+                        </Link>
                         <NotificationCenter />
                     </div>
 
