@@ -88,7 +88,10 @@ export default async function AdminDashboardOverview() {
         totalWalletLinks,
         totalWalletClicks,
         totalWalletConversions,
-        activeWalletConfigs
+        activeWalletConfigs,
+        totalReclamations,
+        totalLitiges,
+        activePromos
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -127,14 +130,18 @@ export default async function AdminDashboardOverview() {
         (prisma as any).championProfile.count().catch(() => 0),
         (prisma as any).championProfile.count({ where: { statut: "ACTIF" } }).catch(() => 0),
         (prisma as any).championCommission.aggregate({ _sum: { montantFcfa: true }, where: { statut: "EN_ATTENTE" } }).catch(() => null),
-        (prisma as any).etatsDesLieux.count().catch(() => 0),
-        (prisma as any).etatsDesLieux.count({ where: { statut: "CERTIFIE" } }).catch(() => 0),
-        (prisma as any).rapportMensuel.count().catch(() => 0),
+        prisma.inspection.count().catch(() => 0),
+        prisma.inspection.count({ where: { status: "TERMINEE" } }).catch(() => 0),
+        prisma.rapportMensuel.count().catch(() => 0),
         prisma.mandate.count({ where: { status: "DRAFT" } }).catch(() => 0),
         (prisma as any).walletRechargeLink.count().catch(() => 0),
         (prisma as any).walletRechargeLink.count({ where: { clique: true } }).catch(() => 0),
         (prisma as any).walletRechargeLink.count({ where: { rechargeEffectuee: true } }).catch(() => 0),
         (prisma as any).walletRechargeConfig.count({ where: { rappelActif: true } }).catch(() => 0),
+        // Nouveaux indicateurs ADD-16
+        (prisma as any).reclamationLocataire.count().catch(() => 0),
+        (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
+        (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => 0),
     ]);
     
     // Formatting data
@@ -189,7 +196,10 @@ export default async function AdminDashboardOverview() {
         totalWalletClicks,
         totalWalletConversions,
         activeWalletConfigs,
-        walletConversionRate: totalWalletLinks > 0 ? Math.round((totalWalletConversions / totalWalletLinks) * 100) : 0
+        walletConversionRate: totalWalletLinks > 0 ? Math.round((totalWalletConversions / totalWalletLinks) * 100) : 0,
+        totalReclamations,
+        totalLitiges,
+        activePromos
     }
 
     try {
@@ -546,6 +556,40 @@ export default async function AdminDashboardOverview() {
                             color="indigo"
                             trend="Conformes"
                             delay={0.8}
+                        />
+                    </div>
+                </div>
+
+                {/* ADD-16 : Compliance & Arbitrage */}
+                <div className="space-y-6">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-red-600 px-2">Supervision ADD-16 : Réclamations & Arbitrage CACI</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <StatCard 
+                            title="Réclamations" 
+                            value={safeData.totalReclamations.toLocaleString()} 
+                            icon={<AlertTriangle size={28} />} 
+                            color="red"
+                            trend="Droits Locataire"
+                            delay={0.1}
+                            href="/admin/reclamations"
+                        />
+                        <StatCard 
+                            title="Litiges CACI" 
+                            value={safeData.totalLitiges.toLocaleString()} 
+                            icon={<Scale size={28} />} 
+                            color="orange"
+                            trend="Dossiers Certifiés"
+                            delay={0.2}
+                            href="/admin/disputes"
+                        />
+                        <StatCard 
+                            title="Promos Actives" 
+                            value={safeData.activePromos.toLocaleString()} 
+                            icon={<Zap size={28} />} 
+                            color="emerald"
+                            trend="Agilité Tarifaire"
+                            delay={0.3}
+                            href="/admin/tarifs"
                         />
                     </div>
                 </div>

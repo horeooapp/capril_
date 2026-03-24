@@ -360,12 +360,23 @@ model User {
   invitationsRecues      InvitationBail[]       @relation("LocataireInvite")
   consultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")
 
+  // ADD-16 Succession
+  successionsOwned       SuccessionProprio[]
+  successionsAsTenant    SuccessionLocataire[] @relation("SuccessionAsTenant")
+  reclamations           ReclamationLocataire[] @relation("TenantReclamations")
+  
   // ADD-15 Rapports & Champions
   redactedEdls         EtatsDesLieux[]    @relation("RedacteurEdl")
   rapportsMensuels     RapportMensuel[]
   championProfile      ChampionProfile?
   supervisedChampions  ChampionProfile[]  @relation("SuperviseurChampions")
   prospectsConvertis   ChampionProspect[] @relation("ProspectConverti")
+
+  // ADD-16 Succession Locataire
+  beneficiaireNom      String? @map("beneficiaire_nom")
+  beneficiaireLien     String? @map("beneficiaire_lien")
+  beneficiairePhone    String? @map("beneficiaire_phone")
+  beneficiaireDesignationAt DateTime? @map("beneficiaire_designation_at")
 
   @@index([phone])
   @@index([role])
@@ -547,6 +558,10 @@ model Lease {
   chargesAmount  Int       @default(0) @map("charges_amount")
   paymentDay     Int       @default(5) @map("payment_day")
   depositAmount  Int       @default(0) @map("deposit_amount")
+  
+  // NOUVEAUX CHAMPS — Pratique locative CI (DLP-001)
+  dateLimitePaiement Int     @default(5) @map("date_limite_paiement") // Jour du mois avant lequel le loyer est dû (ex: 5, 10, personalized)
+  paiementAvance     Boolean @default(true) @map("paiement_avance")    // TRUE = payé d'avance (standard CI)
 
   status     LeaseStatus @default(DRAFT)
   importMode Boolean     @default(false) @map("import_mode")
@@ -616,6 +631,12 @@ model Lease {
   caution                CautionBail?
   preavis                PreavisBail[]
   alertesLoyer           AlerteLoyer[]
+  
+  // ADD-16 Succession & Litige
+  successions            SuccessionLocataire[]
+  reclamations           ReclamationLocataire[]
+  dossiersLitige         DossierLitigeCertifie[]
+  propositionsLoyer      PropositionLoyer[]
 
   @@index([propertyId])
   @@index([tenantId])
@@ -993,6 +1014,131 @@ model MarketData {
 
   @@unique([city, commune, propertyType], name: "city_commune_propertyType")
   @@map("market_data")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-16 SUCCESSION & LITIGE (Phase 3)
+// ═══════════════════════════════════════════════════════
+
+model SuccessionProprio {
+  id              String   @id @default(uuid()) @map("succession_id")
+  landlordId      String   @map("landlord_id")
+  landlord        User     @relation(fields: [landlordId], references: [id])
+  declarantNom    String   @map("declarant_nom")
+  declarantLien   String   @map("declarant_lien") // heritier | notaire | locataire | autre
+  declarantPhone  String   @map("declarant_phone")
+  dateDeclaration DateTime @default(now()) @map("date_declaration")
+  statut          String   @default("EN_COURS") // EN_COURS | VERIFIE | TRANSFERE | ARCHIVE | REJETE
+  dateDeces       DateTime @map("date_deces")
+  acteDecesUrl    String?  @map("acte_deces_url")
+  heritierId      String?  @map("heritier_id")
+  dateTransfert   DateTime? @map("date_transfert")
+  notes           String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("successions_proprio")
+}
+
+model SuccessionLocataire {
+  id              String   @id @default(uuid()) @map("succession_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  tenantId        String   @map("tenant_id")
+  tenant          User     @relation("SuccessionAsTenant", fields: [tenantId], references: [id])
+  dateDeces       DateTime @map("date_deces")
+  declarantType   String?  @map("declarant_type") // proprio | famille | beneficiaire | autre
+  declarantPhone  String?  @map("declarant_phone")
+  
+  beneficiaireId  String?  @map("beneficiaire_id") // Link to internal User if exists
+  beneficiaireExtNom   String? @map("beneficiaire_ext_nom")
+  beneficiaireExtPhone String? @map("beneficiaire_ext_phone")
+  
+  loyerProrata    Decimal? @map("loyer_prorata")
+  cautionMontant  Decimal? @map("caution_montant")
+  cautionRestituee Boolean @default(false) @map("caution_restituee")
+  dateRestitution DateTime? @map("date_restitution")
+  
+  statut          String   @default("TRANSITION") // TRANSITION | CAUTION_TRAITEE | ARCHIVE | LITIGE
+  dateFinTransition DateTime @map("date_fin_transition") // J+30 manual handle or auto
+  notes           String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("successions_locataire")
+}
+
+model ReclamationLocataire {
+  id              String   @id @default(uuid()) @map("reclamation_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  tenantId        String   @map("tenant_id")
+  tenant          User     @relation("TenantReclamations", fields: [tenantId], references: [id])
+  typeReclamation String   @map("type_reclamation") // RCL-01 | RCL-02 | RCL-03 | RCL-04
+  description     String
+  preuveUrl       String?  @map("preuve_url")
+  statut          String   @default("OUVERT") // OUVERT | EN_COURS | RESOLU | ESCALADE_CACI | REJETE
+  dateEcheance    DateTime @map("date_echeance")
+  
+  dossierLitigeId String?  @map("dossier_litige_id")
+  dossierLitige   DossierLitigeCertifie? @relation(fields: [dossierLitigeId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("reclamations_locataire")
+}
+
+model DossierLitigeCertifie {
+  id              String   @id @default(uuid()) @map("dlc_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  uuid            String   @unique @default(uuid()) @map("dlc_uuid")
+  hashSha256      String   @map("dlc_hash_sha256")
+  statut          String   @default("GENERE") // GENERE | TRANSMIS_CACI | MEDIATION_EN_COURS | CLOTURE
+  refCaci         String?  @map("ref_caci")
+  issue           String?  // ACCORD_AMIABLE | SENTENCE_ARBITRALE | ABANDONNE
+  dateCloture     DateTime? @map("date_cloture")
+  notes           String?
+
+  reclamations    ReclamationLocataire[]
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("dossiers_litige_certifies")
+}
+
+model PropositionLoyer {
+  id              String   @id @default(uuid()) @map("prop_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  montantActuel   Int      @map("montant_actuel")
+  nouveauMontant  Int      @map("nouveau_montant")
+  dateEffet       DateTime @map("date_effet")
+  raison          String?
+  statut          String   @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | EXPIRE
+  
+  consentement    ConsentementLoyer?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("propositions_loyer")
+}
+
+model ConsentementLoyer {
+  id              String   @id @default(uuid()) @map("consent_id")
+  propositionId   String   @unique @map("prop_id")
+  proposition     PropositionLoyer @relation(fields: [propositionId], references: [id])
+  reponse         Boolean // true = OUI, false = NON
+  commentaire     String?
+  ipAddress       String?  @map("ip_address")
+  userAgent       String?  @map("user_agent")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("consentements_loyer")
 }
 
 model AuditLog {

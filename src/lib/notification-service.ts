@@ -13,6 +13,10 @@ export type EventType =
   | "WALLET_BAS"
   | "BAIL_EXPIRANT"
   | "INVITATION_BAIL_RECUE"
+  | "RECLAMATION_RECUE"
+  | "PROPOSITION_LOYER"
+  | "DLC_GENERE"
+  | "SUCCESSION_ACTIVEE"
 
 interface NotificationData {
   referenceId?: string
@@ -57,7 +61,7 @@ export class NotificationService {
       const CRITIQUES = ['QUITTANCE_GENEREE', 'PAIEMENT_RECU', 'IMPAYE_DETECTE'];
       if (hors_plage && !CRITIQUES.includes(event)) {
          console.info(`[NotificationService] Événement non critique hors plage horaire. Différé à ${prefs.heureDebut}h00.`);
-         // TODO: Implémenter le scheduling
+         // TODO: Implémenter le scheduling réel via une queue (Bull/Redis)
          return;
       }
 
@@ -89,6 +93,22 @@ export class NotificationService {
     } catch (e) {
       console.error(`[NotificationService] Erreur globale:`, e);
     }
+  }
+
+  /**
+   * Calcule les dates de rappel dynamiques basées sur DLP-001
+   */
+  static calculateReminderDates(dateLimite: number, month: number, year: number) {
+    const baseDate = new Date(year, month - 1, dateLimite);
+    
+    return {
+      t_minus_3: new Date(new Date(baseDate).setDate(baseDate.getDate() - 3)),
+      t_minus_1: new Date(new Date(baseDate).setDate(baseDate.getDate() - 1)),
+      t_zero: new Date(baseDate),
+      t_plus_2: new Date(new Date(baseDate).setDate(baseDate.getDate() + 2)),
+      t_plus_5: new Date(new Date(baseDate).setDate(baseDate.getDate() + 5)),
+      t_plus_10: new Date(new Date(baseDate).setDate(baseDate.getDate() + 10)),
+    };
   }
 
   // ---- Implémentations spécifiques (vides pour l'instant - seront complétées dans le Sprint 1 & 2) ----
