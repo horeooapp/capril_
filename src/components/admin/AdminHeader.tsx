@@ -118,7 +118,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
 
                     <button 
                         onClick={onLogout}
-                        className="hidden md:flex items-center justify-center h-12 w-12 bg-white border border-gray-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
+                        className="flex items-center justify-center h-12 w-12 bg-white border border-gray-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
                         title="Déconnexion"
                     >
                         <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
