@@ -24,18 +24,23 @@ export default async function Home() {
   let dbNews: any[] = [];
   let isLandingPageRestricted = true;
   let stats = { totalLeases: 450, totalSecuredFunds: 125000000, totalFiscal: 15400000, totalUsers: 1200 }; // Fallbacks
+  let flags = { impact: true, observatory: true, geo: true, ranking: true };
 
   try {
     session = await auth();
     dbNews = await getActiveNews();
     isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE");
     
-    // Fetch Global Impact Stats
-    const [tLeases, tSecured, tFiscal, tUsers] = await Promise.all([
+    // Fetch Global Impact Stats & Feature Flags
+    const [tLeases, tSecured, tFiscal, tUsers, fImpact, fObs, fGeo, fRank] = await Promise.all([
         prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 450),
         prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => ({ _sum: { amount: 125000000 } })),
         prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => ({ _sum: { totalDgi: 15400000 } })),
-        prisma.user.count().catch(() => 1200)
+        prisma.user.count().catch(() => 1200),
+        isFeatureEnabled("HOME_IMPACT_STATS"),
+        isFeatureEnabled("HOME_OBSERVATORY"),
+        isFeatureEnabled("HOME_GEO_ANALYSIS"),
+        isFeatureEnabled("HOME_RENT_RANKING")
     ]);
 
     stats = {
@@ -44,9 +49,17 @@ export default async function Home() {
         totalFiscal: Number((tFiscal as any)._sum?.totalDgi || 0),
         totalUsers: tUsers
     };
+
+    flags = {
+        impact: fImpact,
+        observatory: fObs,
+        geo: fGeo,
+        ranking: fRank
+    };
   } catch (error) {
     console.error("[HOME] Error during initial data fetch:", error);
   }
+
 
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
@@ -152,22 +165,24 @@ export default async function Home() {
               </div>
 
               {/* Social Proof for Restricted Portal */}
-              <div className="mt-20 flex items-center justify-center gap-8 md:gap-16 text-white/40 animate-in fade-in duration-1000 delay-1000">
-                  <div className="text-center">
-                      <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalLeases).toLocaleString()}+</span>
-                      <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Baux Certifiés</span>
-                  </div>
-                  <div className="w-px h-10 bg-white/10"></div>
-                  <div className="text-center">
-                      <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalSecuredFunds / 1000000).toFixed(0)}M+</span>
-                      <span className="text-[8px] font-black uppercase tracking-widest opacity-50">FCFA Sécurisés</span>
-                  </div>
-                  <div className="w-px h-10 bg-white/10"></div>
-                  <div className="text-center">
-                      <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">100%</span>
-                      <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Conformité DGI</span>
-                  </div>
-              </div>
+              {flags.impact && (
+                <div className="mt-20 flex items-center justify-center gap-8 md:gap-16 text-white/40 animate-in fade-in duration-1000 delay-1000">
+                    <div className="text-center">
+                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalLeases).toLocaleString()}+</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Baux Certifiés</span>
+                    </div>
+                    <div className="w-px h-10 bg-white/10"></div>
+                    <div className="text-center">
+                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalSecuredFunds / 1000000).toFixed(0)}M+</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">FCFA Sécurisés</span>
+                    </div>
+                    <div className="w-px h-10 bg-white/10"></div>
+                    <div className="text-center">
+                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">100%</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Conformité DGI</span>
+                    </div>
+                </div>
+              )}
             </div>
           </main>
 
@@ -256,7 +271,7 @@ export default async function Home() {
               <h1 className="text-3xl md:text-5xl lg:text-7xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-8 animate-in slide-in-from-bottom duration-700 delay-100">
                 Le Registre <span className="text-primary italic">Locatif</span> National.
               </h1>
-              <p className="text-xl text-gray-700 font-medium leading-relaxed mb-12 max-w-lg animate-in fade-in duration-1000 delay-300">
+              <p className="text-xl text-gray-700 font-medium leading-relaxed mb-12 max-lg animate-in fade-in duration-1000 delay-300">
                 QAPRIL normalise, sécurise et certifie chaque bail immobilier en Côte d&apos;Ivoire. Une solution d&apos;État pour une transparence totale entre propriétaires et locataires.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in duration-1000 delay-500">
@@ -275,7 +290,7 @@ export default async function Home() {
         </section>
 
         {/* --- IMPACT STATISTICS --- */}
-        <ImpactStats stats={stats} />
+        {flags.impact && <ImpactStats stats={stats} />}
 
         {/* --- EXPERTISE / DEPTH SECTION --- */}
         <section id="expertise" className="py-32 bg-white relative overflow-hidden">
@@ -287,15 +302,16 @@ export default async function Home() {
         </section>
 
         {/* --- REAL ESTATE OBSERVATORY --- */}
-        <RealEstateObservatory />
+        {flags.observatory && <RealEstateObservatory />}
 
         {/* --- GEOGRAPHIC RENT ANALYSIS --- */}
-        <GeographicRentAnalysis />
+        {flags.geo && <GeographicRentAnalysis />}
 
         {/* --- RENT RANKING LEADERBOARD --- */}
-        <RentRanking />
+        {flags.ranking && <RentRanking />}
 
         {/* --- TRUST SCORE SECTION --- */}
+
 
 
 

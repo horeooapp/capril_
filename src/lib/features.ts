@@ -43,6 +43,14 @@ export const FEATURES = {
   AGENDA: "M-AGENDA",
   BDQ_VERBAL: "M-BAIL-VERBAL",
   AI_ASSISTANT: "ADD-08-AI",
+
+  // ═══════════════════════════════════════════════════════
+  // CONFIGURATION ACCUEIL (HOME)
+  // ═══════════════════════════════════════════════════════
+  HOME_IMPACT_STATS: "HOME_IMPACT_STATS",
+  HOME_OBSERVATORY: "HOME_OBSERVATORY",
+  HOME_GEO_ANALYSIS: "HOME_GEO_ANALYSIS",
+  HOME_RENT_RANKING: "HOME_RENT_RANKING",
 } as const;
 
 export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES] | string;

@@ -81,6 +81,26 @@ const FEATURES: { key: AppFeature; label: string; description: string }[] = [
         label: "Assistant IA (Claude)", 
         description: "Assistant conversationnel pour la rédaction assistée des baux et le support utilisateur." 
     },
+    { 
+        key: "HOME_IMPACT_STATS", 
+        label: "Impact Immobilier (Accueil)", 
+        description: "Affiche les statistiques globales d'impact (Baux, CDC, DGI) sur la page d'accueil." 
+    },
+    { 
+        key: "HOME_OBSERVATORY", 
+        label: "Observatoire Immobilier (Accueil)", 
+        description: "Affiche les graphiques d'évolution des secteurs (Résidentiel, Commercial, Terrains)." 
+    },
+    { 
+        key: "HOME_GEO_ANALYSIS", 
+        label: "Analyse Géo-Spatiale (Accueil)", 
+        description: "Affiche la comparaison des loyers par commune, ville et région." 
+    },
+    { 
+        key: "HOME_RENT_RANKING", 
+        label: "Classement des Loyers (Accueil)", 
+        description: "Affiche le palmarès des zones les plus chères et attractives." 
+    },
 ]
 
 export default function SystemPage() {
@@ -141,6 +161,10 @@ export default function SystemPage() {
                                             feature.key === "M_MANDAT" ? "📋" :
                                             feature.key === "M_COLOC" ? "👥" :
                                             feature.key === "M_TERRAIN" ? "🌳" :
+                                            feature.key === "HOME_IMPACT_STATS" ? "📊" :
+                                            feature.key === "HOME_OBSERVATORY" ? "📈" :
+                                            feature.key === "HOME_GEO_ANALYSIS" ? "🌍" :
+                                            feature.key === "HOME_RENT_RANKING" ? "🏆" :
                                             "⚙️"
                                         }
                                     </span>
