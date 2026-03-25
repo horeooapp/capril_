@@ -26,6 +26,7 @@ export async function publishVoisinageAnnonce(data: {
 
     const annonce = await VoisinageService.publierAnnonce({
       ...data,
+      destinataires: data.destinataires || "TOUS",
       proprioId: userId,
     });
 

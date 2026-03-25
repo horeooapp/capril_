@@ -3097,6 +3097,8 @@ model AnnonceVoisinage {
   dateExpiration  DateTime? @map("date_expiration")
   epingle         Boolean  @default(false)
   destinataires   String   @default("TOUS") // TOUS | id locataire spécifique
+  photoUrl        String?  @map("photo_url")
+  photoHashSha256 String?  @map("photo_hash_sha256")
 
   @@index([propertyId])
   @@map("annonces_voisinage")
