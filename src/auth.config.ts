@@ -22,6 +22,7 @@ export const authConfig = {
                 token.status = user.status
                 token.fullName = (user as any).fullName
                 token.onboardingComplete = (user as any).onboardingComplete
+                token.diasporaAbonnement = (user as any).diasporaAbonnement
             }
             return token
         },
@@ -34,6 +35,7 @@ export const authConfig = {
                 session.user.status = token.status as any
                 session.user.fullName = token.fullName as string
                 session.user.onboardingComplete = token.onboardingComplete as boolean
+                session.user.diasporaAbonnement = token.diasporaAbonnement as boolean
             }
             return session
         },

@@ -51,6 +51,7 @@ export const FEATURES = {
   HOME_OBSERVATORY: "HOME_OBSERVATORY",
   HOME_GEO_ANALYSIS: "HOME_GEO_ANALYSIS",
   HOME_RENT_RANKING: "HOME_RENT_RANKING",
+  DIASPORA_PACKAGE: "DIASPORA_PACKAGE",
 } as const;
 
 export type AppFeature = keyof typeof FEATURES | (typeof FEATURES)[keyof typeof FEATURES] | string;

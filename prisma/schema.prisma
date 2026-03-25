@@ -311,13 +311,18 @@ model User {
   migrationSessions          MigrationSession[]
   reversalTransactions       ReversalTransaction[]
 
-  // ADD-05 Diaspora & KYC
-  paysResidence       String? @map("pays_residence")
-  fuseauHoraire       String  @default("Africa/Abidjan") @map("fuseau_horaire")
-  emailRapportMensuel String? @map("email_rapport_mensuel")
-  deviceFingerprint   String? @map("device_fingerprint")
-  fraudScore          Int     @default(0) @map("fraud_score")
-  fraudFlags          Json?   @map("fraud_flags")
+  // ADD-19 QAPRIL Diaspora Package
+  diasporaAbonnement     Boolean   @default(false) @map("diaspora_abonnement")
+  diasporaAbonnementSince DateTime?  @map("diaspora_abonnement_since")
+  diasporaDevise         String    @default("FCFA") @map("diaspora_devise")
+  diasporaStripeId       String?   @map("diaspora_stripe_id")
+  diasporaWhatsapp       String?   @map("diaspora_whatsapp")
+  paysResidence          String?   @map("pays_residence")
+  fuseauHoraire          String    @default("Africa/Abidjan") @map("fuseau_horaire")
+  emailRapportMensuel    String?   @map("email_rapport_mensuel")
+  deviceFingerprint      String?   @map("device_fingerprint")
+  fraudScore             Int       @default(0) @map("fraud_score")
+  fraudFlags             Json?     @map("fraud_flags")
 
   // ADD-05 B2B & White Label
   whiteLabelConfig Json?   @map("white_label_config")

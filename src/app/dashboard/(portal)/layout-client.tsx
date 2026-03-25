@@ -19,7 +19,8 @@ import {
     BarChart3,
     FileCheck2,
     Bot,
-    Trophy
+    Trophy,
+    Globe
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -50,6 +51,10 @@ export default function DashboardLayoutClient({
         { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
         ...(session?.user?.role === 'CHAMPION' 
             ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
+            : []
+        ),
+        ...(session?.user?.diasporaAbonnement 
+            ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Trophy size={18} /> }] // Temporary icon, will change later
             : []
         ),
     ];
@@ -174,9 +179,12 @@ export default function DashboardLayoutClient({
                         : [
                             { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
                             { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
+                            ...(session?.user?.diasporaAbonnement 
+                                ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={24} /> }]
+                                : []
+                            ),
                             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
                             { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
-                            { href: "/account", label: "Compte", icon: <User size={24} /> },
                           ]
                 } />
             </main>
