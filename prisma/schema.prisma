@@ -265,7 +265,7 @@ model User {
   id          String  @id @default(uuid()) @map("user_id")
   phone       String? @unique
   fullName    String? @map("full_name")
-  email       String  @unique
+  email       String? @unique
   role        Role    @default(TENANT)
   kycLevel    Int     @default(0) @map("kyc_level") // 0-4
   kycStatus   String  @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected

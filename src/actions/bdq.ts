@@ -204,7 +204,7 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         })
 
         // Notify Landlord
-        await sendSMS(bdq.bailleur.phone, `QAPRIL ✓ Votre locataire ${bdq.nomLocataireDeclare} a confirmé la situation locative. Bail BDQ actif.`)
+        await sendSMS(bdq.bailleur.phone || "", `QAPRIL ✓ Votre locataire ${bdq.nomLocataireDeclare} a confirmé la situation locative. Bail BDQ actif.`)
 
         revalidatePath("/dashboard/leases")
         return { success: true, status: "CONFIRME" }

@@ -49,9 +49,9 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
     }
 
     const containerVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-        exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as any } },
+        exit: { opacity: 0, y: 10, transition: { duration: 0.2 } }
     }
 
     return (

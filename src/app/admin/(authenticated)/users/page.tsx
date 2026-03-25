@@ -86,7 +86,7 @@ export default async function AdminUsersPage() {
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <UserActions 
                                         userId={user.id} 
-                                        userName={user.fullName || user.email || user.phone}
+                                        userName={user.fullName || user.email || user.phone || ""}
                                         currentRole={user.role} 
                                         isSuperAdmin={isSuperAdmin} 
                                         currentUserId={session?.user?.id || ""}
