@@ -10,9 +10,10 @@ interface NewsItem {
 
 interface NewsTickerProps {
     items: NewsItem[]
+    duration?: number
 }
 
-export default function NewsTicker({ items }: NewsTickerProps) {
+export default function NewsTicker({ items, duration = 25 }: NewsTickerProps) {
     if (!items || items.length === 0) return null
 
     // Duplicate items to ensure smooth infinite loop
@@ -40,7 +41,7 @@ export default function NewsTicker({ items }: NewsTickerProps) {
                             x: {
                                 repeat: Infinity,
                                 repeatType: "loop",
-                                duration: 25,
+                                duration: duration,
                                 ease: "linear",
                             },
                         }}
