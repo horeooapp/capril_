@@ -43,61 +43,27 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const pathname = nextUrl.pathname;
 
-            // --- 1. WHITELIST OF PUBLIC PATHS (ALWAYS ALLOWED) ---
-            const publicPaths = [
-                "/", 
-                "/impact",
-                "/expertise",
-                "/a-propos",
-                "/faq",
-                "/admin/login", 
-                "/dashboard/login", 
-                "/locataire/login",
-                "/cgu", 
-                "/confidentialite", 
-                "/contact",
-                "/verify-request",
-                "/auth/forgot-password",
-                "/auth/reset-password"
-            ];
-            
-            const isPublicPath = publicPaths.some(path => 
-                pathname === path || pathname === `${path}/`
-            );
-            const isApiPublic = pathname.startsWith("/api/webhooks") || pathname.startsWith("/api/public");
+            // 1. PUBLIC PATHS (ALWAYS ALLOWED)
+            // We include all login pages and critical public assets
+            const isPublic = 
+                pathname === "/" ||
+                pathname.includes("/login") ||
+                pathname.startsWith("/api/webhooks") ||
+                pathname.startsWith("/api/public") ||
+                pathname.startsWith("/auth/") ||
+                ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/verify-request"].includes(pathname);
 
-            if (isPublicPath || isApiPublic) {
-                return true;
+            if (isPublic) return true;
+
+            // 2. PROTECTED ROUTES
+            if (!isLoggedIn) {
+                // If not logged in, redirect to the relevant login page based on the path
+                if (pathname.startsWith("/admin")) return Response.redirect(new URL("/admin/login", nextUrl));
+                if (pathname.startsWith("/locataire")) return Response.redirect(new URL("/locataire/login", nextUrl));
+                return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
-            // --- 2. PRIVATE ROUTES HANDLING ---
-            if (isLoggedIn) {
-                return true;
-            } else {
-                // Not logged in: Redirect to appropriate landing page
-                
-                // 1. ADMIN PROTECTION
-                if (pathname.startsWith("/admin")) {
-                    // Evite la boucle si on est déjà sur /admin/login ou /admin/login/
-                    if (pathname.startsWith("/admin/login")) return true;
-                    return Response.redirect(new URL("/admin/login", nextUrl));
-                }
-                
-                // 2. DASHBOARD PROTECTION
-                if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
-                    if (pathname.startsWith("/dashboard/login")) return true;
-                    return Response.redirect(new URL("/dashboard/login", nextUrl));
-                }
-                
-                // 3. LOCATAIRE PROTECTION
-                if (pathname.startsWith("/locataire")) {
-                    if (pathname.startsWith("/locataire/login")) return true;
-                    return Response.redirect(new URL("/locataire/login", nextUrl));
-                }
-                
-                // Fallback for any other protected page: portal home
-                return Response.redirect(new URL("/", nextUrl));
-            }
+            return true;
         },
     },
     providers: [], // Empty providers for now, will be populated in auth.ts
