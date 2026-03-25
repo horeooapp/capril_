@@ -55,6 +55,18 @@ export class ReminderService {
           await this.sendReminder(lease, "IMPAYE_DETECTE", "T+10");
         }
 
+        // 2. Fiscal Reminders (ADD-01 v2)
+        if (lease.statutFiscal !== "FISCAL_PAYÉ" && lease.deadlineEnregistrement) {
+          const deadline = lease.deadlineEnregistrement;
+          const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 15) {
+            await this.sendFiscalReminder(lease, "J-15");
+          } else if (diffDays === 5) {
+            await this.sendFiscalReminder(lease, "J-5");
+          }
+        }
+
       } catch (err) {
         console.error(`[ReminderService] Error processing lease ${lease.id}:`, err);
       }
@@ -95,6 +107,23 @@ export class ReminderService {
     };
 
     await NotificationService.envoyerNotification(lease.tenantId, event, {
+      referenceId: lease.id,
+      payload
+    });
+  }
+
+  private static async sendFiscalReminder(lease: any, timing: string) {
+    console.info(`[ReminderService] Sending FISCAL_DEADLINE_APPROACHING (${timing}) for lease ${lease.id}`);
+
+    const payload = {
+      leaseReference: lease.leaseReference,
+      timing,
+      smsText: `QAPRIL: Rappel Enregistrement DGI pour le bail ${lease.leaseReference} (${timing}). Évitez les pénalités de retard !`,
+      parameters: [lease.landlord?.fullName || 'Bailleur', lease.leaseReference, timing]
+    };
+
+    // Note: Le rappel fiscal est pour le BAILLEUR (landlord)
+    await NotificationService.envoyerNotification(lease.landlordId, "FISCAL_DEADLINE_APPROACHING", {
       referenceId: lease.id,
       payload
     });

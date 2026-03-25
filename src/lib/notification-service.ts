@@ -21,6 +21,8 @@ export type EventType =
   | "NOUVEAU_MESSAGE_BAIL"
   | "ANNONCE_VOISINAGE"
   | "FACTURE_UTILITY_DISPO"
+  | "FISCAL_DEADLINE_APPROACHING"
+  | "FISCAL_PAYE_CONFIRME"
 
 interface NotificationData {
   referenceId?: string

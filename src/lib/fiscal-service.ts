@@ -72,29 +72,36 @@ export class FiscalService {
    */
   static async initierSplitCinetPay(leaseId: string) {
     const lease = await prisma.lease.findUnique({
-      where: { id: leaseId }
+      where: { id: leaseId },
+      include: { tenant: true }
     });
 
     if (!lease || !lease.totalFiscalBail) {
       throw new Error("Calcul fiscal non effectué ou montant invalide");
     }
 
-    // Ici on appellerait l'API CinetPay pour le split
-    // Pour l'instant on simule le lien de paiement
-    const transactionId = `QAPRIL-FISCAL-${leaseId}-${Date.now()}`;
-    
-    // Simulation du statut
-    await prisma.lease.update({
-      where: { id: leaseId },
+    // 2. Création d'un PaymentIntent pour le webhook
+    const transactionId = `FISCAL-${leaseId}-${Date.now()}`;
+    await prisma.paymentIntent.create({
       data: {
-        statutFiscal: "FISCAL_PENDING"
+        id: transactionId,
+        idempotencyKey: transactionId,
+        leaseId: leaseId,
+        amount: Number(lease.totalFiscalBail),
+        operator: "CINETPAY",
+        payerPhone: lease.tenant?.phone || "00000000",
+        status: "PENDING",
+        metadata: {
+          type: "FISCAL_REGISTRATION",
+          leaseId: leaseId
+        }
       }
     });
 
     return {
       transactionId,
       montant: lease.totalFiscalBail,
-      paymentUrl: `https://checkout.cinetpay.com/pay/${transactionId}` // URL de simulation
+      paymentUrl: `https://checkout.cinetpay.com/pay/${transactionId}` 
     };
   }
 

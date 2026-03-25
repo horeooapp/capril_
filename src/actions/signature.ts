@@ -97,6 +97,16 @@ export async function verifyLeaseSignature(leaseId: string, otp: string, ip: str
             } as any
         })
 
+        // --- ADD-01 v2 : Calcul Fiscal Automatique ---
+        try {
+            const { FiscalService } = await import("@/lib/fiscal-service");
+            await FiscalService.calculerDroits(leaseId);
+            console.log(`[FISCAL] Calcul automatique effectué pour le bail ${leaseId}`);
+        } catch (fiscalError) {
+            console.error("[FISCAL] Erreur calcul automatique après signature:", fiscalError);
+            // On ne bloque pas la signature si le calcul fiscal échoue
+        }
+
         revalidatePath(`/dashboard/leases/${leaseId}`)
         return { success: true, message: "Bail signé avec succès et scellé numériquement." }
     } catch (error) {

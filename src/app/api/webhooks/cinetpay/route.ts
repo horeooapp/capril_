@@ -59,6 +59,13 @@ export async function POST(req: NextRequest) {
 
             const metadata = intent.metadata as any;
 
+            if (metadata?.type === "FISCAL_REGISTRATION") {
+                const { FiscalService } = await import("@/lib/fiscal-service");
+                await FiscalService.confirmerPaiementFiscal(intent.leaseId, transaction_id, verification.operator_id);
+                console.log(`[CINETPAY_WEBHOOK] Paiement FISCAL confirmé pour le bail ${intent.leaseId}`);
+                return; // On arrête ici pour le fiscal (pas de quittance standard)
+            }
+
             // Generate Receipt if it doesn't exist yet (M-DOC-AUTO)
             if (!metadata?.receiptId && metadata?.periodMonth) {
                 const receipt = await createAndNotifyReceipt({
