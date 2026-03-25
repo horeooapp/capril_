@@ -28,6 +28,8 @@ import MobileMenu from "@/components/MobileMenu"
 import BottomNav from "@/components/BottomNav"
 import { signOut } from "next-auth/react"
 
+import AppSidebar from "@/components/dashboard/AppSidebar"
+
 export default function DashboardLayoutClient({
     children,
     session,
@@ -54,10 +56,12 @@ export default function DashboardLayoutClient({
             : []
         ),
         ...(session?.user?.diasporaAbonnement 
-            ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Trophy size={18} /> }] // Temporary icon, will change later
+            ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }]
             : []
         ),
     ];
+
+    const handleLogout = () => signOut({ callbackUrl: "/" });
 
     return (
         <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
@@ -65,101 +69,75 @@ export default function DashboardLayoutClient({
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
             
-            {/* Ultra Premium Floating Header */}
-            <header className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                <motion.div 
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-200/50"
-                >
-                    <div className="flex items-center gap-10">
-                        <Link href="/dashboard" className="flex items-center space-x-5 group">
-                            <div className="relative">
+            {/* Vertical Sidebar - Only for Desktop */}
+            {session?.user && (
+                <AppSidebar 
+                    role={session.user.role as any} 
+                    onLogout={handleLogout}
+                    userName={session.user.name || session.user.email}
+                    diasporaAbonnement={session.user.diasporaAbonnement}
+                />
+            )}
+
+            <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
+                {/* Ultra Premium Floating Header - Simplified for Sidebar */}
+                <header className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+                    <motion.div 
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-200/50"
+                    >
+                        <div className="flex items-center gap-10">
+                            {/* Mobile Logo Only or Sidebar Toggle */}
+                            <Link href="/dashboard" className="flex lg:hidden items-center space-x-5 group">
                                 <ProtectedLogo 
                                     src="/logo.png" 
                                     alt="QAPRIL Logo" 
                                     className="h-11 w-auto group-hover:scale-105 transition-transform duration-700 rounded-xl shadow-2xl border border-white/60" 
                                 />
-                                <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none">QAPRIL</span>
-                                <span className="text-[11px] font-black tracking-[0.4em] text-ivoire-orange mt-1.5 uppercase opacity-90">Patrimoine Excellence</span>
-                            </div>
-                        </Link>
+                            </Link>
 
-                        <nav className="hidden xl:flex items-center gap-1 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100">
-                            {navLinks.map((link) => {
-                                const isActive = pathname === link.href
-                                return (
-                                    <Link 
-                                        key={link.href} 
-                                        href={link.href}
-                                        className={`relative px-5 py-2.5 text-[14px] font-bold uppercase tracking-[0.1em] transition-all rounded-xl flex items-center gap-2 group/nav ${
-                                            isActive ? "text-[#1F4E79]" : "text-gray-400 hover:text-[#1F4E79]"
-                                        }`}
-                                    >
-                                        {isActive && (
-                                            <motion.div 
-                                                layoutId="nav-pill-owner"
-                                                className="absolute inset-0 bg-white shadow-xl shadow-gray-200/50 rounded-xl"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                        <span className={`relative z-10 transition-transform ${isActive ? "scale-110" : "group-hover/nav:scale-110"}`}>
-                                            {link.icon}
+                            <div className="hidden lg:block">
+                                <h2 className="text-[14px] font-black tracking-[0.2em] text-[#1F4E79] uppercase opacity-60">Console d'Excellence Immobilière</h2>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <div className="hidden lg:flex items-center gap-6 px-6 border-r border-gray-100/50 h-10">
+                                <button className="text-gray-400 hover:text-gray-900 transition-colors">
+                                    <Search size={18} />
+                                </button>
+                                <NotificationCenter />
+                            </div>
+
+                            {session?.user && (
+                                <div className="flex items-center gap-3">
+                                    <div className="hidden sm:flex flex-col items-end">
+                                        <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
+                                        <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">
+                                            {session.user.role === 'CHAMPION' ? 'Champion QAPRIL' : 'Propriétaire Certifié'}
                                         </span>
-                                        <span className="relative z-10">{link.label}</span>
-                                    </Link>
-                                )
-                            })}
-                        </nav>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="hidden lg:flex items-center gap-6 px-6 border-x border-gray-100/50 h-10">
-                            <button className="text-gray-400 hover:text-gray-900 transition-colors">
-                                <Search size={18} />
-                            </button>
-                            <NotificationCenter />
-                        </div>
-
-                        {session?.user && (
-                            <div className="hidden lg:flex items-center gap-3">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
-                                    <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">
-                                        {session.user.role === 'CHAMPION' ? 'Champion QAPRIL' : 'Propriétaire Certifié'}
-                                    </span>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
+                                        <User size={20} />
+                                    </div>
                                 </div>
-                                <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
-                                    <User size={20} />
-                                </div>
+                            )}
+                            
+                            <div className="flex xl:hidden">
+                                <MobileMenu 
+                                    links={navLinks} 
+                                    session={session} 
+                                    variant="light" 
+                                    onLogout={handleLogout} 
+                                />
                             </div>
-                        )}
-                        
-                        <div className="flex xl:hidden">
-                            <MobileMenu 
-                                links={navLinks} 
-                                session={session} 
-                                variant="light" 
-                                onLogout={() => signOut({ callbackUrl: "/" })} 
-                            />
                         </div>
+                    </motion.div>
+                </header>
 
-                        <button 
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                            className="hidden md:flex items-center justify-center h-12 w-12 bg-white border border-gray-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
-                            title="Déconnexion"
-                        >
-                            <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
-                        </button>
-                    </div>
-                </motion.div>
-            </header>
-
-            {/* Main Content with Entry Animations */}
-            <main className="flex-1 w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+                {/* Main Content with Entry Animations */}
+                <main className="flex-1 w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -200,5 +178,6 @@ export default function DashboardLayoutClient({
                 </div>
             </footer>
         </div>
+    </div>
     )
 }

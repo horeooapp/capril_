@@ -5,7 +5,7 @@ import { InvitationsLocataireClient } from "@/components/locataire/InvitationsLo
 
 export default async function InvitationsPage() {
     const session = await auth()
-    if (!session?.user?.id) redirect("/auth/login")
+    if (!session?.user?.id) redirect("/locataire/login")
 
     const invitations = await getLocataireInvitations(session.user.id)
 

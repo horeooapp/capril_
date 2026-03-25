@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export default async function LocataireTrustPage() {
     const session = await auth()
     if (!session?.user || session.user.role !== "TENANT") {
-        redirect("/auth/login")
+        redirect("/locataire/login")
     }
 
     // On s'assure que le score est à jour

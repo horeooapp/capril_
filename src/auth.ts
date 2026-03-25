@@ -22,7 +22,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.otp) return null;
 
-                const email = credentials.email as string;
+                const email = (credentials.email as string).toLowerCase().trim();
                 const otp = credentials.otp as string;
 
                 // 1. Verify OTP in Redis
@@ -41,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (redis) await redis.del(`otp:${email}`);
 
                 // 3. Find or Create User
-                let user = await prisma.user.findUnique({
+                let user = await prisma.user.findFirst({
                     where: { email }
                 });
 
@@ -50,7 +50,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         data: {
                             email,
                             role: 'TENANT',
-                            status: 'PENDING_PROFILE'
+                            status: 'PENDING_PROFILE',
+                            phone: `PENDING_${Date.now()}` // Bypass NOT NULL constraint in production DB
                         }
                     });
                 }

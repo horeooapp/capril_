@@ -93,9 +93,12 @@ export default function MonthlyReportCard({ report }: MonthlyReportCardProps) {
               >
                 <Download className="w-3 h-3" /> PDF Export
               </Link>
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-900 text-[10px] font-black rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest border border-gray-100">
-                <BarChart3 className="w-3 h-3" /> Analystics
-              </button>
+              <Link 
+                href="/dashboard/governance"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-900 text-[10px] font-black rounded-xl hover:bg-gray-100 transition-all uppercase tracking-widest border border-gray-100"
+              >
+                <BarChart3 className="w-3 h-3" /> Analytics
+              </Link>
            </div>
            <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest italic flex items-center gap-1">
               <TrendingUp className="w-3 h-3" /> Generé le {new Date(report.createdAt).toLocaleDateString('fr-FR')}

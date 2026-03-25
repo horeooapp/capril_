@@ -5,7 +5,7 @@ import PasseportLocataireClient from "@/components/locataire/PasseportLocataireC
 
 export default async function PasseportPage() {
     const session = await auth()
-    if (!session?.user || session.user.role !== "TENANT") redirect("/auth/login")
+    if (!session?.user || session.user.role !== "TENANT") redirect("/locataire/login")
 
     const passeports = await getPasseportsLocataire(session.user.id)
 

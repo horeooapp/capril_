@@ -6,7 +6,7 @@ import { ProfilPublicLocataireClient } from "@/components/locataire/ProfilPublic
 
 export default async function ProfilPublicPage() {
     const session = await auth()
-    if (!session?.user?.id) redirect("/auth/login")
+    if (!session?.user?.id) redirect("/locataire/login")
 
     const profil = await getPublicProfile(session.user.id)
 

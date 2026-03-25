@@ -6,7 +6,7 @@ import SignalementsLocataireClient from "@/components/locataire/SignalementsLoca
 
 export default async function SignalementsPage() {
     const session = await auth()
-    if (!session?.user || session.user.role !== "TENANT") redirect("/auth/login")
+    if (!session?.user || session.user.role !== "TENANT") redirect("/locataire/login")
 
     const [signalements, dashboardData] = await Promise.all([
         getSignalementsLocataire(session.user.id),

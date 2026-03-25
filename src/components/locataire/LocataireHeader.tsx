@@ -46,7 +46,7 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                         </div>
                     </Link>
 
-                    <nav className="hidden xl:flex items-center gap-1 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100">
+                    <nav className="hidden xl:flex lg:hidden items-center gap-1 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href
                             return (

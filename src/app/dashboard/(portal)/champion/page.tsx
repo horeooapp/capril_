@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function ChampionPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/auth/login");
+    redirect("/dashboard/login");
     return null;
   }
 

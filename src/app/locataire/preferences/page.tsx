@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export default async function PreferencesPage() {
     const session = await auth()
     if (!session?.user || session.user.role !== "TENANT") {
-        redirect("/auth/login")
+        redirect("/locataire/login")
     }
 
     const profile = await getAlertesPreferences(session.user.id)

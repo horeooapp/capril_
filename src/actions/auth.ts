@@ -24,6 +24,7 @@ export async function requestOTP(email: string) {
     }
 
     try {
+        const normalizedEmail = email.toLowerCase().trim();
         // 1. Generate OTP
         const otp = generateOTP();
         const ttl = parseInt(process.env.OTP_TTL_SECONDS || '600');
@@ -33,13 +34,13 @@ export async function requestOTP(email: string) {
             console.error("[SERVER ACTION] Redis not available");
             return { error: 'Service de validation temporairement indisponible' };
         }
-        await redis.set(`otp:${email}`, otp, 'EX', ttl);
+        await redis.set(`otp:${normalizedEmail}`, otp, 'EX', ttl);
 
         // 3. Send Email
-        const emailResult = await sendOTPEmail(email, otp);
+        const emailResult = await sendOTPEmail(normalizedEmail, otp);
 
         if (!emailResult.success) {
-            console.error(`[SERVER ACTION] Failed to send email to ${email}:`, emailResult.error);
+            console.error(`[SERVER ACTION] Failed to send email to ${normalizedEmail}:`, emailResult.error);
             return { error: `Échec de l'envoi de l'email de validation.` };
         }
 

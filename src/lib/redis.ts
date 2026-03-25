@@ -28,39 +28,39 @@ class MockRedis {
 
 let redis: any = null;
 
-if (process.env.REDIS_URL) {
-    try {
-        const redisGlobal = global as typeof globalThis & {
-            redis: any;
-        };
-        
-        const redisOptions = {
-            maxRetriesPerRequest: 1,
-            commandTimeout: 2000,
-            retryStrategy: (times: number) => (times > 1 ? null : 50),
-            tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
-        };
+const redisGlobal = global as typeof globalThis & {
+    redis: any;
+};
 
-        if (redisGlobal.redis) {
-            redis = redisGlobal.redis;
-        } else {
+if (redisGlobal.redis) {
+    redis = redisGlobal.redis;
+} else {
+    if (process.env.REDIS_URL) {
+        try {
+            const redisOptions = {
+                maxRetriesPerRequest: 1,
+                commandTimeout: 2000,
+                retryStrategy: (times: number) => (times > 1 ? null : 50),
+                tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
+            };
+
             const client = new Redis(process.env.REDIS_URL, redisOptions);
             client.on('error', (err) => {
                 console.error('[Redis] Connection Error:', err.message);
             });
             redis = client;
-            if (process.env.NODE_ENV !== 'production') {
+            redisGlobal.redis = redis;
+        } catch (e) {
+            console.error('[Redis] Failed to initialize client:', e);
+            if (process.env.ENABLE_REDIS_MOCK === 'true') {
+                redis = new MockRedis();
                 redisGlobal.redis = redis;
             }
         }
-    } catch (e) {
-        console.error('[Redis] Failed to initialize client:', e);
-        if (process.env.ENABLE_REDIS_MOCK === 'true') {
-            redis = new MockRedis();
-        }
+    } else if (process.env.ENABLE_REDIS_MOCK === 'true') {
+        redis = new MockRedis();
+        redisGlobal.redis = redis;
     }
-} else if (process.env.ENABLE_REDIS_MOCK === 'true') {
-    redis = new MockRedis();
 }
 
 export { redis };

@@ -5,7 +5,7 @@ import { getProperties } from "@/actions/properties"
 
 export default async function MatchingPage() {
     const session = await auth()
-    if (!session?.user?.id) redirect("/auth/login")
+    if (!session?.user?.id) redirect("/dashboard/login")
 
     const properties = await getProperties()
 
