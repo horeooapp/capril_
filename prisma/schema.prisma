@@ -210,6 +210,53 @@ enum InvitStatutEnum {
   ANNULEE
 }
 
+enum UtilityMode {
+  INDIVIDUEL_LOCATAIRE
+  PARTAGÉ_PROPRIO
+  INDIVIDUEL_PROPRIO
+  MIXTE
+  NON_APPLICABLE
+}
+
+enum RepartitionModel {
+  PRORATA_CHAMBRE
+  FORFAIT_FIXE
+  USAGE_DÉCLARÉ
+}
+
+enum UtilityType {
+  CIE
+  SODECI
+}
+
+enum UtilityStatus {
+  EN_COURS
+  PAYÉE
+  EN_RETARD
+  PARTIELLE
+  EN_ATTENTE
+}
+
+enum MaintenanceCategory {
+  MAI_EL
+  MAI_EA
+  MAI_TO
+  MAI_SE
+  MAI_SA
+  MAI_PC
+  MAI_AU
+  MAI_DI
+}
+
+enum MaintenanceStatus {
+  EN_ATTENTE
+  PRIS_EN_CHARGE
+  RÉSOLU
+  CONTESTÉ
+  LITIGE
+  CLÔTURÉ
+}
+
 
 // ═══════════════════════════════════════════════════════
 // USERS (Part 4 & 5)
@@ -378,6 +425,12 @@ model User {
   // beneficiairePhone    String? @map("beneficiaire_phone")
   // beneficiaireDesignationAt DateTime? @map("beneficiaire_designation_at")
 
+  // ADD-17 & 18 Relations
+  messagesBailEnvoyes   MessagerieBail[]
+  annoncesVoisinage     AnnonceVoisinage[]
+  facturesUtilities     FactureUtility[]
+  repartitionsUtilities RepartitionUtility[]
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -513,6 +566,9 @@ model Property {
   // ADD-11
   accessRoles PropertyAccess[] @relation("PropertyRoles")
 
+  // ADD-17 & 18
+  annoncesVoisinage AnnonceVoisinage[]
+
   @@index([ownerUserId])
   @@index([commune])
   @@index([status])
@@ -617,6 +673,13 @@ model Lease {
   // M-RECOUVREMENT
   reminders ReminderLog[]
 
+  // ADD-18 Utilities
+  modeUtilities     UtilityMode @default(NON_APPLICABLE) @map("mode_utilities")
+  identifiantCie    String?     @map("identifiant_cie")
+  identifiantSodeci String?     @map("identifiant_sodeci")
+  modeleRepartition RepartitionModel @default(PRORATA_CHAMBRE) @map("modele_repartition")
+  forfaitUtilitiesMensuel Decimal? @map("forfait_utilities_mensuel")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -637,6 +700,11 @@ model Lease {
   reclamations           ReclamationLocataire[]
   dossiersLitige         DossierLitigeCertifie[]
   propositionsLoyer      PropositionLoyer[]
+
+  // ADD-17 & 18 Relations
+  messagesBail            MessagerieBail[]
+  facturesUtilities       FactureUtility[]
+  repartitionsUtilities   RepartitionUtility[]
 
   @@index([propertyId])
   @@index([tenantId])
@@ -1603,42 +1671,63 @@ enum SigStatut {
   EXPIRE
 }
 
-// M-MAINT — Maintenance & Travaux
+// M-MAINT — Maintenance & Travaux (ADD-17)
 model TicketMaintenance {
-  id          String   @id @default(uuid()) @map("ticket_id")
-  logementId  String   @map("unite_id")
-  logement    Property @relation(fields: [logementId], references: [id])
-  leaseId     String?  @map("lease_id")
-  lease       Lease?   @relation(fields: [leaseId], references: [id])
-  declarantId String   @map("declarant_id")
-  declarant   User     @relation("MaintenanceDeclarant", fields: [declarantId], references: [id])
+  id                 String              @id @default(uuid()) @map("ticket_id")
+  ticketRef          String              @unique @map("ticket_ref") // MAI-0001
+  
+  logementId         String?             @map("unite_id")
+  logement           Property?           @relation(fields: [logementId], references: [id])
+  
+  leaseId            String              @map("lease_id")
+  lease              Lease               @relation(fields: [leaseId], references: [id])
+  
+  locataireId        String              @map("locataire_id")
+  locataire          User                @relation("MaintenanceDeclarant", fields: [locataireId], references: [id])
+  
+  categorie          MaintenanceCategory @map("categorie_v2")
+  description        String
+  
+  // V1 Compatibility
+  photosUrls         String[]            @default([]) @map("photos_urls")
+  urgence            String              @default("NORMALE") // URGENTE|NORMALE|BASSE
+  
+  // V2 requirements
+  photoUrl           String?             @map("photo_url")
+  photoHashSha256    String?             @map("photo_hash_sha256")
+  statut             MaintenanceStatus   @default(EN_ATTENTE)
+  
+  dateSignalement    DateTime            @default(now()) @map("date_signalement")
+  datePriseEnCharge  DateTime?           @map("date_prise_en_charge")
+  dateResolution     DateTime?           @map("date_resolution")
+  nbReouvertures     Int                 @default(0) @map("nb_reouvertures")
+  commentaireProprio String?             @map("commentaire_proprio")
+  confirmationLoc    Boolean?            @map("confirmation_locataire")
+  dateConfirmation   DateTime?           @map("date_confirmation")
 
-  categorie   MaintCat
-  description String
-  photosUrls  String[] @default([]) @map("photos_urls")
-  urgence     String      @default("NORMALE") // URGENTE|NORMALE|BASSE
-  statut      MaintStatut @default(OUVERT)
+  prestataireId      String?             @map("prestataire_id")
+  prestataire        Prestataire?        @relation(fields: [prestataireId], references: [id])
 
-  prestataireId String?      @map("prestataire_id")
-  prestataire   Prestataire? @relation(fields: [prestataireId], references: [id])
+  devisMontant       Decimal?            @map("devis_montant")
+  coutFinal          Decimal?            @map("cout_final")
+  dateIntervention   DateTime?           @map("date_intervention")
 
-  devisMontant     Decimal?  @map("devis_montant")
-  coutFinal        Decimal?  @map("cout_final")
-  dateIntervention DateTime? @map("date_intervention")
+  noteLocataire      Int?                @map("note_locataire")
+  notePrestataire    Int?                @map("note_prestataire")
 
-  noteLocataire   Int? @map("note_locataire")
-  notePrestataire Int? @map("note_prestataire")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  closedAt           DateTime?           @map("closed_at")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  closedAt  DateTime? @map("closed_at")
-
+  @@index([leaseId])
+  @@index([statut])
   @@map("tickets_maintenance")
 }
 
 model Prestataire {
   id          String   @id @default(uuid()) @map("prestataire_id")
   nom         String
-  specialite  MaintCat
+  specialite  MaintenanceCategory
   telephone   String
   email       String?
   adresse     String?
@@ -1651,22 +1740,7 @@ model Prestataire {
   @@map("prestataires")
 }
 
-enum MaintCat {
-  PLOMBERIE
-  ELECTRICITE
-  MENUISERIE
-  TOITURE
-  PEINTURE
-  SERRURERIE
-  AUTRE
-}
 
-enum MaintStatut {
-  OUVERT
-  EN_COURS
-  CLOS
-  REFUSE
-}
 
 // M-CAND — Candidatures
 model Candidature {
@@ -2985,4 +3059,98 @@ model WalletRechargeConfig {
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("wallet_recharge_configs")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-17 : M-QUOTIDIEN
+// ═══════════════════════════════════════════════════════
+
+model MessagerieBail {
+  id              String   @id @default(uuid()) @map("msg_id")
+  leaseId         String   @map("lease_id")
+  lease           Lease    @relation(fields: [leaseId], references: [id])
+  expediteurId    String   @map("expediteur_id")
+  expediteur      User     @relation(fields: [expediteurId], references: [id])
+  roleExpediteur  String   @map("role_expediteur") // PROPRIO | LOCATAIRE | SYSTEME
+  contenu         String
+  pjUrl           String?  @map("pj_url")
+  pjHashSha256    String?  @map("pj_hash_sha256")
+  statut          String   @default("ENVOYÉ") // ENVOYÉ | REÇU | LU
+  dateEnvoi       DateTime @default(now()) @map("date_envoi")
+  dateReception   DateTime? @map("date_reception")
+  dateLecture     DateTime? @map("date_lecture")
+
+  @@index([leaseId])
+  @@map("messagerie_bail")
+}
+
+model AnnonceVoisinage {
+  id              String   @id @default(uuid()) @map("annonce_id")
+  proprioId       String   @map("proprio_id")
+  proprio         User     @relation(fields: [proprioId], references: [id])
+  propertyId      String   @map("property_id") // Used as building/courtyard reference
+  property        Property @relation(fields: [propertyId], references: [id])
+  typeAnnonce     String   @map("type_annonce") // ANNONCE | PLANNING | ALERTE_COUPURE | REGLEMENT | ECHANGE_TOUR
+  titre           String
+  contenu         String
+  datePublication DateTime @default(now()) @map("date_publication")
+  dateExpiration  DateTime? @map("date_expiration")
+  epingle         Boolean  @default(false)
+  destinataires   String   @default("TOUS") // TOUS | id locataire spécifique
+
+  @@index([propertyId])
+  @@map("annonces_voisinage")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-18 : M-UTILITIES v2
+// ═══════════════════════════════════════════════════════
+
+model FactureUtility {
+  id                  String        @id @default(uuid()) @map("facture_id")
+  leaseId             String        @map("lease_id")
+  lease               Lease         @relation(fields: [leaseId], references: [id])
+  acteurId            String        @map("acteur_id")
+  acteur              User          @relation(fields: [acteurId], references: [id])
+  roleActeur          String        @map("role_acteur") // PROPRIO | LOCATAIRE
+  typeUtility         UtilityType   @map("type_utility")
+  identifiantCompteur String        @map("identifiant_compteur")
+  moisFacture         DateTime      @map("mois_facture")
+  montantTotal        Decimal       @map("montant_total")
+  dateLimitePaiement  DateTime?     @map("date_limite_paiement")
+  statut              UtilityStatus @default(EN_COURS)
+  source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | ...
+  modeUtilities       UtilityMode   @map("mode_utilities")
+  datePaiement        DateTime?     @map("date_paiement")
+  createdAt           DateTime      @default(now()) @map("created_at")
+
+  repartitions        RepartitionUtility[]
+
+  @@unique([leaseId, moisFacture, typeUtility])
+  @@index([leaseId])
+  @@index([acteurId])
+  @@index([statut])
+  @@map("factures_utilities")
+}
+
+model RepartitionUtility {
+  id                String        @id @default(uuid()) @map("repart_id")
+  factureId         String        @map("facture_id")
+  facture           FactureUtility @relation(fields: [factureId], references: [id])
+  leaseLocataireId  String        @map("lease_locataire_id")
+  leaseLocataire    Lease         @relation(fields: [leaseLocataireId], references: [id])
+  locataireId       String        @map("locataire_id")
+  locataire         User          @relation(fields: [locataireId], references: [id])
+  montantQuotePart  Decimal       @map("montant_quote_part")
+  modeleApplique    RepartitionModel @map("modele_applique")
+  statutPaiement    UtilityStatus @default(EN_ATTENTE) @map("statut_paiement")
+  dateNotification  DateTime?     @map("date_notification")
+  datePaiement      DateTime?     @map("date_paiement")
+  modePaiement      String?       @map("mode_paiement") // MOBILE_MONEY | CASH | WALLET_QAPRIL
+  nbRelances        Int           @default(0) @map("nb_relances")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  @@index([factureId])
+  @@index([locataireId])
+  @@map("repartitions_utilities")
 }
