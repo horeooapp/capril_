@@ -165,24 +165,7 @@ export default async function Home() {
               </div>
 
               {/* Social Proof for Restricted Portal */}
-              {flags.impact && (
-                <div className="mt-20 flex items-center justify-center gap-8 md:gap-16 text-white/40 animate-in fade-in duration-1000 delay-1000">
-                    <div className="text-center">
-                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalLeases).toLocaleString()}+</span>
-                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Baux Certifiés</span>
-                    </div>
-                    <div className="w-px h-10 bg-white/10"></div>
-                    <div className="text-center">
-                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">{(stats.totalSecuredFunds / 1000000).toFixed(0)}M+</span>
-                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">FCFA Sécurisés</span>
-                    </div>
-                    <div className="w-px h-10 bg-white/10"></div>
-                    <div className="text-center">
-                        <span className="block text-2xl font-black text-white leading-none mb-1 tracking-tighter italic">100%</span>
-                        <span className="text-[8px] font-black uppercase tracking-widest opacity-50">Conformité DGI</span>
-                    </div>
-                </div>
-              )}
+              {/* Impact stats removed from public entry */}
             </div>
           </main>
 
@@ -290,7 +273,7 @@ export default async function Home() {
         </section>
 
         {/* --- IMPACT STATISTICS --- */}
-        {flags.impact && <ImpactStats stats={stats} />}
+        {/* Impact stats are now reserved for Admin Dashboard */}
 
         {/* --- EXPERTISE / DEPTH SECTION --- */}
         <section id="expertise" className="py-32 bg-white relative overflow-hidden">

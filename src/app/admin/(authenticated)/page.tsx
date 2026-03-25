@@ -671,7 +671,7 @@ export default async function AdminDashboardOverview() {
                             <GeographicRentAnalysis />
                         </div>
                         <div className="space-y-6">
-                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Classement Rendement Locatif</h4>
+                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Le Palmarès Locatif (Ranking)</h4>
                             <RentRanking />
                         </div>
                     </div>
