@@ -30,6 +30,7 @@ export async function sendEmail({
 
   try {
     const from = process.env.EMAIL_FROM || "noreply@qapril.net";
+    console.log(`[Email] Attempting to send from: ${from}`);
     
     const result = await resend.emails.send({
       from,
@@ -42,14 +43,16 @@ export async function sendEmail({
       })) as any,
     });
 
+    console.log("[Email] Resend full result:", JSON.stringify(result, null, 2));
+
     if (result.error) {
-        console.error("[Email] Resend error:", result.error);
+        console.error("[Email] Resend error detected:", result.error);
         return { success: false, error: result.error };
     }
 
     return { success: true, data: result.data };
   } catch (error: any) {
-    console.error("[Email] Technical error:", error);
+    console.error("[Email] Critical technical error during send:", error);
     return { success: false, error };
   }
 }
