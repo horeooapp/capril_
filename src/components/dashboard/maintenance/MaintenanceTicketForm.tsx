@@ -43,7 +43,7 @@ export default function MaintenanceTicketForm({ logementId, leaseId, declarantId
     
     const result = await createMaintenanceTicket({
       logementId,
-      leaseId,
+      leaseId: leaseId || "",
       declarantId,
       titre: `[${categoryLabel}] Signalement technique`,
       description,
@@ -139,22 +139,7 @@ export default function MaintenanceTicketForm({ logementId, leaseId, declarantId
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-4">
-                      <button 
-                        onClick={() => setImageUrl("dummy-url")}
-                        className={`aspect-square border-2 border-dashed rounded-3xl flex flex-col items-center justify-center transition-all ${imageUrl ? "bg-indigo-500/10 border-indigo-500 text-indigo-500" : "bg-gray-800/40 border-gray-700 text-gray-500 hover:text-indigo-500 hover:border-indigo-500"}`}
-                      >
-                        <Camera className="w-8 h-8 mb-2" />
-                        <span className="text-[10px] font-black uppercase">{imageUrl ? "Photo Prête" : "Photos"}</span>
-                      </button>
-                      <div className="p-4 bg-gray-950/50 rounded-3xl border border-gray-800 flex flex-col justify-center">
-                         <div className="flex items-center gap-2 text-amber-500 mb-2">
-                           <AlertCircle className="w-4 h-4" />
-                           <span className="text-[10px] font-black uppercase">Urgence</span>
-                         </div>
-                         <p className="text-[9px] text-gray-600 leading-tight">Si l'incident présente un danger immédiat, contactez les secours avant de remplir ce formulaire.</p>
-                      </div>
-                    </div>
+
 
                     <button
                       onClick={handleSubmit}

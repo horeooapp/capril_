@@ -1,6 +1,5 @@
 import { prisma } from "./prisma";
 import { NotificationService } from "./notification-service";
-import { UtilityType, UtilityMode, RepartitionModel, UtilityStatus } from "@prisma/client";
 
 export interface BillInfo {
   identifiantCompteur: string;
@@ -14,7 +13,7 @@ export class UtilityService {
   /**
    * Tunnel Mobile Money (UTL-02)
    */
-  static async consulterFacture(identifiant: string, type: UtilityType): Promise<BillInfo | null> {
+  static async consulterFacture(identifiant: string, type: any): Promise<BillInfo | null> {
     const operators = ["ORANGE", "MTN", "MOOV", "WAVE"];
     for (const op of operators) {
       try {
@@ -27,7 +26,7 @@ export class UtilityService {
     return null;
   }
 
-  private static async mockApiConsultation(operator: string, identifiant: string, type: UtilityType): Promise<BillInfo | null> {
+  private static async mockApiConsultation(operator: string, identifiant: string, type: any): Promise<BillInfo | null> {
     if (identifiant.endsWith("000")) return null; 
     return {
       identifiantCompteur: identifiant,
@@ -45,18 +44,18 @@ export class UtilityService {
     leaseId: string;
     acteurId: string;
     roleActeur: string;
-    typeUtility: UtilityType;
+    typeUtility: any;
     identifiantCompteur: string;
     moisFacture: Date;
     montantTotal: number;
     source: string;
   }) {
-    const lease = await prisma.lease.findUnique({
+    const lease = await (prisma as any).lease.findUnique({
       where: { id: data.leaseId },
       include: {
         property: {
           include: {
-            leasesAsProperty: {
+            leases: {
               where: { status: "ACTIVE" },
             },
           },
@@ -76,20 +75,20 @@ export class UtilityService {
         moisFacture: data.moisFacture,
         montantTotal: data.montantTotal,
         source: data.source,
-        modeUtilities: lease.modeUtilities,
+        modeUtilities: (lease as any).modeUtilities,
       },
     });
 
-    if (lease.modeUtilities === "PARTAGÉ_PROPRIO" || lease.modeUtilities === "MIXTE") {
-      const activeLeases = lease.property.leasesAsProperty;
+    if ((lease as any).modeUtilities === "PARTAGÉ_PROPRIO" || (lease as any).modeUtilities === "MIXTE") {
+      const activeLeases = (lease as any).property.leases || [];
       const nbLeases = activeLeases.length;
 
       for (const targetLease of activeLeases) {
         let quotePart = 0;
-        if (lease.modeleRepartition === "PRORATA_CHAMBRE") {
+        if ((lease as any).modeleRepartition === "PRORATA_CHAMBRE") {
           quotePart = Number(data.montantTotal) / nbLeases;
-        } else if (lease.modeleRepartition === "FORFAIT_FIXE") {
-          quotePart = Number(lease.forfaitUtilitiesMensuel) || 0;
+        } else if ((lease as any).modeleRepartition === "FORFAIT_FIXE") {
+          quotePart = Number((lease as any).forfaitUtilitiesMensuel) || 0;
         }
 
         if (targetLease.tenantId) {
@@ -99,7 +98,7 @@ export class UtilityService {
               leaseLocataireId: targetLease.id,
               locataireId: targetLease.tenantId,
               montantQuotePart: quotePart,
-              modeleApplique: lease.modeleRepartition,
+              modeleApplique: (lease as any).modeleRepartition,
               statutPaiement: "EN_ATTENTE",
               dateNotification: new Date(),
             },

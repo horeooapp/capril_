@@ -1,60 +1,63 @@
 import { prisma } from "./prisma";
 import { NotificationService } from "./notification-service";
+import { AnnonceVoisinage } from "@prisma/client";
 
 export class VoisinageService {
   /**
-   * Publie une annonce à la "cour" (VOI-01)
+   * Publie une annonce (VOI-01)
    */
   static async publierAnnonce(data: {
     proprioId: string;
-    propertyId: string;
+    logementId: string; // Property ID for the courtyard
     titre: string;
     contenu: string;
-    typeAnnonce: "ANNONCE" | "PLANNING" | "ALERTE_COUPURE" | "REGLEMENT" | "ECHANGE_TOUR";
-    destinataires?: string; // "TOUS" or id locataire
-    dateExpiration?: Date;
-    epingle?: boolean;
+    typeAnnonce: string;
+    destinataires: "COUR_COMMUNE" | "TOUS";
+    photoUrl?: string;
+    photoHashSha256?: string;
   }) {
-    const annonce = await prisma.annonceVoisinage.create({
-      data: {
-        proprioId: data.proprioId,
-        propertyId: data.propertyId,
-        titre: data.titre,
-        contenu: data.contenu,
-        typeAnnonce: data.typeAnnonce,
-        destinataires: data.destinataires || "TOUS",
-        dateExpiration: data.dateExpiration,
-        epingle: data.epingle || false,
-      },
+    // Vérification de l'existence de la propriété
+    const property = await prisma.property.findUnique({
+      where: { id: data.logementId },
       include: {
-        property: {
-          include: {
-            leasesAsProperty: {
-              where: { status: "ACTIVE" },
-              select: { tenantId: true },
-            },
-          },
+        leases: {
+          where: { status: "ACTIVE" },
+          select: { tenantId: true },
         },
       },
     });
 
-    // Notification à tous les locataires actifs de la propriété
-    const tenantIds = annonce.property.leasesAsProperty
-      .map((l) => l.tenantId)
-      .filter((id): id is string => !!id);
+    if (!property) throw new Error("Propriété non trouvée");
 
-    if (tenantIds.length > 0) {
-      await Promise.all(
-        tenantIds.map((userId) =>
-          NotificationService.envoyerNotification({
-            userId,
-            type: "ANNONCE_VOISINAGE",
-            titre: `Nouvelle annonce : ${annonce.titre}`,
-            message: annonce.contenu.substring(0, 100),
-            data: { propertyId: data.propertyId, annonceId: annonce.id },
-            channels: ["PUSH"],
-          })
-        )
+    const annonce = await prisma.annonceVoisinage.create({
+      data: {
+        proprioId: data.proprioId,
+        logementId: data.logementId,
+        titre: data.titre,
+        contenu: data.contenu,
+        typeAnnonce: data.typeAnnonce,
+        destinataires: data.destinataires,
+        photoUrl: data.photoUrl,
+        photoHashSha256: data.photoHashSha256,
+      },
+    });
+
+    // Notification aux locataires actifs de la cour
+    const locatairesIds = (property.leases as any[])
+      .map((l: any) => l.tenantId as string)
+      .filter((id: string | null): id is string => !!id);
+
+    for (const userId of locatairesIds) {
+      await NotificationService.envoyerNotification(
+        userId,
+        "ANNONCE_VOISINAGE",
+        {
+          payload: {
+            titre: `Annonce Voisinage: ${annonce.titre}`,
+            message: annonce.contenu.substring(0, 50) + "...",
+            annonceId: annonce.id
+          }
+        }
       );
     }
 
@@ -62,46 +65,29 @@ export class VoisinageService {
   }
 
   /**
-   * Récupère les annonces actives d'une propriété (VOI-02)
+   * Supprime une annonce (VOI-02)
    */
-  static async getAnnoncesCour(propertyId: string) {
-    return await prisma.annonceVoisinage.findMany({
-      where: {
-        propertyId,
-        OR: [
-          { dateExpiration: null },
-          { dateExpiration: { gt: new Date() } },
-        ],
-      },
-      orderBy: [
-        { epingle: "desc" },
-        { datePublication: "desc" },
-      ],
-      include: {
-        proprio: {
-          select: { fullName: true },
-        },
-      },
+  static async supprimerAnnonce(annonceId: string, userId: string) {
+    const annonce = await (prisma as any).annonceVoisinage.findUnique({
+      where: { id: annonceId },
+    });
+
+    if (annonce?.proprioId !== userId) {
+      throw new Error("Action non autorisée");
+    }
+
+    return await (prisma as any).annonceVoisinage.delete({
+      where: { id: annonceId },
     });
   }
 
   /**
-   * Epingle ou désépingle une annonce (VOI-04)
+   * Liste les annonces d'une cour (VOI-03)
    */
-  static async epinglerAnnonce(annonceId: string, epingle: boolean) {
-    return await prisma.annonceVoisinage.update({
-      where: { id: annonceId },
-      data: { epingle },
-    });
-  }
-
-  /**
-   * Action d'archivage (manuel ou automatique via date expirée)
-   */
-  static async archiverAnnonce(annonceId: string) {
-    return await prisma.annonceVoisinage.update({
-      where: { id: annonceId },
-      data: { dateExpiration: new Date() },
+  static async getAnnoncesCour(logementId: string) {
+    return await (prisma as any).annonceVoisinage.findMany({
+      where: { logementId },
+      orderBy: { datePublication: "desc" },
     });
   }
 }
