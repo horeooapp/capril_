@@ -111,7 +111,7 @@ export class DiasporaService {
     const rate = await this.getExchangeRate(currency);
 
     let totalRentFcfa = 0;
-    let totalAssets = user.propertiesOwned.length;
+    const totalAssets = user.propertiesOwned.length;
     let occupancyRate = 0;
     let activeLeases = 0;
 
