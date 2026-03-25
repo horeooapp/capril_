@@ -13,22 +13,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         Credentials({
-            id: "phone-otp",
-            name: "Phone OTP",
+            id: "email-otp",
+            name: "Email OTP",
             credentials: {
-                phone: { label: "Téléphone", type: "text" },
+                email: { label: "Email", type: "email" },
                 otp: { label: "Code OTP", type: "text" }
             },
             async authorize(credentials) {
-                if (!credentials?.phone || !credentials?.otp) return null;
+                if (!credentials?.email || !credentials?.otp) return null;
 
-                const phone = credentials.phone as string;
+                const email = credentials.email as string;
                 const otp = credentials.otp as string;
 
-                // 1. Verify OTP in Redis (Part 3.3)
+                // 1. Verify OTP in Redis
                 let storedOtp: string | null = null;
                 if (redis) {
-                    storedOtp = await redis.get(`otp:${phone}`);
+                    storedOtp = await redis.get(`otp:${email}`);
                 }
 
                 const isValid = storedOtp === otp;
@@ -38,17 +38,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 // 2. Clear OTP
-                if (redis) await redis.del(`otp:${phone}`);
+                if (redis) await redis.del(`otp:${email}`);
 
-                // 3. Find or Create User (Part 3.4.1)
+                // 3. Find or Create User
                 let user = await prisma.user.findUnique({
-                    where: { phone }
+                    where: { email }
                 });
 
                 if (!user) {
                     user = await prisma.user.create({
                         data: {
-                            phone,
+                            email,
                             role: 'TENANT',
                             status: 'PENDING_PROFILE'
                         }
@@ -57,13 +57,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 return {
                     id: user.id,
+                    email: user.email,
                     phone: user.phone,
                     role: user.role,
                     status: user.status,
                     fullName: user.fullName,
                     onboardingComplete: (user as any).onboardingComplete,
-                    diasporaAbonnement: user.diasporaAbonnement
-                };
+                    diasporaAbonnement: (user as any).diasporaAbonnement
+                } as any;
             }
         }),
         Credentials({
@@ -111,8 +112,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         status: user.status,
                         fullName: user.fullName,
                         onboardingComplete: (user as any).onboardingComplete,
-                        diasporaAbonnement: user.diasporaAbonnement
-                    };
+                        diasporaAbonnement: (user as any).diasporaAbonnement
+                    } as any;
                 } catch (error) {
                     console.error("[AUTH] Error in admin-password authorize:", error);
                     return null;

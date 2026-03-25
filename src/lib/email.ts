@@ -114,3 +114,25 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     html: wrapInPremiumTemplate(content, "Sécurité de votre compte"),
   });
 }
+
+export async function sendOTPEmail(email: string, otp: string) {
+  const content = `
+    <div style="text-align: center;">
+      <p style="font-size: 16px; color: #344054; margin-bottom: 32px;">Utilisez le code de validation ci-dessous pour sécuriser votre accès à la console <strong>QAPRIL</strong>.</p>
+      
+      <div style="background-color: #f9fafb; border: 2px dashed #eef2f7; border-radius: 16px; padding: 32px; margin: 24px 0;">
+        <span style="font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #1F4E79; font-family: 'Courier New', Courier, monospace;">${otp}</span>
+      </div>
+      
+      <p style="font-size: 13px; color: #667085; margin-top: 32px;">Ce code est strictement personnel et expirera dans 10 minutes par mesure de sécurité.</p>
+      <p style="font-size: 11px; color: #98a2b3; font-style: italic;">Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: `${otp} est votre code de validation QAPRIL`,
+    html: wrapInPremiumTemplate(content, "Authentification Sécurisée"),
+  });
+}
+

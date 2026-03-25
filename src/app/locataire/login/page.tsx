@@ -1,72 +1,85 @@
- 
+"use client"
+
 import Link from "next/link"
-import AuthForm from "@/components/auth/AuthForm"
-import { Home, ArrowLeft, Heart } from "lucide-react"
+import EmailOTPForm from "@/components/auth/EmailOTPForm"
+import { Home, Sparkles, ShieldCheck } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function TenantLoginPage() {
     return (
-        <div className="min-h-screen bg-white flex relative overflow-hidden">
-            {/* Background Mesh with green/secondary tint */}
-            <div className="absolute inset-0 bg-mesh opacity-30 pointer-events-none"></div>
-            <div className="absolute top-0 right-1/2 w-96 h-96 bg-secondary/5 blur-[100px] rounded-full pointer-events-none"></div>
-
+        <div className="min-h-screen bg-[#FDFCFB] flex relative overflow-hidden">
+            {/* Soft Organic Mesh Background */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.05)_0%,transparent_40%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(31,78,121,0.05)_0%,transparent_40%)]"></div>
+            
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
-                    <Link href="/" className="flex items-center space-x-4 mb-12 group">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-secondary/20 blur-lg rounded-full scale-125 group-hover:bg-secondary/40 transition-all"></div>
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto relative z-10 group-hover:rotate-3 transition-transform duration-500" />
-                        </div>
-                        <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase">QAPRIL</span>
-                    </Link>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <Link href="/" className="flex items-center space-x-4 mb-12 group">
+                            <div className="w-14 h-14 bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
+                                <Home className="text-white w-7 h-7" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">QAPRIL</h1>
+                                <p className="text-[10px] font-bold text-[#10B981] uppercase tracking-[0.2em] mt-1">Sérénité Locative</p>
+                            </div>
+                        </Link>
 
-                    <div className="mb-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-green-50 text-secondary text-[9px] font-black uppercase tracking-[0.2em] shadow-sm border border-green-100/50">
-                            <Home size={12} />
-                            Espace Locataire QAPRIL
-                        </div>
-                    </div>
-
-                    <div className="glass-card-premium p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-gray-200/50 mb-12">
-                        <AuthForm 
+                        <EmailOTPForm 
                             role="TENANT"
                             redirectPath="/locataire"
-                            title="Votre Espace"
-                            subtitle="Rejoignez la communauté des locataires certifiés et gérez vos documents."
+                            title="Votre Habitat"
+                            subtitle="Rejoignez la communauté certifiée de Côte d'Ivoire. Connexion sécurisée."
                         />
-                    </div>
 
-                    <Link href="/" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all">
-                        <div className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center group-hover:bg-gray-900 group-hover:text-white transition-all shadow-sm">
-                            <ArrowLeft size={16} />
+                        <div className="mt-12 flex items-center justify-between text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                            <Link href="/auth/help" className="hover:text-[#10B981] transition-colors">Aide</Link>
+                            <Link href="/" className="hover:text-[#10B981] transition-colors">Accueil</Link>
                         </div>
-                        Retour à l&apos;accueil
-                    </Link>
+                    </motion.div>
                 </div>
             </div>
 
-            <div className="hidden lg:block relative w-0 flex-1 overflow-hidden">
+            {/* Visual Side Panel (Serenity) */}
+            <div className="hidden lg:block relative w-0 flex-1 bg-[#10B981] overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <img
-                        className="h-full w-full object-cover scale-105"
-                        src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                        alt="Intérieur moderne et chaleureux"
+                        className="h-full w-full object-cover scale-105 opacity-60 mix-blend-luminosity"
+                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+                        alt="Intérieur serein"
                     />
                 </div>
-                {/* Premium Glass Overlay on Image with green tint */}
-                <div className="absolute inset-0 bg-secondary/20 mix-blend-multiply backdrop-blur-[2px]"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981]/90 via-[#10B981]/70 to-transparent"></div>
                 
-                <div className="absolute bottom-20 left-20 right-20 z-10">
-                    <div className="glass-panel p-10 rounded-[2.5rem] border border-white/20 backdrop-blur-xl shadow-2xl">
-                        <Heart className="text-white mb-6" size={40} />
-                        <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-tight italic">
-                            Confort & <br/>Confiance.
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-24 text-white">
+                    <motion.div 
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1.2 }}
+                        className="max-w-xl"
+                    >
+                        <div className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black tracking-widest uppercase">
+                            <Sparkles className="w-4 h-4 text-orange-300" />
+                            Expérience Locataire Certifiée
+                        </div>
+                        <h2 className="text-7xl font-black tracking-tighter leading-[0.85] mb-10 uppercase italic">
+                            Habitez en <br />
+                            <span className="text-white/40 not-italic">toute</span> <br/>
+                            confiance.
                         </h2>
-                        <p className="mt-4 text-white/70 font-medium text-sm leading-relaxed max-w-md">
-                            Une expérience locative simplifiée, certifiée et humaine, pour votre tranquillité d&apos;esprit.
+                        <p className="text-2xl text-white/80 font-medium leading-relaxed mb-16">
+                            Simplifiez votre vie de locataire avec des outils numériques certifiés par l'État. Baux, quittances et maintenance en un clic.
                         </p>
-                    </div>
+                        
+                        <div className="inline-flex items-center gap-3 p-5 bg-white/5 backdrop-blur-xl rounded-[28px] border border-white/10">
+                            <ShieldCheck className="w-8 h-8 text-orange-300" />
+                            <div className="text-[10px] uppercase tracking-[0.2em] font-black max-w-[120px]">Protocole de Sécurité National</div>
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </div>

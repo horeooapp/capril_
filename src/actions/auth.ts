@@ -4,8 +4,7 @@ import { signIn, signOut } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 import { redis } from '@/lib/redis';
-import { getSMSService } from '@/lib/sms';
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendOTPEmail, sendPasswordResetEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
 import crypto from "crypto";
 
@@ -14,14 +13,14 @@ function generateOTP(): string {
 }
 
 /**
- * Part 3.3: Request OTP (Server Action)
- * Initiates the phone verification flow.
+ * Part 3.3: Request Email OTP (Server Action)
+ * Initiates the email verification flow.
  */
-export async function requestOTP(phone: string) {
-    console.log("[SERVER ACTION] requestOTP called for phone:", phone);
+export async function requestOTP(email: string) {
+    console.log("[SERVER ACTION] requestOTP called for email:", email);
 
-    if (!phone || !/^\+?[1-9]\d{1,14}$/.test(phone)) {
-        return { error: 'Format de numéro de téléphone invalide' };
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { error: "Format d'email invalide" };
     }
 
     try {
@@ -34,38 +33,35 @@ export async function requestOTP(phone: string) {
             console.error("[SERVER ACTION] Redis not available");
             return { error: 'Service de validation temporairement indisponible' };
         }
-        await redis.set(`otp:${phone}`, otp, 'EX', ttl);
+        await redis.set(`otp:${email}`, otp, 'EX', ttl);
 
-        // 3. Send SMS
-        const sms = getSMSService();
-        const sendResult = await sms.sendOTP(phone, otp);
+        // 3. Send Email
+        const emailResult = await sendOTPEmail(email, otp);
 
-        if (!sendResult.success) {
-            console.error(`[SERVER ACTION] Failed to send SMS to ${phone}:`, sendResult.error);
-            return { error: `Échec de l'envoi du SMS de validation: ${sendResult.error}` };
+        if (!emailResult.success) {
+            console.error(`[SERVER ACTION] Failed to send email to ${email}:`, emailResult.error);
+            return { error: `Échec de l'envoi de l'email de validation.` };
         }
 
         return { success: true };
     } catch (error) {
         console.error("[SERVER ACTION] requestOTP error:", error);
-        const errMessage = error instanceof Error ? error.message : String(error);
-        const redisInfo = redis ? `Redis status: ${redis.status}` : 'Redis is null';
-        return { error: `Erreur technique: ${errMessage} [${redisInfo}]` };
+        return { error: `Erreur technique lors de l'envoi du code.` };
     }
 }
 
 /**
- * Part 3.4: Login with OTP (Server Action)
+ * Part 3.4: Login with Email OTP (Server Action)
  * Finalizes authentication via NextAuth.
  */
-export async function loginWithOTP(phone: string, otp: string) {
-    console.log("[SERVER ACTION] loginWithOTP called for phone:", phone);
+export async function loginWithOTP(email: string, otp: string) {
+    console.log("[SERVER ACTION] loginWithOTP called for email:", email);
 
-    if (!phone || !otp) return { error: "Téléphone et code OTP requis" }
+    if (!email || !otp) return { error: "Email et code OTP requis" }
 
     try {
-        const result = await signIn("phone-otp", {
-            phone,
+        const result = await signIn("email-otp", {
+            email,
             otp,
             redirect: false,
         });
@@ -77,7 +73,6 @@ export async function loginWithOTP(phone: string, otp: string) {
         return { success: true };
     } catch (error: unknown) {
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-             // In NextAuth v5 server actions, signin might throw a redirect
              return { success: true };
         }
         console.error("[SERVER ACTION] loginWithOTP error:", error);

@@ -1,76 +1,96 @@
- 
+"use client"
+
 import Link from "next/link"
-import AuthForm from "@/components/auth/AuthForm"
-import { Building2, ArrowLeft, ShieldCheck } from "lucide-react"
+import EmailOTPForm from "@/components/auth/EmailOTPForm"
+import { ShieldCheck, TrendingUp, Gem } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function LandlordLoginPage() {
     return (
         <div className="min-h-screen bg-white flex relative overflow-hidden">
-            {/* Background Mesh for the whole page */}
-            <div className="absolute inset-0 bg-mesh opacity-60 pointer-events-none"></div>
-            <div className="absolute inset-0 bg-ivory-pattern opacity-15 pointer-events-none"></div>
-
+            {/* Elegant Background Mesh */}
+            <div className="absolute inset-0 bg-[#0F172A] opacity-[0.02]"></div>
+            <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#C55A11] opacity-[0.05] rounded-full blur-[100px]"></div>
+            
             <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
-                    <Link href="/" className="flex items-center space-x-5 mb-12 group">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-125 group-hover:bg-primary/40 transition-all duration-700"></div>
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto relative z-10 group-hover:scale-105 transition-transform duration-700 rounded-xl border border-white/40 shadow-xl" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none">QAPRIL</span>
-                            <span className="text-[10px] font-black tracking-[0.3em] text-ivoire-orange mt-1.5 uppercase opacity-80">Patrimoine Excellence</span>
-                        </div>
-                    </Link>
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
+                        <Link href="/" className="flex items-center space-x-5 mb-16 group">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-[#C55A11]/20 blur-lg rounded-full animate-pulse group-hover:bg-[#C55A11]/40 transition-colors"></div>
+                                <div className="relative w-14 h-14 bg-gradient-to-br from-[#1F4E79] to-[#0F172A] rounded-[20px] flex items-center justify-center shadow-2xl border border-white/10 group-hover:-rotate-3 transition-transform">
+                                    <Gem className="text-[#C55A11] w-7 h-7" />
+                                </div>
+                            </div>
+                            <div>
+                                <h1 className="text-3xl font-black text-[#1F4E79] tracking-[0.1em] uppercase leading-none">QAPRIL</h1>
+                                <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mt-2">Console Propriétaire</p>
+                            </div>
+                        </Link>
 
-                    <div className="mb-10 text-center lg:text-left">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-ivoire-dark text-white text-[9px] font-black uppercase tracking-[0.2em] shadow-xl shadow-gray-900/10">
-                            <Building2 size={12} className="text-ivoire-orange" />
-                            Espace Propriétaire Certifié
-                        </div>
-                    </div>
-
-                    <div className="glass-card-premium p-10 rounded-[3rem] border border-white/60 shadow-2xl shadow-gray-200/50 mb-12">
-                        <AuthForm 
+                        <EmailOTPForm 
                             role="LANDLORD"
                             redirectPath="/dashboard"
-                            title="Gestion Bailleur"
-                            subtitle="Pilotez votre patrimoine avec la précision du standard QAPRIL."
+                            title="Gestion de Patrimoine"
+                            subtitle="Entrez votre email pour accéder à votre console de supervision immobilière."
                         />
-                    </div>
 
-                    <Link href="/" className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all">
-                        <div className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center group-hover:bg-gray-900 group-hover:text-white transition-all shadow-sm">
-                            <ArrowLeft size={16} />
+                        <div className="mt-16 pt-8 border-t border-gray-100 flex items-center justify-between text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                            <Link href="/auth/forgot-password" title="Accès de secours" className="hover:text-[#C55A11] transition-colors">Supervision</Link>
+                            <span className="opacity-30">|</span>
+                            <Link href="/contact" className="hover:text-[#C55A11] transition-colors">Support Dédié</Link>
                         </div>
-                        Retour à l&apos;accueil
-                    </Link>
+                    </motion.div>
                 </div>
             </div>
 
-            <div className="hidden lg:block relative w-0 flex-1 overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <img
-                        className="h-full w-full object-cover scale-105"
-                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                        alt="Façade bâtiment moderne"
-                    />
-                </div>
-                {/* Premium Glass Overlay on Image */}
-                <div className="absolute inset-0 bg-primary/20 mix-blend-multiply backdrop-blur-[2px]"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
+            {/* Exclusive Visual Side Panel */}
+            <div className="hidden lg:block relative w-0 flex-1 bg-[#0F172A] overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/ivory-pattern.svg')] opacity-[0.03]"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#0F172A] via-[#1F4E79] to-[#C55A11]/20"></div>
                 
-                <div className="absolute bottom-20 left-20 right-20 z-10">
-                    <div className="glass-panel p-10 rounded-[2.5rem] border border-white/20 backdrop-blur-xl shadow-2xl">
-                        <ShieldCheck className="text-white mb-6" size={40} />
-                        <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-tight italic">
-                            Sécurité & <br/>Performance.
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-24 text-white">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1 }}
+                        className="max-w-2xl"
+                    >
+                        <div className="mb-8 inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-[18px] border border-white/10 text-[10px] font-black tracking-[0.2em] uppercase text-[#C55A11]">
+                            <ShieldCheck className="w-5 h-5" />
+                            Accès Distingué & Sécurisé
+                        </div>
+                        <h2 className="text-7xl font-black tracking-tighter leading-[0.85] mb-10 uppercase">
+                            Supervisez <br />
+                            votre <span className="italic font-serif normal-case text-[#C55A11] text-8xl">patrimoine.</span>
                         </h2>
-                        <p className="mt-4 text-white/70 font-medium text-sm leading-relaxed max-w-md">
-                            Votre patrimoine mérite la meilleure infrastructure digitale de Côte d&apos;Ivoire.
+                        
+                        <div className="h-1 w-24 bg-gradient-to-r from-[#C55A11] to-transparent mb-12"></div>
+
+                        <p className="text-2xl text-slate-300 font-light leading-relaxed mb-16">
+                            Accédez en temps réel à vos rapports financiers, vos baux certifiés et la gestion simplifiée de vos locataires sur l'infrastructure d'État.
                         </p>
-                    </div>
+                        
+                        <div className="flex gap-12">
+                            <div>
+                                <div className="text-4xl font-black text-white mb-2 font-serif">A+</div>
+                                <div className="text-[10px] uppercase tracking-[0.2em] text-[#C55A11] font-black opacity-80">Notation Sûreté</div>
+                            </div>
+                            <div className="w-px h-12 bg-white/10 mt-2"></div>
+                            <div>
+                                <div className="text-4xl font-black text-white mb-2 font-serif">100%</div>
+                                <div className="text-[10px] uppercase tracking-[0.2em] text-[#C55A11] font-black opacity-80">Conformité DGI</div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
+
+                {/* Abstract Decorative Light */}
+                <div className="absolute top-1/2 -right-64 w-96 h-96 bg-[#C55A11]/20 blur-[150px] rounded-full"></div>
             </div>
         </div>
     )
