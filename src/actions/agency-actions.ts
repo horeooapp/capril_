@@ -56,8 +56,11 @@ export async function getAgencyKpis(agencyId: string) {
         }
       }).catch(() => 0)
     };
-  } catch (error) {
-    console.error("[Agency KPI] Error:", error);
+  } catch (error: any) {
+    console.error("[Agency KPI] Fatal Error:", error);
+    if (error.code === 'P2021') {
+      throw new Error("Table de données agence manquante dans la base de données.");
+    }
     return null;
   }
 }

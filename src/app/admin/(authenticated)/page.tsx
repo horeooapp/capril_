@@ -141,8 +141,18 @@ export default async function AdminDashboardOverview() {
         // Nouveaux indicateurs ADD-16
         (prisma as any).reclamationLocataire.count().catch(() => 0),
         (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
-        (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => 0),
+        (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
     ]);
+    
+    // Check for missing tables
+    const isDbIncomplete = [
+        totalPaymentsRes, 
+        totalReversals, 
+        fraudAlerts, 
+        totalBdqs, 
+        totalSmsDeclarations,
+        totalMonthlyReports
+    ].some(v => v === -1);
     
     // Formatting data
     const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
@@ -207,6 +217,24 @@ export default async function AdminDashboardOverview() {
             <div className="space-y-12 pb-16 relative">
                 <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
                 
+                {isDbIncomplete && (
+                    <div className="bg-red-50 border-2 border-red-100 p-6 rounded-3xl flex items-center gap-6 animate-pulse mb-8">
+                        <div className="p-4 bg-red-100 text-red-600 rounded-2xl">
+                            <ShieldAlert size={32} />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-black text-red-900 uppercase">Synchronisation Base de Données Partielle</h3>
+                            <p className="text-red-700/60 text-sm font-medium">Certaines tables (Payments, Fraud, SMS) semblent absentes de {process.env.DATABASE_URL?.split('@')[1] || "la base"}.</p>
+                        </div>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-3 bg-red-600 text-white font-black rounded-xl text-xs uppercase"
+                        >
+                            Démarrer Sync
+                        </button>
+                    </div>
+                )}
+
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
@@ -228,7 +256,7 @@ export default async function AdminDashboardOverview() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <StatCard 
                         title="Reversements (M-PAY)" 
-                        value={(safeData.totalReversals || 0).toString()} 
+                        value={safeData.totalReversals === -1 ? "N/A" : (safeData.totalReversals || 0).toString()} 
                         icon={<CreditCard size={28} />} 
                         color="emerald"
                         trend="Nouveauté"
@@ -237,7 +265,7 @@ export default async function AdminDashboardOverview() {
                     />
                     <StatCard 
                         title="Alertes Fraude (M-GUARD)" 
-                        value={(safeData.fraudAlerts || 0).toString()} 
+                        value={safeData.fraudAlerts === -1 ? "N/A" : (safeData.fraudAlerts || 0).toString()} 
                         icon={<Zap size={28} />} 
                         color="red"
                         trend="Haute Vigilance"
@@ -287,7 +315,7 @@ export default async function AdminDashboardOverview() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <StatCard 
                             title="Bails Déclaratifs (BDQ)" 
-                            value={safeData.totalBdqs.toLocaleString()} 
+                            value={safeData.totalBdqs === -1 ? "N/A" : safeData.totalBdqs.toLocaleString()} 
                             icon={<FileSignature size={28} />} 
                             color="orange"
                             trend={`${safeData.confirmedBdqs} Confirmés`}
