@@ -13,6 +13,9 @@ import { isFeatureEnabled } from "@/lib/features";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ImpactStats from "@/components/ImpactStats";
+import RealEstateObservatory from "@/components/RealEstateObservatory";
+import GeographicRentAnalysis from "@/components/GeographicRentAnalysis";
+import RentRanking from "@/components/RentRanking";
 
 export const dynamic = "force-dynamic";
 
@@ -283,7 +286,19 @@ export default async function Home() {
             <AppDepthCards />
         </section>
 
+        {/* --- REAL ESTATE OBSERVATORY --- */}
+        <RealEstateObservatory />
+
+        {/* --- GEOGRAPHIC RENT ANALYSIS --- */}
+        <GeographicRentAnalysis />
+
+        {/* --- RENT RANKING LEADERBOARD --- */}
+        <RentRanking />
+
         {/* --- TRUST SCORE SECTION --- */}
+
+
+
         <section className="bg-gray-900 py-32 text-center overflow-hidden">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 text-[15rem] font-black text-white/5 select-none pointer-events-none lowercase">trust</div>
