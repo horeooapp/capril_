@@ -1,5 +1,3 @@
-import twilio from 'twilio';
-
 /**
  * Interface for SMS Gateway implementations as per v2.0 Specification Part 3
  */
@@ -9,17 +7,25 @@ export interface SMSService {
 }
 
 export class TwilioService implements SMSService {
-  private client: twilio.Twilio | null = null;
+  private client: any = null;
   private from: string;
 
   constructor() {
+    this.from = process.env.TWILIO_SENDER_NUMBER || '';
+  }
+
+  private async getClient() {
+    if (this.client) return this.client;
+    
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    this.from = process.env.TWILIO_SENDER_NUMBER || '';
 
     if (accountSid && authToken) {
+      // Dynamic import to avoid bundling Node modules on the client
+      const twilio = (await import('twilio')).default;
       this.client = twilio(accountSid, authToken);
     }
+    return this.client;
   }
 
   async sendOTP(phone: string, otp: string) {
@@ -30,13 +36,14 @@ export class TwilioService implements SMSService {
   async sendMessage(phone: string, message: string) {
     console.log(`[SMS][Twilio] Sending to ${phone}: ${message.substring(0, 40)}...`);
     
-    if (!this.client) {
+    const client = await this.getClient();
+    if (!client) {
       console.error("[SMS][Twilio] Client not initialized. Missing TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN");
       return { success: false, error: 'Twilio credentials missing' };
     }
 
     try {
-      const result = await this.client.messages.create({
+      const result = await client.messages.create({
         body: message,
         from: this.from,
         to: phone.startsWith('+') ? phone : `+${phone}`
@@ -52,7 +59,6 @@ export class TwilioService implements SMSService {
 
 export class OrangeCIService implements SMSService {
   async sendMessage(phone: string, message: string) {
-    // Port existing sendOTP logic to generic sendMessage
     return this.sendOTPRequest(phone, message);
   }
 
@@ -63,8 +69,6 @@ export class OrangeCIService implements SMSService {
 
   private async sendOTPRequest(phone: string, message: string) {
     console.log(`[SMS][Orange] Sending to ${phone}`);
-    
-    // Default to the developer phone number if SMS_SENDER_NAME isn't a valid phone
     const senderAddress = process.env.SMS_SENDER_NAME || '00000000';
     const authHeader = process.env.SMS_GATEWAY_API_KEY || process.env.SMS_API_KEY;
 
@@ -74,7 +78,6 @@ export class OrangeCIService implements SMSService {
     }
 
     try {
-        // 1. Authenticate with Orange Developer API
         const authValue = authHeader.startsWith('Basic ') ? authHeader : `Basic ${authHeader}`;
         const tokenRes = await fetch('https://api.orange.com/oauth/v3/token', {
             method: 'POST',
@@ -92,8 +95,6 @@ export class OrangeCIService implements SMSService {
         }
 
         const { access_token } = await tokenRes.json();
-
-        // 2. Send the SMS
         const safeSender = senderAddress.replace('+', '');
         const outBoundUrl = `https://api.orange.com/smsmessaging/v1/outbound/tel%3A%2B${safeSender}/requests`;
         const phoneFormat = phone.startsWith('+') ? phone : `+${phone}`;

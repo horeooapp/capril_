@@ -1,3 +1,5 @@
+"use server"
+
 import { MaintenanceService } from "@/lib/maintenance-service";
 import { revalidatePath } from "next/cache";
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers";
