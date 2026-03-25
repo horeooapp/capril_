@@ -706,6 +706,19 @@ model Lease {
   facturesUtilities       FactureUtility[]
   repartitionsUtilities   RepartitionUtility[]
 
+  // ADD-01 v2 M-FISCAL
+  nbPagesBail            Int?      @map("nb_pages_bail")
+  dureeMoisBail          Int?      @map("duree_mois_bail")
+  loyerTotalFcfa         Decimal?  @map("loyer_total_fcfa")
+  droitsEnregistrement   Decimal?  @map("droits_enregistrement")
+  fraisTimbre            Decimal?  @map("frais_timbre")
+  totalFiscalBail        Decimal?  @map("total_fiscal_bail")
+  statutFiscal           String    @default("NON_CALCULÉ") @map("statut_fiscal")
+  recuFiscalUrl          String?   @map("recu_fiscal_url")
+  recuFiscalHash         String?   @map("recu_fiscal_hash")
+  deadlineEnregistrement DateTime? @map("deadline_enregistrement")
+  certEnregistrementDgiUrl String? @map("cert_enregistrement_dgi_url")
+
   @@index([propertyId])
   @@index([tenantId])
   @@index([status])
