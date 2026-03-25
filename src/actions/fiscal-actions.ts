@@ -9,10 +9,10 @@ export async function calculerDroitsAction(leaseId: string, pdfBuffer?: Buffer) 
   if (!session) throw new Error("Non autorisé");
 
   try {
-    const updatedLease = await FiscalService.calculerDroits(leaseId, pdfBuffer);
-    return { success: true, lease: updatedLease };
+    const updatedDossier = await FiscalService.calculerDroits(leaseId, pdfBuffer);
+    return { success: true as const, dossier: updatedDossier };
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return { success: false as const, error: error.message };
   }
 }
 
@@ -22,9 +22,9 @@ export async function initierPaiementFiscalAction(leaseId: string) {
 
   try {
     const result = await FiscalService.initierSplitCinetPay(leaseId);
-    return { success: true, ...result };
+    return { success: true as const, paymentUrl: result.paymentUrl };
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return { success: false as const, error: error.message };
   }
 }
 
@@ -34,8 +34,51 @@ export async function genererPackDgiAction(leaseId: string) {
 
   try {
     const pack = await DossierDgiService.genererPackComplet(leaseId);
-    return { success: true, pack };
+    return { success: true as const, pack };
   } catch (error: any) {
-    return { success: false, error: error.message };
+    return { success: false as const, error: error.message };
   }
 }
+
+// ALIASES & NEW EXPORTS FOR UI COMPATIBILITY
+export async function getFiscalStats() {
+  try {
+    const data = await FiscalService.getStats();
+    return { 
+      success: true as const, 
+      stats: data.stats, 
+      recentRegistrations: data.recentRegistrations 
+    };
+  } catch (error: any) {
+    return { success: false as const, error: error.message };
+  }
+}
+
+export async function getOrCreateFiscalDossier(leaseId: string) {
+  try {
+    const dossier = await FiscalService.getOrCreateDossier(leaseId);
+    return { success: true as const, data: dossier };
+  } catch (error: any) {
+    return { success: false as const, error: error.message };
+  }
+}
+
+export async function initiateFiscalPayment(fiscalId: string) {
+  try {
+    const result = await FiscalService.initierSplitCinetPay(fiscalId);
+    return { success: true as const, paymentUrl: result.paymentUrl };
+  } catch (error: any) {
+    return { success: false as const, error: error.message };
+  }
+}
+
+export async function generateFiscalCert(fiscalId: string) {
+  try {
+    const cert = await FiscalService.generateCertificate(fiscalId);
+    return { success: true as const, cert };
+  } catch (error: any) {
+    return { success: false as const, error: error.message };
+  }
+}
+
+

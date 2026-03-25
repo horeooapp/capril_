@@ -4,119 +4,219 @@ import { PDFDocument } from "pdf-lib";
 
 export class FiscalService {
   /**
+   * Récupère ou crée un dossier fiscal pour un bail.
+   */
+  static async getOrCreateDossier(leaseId: string) {
+    let dossier = await prisma.fiscalDossier.findFirst({
+      where: { leaseId }
+    });
+
+    if (!dossier) {
+      const lease = await prisma.lease.findUnique({
+        where: { id: leaseId },
+        include: { property: true }
+      });
+
+      if (!lease) throw new Error("Bail non trouvé");
+
+      // Calcul initial
+      const duree = lease.durationMonths || 12;
+      const nbPages = lease.nbPagesBail || 3;
+      const loyerTotal = lease.rentAmount * duree;
+      const droits = Math.round(loyerTotal * 0.025);
+      const timbre = nbPages * 500;
+      const fraisQapril = 5000; // Frais de service QAPRIL par défaut
+      const deadline = addDays(lease.signedAt || new Date(), 30);
+
+      dossier = await prisma.fiscalDossier.create({
+        data: {
+          leaseId,
+          loyerMensuel: lease.rentAmount,
+          dureeBailMois: duree,
+          dureeRetenueMois: duree,
+          baseCalcul: loyerTotal,
+          droitsEnregistrement: droits,
+          fraisTimbre: timbre,
+          fraisQapril: fraisQapril,
+          totalDgi: droits + timbre,
+          totalBailleur: droits + timbre + fraisQapril,
+          statut: "EN_ATTENTE_DECLARATION",
+          dateLimiteLegale: deadline
+        }
+      });
+
+      // Sync Lease
+      await prisma.lease.update({
+        where: { id: leaseId },
+        data: {
+          totalFiscalBail: dossier.totalBailleur,
+          statutFiscal: "EN_ATTENTE_DECLARATION",
+          deadlineEnregistrement: deadline
+        }
+      });
+    }
+
+    return dossier;
+  }
+
+  /**
    * Calcule les droits d'enregistrement et frais de timbre pour un bail.
-   * Règle : 2.5% du loyer total contractuel + 500 FCFA par page.
    */
   static async calculerDroits(leaseId: string, pdfBuffer?: Buffer) {
     const lease = await prisma.lease.findUnique({
-      where: { id: leaseId },
-      include: { 
-        property: true,
-        tenant: true 
-      }
+      where: { id: leaseId }
     });
 
     if (!lease) throw new Error("Bail non trouvé");
 
-    // 1. Calcul de la durée en mois (P1)
-    let dureeMois = 12; // Défaut pour BDQ verbal sans fin
-    if (lease.startDate && lease.endDate) {
-      dureeMois = Math.ceil(differenceInMonths(lease.endDate, lease.startDate));
-      if (dureeMois <= 0) dureeMois = 1; // Minimum 1 mois
-    } else if (lease.durationMonths) {
-        dureeMois = lease.durationMonths;
-    }
-
-    // 2. Calcul du nombre de pages (P2)
-    let nbPages = 3; // Défaut estimé
+    let nbPages = lease.nbPagesBail || 3;
     if (pdfBuffer) {
       try {
         const pdfDoc = await PDFDocument.load(pdfBuffer);
         nbPages = pdfDoc.getPageCount();
       } catch (error) {
-        console.error("Erreur lors du comptage des pages PDF:", error);
+        console.error("Erreur PDF:", error);
       }
     }
 
-    // 3. Formules de calcul (M-FISCAL)
-    const loyerMensuel = lease.rentAmount;
-    const loyerTotal = loyerMensuel * dureeMois;
-    const droitsEnregistrement = Math.round(loyerTotal * 0.025);
-    const fraisTimbre = nbPages * 500;
-    const totalFiscal = droitsEnregistrement + fraisTimbre;
+    const dossier = await this.getOrCreateDossier(leaseId);
+    
+    // Recalcul si nécessaire
+    const timbre = nbPages * 500;
+    const totalDgi = dossier.droitsEnregistrement + timbre;
+    const totalBailleur = totalDgi + dossier.fraisQapril;
 
-    // 4. Deadline (Signature + 30 jours)
-    const deadline = addDays(lease.signedAt || new Date(), 30);
+    const updatedDossier = await prisma.fiscalDossier.update({
+      where: { id: dossier.id },
+      data: {
+        fraisTimbre: timbre,
+        totalDgi,
+        totalBailleur
+      }
+    });
 
-    // 5. Mise à jour du bail
-    const updatedLease = await prisma.lease.update({
+    await prisma.lease.update({
       where: { id: leaseId },
       data: {
         nbPagesBail: nbPages,
-        dureeMoisBail: dureeMois,
-        loyerTotalFcfa: loyerTotal,
-        droitsEnregistrement: droitsEnregistrement,
-        fraisTimbre: fraisTimbre,
-        totalFiscalBail: totalFiscal,
-        statutFiscal: "FISCAL_PENDING",
-        deadlineEnregistrement: deadline
+        totalFiscalBail: totalBailleur
       }
     });
 
-    return updatedLease;
+    return updatedDossier;
   }
 
   /**
-   * Simule ou initie le split CinetPay.
-   * QAPRIL -> DGI (100% du montant fiscal)
+   * Initie le paiement CinetPay pour le dossier fiscal.
    */
-  static async initierSplitCinetPay(leaseId: string) {
-    const lease = await prisma.lease.findUnique({
-      where: { id: leaseId },
-      include: { tenant: true }
+  static async initierSplitCinetPay(fiscalId: string) {
+    const dossier = await prisma.fiscalDossier.findUnique({
+      where: { id: fiscalId },
+      include: { lease: { include: { tenant: true } } }
     });
 
-    if (!lease || !lease.totalFiscalBail) {
-      throw new Error("Calcul fiscal non effectué ou montant invalide");
-    }
+    if (!dossier) throw new Error("Dossier fiscal non trouvé");
 
-    // 2. Création d'un PaymentIntent pour le webhook
-    const transactionId = `FISCAL-${leaseId}-${Date.now()}`;
+    const transactionId = `FISCAL-${fiscalId}-${Date.now()}`;
+    const paymentUrl = `https://checkout.cinetpay.com/pay/${transactionId}`;
+
+    await prisma.fiscalDossier.update({
+      where: { id: fiscalId },
+      data: {
+        cinetpayTransId: transactionId,
+        cinetpayPaymentUrl: paymentUrl,
+        statut: "EN_COURS_PAIEMENT"
+      }
+    });
+
+    // Optionnel: Créer un PaymentIntent global
     await prisma.paymentIntent.create({
       data: {
         id: transactionId,
         idempotencyKey: transactionId,
-        leaseId: leaseId,
-        amount: Number(lease.totalFiscalBail),
+        leaseId: dossier.leaseId,
+        amount: dossier.totalBailleur,
         operator: "CINETPAY",
-        payerPhone: lease.tenant?.phone || "00000000",
+        payerPhone: dossier.lease.tenant?.phone || "00000000",
         status: "PENDING",
-        metadata: {
-          type: "FISCAL_REGISTRATION",
-          leaseId: leaseId
-        }
+        metadata: { type: "FISCAL_REGISTRATION", fiscalId }
       }
     });
 
-    return {
-      transactionId,
-      montant: lease.totalFiscalBail,
-      paymentUrl: `https://checkout.cinetpay.com/pay/${transactionId}` 
-    };
+    return { success: true, paymentUrl };
   }
 
   /**
    * Confirmation du paiement fiscal (via Webhook)
    */
-  static async confirmerPaiementFiscal(leaseId: string, transactionId: string, hash?: string) {
-    return await prisma.lease.update({
-      where: { id: leaseId },
+  static async confirmerPaiementFiscal(fiscalId: string, transactionId: string, hash?: string) {
+    const dossier = await prisma.fiscalDossier.update({
+      where: { id: fiscalId },
       data: {
-        statutFiscal: "FISCAL_PAYÉ",
-        recuFiscalHash: hash || `HASH-${transactionId}`,
-        // activation du bail si nécessaire
-        status: "ACTIVE" 
+        statut: "PAYE_CONFIRME",
+        paidAt: new Date()
+      }
+    });
+
+    await prisma.lease.update({
+      where: { id: dossier.leaseId },
+      data: { statutFiscal: "PAYE_CONFIRME" }
+    });
+
+    return dossier;
+  }
+
+  /**
+   * Statistiques fiscales pour l'admin
+   */
+  static async getStats() {
+    const totalDossiers = await prisma.fiscalDossier.count();
+    const payes = await prisma.fiscalDossier.count({ where: { statut: "PAYE_CONFIRME" } });
+    const collected = await prisma.fiscalDossier.aggregate({
+      _sum: { totalDgi: true },
+      where: { statut: "PAYE_CONFIRME" }
+    });
+
+    const recentRegistrations = await prisma.fiscalDossier.findMany({
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+      include: { lease: { include: { property: true, tenant: true } } }
+    });
+
+    return {
+      stats: {
+        totalDossiers,
+        complianceRate: totalDossiers > 0 ? (payes / totalDossiers) * 100 : 0,
+        totalCollected: Number(collected._sum.totalDgi || 0),
+        totalPenalties: 0 // A implémenter plus tard si nécessaire
+      },
+      recentRegistrations
+    };
+  }
+
+  /**
+   * Génère un certificat fiscal
+   */
+  static async generateCertificate(fiscalId: string) {
+    const dossier = await prisma.fiscalDossier.findUnique({
+      where: { id: fiscalId },
+      include: { certificat: true }
+    });
+
+    if (!dossier) throw new Error("Dossier non trouvé");
+    if (dossier.certificat) return dossier.certificat;
+
+    // Simulation de génération
+    const certNumber = `DGI-${fiscalId.slice(0, 8).toUpperCase()}`;
+    return await prisma.certificatFiscal.create({
+      data: {
+        fiscalId,
+        numeroCertificat: certNumber,
+        qrToken: `QR-${certNumber}`,
+        pdfPath: `/certs/${certNumber}.pdf`,
+        hashSha256: `HASH-${certNumber}`
       }
     });
   }
 }
+
