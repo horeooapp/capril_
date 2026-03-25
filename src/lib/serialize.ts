@@ -50,6 +50,10 @@ export const serializeLease = (lease: any) => {
         rentAmount: Number(lease.rentAmount || 0),
         depositAmount: Number(lease.depositAmount || 0),
         chargesAmount: Number(lease.chargesAmount || 0),
+        totalFiscalBail: Number(lease.totalFiscalBail || 0),
+        droitsEnregistrement: Number(lease.droitsEnregistrement || 0),
+        fraisTimbre: Number(lease.fraisTimbre || 0),
+        loyerTotalFcfa: Number(lease.loyerTotalFcfa || 0),
         tenant: tenantData,
         cdcDeposits: (lease.cdcDeposits || []).map((dep: any) => ({
             ...dep,
@@ -64,6 +68,7 @@ export const serializeLease = (lease: any) => {
         }))
     }
 }
+
 
 /**
  * Helper to serialize BigInt for Receipts

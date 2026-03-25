@@ -68,22 +68,33 @@ export default function DashboardOverviewClient({
     let totalLeases = 0
     let totalSecuredFunds = 0
     let receiptsThisMonth = 0
+    let fiscalCompliantCount = 0
 
     // Single pass optimization for all core stats
     properties.forEach((p: DashboardProperty) => {
         totalLeases += (p.leases?.length || 0)
-        p.leases?.forEach((l) => {
+        p.leases?.forEach((l: any) => {
             if (l.cdcDeposits?.[0]?.amount) totalSecuredFunds += l.cdcDeposits[0].amount
             if (l.receipts) {
-                receiptsThisMonth += l.receipts.filter((r) => r.paidAt && new Date(r.paidAt) >= startOfMonth).length
+                receiptsThisMonth += l.receipts.filter((r: any) => r.paidAt && new Date(r.paidAt) >= startOfMonth).length
+            }
+            if (l.statutFiscal === "PAYE_CONFIRME" || l.statutFiscal === "ENREGISTRE") {
+                fiscalCompliantCount++
             }
         })
     })
 
     const stats = [
         { label: "Logements gérés", value: properties.length, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
-        { label: "Contrats actifs", value: totalLeases, unit: "Baux", icon: ClipboardList, color: "text-emerald-600 bg-emerald-50", glow: "shadow-emerald-200/40" },
         { label: "Sécurisé (CDC)", value: totalSecuredFunds, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
+        { 
+            label: "Conformité Fiscale", 
+            value: totalLeases > 0 ? Math.round((fiscalCompliantCount / totalLeases) * 100) : 0, 
+            unit: "% DGI", 
+            icon: FileCheck, 
+            color: "text-amber-600 bg-amber-50", 
+            glow: "shadow-amber-200/40" 
+        },
         { 
             label: "Performance / Mois", 
             value: latestReport?.dataRapport?.metrics?.tauxRecouvrement ?? (totalLeases > 0 ? Math.round((receiptsThisMonth / totalLeases) * 100) : 0), 
@@ -93,6 +104,7 @@ export default function DashboardOverviewClient({
             glow: "shadow-violet-200/40" 
         },
     ]
+
 
     return (
         <motion.div 

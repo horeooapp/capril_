@@ -13,13 +13,15 @@ import {
     Filter,
     FileText,
     CheckCircle2,
-    Clock
+    Clock,
+    ShieldCheck
 } from "lucide-react"
 
 interface Lease {
     id: string;
     leaseReference: string | null;
     status: string;
+    statutFiscal?: string;
     rentAmount: bigint | number;
     startDate: Date | string;
     tenant: { fullName: string | null; phone: string | null } | null;
@@ -27,6 +29,7 @@ interface Lease {
     propertyCode: string;
     propertyCommune: string;
 }
+
 
 const container = {
   hidden: { opacity: 0 },
@@ -138,6 +141,16 @@ export default function LeasesClient({ leases }: { leases: Lease[] }) {
                                                 {lease.status === 'ACTIVE' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
                                                 {lease.status === 'ACTIVE' ? 'Certifié Actif' : 'Validation...'}
                                             </span>
+                                            {lease.statutFiscal && (
+                                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm ring-1 ring-inset ${
+                                                    lease.statutFiscal === 'PAYE_CONFIRME' || lease.statutFiscal === 'ENREGISTRE'
+                                                    ? 'bg-blue-50 text-blue-700 ring-blue-600/20' 
+                                                    : 'bg-slate-50 text-slate-500 ring-slate-400/20'
+                                                }`}>
+                                                    <ShieldCheck size={10} />
+                                                    {lease.statutFiscal === 'PAYE_CONFIRME' || lease.statutFiscal === 'ENREGISTRE' ? 'DGI : Confirmé' : 'DGI : En attente'}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

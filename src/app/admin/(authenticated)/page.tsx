@@ -244,12 +244,13 @@ export default async function AdminDashboardOverview() {
                         delay={0.2}
                     />
                     <StatCard 
-                        title="Consignation CDC" 
-                        value={`${safeData.cdcAmount.toLocaleString()} FCFA`} 
+                        title="Droits Collectés (DGI)" 
+                        value={`${safeData.totalDgi.toLocaleString()} FCFA`} 
                         icon={<ShieldCheck size={28} />} 
                         color="blue"
-                        trend="Sécurisé"
+                        trend="Fiscalité M17"
                         delay={0.3}
+                        href="/admin/fiscal"
                     />
                     <StatCard 
                         title="Auto-KYC IA" 
@@ -270,13 +271,14 @@ export default async function AdminDashboardOverview() {
                         href="/admin/disputes"
                     />
                     <StatCard 
-                        title="Impayés (Rappels)" 
-                        value={`${safeData.overdueStats.count}`} 
-                        icon={<ShieldAlert size={28} />} 
-                        color="red"
-                        trend="Relances Auto."
+                        title="Consignation CDC" 
+                        value={`${safeData.cdcAmount.toLocaleString()} FCFA`} 
+                        icon={<ShieldCheck size={28} />} 
+                        color="emerald"
+                        trend="Sécurisé"
                         delay={0.5}
                     />
+
                 </div>
 
                 {/* ADD-06/08: Innovation & IA Monitoring */}
