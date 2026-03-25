@@ -33,7 +33,10 @@ import { prisma } from "@/lib/prisma"
 import { getDemoMode } from "@/actions/demo-actions"
 import { getDemoData } from "@/lib/demo-data"
 import { getOverdueStats } from "@/actions/reminder-actions"
-import { ShieldAlert } from "lucide-react"
+import { ShieldAlert, MapPin, BarChart } from "lucide-react"
+import RealEstateObservatory from "@/components/RealEstateObservatory"
+import GeographicRentAnalysis from "@/components/GeographicRentAnalysis"
+import RentRanking from "@/components/RentRanking"
 
 export const dynamic = "force-dynamic"
 
@@ -644,6 +647,32 @@ export default async function AdminDashboardOverview() {
                                 <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Mandats</p>
                                 <p className="text-2xl font-black">{safeData.totalMandates}</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Market Intelligence & Observatory (Reserved for Admin) */}
+                <div className="space-y-10">
+                    <div className="flex items-center gap-4 px-2">
+                        <div className="p-3 bg-primary/10 text-primary rounded-2xl">
+                            <BarChart size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter italic">Intelligence Marché & Observatoire</h3>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Données consolidées du Registre National</p>
+                        </div>
+                    </div>
+                    
+                    <RealEstateObservatory />
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <div className="space-y-6">
+                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Analyse Géographique des Loyers</h4>
+                            <GeographicRentAnalysis />
+                        </div>
+                        <div className="space-y-6">
+                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Classement Rendement Locatif</h4>
+                            <RentRanking />
                         </div>
                     </div>
                 </div>

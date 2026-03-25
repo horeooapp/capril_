@@ -301,14 +301,7 @@ export default async function Home() {
             <AppDepthCards />
         </section>
 
-        {/* --- REAL ESTATE OBSERVATORY --- */}
-        {flags.observatory && <RealEstateObservatory />}
-
-        {/* --- GEOGRAPHIC RENT ANALYSIS --- */}
-        {flags.geo && <GeographicRentAnalysis />}
-
-        {/* --- RENT RANKING LEADERBOARD --- */}
-        {flags.ranking && <RentRanking />}
+        {/* Advanced Market Insights are now reserved for Admin Dashboard */}
 
         {/* --- TRUST SCORE SECTION --- */}
 
