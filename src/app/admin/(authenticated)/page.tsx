@@ -665,14 +665,14 @@ export default async function AdminDashboardOverview() {
                     
                     <RealEstateObservatory />
                     
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="space-y-12">
                         <div className="space-y-6">
-                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Analyse Géographique des Loyers</h4>
-                            <GeographicRentAnalysis />
+                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Le Palmarès Locatif (Indice de Positionnement)</h4>
+                            <RentRanking />
                         </div>
                         <div className="space-y-6">
-                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Le Palmarès Locatif (Ranking)</h4>
-                            <RentRanking />
+                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Cartographie des Loyers (Analyse Géographique)</h4>
+                            <GeographicRentAnalysis />
                         </div>
                     </div>
                 </div>
