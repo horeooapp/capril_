@@ -277,6 +277,8 @@ enum PaymentCanal {
   SMS_DECLARATIF
   SMS
   WHATSAPP
+  EMAIL
+  PUSH
   APP_CHAT
 }
 
