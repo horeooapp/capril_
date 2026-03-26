@@ -23,6 +23,7 @@ import {
 import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
 import { AgencyPortalDashboard } from "@/components/dashboard/agency/AgencyPortalDashboard"
+import { OwnerPortalDashboard } from "@/components/dashboard/owner/OwnerPortalDashboard"
 
 interface DashboardProperty {
     id: string;
@@ -65,6 +66,10 @@ export default function DashboardOverviewClient({
 }) {
     if (user?.role === 'AGENCY') {
         return <AgencyPortalDashboard user={user} properties={properties || []} />;
+    }
+
+    if (user?.role === 'LANDLORD' || user?.role === 'LANDLORD_PRO') {
+        return <OwnerPortalDashboard user={user} properties={properties || []} />;
     }
 
     const startOfMonth = new Date()
