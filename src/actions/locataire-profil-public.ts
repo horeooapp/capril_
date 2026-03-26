@@ -22,6 +22,23 @@ export async function getPublicProfile(userId: string) {
                 }
             }
         })
+
+        if (profil) {
+            // Parse SQLite JSON strings back to arrays
+            try {
+                if (typeof profil.communesSouhaitees === 'string') {
+                    profil.communesSouhaitees = JSON.parse(profil.communesSouhaitees || '[]')
+                }
+                if (typeof profil.typeLogement === 'string') {
+                    profil.typeLogement = JSON.parse(profil.typeLogement || '[]')
+                }
+            } catch (e) {
+                console.error("Error parsing profile strings:", e)
+                profil.communesSouhaitees = []
+                profil.typeLogement = []
+            }
+        }
+
         return profil
     } catch (error) {
         console.error("Error fetching public profile:", error)
@@ -31,14 +48,21 @@ export async function getPublicProfile(userId: string) {
 
 export async function upsertPublicProfile(userId: string, data: any) {
     try {
+        // Preparation for SQLite (stringify arrays)
+        const profilDataToSave = {
+            ...data,
+            communesSouhaitees: Array.isArray(data.communesSouhaitees) ? JSON.stringify(data.communesSouhaitees) : data.communesSouhaitees,
+            typeLogement: Array.isArray(data.typeLogement) ? JSON.stringify(data.typeLogement) : data.typeLogement
+        }
+
         const profil = await (prisma as any).locataireProfilPublic.upsert({
             where: { userId },
             create: {
                 userId,
-                ...data
+                ...profilDataToSave
             },
             update: {
-                ...data
+                ...profilDataToSave
             }
         })
         revalidatePath("/locataire/profil-public")
