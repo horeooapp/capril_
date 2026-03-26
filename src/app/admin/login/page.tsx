@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import EmailOTPForm from "@/components/auth/EmailOTPForm"
+import AdminLoginForm from "@/components/auth/AdminLoginForm"
 import { ShieldAlert, Server, Fingerprint, Activity } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -40,8 +40,7 @@ export default function AdminLoginPage() {
                         but since EmailOTPForm is white-based inside, let's keep it as is or wrap it in a dark mode container if the text remains legible. 
                         Actually, EmailOTPForm uses white/40 backdrop. On dark background it will look like glass. */}
                     
-                    <EmailOTPForm 
-                        role="ADMIN"
+                    <AdminLoginForm 
                         redirectPath="/admin"
                         title="Authentification"
                         subtitle="Console d'Administration Centrale (Certifiée)"

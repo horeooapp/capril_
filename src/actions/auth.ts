@@ -82,6 +82,36 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
     }
 }
 
+/**
+ * Login with Credentials (Admin)
+ */
+export async function loginWithAdminCredentials(email: string, password: string) {
+    console.log("[SERVER ACTION] loginWithAdminCredentials called for email:", email);
+
+    if (!email || !password) return { error: "Email et mot de passe requis" }
+
+    try {
+        const result = await signIn("admin-password", {
+            email,
+            password,
+            redirect: false,
+        });
+
+        return { success: true };
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            if (error.message === "NEXT_REDIRECT") return { success: true };
+            
+            // Handle NextAuth errors that might be thrown with specific messages
+            const errorMessage = (error as any).cause?.err?.message || error.message;
+            if (errorMessage) return { error: errorMessage };
+        }
+        
+        console.error("[SERVER ACTION] loginWithAdminCredentials error:", error);
+        return { error: "Identifiants incorrects ou accès refusé." };
+    }
+}
+
 export async function logout() {
     await signOut({ redirectTo: "/" })
 }

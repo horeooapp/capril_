@@ -82,8 +82,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     console.log("[AUTH] Admin authorize attempt:", credentials?.email);
                     if (!credentials?.email || !credentials?.password) return null;
 
-                    const email = credentials.email as string;
+                    const email = (credentials.email as string).toLowerCase().trim();
                     const password = credentials.password as string;
+
+                    // 1. Domain Restriction
+                    if (!email.endsWith("@qapril.ci") && !email.endsWith("@qapril.net")) {
+                        console.warn("[AUTH] Admin login rejected: invalid domain", email);
+                        throw new Error("Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)");
+                    }
 
                     const user = await prisma.user.findFirst({
                         where: { 
@@ -97,7 +103,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         throw new Error("Admin non trouvé ou mot de passe non configuré");
                     }
 
-                    // 1. Verify password
+                    // 2. Verify password
                     const { compare } = await import("bcrypt-ts");
                     const isValidPassword = await compare(password, user.password);
 
@@ -106,12 +112,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         throw new Error("Mot de passe incorrect");
                     }
 
-                    console.log("[AUTH] Admin login success:", email);
+                    // 3. SuperAdmin Logic
+                    let role = user.role;
+                    if (email === "admin@qapril.ci") {
+                        role = "SUPER_ADMIN";
+                        // Update DB if necessary (optional but good for consistency)
+                        if (user.role !== "SUPER_ADMIN") {
+                            await prisma.user.update({
+                                where: { id: user.id },
+                                data: { role: "SUPER_ADMIN" }
+                            });
+                        }
+                    }
+
+                    console.log("[AUTH] Admin login success:", email, "Role:", role);
                     return {
                         id: user.id,
                         email: user.email,
                         phone: user.phone,
-                        role: user.role,
+                        role: role,
                         status: user.status,
                         fullName: user.fullName,
                         onboardingComplete: (user as any).onboardingComplete,
