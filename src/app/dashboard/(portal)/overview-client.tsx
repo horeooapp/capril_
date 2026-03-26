@@ -64,7 +64,7 @@ export default function DashboardOverviewClient({
     regularizationAlert?: React.ReactNode
 }) {
     if (user?.role === 'AGENCY') {
-        return <AgencyPortalDashboard />;
+        return <AgencyPortalDashboard user={user} properties={properties || []} />;
     }
 
     const startOfMonth = new Date()

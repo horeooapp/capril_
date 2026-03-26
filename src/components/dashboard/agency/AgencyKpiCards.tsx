@@ -5,17 +5,26 @@ import { motion } from 'framer-motion';
 
 const fmt = (v: number) => v.toLocaleString();
 
-export const AgencyKpiCards: React.FC = () => {
-  const totalLoyers = biens.reduce((acc, b) => acc + b.loyer, 0);
-  const encaisse = biens
-    .filter((b) => b.paiement === "Encaissé")
-    .reduce((acc, b) => acc + b.loyer, 0);
-  const impayes = biens
-    .filter((b) => b.paiement === "Impayé")
-    .reduce((acc, b) => acc + b.loyer, 0);
-  const vacants = biens.filter((b) => b.statut === "vacant").length;
-  const totalBiens = biens.length;
-  const txVacance = Math.round((vacants / totalBiens) * 100);
+export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) => {
+  const now = new Date();
+  const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  // Calculate live stats
+  const activeLeases = properties.flatMap(p => p.leases || []).filter(l => l.status === 'ACTIVE');
+  const totalLoyers = activeLeases.reduce((acc, l) => acc + (l.rentAmount || 0), 0);
+  
+  // Total collected for current month
+  const encaisse = activeLeases.reduce((acc, l) => {
+    const monthReceipts = (l.receipts || []).filter((r: any) => r.periodMonth === currentMonthYear && r.status === 'paid');
+    const collectedForLease = monthReceipts.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0);
+    return acc + collectedForLease;
+  }, 0);
+
+  const vacants = properties.filter(p => !p.leases || p.leases.length === 0 || p.leases.every((l: any) => l.status !== 'ACTIVE')).length;
+  const totalBiens = properties.length;
+  const txVacance = totalBiens > 0 ? Math.round((vacants / totalBiens) * 100) : 0;
+  
+  const impayes = totalLoyers - encaisse > 0 ? totalLoyers - encaisse : 0;
 
   const stats = [
     {
@@ -29,7 +38,7 @@ export const AgencyKpiCards: React.FC = () => {
     {
       label: "ENCAISSÉ (MÉDIAN)",
       value: `${fmt(encaisse)} FCFA`,
-      sub: `${Math.round((encaisse / totalLoyers) * 100)}% du CA théorique`,
+      sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du CA théorique` : "0% du CA théorique",
       icon: <TrendingUp size={20} />,
       color: T.green,
       bg: T.greenPale,
@@ -37,7 +46,7 @@ export const AgencyKpiCards: React.FC = () => {
     {
       label: "IMPAYÉS / RETARD",
       value: `${fmt(impayes)} FCFA`,
-      sub: "1 lot en situation critique",
+      sub: impayes > 0 ? "Lots en situation de retard" : "Aucun retard détecté",
       icon: <ShieldAlert size={20} />,
       color: T.red,
       bg: T.redPale,

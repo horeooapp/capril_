@@ -22,7 +22,7 @@ import { T } from '@/constants/agency-data';
 
 type TabType = 'overview' | 'biens' | 'candidats' | 'outils';
 
-export const AgencyPortalDashboard: React.FC = () => {
+export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> = ({ user, properties }) => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   const tabs = [
@@ -42,9 +42,11 @@ export const AgencyPortalDashboard: React.FC = () => {
               Console Agence.
             </h1>
             <p className="text-[16px] text-gray-500 font-medium tracking-wide flex items-center gap-2">
-              <span className="text-[#1F4E79] font-black uppercase">Immobilière du Golfe</span>
+              <span className="text-[#1F4E79] font-black uppercase">{user?.fullName || user?.name || "Agence Sans Nom"}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-              <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11]">Agence Agréée QAPRIL</span>
+              <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11]">
+                {user?.isCertified ? "Agence Agréée QAPRIL" : "Agence en cours d'agrément"}
+              </span>
             </p>
           </div>
           
@@ -95,7 +97,7 @@ export const AgencyPortalDashboard: React.FC = () => {
           >
             {activeTab === 'overview' && (
               <div className="space-y-10">
-                <AgencyKpiCards />
+                <AgencyKpiCards properties={properties} />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 px-4">
                   <div className="lg:col-span-4 space-y-6">
                     <section className="glass-card-premium p-10 rounded-[3rem] bg-[#071A45] text-white overflow-hidden relative group border-none shadow-2xl shadow-blue-950/20">
@@ -151,13 +153,13 @@ export const AgencyPortalDashboard: React.FC = () => {
                         <div className="p-2 bg-slate-50 border-b border-slate-100 flex items-center justify-center">
                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Vue d'ensemble du Portefeuille</span>
                         </div>
-                        <AgencyPropertyList />
+                        <AgencyPropertyList properties={properties} />
                      </section>
                   </div>
                 </div>
               </div>
             )}
-            {activeTab === 'biens' && <AgencyPropertyList />}
+            {activeTab === 'biens' && <AgencyPropertyList properties={properties} />}
             {activeTab === 'candidats' && <AgencyCandidateList />}
             {activeTab === 'outils' && <AgencyToolsGrid />}
           </motion.div>
