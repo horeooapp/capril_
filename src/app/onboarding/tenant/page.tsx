@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import TenantOnboardingClient from "@/components/auth/TenantOnboardingClient"
+import { prisma } from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
@@ -15,7 +16,13 @@ export default async function TenantOnboardingPage() {
         redirect("/dashboard")
     }
 
-    if (session.user.onboardingComplete) {
+    // Always check DB for onboarding status as JWT might be stale
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { onboardingComplete: true }
+    })
+
+    if (user?.onboardingComplete) {
         redirect("/locataire")
     }
 

@@ -151,12 +151,17 @@ export async function completeOnboarding(userId: string, data: {
             }
         })
 
+        console.log(`[ONBOARDING] Successfully updated user ${userId} and UPSERTED public profile`);
+        
         revalidatePath("/locataire")
         revalidatePath("/onboarding/tenant")
         
-        return { success: true, profil: serializeObject(profil) }
-    } catch (error) {
+        return { success: true }
+    } catch (error: any) {
         console.error("Error completing onboarding:", error)
-        return { success: false, error: "Erreur lors de la finalisation de l'onboarding" }
+        return { 
+            success: false, 
+            error: error.message || "Erreur lors de la finalisation de l'onboarding" 
+        }
     }
 }
