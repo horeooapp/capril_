@@ -107,9 +107,24 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
 export async function completeOnboarding(userId: string, data: {
     fullName?: string,
     email?: string,
-    profilData: any
+    profilData: {
+        statutPro?: string,
+        revenuFourchette?: string,
+        budgetMaxFcfa?: number,
+        city?: string,
+        communesSouhaitees?: string[],
+        typeLogement?: string[],
+        visibilite?: string
+    }
 }) {
     try {
+        // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
+        const profilDataToSave = {
+            ...data.profilData,
+            communesSouhaitees: data.profilData.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
+            typeLogement: data.profilData.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
+        }
+
         // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
         const updateData: any = { onboardingComplete: true }
         if (data.fullName) updateData.fullName = data.fullName
@@ -125,10 +140,10 @@ export async function completeOnboarding(userId: string, data: {
             where: { userId },
             create: {
                 userId,
-                ...data.profilData
+                ...profilDataToSave
             },
             update: {
-                ...data.profilData
+                ...profilDataToSave
             }
         })
 

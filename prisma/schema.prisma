@@ -2947,6 +2947,7 @@ model LocataireProfilPublic {
   revenuFourchette String?     @map("revenu_fourchette")
   employeurType    String?     @map("employeur_type")
   
+  city               String?     @map("city")
   communesSouhaitees String @default("[]") @map("communes_souhaitees")
   budgetMaxFcfa      Int?      @map("budget_max_fcfa")
   typeLogement String @default("[]") @map("type_logement")

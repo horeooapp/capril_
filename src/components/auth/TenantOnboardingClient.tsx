@@ -72,6 +72,7 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
                 statutPro: formData.statutPro,
                 revenuFourchette: formData.revenuFourchette,
                 budgetMaxFcfa: formData.budgetMaxFcfa,
+                city: formData.city,
                 communesSouhaitees: formData.communesSouhaitees,
                 typeLogement: formData.typeLogement,
                 visibilite: formData.visibilite
