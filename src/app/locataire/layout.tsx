@@ -8,6 +8,7 @@ import BottomNav from "@/components/BottomNav"
 import { Home, Receipt, Bell, User } from "lucide-react"
 
 import LocataireLayoutClient from "./layout-client"
+import { prisma } from "@/lib/prisma"
 
 export default async function LocataireLayout({
     children,
@@ -20,9 +21,16 @@ export default async function LocataireLayout({
         redirect("/dashboard")
     }
 
-    // Force onboarding for tenants
-    if (session?.user?.role === "TENANT" && !session.user.onboardingComplete) {
-        redirect("/onboarding/tenant")
+    // Force onboarding for tenants - Check DB as JWT might be stale
+    if (session?.user?.role === "TENANT") {
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { onboardingComplete: true }
+        })
+
+        if (!user?.onboardingComplete) {
+            redirect("/onboarding/tenant")
+        }
     }
 
     const handleLogout = async () => {

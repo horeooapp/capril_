@@ -106,34 +106,60 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
 }
 
 export async function completeOnboarding(userId: string, data: any) {
-    console.log(`[ONBOARDING] RESTORING DB UPDATE with timeout for user: ${userId}`);
+    console.log(`[ONBOARDING] Initiating for user: ${userId}`);
+    
     try {
-        if (!userId) return { success: false, error: "Utilisateur non identifié" }
+        if (!userId) {
+            console.error("[ONBOARDING] Missing userId");
+            return { success: false, error: "Utilisateur non identifié" }
+        }
 
-        const updateData: any = { 
-            onboardingComplete: true,
-            fullName: data.fullName,
-            email: data.email
+        // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
+        const profilDataToSave: any = {
+            ...data.profilData,
+            communesSouhaitees: data.profilData?.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
+            typeLogement: data.profilData?.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
         }
         
-        console.log(`[ONBOARDING] Attempting User.update with 5s timeout...`);
+        // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
+        delete profilDataToSave.city;
+
+        // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
+        const updateData: any = { onboardingComplete: true }
+        if (data.fullName) updateData.fullName = data.fullName
+        if (data.email) updateData.email = data.email
         
-        const updatePromise = prisma.user.update({
+        console.log(`[ONBOARDING] Updating user...`);
+        await prisma.user.update({
             where: { id: userId },
             data: updateData
         })
-        
-        await Promise.race([
-            updatePromise,
-            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Base de Données (5s). La base est peut-être verrouillée.")), 5000))
-        ])
 
-        console.log(`[ONBOARDING] User update SUCCESS`);
+        if ((prisma as any).locataireProfilPublic) {
+            console.log(`[ONBOARDING] Upserting public profile...`);
+            await (prisma as any).locataireProfilPublic.upsert({
+                where: { userId },
+                create: {
+                    userId,
+                    ...profilDataToSave
+                },
+                update: {
+                    ...profilDataToSave
+                }
+            })
+        }
+
+        console.log(`[ONBOARDING] Action complete, success:true`);
         
-        // On garde l'upsert du profil désactivé pour l'instant pour valider le user d'abord
+        revalidatePath("/locataire")
+        revalidatePath("/onboarding/tenant")
+        
         return { success: true }
     } catch (error: any) {
-        console.error("Error in completeOnboarding with timeout:", error)
-        return { success: false, error: error.message }
+        console.error("Error completing onboarding:", error)
+        return { 
+            success: false, 
+            error: error.message || "Erreur lors de la finalisation" 
+        }
     }
 }
