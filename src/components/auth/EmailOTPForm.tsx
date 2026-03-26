@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Mail, ShieldCheck, ArrowRight, Loader2, ArrowLeft } from "lucide-react"
+import { Mail, ShieldCheck, ArrowRight, Loader2, ArrowLeft, Home } from "lucide-react"
+import Link from "next/link"
 import { requestOTP, loginWithOTP } from "@/actions/auth"
 
 interface EmailOTPFormProps {
@@ -196,8 +197,15 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                     )}
                 </AnimatePresence>
 
-                <div className="mt-10 pt-6 border-t border-gray-100/50 text-center">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                <div className="mt-10 pt-6 border-t border-gray-100/50 flex flex-col items-center gap-4">
+                    <Link 
+                        href="/" 
+                        className="flex items-center gap-2 text-[10px] font-black text-[#1F4E79] hover:text-[#C55A11] uppercase tracking-[0.2em] transition-colors group"
+                    >
+                        <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                        Retour à l'accueil
+                    </Link>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center leading-relaxed">
                         Protocole de Sécurité QAPRIL v3.0 <br />
                         <span className="opacity-50">Validation par email certifiée</span>
                     </p>

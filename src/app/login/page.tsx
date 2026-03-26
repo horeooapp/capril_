@@ -106,9 +106,16 @@ export default function LoginPage() {
                 transition={{ delay: 0.5 }}
                 className="mt-20 text-center relative z-10"
             >
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4">
                     Certifié par l'État de Côte d'Ivoire & QAPRIL v3.0
                 </p>
+                <Link 
+                    href="/" 
+                    className="inline-flex items-center gap-2 text-[10px] font-black text-[#1F4E79] hover:text-[#C55A11] uppercase tracking-[0.2em] transition-colors group"
+                >
+                    <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                    Retour à l'accueil
+                </Link>
             </motion.div>
         </div>
     )

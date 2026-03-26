@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { requestPasswordReset } from "@/actions/auth"
 import Link from "next/link"
-import { ArrowLeft, Mail, ShieldCheck } from "lucide-react"
+import { ArrowLeft, Mail, ShieldCheck, Home } from "lucide-react"
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("")
@@ -82,6 +82,13 @@ export default function ForgotPasswordPage() {
                         <Link href="/admin/login" className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-ivoire-dark transition-colors">
                             <ArrowLeft size={14} />
                             Retour à la connexion
+                        </Link>
+                        <Link 
+                            href="/" 
+                            className="mt-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#1F4E79] hover:text-[#C55A11] transition-colors group"
+                        >
+                            <Home size={14} className="group-hover:scale-110 transition-transform" />
+                            Retour à l'accueil
                         </Link>
                     </div>
                 </div>

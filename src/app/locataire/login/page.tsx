@@ -35,9 +35,8 @@ export default function TenantLoginPage() {
                             subtitle="Rejoignez la communauté certifiée de Côte d'Ivoire. Connexion sécurisée."
                         />
 
-                        <div className="mt-12 flex items-center justify-between text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                            <Link href="/auth/help" className="hover:text-[#10B981] transition-colors">Aide</Link>
-                            <Link href="/" className="hover:text-[#10B981] transition-colors">Accueil</Link>
+                        <div className="mt-12 flex items-center justify-center text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                            <Link href="/auth/help" className="hover:text-[#10B981] transition-colors">Aide & Assistance</Link>
                         </div>
                     </motion.div>
                 </div>
