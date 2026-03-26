@@ -7,4 +7,13 @@ find prisma/migrations -name "migration.sql" | while read -r filename; do
     sed -i "s/JSONB DEFAULT {}/JSONB DEFAULT '{}'::jsonb/g" "$filename"
     sed -i "s/JSONB DEFAULT \\[\\]/JSONB DEFAULT '[]'::jsonb/g" "$filename"
 done
+
+# Fix P3019: Provider mismatch (stale PostgreSQL lock in SQLite project)
+if [ -f "prisma/migrations/migration_lock.toml" ]; then
+    if grep -q "postgresql" "prisma/migrations/migration_lock.toml"; then
+        echo "Deleting stale PostgreSQL migration lock to resolve P3019..."
+        rm -f "prisma/migrations/migration_lock.toml"
+    fi
+fi
+
 echo "Fix complete."
