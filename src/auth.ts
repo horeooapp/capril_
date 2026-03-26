@@ -39,35 +39,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     throw new Error("Invalid or expired OTP");
                 }
 
-                // 2. Clear OTP
-                if (redis) await redis.del(`otp:${email}`);
+                try {
+                    // 2. Clear OTP
+                    if (redis) await redis.del(`otp:${email}`);
 
-                // 3. Find or Create User
-                let user = await prisma.user.findFirst({
-                    where: { email }
-                });
-
-                if (!user) {
-                    user = await prisma.user.create({
-                        data: {
-                            email,
-                            role: requestedRole as any,
-                            status: 'PENDING_PROFILE',
-                            phone: `PENDING_${Date.now()}` // Bypass NOT NULL constraint in production DB
-                        }
+                    // 3. Find or Create User
+                    let user = await prisma.user.findFirst({
+                        where: { email }
                     });
-                }
 
-                return {
-                    id: user.id,
-                    email: user.email,
-                    phone: user.phone,
-                    role: user.role,
-                    status: user.status,
-                    fullName: user.fullName,
-                    onboardingComplete: (user as any).onboardingComplete,
-                    diasporaAbonnement: (user as any).diasporaAbonnement
-                } as any;
+                    if (!user) {
+                        user = await prisma.user.create({
+                            data: {
+                                email,
+                                role: requestedRole as any,
+                                status: 'PENDING_PROFILE',
+                                phone: `PENDING_${Date.now()}` // Bypass NOT NULL constraint in production DB
+                            }
+                        });
+                    }
+
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        phone: user.phone,
+                        role: user.role,
+                        status: user.status,
+                        fullName: user.fullName,
+                        onboardingComplete: (user as any).onboardingComplete,
+                        diasporaAbonnement: (user as any).diasporaAbonnement
+                    } as any;
+                } catch (dbError: any) {
+                    console.error("[AUTH] Database Error in authorize:", dbError.message || dbError);
+                    throw new Error(`Database error: ${dbError.message || "Unknown"}`);
+                }
             }
         }),
         Credentials({

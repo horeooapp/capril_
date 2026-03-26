@@ -69,16 +69,25 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
         });
 
         if (result?.error) {
+            console.error("[SERVER ACTION] loginWithOTP Result Error:", result.error);
             return { error: "Code OTP incorrect ou expiré." };
         }
 
         return { success: true };
-    } catch (error: unknown) {
+    } catch (error: any) {
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
              return { success: true };
         }
-        console.error("[SERVER ACTION] loginWithOTP error:", error);
-        return { error: "Échec de l'authentification." };
+        
+        // Log details to help debugging
+        console.error("[SERVER ACTION] loginWithOTP Exception:", {
+            message: error?.message,
+            stack: error?.stack,
+            type: error?.type,
+            name: error?.name
+        });
+
+        return { error: `Échec de l'authentification: ${error?.message || "Erreur interne"}` };
     }
 }
 
