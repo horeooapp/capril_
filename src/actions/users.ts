@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { serializeUser } from "@/lib/serialize"
+import { serializeUser, serializeObject } from "@/lib/serialize"
 import { ensureAuthenticated } from "./auth-helpers"
 import { revalidatePath } from "next/cache"
 
@@ -16,7 +16,7 @@ export async function getCurrentUser() {
             where: { id: userId }
         })
         
-        return serializeUser(user)
+        return serializeObject(serializeUser(user))
     } catch (error) {
         console.error("[ACTION] getCurrentUser error:", error)
         return null

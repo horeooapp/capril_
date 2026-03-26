@@ -15,6 +15,8 @@ export const ReliabilityBadge = ({ score, showLabel = true }: ReliabilityBadgePr
     else conf = { color: 'text-red-600 bg-red-50 border-red-100', label: 'À surveiller', icon: AlertTriangle, glow: 'shadow-red-200/50' }
 
     const Icon = conf.icon
+    const safeScore = (typeof score === 'number' && !isNaN(score)) ? score : 0
+
     return (
         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl border ${conf.color} shadow-xl ${conf.glow} transition-all hover:scale-105 cursor-help group`}>
             <div className="flex items-center justify-center p-1 bg-white/60 rounded-lg shadow-inner">
@@ -22,7 +24,7 @@ export const ReliabilityBadge = ({ score, showLabel = true }: ReliabilityBadgePr
             </div>
             <div className="flex flex-col">
                 {showLabel && <span className="text-[8px] font-black uppercase tracking-widest opacity-60 leading-none mb-0.5">{conf.label}</span>}
-                <span className="text-xs font-black tracking-tighter leading-none">{score.toFixed(1)}%</span>
+                <span className="text-xs font-black tracking-tighter leading-none">{safeScore.toFixed(1)}%</span>
             </div>
         </div>
     )

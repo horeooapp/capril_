@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { generatePropertyCode } from "@/lib/property"
 import { revalidatePath } from "next/cache"
-import { serializeProperty, serializeLease } from "@/lib/serialize"
+import { serializeProperty, serializeLease, serializeObject } from "@/lib/serialize"
 import { ensureAuthenticated, ensurePropertyAccess } from "./auth-helpers"
 import { Role } from "@prisma/client"
 

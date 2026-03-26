@@ -123,12 +123,18 @@ export async function generateOwnerMonthlyReport(ownerId: string, month: number,
 /**
  * M-RAPPORT-02 : Récupérer les rapports d'un utilisateur
  */
+import { serializeObject } from "@/lib/serialize";
+
+/**
+ * M-RAPPORT-02 : Récupérer les rapports d'un utilisateur
+ */
 export async function getMonthlyReports(userId: string) {
   try {
-    return await (prisma as any).rapportMensuel.findMany({
+    const reports = await (prisma as any).rapportMensuel.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" }
     });
+    return serializeObject(reports);
   } catch (error) {
     console.error("[M-RAPPORT] Fetch Error:", error);
     return [];
