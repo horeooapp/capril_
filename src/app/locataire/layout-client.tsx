@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut } from "lucide-react"
 
 interface LocataireLayoutClientProps {
     children: React.ReactNode
@@ -52,6 +52,11 @@ export default function LocataireLayoutClient({
                             { href: "/locataire/leases", label: "Payer", icon: <Receipt size={24} /> },
                             { href: "/locataire/signalements", label: "Alertes", icon: <Bell size={24} /> },
                             { href: "/locataire/preferences", label: "Compte", icon: <User size={24} /> },
+                            { 
+                                onClick: onLogout, 
+                                label: "Quitter", 
+                                icon: <LogOut size={24} className="text-red-500" /> 
+                            },
                         ]} />
                     )}
                 </main>

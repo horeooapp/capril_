@@ -54,16 +54,16 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Signalements.</h1>
-                    <p className="text-gray-500 font-medium">Tracez vos interventions et communiquez avec votre bailleur.</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 items-center text-center md:text-left">
+                <div className="max-w-md">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Signalements.</h1>
+                    <p className="text-gray-500 font-medium">Tracez vos interventions et communiquez avec votre bailleur de manière professionnelle.</p>
                 </div>
                 <button 
                     onClick={() => setIsAdding(true)}
-                    className="flex items-center gap-2 px-6 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-[#163a5a] transition-all shadow-xl active:scale-95"
+                    className="flex items-center justify-center gap-3 px-10 py-5 bg-[#1F4E79] text-white rounded-3xl font-black uppercase tracking-widest text-[13px] hover:bg-[#C55A11] transition-all shadow-2xl hover:shadow-[#1F4E79]/20 active:scale-95 w-full md:w-auto"
                 >
-                    <Plus size={18} />
+                    <Plus size={20} />
                     Nouveau Ticket
                 </button>
             </div>

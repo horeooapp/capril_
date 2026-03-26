@@ -18,8 +18,10 @@ export default async function TenantOnboardingPage() {
 
     // Always check DB for onboarding status as JWT might be stale
     const user = await getCurrentUser()
+    console.log(`[ONBOARDING_PAGE] User ID: ${user?.id}, DB onboardingComplete: ${user?.onboardingComplete}`);
 
     if (user?.onboardingComplete) {
+        console.log(`[ONBOARDING_PAGE] User already completed onboarding, redirecting to /locataire`);
         redirect("/locataire")
     }
 

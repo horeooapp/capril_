@@ -28,7 +28,10 @@ export default async function LocataireLayout({
             select: { onboardingComplete: true }
         })
 
+        console.log(`[LOCATAIRE_LAYOUT] User ID: ${session.user.id}, DB onboardingComplete: ${user?.onboardingComplete}`);
+
         if (!user?.onboardingComplete) {
+            console.log(`[LOCATAIRE_LAYOUT] Redirecting to onboarding because DB status is false`);
             redirect("/onboarding/tenant")
         }
     }
