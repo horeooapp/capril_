@@ -87,7 +87,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     // 1. Domain Restriction
                     if (!email.endsWith("@qapril.ci") && !email.endsWith("@qapril.net")) {
-                        console.warn("[AUTH] Admin login rejected: invalid domain", email);
                         throw new Error("Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)");
                     }
 
@@ -98,9 +97,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }
                     });
 
-                    if (!user || !user.password) {
-                        console.warn("[AUTH] Admin user not found or no password:", email);
-                        throw new Error("Admin non trouvé ou mot de passe non configuré");
+                    if (!user) {
+                        throw new Error("Admin non trouvé ou rôle insuffisant");
+                    }
+
+                    if (!user.password) {
+                        throw new Error("Mot de passe non configuré");
                     }
 
                     // 2. Verify password
@@ -108,7 +110,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const isValidPassword = await compare(password, user.password);
 
                     if (!isValidPassword) {
-                        console.warn("[AUTH] Invalid password for admin:", email);
                         throw new Error("Mot de passe incorrect");
                     }
 
@@ -116,7 +117,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     let role = user.role;
                     if (email === "admin@qapril.ci") {
                         role = "SUPER_ADMIN";
-                        // Update DB if necessary (optional but good for consistency)
                         if (user.role !== "SUPER_ADMIN") {
                             await prisma.user.update({
                                 where: { id: user.id },
@@ -125,7 +125,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }
                     }
 
-                    console.log("[AUTH] Admin login success:", email, "Role:", role);
                     return {
                         id: user.id,
                         email: user.email,
@@ -136,9 +135,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         onboardingComplete: (user as any).onboardingComplete,
                         diasporaAbonnement: (user as any).diasporaAbonnement
                     } as any;
-                } catch (error) {
-                    console.error("[AUTH] Error in admin-password authorize:", error);
-                    return null;
+                } catch (error: any) {
+                    console.error("[AUTH-ERROR] Admin failure:", error.message || error);
+                    throw error; 
                 }
             }
         })

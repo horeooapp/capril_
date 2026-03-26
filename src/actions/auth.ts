@@ -86,29 +86,52 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
  * Login with Credentials (Admin)
  */
 export async function loginWithAdminCredentials(email: string, password: string) {
-    console.log("[SERVER ACTION] loginWithAdminCredentials called for email:", email);
-
-    if (!email || !password) return { error: "Email et mot de passe requis" }
+    if (!email || !password) return { error: "Email et mot de passe requis" };
 
     try {
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // 1. Domain Restriction (Fast check)
+        if (!normalizedEmail.endsWith("@qapril.ci") && !normalizedEmail.endsWith("@qapril.net")) {
+            return { error: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)" };
+        }
+
+        // 2. User & Role Check
+        const user = await prisma.user.findFirst({
+            where: { 
+                email: normalizedEmail,
+                role: { in: ['ADMIN', 'SUPER_ADMIN'] }
+            }
+        });
+
+        if (!user) {
+            return { error: "Compte administrateur non trouvé ou accès refusé." };
+        }
+
+        if (!user.password) {
+            return { error: "Mot de passe non configuré pour ce compte." };
+        }
+
+        // 3. Perform Actual Sign In
         const result = await signIn("admin-password", {
-            email,
+            email: normalizedEmail,
             password,
             redirect: false,
         });
 
-        return { success: true };
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            if (error.message === "NEXT_REDIRECT") return { success: true };
-            
-            // Handle NextAuth errors that might be thrown with specific messages
-            const errorMessage = (error as any).cause?.err?.message || error.message;
-            if (errorMessage) return { error: errorMessage };
+        if (result?.error) {
+            // Since we already checked user existence and domain, this error is most likely wrong password
+            console.warn("[SERVER ACTION] Admin login failed for:", normalizedEmail, "Error:", result.error);
+            return { error: "Mot de passe incorrect." };
         }
-        
+
+        return { success: true };
+    } catch (error: any) {
+        if (error?.type === 'CallbackRouteError' || error?.name === 'CallbackRouteError' || error?.message?.includes('CallbackRouteError')) {
+             return { error: "Mot de passe incorrect." };
+        }
         console.error("[SERVER ACTION] loginWithAdminCredentials error:", error);
-        return { error: "Identifiants incorrects ou accès refusé." };
+        return { error: "Une erreur technique est survenue." };
     }
 }
 

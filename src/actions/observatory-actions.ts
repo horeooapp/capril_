@@ -1,133 +1,105 @@
 "use server"
 
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { getDemoMode } from "./demo-actions"
-import { getDemoData } from "@/lib/demo-data"
+import { Role, LeaseStatus } from "@prisma/client"
 
-export async function getGlobalActivityStats() {
-    const session = await auth()
-    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized")
-    }
-
-    if (await getDemoMode()) {
-        const demo = getDemoData()
-        return {
-            totalUsers: demo.totalUsers,
-            totalProperties: demo.totalProperties,
-            totalLeases: demo.totalLeases,
-            totalMandates: demo.totalMandates || 42,
-            activeColocs: demo.activeColocs || 18,
-            landLeases: demo.landLeases || 7,
-            marketTrend: "+5.4%"
-        }
-    }
-
-    let u = 0, p = 0, l = 0, m = 0, c = 0, t = 0;
-
-    try {
-        const counts = await Promise.all([
-            prisma.user.count().catch(() => 0),
-            prisma.property.count().catch(() => 0),
-            prisma.lease.count().catch(() => 0),
-            prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-            prisma.colocataire.count({ where: { status: "ACTIF" } }).catch(() => 0),
-            prisma.landLeaseInfo.count().catch(() => 0)
-        ]);
-        [u, p, l, m, c, t] = counts;
-    } catch (e) {
-        console.error("Database sync error in Observatory:", e);
-    }
-
-    return {
-        totalUsers: u,
-        totalProperties: p,
-        totalLeases: l,
-        totalMandates: m,
-        activeColocs: c,
-        landLeases: t,
-        marketTrend: "+2.1%"
-    }
-}
-
-export async function getMarketInsights() {
-    const session = await auth()
-    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized")
-    }
-
-    // Get latest snapshots for the most active communes
+/**
+ * Fetch the most recent market snapshots for public display
+ */
+export async function getGlobalMarketStats(limit = 6) {
     try {
         return await prisma.observatorySnapshot.findMany({
-            distinct: ['commune'],
-            orderBy: {
-                createdAt: 'desc'
-            },
-            take: 12
-        })
-    } catch (e) {
-        console.error("Observatory Snapshot missing:", e);
+            orderBy: { createdAt: 'desc' },
+            take: limit
+        });
+    } catch (error) {
+        console.error("Error fetching market stats:", error);
         return [];
     }
 }
 
-export async function getLiveEventStream() {
-    const session = await auth()
-    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized")
-    }
+/**
+ * Admin: Get global activity statistics for the dashboard
+ */
+export async function getGlobalActivityStats() {
+    try {
+        const [users, properties, leases, mandates] = await Promise.all([
+            prisma.user.count(),
+            prisma.property.count(),
+            prisma.lease.count({ where: { status: 'ACTIVE' } }),
+            prisma.mandate.count({ where: { status: 'ACTIVE' } })
+        ]);
 
-    if (await getDemoMode()) {
-        return getDemoData().recentAuditLogs
+        return {
+            totalUsers: users,
+            totalProperties: properties,
+            totalLeases: leases,
+            totalMandates: mandates,
+            activeColocs: 0, // Placeholder or implement if schema allows
+            landLeases: 0,   // Placeholder
+            marketTrend: "+4.2%" // Dynamic trend or placeholder
+        };
+    } catch (error) {
+        return { totalUsers: 0, totalProperties: 0, totalLeases: 0, totalMandates: 0, activeColocs: 0, landLeases: 0, marketTrend: "Stable" };
     }
-
-    return await prisma.auditLog.findMany({
-        include: {
-            user: { select: { fullName: true } }
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 15
-    }).catch(() => [])
 }
 
-export async function getCommunalStats() {
-    const session = await auth()
-    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized")
+/**
+ * Admin: Get market insights (top communes by rent)
+ */
+export async function getMarketInsights() {
+    try {
+        const snapshots = await prisma.observatorySnapshot.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5
+        });
+        return snapshots.map(s => ({
+            commune: s.commune,
+            avgRent: s.avgRent,
+            sampleCount: s.sampleCount
+        }));
+    } catch (error) {
+        return [];
     }
+}
 
-    // Agrégation par commune : Nombre de baux et Loyer moyen
-    // Note: Prisma ne permet pas directement groupby sur une relation lointaine facilement avec aggregations complexes
-    // On va faire une requête brute ou récupérer et traiter (pour la démo, on traite en JS)
-    
-    const properties = await prisma.property.findMany({
-        select: {
-            commune: true,
-            leases: {
-                select: {
-                    rentAmount: true,
-                    status: true
-                }
-            }
-        }
-    });
+/**
+ * Admin: Get live event stream (recent audit logs or notifications)
+ */
+export async function getLiveEventStream() {
+    try {
+        const logs = await prisma.auditLog.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+            include: { user: { select: { fullName: true } } }
+        });
+        return logs.map(l => ({
+            id: l.id,
+            action: l.action,
+            user: l.user?.fullName || "Système",
+            createdAt: l.createdAt
+        }));
+    } catch (error) {
+        return [];
+    }
+}
 
-    const statsMap: Record<string, { count: number, totalRent: number }> = {};
-
-    properties.forEach(p => {
-        if (!p.commune) return;
-        if (!statsMap[p.commune]) statsMap[p.commune] = { count: 0, totalRent: 0 };
-        
-        const activeLeases = p.leases.filter(l => l.status === "ACTIVE" || l.status === "ACTIVE_DECLARATIF");
-        statsMap[p.commune].count += activeLeases.length;
-        statsMap[p.commune].totalRent += activeLeases.reduce((acc, l) => acc + Number(l.rentAmount), 0);
-    });
-
-    return Object.entries(statsMap).map(([name, data]) => ({
-        name,
-        leaseCount: data.count,
-        avgRent: data.count > 0 ? Math.round(data.totalRent / data.count) : 0,
-        trend: Math.random() > 0.5 ? "up" : "down" // Simulated trend
-    })).sort((a, b) => b.leaseCount - a.leaseCount);
+/**
+ * Admin: Get detailed communal stats
+ */
+export async function getCommunalStats() {
+    try {
+        const snapshots = await prisma.observatorySnapshot.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 20
+        });
+        return snapshots.map(s => ({
+            name: s.commune,
+            leaseCount: s.sampleCount,
+            avgRent: s.avgRent,
+            trend: s.trendPct >= 0 ? "up" : "down"
+        }));
+    } catch (error) {
+        return [];
+    }
 }
