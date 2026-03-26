@@ -121,6 +121,15 @@ export default function DashboardLayoutClient({
                                     <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
                                         <User size={20} />
                                     </div>
+
+                                    {/* Quick Logout Button */}
+                                    <button 
+                                        onClick={handleLogout}
+                                        className="flex items-center justify-center h-10 w-10 bg-white border border-gray-200 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
+                                        title="Déconnexion"
+                                    >
+                                        <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
+                                    </button>
                                 </div>
                             )}
                             

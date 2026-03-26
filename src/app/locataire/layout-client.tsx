@@ -34,7 +34,7 @@ export default function LocataireLayoutClient({
             )}
 
             <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
-                {session && <LocataireHeader session={session} onLogout={onLogout} />}
+                {/* Header removed per user request for cleaner UI */}
 
                 {/* Main Content */}
                 <main className={session ? "flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" : "flex-1"}>
