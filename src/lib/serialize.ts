@@ -99,6 +99,10 @@ export const serializeUser = (user: any) => {
         kycStatus: user.kycStatus,
         status: user.status,
         isCertified: user.isCertified,
+        onboardingComplete: user.onboardingComplete,
+        walletBalance: user.walletBalance,
+        fraudScore: user.fraudScore,
+        diasporaAbonnement: user.diasporaAbonnement,
         notificationPrefs: user.notificationPrefs
     }
 }

@@ -16,7 +16,12 @@ export async function getProperties() {
         const userId = session.user.id
 
         const properties = await prisma.property.findMany({
-            where: { ownerUserId: session.user.id },
+            where: {
+                OR: [
+                    { ownerUserId: userId },
+                    { managedByUserId: userId }
+                ]
+            },
             include: {
                 leases: {
                     include: {
