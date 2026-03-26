@@ -111,7 +111,7 @@ export async function completeOnboarding(userId: string, data: {
         statutPro?: string,
         revenuFourchette?: string,
         budgetMaxFcfa?: number,
-        city?: string,
+        // city?: string, // Temporairement retiré pour tester la sérialisation sans erreur Prisma Client
         communesSouhaitees?: string[],
         typeLogement?: string[],
         visibilite?: string
@@ -119,11 +119,14 @@ export async function completeOnboarding(userId: string, data: {
 }) {
     try {
         // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
-        const profilDataToSave = {
+        const profilDataToSave: any = {
             ...data.profilData,
             communesSouhaitees: data.profilData.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
             typeLogement: data.profilData.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
         }
+        
+        // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
+        delete profilDataToSave.city;
 
         // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
         const updateData: any = { onboardingComplete: true }
