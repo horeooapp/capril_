@@ -35,7 +35,9 @@ async function main() {
     // 3. Créer un Utilisateur Administrateur (Admin)
     const admin = await prisma.user.upsert({
         where: { email: 'admin@qapril.ci' },
-        update: {},
+        update: {
+            role: 'ADMIN', // Force the role if it exists
+        },
         create: {
             email: 'admin@qapril.ci',
             fullName: 'Ministère de la Construction',
