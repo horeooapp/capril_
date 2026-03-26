@@ -140,6 +140,7 @@ export async function completeOnboarding(userId: string, data: any) {
             data: updateData
         })
 
+        /* 
         // 2. Créer ou mettre à jour le profil public
         console.log(`[ONBOARDING] Upserting public profile...`);
         const profil = await (prisma as any).locataireProfilPublic.upsert({
@@ -152,8 +153,10 @@ export async function completeOnboarding(userId: string, data: any) {
                 ...profilDataToSave
             }
         })
+        console.log(`[ONBOARDING] Successfully UPSERTED public profile`);
+        */
 
-        console.log(`[ONBOARDING] Successfully updated user ${userId} and UPSERTED public profile`);
+        console.log(`[ONBOARDING] Skipping public profile upsert for debug...`);
         
         revalidatePath("/locataire")
         revalidatePath("/onboarding/tenant")

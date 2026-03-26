@@ -325,11 +325,11 @@ function KYCStep({ data, update }: any) {
                     <option value="ATTESTATION">Attestation d&apos;identité</option>
                 </select>
 
-                <div className="border-4 border-dashed border-gray-100 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-blue-100 transition-all cursor-pointer bg-slate-50 relative group">
+                <label className="border-4 border-dashed border-gray-100 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-blue-100 transition-all cursor-pointer bg-slate-50 relative group">
                     <input 
                         type="file" 
                         onChange={(e) => update({...data, file: e.target.files?.[0] || null})}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="hidden"
                     />
                     <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:scale-110 transition-transform">
                         <Upload className="text-blue-500" size={32} />
@@ -340,7 +340,7 @@ function KYCStep({ data, update }: any) {
                         </p>
                         <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-widest">PDF, JPG ou PNG (Max 5Mo)</p>
                     </div>
-                </div>
+                </label>
             </div>
         </div>
     )
