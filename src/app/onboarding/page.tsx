@@ -7,9 +7,18 @@ import { updateProfile } from "@/actions/users"
 
 type Step = 'ROLE' | 'PROFILE' | 'KYC' | 'COMPLETE'
 
+const profiles = [
+    { id: 'LANDLORD', title: 'Propriétaire', icon: '🏠', desc: 'Je gère mes propres biens immobiliers.' },
+    { id: 'CERTIFIED_AGENCY', title: 'Agence Agréée', icon: '🏢', desc: 'Agence immobilière certifiée avec carte professionnelle.' },
+    { id: 'NON_CERTIFIED_AGENCY', title: 'Agence Non Agréée', icon: '🏘️', desc: 'Structure de gestion immobilière en cours de certification.' },
+    { id: 'INTERMEDIARY', title: 'Intermédiaire', icon: '🤝', desc: 'Apporteur d\'affaires ou démarcheur indépendant.' },
+    { id: 'DIASPORA', title: 'Diaspora', icon: '✈️', desc: 'Ivoirien résidant à l\'étranger gérant des biens au pays.' },
+    { id: 'TENANT', title: 'Locataire', icon: '🔑', desc: 'Je cherche ou je loue déjà un logement sur QAPRIL.' },
+]
+
 export default function OnboardingPage() {
     const [step, setStep] = useState<Step>('ROLE')
-    const [selectedRole, setSelectedRole] = useState<string | null>(null)
+    const [selectedProfile, setSelectedProfile] = useState<string | null>(null)
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [isPending, startTransition] = useTransition()
@@ -18,11 +27,11 @@ export default function OnboardingPage() {
 
     const handleNext = () => {
         setError(null)
-        if (step === 'ROLE' && selectedRole) {
+        if (step === 'ROLE' && selectedProfile) {
             setStep('PROFILE')
         } else if (step === 'PROFILE' && fullName && email) {
             startTransition(async () => {
-                const result = await updateProfile({ fullName, email, role: selectedRole! })
+                const result = await updateProfile({ fullName, email, profileType: selectedProfile! })
                 if (result.success) {
                     setStep('KYC')
                 } else {
@@ -75,20 +84,24 @@ export default function OnboardingPage() {
 
                     {step === 'ROLE' && (
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Quel est votre profil ?</h3>
-                            <div 
-                                onClick={() => setSelectedRole('LANDLORD')}
-                                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${selectedRole === 'LANDLORD' ? 'border-[#FF8200] bg-orange-50' : 'border-gray-200 hover:border-[#FF8200]'}`}
-                            >
-                                <h4 className="font-bold text-gray-900">Propriétaire / Bailleur</h4>
-                                <p className="text-xs text-gray-500 mt-1">Je possède des biens et je souhaite les gérer.</p>
-                            </div>
-                            <div 
-                                onClick={() => setSelectedRole('TENANT')}
-                                className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${selectedRole === 'TENANT' ? 'border-[#FF8200] bg-orange-50' : 'border-gray-200 hover:border-[#FF8200]'}`}
-                            >
-                                <h4 className="font-bold text-gray-900">Locataire</h4>
-                                <p className="text-xs text-gray-500 mt-1">Je loue un bien et je souhaite payer mes loyers.</p>
+                            <h3 className="text-lg font-black text-slate-800 mb-4 uppercase tracking-tighter">Quel est votre profil ?</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {profiles.map((p) => (
+                                    <div 
+                                        key={p.id}
+                                        onClick={() => setSelectedProfile(p.id)}
+                                        className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col gap-2 group ${selectedProfile === p.id ? 'border-[#FF8200] bg-orange-50/30' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-2xl group-hover:scale-110 transition-transform">{p.icon}</span>
+                                            {selectedProfile === p.id && <div className="w-5 h-5 bg-[#FF8200] rounded-full flex items-center justify-center text-[10px] text-white font-bold">✓</div>}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-[13px] text-slate-900 uppercase tracking-tight">{p.title}</h4>
+                                            <p className="text-[10px] leading-tight text-slate-500 mt-1 font-medium italic">{p.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
@@ -120,17 +133,20 @@ export default function OnboardingPage() {
                     )}
 
                     {step === 'KYC' && (
-                        <KYCStep onComplete={() => router.push(selectedRole === 'LANDLORD' ? '/dashboard' : '/locataire')} />
+                        <KYCStep onComplete={() => {
+                            if (selectedProfile === 'TENANT') router.push('/locataire');
+                            else router.push('/dashboard');
+                        }} />
                     )}
 
                     {step !== 'KYC' && (
                         <div className="mt-8">
                             <button
                                 onClick={handleNext}
-                                disabled={isPending || (step === 'ROLE' && !selectedRole) || (step === 'PROFILE' && (!fullName || !email))}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] disabled:opacity-50 transition-all"
+                                disabled={isPending || (step === 'ROLE' && !selectedProfile) || (step === 'PROFILE' && (!fullName || !email))}
+                                className="w-full h-14 flex justify-center items-center px-4 border border-transparent rounded-[1.2rem] shadow-xl text-xs font-black uppercase tracking-[0.2em] text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] disabled:opacity-50 transition-all active:scale-95"
                             >
-                                {isPending ? 'Chargement...' : 'Continuer'}
+                                {isPending ? 'Mise à jour du profil...' : 'Suivant : Identité →'}
                             </button>
                         </div>
                     )}

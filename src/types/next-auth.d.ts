@@ -13,6 +13,7 @@ declare module "next-auth" {
             kycStatus: string
             fullName?: string | null
             onboardingComplete?: boolean
+            profileType?: string | null
             diasporaAbonnement?: boolean
         } & DefaultSession["user"]
     }
@@ -26,6 +27,7 @@ declare module "next-auth" {
         kycStatus?: string
         fullName?: string | null
         onboardingComplete?: boolean
+        profileType?: string | null
         diasporaAbonnement?: boolean
     }
 }
@@ -41,6 +43,7 @@ declare module "next-auth/jwt" {
         kycStatus?: string
         fullName?: string | null
         onboardingComplete?: boolean
+        profileType?: string | null
         diasporaAbonnement?: boolean
     }
 }
@@ -57,6 +60,7 @@ declare module "@auth/core/types" {
             kycStatus: string
             fullName?: string | null
             onboardingComplete?: boolean
+            profileType?: string | null
             diasporaAbonnement?: boolean
         } & DefaultSession["user"]
     }
@@ -70,6 +74,7 @@ declare module "@auth/core/types" {
         kycStatus?: string
         fullName?: string | null
         onboardingComplete?: boolean
+        profileType?: string | null
         diasporaAbonnement?: boolean
     }
 }
@@ -86,6 +91,7 @@ declare module "@auth/core" {
             kycStatus: string
             fullName?: string | null
             onboardingComplete?: boolean
+            profileType?: string | null
             diasporaAbonnement?: boolean
         } & DefaultSession["user"]
     }
@@ -101,6 +107,7 @@ declare module "@auth/core/adapters" {
         kycStatus?: string
         fullName?: string | null
         onboardingComplete?: boolean
+        profileType?: string | null
         diasporaAbonnement?: boolean
     }
 }

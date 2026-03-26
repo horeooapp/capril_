@@ -508,6 +508,15 @@ enum CommType {
   BONUS
 }
 
+enum ProfileType {
+  LANDLORD
+  CERTIFIED_AGENCY
+  NON_CERTIFIED_AGENCY
+  INTERMEDIARY
+  DIASPORA
+  TENANT
+}
+
 model User {
   id          String  @id @default(uuid()) @map("user_id")
   phone       String? @unique
@@ -515,6 +524,7 @@ model User {
   name        String?
   email       String? @unique
   role Role @default(TENANT)
+  profileType ProfileType? @map("profile_type")
   kycLevel    Int     @default(0) @map("kyc_level") // 0-4
   kycStatus   String  @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
   status      String  @default("active") // active|suspended|inactive

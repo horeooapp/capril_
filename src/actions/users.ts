@@ -58,7 +58,7 @@ export async function logScoreConsultation(targetUserId: string, reason: string)
     return { success: true }
 }
 
-export async function updateProfile(data: { fullName?: string, email?: string, role?: string }) {
+export async function updateProfile(data: { fullName?: string, email?: string, role?: string, profileType?: string }) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
@@ -66,12 +66,42 @@ export async function updateProfile(data: { fullName?: string, email?: string, r
     }
 
     try {
+        let updateData: any = { ...data };
+        
+        // Mapping du ProfileType vers le Rôle technique et les flags
+        if (data.profileType) {
+            switch (data.profileType) {
+                case 'LANDLORD':
+                    updateData.role = 'LANDLORD';
+                    break;
+                case 'CERTIFIED_AGENCY':
+                    updateData.role = 'AGENCY';
+                    updateData.isCertified = true;
+                    break;
+                case 'NON_CERTIFIED_AGENCY':
+                    updateData.role = 'AGENCY';
+                    updateData.isCertified = false;
+                    break;
+                case 'INTERMEDIARY':
+                    updateData.role = 'NON_CERTIFIED_AGENT';
+                    break;
+                case 'DIASPORA':
+                    updateData.role = 'LANDLORD';
+                    updateData.diasporaAbonnement = true;
+                    break;
+                case 'TENANT':
+                    updateData.role = 'TENANT';
+                    break;
+            }
+        }
+
         await prisma.user.update({
             where: { id: session.user.id },
             data: {
-                ...data,
-                status: 'ACTIVE' 
-            } as any
+                ...updateData,
+                status: 'ACTIVE',
+                onboardingComplete: true
+            }
         })
 
         revalidatePath("/dashboard")
@@ -82,7 +112,7 @@ export async function updateProfile(data: { fullName?: string, email?: string, r
             action: "UPDATE_PROFILE",
             module: "USER",
             entityId: session.user.id,
-            newValues: data
+            newValues: updateData
         })
         
         return { success: true }

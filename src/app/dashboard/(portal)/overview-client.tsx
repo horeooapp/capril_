@@ -22,6 +22,8 @@ import {
 } from "lucide-react"
 import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
+import { AgencyPortalDashboard } from "@/components/dashboard/agency/AgencyPortalDashboard"
+
 interface DashboardProperty {
     id: string;
     name?: string | null;
@@ -61,6 +63,10 @@ export default function DashboardOverviewClient({
     latestReport?: any,
     regularizationAlert?: React.ReactNode
 }) {
+    if (user?.role === 'AGENCY') {
+        return <AgencyPortalDashboard />;
+    }
+
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)

@@ -19,6 +19,7 @@ export const authConfig = {
                 token.email = user.email
                 token.phone = user.phone
                 token.role = user.role as Role
+                token.profileType = (user as any).profileType
                 token.status = user.status
                 token.fullName = (user as any).fullName
                 token.onboardingComplete = (user as any).onboardingComplete
@@ -34,7 +35,8 @@ export const authConfig = {
                 session.user.role = (token.role as Role) || 'TENANT'
                 session.user.status = token.status as any
                 session.user.fullName = token.fullName as string
-                session.user.onboardingComplete = token.onboardingComplete as boolean
+                session.user.onboardingComplete = token.onboardingComplete as boolean;
+                (session.user as any).profileType = token.profileType as string;
                 (session.user as any).diasporaAbonnement = token.diasporaAbonnement as boolean
             }
             return session
