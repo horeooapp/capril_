@@ -106,12 +106,34 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
 }
 
 export async function completeOnboarding(userId: string, data: any) {
-    console.log(`[ONBOARDING] MINIMAL DEBUG START for user: ${userId}`);
+    console.log(`[ONBOARDING] RESTORING DB UPDATE with timeout for user: ${userId}`);
     try {
-        console.log(`[ONBOARDING] Returning SUCCESS without any DB write...`);
+        if (!userId) return { success: false, error: "Utilisateur non identifié" }
+
+        const updateData: any = { 
+            onboardingComplete: true,
+            fullName: data.fullName,
+            email: data.email
+        }
+        
+        console.log(`[ONBOARDING] Attempting User.update with 5s timeout...`);
+        
+        const updatePromise = prisma.user.update({
+            where: { id: userId },
+            data: updateData
+        })
+        
+        await Promise.race([
+            updatePromise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout Base de Données (5s). La base est peut-être verrouillée.")), 5000))
+        ])
+
+        console.log(`[ONBOARDING] User update SUCCESS`);
+        
+        // On garde l'upsert du profil désactivé pour l'instant pour valider le user d'abord
         return { success: true }
     } catch (error: any) {
-        console.error("Error in completeOnboarding minimal:", error)
+        console.error("Error in completeOnboarding with timeout:", error)
         return { success: false, error: error.message }
     }
 }
