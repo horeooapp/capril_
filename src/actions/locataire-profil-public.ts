@@ -105,25 +105,25 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
     }
 }
 
-export async function completeOnboarding(userId: string, data: {
-    fullName?: string,
-    email?: string,
-    profilData: {
-        statutPro?: string,
-        revenuFourchette?: string,
-        budgetMaxFcfa?: number,
-        // city?: string, // Temporairement retiré pour tester la sérialisation sans erreur Prisma Client
-        communesSouhaitees?: string[],
-        typeLogement?: string[],
-        visibilite?: string
-    }
-}) {
+export async function completeOnboarding(userId: string, data: any) {
+    console.log(`[ONBOARDING] Initiating for user: ${userId}`);
+    
     try {
+        if (!userId) {
+            console.error("[ONBOARDING] Missing userId");
+            return { success: false, error: "Utilisateur non identifié" }
+        }
+
+        if (!(prisma as any).locataireProfilPublic) {
+            console.error("[ONBOARDING] CRITICAL: locataireProfilPublic model is missing from Prisma Client");
+            return { success: false, error: "Mise à jour de l'infrastructure requise (Prisma mismatch)" }
+        }
+
         // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
         const profilDataToSave: any = {
             ...data.profilData,
-            communesSouhaitees: data.profilData.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
-            typeLogement: data.profilData.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
+            communesSouhaitees: data.profilData?.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
+            typeLogement: data.profilData?.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
         }
         
         // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
@@ -134,12 +134,14 @@ export async function completeOnboarding(userId: string, data: {
         if (data.fullName) updateData.fullName = data.fullName
         if (data.email) updateData.email = data.email
         
+        console.log(`[ONBOARDING] Updating user basic info...`);
         await prisma.user.update({
             where: { id: userId },
             data: updateData
         })
 
         // 2. Créer ou mettre à jour le profil public
+        console.log(`[ONBOARDING] Upserting public profile...`);
         const profil = await (prisma as any).locataireProfilPublic.upsert({
             where: { userId },
             create: {
