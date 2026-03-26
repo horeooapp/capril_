@@ -50,18 +50,6 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> =
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
-             <div className="flex -space-x-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-lg">
-                    A{i}
-                  </div>
-                ))}
-              </div>
-              <div className="h-10 px-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center shadow-sm">
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">4 Collaborateurs</span>
-              </div>
-          </div>
         </div>
       </div>
 

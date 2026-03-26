@@ -230,21 +230,6 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
                         </div>
                     </div>
 
-                    {/* KPI CARDS */}
-                    <div className="grid grid-cols-4 gap-2 mt-5">
-                        {[
-                            { label: "Entités", val: entities.length, icon: <Building2 size={16}/>, nav: () => resetNav("biens") },
-                            { label: "Taux occ.", val: stats.occupancyRate + "%", icon: <BarChart3 size={16}/> },
-                            { label: "Impayés", val: stats.arrears, icon: <AlertCircle size={16}/>, nav: () => { resetNav("biens"); setFilterBiens("impayés"); } },
-                            { label: "Vacants", val: stats.vacants, icon: <ShieldCheck size={16}/>, nav: () => { resetNav("biens"); setFilterBiens("vacants"); } },
-                        ].map((k, i) => (
-                            <div key={i} onClick={k.nav} className={`bg-white/12 border border-white/15 rounded-xl p-2 text-center transition-all ${k.nav ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}>
-                                <div className="text-white/80 mb-1 flex justify-center">{k.icon}</div>
-                                <div className="text-white font-extrabold text-sm leading-none">{k.val}</div>
-                                <div className="text-white/50 text-[8px] mt-1.5 uppercase font-bold tracking-wider">{k.label}</div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
 
                 {/* BODY SECTION (Scrollable) */}
