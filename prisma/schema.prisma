@@ -275,6 +275,9 @@ enum PaymentCanal {
   MOOV
   CINETPAY_M17
   SMS_DECLARATIF
+  SMS
+  WHATSAPP
+  APP_CHAT
 }
 
 enum PaymentPgwStatus {
