@@ -184,6 +184,11 @@ jobs:
             npx prisma@6.4.1 migrate resolve --rolled-back \"20260322172550_init\" || true && \
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
+            # FIX: Standalone mode requires public and .next/static to be inside the standalone folder
+            mkdir -p .next/standalone/public && \
+            cp -r public/* .next/standalone/public/ || true && \
+            mkdir -p .next/standalone/.next/static && \
+            cp -r .next/static/* .next/standalone/.next/static/ || true && \
             (pm2 delete capril || true) && \
             pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production && \
             pm2 save
