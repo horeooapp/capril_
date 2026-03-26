@@ -86,8 +86,8 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
 
             if (result.success) {
                 toast.success("Bienvenue sur QAPRIL !")
-                router.push("/locataire")
-                router.refresh()
+                // Force a hard redirect to ensure session is refreshed and dashboard loads correctly
+                window.location.href = "/locataire"
             } else {
                 toast.error(result.error || "Erreur lors de la sauvegarde")
             }

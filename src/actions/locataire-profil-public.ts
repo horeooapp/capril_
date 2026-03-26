@@ -158,6 +158,7 @@ export async function completeOnboarding(userId: string, data: any) {
         revalidatePath("/locataire")
         revalidatePath("/onboarding/tenant")
         
+        console.log(`[ONBOARDING] Action complete, returning success:true to client`);
         return { success: true }
     } catch (error: any) {
         console.error("Error completing onboarding:", error)
