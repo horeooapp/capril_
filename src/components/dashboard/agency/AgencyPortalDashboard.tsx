@@ -55,15 +55,15 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> =
 
       {/* Internal Navigation Tabs */}
       <div className="px-4">
-        <div className="flex gap-1 bg-white/50 backdrop-blur-md p-1.5 rounded-[2rem] border border-white/40 w-fit shadow-xl shadow-slate-200/50">
+        <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex items-center gap-3 px-6 py-4 rounded-[1.5rem] text-[12px] font-black uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#1F4E79] text-white shadow-2xl shadow-blue-900/20"
-                  : "text-slate-400 hover:text-slate-600 hover:bg-white/60"
+                  ? "bg-[#1F4E79] text-white shadow-lg shadow-blue-900/10"
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-200"
               }`}
             >
               {tab.icon}
@@ -87,12 +87,9 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> =
               <div className="space-y-10">
                 <AgencyKpiCards properties={properties} />
                 <div className="px-4">
-                     <section className="bg-white rounded-[3.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
-                        <div className="p-2 bg-slate-50 border-b border-slate-100 flex items-center justify-center">
-                           <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Vue d'ensemble du Portefeuille</span>
-                        </div>
-                        <AgencyPropertyList properties={properties} />
-                     </section>
+                  <div className="border-t border-slate-100 pt-8 mt-8">
+                    <AgencyPropertyList properties={properties} />
+                  </div>
                 </div>
               </div>
             )}

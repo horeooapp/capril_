@@ -8,7 +8,7 @@ import {
     Receipt, 
     ShieldCheck, 
     User, 
-    Bell, 
+    Zap,
     Plus, 
     ArrowRight,
     Search,
@@ -76,16 +76,16 @@ const Badge = ({ label, color, bg, size = 10 }: { label: string, color: string, 
 const Chip = ({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) => (
   <button 
     onClick={onClick} 
-    className={`border-none cursor-pointer px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors ${active ? 'bg-[#0D2B6E] text-white' : 'bg-[#EEF2F7] text-[#6A7D9E]'}`}
+    className={`border-none cursor-pointer px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors ${active ? 'bg-[#1F4E79] text-white' : 'bg-[#F2F5FA] text-[#6A7D9E]'}`}
   >
     {label}
   </button>
 )
 
 const Row = ({ label, value, color }: { label: string, value: string | number, color?: string }) => (
-  <div className="flex justify-between items-center py-2 border-b border-[#EEF2F7]">
+  <div className="flex justify-between items-center py-2 border-b border-[#F2F5FA]">
     <span className="text-[10px] text-[#6A7D9E] uppercase tracking-wider">{label}</span>
-    <span style={{ color: color || T.textMid }} className="text-[11px] font-bold">{value}</span>
+    <span style={{ color: color || "#2D3F5E" }} className="text-[11px] font-bold">{value}</span>
   </div>
 )
 
@@ -96,7 +96,7 @@ const SecTitle = ({ label }: { label: string }) => (
 const BackBtn = ({ label, onClick }: { label: string, onClick: () => void }) => (
   <button 
     onClick={onClick} 
-    className="bg-[#EEF2F7] border-none rounded-xl px-3 py-1.5 text-[11px] font-bold text-[#2D3F5E] cursor-pointer flex items-center gap-2"
+    className="bg-[#F2F5FA] border-none rounded-xl px-3 py-1.5 text-[11px] font-bold text-[#2D3F5E] cursor-pointer flex items-center gap-2"
   >
     <ArrowRight size={14} className="rotate-180" /> {label}
   </button>
@@ -165,7 +165,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
             occupancyRate: Math.round(((initialProperties.length - vacantCount) / Math.max(initialProperties.length, 1)) * 100),
             arrears: arrearsCount,
             vacants: vacantCount,
-            totalCautionCases: 0 // Mock for now or calculate if needed
+            totalCautionCases: 0 
         };
     }, [initialProperties]);
 
@@ -206,30 +206,19 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
     }
 
     return (
-        <div className="min-h-screen bg-[#F2F5FA] flex justify-center items-start p-4 font-sans text-[#0A1930]">
-            {/* Mobile-style Frame */}
-            <div className="w-[390px] min-h-[844px] bg-white rounded-[36px] shadow-2xl relative border border-[#D6DCE8] overflow-hidden flex flex-col">
+        <div className="min-h-screen bg-[#F2F5FA] p-0 md:p-8 font-sans text-[#0A1930]">
+            {/* Main Responsive Container */}
+            <div className="max-w-5xl mx-auto bg-white min-h-[90vh] md:rounded-[2.5rem] shadow-xl border border-[#D6DCE8] overflow-hidden flex flex-col relative">
                 
-                {/* HEADER SECTION */}
-                <div style={{ background: `linear-gradient(145deg, ${T.navyDark} 0%, ${T.green} 100%)` }} className="p-6 pb-8 relative overflow-hidden">
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full" />
-                    <div className="flex justify-between items-start relative z-10">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="bg-[#1A7A3C] text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Propriétaire</span>
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#22A050]" />
-                            </div>
-                            <h1 className="text-white text-lg font-extrabold uppercase tracking-tight">{user?.name || "KOUASSI ADAMA"}</h1>
-                            <p className="text-white/60 text-[11px] mt-1">{user?.email || "+225 07 44 55 66"}</p>
+                {/* CLEAN WELCOME HEADER */}
+                <div className="p-8 pt-12 pb-4">
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tableau de Bord Certifié</span>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                             <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white cursor-pointer hover:bg-white/25 transition-colors">
-                                <Bell size={20} />
-                             </div>
-                             {stats.arrears > 0 && <Badge label={`${stats.arrears} alertes`} color="#FFF" bg={T.red} size={8} />}
-                        </div>
+                        <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter leading-none uppercase italic">👋 Hello, <br/> {user?.name || "Propriétaire"}</h1>
                     </div>
-
                 </div>
 
                 {/* BODY SECTION (Scrollable) */}
@@ -237,105 +226,100 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
                     
                     {/* --- TAB: DASHBOARD (ACCUEIL) --- */}
                     {tab === "dashboard" && (
-                        <div className="p-4 space-y-6">
-                            {/* Original Welcome Info */}
-                            <div className="flex flex-col gap-1 mb-2 px-2">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Status de votre Portefeuille</p>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[14px] font-black text-[#1F4E79] uppercase">Compte Certifié</span>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                                </div>
-                            </div>
-
-                            {/* Original KPI Strip */}
-                            <div className="grid grid-cols-2 gap-3">
+                        <div className="p-8 space-y-12">
+                            {/* Premium Stats Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {[
-                                    { label: "Loyers Encaissés", val: fmt(stats.collected) + " FCFA", icon: <Receipt size={18}/>, color: "text-emerald-600", bg: "bg-emerald-50" },
-                                    { label: "Taux Occupation", val: stats.occupancyRate + "%", icon: <Building2 size={18}/>, color: "text-blue-600", bg: "bg-blue-50" },
-                                    { label: "Cautions Gérées", val: stats.totalCautionCases || "0", icon: <ShieldCheck size={18}/>, color: "text-orange-600", bg: "bg-orange-50" },
-                                    { label: "Indice Confiance", val: "98/100", icon: <ShieldCheck size={18}/>, color: "text-purple-600", bg: "bg-purple-50" },
-                                ].map((k, i) => (
-                                    <div key={i} className={`p-4 rounded-2xl ${k.bg} border border-transparent hover:border-white transition-all shadow-sm`}>
-                                        <div className={`mb-3 ${k.color}`}>{k.icon}</div>
-                                        <div className="text-[14px] font-black text-gray-900 leading-none">{k.val}</div>
-                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2">{k.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Original Financial Overview Card */}
-                            <div className="glass-panel p-6 rounded-3xl border border-white/50 shadow-xl">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex flex-col">
-                                        <h4 className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1">Loyer Mensuel Global.</h4>
-                                        <div className="text-2xl font-black text-[#1F4E79] font-mono leading-none">{fmt(stats.totalRent)} <span className="text-[12px] text-gray-400">FCFA</span></div>
-                                    </div>
-                                    <div className="px-3 py-1 bg-gray-50 rounded-lg border border-gray-100">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-60">Avril 2024</span>
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest">Encaissé à ce jour</span>
-                                        <span className="text-[16px] font-black text-emerald-600">{fmt(stats.collected)} FCFA</span>
-                                    </div>
-                                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                                        <div 
-                                            className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000" 
-                                            style={{ width: `${Math.round((stats.collected / Math.max(stats.totalRent, 1)) * 100)}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Original Flash Actions */}
-                            <div className="grid grid-cols-4 gap-2">
-                                {[
-                                    { icon: <Plus size={18} />, label: "Bien", tab: "biens" },
-                                    { icon: <Receipt size={18} />, label: "Quittance", tab: "quittances" },
-                                    { icon: <FileText size={18} />, label: "Rapports" },
-                                    { icon: <BarChart3 size={18} />, label: "Stats" },
-                                ].map((a, i) => (
-                                    <button 
-                                        key={i} 
-                                        onClick={() => a.tab && resetNav(a.tab)}
-                                        className="flex flex-col items-center gap-2 p-3 bg-white hover:bg-gray-50 rounded-2xl border border-gray-100 transition-all shadow-sm group"
+                                    { label: "Logements gérés", value: initialProperties.length, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
+                                    { label: "Sécurisé (CDC)", value: stats.totalRent * 2.5, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
+                                    { label: "Conformité Fiscale", value: 100, unit: "% DGI", icon: FileText, color: "text-amber-600 bg-amber-50", glow: "shadow-amber-200/40" },
+                                    { label: "Performance / Mois", value: stats.occupancyRate, unit: "%", icon: Zap, color: "text-violet-600 bg-violet-50", glow: "shadow-violet-200/40" },
+                                ].map((stat, i) => (
+                                    <motion.div 
+                                        key={i}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className={`glass-card-premium p-8 rounded-[2.5rem] border border-white/40 shadow-xl ${stat.glow} flex flex-col justify-between min-h-[180px] relative group hover:scale-[1.02] transition-all`}
                                     >
-                                        <div className="w-10 h-10 bg-gray-50 flex items-center justify-center rounded-xl text-[#1F4E79] group-hover:scale-110 transition-transform">{a.icon}</div>
-                                        <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{a.label}</span>
-                                    </button>
+                                        <div className="flex justify-between items-start relative z-10 font-bold">
+                                            <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400 mb-1 leading-none">{stat.label}</span>
+                                            <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
+                                                <stat.icon size={20} />
+                                            </div>
+                                        </div>
+                                        <div className="relative z-10 mt-6">
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-3xl font-black text-[#1F4E79] tracking-tighter leading-none">
+                                                    {stat.isCurrency ? fmt(stat.value) : stat.value}
+                                                </span>
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-400">{stat.unit}</span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
                                 ))}
                             </div>
 
-                            {/* Original Performance / Patrimoine List */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between px-2">
-                                    <h4 className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Patrimoine Actif.</h4>
-                                    <button onClick={() => resetNav("biens")} className="text-[10px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline">Voir tout →</button>
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                {/* Command Panel */}
+                                <div className="lg:col-span-4 glass-card-premium p-8 rounded-[2.5rem] bg-gray-900 text-white overflow-hidden relative group border-none shadow-2xl">
+                                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-orange-600 blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                                    <div className="relative z-10 flex flex-col h-full space-y-8">
+                                        <div>
+                                            <h2 className="text-3xl font-black mb-3 leading-none uppercase tracking-tighter italic text-white">Actions.<br/>Directes</h2>
+                                            <p className="text-[10px] font-medium text-gray-400 leading-relaxed max-w-[180px]">Commandes ultra-rapides pour la gestion de votre parc immobilier.</p>
+                                        </div>
+                                        <div className="space-y-3 mt-auto">
+                                            <button onClick={() => resetNav("biens")} className="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 rounded-2xl transition-all group/link border border-white/5 hover:border-white/20 active:scale-95">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-white/10 rounded-lg"><Plus size={18} /></div>
+                                                    <span className="font-black tracking-[0.1em] text-[12px] uppercase">Nouveau Logement</span>
+                                                </div>
+                                                <ArrowRight size={16} className="opacity-40 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all" />
+                                            </button>
+                                            <button onClick={() => resetNav("quittances")} className="w-full flex items-center justify-between p-5 bg-[#C55A11] hover:bg-[#A54A0D] rounded-2xl transition-all group/link active:scale-95">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-white/20 rounded-lg"><Zap size={18} /></div>
+                                                    <span className="font-black tracking-[0.1em] text-[12px] uppercase">Générer Quittance</span>
+                                                </div>
+                                                <ChevronRight size={16} className="group-hover/link:translate-x-1 transition-transform" />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    {entities.slice(0, 3).map((e: any) => {
-                                        const s = getEntiteStats(e);
-                                        return (
-                                            <div 
-                                                key={e.id} 
-                                                onClick={() => { setSelectedEntite(e); setTab("biens"); }}
-                                                className="p-4 bg-white border border-gray-100 rounded-2xl flex items-center justify-between group hover:shadow-lg transition-all"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 bg-gray-50 flex items-center justify-center rounded-xl text-[#1F4E79] shadow-sm">{getEntiteIcon(e.type)}</div>
-                                                    <div>
-                                                        <p className="text-[13px] font-black text-gray-900 uppercase tracking-tighter">{e.nom}</p>
-                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{e.commune}</p>
+
+                                {/* Patrimoine List */}
+                                <div className="lg:col-span-8 glass-panel p-8 rounded-[2.5rem] border border-white/50 shadow-xl font-bold">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">Patrimoine Actif.</h3>
+                                        <button onClick={() => resetNav("biens")} className="text-[10px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline">Voir tout le parc →</button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {entities.slice(0, 3).map((e: any) => {
+                                            const s = getEntiteStats(e);
+                                            return (
+                                                <div 
+                                                    key={e.id} 
+                                                    onClick={() => { setSelectedEntite(e); setTab("biens"); }}
+                                                    className="p-6 bg-gray-50/50 hover:bg-white rounded-3xl flex items-center justify-between group hover:shadow-lg transition-all border border-transparent hover:border-gray-100"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-14 h-14 bg-white flex items-center justify-center rounded-2xl text-[#1F4E79] shadow-sm border border-gray-50 group-hover:bg-[#1F4E79] group-hover:text-white transition-colors">
+                                                            {getEntiteIcon(e.type)}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[15px] font-black text-gray-900 uppercase tracking-tighter">{e.nom}</p>
+                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{e.commune}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[16px] font-black text-[#1F4E79] font-mono leading-none">{fmt(s.loyers)}</p>
+                                                        <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">FCFA/Mois</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-[14px] font-black text-[#1F4E79] font-mono">{fmt(s.loyers)}</p>
-                                                    <p className="text-[8px] font-black text-gray-300 uppercase">FCFA/Mois</p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         </div>
