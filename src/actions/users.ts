@@ -66,7 +66,7 @@ export async function updateProfile(data: { fullName?: string, email?: string, r
     }
 
     try {
-        let updateData: any = { ...data };
+        const updateData: any = { ...data };
         
         // Mapping du ProfileType vers le Rôle technique et les flags
         if (data.profileType) {
