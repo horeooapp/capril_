@@ -118,3 +118,36 @@ export const safeStringify = (obj: any) => {
         return value;
     }, 2);
 }
+/**
+ * Deep serialization for Prisma results (Dates, BigInt, etc.)
+ */
+export const serializeObject = (obj: any): any => {
+    if (obj === null || obj === undefined) return obj;
+    
+    // Handle Dates
+    if (obj instanceof Date) return obj.toISOString();
+    
+    // Handle BigInt
+    if (typeof obj === 'bigint') return obj.toString();
+    
+    // Handle Arrays
+    if (Array.isArray(obj)) {
+        return obj.map(item => serializeObject(item));
+    }
+    
+    // Handle Objects
+    if (typeof obj === 'object') {
+        const serialized: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            // Check for Prisma Decimal (has toFixed or is recognized differently)
+            if (value && typeof value === 'object' && (value as any).constructor?.name === 'Decimal') {
+                serialized[key] = Number(value);
+            } else {
+                serialized[key] = serializeObject(value);
+            }
+        }
+        return serialized;
+    }
+    
+    return obj;
+}

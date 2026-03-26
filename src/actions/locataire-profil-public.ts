@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { serializeObject } from "@/lib/serialize"
 
 /**
  * M-PROFIL-LOC : Profil Locataire Autonome
@@ -153,7 +154,7 @@ export async function completeOnboarding(userId: string, data: {
         revalidatePath("/locataire")
         revalidatePath("/onboarding/tenant")
         
-        return { success: true, profil }
+        return { success: true, profil: serializeObject(profil) }
     } catch (error) {
         console.error("Error completing onboarding:", error)
         return { success: false, error: "Erreur lors de la finalisation de l'onboarding" }

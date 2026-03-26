@@ -2,12 +2,18 @@
 
 import { prisma } from "@/lib/prisma"
 import { calculateUserScore } from "@/lib/scoring"
+import { serializeObject } from "@/lib/serialize"
 
 /**
  * M-LOC-DASHBOARD & M-LOC-SCORE (Profil centralisé)
  */
 
 export async function getLocataireDashboardData(userId: string) {
+    const data = await getLocataireDashboardDataRaw(userId)
+    return serializeObject(data)
+}
+
+async function getLocataireDashboardDataRaw(userId: string) {
     // Profil existant ou création si premier accès
     let profile = await (prisma as any).locataireProfile.findUnique({
         where: { userId }
