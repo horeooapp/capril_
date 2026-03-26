@@ -114,6 +114,7 @@ jobs:
           rsync -rlptvz --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='node_modules' \
+            --exclude='*.db*' \
             --exclude='.git' \
             --exclude='.github' \
             ./ $DEPLOY_DEST/
