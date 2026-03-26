@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 let _resend: Resend | null = null;
 
@@ -20,45 +21,66 @@ export async function sendEmail({
   html: string;
   attachments?: any[];
 }) {
-  console.log(`[Email] Sending to ${to}: ${subject}`);
+  console.log(`[Email] Attempting to send to ${to}: ${subject}`);
   
-  const resend = getResend();
+  const from = process.env.EMAIL_FROM || "noreply@qapril.net";
   const useMock = process.env.ENABLE_EMAIL_MOCK === 'true';
+  const resend = getResend();
+  const smtpUrl = process.env.EMAIL_SERVER;
 
-  if (!resend || useMock) {
-    console.warn(`[Email] ${useMock ? "Mock Enabled" : "AUTH_RESEND_KEY missing"}. Email not sent, logged to console instead.`);
-    console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
-    console.log(`[Email] MOCK HTML: ${html.substring(0, 500)}...`);
-    return { success: true, mock: true };
-  }
+  // 1. Try Resend if configured
+  if (resend && !useMock) {
+    try {
+      console.log(`[Email] Trying Resend provider...`);
+      const result = await resend.emails.send({
+        from,
+        to,
+        subject,
+        html,
+        attachments: attachments?.map(att => ({
+          filename: att.filename,
+          content: att.content,
+        })) as any,
+      });
 
-  try {
-    const from = process.env.EMAIL_FROM || "noreply@qapril.net";
-    console.log(`[Email] Attempting to send from: ${from}`);
-    
-    const result = await resend.emails.send({
-      from,
-      to,
-      subject,
-      html,
-      attachments: attachments?.map(att => ({
-        filename: att.filename,
-        content: att.content,
-      })) as any,
-    });
-
-    console.log("[Email] Resend full result:", JSON.stringify(result, null, 2));
-
-    if (result.error) {
-        console.error("[Email] Resend error detected:", result.error);
-        return { success: false, error: result.error };
+      if (!result.error) {
+        console.log("[Email] Resend delivery successful");
+        return { success: true, provider: 'resend', data: result.data };
+      }
+      console.error("[Email] Resend failed:", JSON.stringify(result.error));
+    } catch (error) {
+      console.error("[Email] Critical Resend technical error:", error);
     }
-
-    return { success: true, data: result.data };
-  } catch (error: any) {
-    console.error("[Email] Critical technical error during send:", error);
-    return { success: false, error };
   }
+
+  // 2. Fallback to SMTP if configured
+  if (smtpUrl && !useMock) {
+    try {
+      console.log(`[Email] Fallback to SMTP provider...`);
+      const transporter = nodemailer.createTransport(smtpUrl);
+      
+      const info = await transporter.sendMail({
+        from,
+        to,
+        subject,
+        html,
+        attachments: attachments?.map(att => ({
+          filename: att.filename,
+          content: att.content,
+        })),
+      });
+
+      console.log("[Email] SMTP delivery successful:", info.messageId);
+      return { success: true, provider: 'smtp', data: info };
+    } catch (error) {
+      console.error("[Email] SMTP fallback failed:", error);
+    }
+  }
+
+  // 3. Final Fallback to MOCK/LOG
+  console.warn(`[Email] All providers unavailable or Mock Enabled. Logging to console.`);
+  console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
+  return { success: true, mock: true };
 }
 
 export function wrapInPremiumTemplate(content: string, title?: string) {
