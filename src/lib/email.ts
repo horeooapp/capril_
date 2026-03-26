@@ -28,11 +28,19 @@ export async function sendEmail({
   const resend = getResend();
   const smtpUrl = process.env.EMAIL_SERVER;
 
+  // Helper for timeout
+  const withTimeout = (promise: Promise<any>, timeoutMs: number, providerName: string) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout: ${providerName} failed to respond after ${timeoutMs}ms`)), timeoutMs))
+    ]);
+  };
+
   // 1. Try Resend if configured
   if (resend && !useMock) {
     try {
-      console.log(`[Email] Trying Resend provider...`);
-      const result = await resend.emails.send({
+      console.log(`[Email] Trying Resend provider (10s timeout)...`);
+      const result = await withTimeout(resend.emails.send({
         from,
         to,
         subject,
@@ -41,26 +49,43 @@ export async function sendEmail({
           filename: att.filename,
           content: att.content,
         })) as any,
-      });
+      }), 10000, "Resend");
 
       if (!result.error) {
         console.log("[Email] Resend delivery successful");
         return { success: true, provider: 'resend', data: result.data };
       }
-      console.error("[Email] Resend failed:", JSON.stringify(result.error));
-      // Continuous to fallback if Resend fails
-    } catch (error) {
-      console.error("[Email] Critical Resend technical error:", error);
+      console.error("[Email] Resend returned error:", JSON.stringify(result.error));
+    } catch (error: any) {
+      console.error("[Email] Resend attempt failed/timed out:", error.message || error);
     }
   }
 
   // 2. Fallback to SMTP if configured
   if (smtpUrl && !useMock) {
     try {
-      console.log(`[Email] Fallback to SMTP provider...`);
-      const transporter = nodemailer.createTransport(smtpUrl);
+      console.log(`[Email] Fallback to SMTP provider (10s timeout)...`);
       
-      const info = await transporter.sendMail({
+      // Explicitly handle Port 465 for SSL/TLS if detected in the URL
+      const isSecurePort = smtpUrl.includes(":465");
+      
+      const transporter = nodemailer.createTransport(isSecurePort ? {
+        // Use object config for 465 to ensure secure: true
+        ...(() => {
+          const url = new URL(smtpUrl);
+          return {
+            host: url.hostname,
+            port: 465,
+            secure: true,
+            auth: {
+              user: decodeURIComponent(url.username),
+              pass: decodeURIComponent(url.password),
+            }
+          };
+        })()
+      } : smtpUrl);
+      
+      const info = await withTimeout(transporter.sendMail({
         from,
         to,
         subject,
@@ -69,12 +94,12 @@ export async function sendEmail({
           filename: att.filename,
           content: att.content,
         })),
-      });
+      }), 10000, "SMTP");
 
       console.log("[Email] SMTP delivery successful:", info.messageId);
       return { success: true, provider: 'smtp', data: info };
-    } catch (error) {
-      console.error("[Email] SMTP fallback failed:", error);
+    } catch (error: any) {
+      console.error("[Email] SMTP fallback failed/timed out:", error.message || error);
     }
   }
 
