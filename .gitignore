@@ -45,3 +45,11 @@ next-env.d.ts
 
 /src/generated/prisma
 test-smtp.js
+
+# OTP System (Removed from tracking)
+src/auth.ts
+src/auth.config.ts
+src/middleware.ts
+src/actions/auth.ts
+src/components/auth/EmailOTPForm.tsx
+src/app/api/v1/auth/verify-otp/
