@@ -117,6 +117,8 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: "Compte administrateur non trouvé ou accès refusé." };
         }
 
+        console.log("[AUTH-DEBUG] Found user:", user.email, "Role:", user.role);
+
         if (!user.password) {
             return { error: "Mot de passe non configuré pour ce compte." };
         }
