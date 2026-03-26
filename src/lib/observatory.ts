@@ -1,6 +1,6 @@
  
 import { prisma } from "./prisma";
-import { Decimal } from "@prisma/client/runtime/library";
+
 
 /**
  * Part 17.1: Compute Communal Rent Statistics
@@ -60,7 +60,7 @@ export async function computeCommunalStats(commune: string, propertyType: string
             minRent,
             maxRent,
             sampleCount: count,
-            trendPct: new Decimal(trendPct)
+            trendPct: trendPct
         }
     });
 }

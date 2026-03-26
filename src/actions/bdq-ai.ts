@@ -131,12 +131,12 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
                 canal: "APP_CHAT",
                 canalRef,
                 statut: BdqConvStatut.EN_COURS,
-                messagesHistory: []
+                messagesHistory: "[]"
             }
         });
     }
 
-    const history = (conv.messagesHistory as any[]) || [];
+    const history = JSON.parse(conv.messagesHistory || "[]") as any[];
     history.push({ role: "user", content: userMessage });
 
     // 2. Call Claude API 
@@ -203,7 +203,7 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
                     nomLocataireDeclare: input.nom_locataire,
                     telephoneLocataire: "NON_FOURNI",
                     descriptionLogement: input.description_logement,
-                    loyerDeclareMensuel: new Prisma.Decimal(input.loyer_mensuel),
+                    loyerDeclareMensuel: input.loyer_mensuel,
                     dateEntreeEstimee: input.date_entree_estimee ? new Date(input.date_entree_estimee) : null,
                     statut: BdqStatut.PENDING_LOCATAIRE,
                     hashDeclaration: "PENDING_AGENT_VISIT"
@@ -268,10 +268,10 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
                 await prisma.bdqConversationState.update({
                     where: { id: conv.id },
                     data: {
-                        messagesHistory: history,
+                        messagesHistory: JSON.stringify(history),
                         tokensEntreeTotal: conv.tokensEntreeTotal + inputTokens + (finalData.usage?.input_tokens || 0),
                         tokensSortieTotal: conv.tokensSortieTotal + outputTokens + (finalData.usage?.output_tokens || 0),
-                        coutEstimeFcfa: (conv.coutEstimeFcfa as Prisma.Decimal).add(new Prisma.Decimal(costFcfa))
+                        coutEstimeFcfa: (conv.coutEstimeFcfa as unknown as number) + costFcfa
                     }
                 });
                 return { message: finalMsg || "Success", status: "COMPLETE" };
@@ -283,11 +283,11 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
     await prisma.bdqConversationState.update({
         where: { id: conv.id },
         data: {
-            messagesHistory: history,
+            messagesHistory: JSON.stringify(history),
             nbEchanges: conv.nbEchanges + 1,
             tokensEntreeTotal: conv.tokensEntreeTotal + inputTokens,
             tokensSortieTotal: conv.tokensSortieTotal + outputTokens,
-            coutEstimeFcfa: (conv.coutEstimeFcfa as Prisma.Decimal).add(new Prisma.Decimal(costFcfa))
+            coutEstimeFcfa: (conv.coutEstimeFcfa as unknown as number) + costFcfa
         }
     });
 

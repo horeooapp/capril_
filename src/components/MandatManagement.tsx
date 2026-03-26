@@ -17,7 +17,7 @@ import { ProfilInterm } from "@prisma/client"
 
 export default function MandatManagement({ properties }: { properties: any[] }) {
   const [phone, setPhone] = useState("")
-  const [profil, setProfil] = useState<ProfilInterm>("PARENT_AMI")
+  const [profil, setProfil] = useState<ProfilInterm>(ProfilInterm.PARENT_AMI)
   const [selectedBiens, setSelectedBiens] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)

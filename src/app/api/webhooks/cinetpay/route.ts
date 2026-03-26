@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cinetpay } from "@/lib/cinetpay";
 import { createAndNotifyReceipt } from "@/lib/receipt";
-import { Decimal } from "@prisma/client/runtime/library";
 import { PaymentCanal, PaymentPgwStatus } from "@prisma/client";
 
 /**
@@ -108,7 +107,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     leaseId: intent.leaseId,
                     moisConcerne: new Date(),
-                    montant: new Decimal(intent.amount),
+                    montant: intent.amount,
                     payeurId: intent.lease.tenantId || "SYSTEM",
                     beneficiaireId: intent.lease.landlordId,
                     canal: PaymentCanal.CINETPAY_M17,
@@ -122,16 +121,16 @@ export async function POST(req: NextRequest) {
             });
 
             // --- ADD-05: M-TVA Ventilation ---
-            const montantTtc = new Decimal(intent.amount);
-            const montantHt = montantTtc.div(1.18);
-            const montantTva = montantTtc.minus(montantHt);
+            const montantTtc = intent.amount;
+            const montantHt = Math.round(montantTtc / 1.18);
+            const montantTva = montantTtc - montantHt;
             
             await tx.tvaTransaction.create({
                 data: {
                     paymentId: pgw.id, 
                     serviceType: metadata?.serviceType || "LOYER",
                     montantHt,
-                    tauxTva: new Decimal(18.00),
+                    tauxTva: 18.00,
                     montantTva,
                     montantTtc,
                     periodeFiscale: new Date(new Date().getFullYear(), new Date().getMonth(), 1)

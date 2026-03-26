@@ -3,259 +3,259 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  SUPER_ADMIN
-  ADMIN
-  ANAH_AGENT
-  CDC_AGENT
-  LANDLORD
-  LANDLORD_PRO
-  AGENCY
-  TENANT
-  NON_CERTIFIED_AGENT
-  CHAMPION
-}
+// enum String {
+//   SUPER_ADMIN
+//   ADMIN
+//   ANAH_AGENT
+//   CDC_AGENT
+//   LANDLORD
+//   LANDLORD_PRO
+//   AGENCY
+//   TENANT
+//   NON_CERTIFIED_AGENT
+//   CHAMPION
+// }
 
-enum CDCDepositStatus {
-  AWAITING_PAYMENT
-  PENDING
-  CONSIGNED
-  RETURN_REQUESTED
-  RETURNED
-  FORFEITED
-}
+// enum String {
+//   AWAITING_PAYMENT
+//   PENDING
+//   CONSIGNED
+//   RETURN_REQUESTED
+//   RETURNED
+//   FORFEITED
+// }
 
-enum CDCDepositInitiator {
-  OWNER
-  AGENCY
-  ADMIN
-}
+// enum String {
+//   OWNER
+//   AGENCY
+//   ADMIN
+// }
 
-enum LeaseStatus {
-  DRAFT
-  PENDING_SIGNATURE
-  PENDING_CONFIRMATION
-  PENDING_DEPOSIT
-  ACTIVE
-  ACTIVE_DECLARATIF
-  LOYER_IMPAYE
-  MISE_EN_DEMEURE
-  CLEMENCE_EN_COURS
-  REPRISE_PROCEDURE
-  DEMANDE_RESILIATION
-  TERMINATED
-  CANCELLED
-  ARCHIVED
-}
+// enum String {
+//   DRAFT
+//   PENDING_SIGNATURE
+//   PENDING_CONFIRMATION
+//   PENDING_DEPOSIT
+//   ACTIVE
+//   ACTIVE_DECLARATIF
+//   LOYER_IMPAYE
+//   MISE_EN_DEMEURE
+//   CLEMENCE_EN_COURS
+//   REPRISE_PROCEDURE
+//   DEMANDE_RESILIATION
+//   TERMINATED
+//   CANCELLED
+//   ARCHIVED
+// }
 
-enum TypeBail {
-  ECRIT
-  DECLARATIF_BDQ
-  DECLARATIF_EN_COURS_FORMALISATION
-}
+// enum String {
+//   ECRIT
+//   DECLARATIF_BDQ
+//   DECLARATIF_EN_COURS_FORMALISATION
+// }
 
-enum PlanTier {
-  LOCATAIRE
-  ESSENTIEL
-  PRO
-  PREMIUM
-  INSTITUTIONNEL
-}
+// enum String {
+//   LOCATAIRE
+//   ESSENTIEL
+//   PRO
+//   PREMIUM
+//   INSTITUTIONNEL
+// }
 
-enum PlanStatus {
-  PROPOSED
-  ACCEPTED
-  REJECTED
-  BROKEN
-  COMPLETED
-}
+// enum String {
+//   PROPOSED
+//   ACCEPTED
+//   REJECTED
+//   BROKEN
+//   COMPLETED
+// }
 
-enum InsuranceStatus {
-  ACTIVE
-  CANCELLED
-  EXPIRED
-}
+// enum String {
+//   ACTIVE
+//   CANCELLED
+//   EXPIRED
+// }
 
-enum InsuranceClaimStatus {
-  OPEN
-  PROCESSING
-  RESOLVED
-  REJECTED
-}
+// enum String {
+//   OPEN
+//   PROCESSING
+//   RESOLVED
+//   REJECTED
+// }
 
-enum MediationStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-  CANCELLED
-}
+// enum String {
+//   OPEN
+//   IN_PROGRESS
+//   RESOLVED
+//   CLOSED
+//   CANCELLED
+// }
 
-enum DisputeStatus {
-  OPEN
-  WAITING_RESPONSE
-  IN_MEDIATION
-  RESOLVED
-  ESCALATED
-  CLOSED
-}
+// enum String {
+//   OPEN
+//   WAITING_RESPONSE
+//   IN_MEDIATION
+//   RESOLVED
+//   ESCALATED
+//   CLOSED
+// }
 
-enum PrepaymentRequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  COMPLETED
-  CANCELLED
-}
+// enum String {
+//   PENDING
+//   APPROVED
+//   REJECTED
+//   COMPLETED
+//   CANCELLED
+// }
 
-enum FiscalStatus {
-  EN_ATTENTE_DECLARATION
-  NOTIFIE
-  EN_COURS_PAIEMENT
-  PAYE_CONFIRME
-  ENREGISTRE
-  ECHEC_PAIEMENT
-  PAIEMENT_PARTIEL
-  DECLARATION_EN_RETARD
-  IGNORE_PAR_BAILLEUR
-  RENOUVELE
-}
+// enum String {
+//   EN_ATTENTE_DECLARATION
+//   NOTIFIE
+//   EN_COURS_PAIEMENT
+//   PAYE_CONFIRME
+//   ENREGISTRE
+//   ECHEC_PAIEMENT
+//   PAIEMENT_PARTIEL
+//   DECLARATION_EN_RETARD
+//   IGNORE_PAR_BAILLEUR
+//   RENOUVELE
+// }
 
-enum MandateType {
-  EXCLUSIVE
-  SIMPLE
-  CO_EXCLUSIVE
-  DIRECT
-}
+// enum String {
+//   EXCLUSIVE
+//   SIMPLE
+//   CO_EXCLUSIVE
+//   DIRECT
+// }
 
-enum MandateStatus {
-  ACTIVE
-  SUSPENDED
-  CANCELLED
-  EXPIRED
-  DRAFT
-}
+// enum String {
+//   ACTIVE
+//   SUSPENDED
+//   CANCELLED
+//   EXPIRED
+//   DRAFT
+// }
 
-enum DeclencheurEnum {
-  SOLDE_BAS
-  FIN_DE_MOIS
-  CREDIT_GENERE
-  RAPPEL_MENSUEL
-  MANUEL
-}
+// enum String {
+//   SOLDE_BAS
+//   FIN_DE_MOIS
+//   CREDIT_GENERE
+//   RAPPEL_MENSUEL
+//   MANUEL
+// }
 
-enum ManagementMode {
-  AGENCY
-  DIRECT
-  MIXED
-}
+// enum String {
+//   AGENCY
+//   DIRECT
+//   MIXED
+// }
 
-enum ColocRole {
-  PRINCIPAL
-  SECONDAIRE
-}
+// enum String {
+//   PRINCIPAL
+//   SECONDAIRE
+// }
 
-enum ColocMode {
-  GROUPE
-  INDIVIDUEL
-  LIBRE
-}
+// enum String {
+//   GROUPE
+//   INDIVIDUEL
+//   LIBRE
+// }
 
-enum LoyerStatut {
-  EN_ATTENTE
-  PARTIEL
-  COMPLET
-  EXCEDENT
-  IMPAYE
-}
+// enum String {
+//   EN_ATTENTE
+//   PARTIEL
+//   COMPLET
+//   EXCEDENT
+//   IMPAYE
+// }
 
-enum TerrainUsage {
-  PARKING_VEHICULES
-  PARKING_CAMIONS
-  COMMERCE_TEMPORAIRE
-  STOCKAGE
-  AGRICULTURE
-  EVENEMENTIEL
-  INDUSTRIEL
-  AUTRE
-}
+// enum String {
+//   PARKING_VEHICULES
+//   PARKING_CAMIONS
+//   COMMERCE_TEMPORAIRE
+//   STOCKAGE
+//   AGRICULTURE
+//   EVENEMENTIEL
+//   INDUSTRIEL
+//   AUTRE
+// }
 
-enum Periodicite {
-  JOURNALIER
-  HEBDOMADAIRE
-  MENSUEL
-  TRIMESTRIEL
-  SEMESTRIEL
-  ANNUEL
-  FORFAIT
-}
+// enum String {
+//   JOURNALIER
+//   HEBDOMADAIRE
+//   MENSUEL
+//   TRIMESTRIEL
+//   SEMESTRIEL
+//   ANNUEL
+//   FORFAIT
+// }
 
-enum VisibEnum {
-  INVISIBLE
-  INVITATION_PROPRIO
-  INVITATION_AGENCE
-  TOUS
-}
+// enum String {
+//   INVISIBLE
+//   INVITATION_PROPRIO
+//   INVITATION_AGENCE
+//   TOUS
+// }
 
-enum InvitStatutEnum {
-  ENVOYEE
-  VUE
-  ACCEPTEE
-  REFUSEE
-  EXPIREE
-  ANNULEE
-}
+// enum String {
+//   ENVOYEE
+//   VUE
+//   ACCEPTEE
+//   REFUSEE
+//   EXPIREE
+//   ANNULEE
+// }
 
-enum UtilityMode {
-  INDIVIDUEL_LOCATAIRE
-  PARTAGÉ_PROPRIO
-  INDIVIDUEL_PROPRIO
-  MIXTE
-  NON_APPLICABLE
-}
+// enum String {
+//   INDIVIDUEL_LOCATAIRE
+//   PARTAGÉ_PROPRIO
+//   INDIVIDUEL_PROPRIO
+//   MIXTE
+//   NON_APPLICABLE
+// }
 
-enum RepartitionModel {
-  PRORATA_CHAMBRE
-  FORFAIT_FIXE
-  USAGE_DÉCLARÉ
-}
+// enum String {
+//   PRORATA_CHAMBRE
+//   FORFAIT_FIXE
+//   USAGE_DÉCLARÉ
+// }
 
-enum UtilityType {
-  CIE
-  SODECI
-}
+// enum String {
+//   CIE
+//   SODECI
+// }
 
-enum UtilityStatus {
-  EN_COURS
-  PAYÉE
-  EN_RETARD
-  PARTIELLE
-  EN_ATTENTE
-}
+// enum String {
+//   EN_COURS
+//   PAYÉE
+//   EN_RETARD
+//   PARTIELLE
+//   EN_ATTENTE
+// }
 
-enum MaintenanceCategory {
-  MAI_EL
-  MAI_EA
-  MAI_TO
-  MAI_SE
-  MAI_SA
-  MAI_PC
-  MAI_AU
-  MAI_DI
-}
+// enum String {
+//   MAI_EL
+//   MAI_EA
+//   MAI_TO
+//   MAI_SE
+//   MAI_SA
+//   MAI_PC
+//   MAI_AU
+//   MAI_DI
+// }
 
-enum MaintenanceStatus {
-  EN_ATTENTE
-  PRIS_EN_CHARGE
-  RÉSOLU
-  CONTESTÉ
-  LITIGE
-  CLÔTURÉ
-}
+// enum String {
+//   EN_ATTENTE
+//   PRIS_EN_CHARGE
+//   RÉSOLU
+//   CONTESTÉ
+//   LITIGE
+//   CLÔTURÉ
+// }
 
 
 // ═══════════════════════════════════════════════════════
@@ -265,8 +265,9 @@ model User {
   id          String  @id @default(uuid()) @map("user_id")
   phone       String? @unique
   fullName    String? @map("full_name")
+  name        String?
   email       String? @unique
-  role        Role    @default(TENANT)
+  role        String    @default("TENANT")
   kycLevel    Int     @default(0) @map("kyc_level") // 0-4
   kycStatus   String  @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
   status      String  @default("active") // active|suspended|inactive
@@ -335,7 +336,7 @@ model User {
   blacklistAuthored   FraudBlacklist[]       @relation("BlacklistAuthor")
 
   // ADD-05 Freemium
-  activePlanTier     PlanTier            @default(LOCATAIRE) @map("active_plan_tier")
+  activePlanTier     String            @default("LOCATAIRE") @map("active_plan_tier")
   planExpiresAt      DateTime?           @map("plan_expires_at")
   subscriptionAudits SubscriptionAudit[]
 
@@ -343,10 +344,10 @@ model User {
   walletBalance Int @default(0) @map("wallet_balance")
 
   // ADD-07 v3 Rechargement Automatique
-  walletSeuilAlerte   Decimal? @default(500) @map("wallet_seuil_alerte")
+  walletSeuilAlerte   Float? @default(500) @map("wallet_seuil_alerte")
   walletRappelActif   Boolean  @default(false) @map("wallet_rappel_actif")
   walletRappelJour    Int      @default(1) @map("wallet_rappel_jour")
-  walletRappelMontant Decimal? @map("wallet_rappel_montant")
+  walletRappelMontant Float? @map("wallet_rappel_montant")
   walletOperateurPrefere String @default("WAVE") @map("wallet_operateur_prefere")
   walletCanalAlertePref String @default("WHATSAPP") @map("wallet_canal_alerte_pref")
 
@@ -516,16 +517,16 @@ model Property {
   leaseType            String   @default("residential") @map("lease_type") // residential|commercial
   commune              String
   address              String
-  areaSqm              Decimal? @map("area_sqm")
+  areaSqm              Float? @map("area_sqm")
   rooms                Int?
   bedrooms             Int?
   name                 String?  @map("name")
   city                 String?  @map("city")
-  declaredRentFcfa     Decimal? @map("declared_rent_fcfa")
+  declaredRentFcfa     Float? @map("declared_rent_fcfa")
   digitalPostalAddress String?  @map("digital_postal_address")
-  gpsLatitude          Decimal? @map("gps_latitude")
-  gpsLongitude         Decimal? @map("gps_longitude")
-  amenities            String[] @default([])
+  gpsLatitude          Float? @map("gps_latitude")
+  gpsLongitude         Float? @map("gps_longitude")
+  amenities String @default("[]")
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
   documents            Json?
 
@@ -535,9 +536,9 @@ model Property {
   managedByUserId String? @map("managed_by")
   manager         User?   @relation("AgentProperties", fields: [managedByUserId], references: [id])
 
-  managementMode    ManagementMode @default(DIRECT) @map("management_mode")
-  superficieM2      Decimal?       @map("superficie_m2")
-  usageTerrain      TerrainUsage?  @map("usage_terrain")
+  managementMode    String @default("DIRECT") @map("management_mode")
+  superficieM2      Float?       @map("superficie_m2")
+  usageTerrain      String?  @map("usage_terrain")
   referenceCadastre String?        @map("reference_cadastre")
 
   leases           Lease[]
@@ -549,7 +550,7 @@ model Property {
 
   // ADD-05 Horeoo
   isHoreoo       Boolean  @default(false) @map("is_horeoo")
-  horeooDiscount Decimal? @map("horeoo_discount")
+  horeooDiscount Float? @map("horeoo_discount")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -624,11 +625,11 @@ model Lease {
   dateLimitePaiement Int     @default(5) @map("date_limite_paiement") // Jour du mois avant lequel le loyer est dû (ex: 5, 10, personalized)
   paiementAvance     Boolean @default(true) @map("paiement_avance")    // TRUE = payé d'avance (standard CI)
 
-  status     LeaseStatus @default(DRAFT)
+  status     String @default("DRAFT")
   importMode Boolean     @default(false) @map("import_mode")
 
   // ADD-05 BDQ
-  typeBail                 TypeBail  @default(ECRIT) @map("type_bail")
+  typeBail                 String  @default("ECRIT") @map("type_bail")
   confirmationLocataireSms Boolean   @default(false) @map("confirmation_locataire_sms")
   confirmationLocataireAt  DateTime? @map("confirmation_locataire_at")
   preavisRequisMois        Int?      @default(1) @map("preavis_requis_mois")
@@ -679,11 +680,11 @@ model Lease {
   reminders ReminderLog[]
 
   // ADD-18 Utilities
-  modeUtilities     UtilityMode @default(NON_APPLICABLE) @map("mode_utilities")
+  modeUtilities     String @default("NON_APPLICABLE") @map("mode_utilities")
   identifiantCie    String?     @map("identifiant_cie")
   identifiantSodeci String?     @map("identifiant_sodeci")
-  modeleRepartition RepartitionModel @default(PRORATA_CHAMBRE) @map("modele_repartition")
-  forfaitUtilitiesMensuel Decimal? @map("forfait_utilities_mensuel")
+  modeleRepartition String @default("PRORATA_CHAMBRE") @map("modele_repartition")
+  forfaitUtilitiesMensuel Float? @map("forfait_utilities_mensuel")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -714,10 +715,10 @@ model Lease {
   // ADD-01 v2 M-FISCAL
   nbPagesBail            Int?      @map("nb_pages_bail")
   dureeMoisBail          Int?      @map("duree_mois_bail")
-  loyerTotalFcfa         Decimal?  @map("loyer_total_fcfa")
-  droitsEnregistrement   Decimal?  @map("droits_enregistrement")
-  fraisTimbre            Decimal?  @map("frais_timbre")
-  totalFiscalBail        Decimal?  @map("total_fiscal_bail")
+  loyerTotalFcfa         Float?  @map("loyer_total_fcfa")
+  droitsEnregistrement   Float?  @map("droits_enregistrement")
+  fraisTimbre            Float?  @map("frais_timbre")
+  totalFiscalBail        Float?  @map("total_fiscal_bail")
   statutFiscal           String    @default("NON_CALCULÉ") @map("statut_fiscal")
   recuFiscalUrl          String?   @map("recu_fiscal_url")
   recuFiscalHash         String?   @map("recu_fiscal_hash")
@@ -819,9 +820,9 @@ model CDCDeposit {
   leaseId      String              @unique @map("lease_id")
   lease        Lease               @relation(fields: [leaseId], references: [id])
   amount       Int
-  initiator    CDCDepositInitiator @default(OWNER)
+  initiator    String @default("OWNER")
   cdcReference String?             @map("cdc_reference")
-  status       CDCDepositStatus    @default(AWAITING_PAYMENT)
+  status       String    @default("AWAITING_PAYMENT")
   proofHash    String?             @map("proof_hash")
   consignedAt  DateTime?           @map("consigned_at")
   returnedAt   DateTime?           @map("returned_at")
@@ -842,13 +843,13 @@ model Mandate {
   property        Property      @relation(fields: [propertyId], references: [id])
   agentUserId     String?       @map("agent_id")
   agent           User?         @relation("AgentMandates", fields: [agentUserId], references: [id])
-  mandateType     MandateType
-  commissionPct   Decimal?      @map("commission_pct")
+  mandateType     String
+  commissionPct   Float?      @map("commission_pct")
   commissionFixed Int?          @map("commission_fixed")
   startDate       DateTime      @map("start_date")
   endDate         DateTime?     @map("end_date")
-  status          MandateStatus @default(DRAFT)
-  scope           String[]      @default([]) // List of units or total
+  status          String @default("DRAFT")
+  scope String @default("[]") // List of units or total
 
   signedAt          DateTime? @map("signed_at")
   cancelledAt       DateTime? @map("cancelled_at")
@@ -874,7 +875,7 @@ model MandateHistory {
   mandate          Mandate     @relation(fields: [mandateId], references: [id])
   agentUserId      String?     @map("agent_id")
   agent            User?       @relation("MandateHistoryAgent", fields: [agentUserId], references: [id])
-  mandateType      MandateType @map("type_mandat")
+  mandateType      String @map("type_mandat")
   startDate        DateTime    @map("periode_debut")
   endDate          DateTime?   @map("periode_fin")
   bailsTransferred Int?        @map("baux_actifs_transferes")
@@ -890,10 +891,10 @@ model Colocataire {
   lease        Lease     @relation(fields: [leaseId], references: [id])
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
-  role         ColocRole @default(SECONDAIRE)
+  role         String @default("SECONDAIRE")
   partLoyer    Int?      @map("part_loyer")
-  pctLoyer     Decimal?  @map("pct_loyer")
-  modePaiement ColocMode @default(INDIVIDUEL) @map("mode_paiement")
+  pctLoyer     Float?  @map("pct_loyer")
+  modePaiement String @default("INDIVIDUEL") @map("mode_paiement")
   dateEntree   DateTime  @map("date_entree")
   dateSortie   DateTime? @map("date_sortie")
   status       String    @default("ACTIF") // ACTIF | SORTI | EXCLU
@@ -931,7 +932,7 @@ model MonthlyRentSynthesis {
   month           String      @map("mois_concerne") // YYYY-MM
   totalExpected   Int         @map("loyer_total_du")
   amountCollected Int         @default(0) @map("montant_collecte")
-  status          LoyerStatut @default(EN_ATTENTE) @map("statut_mois")
+  status          String @default("EN_ATTENTE") @map("statut_mois")
   globalReceiptId String?     @map("quittance_glob_id")
   completedAt     DateTime?   @map("completed_at")
 
@@ -943,11 +944,11 @@ model LandLeaseInfo {
   id                String       @id @default(uuid())
   leaseId           String       @unique @map("bail_id")
   lease             Lease        @relation(fields: [leaseId], references: [id])
-  superficieLouee   Decimal      @map("superficie_louee_m2")
-  usage             TerrainUsage @map("usage_declare")
-  periodicity       Periodicite  @default(MENSUEL) @map("periodicite_loyer")
+  superficieLouee   Float      @map("superficie_louee_m2")
+  usage             String @map("usage_declare")
+  periodicity       String  @default("MENSUEL") @map("periodicite_loyer")
   eventEndDate      DateTime?    @map("date_evenement_fin")
-  annualIndexation  Decimal?     @default(0) @map("indexation_annuelle")
+  annualIndexation  Float?     @default(0) @map("indexation_annuelle")
   conditions        String?      @map("conditions_usage")
   hasEntryInventory Boolean      @default(false) @map("etat_des_lieux_entree")
   hasExitInventory  Boolean      @default(false) @map("etat_des_lieux_sortie")
@@ -1008,7 +1009,7 @@ model Dispute {
   title           String
   description     String
   amountInDispute Int?          @map("amount_in_dispute")
-  status          DisputeStatus @default(OPEN)
+  status          String @default("OPEN")
   resolution      String?
 
   messages DisputeMessage[]
@@ -1026,7 +1027,7 @@ model DisputeMessage {
   senderId    String   @map("sender_id")
   sender      User     @relation("DisputeSender", fields: [senderId], references: [id])
   content     String
-  attachments String[] @default([])
+  attachments String @default("[]")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1080,7 +1081,7 @@ model ObservatorySnapshot {
   minRent      Int     @map("min_rent")
   maxRent      Int     @map("max_rent")
   sampleCount  Int     @map("sample_count")
-  trendPct     Decimal @map("trend_pct")
+  trendPct     Float @map("trend_pct")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1141,8 +1142,8 @@ model SuccessionLocataire {
   beneficiaireExtNom   String? @map("beneficiaire_ext_nom")
   beneficiaireExtPhone String? @map("beneficiaire_ext_phone")
   
-  loyerProrata    Decimal? @map("loyer_prorata")
-  cautionMontant  Decimal? @map("caution_montant")
+  loyerProrata    Float? @map("loyer_prorata")
+  cautionMontant  Float? @map("caution_montant")
   cautionRestituee Boolean @default(false) @map("caution_restituee")
   dateRestitution DateTime? @map("date_restitution")
   
@@ -1286,7 +1287,7 @@ model Insurance {
   lease    Lease           @relation(fields: [leaseId], references: [id])
   provider String
   policyNo String          @unique @map("policy_no")
-  status   InsuranceStatus @default(ACTIVE)
+  status   String @default("ACTIVE")
 
   claims InsuranceClaim[]
 
@@ -1302,7 +1303,7 @@ model InsuranceClaim {
   insurance   Insurance            @relation(fields: [insuranceId], references: [id])
   amount      Int
   reason      String
-  status      InsuranceClaimStatus @default(OPEN)
+  status      String @default("OPEN")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1315,7 +1316,7 @@ model RepaymentPlan {
   leaseId         String     @map("lease_id")
   lease           Lease      @relation(fields: [leaseId], references: [id])
   details         String
-  status          PlanStatus @default(PROPOSED)
+  status          String @default("PROPOSED")
   tenantSignature String?    @map("tenant_signature")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1331,7 +1332,7 @@ model Mediation {
   bdqId   String?         @unique @map("bdq_id")
   bdq     BailDeclaratif? @relation(fields: [bdqId], references: [id])
   subject String
-  status  MediationStatus @default(OPEN)
+  status  String @default("OPEN")
 
   messages MediationMessage[]
 
@@ -1377,7 +1378,7 @@ model FiscalDossier {
   dureeBailMois        Int     @map("duree_bail_mois")
   dureeRetenueMois     Int     @map("duree_retenue_mois")
   baseCalcul           Int     @map("base_calcul")
-  tauxApplique         Decimal @default(0.0250) @map("taux_applique")
+  tauxApplique         Float @default(0.0250) @map("taux_applique")
   droitsEnregistrement Int     @map("droits_enregistrement")
   fraisTimbre          Int     @default(1000) @map("frais_timbre")
   fraisQapril          Int     @map("frais_qapril")
@@ -1386,7 +1387,7 @@ model FiscalDossier {
   penaltyAmount        Int     @default(0) @map("penalty_amount")
   exonere              Boolean @default(false)
 
-  statut           FiscalStatus @default(EN_ATTENTE_DECLARATION)
+  statut           String @default("EN_ATTENTE_DECLARATION")
   dateLimiteLegale DateTime     @map("date_limite_legale")
 
   cinetpayTransId    String?   @map("cinetpay_transaction_id")
@@ -1431,7 +1432,7 @@ model PrepaymentRequest {
   monthsCount Int                     @map("months_count")
   totalAmount Int                     @map("total_amount")
   reason      String?
-  status      PrepaymentRequestStatus @default(PENDING)
+  status      String @default("PENDING")
 
   rejectionReason String?   @map("rejection_reason")
   approvedAt      DateTime? @map("approved_at")
@@ -1456,18 +1457,18 @@ model PaymentPgw {
   leaseId      String   @map("lease_id")
   lease        Lease    @relation(fields: [leaseId], references: [id])
   moisConcerne DateTime @map("mois_concerne")
-  montant      Decimal
+  montant      Float
 
   payeurId       String @map("payeur_id")
   payeur         User   @relation("PayerTransactions", fields: [payeurId], references: [id])
   beneficiaireId String @map("beneficiaire_id")
   beneficiaire   User   @relation("BeneficiaryTransactions", fields: [beneficiaireId], references: [id])
 
-  canal              PaymentCanal
+  canal              String
   msisdnPayeur       String?      @map("msisdn_payeur")
   msisdnBeneficiaire String?      @map("msisdn_beneficiaire")
 
-  statut PaymentPgwStatus @default(INITIEE)
+  statut String @default("INITIEE")
 
   refInterne   String  @unique @map("ref_interne")
   refOperateur String? @map("ref_operateur")
@@ -1491,8 +1492,8 @@ model PaymentPgw {
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
   // M-PAY-AUTO
-  reversalStatus   ReversalStatus        @default(PENDING) @map("reversal_status")
-  honorairesAgence Decimal?              @map("honoraires_agence")
+  reversalStatus   String        @default("PENDING") @map("reversal_status")
+  honorairesAgence Float?              @map("honoraires_agence")
   reversals        ReversalTransaction[]
 
   @@index([leaseId, moisConcerne])
@@ -1501,11 +1502,11 @@ model PaymentPgw {
   @@map("payments_pgw")
 }
 
-enum ReversalStatus {
-  PENDING
-  REVERSED
-  FAILED
-}
+// enum String {
+//   PENDING
+//   REVERSED
+//   FAILED
+// }
 
 model ReversalTransaction {
   id           String       @id @default(uuid()) @map("reversal_id")
@@ -1513,8 +1514,8 @@ model ReversalTransaction {
   payment      PaymentPgw   @relation(fields: [paymentId], references: [id])
   recipientId  String       @map("recipient_id")
   recipient    User         @relation(fields: [recipientId], references: [id])
-  type         ReversalType
-  amount       Decimal
+  type         String
+  amount       Float
   status       String       @default("SUCCESS") // SUCCESS, FAILED
   referencePgw String?      @map("reference_pgw")
 
@@ -1523,32 +1524,32 @@ model ReversalTransaction {
   @@map("reversal_transactions")
 }
 
-enum ReversalType {
-  AGENCY_COMMISSION
-  LANDLORD_RENT
-}
+// enum String {
+//   AGENCY_COMMISSION
+//   LANDLORD_RENT
+// }
 
-enum PaymentCanal {
-  ORANGE
-  MTN
-  WAVE
-  MOOV
-  CINETPAY_M17
-  SMS_DECLARATIF
-}
+// enum String {
+//   ORANGE
+//   MTN
+//   WAVE
+//   MOOV
+//   CINETPAY_M17
+//   SMS_DECLARATIF
+// }
 
-enum PaymentPgwStatus {
-  INITIEE
-  EN_ATTENTE_PAIEMENT
-  CONFIRMEE
-  ECHEC
-  EXPIREE
-  DECLAREE
-}
+// enum String {
+//   INITIEE
+//   EN_ATTENTE_PAIEMENT
+//   CONFIRMEE
+//   ECHEC
+//   EXPIREE
+//   DECLAREE
+// }
 
 model PgwWebhook {
   id              String       @id @default(uuid()) @map("webhook_id")
-  canal           PaymentCanal
+  canal           String
   refOperateur    String?      @map("ref_operateur")
   payload         Json
   signatureValide Boolean      @map("signature_valid")
@@ -1563,7 +1564,7 @@ model PgwWebhook {
 
 model PgwMsisdnLookup {
   prefixe   String       @id @map("prefixe")
-  operateur PaymentCanal
+  operateur String
   actif     Boolean      @default(true)
   updatedAt DateTime     @updatedAt @map("updated_at")
 
@@ -1573,11 +1574,11 @@ model PgwMsisdnLookup {
 model PgwReconciliation {
   id                      String       @id @default(uuid()) @map("recon_id")
   dateRecon               DateTime     @map("date_recon")
-  canal                   PaymentCanal
+  canal                   String
   nbTransactionsQapril    Int          @map("nb_transactions_qapril")
   nbTransactionsOperateur Int?         @map("nb_transactions_operateur")
-  montantTotalQapril      Decimal      @map("montant_total_qapril")
-  montantTotalOperateur   Decimal?     @map("montant_total_operateur")
+  montantTotalQapril      Float      @map("montant_total_qapril")
+  montantTotalOperateur   Float?     @map("montant_total_operateur")
   nbEcarts                Int          @default(0) @map("nb_ecarts")
   ecartsDetail            Json?        @map("ecarts_detail")
   statut                  String       @default("EN_COURS")
@@ -1605,8 +1606,8 @@ model EtatsDesLieux {
   id               String      @id @default(uuid()) @map("edl_id")
   leaseId          String      @map("lease_id")
   lease            Lease       @relation(fields: [leaseId], references: [id])
-  typeEdl          EdlType     @map("type_edl") // ENTREE | SORTIE
-  statut           EdlStatut   @default(EN_COURS)
+  typeEdl          String     @map("type_edl") // ENTREE | SORTIE
+  statut           String   @default("EN_COURS")
   
   redigeParId      String      @map("redige_par")
   redigePar        User        @relation("RedacteurEdl", fields: [redigeParId], references: [id])
@@ -1619,8 +1620,8 @@ model EtatsDesLieux {
   dateEdl          DateTime    @default(now()) @map("date_edl")
   sections         Json? // Sections/photos/etats
   
-  indexEau         Decimal?    @map("index_eau")
-  indexElec        Decimal?    @map("index_elec")
+  indexEau         Float?    @map("index_eau")
+  indexElec        Float?    @map("index_elec")
   
   clesRemises      Int         @default(0) @map("cles_remises")
   clesDetail       String?     @map("cles_detail")
@@ -1646,19 +1647,19 @@ model EtatsDesLieux {
   @@map("etats_des_lieux")
 }
 
-enum EdlType {
-  ENTREE
-  SORTIE
-}
+// enum String {
+//   ENTREE
+//   SORTIE
+// }
 
 // M-SIGN — Signatures Électroniques
 model SignatureElectronique {
   id           String    @id @default(uuid()) @map("sig_id")
-  documentType SigDoc    @map("document_type")
+  documentType String    @map("document_type")
   documentId   String    @map("document_id")
   signataireId String    @map("signataire_id")
   signataire   User      @relation(fields: [signataireId], references: [id])
-  statut       SigStatut @default(EN_ATTENTE)
+  statut       String @default("EN_ATTENTE")
 
   methode      String? // OTP_SMS | DESSIN | BIOMETRIQUE
   otpUtilise   String? @map("otp_utilise")
@@ -1673,21 +1674,21 @@ model SignatureElectronique {
   @@map("signatures_electroniques")
 }
 
-enum SigDoc {
-  BAIL
-  BAIL_COMMERCIAL
-  MANDAT
-  EDL
-  ACCORD_MEDIATION
-  AVENANT
-}
+// enum String {
+//   BAIL
+//   BAIL_COMMERCIAL
+//   MANDAT
+//   EDL
+//   ACCORD_MEDIATION
+//   AVENANT
+// }
 
-enum SigStatut {
-  EN_ATTENTE
-  SIGNE
-  REFUSE
-  EXPIRE
-}
+// enum String {
+//   EN_ATTENTE
+//   SIGNE
+//   REFUSE
+//   EXPIRE
+// }
 
 // M-MAINT — Maintenance & Travaux (ADD-17)
 model TicketMaintenance {
@@ -1703,17 +1704,17 @@ model TicketMaintenance {
   locataireId        String              @map("locataire_id")
   locataire          User                @relation("MaintenanceDeclarant", fields: [locataireId], references: [id])
   
-  categorie          MaintenanceCategory @map("categorie_v2")
+  categorie          String @map("categorie_v2")
   description        String
   
   // V1 Compatibility
-  photosUrls         String[]            @default([]) @map("photos_urls")
+  photosUrls String @default("[]") @map("photos_urls")
   urgence            String              @default("NORMALE") // URGENTE|NORMALE|BASSE
   
   // V2 requirements
   photoUrl           String?             @map("photo_url")
   photoHashSha256    String?             @map("photo_hash_sha256")
-  statut             MaintenanceStatus   @default(EN_ATTENTE)
+  statut             String   @default("EN_ATTENTE")
   
   dateSignalement    DateTime            @default(now()) @map("date_signalement")
   datePriseEnCharge  DateTime?           @map("date_prise_en_charge")
@@ -1726,8 +1727,8 @@ model TicketMaintenance {
   prestataireId      String?             @map("prestataire_id")
   prestataire        Prestataire?        @relation(fields: [prestataireId], references: [id])
 
-  devisMontant       Decimal?            @map("devis_montant")
-  coutFinal          Decimal?            @map("cout_final")
+  devisMontant       Float?            @map("devis_montant")
+  coutFinal          Float?            @map("cout_final")
   dateIntervention   DateTime?           @map("date_intervention")
 
   noteLocataire      Int?                @map("note_locataire")
@@ -1745,11 +1746,11 @@ model TicketMaintenance {
 model Prestataire {
   id          String   @id @default(uuid()) @map("prestataire_id")
   nom         String
-  specialite  MaintenanceCategory
+  specialite  String
   telephone   String
   email       String?
   adresse     String?
-  noteMoyenne Decimal? @map("note_moyenne")
+  noteMoyenne Float? @map("note_moyenne")
 
   tickets TicketMaintenance[]
 
@@ -1771,13 +1772,13 @@ model Candidature {
   nom           String
   prenom        String
   telephone     String
-  revenuMensuel Decimal? @map("revenu_mensuel")
+  revenuMensuel Float? @map("revenu_mensuel")
   employeur     String?
   scoreQapril   Int?     @map("score_qapril")
-  tauxEffort    Decimal? @map("taux_effort")
+  tauxEffort    Float? @map("taux_effort")
   docsJsonb     Json?    @map("docs_jsonb")
 
-  statut     CandStatut @default(SOUMISE)
+  statut     String @default("SOUMISE")
   noteAgence String?    @map("note_agence")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1785,23 +1786,23 @@ model Candidature {
   @@map("candidatures")
 }
 
-enum CandStatut {
-  SOUMISE
-  EN_ETUDE
-  ACCEPTEE
-  REFUSEE
-  CONVERTIE_LOCATAIRE
-}
+// enum String {
+//   SOUMISE
+//   EN_ETUDE
+//   ACCEPTEE
+//   REFUSEE
+//   CONVERTIE_LOCATAIRE
+// }
 
 // M-CHARGES — Charges Locatives
 model ChargeParametrage {
   id             String     @id @default(uuid()) @map("charge_id")
   logementId     String     @map("logement_id")
   logement       Property   @relation(fields: [logementId], references: [id])
-  typeCharge     ChargeType @map("type_charge")
+  typeCharge     String @map("type_charge")
   mode           String     @default("FORFAIT") // FORFAIT | PROVISION_REELLE
-  montantMensuel Decimal    @map("montant_mensuel")
-  cleRepartition Decimal?   @map("cle_repartition")
+  montantMensuel Float    @map("montant_mensuel")
+  cleRepartition Float?   @map("cle_repartition")
   actif          Boolean    @default(true)
   createdAt      DateTime   @default(now()) @map("created_at")
 
@@ -1813,9 +1814,9 @@ model RegularisationCharges {
   leaseId              String    @map("bail_id")
   lease                Lease     @relation(fields: [leaseId], references: [id])
   annee                Int
-  provisionsCollectees Decimal   @map("provisions_collectees")
-  chargesReelles       Decimal   @map("charges_reelles")
-  solde                Decimal
+  provisionsCollectees Float   @map("provisions_collectees")
+  chargesReelles       Float   @map("charges_reelles")
+  solde                Float
   statut               String    @default("CALCULE")
   notifieAt            DateTime? @map("notifie_at")
   regleAt              DateTime? @map("regle_at")
@@ -1823,14 +1824,14 @@ model RegularisationCharges {
   @@map("regularisations_charges")
 }
 
-enum ChargeType {
-  EAU
-  ELECTRICITE_COMMUNE
-  GARDIENNAGE
-  NETTOYAGE
-  TOM // Taxe Ordures Ménagères
-  AUTRE
-}
+// enum String {
+//   EAU
+//   ELECTRICITE_COMMUNE
+//   GARDIENNAGE
+//   NETTOYAGE
+//   TOM // Taxe Ordures Ménagères
+//   AUTRE
+// }
 
 // M-ANNONCES — Vacance Locative
 model Annonce {
@@ -1842,9 +1843,9 @@ model Annonce {
 
   titre        String
   description  String
-  loyerDemande Decimal @map("loyer_demande")
-  charges      Decimal @default(0)
-  photosUrls   String[] @default([]) @map("photos_urls")
+  loyerDemande Float @map("loyer_demande")
+  charges      Float @default(0)
+  photosUrls String @default("[]") @map("photos_urls")
   criteres     Json?
 
   statut         String   @default("ACTIVE") // ACTIVE|SUSPENDUE|ARCHIVEE
@@ -1852,7 +1853,7 @@ model Annonce {
   nbContacts     Int      @default(0) @map("nb_contacts")
   nbVisites      Int      @default(0) @map("nb_visites")
   nbCandidatures Int      @default(0) @map("nb_candidatures")
-  coutVacance    Decimal? @map("cout_vacance")
+  coutVacance    Float? @map("cout_vacance")
 
   publieeAt  DateTime? @map("publiee_at")
   archiveeAt DateTime? @map("archivee_at")
@@ -1869,11 +1870,11 @@ model CrgMensuel {
   agence         User   @relation("AgenceCrgs", fields: [agenceId], references: [id])
 
   mois             DateTime
-  loyersEncaisses  Decimal  @default(0) @map("loyers_encaisses")
-  chargesDeduites  Decimal  @default(0) @map("charges_deduites")
-  travauxDeduits   Decimal  @default(0) @map("travaux_deduits")
-  honorairesAgence Decimal  @default(0) @map("honoraires_agence")
-  reversementNet   Decimal  @map("reversement_net")
+  loyersEncaisses  Float  @default(0) @map("loyers_encaisses")
+  chargesDeduites  Float  @default(0) @map("charges_deduites")
+  travauxDeduits   Float  @default(0) @map("travaux_deduits")
+  honorairesAgence Float  @default(0) @map("honoraires_agence")
+  reversementNet   Float  @map("reversement_net")
 
   reversementEffectueAt DateTime? @map("reversement_effectue_at")
   pdfUrl                String?   @map("pdf_url")
@@ -1892,7 +1893,7 @@ model AgendaEvenement {
   agentId  String? @map("agent_id")
   agent    User?   @relation("AgentEvents", fields: [agentId], references: [id])
 
-  typeEvent   AgendaType @map("type_event")
+  typeEvent   String @map("type_event")
   titre       String
   description String?
 
@@ -1913,16 +1914,16 @@ model AgendaEvenement {
   @@map("agenda_evenements")
 }
 
-enum AgendaType {
-  VISITE
-  EDL_ENTREE
-  EDL_SORTIE
-  REMISE_CLES
-  REUNION_PROPRIO
-  TRAVAUX
-  ECHEANCE_BAIL
-  AUTRE
-}
+// enum String {
+//   VISITE
+//   EDL_ENTREE
+//   EDL_SORTIE
+//   REMISE_CLES
+//   REUNION_PROPRIO
+//   TRAVAUX
+//   ECHEANCE_BAIL
+//   AUTRE
+// }
 
 // ═══════════════════════════════════════════════════════
 // ADD-05 NEW MODELS
@@ -1933,10 +1934,10 @@ model TvaTransaction {
   paymentId      String     @map("payment_id")
   payment        PaymentPgw @relation(fields: [paymentId], references: [id])
   serviceType    String     @map("service_type")
-  montantHt      Decimal    @map("montant_ht")
-  tauxTva        Decimal    @default(18.00) @map("taux_tva")
-  montantTva     Decimal    @map("montant_tva")
-  montantTtc     Decimal    @map("montant_ttc")
+  montantHt      Float    @map("montant_ht")
+  tauxTva        Float    @default(18.00) @map("taux_tva")
+  montantTva     Float    @map("montant_tva")
+  montantTtc     Float    @map("montant_ttc")
   periodeFiscale DateTime   @map("periode_fiscale")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1978,8 +1979,8 @@ model SubscriptionAudit {
   id           String   @id @default(uuid()) @map("sub_audit_id")
   userId       String   @map("user_id")
   user         User     @relation(fields: [userId], references: [id])
-  oldTier      PlanTier @map("old_tier")
-  newTier      PlanTier @map("new_tier")
+  oldTier      String @map("old_tier")
+  newTier      String @map("new_tier")
   reason       String?
   executedById String?  @map("executed_by")
 
@@ -1992,7 +1993,7 @@ model LegalProcedure {
   id          String    @id @default(uuid()) @map("procedure_id")
   leaseId     String    @map("lease_id")
   lease       Lease     @relation(fields: [leaseId], references: [id])
-  type        LegalType
+  type        String
   status      String    @default("OPEN") // OPEN, SERVED, CLOSED
   description String?
   servedAt    DateTime? @map("served_at")
@@ -2002,19 +2003,19 @@ model LegalProcedure {
   @@map("legal_procedures")
 }
 
-enum LegalType {
-  PRE_NOTICE
-  COMMAND_TO_PAY
-  TERMINATION_NOTICE
-  EVICTION_ORDER
-}
+// enum String {
+//   PRE_NOTICE
+//   COMMAND_TO_PAY
+//   TERMINATION_NOTICE
+//   EVICTION_ORDER
+// }
 
 model CoopGroup {
   id          String  @id @default(uuid()) @map("coop_id")
   leaseId     String  @unique @map("lease_id")
   lease       Lease   @relation(fields: [leaseId], references: [id])
   name        String
-  totalTarget Decimal @map("total_target")
+  totalTarget Float @map("total_target")
 
   members User[] @relation("CoopMembers")
 
@@ -2030,7 +2031,7 @@ model MigrationSession {
   fichierNom     String          @map("fichier_nom")
   fichierFormat  String          @map("fichier_format") // EXCEL|CSV|PDF|MANUAL
   sourceLogiciel String?         @map("source_logiciel")
-  statut         MigrationStatus @default(UPLOADE)
+  statut         String @default("UPLOADE")
 
   nbLogements  Int @default(0) @map("nb_logements")
   nbLocataires Int @default(0) @map("nb_locataires")
@@ -2076,13 +2077,13 @@ model MigrationStaging {
   @@map("migration_staging")
 }
 
-enum MigrationStatus {
-  UPLOADE
-  EN_ANALYSE
-  RAPPORT_GENERE
-  COMMITE
-  ERREUR
-}
+// enum String {
+//   UPLOADE
+//   EN_ANALYSE
+//   RAPPORT_GENERE
+//   COMMITE
+//   ERREUR
+// }
 
 // ═══════════════════════════════════════════════════════
 // FINAL SPRINT MODELS (EDL, SIG, RECOUVREMENT)
@@ -2092,7 +2093,7 @@ model Inspection {
   id           String         @id @default(uuid()) @map("insp_id")
   leaseId      String         @map("lease_id")
   lease        Lease          @relation(fields: [leaseId], references: [id])
-  type         InspectionType
+  type         String
   status       String         @default("PLANIFIEE") // PLANIFIEE|EN_COURS|TERMINEE
   date         DateTime
   generalScore Int?           @map("general_score") // 0-100
@@ -2106,17 +2107,17 @@ model Inspection {
   @@map("inspections")
 }
 
-enum InspectionType {
-  ENTRY
-  EXIT
-}
+// enum String {
+//   ENTRY
+//   EXIT
+// }
 
 model InspectionRoom {
   id           String     @id @default(uuid()) @map("room_id")
   inspectionId String     @map("inspection_id")
   inspection   Inspection @relation(fields: [inspectionId], references: [id])
   name         String // Salon, Chambre 1, etc.
-  status       RoomStatus @default(GOOD)
+  status       String @default("GOOD")
   comments     String?
 
   photos InspectionPhoto[]
@@ -2124,12 +2125,12 @@ model InspectionRoom {
   @@map("inspection_rooms")
 }
 
-enum RoomStatus {
-  EXCELLENT
-  GOOD
-  FAIR
-  POOR
-}
+// enum String {
+//   EXCELLENT
+//   GOOD
+//   FAIR
+//   POOR
+// }
 
 model InspectionPhoto {
   id               String         @id @default(uuid()) @map("photo_id")
@@ -2147,39 +2148,39 @@ model ReminderLog {
   id      String       @id @default(uuid()) @map("log_id")
   leaseId String       @map("lease_id")
   lease   Lease        @relation(fields: [leaseId], references: [id])
-  type    ReminderType
+  type    String
   sentAt  DateTime     @default(now()) @map("sent_at")
   status  String       @default("SENT")
 
   @@map("reminder_logs")
 }
 
-enum ReminderType {
-  D_MINUS_5
-  D_DAY
-  D_PLUS_5
-  LEGAL_NOTICE
-}
+// enum String {
+//   D_MINUS_5
+//   D_DAY
+//   D_PLUS_5
+//   LEGAL_NOTICE
+// }
 
-enum BdqStatut {
-  PENDING_LOCATAIRE
-  CONFIRME
-  CONFIRME_AGENT
-  CONFIRME_MEDIATION
-  DECLARATIF_SANS_REPONSE
-  DECLARATIF_UNILATERAL
-  CONTESTE
-  FORMALISE
-  ARCHIVE
-}
+// enum String {
+//   PENDING_LOCATAIRE
+//   CONFIRME
+//   CONFIRME_AGENT
+//   CONFIRME_MEDIATION
+//   DECLARATIF_SANS_REPONSE
+//   DECLARATIF_UNILATERAL
+//   CONTESTE
+//   FORMALISE
+//   ARCHIVE
+// }
 
-enum BdqConvStatut {
-  EN_COURS
-  EN_PAUSE
-  COMPLETE
-  ABANDONNE
-  EXPIRE
-}
+// enum String {
+//   EN_COURS
+//   EN_PAUSE
+//   COMPLETE
+//   ABANDONNE
+//   EXPIRE
+// }
 
 // ═══════════════════════════════════════════════════════
 // BAILS DÉCLARATIFS (ADD-06 M-BAIL-VERBAL)
@@ -2199,16 +2200,16 @@ model BailDeclaratif {
   telephoneLocataire     String    @map("telephone_locataire")
   descriptionLogement    String    @map("description_logement")
   adresseLibre           String?   @map("adresse_libre")
-  loyerDeclareMensuel    Decimal   @map("loyer_declare_mensuel")
+  loyerDeclareMensuel    Float   @map("loyer_declare_mensuel")
   dateEntreeEstimee      DateTime? @map("date_entree_estimee")
   precisionDateEntree    String    @default("EXACTE") @map("precision_date_entree")
   identiteIncomplete     Boolean   @default(false) @map("identite_incomplete")
   sourceCreation         String    @default("FORM") @map("source_creation")
 
-  statut                 BdqStatut @default(PENDING_LOCATAIRE)
+  statut                 String @default("PENDING_LOCATAIRE")
   confirmationLocataire  Boolean?  @map("confirmation_locataire")
   confirmationAt         DateTime? @map("confirmation_at")
-  contrePropositionLoyer Decimal?  @map("contre_proposition_loyer")
+  contrePropositionLoyer Float?  @map("contre_proposition_loyer")
   motifRefus             String?   @map("motif_refus")
 
   agentConfirmantId     String?   @map("agent_confirmant_id")
@@ -2256,8 +2257,8 @@ model BdqHistoriqueLoyer {
   id                    String         @id @default(uuid()) @map("hist_id")
   bdqId                 String         @map("bdq_id")
   bdq                   BailDeclaratif @relation(fields: [bdqId], references: [id])
-  ancienLoyer           Decimal        @map("ancien_loyer")
-  nouveauLoyer          Decimal        @map("nouveau_loyer")
+  ancienLoyer           Float        @map("ancien_loyer")
+  nouveauLoyer          Float        @map("nouveau_loyer")
   motif                 String?
   confirmationLocataire Boolean?       @map("confirmation_locataire")
   modifieParId          String?        @map("modifie_par")
@@ -2276,20 +2277,20 @@ model BdqConversationState {
   legalEntity   LegalEntity?  @relation("BdqConvLegalEntity", fields: [legalEntityId], references: [id])
   canal         String // WHATSAPP | APP_CHAT
   canalRef      String?       @unique @map("canal_ref")
-  statut        BdqConvStatut @default(EN_COURS)
+  statut        String @default("EN_COURS")
 
   // Extracted fields
   nomLocataireExtrait        String?   @map("nom_locataire_extrait")
   telephoneExtrait           String?   @map("telephone_extrait")
   descriptionLogementExtrait String?   @map("description_logement_extrait")
-  loyerExtrait               Decimal?  @map("loyer_extrait")
+  loyerExtrait               Float?  @map("loyer_extrait")
   dateEntreeExtraite         DateTime? @map("date_entree_extraite")
   precisionDate              String    @default("APPROXIMATIVE") @map("precision_date")
   telephoneManquant          Boolean   @default(false) @map("telephone_manquant")
   identiteIncomplete         Boolean   @default(false) @map("identite_incomplete")
 
   // History
-  messagesHistory String[]    @default([]) @map("messages_history")
+  messagesHistory String @default("[]") @map("messages_history")
   nbEchanges      Int     @default(0) @map("nb_echanges")
   champEnAttente  String? @map("champ_en_attente")
   pauseReason     String? @map("pause_reason")
@@ -2300,7 +2301,7 @@ model BdqConversationState {
   // Costs
   tokensEntreeTotal Int     @default(0) @map("tokens_entree_total")
   tokensSortieTotal Int     @default(0) @map("tokens_sortie_total")
-  coutEstimeFcfa    Decimal @default(0) @map("cout_estime_fcfa")
+  coutEstimeFcfa    Float @default(0) @map("cout_estime_fcfa")
 
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -2323,7 +2324,7 @@ model PropertyMaintenance {
   cost        Float?
   date        DateTime @default(now())
   provider    String? // Name of the company/craftsman
-  attachments String[] @default([]) // Links to invoices/photos
+  attachments String @default("[]") // Links to invoices/photos
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2348,21 +2349,21 @@ model PropertyDocument {
 // ═══════════════════════════════════════════════════════
 // NOTIFICATIONS (Part 17 / ADD-09)
 // ═══════════════════════════════════════════════════════
-enum NotifCanal {
-  WHATSAPP
-  SMS
-  EMAIL
-  PUSH
-}
+// enum String {
+//   WHATSAPP
+//   SMS
+//   EMAIL
+//   PUSH
+// }
 
-enum NotifStatut {
-  EN_ATTENTE
-  ENVOYE
-  LIVRE
-  LU
-  ECHEC
-  ANNULE
-}
+// enum String {
+//   EN_ATTENTE
+//   ENVOYE
+//   LIVRE
+//   LU
+//   ECHEC
+//   ANNULE
+// }
 
 model NotificationPreference {
   id     String @id @default(uuid()) @map("pref_id")
@@ -2399,12 +2400,12 @@ model NotificationLog {
   id             String      @id @default(uuid()) @map("notif_id")
   userId         String      @map("user_id")
   user           User        @relation(fields: [userId], references: [id])
-  canal          NotifCanal
+  canal          String
   typeEvenement  String      @map("type_evenement")
   referenceId    String?     @map("reference_id")
   templateId     String?     @map("template_id")
   contenuPreview String?     @map("contenu_preview")
-  statut         NotifStatut @default(EN_ATTENTE)
+  statut         String @default("EN_ATTENTE")
   nbTentatives   Int         @default(0) @map("nb_tentatives")
   erreurDetail   String?     @map("erreur_detail")
 
@@ -2421,42 +2422,42 @@ model NotificationLog {
 // ═══════════════════════════════════════════════════════
 // ADD-11 : Rôles & Réclamations
 // ═══════════════════════════════════════════════════════
-enum BienRole {
-  OWNER
-  INTERMEDIAIRE
-  AGENCE
-  FIELD_AGENT
-}
+// enum String {
+//   OWNER
+//   INTERMEDIAIRE
+//   AGENCE
+//   FIELD_AGENT
+// }
 
-enum ProfilInterm {
-  PARENT_AMI
-  NOTAIRE
-  HUISSIER
-  AVOCAT
-}
+// enum String {
+//   PARENT_AMI
+//   NOTAIRE
+//   HUISSIER
+//   AVOCAT
+// }
 
-enum RegStatut {
-  EN_COURS
-  PROLONGE_RECEPISSE
-  PROLONGE_FORMATION
-  REGULARISE
-  BASCULE
-}
+// enum String {
+//   EN_COURS
+//   PROLONGE_RECEPISSE
+//   PROLONGE_FORMATION
+//   REGULARISE
+//   BASCULE
+// }
 
-enum DeclStatut {
-  EN_ATTENTE
-  CONFIRME
-  CONTESTE
-  EXPIRE
-  AUTO_GENERE
-}
+// enum String {
+//   EN_ATTENTE
+//   CONFIRME
+//   CONTESTE
+//   EXPIRE
+//   AUTO_GENERE
+// }
 
 model PropertyAccess {
   id                  String        @id @default(uuid()) @map("acces_id")
   propertyId          String        @map("bien_id")
   userId              String        @map("user_id")
-  role                BienRole
-  profil              ProfilInterm? @map("profil_intermediaire")
+  role                String
+  profil              String? @map("profil_intermediaire")
   statut              String        @default("EN_ATTENTE") // EN_ATTENTE | ACTIF | SUSPENDU | REVOQUE | EXPIRE
   
   justificatifType    String?       @map("justificatif_type")
@@ -2487,8 +2488,8 @@ model MandatGestion {
   id                String       @id @default(uuid()) @map("mandat_id")
   proprietaireId    String       @map("proprietaire_id")
   intermediaireId   String       @map("intermediaire_id")
-  profil            ProfilInterm
-  biensConcernes    String[] @default([]) @map("biens_concernes") // IDs des biens
+  profil            String
+  biensConcernes String @default("[]") @map("biens_concernes") // IDs des biens
   dateDebut         DateTime     @default(now()) @map("date_debut")
   dateFin           DateTime?    @map("date_fin")
   remuneration      String?      @default("GRATUIT")
@@ -2509,7 +2510,7 @@ model MandatGestion {
 model AgencesRegularisation {
   id                  String      @id @default(uuid()) @map("reg_id")
   userId              String      @unique @map("user_id")
-  statut              RegStatut   @default(EN_COURS)
+  statut              String   @default("EN_COURS")
   dateInscription     DateTime    @default(now()) @map("date_inscription")
   dateLimiteInitiale  DateTime    @map("date_limite_initiale")
   dateLimiteActuelle  DateTime    @map("date_limite_actuelle")
@@ -2553,9 +2554,9 @@ model SmsDeclaration {
   id              String      @id @default(uuid()) @map("decl_id")
   leaseId         String      @map("bail_id")
   tenantId        String      @map("locataire_id")
-  montantDeclare  Decimal     @map("montant_declare")
+  montantDeclare  Float     @map("montant_declare")
   canal           String      @default("SMS") // SMS | WHATSAPP | APP
-  statut          DeclStatut  @default(EN_ATTENTE)
+  statut          String  @default("EN_ATTENTE")
   confirmeParId   String?     @map("confirme_par")
   confirmeAt      DateTime?   @map("confirme_at")
   receiptId       String?     @map("quittance_id")
@@ -2575,30 +2576,30 @@ model SmsDeclaration {
 // ═══════════════════════════════════════════════════════
 // ADD-12 : Configuration Tarifaire Admin
 // ═══════════════════════════════════════════════════════
-enum PromoType {
-  MOIS_GRATUITS
-  REMISE_POURCENTAGE
-  REMISE_MONTANT
-  PRIX_FIXE
-  ESSAI_ETENDU
-}
+// enum String {
+//   MOIS_GRATUITS
+//   REMISE_POURCENTAGE
+//   REMISE_MONTANT
+//   PRIX_FIXE
+//   ESSAI_ETENDU
+// }
 
-enum NegocieType {
-  ABONNEMENT_DEROGATOIRE
-  QUITTANCE_DEROGATOIRE
-  ENREGISTREMENT_DEROGATOIRE
-}
+// enum String {
+//   ABONNEMENT_DEROGATOIRE
+//   QUITTANCE_DEROGATOIRE
+//   ENREGISTREMENT_DEROGATOIRE
+// }
 
 model ConfigTarif {
   id               String       @id @default(uuid()) @map("tarif_id")
   cle              String       @unique
-  valeur           Decimal
+  valeur           Float
   description      String
   modifiable       Boolean      @default(true)
   dateEffet        DateTime     @default(now()) @map("date_effet")
   modifieParId     String?      @map("modifie_par")
   modifieAt        DateTime?    @default(now()) @map("modifie_at")
-  valeurPrecedente Decimal?     @map("valeur_precedente")
+  valeurPrecedente Float?     @map("valeur_precedente")
   noteModification String?      @map("note_modification")
   metadata         String?      @map("metadata")
 
@@ -2612,9 +2613,9 @@ model OffreAbonnement {
   code              String       @unique
   nomAffichage      String       @map("nom_affichage")
   description       String?
-  prixBaseTtc       Decimal      @map("prix_base_ttc")
+  prixBaseTtc       Float      @map("prix_base_ttc")
   quittancesInclus  Int          @default(0) @map("quittances_inclus") // 0 = illimité
-  prixUniteTtc      Decimal?     @default(0) @map("prix_unite_ttc")
+  prixUniteTtc      Float?     @default(0) @map("prix_unite_ttc")
   modules           Json?
   actif             Boolean      @default(true)
   visibleSignup     Boolean      @default(true) @map("visible_signup")
@@ -2633,8 +2634,8 @@ model OffreAbonnement {
 model CodePromo {
   id               String          @id @default(uuid()) @map("promo_id")
   code             String          @unique
-  typeRemise       PromoType       @map("type_remise")
-  valeurRemise     Decimal         @map("valeur_remise")
+  typeRemise       String       @map("type_remise")
+  valeurRemise     Float         @map("valeur_remise")
   offreCibleId     String?         @map("offre_cible")
   cibleProfil      String          @default("TOUS") @map("cible_profil") // TOUS, AGENCE, PARTICULIER
   dateDebut        DateTime        @default(now()) @map("date_debut")
@@ -2655,9 +2656,9 @@ model CodePromo {
 model TarifNegocie {
   id               String          @id @default(uuid()) @map("neg_id")
   userId           String          @map("user_id")
-  type             NegocieType
+  type             String
   offreId          String?         @map("offre_id")
-  prixNegocieTtc   Decimal         @map("prix_negocie_ttc")
+  prixNegocieTtc   Float         @map("prix_negocie_ttc")
   dateDebut        DateTime        @default(now()) @map("date_debut")
   dateFin          DateTime?       @map("date_fin")
   autoRenouveler   Boolean         @default(false) @map("auto_renouveler")
@@ -2697,7 +2698,7 @@ model LocataireProfile {
   scoreActuel       Int          @default(0) @map("score_actuel")
   scoreBadge        String       @default("D") @map("score_badge")
   scoreCalculeAt    DateTime?    @map("score_calcule_at")
-  tauxPaiement12m   Decimal      @default(0) @map("taux_paiement_12m")
+  tauxPaiement12m   Float      @default(0) @map("taux_paiement_12m")
   nbBailsActifs     Int          @default(0) @map("nb_bails_actifs")
   nbBailsClos       Int          @default(0) @map("nb_bails_clos")
   alerteJ3Active    Boolean      @default(true) @map("alerte_j3_active")
@@ -2711,32 +2712,32 @@ model LocataireProfile {
   @@map("locataire_profiles")
 }
 
-enum SignalCatEnum {
-  FUITE_EAU
-  ELECTRICITE
-  PORTE_SERRURE
-  NUISANCE
-  DEGRADATION
-  AUTRE
-}
+// enum String {
+//   FUITE_EAU
+//   ELECTRICITE
+//   PORTE_SERRURE
+//   NUISANCE
+//   DEGRADATION
+//   AUTRE
+// }
 
-enum SignalStatutEnum {
-  ENVOYE
-  VU_PROPRIO
-  EN_COURS
-  RESOLU
-  NON_RESOLU_FERME
-}
+// enum String {
+//   ENVOYE
+//   VU_PROPRIO
+//   EN_COURS
+//   RESOLU
+//   NON_RESOLU_FERME
+// }
 
 model SignalementLocataire {
   id              String           @id @default(uuid()) @map("signal_id")
   bailId          String           @map("bail_id")
   locataireId     String           @map("locataire_id")
-  categorie       SignalCatEnum
+  categorie       String
   description     String
   urgence         String           @default("NORMAL") // NORMAL | URGENT | TRES_URGENT
-  photos          String[] @default([])
-  statut          SignalStatutEnum @default(ENVOYE)
+  photos String @default("[]")
+  statut          String @default("ENVOYE")
   proprioVuAt     DateTime?        @map("proprio_vu_at")
   resoluAt        DateTime?        @map("resolu_at")
   resoluPar       String? @map("resolu_par")
@@ -2749,19 +2750,19 @@ model SignalementLocataire {
   @@map("signalements_locataire")
 }
 
-enum CautionDestEnum {
-  PROPRIETAIRE
-  CDC_CI
-  AUTRE
-}
+// enum String {
+//   PROPRIETAIRE
+//   CDC_CI
+//   AUTRE
+// }
 
 model CautionBail {
   id                String           @id @default(uuid()) @map("caution_id")
   bailId            String           @unique @map("bail_id")
-  montantFcfa       Decimal          @map("montant_fcfa")
+  montantFcfa       Float          @map("montant_fcfa")
   dateVersement     DateTime         @map("date_versement")
   modeVersement     String?          @map("mode_versement") // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
-  destination       CautionDestEnum  @default(PROPRIETAIRE)
+  destination       String  @default("PROPRIETAIRE")
   recepisseCdcCi    String?          @map("recepissse_cdc_ci")
   conditionsRestit  String?          @map("conditions_restit")
   confirmeLocataire Boolean          @default(false) @map("confirme_locataire")
@@ -2771,7 +2772,7 @@ model CautionBail {
   
   // Restitution
   restituee         Boolean          @default(false)
-  montantRestitue   Decimal?         @map("montant_restitue")
+  montantRestitue   Float?         @map("montant_restitue")
   dateRestitution   DateTime?        @map("date_restitution")
   motifRetenue      String?          @map("motif_retenue")
   createdAt         DateTime         @default(now()) @map("created_at")
@@ -2781,12 +2782,12 @@ model CautionBail {
   @@map("cautions_bail")
 }
 
-enum PreavisStatutEnum {
-  EMIS
-  ACCUSE
-  ETAT_LIEUX_PLANIFIE
-  CLOS
-}
+// enum String {
+//   EMIS
+//   ACCUSE
+//   ETAT_LIEUX_PLANIFIE
+//   CLOS
+// }
 
 model PreavisBail {
   id                  String             @id @default(uuid()) @map("preavis_id")
@@ -2796,7 +2797,7 @@ model PreavisBail {
   dateDepartPrevue    DateTime           @map("date_depart_prevue")
   dateDepartEffective DateTime?          @map("date_depart_effective")
   motif               String?
-  statut              PreavisStatutEnum  @default(EMIS)
+  statut              String  @default("EMIS")
   proprioAccuseAt     DateTime?          @map("proprio_accuse_at")
   etatLieuxPrevu      DateTime?          @map("etat_lieux_prevu")
   refPreavis          String?            @unique @map("ref_preavis")
@@ -2814,7 +2815,7 @@ model PasseportLocatif {
   locataireId          String       @map("locataire_id")
   refPasseport         String?      @unique @map("ref_passeport")
   scoreGlobal          Int @map("score_global")
-  tauxPaiementGlobal   Decimal @map("taux_paiement_global")
+  tauxPaiementGlobal   Float @map("taux_paiement_global")
   nbBailsInclus        Int @map("nb_bails_inclus")
   periodeCouverteDebut DateTime     @map("periode_couverte_debut")
   periodeCouverteFin   DateTime     @map("periode_couverte_fin")
@@ -2856,16 +2857,16 @@ model LocataireProfilPublic {
   userId           String      @unique @map("user_id")
   user             User        @relation(fields: [userId], references: [id])
   
-  visibilite       VisibEnum   @default(INVISIBLE)
+  visibilite       String   @default("INVISIBLE")
   statutRecherche  String      @default("EN_RECHERCHE") @map("statut_recherche")
   
   statutPro        String?     @map("statut_pro") // SALARIE | INDEPENDANT | INFORMEL | SANS_EMPLOI
   revenuFourchette String?     @map("revenu_fourchette")
   employeurType    String?     @map("employeur_type")
   
-  communesSouhaitees String[] @default([]) @map("communes_souhaitees")
+  communesSouhaitees String @default("[]") @map("communes_souhaitees")
   budgetMaxFcfa      Int?      @map("budget_max_fcfa")
-  typeLogement       String[] @default([]) @map("type_logement")
+  typeLogement String @default("[]") @map("type_logement")
   disponibleAPartir  DateTime? @map("disponible_a_partir")
   
   kycNiveau          Int       @default(0) @map("kyc_niveau")
@@ -2895,11 +2896,11 @@ model InvitationBail {
   locataire         User            @relation("LocataireInvite", fields: [locataireId], references: [id])
   
   methodeDecouverte String?         @map("methode_decouverte") // NUMERO | QR_CODE | LIEN | RECHERCHE_AGENCE
-  loyerPropose      Decimal?        @map("loyer_propose")
+  loyerPropose      Float?        @map("loyer_propose")
   dateDebutProposee DateTime?       @map("date_debut_proposee")
   messageInvitant   String?         @map("message_invitant")
   
-  statut            InvitStatutEnum @default(ENVOYEE)
+  statut            String @default("ENVOYEE")
   
   vueAt             DateTime?       @map("vue_at")
   reponduAt         DateTime?       @map("repondu_at")
@@ -2931,29 +2932,29 @@ model ConsultationProfil {
 // ADD-15 : Modules Critiques (EDL, RPT, CHP)
 // ═══════════════════════════════════════════════════════
 
-enum EdlStatut {
-  EN_COURS
-  SOUMIS_LOCATAIRE
-  CONFIRME
-  CONTESTE
-  CERTIFIE
-}
+// enum String {
+//   EN_COURS
+//   SOUMIS_LOCATAIRE
+//   CONFIRME
+//   CONTESTE
+//   CERTIFIE
+// }
 
-enum ProspectStatut {
-  A_RAPPELER
-  EN_DISCUSSION
-  INSCRIT
-  PAS_INTERESSE
-  PERDU
-}
+// enum String {
+//   A_RAPPELER
+//   EN_DISCUSSION
+//   INSCRIT
+//   PAS_INTERESSE
+//   PERDU
+// }
 
-enum CommType {
-  BAIL_FORMEL
-  BDQ_CONFIRME
-  FORMALISATION
-  RECRUTEMENT
-  BONUS
-}
+// enum String {
+//   BAIL_FORMEL
+//   BDQ_CONFIRME
+//   FORMALISATION
+//   RECRUTEMENT
+//   BONUS
+// }
 
 model RapportMensuel {
   id              String   @id @default(uuid()) @map("rapport_id")
@@ -2978,14 +2979,14 @@ model ChampionProfile {
   userId                 String    @unique @map("user_id")
   user                   User      @relation(fields: [userId], references: [id])
   zonePrincipale         String    @map("zone_principale")
-  zonesSecondaires       String[] @default([]) @map("zones_secondaires")
+  zonesSecondaires String @default("[]") @map("zones_secondaires")
   superviseurId          String?   @map("superviseur_id")
   superviseur            User?     @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
   statut                 String    @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
   dateDebut              DateTime  @default(now()) @map("date_debut")
   objectifMensuel        Int       @default(30) @map("objectif_mensuel")
   totalInscriptions      Int       @default(0) @map("total_inscriptions")
-  totalCommissionsFcfa   Decimal   @default(0) @map("total_commissions_fcfa")
+  totalCommissionsFcfa   Float   @default(0) @map("total_commissions_fcfa")
   
   prospects              ChampionProspect[]
   commissions            ChampionCommission[]
@@ -3004,7 +3005,7 @@ model ChampionProspect {
   quartier           String?
   nbLogementsEstime  String?        @map("nb_logements_estime")
   argumentCle        String?        @map("argument_cle")
-  statut             ProspectStatut @default(A_RAPPELER)
+  statut             String @default("A_RAPPELER")
   dateDernierContact DateTime?      @map("date_dernier_contact")
   dateRappelPrevu    DateTime?      @map("date_rappel_prevu")
   note               String?
@@ -3021,9 +3022,9 @@ model ChampionCommission {
   id             String          @id @default(uuid()) @map("commission_id")
   championId     String          @map("champion_id")
   champion       ChampionProfile @relation(fields: [championId], references: [id])
-  typeAction     CommType        @map("type_action")
+  typeAction     String        @map("type_action")
   referenceId    String?         @map("reference_id")
-  montantFcfa    Decimal         @map("montant_fcfa")
+  montantFcfa    Float         @map("montant_fcfa")
   statut         String          @default("EN_ATTENTE") // EN_ATTENTE | VALIDE | PAYE | ANNULE
   valideAt       DateTime?       @map("valide_at")
   payeAt         DateTime?       @map("paye_at")
@@ -3037,10 +3038,10 @@ model WalletRechargeLink {
   id              String          @id @default(uuid()) @map("link_id")
   userId          String          @map("user_id")
   user            User            @relation(fields: [userId], references: [id])
-  declencheur     DeclencheurEnum
+  declencheur     String
   operateur       String          // WAVE | ORANGE | MTN | MOOV
-  montantSuggere  Decimal         @map("montant_suggere")
-  soldeAuMoment   Decimal         @map("solde_au_moment")
+  montantSuggere  Float         @map("montant_suggere")
+  soldeAuMoment   Float         @map("solde_au_moment")
   nbBailsActifs   Int             @map("nb_bails_actifs")
   urlGeneree      String          @map("url_generee")
   canalEnvoi      String          @map("canal_envoi") // WHATSAPP | SMS | PUSH
@@ -3050,7 +3051,7 @@ model WalletRechargeLink {
   cliqueAt        DateTime?       @map("clique_at")
   rechargeEffectuee Boolean       @default(false) @map("recharge_effectuee")
   rechargeAt      DateTime?       @map("recharge_at")
-  montantRecharge Decimal?        @map("montant_recharge")
+  montantRecharge Float?        @map("montant_recharge")
   webhookRef      String?         @map("webhook_ref")
   
   createdAt       DateTime        @default(now()) @map("created_at")
@@ -3066,7 +3067,7 @@ model WalletRechargeConfig {
   user              User     @relation(fields: [userId], references: [id])
   rappelActif       Boolean  @default(false) @map("rappel_actif")
   jourDuMois        Int      @default(1) @map("jour_du_mois")
-  montantFixe       Decimal? @map("montant_fixe")
+  montantFixe       Float? @map("montant_fixe")
   operateurPrefere  String   @default("WAVE") @map("operateur_prefere")
   canalPrefere      String   @default("WHATSAPP") @map("canal_prefere")
   dernierRappelAt   DateTime? @map("dernier_rappel_at")
@@ -3133,14 +3134,14 @@ model FactureUtility {
   acteurId            String        @map("acteur_id")
   acteur              User          @relation(fields: [acteurId], references: [id])
   roleActeur          String        @map("role_acteur") // PROPRIO | LOCATAIRE
-  typeUtility         UtilityType   @map("type_utility")
+  typeUtility         String   @map("type_utility")
   identifiantCompteur String        @map("identifiant_compteur")
   moisFacture         DateTime      @map("mois_facture")
-  montantTotal        Decimal       @map("montant_total")
+  montantTotal        Float       @map("montant_total")
   dateLimitePaiement  DateTime?     @map("date_limite_paiement")
-  statut              UtilityStatus @default(EN_COURS)
+  statut              String @default("EN_COURS")
   source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | ...
-  modeUtilities       UtilityMode   @map("mode_utilities")
+  modeUtilities       String   @map("mode_utilities")
   datePaiement        DateTime?     @map("date_paiement")
   createdAt           DateTime      @default(now()) @map("created_at")
 
@@ -3161,9 +3162,9 @@ model RepartitionUtility {
   leaseLocataire    Lease         @relation(fields: [leaseLocataireId], references: [id])
   locataireId       String        @map("locataire_id")
   locataire         User          @relation(fields: [locataireId], references: [id])
-  montantQuotePart  Decimal       @map("montant_quote_part")
-  modeleApplique    RepartitionModel @map("modele_applique")
-  statutPaiement    UtilityStatus @default(EN_ATTENTE) @map("statut_paiement")
+  montantQuotePart  Float       @map("montant_quote_part")
+  modeleApplique    String @map("modele_applique")
+  statutPaiement    String @default("EN_ATTENTE") @map("statut_paiement")
   dateNotification  DateTime?     @map("date_notification")
   datePaiement      DateTime?     @map("date_paiement")
   modePaiement      String?       @map("mode_paiement") // MOBILE_MONEY | CASH | WALLET_QAPRIL

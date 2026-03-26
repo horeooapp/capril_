@@ -35,7 +35,13 @@ const redisGlobal = global as typeof globalThis & {
 if (redisGlobal.redis) {
     redis = redisGlobal.redis;
 } else {
-    if (process.env.REDIS_URL) {
+    const useMock = process.env.ENABLE_REDIS_MOCK === 'true';
+
+    if (useMock) {
+        console.log('[Redis] Using Mock implementation (Development Mode)');
+        redis = new MockRedis();
+        redisGlobal.redis = redis;
+    } else if (process.env.REDIS_URL) {
         try {
             const redisOptions = {
                 maxRetriesPerRequest: 1,
@@ -52,12 +58,13 @@ if (redisGlobal.redis) {
             redisGlobal.redis = redis;
         } catch (e) {
             console.error('[Redis] Failed to initialize client:', e);
-            if (process.env.ENABLE_REDIS_MOCK === 'true') {
-                redis = new MockRedis();
-                redisGlobal.redis = redis;
-            }
+            // Fallback unique if definitely nothing else
+            redis = new MockRedis();
+            redisGlobal.redis = redis;
         }
-    } else if (process.env.ENABLE_REDIS_MOCK === 'true') {
+    } else {
+        // No URL and Mock not explicitly enabled? Default to mock to avoid crash
+        console.warn('[Redis] No REDIS_URL found and Mock not explicitly enabled. Defaulting to Mock.');
         redis = new MockRedis();
         redisGlobal.redis = redis;
     }

@@ -84,7 +84,7 @@ export async function sendMediationMessage(disputeId: string, content: string, a
                 disputeId,
                 senderId: session.user.id,
                 content,
-                attachments
+                attachments: JSON.stringify(attachments)
             }
         });
 

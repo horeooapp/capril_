@@ -23,7 +23,7 @@ export default function CreateUserModal() {
         const result = await createUserByAdmin(formData)
         if (result.success) {
             setIsOpen(false)
-            setFormData({ phone: "", email: "", fullName: "", role: "TENANT", password: "" })
+            setFormData({ phone: "", email: "", fullName: "", role: "TENANT" as Role, password: "" })
             router.refresh()
         } else {
             alert(result.error)

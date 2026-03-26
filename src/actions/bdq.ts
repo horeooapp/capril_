@@ -64,7 +64,7 @@ export async function createBDQ(data: CreateBdqInput) {
                 telephoneLocataire: data.telephoneLocataire,
                 descriptionLogement: data.descriptionLogement,
                 adresseLibre: data.adresseLibre,
-                loyerDeclareMensuel: new Prisma.Decimal(data.loyerMensuel),
+                loyerDeclareMensuel: data.loyerMensuel,
                 dateEntreeEstimee: data.dateEntree,
                 precisionDateEntree: data.precisionDateEntree || "EXACTE",
                 identiteIncomplete: data.identiteIncomplete || false,
@@ -180,7 +180,7 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
                     landlordId: bdq.bailleurId,
                     tenantId: tenant.id,
                     startDate: bdq.dateEntreeEstimee || new Date(),
-                    rentAmount: Number(bdq.loyerDeclareMensuel),
+                    rentAmount: bdq.loyerDeclareMensuel as any,
                     durationMonths: 12,
                     status: LeaseStatus.ACTIVE_DECLARATIF,
                     typeBail: TypeBail.DECLARATIF_BDQ,
@@ -298,7 +298,7 @@ export async function updateBDQRent(bdqId: string, nouveauLoyer: number, motif: 
                 data: {
                     bdqId: bdq.id,
                     ancienLoyer: bdq.loyerDeclareMensuel,
-                    nouveauLoyer: new Prisma.Decimal(nouveauLoyer),
+                    nouveauLoyer: nouveauLoyer,
                     motif: motif,
                     effectiveLe: effectiveLe,
                     hashModification: hashMod
@@ -307,7 +307,7 @@ export async function updateBDQRent(bdqId: string, nouveauLoyer: number, motif: 
             prisma.bailDeclaratif.update({
                 where: { id: bdqId },
                 data: {
-                    loyerDeclareMensuel: new Prisma.Decimal(nouveauLoyer),
+                    loyerDeclareMensuel: nouveauLoyer,
                     statut: BdqStatut.PENDING_LOCATAIRE // Reset to pending for confirmation of new rent
                 }
             })

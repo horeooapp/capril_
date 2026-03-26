@@ -28,8 +28,8 @@ export async function processWalletTriggers() {
       let triggerType: "SOLDE_BAS" | "FIN_DE_MOIS" | "RAPPEL_MENSUEL" | null = null;
 
       // --- TRIGGER 1: Solde Bas ---
-      const seuil = user.walletSeuilAlerte?.toNumber() || 500;
-      if (user.walletBalance < seuil) {
+      const seuil = user.walletSeuilAlerte || 500;
+      if ((user.walletBalance as number) < (seuil as number)) {
         // Vérifier si une alerte a été envoyée dans les dernières 24h
         const lastAlert = await prisma.walletRechargeLink.findFirst({
           where: {

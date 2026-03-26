@@ -90,7 +90,7 @@ export async function designateMandatLocal(input: {
         proprietaireId: session.user.id,
         intermediaireId: mandataire.id,
         profil: input.profil,
-        biensConcernes: input.biensIds,
+        biensConcernes: JSON.stringify(input.biensIds),
         permissions: input.permissions,
         statut: "EN_ATTENTE"
       }

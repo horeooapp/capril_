@@ -57,9 +57,12 @@ export async function createProperty(input: CreatePropertyInput) {
 
         const propertyCode = generatePropertyCode(input.leaseType, input.commune, count + 1)
 
+        const { amenities, ...propertyData } = input;
+
         const property = await prisma.property.create({
             data: {
-                ...input,
+                ...propertyData,
+                amenities: JSON.stringify(amenities || []),
                 propertyCode,
                 ownerUserId: session.user.id,
                 status: 'pending_verification',

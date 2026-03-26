@@ -320,7 +320,7 @@ export async function updateAdminPassword(userId: string, newPassword: string) {
         }
 
         const adminRoles: Role[] = [Role.ADMIN, Role.SUPER_ADMIN]
-        if (!adminRoles.includes(targetUser.role)) {
+        if (!adminRoles.includes(targetUser.role as Role)) {
             throw new Error("Cette action est réservée aux comptes administratifs.")
         }
 

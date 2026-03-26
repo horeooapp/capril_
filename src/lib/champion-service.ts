@@ -22,7 +22,7 @@ export class ChampionService {
         telephone: data.telephone,
         quartier: data.quartier,
         nbLogementsEstime: data.nbLogements,
-        statut: "A_RAPPELER",
+        statut: ProspectStatut.A_RAPPELER,
       },
     });
   }
@@ -42,7 +42,7 @@ export class ChampionService {
     await prisma.championProspect.update({
       where: { id: prospectId },
       data: {
-        statut: "INSCRIT",
+        statut: ProspectStatut.INSCRIT,
         userIdInscrit: registeredUserId,
         dateDernierContact: new Date(),
       },
@@ -52,7 +52,7 @@ export class ChampionService {
     // Example: 5000 FCFA for a new verified owner recruitment
     const commissionAmount = 5000; 
 
-    return await this.addCommission(prospect.championId, "RECRUTEMENT", registeredUserId, commissionAmount);
+    return await this.addCommission(prospect.championId, CommType.RECRUTEMENT, registeredUserId, commissionAmount);
   }
 
   /**

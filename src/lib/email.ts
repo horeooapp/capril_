@@ -23,8 +23,12 @@ export async function sendEmail({
   console.log(`[Email] Sending to ${to}: ${subject}`);
   
   const resend = getResend();
-  if (!resend) {
-    console.warn("[Email] AUTH_RESEND_KEY missing. Email not sent, logged to console instead.");
+  const useMock = process.env.ENABLE_EMAIL_MOCK === 'true';
+
+  if (!resend || useMock) {
+    console.warn(`[Email] ${useMock ? "Mock Enabled" : "AUTH_RESEND_KEY missing"}. Email not sent, logged to console instead.`);
+    console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
+    console.log(`[Email] MOCK HTML: ${html.substring(0, 500)}...`);
     return { success: true, mock: true };
   }
 
