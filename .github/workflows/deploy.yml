@@ -69,16 +69,13 @@ jobs:
           include-hidden-files: true
           path: |
             .next
+            !.next/cache
             public
             prisma
             package.json
             package-lock.json
             next.config.ts
-            next-env.d.ts
-            tsconfig.json
-            postcss.config.mjs
-            tailwind.config.ts
-            src
+            server.js
             scripts
           retention-days: 1
 
@@ -187,8 +184,8 @@ jobs:
             npx prisma@6.4.1 migrate resolve --rolled-back \"20260322172550_init\" || true && \
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 generate && \
-            (pm2 reload capril --update-env || \
-             pm2 start node_modules/next/dist/bin/next --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production -- start -p 3000 -H 0.0.0.0) && \
+            (pm2 delete capril || true) && \
+            pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production && \
             pm2 save
           "
 
