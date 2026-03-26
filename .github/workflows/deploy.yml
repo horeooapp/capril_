@@ -79,6 +79,7 @@ jobs:
             postcss.config.mjs
             tailwind.config.ts
             src
+            scripts
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
