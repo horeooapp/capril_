@@ -19,7 +19,8 @@ import {
     ChevronRight,
     Send,
     User,
-    BarChart3
+    BarChart3,
+    Settings
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -42,7 +43,9 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
                 { href: "/locataire/profil-public", label: "Profil Public", icon: <User size={20} /> },
                 { href: "/locataire/invitations", label: "Invitations", icon: <Send size={20} /> },
-                { href: "/locataire/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
+                { href: "/locataire/leases", label: "Contrats", icon: <Handshake size={20} /> },
+                { href: "/locataire/preferences", label: "Paramètres", icon: <Settings size={20} /> },
+                { href: "/locataire/trust", label: "Indice ICL", icon: <Star size={20} /> },
             ]
         }
         

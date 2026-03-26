@@ -49,9 +49,9 @@ export default function LocataireLayoutClient({
                     {session && (
                         <BottomNav items={[
                             { href: "/locataire", label: "Accueil", icon: <Home size={24} /> },
-                            { href: "/locataire/payments", label: "Payer", icon: <Receipt size={24} /> },
-                            { href: "/locataire/alerts", label: "Alertes", icon: <Bell size={24} /> },
-                            { href: "/account", label: "Compte", icon: <User size={24} /> },
+                            { href: "/locataire/leases", label: "Payer", icon: <Receipt size={24} /> },
+                            { href: "/locataire/signalements", label: "Alertes", icon: <Bell size={24} /> },
+                            { href: "/locataire/preferences", label: "Compte", icon: <User size={24} /> },
                         ]} />
                     )}
                 </main>
