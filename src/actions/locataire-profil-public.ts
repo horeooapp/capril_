@@ -106,68 +106,12 @@ export async function logProfileConsultation(locataireId: string, consultantId: 
 }
 
 export async function completeOnboarding(userId: string, data: any) {
-    console.log(`[ONBOARDING] Initiating for user: ${userId}`);
-    
+    console.log(`[ONBOARDING] MINIMAL DEBUG START for user: ${userId}`);
     try {
-        if (!userId) {
-            console.error("[ONBOARDING] Missing userId");
-            return { success: false, error: "Utilisateur non identifié" }
-        }
-
-        if (!(prisma as any).locataireProfilPublic) {
-            console.error("[ONBOARDING] CRITICAL: locataireProfilPublic model is missing from Prisma Client");
-            return { success: false, error: "Mise à jour de l'infrastructure requise (Prisma mismatch)" }
-        }
-
-        // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
-        const profilDataToSave: any = {
-            ...data.profilData,
-            communesSouhaitees: data.profilData?.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
-            typeLogement: data.profilData?.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
-        }
-        
-        // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
-        delete profilDataToSave.city;
-
-        // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
-        const updateData: any = { onboardingComplete: true }
-        if (data.fullName) updateData.fullName = data.fullName
-        if (data.email) updateData.email = data.email
-        
-        console.log(`[ONBOARDING] Updating user basic info...`);
-        await prisma.user.update({
-            where: { id: userId },
-            data: updateData
-        })
-
-        /* 
-        // 2. Créer ou mettre à jour le profil public
-        console.log(`[ONBOARDING] Upserting public profile...`);
-        const profil = await (prisma as any).locataireProfilPublic.upsert({
-            where: { userId },
-            create: {
-                userId,
-                ...profilDataToSave
-            },
-            update: {
-                ...profilDataToSave
-            }
-        })
-        console.log(`[ONBOARDING] Successfully UPSERTED public profile`);
-        */
-
-        console.log(`[ONBOARDING] Skipping public profile upsert for debug...`);
-        
-        revalidatePath("/locataire")
-        revalidatePath("/onboarding/tenant")
-        
-        console.log(`[ONBOARDING] Action complete, returning success:true to client`);
+        console.log(`[ONBOARDING] Returning SUCCESS without any DB write...`);
         return { success: true }
     } catch (error: any) {
-        console.error("Error completing onboarding:", error)
-        return { 
-            success: false, 
-            error: error.message || "Erreur lors de la finalisation de l'onboarding" 
-        }
+        console.error("Error in completeOnboarding minimal:", error)
+        return { success: false, error: error.message }
     }
 }

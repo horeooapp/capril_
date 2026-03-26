@@ -68,28 +68,34 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
 
     const onFinish = () => {
         startTransition(async () => {
-            const profilData = {
-                statutPro: formData.statutPro,
-                revenuFourchette: formData.revenuFourchette,
-                budgetMaxFcfa: formData.budgetMaxFcfa,
-                city: formData.city,
-                communesSouhaitees: formData.communesSouhaitees,
-                typeLogement: formData.typeLogement,
-                visibilite: formData.visibilite
-            }
+            try {
+                const profilData = {
+                    statutPro: formData.statutPro,
+                    revenuFourchette: formData.revenuFourchette,
+                    budgetMaxFcfa: formData.budgetMaxFcfa,
+                    city: formData.city,
+                    communesSouhaitees: formData.communesSouhaitees,
+                    typeLogement: formData.typeLogement,
+                    visibilite: formData.visibilite
+                }
 
-            const result = await completeOnboarding(session.user.id, {
-                fullName: formData.fullName,
-                email: formData.email,
-                profilData
-            })
+                console.log("Calling completeOnboarding...");
+                const result = await completeOnboarding(session.user.id, {
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    profilData
+                })
+                console.log("Result received:", result);
 
-            if (result.success) {
-                toast.success("Bienvenue sur QAPRIL !")
-                // Force a hard redirect to ensure session is refreshed and dashboard loads correctly
-                window.location.href = "/locataire"
-            } else {
-                toast.error(result.error || "Erreur lors de la sauvegarde")
+                if (result.success) {
+                    toast.success("Bienvenue sur QAPRIL !")
+                    window.location.href = "/locataire"
+                } else {
+                    toast.error(result.error || "Erreur lors de la sauvegarde")
+                }
+            } catch (err: any) {
+                console.error("Client-side error during onboarding:", err);
+                toast.error("Une erreur inattendue est survenue: " + err.message);
             }
         })
     }
