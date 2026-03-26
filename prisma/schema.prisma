@@ -7,267 +7,509 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// enum String {
-//   SUPER_ADMIN
-//   ADMIN
-//   ANAH_AGENT
-//   CDC_AGENT
-//   LANDLORD
-//   LANDLORD_PRO
-//   AGENCY
-//   TENANT
-//   NON_CERTIFIED_AGENT
-//   CHAMPION
-// }
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  ANAH_AGENT
+  CDC_AGENT
+  LANDLORD
+  LANDLORD_PRO
+  AGENCY
+  TENANT
+  NON_CERTIFIED_AGENT
+  CHAMPION
+}
 
-// enum String {
-//   AWAITING_PAYMENT
-//   PENDING
-//   CONSIGNED
-//   RETURN_REQUESTED
-//   RETURNED
-//   FORFEITED
-// }
+enum CDCDepositStatus {
+  AWAITING_PAYMENT
+  PENDING
+  CONSIGNED
+  RETURN_REQUESTED
+  RETURNED
+  FORFEITED
+}
 
-// enum String {
-//   OWNER
-//   AGENCY
-//   ADMIN
-// }
+enum CDCDepositInitiator {
+  OWNER
+  AGENCY
+  ADMIN
+}
 
-// enum String {
-//   DRAFT
-//   PENDING_SIGNATURE
-//   PENDING_CONFIRMATION
-//   PENDING_DEPOSIT
-//   ACTIVE
-//   ACTIVE_DECLARATIF
-//   LOYER_IMPAYE
-//   MISE_EN_DEMEURE
-//   CLEMENCE_EN_COURS
-//   REPRISE_PROCEDURE
-//   DEMANDE_RESILIATION
-//   TERMINATED
-//   CANCELLED
-//   ARCHIVED
-// }
+enum LeaseStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  PENDING_CONFIRMATION
+  PENDING_DEPOSIT
+  ACTIVE
+  ACTIVE_DECLARATIF
+  LOYER_IMPAYE
+  MISE_EN_DEMEURE
+  CLEMENCE_EN_COURS
+  REPRISE_PROCEDURE
+  DEMANDE_RESILIATION
+  TERMINATED
+  CANCELLED
+  ARCHIVED
+}
 
-// enum String {
-//   ECRIT
-//   DECLARATIF_BDQ
-//   DECLARATIF_EN_COURS_FORMALISATION
-// }
+enum TypeBail {
+  ECRIT
+  DECLARATIF_BDQ
+  DECLARATIF_EN_COURS_FORMALISATION
+}
 
-// enum String {
-//   LOCATAIRE
-//   ESSENTIEL
-//   PRO
-//   PREMIUM
-//   INSTITUTIONNEL
-// }
+enum PlanTier {
+  LOCATAIRE
+  ESSENTIEL
+  PRO
+  PREMIUM
+  INSTITUTIONNEL
+}
 
-// enum String {
-//   PROPOSED
-//   ACCEPTED
-//   REJECTED
-//   BROKEN
-//   COMPLETED
-// }
+enum PlanStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+  BROKEN
+  COMPLETED
+}
 
-// enum String {
-//   ACTIVE
-//   CANCELLED
-//   EXPIRED
-// }
+enum InsuranceStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
 
-// enum String {
-//   OPEN
-//   PROCESSING
-//   RESOLVED
-//   REJECTED
-// }
+enum InsuranceClaimStatus {
+  OPEN
+  PROCESSING
+  RESOLVED
+  REJECTED
+}
 
-// enum String {
-//   OPEN
-//   IN_PROGRESS
-//   RESOLVED
-//   CLOSED
-//   CANCELLED
-// }
+enum MediationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
 
-// enum String {
-//   OPEN
-//   WAITING_RESPONSE
-//   IN_MEDIATION
-//   RESOLVED
-//   ESCALATED
-//   CLOSED
-// }
+enum DisputeStatus {
+  OPEN
+  WAITING_RESPONSE
+  IN_MEDIATION
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
 
-// enum String {
-//   PENDING
-//   APPROVED
-//   REJECTED
-//   COMPLETED
-//   CANCELLED
-// }
+enum PrepaymentRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
 
-// enum String {
-//   EN_ATTENTE_DECLARATION
-//   NOTIFIE
-//   EN_COURS_PAIEMENT
-//   PAYE_CONFIRME
-//   ENREGISTRE
-//   ECHEC_PAIEMENT
-//   PAIEMENT_PARTIEL
-//   DECLARATION_EN_RETARD
-//   IGNORE_PAR_BAILLEUR
-//   RENOUVELE
-// }
+enum FiscalStatus {
+  EN_ATTENTE_DECLARATION
+  NOTIFIE
+  EN_COURS_PAIEMENT
+  PAYE_CONFIRME
+  ENREGISTRE
+  ECHEC_PAIEMENT
+  PAIEMENT_PARTIEL
+  DECLARATION_EN_RETARD
+  IGNORE_PAR_BAILLEUR
+  RENOUVELE
+}
 
-// enum String {
-//   EXCLUSIVE
-//   SIMPLE
-//   CO_EXCLUSIVE
-//   DIRECT
-// }
+enum MandateType {
+  EXCLUSIVE
+  SIMPLE
+  CO_EXCLUSIVE
+  DIRECT
+}
 
-// enum String {
-//   ACTIVE
-//   SUSPENDED
-//   CANCELLED
-//   EXPIRED
-//   DRAFT
-// }
+enum MandateStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+  DRAFT
+}
 
-// enum String {
-//   SOLDE_BAS
-//   FIN_DE_MOIS
-//   CREDIT_GENERE
-//   RAPPEL_MENSUEL
-//   MANUEL
-// }
+enum DeclencheurEnum {
+  SOLDE_BAS
+  FIN_DE_MOIS
+  CREDIT_GENERE
+  RAPPEL_MENSUEL
+  MANUEL
+}
 
-// enum String {
-//   AGENCY
-//   DIRECT
-//   MIXED
-// }
+enum ManagementMode {
+  AGENCY
+  DIRECT
+  MIXED
+}
 
-// enum String {
-//   PRINCIPAL
-//   SECONDAIRE
-// }
+enum ColocRole {
+  PRINCIPAL
+  SECONDAIRE
+}
 
-// enum String {
-//   GROUPE
-//   INDIVIDUEL
-//   LIBRE
-// }
+enum ColocMode {
+  GROUPE
+  INDIVIDUEL
+  LIBRE
+}
 
-// enum String {
-//   EN_ATTENTE
-//   PARTIEL
-//   COMPLET
-//   EXCEDENT
-//   IMPAYE
-// }
+enum LoyerStatut {
+  EN_ATTENTE
+  PARTIEL
+  COMPLET
+  EXCEDENT
+  IMPAYE
+}
 
-// enum String {
-//   PARKING_VEHICULES
-//   PARKING_CAMIONS
-//   COMMERCE_TEMPORAIRE
-//   STOCKAGE
-//   AGRICULTURE
-//   EVENEMENTIEL
-//   INDUSTRIEL
-//   AUTRE
-// }
+enum TerrainUsage {
+  PARKING_VEHICULES
+  PARKING_CAMIONS
+  COMMERCE_TEMPORAIRE
+  STOCKAGE
+  AGRICULTURE
+  EVENEMENTIEL
+  INDUSTRIEL
+  AUTRE
+}
 
-// enum String {
-//   JOURNALIER
-//   HEBDOMADAIRE
-//   MENSUEL
-//   TRIMESTRIEL
-//   SEMESTRIEL
-//   ANNUEL
-//   FORFAIT
-// }
+enum Periodicite {
+  JOURNALIER
+  HEBDOMADAIRE
+  MENSUEL
+  TRIMESTRIEL
+  SEMESTRIEL
+  ANNUEL
+  FORFAIT
+}
 
-// enum String {
-//   INVISIBLE
-//   INVITATION_PROPRIO
-//   INVITATION_AGENCE
-//   TOUS
-// }
+enum VisibEnum {
+  INVISIBLE
+  INVITATION_PROPRIO
+  INVITATION_AGENCE
+  TOUS
+}
 
-// enum String {
-//   ENVOYEE
-//   VUE
-//   ACCEPTEE
-//   REFUSEE
-//   EXPIREE
-//   ANNULEE
-// }
+enum InvitStatutEnum {
+  ENVOYEE
+  VUE
+  ACCEPTEE
+  REFUSEE
+  EXPIREE
+  ANNULEE
+}
 
-// enum String {
-//   INDIVIDUEL_LOCATAIRE
-//   PARTAGÉ_PROPRIO
-//   INDIVIDUEL_PROPRIO
-//   MIXTE
-//   NON_APPLICABLE
-// }
+enum UtilityMode {
+  INDIVIDUEL_LOCATAIRE
+  PARTAGÉ_PROPRIO
+  INDIVIDUEL_PROPRIO
+  MIXTE
+  NON_APPLICABLE
+}
 
-// enum String {
-//   PRORATA_CHAMBRE
-//   FORFAIT_FIXE
-//   USAGE_DÉCLARÉ
-// }
+enum RepartitionModel {
+  PRORATA_CHAMBRE
+  FORFAIT_FIXE
+  USAGE_DÉCLARÉ
+}
 
-// enum String {
-//   CIE
-//   SODECI
-// }
+enum UtilityType {
+  CIE
+  SODECI
+}
 
-// enum String {
-//   EN_COURS
-//   PAYÉE
-//   EN_RETARD
-//   PARTIELLE
-//   EN_ATTENTE
-// }
+enum UtilityStatus {
+  EN_COURS
+  PAYÉE
+  EN_RETARD
+  PARTIELLE
+  EN_ATTENTE
+}
 
-// enum String {
-//   MAI_EL
-//   MAI_EA
-//   MAI_TO
-//   MAI_SE
-//   MAI_SA
-//   MAI_PC
-//   MAI_AU
-//   MAI_DI
-// }
+enum MaintenanceCategory {
+  MAI_EL
+  MAI_EA
+  MAI_TO
+  MAI_SE
+  MAI_SA
+  MAI_PC
+  MAI_AU
+  MAI_DI
+}
 
-// enum String {
-//   EN_ATTENTE
-//   PRIS_EN_CHARGE
-//   RÉSOLU
-//   CONTESTÉ
-//   LITIGE
-//   CLÔTURÉ
-// }
+enum MaintenanceStatus {
+  EN_ATTENTE
+  PRIS_EN_CHARGE
+  RÉSOLU
+  CONTESTÉ
+  LITIGE
+  CLÔTURÉ
+}
 
+enum ReversalStatus {
+  PENDING
+  REVERSED
+  FAILED
+}
 
-// ═══════════════════════════════════════════════════════
-// USERS (Part 4 & 5)
-// ═══════════════════════════════════════════════════════
+enum ReversalType {
+  AGENCY_COMMISSION
+  LANDLORD_RENT
+}
+
+enum PaymentCanal {
+  ORANGE
+  MTN
+  WAVE
+  MOOV
+  CINETPAY_M17
+  SMS_DECLARATIF
+}
+
+enum PaymentPgwStatus {
+  INITIEE
+  EN_ATTENTE_PAIEMENT
+  CONFIRMEE
+  ECHEC
+  EXPIREE
+  DECLAREE
+}
+
+enum EdlType {
+  ENTREE
+  SORTIE
+}
+
+enum SigDoc {
+  BAIL
+  BAIL_COMMERCIAL
+  MANDAT
+  EDL
+  ACCORD_MEDIATION
+  AVENANT
+}
+
+enum SigStatut {
+  EN_ATTENTE
+  SIGNE
+  REFUSE
+  EXPIRE
+}
+
+enum CandStatut {
+  SOUMISE
+  EN_ETUDE
+  ACCEPTEE
+  REFUSEE
+  CONVERTIE_LOCATAIRE
+}
+
+enum ChargeType {
+  EAU
+  ELECTRICITE_COMMUNE
+  GARDIENNAGE
+  NETTOYAGE
+  TOM
+  AUTRE
+}
+
+enum AgendaType {
+  VISITE
+  EDL_ENTREE
+  EDL_SORTIE
+  REMISE_CLES
+  REUNION_PROPRIO
+  TRAVAUX
+  ECHEANCE_BAIL
+  AUTRE
+}
+
+enum LegalType {
+  PRE_NOTICE
+  COMMAND_TO_PAY
+  TERMINATION_NOTICE
+  EVICTION_ORDER
+}
+
+enum MigrationStatus {
+  UPLOADE
+  EN_ANALYSE
+  RAPPORT_GENERE
+  COMMITE
+  ERREUR
+}
+
+enum InspectionType {
+  ENTRY
+  EXIT
+}
+
+enum RoomStatus {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
+
+enum ReminderType {
+  D_MINUS_5
+  D_DAY
+  D_PLUS_5
+  LEGAL_NOTICE
+}
+
+enum BdqStatut {
+  PENDING_LOCATAIRE
+  CONFIRME
+  CONFIRME_AGENT
+  CONFIRME_MEDIATION
+  DECLARATIF_SANS_REPONSE
+  DECLARATIF_UNILATERAL
+  CONTESTE
+  FORMALISE
+  ARCHIVE
+}
+
+enum BdqConvStatut {
+  EN_COURS
+  EN_PAUSE
+  COMPLETE
+  ABANDONNE
+  EXPIRE
+}
+
+enum NotifCanal {
+  WHATSAPP
+  SMS
+  EMAIL
+  PUSH
+}
+
+enum NotifStatut {
+  EN_ATTENTE
+  ENVOYE
+  LIVRE
+  LU
+  ECHEC
+  ANNULE
+}
+
+enum BienRole {
+  OWNER
+  INTERMEDIAIRE
+  AGENCE
+  FIELD_AGENT
+}
+
+enum ProfilInterm {
+  PARENT_AMI
+  NOTAIRE
+  HUISSIER
+  AVOCAT
+}
+
+enum RegStatut {
+  EN_COURS
+  PROLONGE_RECEPISSE
+  PROLONGE_FORMATION
+  REGULARISE
+  BASCULE
+}
+
+enum DeclStatut {
+  EN_ATTENTE
+  CONFIRME
+  CONTESTE
+  EXPIRE
+  AUTO_GENERE
+}
+
+enum PromoType {
+  MOIS_GRATUITS
+  REMISE_POURCENTAGE
+  REMISE_MONTANT
+  PRIX_FIXE
+  ESSAI_ETENDU
+}
+
+enum NegocieType {
+  ABONNEMENT_DEROGATOIRE
+  QUITTANCE_DEROGATOIRE
+  ENREGISTREMENT_DEROGATOIRE
+}
+
+enum SignalCatEnum {
+  FUITE_EAU
+  ELECTRICITE
+  PORTE_SERRURE
+  NUISANCE
+  DEGRADATION
+  AUTRE
+}
+
+enum SignalStatutEnum {
+  ENVOYE
+  VU_PROPRIO
+  EN_COURS
+  RESOLU
+  NON_RESOLU_FERME
+}
+
+enum CautionDestEnum {
+  PROPRIETAIRE
+  CDC_CI
+  AUTRE
+}
+
+enum PreavisStatutEnum {
+  EMIS
+  ACCUSE
+  ETAT_LIEUX_PLANIFIE
+  CLOS
+}
+
+enum EdlStatut {
+  EN_COURS
+  SOUMIS_LOCATAIRE
+  CONFIRME
+  CONTESTE
+  CERTIFIE
+}
+
+enum ProspectStatut {
+  A_RAPPELER
+  EN_DISCUSSION
+  INSCRIT
+  PAS_INTERESSE
+  PERDU
+}
+
+enum CommType {
+  BAIL_FORMEL
+  BDQ_CONFIRME
+  FORMALISATION
+  RECRUTEMENT
+  BONUS
+}
+
 model User {
   id          String  @id @default(uuid()) @map("user_id")
   phone       String? @unique
   fullName    String? @map("full_name")
   name        String?
   email       String? @unique
-  role        String    @default("TENANT")
+  role Role @default(TENANT)
   kycLevel    Int     @default(0) @map("kyc_level") // 0-4
   kycStatus   String  @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
   status      String  @default("active") // active|suspended|inactive
@@ -891,7 +1133,7 @@ model Colocataire {
   lease        Lease     @relation(fields: [leaseId], references: [id])
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
-  role         String @default("SECONDAIRE")
+  role ColocRole @default(SECONDAIRE)
   partLoyer    Int?      @map("part_loyer")
   pctLoyer     Float?  @map("pct_loyer")
   modePaiement String @default("INDIVIDUEL") @map("mode_paiement")
@@ -1464,11 +1706,11 @@ model PaymentPgw {
   beneficiaireId String @map("beneficiaire_id")
   beneficiaire   User   @relation("BeneficiaryTransactions", fields: [beneficiaireId], references: [id])
 
-  canal              String
+  canal PaymentCanal
   msisdnPayeur       String?      @map("msisdn_payeur")
   msisdnBeneficiaire String?      @map("msisdn_beneficiaire")
 
-  statut String @default("INITIEE")
+  statut PaymentPgwStatus @default(INITIEE)
 
   refInterne   String  @unique @map("ref_interne")
   refOperateur String? @map("ref_operateur")
@@ -1502,11 +1744,7 @@ model PaymentPgw {
   @@map("payments_pgw")
 }
 
-// enum String {
-//   PENDING
-//   REVERSED
-//   FAILED
-// }
+
 
 model ReversalTransaction {
   id           String       @id @default(uuid()) @map("reversal_id")
@@ -1524,32 +1762,15 @@ model ReversalTransaction {
   @@map("reversal_transactions")
 }
 
-// enum String {
-//   AGENCY_COMMISSION
-//   LANDLORD_RENT
-// }
 
-// enum String {
-//   ORANGE
-//   MTN
-//   WAVE
-//   MOOV
-//   CINETPAY_M17
-//   SMS_DECLARATIF
-// }
 
-// enum String {
-//   INITIEE
-//   EN_ATTENTE_PAIEMENT
-//   CONFIRMEE
-//   ECHEC
-//   EXPIREE
-//   DECLAREE
-// }
+
+
+
 
 model PgwWebhook {
   id              String       @id @default(uuid()) @map("webhook_id")
-  canal           String
+  canal PaymentCanal
   refOperateur    String?      @map("ref_operateur")
   payload         Json
   signatureValide Boolean      @map("signature_valid")
@@ -1564,7 +1785,7 @@ model PgwWebhook {
 
 model PgwMsisdnLookup {
   prefixe   String       @id @map("prefixe")
-  operateur String
+  operateur PaymentCanal
   actif     Boolean      @default(true)
   updatedAt DateTime     @updatedAt @map("updated_at")
 
@@ -1574,7 +1795,7 @@ model PgwMsisdnLookup {
 model PgwReconciliation {
   id                      String       @id @default(uuid()) @map("recon_id")
   dateRecon               DateTime     @map("date_recon")
-  canal                   String
+  canal PaymentCanal
   nbTransactionsQapril    Int          @map("nb_transactions_qapril")
   nbTransactionsOperateur Int?         @map("nb_transactions_operateur")
   montantTotalQapril      Float      @map("montant_total_qapril")
@@ -1607,7 +1828,7 @@ model EtatsDesLieux {
   leaseId          String      @map("lease_id")
   lease            Lease       @relation(fields: [leaseId], references: [id])
   typeEdl          String     @map("type_edl") // ENTREE | SORTIE
-  statut           String   @default("EN_COURS")
+  statut EdlStatut @default(EN_COURS)
   
   redigeParId      String      @map("redige_par")
   redigePar        User        @relation("RedacteurEdl", fields: [redigeParId], references: [id])
@@ -1647,10 +1868,7 @@ model EtatsDesLieux {
   @@map("etats_des_lieux")
 }
 
-// enum String {
-//   ENTREE
-//   SORTIE
-// }
+
 
 // M-SIGN — Signatures Électroniques
 model SignatureElectronique {
@@ -1674,21 +1892,9 @@ model SignatureElectronique {
   @@map("signatures_electroniques")
 }
 
-// enum String {
-//   BAIL
-//   BAIL_COMMERCIAL
-//   MANDAT
-//   EDL
-//   ACCORD_MEDIATION
-//   AVENANT
-// }
 
-// enum String {
-//   EN_ATTENTE
-//   SIGNE
-//   REFUSE
-//   EXPIRE
-// }
+
+
 
 // M-MAINT — Maintenance & Travaux (ADD-17)
 model TicketMaintenance {
@@ -1786,13 +1992,7 @@ model Candidature {
   @@map("candidatures")
 }
 
-// enum String {
-//   SOUMISE
-//   EN_ETUDE
-//   ACCEPTEE
-//   REFUSEE
-//   CONVERTIE_LOCATAIRE
-// }
+
 
 // M-CHARGES — Charges Locatives
 model ChargeParametrage {
@@ -1824,14 +2024,7 @@ model RegularisationCharges {
   @@map("regularisations_charges")
 }
 
-// enum String {
-//   EAU
-//   ELECTRICITE_COMMUNE
-//   GARDIENNAGE
-//   NETTOYAGE
-//   TOM // Taxe Ordures Ménagères
-//   AUTRE
-// }
+
 
 // M-ANNONCES — Vacance Locative
 model Annonce {
@@ -1914,16 +2107,7 @@ model AgendaEvenement {
   @@map("agenda_evenements")
 }
 
-// enum String {
-//   VISITE
-//   EDL_ENTREE
-//   EDL_SORTIE
-//   REMISE_CLES
-//   REUNION_PROPRIO
-//   TRAVAUX
-//   ECHEANCE_BAIL
-//   AUTRE
-// }
+
 
 // ═══════════════════════════════════════════════════════
 // ADD-05 NEW MODELS
@@ -2003,12 +2187,7 @@ model LegalProcedure {
   @@map("legal_procedures")
 }
 
-// enum String {
-//   PRE_NOTICE
-//   COMMAND_TO_PAY
-//   TERMINATION_NOTICE
-//   EVICTION_ORDER
-// }
+
 
 model CoopGroup {
   id          String  @id @default(uuid()) @map("coop_id")
@@ -2077,13 +2256,7 @@ model MigrationStaging {
   @@map("migration_staging")
 }
 
-// enum String {
-//   UPLOADE
-//   EN_ANALYSE
-//   RAPPORT_GENERE
-//   COMMITE
-//   ERREUR
-// }
+
 
 // ═══════════════════════════════════════════════════════
 // FINAL SPRINT MODELS (EDL, SIG, RECOUVREMENT)
@@ -2107,10 +2280,7 @@ model Inspection {
   @@map("inspections")
 }
 
-// enum String {
-//   ENTRY
-//   EXIT
-// }
+
 
 model InspectionRoom {
   id           String     @id @default(uuid()) @map("room_id")
@@ -2125,12 +2295,7 @@ model InspectionRoom {
   @@map("inspection_rooms")
 }
 
-// enum String {
-//   EXCELLENT
-//   GOOD
-//   FAIR
-//   POOR
-// }
+
 
 model InspectionPhoto {
   id               String         @id @default(uuid()) @map("photo_id")
@@ -2155,32 +2320,11 @@ model ReminderLog {
   @@map("reminder_logs")
 }
 
-// enum String {
-//   D_MINUS_5
-//   D_DAY
-//   D_PLUS_5
-//   LEGAL_NOTICE
-// }
 
-// enum String {
-//   PENDING_LOCATAIRE
-//   CONFIRME
-//   CONFIRME_AGENT
-//   CONFIRME_MEDIATION
-//   DECLARATIF_SANS_REPONSE
-//   DECLARATIF_UNILATERAL
-//   CONTESTE
-//   FORMALISE
-//   ARCHIVE
-// }
 
-// enum String {
-//   EN_COURS
-//   EN_PAUSE
-//   COMPLETE
-//   ABANDONNE
-//   EXPIRE
-// }
+
+
+
 
 // ═══════════════════════════════════════════════════════
 // BAILS DÉCLARATIFS (ADD-06 M-BAIL-VERBAL)
@@ -2206,7 +2350,7 @@ model BailDeclaratif {
   identiteIncomplete     Boolean   @default(false) @map("identite_incomplete")
   sourceCreation         String    @default("FORM") @map("source_creation")
 
-  statut                 String @default("PENDING_LOCATAIRE")
+  statut BdqStatut @default(PENDING_LOCATAIRE)
   confirmationLocataire  Boolean?  @map("confirmation_locataire")
   confirmationAt         DateTime? @map("confirmation_at")
   contrePropositionLoyer Float?  @map("contre_proposition_loyer")
@@ -2275,7 +2419,7 @@ model BdqConversationState {
   bailleur      User          @relation("BdqConvBailleur", fields: [bailleurId], references: [id])
   legalEntityId String?       @map("legal_entity_id")
   legalEntity   LegalEntity?  @relation("BdqConvLegalEntity", fields: [legalEntityId], references: [id])
-  canal         String // WHATSAPP | APP_CHAT
+  canal PaymentCanal // WHATSAPP | APP_CHAT
   canalRef      String?       @unique @map("canal_ref")
   statut        String @default("EN_COURS")
 
@@ -2349,21 +2493,9 @@ model PropertyDocument {
 // ═══════════════════════════════════════════════════════
 // NOTIFICATIONS (Part 17 / ADD-09)
 // ═══════════════════════════════════════════════════════
-// enum String {
-//   WHATSAPP
-//   SMS
-//   EMAIL
-//   PUSH
-// }
 
-// enum String {
-//   EN_ATTENTE
-//   ENVOYE
-//   LIVRE
-//   LU
-//   ECHEC
-//   ANNULE
-// }
+
+
 
 model NotificationPreference {
   id     String @id @default(uuid()) @map("pref_id")
@@ -2400,7 +2532,7 @@ model NotificationLog {
   id             String      @id @default(uuid()) @map("notif_id")
   userId         String      @map("user_id")
   user           User        @relation(fields: [userId], references: [id])
-  canal          String
+  canal PaymentCanal
   typeEvenement  String      @map("type_evenement")
   referenceId    String?     @map("reference_id")
   templateId     String?     @map("template_id")
@@ -2422,41 +2554,19 @@ model NotificationLog {
 // ═══════════════════════════════════════════════════════
 // ADD-11 : Rôles & Réclamations
 // ═══════════════════════════════════════════════════════
-// enum String {
-//   OWNER
-//   INTERMEDIAIRE
-//   AGENCE
-//   FIELD_AGENT
-// }
 
-// enum String {
-//   PARENT_AMI
-//   NOTAIRE
-//   HUISSIER
-//   AVOCAT
-// }
 
-// enum String {
-//   EN_COURS
-//   PROLONGE_RECEPISSE
-//   PROLONGE_FORMATION
-//   REGULARISE
-//   BASCULE
-// }
 
-// enum String {
-//   EN_ATTENTE
-//   CONFIRME
-//   CONTESTE
-//   EXPIRE
-//   AUTO_GENERE
-// }
+
+
+
+
 
 model PropertyAccess {
   id                  String        @id @default(uuid()) @map("acces_id")
   propertyId          String        @map("bien_id")
   userId              String        @map("user_id")
-  role                String
+  role Role
   profil              String? @map("profil_intermediaire")
   statut              String        @default("EN_ATTENTE") // EN_ATTENTE | ACTIF | SUSPENDU | REVOQUE | EXPIRE
   
@@ -2555,7 +2665,7 @@ model SmsDeclaration {
   leaseId         String      @map("bail_id")
   tenantId        String      @map("locataire_id")
   montantDeclare  Float     @map("montant_declare")
-  canal           String      @default("SMS") // SMS | WHATSAPP | APP
+  canal PaymentCanal @default(SMS_DECLARATIF) // SMS | WHATSAPP | APP
   statut          String  @default("EN_ATTENTE")
   confirmeParId   String?     @map("confirme_par")
   confirmeAt      DateTime?   @map("confirme_at")
@@ -2576,19 +2686,9 @@ model SmsDeclaration {
 // ═══════════════════════════════════════════════════════
 // ADD-12 : Configuration Tarifaire Admin
 // ═══════════════════════════════════════════════════════
-// enum String {
-//   MOIS_GRATUITS
-//   REMISE_POURCENTAGE
-//   REMISE_MONTANT
-//   PRIX_FIXE
-//   ESSAI_ETENDU
-// }
 
-// enum String {
-//   ABONNEMENT_DEROGATOIRE
-//   QUITTANCE_DEROGATOIRE
-//   ENREGISTREMENT_DEROGATOIRE
-// }
+
+
 
 model ConfigTarif {
   id               String       @id @default(uuid()) @map("tarif_id")
@@ -2712,22 +2812,9 @@ model LocataireProfile {
   @@map("locataire_profiles")
 }
 
-// enum String {
-//   FUITE_EAU
-//   ELECTRICITE
-//   PORTE_SERRURE
-//   NUISANCE
-//   DEGRADATION
-//   AUTRE
-// }
 
-// enum String {
-//   ENVOYE
-//   VU_PROPRIO
-//   EN_COURS
-//   RESOLU
-//   NON_RESOLU_FERME
-// }
+
+
 
 model SignalementLocataire {
   id              String           @id @default(uuid()) @map("signal_id")
@@ -2750,11 +2837,7 @@ model SignalementLocataire {
   @@map("signalements_locataire")
 }
 
-// enum String {
-//   PROPRIETAIRE
-//   CDC_CI
-//   AUTRE
-// }
+
 
 model CautionBail {
   id                String           @id @default(uuid()) @map("caution_id")
@@ -2782,12 +2865,7 @@ model CautionBail {
   @@map("cautions_bail")
 }
 
-// enum String {
-//   EMIS
-//   ACCUSE
-//   ETAT_LIEUX_PLANIFIE
-//   CLOS
-// }
+
 
 model PreavisBail {
   id                  String             @id @default(uuid()) @map("preavis_id")
@@ -2839,7 +2917,7 @@ model AlerteLoyer {
   datePrevue      DateTime     @map("date_prevue")
   envoyee         Boolean      @default(false)
   envoyeeAt       DateTime?    @map("envoyee_at")
-  canal           String? // SMS | WHATSAPP | PUSH
+  canal PaymentCanal? // SMS | WHATSAPP | PUSH
   createdAt       DateTime     @default(now()) @map("created_at")
 
   bail            Lease        @relation(fields: [bailId], references: [id])
@@ -2932,29 +3010,11 @@ model ConsultationProfil {
 // ADD-15 : Modules Critiques (EDL, RPT, CHP)
 // ═══════════════════════════════════════════════════════
 
-// enum String {
-//   EN_COURS
-//   SOUMIS_LOCATAIRE
-//   CONFIRME
-//   CONTESTE
-//   CERTIFIE
-// }
 
-// enum String {
-//   A_RAPPELER
-//   EN_DISCUSSION
-//   INSCRIT
-//   PAS_INTERESSE
-//   PERDU
-// }
 
-// enum String {
-//   BAIL_FORMEL
-//   BDQ_CONFIRME
-//   FORMALISATION
-//   RECRUTEMENT
-//   BONUS
-// }
+
+
+
 
 model RapportMensuel {
   id              String   @id @default(uuid()) @map("rapport_id")
@@ -3039,7 +3099,7 @@ model WalletRechargeLink {
   userId          String          @map("user_id")
   user            User            @relation(fields: [userId], references: [id])
   declencheur     String
-  operateur       String          // WAVE | ORANGE | MTN | MOOV
+  operateur PaymentCanal          // WAVE | ORANGE | MTN | MOOV
   montantSuggere  Float         @map("montant_suggere")
   soldeAuMoment   Float         @map("solde_au_moment")
   nbBailsActifs   Int             @map("nb_bails_actifs")
@@ -3139,7 +3199,7 @@ model FactureUtility {
   moisFacture         DateTime      @map("mois_facture")
   montantTotal        Float       @map("montant_total")
   dateLimitePaiement  DateTime?     @map("date_limite_paiement")
-  statut              String @default("EN_COURS")
+  statut UtilityStatus @default(EN_COURS)
   source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | ...
   modeUtilities       String   @map("mode_utilities")
   datePaiement        DateTime?     @map("date_paiement")
