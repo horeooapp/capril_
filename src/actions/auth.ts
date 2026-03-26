@@ -127,10 +127,25 @@ export async function loginWithAdminCredentials(email: string, password: string)
 
         return { success: true };
     } catch (error: any) {
-        if (error?.type === 'CallbackRouteError' || error?.name === 'CallbackRouteError' || error?.message?.includes('CallbackRouteError')) {
+        const errorString = String(error);
+        const errorStack = error?.stack || "";
+        
+        if (
+            error?.type === 'CallbackRouteError' || 
+            error?.name === 'CallbackRouteError' || 
+            errorString.includes('CallbackRouteError') ||
+            errorStack.includes('CallbackRouteError')
+        ) {
              return { error: "Mot de passe incorrect." };
         }
-        console.error("[SERVER ACTION] loginWithAdminCredentials error:", error);
+        
+        console.error("[SERVER ACTION] loginWithAdminCredentials detail:", {
+            name: error?.name,
+            message: error?.message,
+            type: error?.type,
+            stack: error?.stack
+        });
+        
         return { error: "Une erreur technique est survenue." };
     }
 }
