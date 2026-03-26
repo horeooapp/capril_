@@ -95,11 +95,10 @@ export default async function Home() {
               <Link href="/" className="flex items-center space-x-6 group">
                 <div className="relative">
                     <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full scale-110"></div>
-                    <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto relative z-10 rounded-2xl shadow-2xl border border-white/20 group-hover:scale-105 transition-transform duration-700" />
+                    <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-black text-5xl tracking-tighter text-white leading-none italic">QAPRIL.</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.5em] text-ivoire-orange mt-2">Infrastructure Nationale</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.6em] text-ivoire-orange mt-2 ml-1">Infrastructure Nationale</span>
                 </div>
               </Link>
               <div className="hidden md:flex items-center gap-4">
@@ -195,10 +194,9 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center space-x-4 group">
-              <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto rounded-2xl shadow-2xl border border-gray-100 group-hover:scale-105 transition-transform duration-700" />
+              <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto group-hover:scale-105 transition-transform duration-700" />
               <div className="flex flex-col">
-                <span className="font-black text-3xl tracking-tighter text-ivoire-dark leading-none uppercase">QAPRIL</span>
-                <span className="text-[9px] font-black tracking-[0.2em] text-ivoire-orange mt-1 uppercase opacity-80">Infrastructure</span>
+                <span className="text-[10px] font-black tracking-[0.3em] text-ivoire-orange mt-1 uppercase opacity-80">Infrastructure Bureaucratique</span>
               </div>
             </Link>
 

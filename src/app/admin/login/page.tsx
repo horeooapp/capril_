@@ -24,12 +24,12 @@ export default function AdminLoginPage() {
                 >
                     <div className="flex flex-col items-center mb-10">
                         <Link href="/" className="group inline-flex flex-col items-center mb-8">
-                            <div className="relative w-20 h-20 bg-black rounded-3xl flex items-center justify-center border border-white/20 shadow-[0_0_30px_rgba(31,78,121,0.3)] group-hover:border-[#C55A11]/50 transition-all duration-500 overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-[#1F4E79] to-transparent opacity-40"></div>
-                                <ShieldAlert className="text-white w-10 h-10 relative z-10" />
-                            </div>
-                            <h1 className="mt-6 text-4xl font-black text-white tracking-[0.25em] uppercase leading-none">QAPRIL</h1>
-                            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-[#C55A11]/10 rounded-full border border-[#C55A11]/30">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="w-40 h-auto hover:scale-105 transition-transform duration-500 drop-shadow-2xl" 
+                            />
+                            <div className="mt-8 inline-flex items-center gap-2 px-3 py-1 bg-[#C55A11]/10 rounded-full border border-[#C55A11]/30">
                                 <Activity className="w-3 h-3 text-[#C55A11] animate-pulse" />
                                 <span className="text-[9px] font-black text-[#C55A11] uppercase tracking-[0.2em]">Console Sécurisée v3.0</span>
                             </div>

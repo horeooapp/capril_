@@ -63,10 +63,9 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL" 
-                            className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-xl" 
+                            className="h-10 w-auto group-hover:scale-110 transition-transform duration-500" 
                         />
                         <div className="flex flex-col">
-                            <span className="font-black text-xl tracking-tighter text-[#1F4E79] uppercase">QAPRIL</span>
                             <span className="text-[9px] font-black tracking-[0.2em] text-[#C55A11] uppercase">Management</span>
                         </div>
                     </Link>

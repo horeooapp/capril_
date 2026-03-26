@@ -19,14 +19,13 @@ export default function TenantLoginPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <Link href="/" className="flex items-center space-x-4 mb-12 group">
-                            <div className="w-14 h-14 bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
-                                <Home className="text-white w-7 h-7" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">QAPRIL</h1>
-                                <p className="text-[10px] font-bold text-[#10B981] uppercase tracking-[0.2em] mt-1">Sérénité Locative</p>
-                            </div>
+                        <Link href="/" className="flex flex-col items-start mb-12 group">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-20 w-auto group-hover:scale-105 transition-transform duration-500" 
+                            />
+                            <p className="text-[10px] font-bold text-[#10B981] uppercase tracking-[0.2em] mt-4 ml-1">Sérénité Locative</p>
                         </Link>
 
                         <EmailOTPForm 

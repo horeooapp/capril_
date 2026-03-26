@@ -19,17 +19,13 @@ export default function LandlordLoginPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <Link href="/" className="flex items-center space-x-5 mb-16 group">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-[#C55A11]/20 blur-lg rounded-full animate-pulse group-hover:bg-[#C55A11]/40 transition-colors"></div>
-                                <div className="relative w-14 h-14 bg-gradient-to-br from-[#1F4E79] to-[#0F172A] rounded-[20px] flex items-center justify-center shadow-2xl border border-white/10 group-hover:-rotate-3 transition-transform">
-                                    <Gem className="text-[#C55A11] w-7 h-7" />
-                                </div>
-                            </div>
-                            <div>
-                                <h1 className="text-3xl font-black text-[#1F4E79] tracking-[0.1em] uppercase leading-none">QAPRIL</h1>
-                                <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mt-2">Console Propriétaire</p>
-                            </div>
+                        <Link href="/" className="flex flex-col items-start mb-16 group">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-20 w-auto group-hover:scale-105 transition-transform duration-500" 
+                            />
+                            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mt-4 ml-1">Console Propriétaire</p>
                         </Link>
 
                         <EmailOTPForm 

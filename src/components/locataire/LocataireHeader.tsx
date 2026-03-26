@@ -38,11 +38,10 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL Logo" 
-                            className="h-12 w-auto rounded-2xl shadow-2xl border border-white/60 group-hover:rotate-3 transition-transform duration-500" 
+                            className="h-14 w-auto drop-shadow-xl group-hover:scale-105 transition-transform duration-500" 
                         />
                         <div className="flex flex-col">
-                            <span className="font-black text-xl text-[#1F4E79] leading-none tracking-tighter uppercase">QAPRIL</span>
-                            <span className="text-[12px] font-black text-[#C55A11] uppercase tracking-[0.3em] mt-1">Portal Locataire</span>
+                            <span className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.4em] ml-1">Portal Locataire</span>
                         </div>
                     </Link>
 

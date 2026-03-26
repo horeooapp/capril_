@@ -58,15 +58,12 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
             >
                 <div className="flex items-center gap-8">
                     {/* Logo - Hidden on large screens where sidebar is visible */}
-                    <Link href="/admin" className="flex lg:hidden items-center space-x-4 group">
+                    <Link href="/admin" className="flex lg:hidden items-center group">
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL Logo" 
-                            className="h-10 w-auto group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 rounded-[0.8rem] shadow-xl border border-white/40 ring-1 ring-black/5" 
+                            className="h-12 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-lg" 
                         />
-                        <div className="flex flex-col">
-                            <span className="font-black text-2xl tracking-tighter text-[#1F4E79] leading-none uppercase">QAPRIL</span>
-                        </div>
                     </Link>
 
                     {/* Back to Home Link for Mobile and Small Screens */}

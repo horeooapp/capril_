@@ -39,12 +39,11 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                 
                 {/* Official Header */}
                 <div className="flex justify-between items-start mb-16 relative z-10">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                         <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-                             <Image src="/logo.png" alt="QAPRIL" width={50} height={50} />
+                             <Image src="/logo.png" alt="QAPRIL" width={70} height={70} />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-0.5 leading-none">QAPRIL</h2>
                             <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Digital Property Registry - RCI</p>
                         </div>
                     </div>
