@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation"
 import { createLease } from "@/actions/leases"
 import { createBDQ } from "@/actions/bdq"
 import { getProperties } from "@/actions/properties"
-import { TypeBail } from "@prisma/client"
+// Define TypeBail locally to avoid @prisma/client bundling issues in Client Components
+enum TypeBail {
+    ECRIT = "ECRIT",
+    DECLARATIF_BDQ = "DECLARATIF_BDQ"
+}
 
 export default function LeaseRegistrationPage() {
     const router = useRouter()
