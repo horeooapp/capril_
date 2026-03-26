@@ -20,7 +20,11 @@ import {
     FileCheck2,
     Bot,
     Trophy,
-    Globe
+    Globe,
+    ShieldCheck,
+    Users,
+    Settings,
+    Settings2
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -39,27 +43,32 @@ export default function DashboardLayoutClient({
 }) {
     const pathname = usePathname()
 
-    const navLinks = [
-        { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={18} /> },
-        { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} /> },
-        { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
-        { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },
-        { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
-        ...(session?.user?.role === 'TENANT' 
-            ? [{ href: "/dashboard/certificates", label: "Passeport", icon: <FileCheck2 size={18} /> }]
-            : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
-        ),
-        { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
-        { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-        ...(session?.user?.role === 'CHAMPION' 
-            ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
-            : []
-        ),
-        ...(session?.user?.diasporaAbonnement 
-            ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }]
-            : []
-        ),
-    ];
+    const currentRole = session?.user?.role;
+    const navLinks = currentRole === 'TENANT' 
+        ? [
+            { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard/signalements", label: "Signalements", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard/cautions", label: "Ma Caution", icon: <Star size={18} /> },
+            { href: "/dashboard/passeport", label: "Passeport", icon: <FileCheck2 size={18} /> },
+            { href: "/dashboard/profil", label: "Profil", icon: <User size={18} /> },
+        ]
+        : (currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN')
+        ? [
+            { href: "/dashboard?tab=dashboard", label: "Tableau", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard?tab=portefeuille", label: "Biens", icon: <Building2 size={18} /> },
+            { href: "/dashboard?tab=mandats", label: "Mandats", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard?tab=candidats", label: "M-CAND", icon: <User size={18} /> },
+            { href: "/dashboard?tab=outils", label: "Outils", icon: <Settings size={18} /> },
+        ]
+        : [
+            { href: "/dashboard?tab=dashboard", label: "Tableau", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard?tab=biens", label: "Patrimoine", icon: <Building2 size={18} /> },
+            { href: "/dashboard?tab=quittances", label: "Quittances", icon: <FileText size={18} /> },
+            { href: "/dashboard?tab=cautions", label: "Cautions", icon: <ShieldCheck size={18} /> },
+            { href: "/dashboard?tab=profil", label: "Profil", icon: <User size={18} /> },
+            ...(currentRole === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }] : []),
+            ...(session?.user?.diasporaAbonnement ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }] : []),
+        ];
 
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
@@ -163,15 +172,20 @@ export default function DashboardLayoutClient({
                             { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
                             { href: "/account", label: "Compte", icon: <User size={24} /> },
                           ]
+                        : (currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN')
+                        ? [
+                            { href: "/dashboard", label: "Tableau", icon: <LayoutDashboard size={24} /> },
+                            { href: "/dashboard?tab=portefeuille", label: "Biens", icon: <Building2 size={24} /> },
+                            { href: "/dashboard?tab=mandats", label: "Mandats", icon: <ClipboardList size={24} /> },
+                            { href: "/dashboard?tab=candidats", label: "M-CAND", icon: <Users size={24} /> },
+                            { href: "/dashboard?tab=outils", label: "Outils", icon: <Settings2 size={24} /> },
+                          ]
                         : [
-                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
-                            { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
-                            ...(session?.user?.diasporaAbonnement 
-                                ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={24} /> }]
-                                : []
-                            ),
-                            { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
-                            { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
+                            { href: "/dashboard", label: "Tableau", icon: <LayoutDashboard size={24} /> },
+                            { href: "/dashboard?tab=biens", label: "Patrimoine", icon: <Building2 size={24} /> },
+                            { href: "/dashboard?tab=quittances", label: "Quittances", icon: <FileText size={24} /> },
+                            { href: "/dashboard?tab=cautions", label: "Cautions", icon: <ShieldCheck size={24} /> },
+                            { href: "/dashboard?tab=profil", label: "Profil", icon: <User size={24} /> },
                           ]
                 } />
             </main>

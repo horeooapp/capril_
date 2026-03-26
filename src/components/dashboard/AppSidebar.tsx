@@ -20,7 +20,8 @@ import {
     Send,
     User,
     BarChart3,
-    Settings
+    Settings,
+    ShieldCheck
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -49,16 +50,23 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             ]
         }
         
-        // Default Owner Links
+        if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+            return [
+                { href: "/dashboard?tab=dashboard", label: "Tableau", icon: <LayoutDashboard size={20} /> },
+                { href: "/dashboard?tab=portefeuille", label: "Biens", icon: <Building2 size={20} /> },
+                { href: "/dashboard?tab=mandats", label: "Mandats", icon: <ClipboardList size={20} /> },
+                { href: "/dashboard?tab=candidats", label: "M-CAND", icon: <User size={20} /> },
+                { href: "/dashboard?tab=outils", label: "Outils", icon: <Settings size={20} /> },
+            ]
+        }
+
+        // Default Owner Links (LANDLORD)
         return [
-            { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={20} /> },
-            { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={20} /> },
-            { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
-            { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={20} /> },
-            { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={20} /> },
-            { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={20} /> },
-            { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={20} /> },
-            { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={20} /> },
+            { href: "/dashboard?tab=dashboard", label: "Tableau", icon: <LayoutDashboard size={20} /> },
+            { href: "/dashboard?tab=biens", label: "Patrimoine", icon: <Building2 size={20} /> },
+            { href: "/dashboard?tab=quittances", label: "Quittances", icon: <FileText size={20} /> },
+            { href: "/dashboard?tab=cautions", label: "Cautions", icon: <ShieldCheck size={20} /> },
+            { href: "/dashboard?tab=profil", label: "Profil", icon: <User size={20} /> },
             ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={20} /> }] : []),
             ...(diasporaAbonnement ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),
         ]
