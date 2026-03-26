@@ -126,12 +126,11 @@ export default async function Home() {
               <p className="text-xl md:text-2xl text-white/40 font-medium leading-relaxed mb-20 max-w-2xl mx-auto animate-in fade-in duration-1000 delay-500">
                 L&apos;infrastructure d&apos;État pour la normalisation, la certification et la sécurisation intégrale du patrimoine immobilier en Côte d&apos;Ivoire.
               </p>
-              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-in fade-in delay-700">
                   <Link href="/admin/login" className="group glass-card-premium overflow-hidden px-10 py-10 rounded-[2.5rem] bg-white border border-white transition-all hover:scale-[1.03] shadow-2xl active:scale-95 text-center">
                     <div className="flex flex-col items-center">
                         <span className="font-black uppercase tracking-[0.3em] text-black text-xs mb-2 italic">Accès Gouvernance</span>
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-6">Contrôle DGI & Audit d&apos;État</span>
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-6">Contrôle DGI & Audit d'État</span>
                         <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white group-hover:bg-primary transition-colors">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -141,7 +140,7 @@ export default async function Home() {
                   </Link>
                   <Link href="/dashboard/login" className="group glass-card-premium overflow-hidden px-10 py-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:bg-white/10 hover:scale-[1.03] active:scale-95 text-center">
                     <div className="flex flex-col items-center">
-                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs mb-2 italic">Espace Propriétaire</span>
+                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs mb-2 italic">Espace Bailleur</span>
                         <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-6">Digitalisation du Patrimoine</span>
                         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-primary transition-colors">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
