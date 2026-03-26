@@ -20,7 +20,7 @@ export async function sendEmail({
   subject: string;
   html: string;
   attachments?: any[];
-}) {
+}): Promise<{ success: boolean; provider?: string; data?: any; error?: any; mock?: boolean }> {
   console.log(`[Email] Attempting to send to ${to}: ${subject}`);
   
   const from = process.env.EMAIL_FROM || "noreply@qapril.net";
@@ -48,6 +48,7 @@ export async function sendEmail({
         return { success: true, provider: 'resend', data: result.data };
       }
       console.error("[Email] Resend failed:", JSON.stringify(result.error));
+      // Continuous to fallback if Resend fails
     } catch (error) {
       console.error("[Email] Critical Resend technical error:", error);
     }
@@ -77,10 +78,14 @@ export async function sendEmail({
     }
   }
 
-  // 3. Final Fallback to MOCK/LOG
-  console.warn(`[Email] All providers unavailable or Mock Enabled. Logging to console.`);
-  console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
-  return { success: true, mock: true };
+  // 3. Final Fallback to MOCK/LOG (only in dev/test or if explicitly enabled)
+  if (useMock || (!resend && !smtpUrl)) {
+    console.warn(`[Email] All providers unavailable or Mock Enabled. Logging to console.`);
+    console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
+    return { success: true, mock: true };
+  }
+
+  return { success: false, error: "No email provider available or configured" };
 }
 
 export function wrapInPremiumTemplate(content: string, title?: string) {
