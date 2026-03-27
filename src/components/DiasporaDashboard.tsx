@@ -146,7 +146,43 @@ function Modal({ open, onClose, title, color = T.navy, children }: any) {
 
 // --- Main Dashboard ---
 
-export default function DiasporaDashboard({ data, user }: { data: any, user: any }) {
+interface DiasporaDashboardProps {
+  data: {
+    stats: {
+      totalRentFcfa: number;
+      totalRentDevise: number;
+      currency: string;
+      totalAssets: number;
+      occupancyRate: number;
+    };
+    properties: Array<{
+      id: string;
+      name: string;
+      commune: string;
+      propertyCode: string;
+      status: string;
+      managementMode: string;
+      isImpaye: boolean;
+      isHorsSLA: boolean;
+      activeLease: {
+        rentFcfa: number;
+        rentDevise: number;
+        tenant: string | null;
+        lastPayment: string | Date | null;
+      } | null;
+    }>;
+    mandats: Array<{
+      id: string;
+      name: string;
+      phone: string;
+      statut: string;
+      since: string | Date;
+    }>;
+  };
+  user: any;
+}
+
+export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps) {
   const [tab, setTab] = useState("dash");
   const [selBien, setSelBien] = useState<any>(null);
   const [bienTab, setBienTab] = useState("info");
