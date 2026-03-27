@@ -2,7 +2,12 @@ import { getTenantLeases } from "@/actions/leases"
 import Link from "next/link"
 
 export default async function TenantLeasesPage() {
-    const leases = await getTenantLeases()
+    let leases: any[] = []
+    try {
+        leases = await getTenantLeases()
+    } catch (err) {
+        console.error("[TenantLeasesPage] Failed to load leases:", err)
+    }
 
     return (
         <div className="space-y-10 pb-20">

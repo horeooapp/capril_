@@ -170,20 +170,28 @@ export async function getTenantLeases() {
         return []
     }
 
-    const leases = await prisma.lease.findMany({
-        where: { tenantId: session.user.id },
-        include: {
-            property: true,
-            landlord: { select: { fullName: true } },
-            receipts: {
-                orderBy: { periodMonth: 'desc' },
-                take: 3
-            }
-        },
-        orderBy: { startDate: 'desc' }
-    })
+    try {
+        const leases = await prisma.lease.findMany({
+            where: { tenantId: session.user.id },
+            include: {
+                property: true,
+                landlord: { select: { fullName: true } },
+                receipts: {
+                    where: { status: 'paid' },
+                    orderBy: { periodMonth: 'desc' },
+                    take: 3
+                }
+            },
+            orderBy: { startDate: 'desc' }
+        })
 
-    return leases.map(serializeLease)
+        return leases.map(lease => {
+            try { return serializeLease(lease) } catch { return serializeLease({ ...lease, receipts: [] }) }
+        })
+    } catch (err) {
+        console.error("[getTenantLeases] DB error:", err)
+        return []
+    }
 }
 
 /**
