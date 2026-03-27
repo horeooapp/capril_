@@ -103,7 +103,23 @@ export function useTicketsLocataire() {
   const ticketActif   = data?.find((t: any) => t.statut === 'En attente bailleur') || null;
   const ticketsResolus = data?.filter((t: any) => t.statut !== 'En attente bailleur') || [];
 
-  return { ticketActif, ticketsResolus, loading, error, refetch };
+  // 144h SLA Logic (MM-03)
+  const ticketAvecSLA = ticketActif ? (() => {
+    const createdAt = new Date(ticketActif.createdAt).getTime();
+    const now = Date.now();
+    const heuresPassees = (now - createdAt) / 3600000;
+    const heuresRestantes = Math.max(0, 144 - heuresPassees);
+    const favorLocataire = heuresPassees > 144;
+    
+    return {
+      ...ticketActif,
+      heuresRestantes,
+      favorLocataire,
+      pourcentageTemps: Math.min(100, (heuresPassees / 144) * 100)
+    };
+  })() : null;
+
+  return { ticketActif: ticketAvecSLA, ticketsResolus, loading, error, refetch };
 }
 
 export function useMrlDemande() {

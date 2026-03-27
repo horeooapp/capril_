@@ -2,112 +2,69 @@
 
 import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-    BarChart3, 
-    Building2, 
-    Receipt, 
-    ShieldCheck, 
-    User, 
-    Zap,
-    Plus, 
-    ArrowRight,
-    Search,
-    ChevronRight,
-    Home,
-    MapPin,
-    Calendar,
-    Phone,
-    FileText,
-    RefreshCw,
-    Download,
-    AlertCircle,
-    CheckCircle2,
-    X,
-    Users,
-    Settings2
-} from "lucide-react"
 
-import { AgencyCandidateList } from "../agency/AgencyCandidateList"
-import { AgencyToolsGrid } from "../agency/AgencyToolsGrid"
-
-// Theme Colors from Mockup
+// Theme Colors from Validated JSX
 const T = {
-  navy: "#0D2B6E",
-  navyDark: "#071A45",
-  navyLight: "#1A3D8C",
-  navyPale: "#EEF2FA",
-  green: "#1A7A3C",
-  greenLight: "#22A050",
-  greenPale: "#E8F5EE",
-  orange: "#C05B00",
-  orangePale: "#FFF3E0",
-  red: "#A00000",
-  redPale: "#FEECEC",
-  gold: "#C9A84C",
-  goldPale: "#FDF6E3",
-  teal: "#0E7490",
-  tealPale: "#E0F4F9",
-  purple: "#5B21B6",
-  purplePale: "#EDE9FE",
-  white: "#FFFFFF",
-  bg: "#F2F5FA",
-  grey1: "#EEF2F7",
-  grey2: "#D6DCE8",
-  grey3: "#8FA0BC",
-  grey4: "#4A5B7A",
-  text: "#0A1930",
-  textMid: "#2D3F5E",
-  textLight: "#6A7D9E",
+  navy:"#0D2B6E",navyDark:"#071A45",navyLight:"#1A3D8C",navyPale:"#EEF2FA",
+  green:"#1A7A3C",greenLight:"#22A050",greenPale:"#E8F5EE",
+  orange:"#C05B00",orangePale:"#FFF3E0",
+  red:"#A00000",redPale:"#FEECEC",
+  gold:"#C9A84C",goldPale:"#FDF6E3",
+  teal:"#0E7490",tealPale:"#E0F4F9",
+  purple:"#5B21B6",purplePale:"#EDE9FE",
+  white:"#FFFFFF",bg:"#F2F5FA",
+  grey1:"#EEF2F7",grey2:"#D6DCE8",grey3:"#8FA0BC",grey4:"#4A5B7A",
+  text:"#0A1930",textMid:"#2D3F5E",textLight:"#6A7D9E",
+};
+
+const fmt = (n: number) => n.toLocaleString("fr-FR");
+
+// --- COMPONENTS ---
+const Badge = ({label,color,bg,size=10}: {label:any, color:string, bg:string, size?:number}) => (
+  <span style={{display:"inline-flex",alignItems:"center",background:bg,color,borderRadius:6,padding:"2px 7px",fontSize:size,fontWeight:700,whiteSpace:"nowrap"}}>{label}</span>
+);
+
+const Chip = ({label,active,onClick}: {label:string, active:boolean, onClick:()=>void}) => (
+  <button onClick={onClick} style={{border:"none",cursor:"pointer",padding:"5px 12px",borderRadius:20,fontSize:11,fontWeight:700,background:active?T.navy:T.grey1,color:active?T.white:T.textLight}}>{label}</button>
+);
+
+const Row = ({label,value,color}: {label:string, value:any, color?:string}) => (
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:`1px solid ${T.grey1}`}}>
+    <span style={{fontSize:10,color:T.textLight}}>{label}</span>
+    <span style={{fontSize:11,fontWeight:700,color:color||T.textMid}}>{value}</span>
+  </div>
+);
+
+const BackBtn = ({label,onClick}: {label:string, onClick:()=>void}) => (
+  <button onClick={onClick} style={{background:T.grey1,border:"none",borderRadius:10,padding:"6px 12px",fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer"}}>← {label}</button>
+);
+
+const SecTitle = ({label}: {label:string}) => (
+  <div style={{fontSize:10,fontWeight:800,color:T.textLight,letterSpacing:1,textTransform:"uppercase",marginBottom:8,marginTop:4}}>{label}</div>
+);
+
+function Overlay({open,onClose,title,titleColor,children,maxH="82%"}: {open:boolean, onClose:()=>void, title:string, titleColor?:string, children:any, maxH?:string}) {
+  if (!open) return null;
+  return (
+    <div style={{position:"absolute",inset:0,background:"rgba(7,26,69,0.76)",display:"flex",alignItems:"flex-end",zIndex:300}}>
+      <div style={{background:T.white,borderRadius:"22px 22px 0 0",width:"100%",maxHeight:maxH,overflowY:"auto",paddingBottom:24}}>
+        <div style={{padding:"16px 20px 0",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <span style={{fontSize:14,fontWeight:800,color:titleColor||T.navy}}>{title}</span>
+          <button onClick={onClose} style={{background:T.grey1,border:"none",borderRadius:8,padding:"5px 10px",fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer"}}>✕</button>
+        </div>
+        <div style={{padding:"0 20px"}}>{children}</div>
+      </div>
+    </div>
+  );
 }
 
-const fmt = (n: number) => n.toLocaleString("fr-FR")
-
-// --- REUSABLE MINI COMPONENTS ---
-
-const Badge = ({ label, color, bg, size = 10 }: { label: string, color: string, bg: string, size?: number }) => (
-  <span style={{ 
-    display: "inline-flex", 
-    alignItems: "center", 
-    background: bg, 
-    color, 
-    borderRadius: 6, 
-    padding: "2px 7px", 
-    fontSize: size, 
-    fontWeight: 700, 
-    whiteSpace: "nowrap" 
-  }}>{label}</span>
-)
-
-const Chip = ({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) => (
-  <button 
-    onClick={onClick} 
-    className={`border-none cursor-pointer px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors ${active ? 'bg-[#1F4E79] text-white' : 'bg-[#F2F5FA] text-[#6A7D9E]'}`}
-  >
-    {label}
-  </button>
-)
-
-const Row = ({ label, value, color }: { label: string, value: string | number, color?: string }) => (
-  <div className="flex justify-between items-center py-2 border-b border-[#F2F5FA]">
-    <span className="text-[10px] text-[#6A7D9E] uppercase tracking-wider">{label}</span>
-    <span style={{ color: color || "#2D3F5E" }} className="text-[11px] font-bold">{value}</span>
-  </div>
-)
-
-const SecTitle = ({ label }: { label: string }) => (
-  <div className="text-[10px] font-extrabold text-[#6A7D9E] tracking-widest uppercase mb-2 mt-1">{label}</div>
-)
-
-const BackBtn = ({ label, onClick }: { label: string, onClick: () => void }) => (
-  <button 
-    onClick={onClick} 
-    className="bg-[#F2F5FA] border-none rounded-xl px-3 py-1.5 text-[11px] font-bold text-[#2D3F5E] cursor-pointer flex items-center gap-2"
-  >
-    <ArrowRight size={14} className="rotate-180" /> {label}
-  </button>
-)
-
-// --- MAIN PORTAL COMPONENT ---
+const TABS = [
+  {id:"dashboard",icon:"📊",label:"Tableau"},
+  {id:"biens",icon:"🏘",label:"Patrimoine"},
+  {id:"quittances",icon:"🧾",label:"Quittances"},
+  {id:"cautions",icon:"🔒",label:"Cautions"},
+  {id:"profil",icon:"👤",label:"Profil"},
+];
 
 export function OwnerPortalDashboard({ user, properties: initialProperties }: { user: any, properties: any[] }) {
     const [tab, setTab] = useState("dashboard")
@@ -115,571 +72,291 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
     const [selectedUnite, setSelectedUnite] = useState<any>(null)
     const [filterBiens, setFilterBiens] = useState("tous")
     const [unitTab, setUnitTab] = useState("info")
-    
-    // Group properties by address to simulate "Entities"
+    const [O, setO] = useState<any>({});
+
+    const open = (k: string) => setO((o: any) => ({...o, [k]: true}));
+    const close = (k: string) => setO((o: any) => ({...o, [k]: false}));
+
+    // Data Processing: Mimicking 3-level hierarchy from flat properties
     const entities = useMemo(() => {
         const grouped = initialProperties.reduce((acc: any, p: any) => {
             const key = p.address;
             if (!acc[key]) {
                 acc[key] = {
                     id: `E-${p.id}`,
+                    code: p.propertyCode || `IMM-${p.id}`,
                     nom: p.name || p.address,
                     adresse: p.address,
                     commune: p.commune,
-                    type: p.propertyType === 'building' ? 'immeuble' : 'standalone',
+                    type: p.propertyType === 'building' ? 'immeuble' : p.propertyType === 'court' ? 'cour' : 'standalone',
                     unites: []
                 };
             }
-            acc[key].unites.push(p);
+            acc[key].unites.push({
+                ...p,
+                label: p.name || "Unité",
+                statut: p.status === 'active' ? 'occupé' : 'vacant',
+                paiement: p.leases?.[0]?.statutFiscal === 'A_JOUR' ? "À jour" : p.leases?.[0]?.statutFiscal === 'EN_RETARD' ? "Impayé" : "—",
+                loyer: p.leases?.[0]?.rentAmount || p.declaredRentFcfa || 0,
+                retard: p.leases?.[0]?.daysOverdue || 0,
+                locataire: p.leases?.[0]?.tenant?.fullName || p.leases?.[0]?.tenant?.name
+            });
             return acc;
         }, {});
 
         return Object.values(grouped).map((e: any) => {
-            // If an address has multiple units, treat it as an immeuble for better UI
-            if (e.unites.length > 1) e.type = 'immeuble';
+            if (e.unites.length > 1 && e.type === 'standalone') e.type = 'immeuble';
             return e;
         });
     }, [initialProperties]);
 
-    // Aggregate Stats
     const stats = useMemo(() => {
-        let totalVal = 0;
-        let collectedVal = 0;
-        let arrearsCount = 0;
-        let vacantCount = 0;
-
-        initialProperties.forEach(p => {
-            const activeLease = p.leases?.find((l: any) => l.status === 'ACTIVE');
-            if (activeLease) {
-                totalVal += activeLease.rentAmount || 0;
-                // Simple logic: if has a receipt this month, consider as collected (mock for now)
-                const hasRecentReceipt = activeLease.receipts?.some((r: any) => {
-                    const d = new Date(r.paidAt || r.createdAt);
-                    return d.getMonth() === new Date().getMonth();
-                });
-                if (hasRecentReceipt) collectedVal += activeLease.rentAmount || 0;
-                if (activeLease.statutFiscal === 'EN_RETARD' || p.status === 'arrears') arrearsCount++;
-            } else {
-                vacantCount++;
-            }
-        });
-
-        return {
-            totalRent: totalVal,
-            collected: collectedVal,
-            occupancyRate: Math.round(((initialProperties.length - vacantCount) / Math.max(initialProperties.length, 1)) * 100),
-            arrears: arrearsCount,
-            vacants: vacantCount,
-            totalCautionCases: 0 
-        };
-    }, [initialProperties]);
+        const toutes = entities.flatMap(e => e.type === 'standalone' ? e.unites : e.unites);
+        const totalLoyers = toutes.filter(u => u.statut === 'occupé').reduce((s, u) => s + u.loyer, 0);
+        const encaisse = toutes.filter(u => u.paiement === 'À jour').reduce((s, u) => s + u.loyer, 0);
+        const impayesN = toutes.filter(u => u.paiement === 'Impayé').length;
+        const vacants = toutes.filter(u => u.statut === 'vacant').length;
+        return { totalLoyers, encaisse, impayesN, vacants };
+    }, [entities]);
 
     const resetNav = (t: string) => {
-        setTab(t); 
-        setSelectedEntite(null); 
-        setSelectedUnite(null);
-        setUnitTab("info");
+        setTab(t); setSelectedEntite(null); setSelectedUnite(null); setUnitTab("info");
     };
 
-    const getEntiteStats = (e: any) => {
-        const unites = e.unites || [];
-        const occupes = unites.filter((u: any) => u.leases?.some((l: any) => l.status === 'ACTIVE')).length;
-        const totalLoyers = unites.reduce((sum: number, u: any) => {
-            const activeLease = u.leases?.find((l: any) => l.status === 'ACTIVE');
-            return sum + (activeLease?.rentAmount || 0);
-        }, 0);
+    const entiteStats = (e: any) => {
+        const us = e.unites || [];
         return {
-            total: unites.length,
-            occupes,
-            vacants: unites.length - occupes,
-            loyers: totalLoyers
+            total: us.length,
+            occupes: us.filter((u: any) => u.statut === 'occupé').length,
+            vacants: us.filter((u: any) => u.statut === 'vacant').length,
+            impayes: us.filter((u: any) => u.paiement === 'Impayé').length,
+            loyers: us.reduce((s: number, u: any) => s + u.loyer, 0)
         };
-    }
+    };
 
-    const getEntiteIcon = (type: string) => {
-        switch(type) {
-            case 'immeuble': return <Building2 />;
-            case 'cour': return <Home />;
-            default: return <Home />;
-        }
-    }
+    const entiteIcon = (type: string) => 
+        type === 'immeuble' ? "🏢" : type === 'cour' ? "🏡" : "🏠";
 
-    const pColor = (u: any) => {
-        const activeLease = u.leases?.find((l: any) => l.status === 'ACTIVE');
-        if (!activeLease) return T.orange; // Vacant
-        return T.green; // Active
-    }
+    const pColor = (u: any) => 
+        u.paiement === "Impayé" ? T.red : u.statut === "vacant" ? T.grey3 : T.green;
 
     return (
-        <div className="min-h-screen bg-[#F2F5FA] p-0 md:p-8 font-sans text-[#0A1930]">
-            {/* Main Responsive Container */}
-            <div className="max-w-5xl mx-auto bg-white min-h-[90vh] md:rounded-[2.5rem] shadow-xl border border-[#D6DCE8] overflow-hidden flex flex-col relative">
+        <div style={{fontFamily:"'DM Sans','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",display:"flex",justifyContent:"center",padding:"20px 16px"}}>
+            <div style={{width:390,background:T.white,borderRadius:36,boxShadow:`0 24px 80px ${T.navy}25`,overflow:"hidden",position:"relative",border:`1px solid ${T.grey2}`,minHeight:844}}>
                 
-                {/* CLEAN WELCOME HEADER */}
-                <div className="p-8 pt-12 pb-4">
-                    <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-3">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tableau de Bord Certifié</span>
+                {/* HEADER */}
+                <div style={{background:`linear-gradient(145deg,${T.navyDark} 0%,${T.green} 100%)`,padding:"14px 20px 20px",position:"relative"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                        <div>
+                            <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
+                                <div style={{background:T.green,borderRadius:7,padding:"2px 9px",fontSize:9,fontWeight:900,color:T.white,letterSpacing:1.5,textTransform:"uppercase"}}>PROPRIÉTAIRE</div>
+                                <div style={{width:6,height:6,borderRadius:"50%",background:T.greenLight}}/>
+                            </div>
+                            <div style={{fontSize:17,fontWeight:800,color:T.white}}>{(user?.name || "PROPRIÉTAIRE").toUpperCase()}</div>
+                            <div style={{fontSize:11,color:T.white,opacity:.6}}>V4.0 Certifiée QAPRIL</div>
                         </div>
-                        <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter leading-none uppercase italic">👋 Hello, <br/> {user?.name || "Propriétaire"}</h1>
+                        <div onClick={() => open("notifs")} style={{width:38,height:38,borderRadius:12,background:T.white+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,cursor:"pointer"}}>🔔</div>
                     </div>
                 </div>
 
-                {/* BODY SECTION (Scrollable) */}
-                <div className="flex-1 overflow-y-auto pb-24">
+                {/* BODY */}
+                <div style={{overflowY:"auto",maxHeight:590,paddingBottom:80}}>
                     
-                    {/* --- TAB: DASHBOARD (ACCUEIL) --- */}
+                    {/* ACCUEIL */}
                     {tab === "dashboard" && (
-                        <div className="p-8 space-y-12">
-                            {/* Action Requise Alert - RCL/MRL */}
-                            {(initialProperties.some(p => p.leases?.some((l:any) => l.reclamations?.length > 0)) || 
-                              initialProperties.some(p => p.leases?.some((l:any) => l.dossiersLitige?.length > 0))) && (
-                                <div className="mb-10">
-                                    <div className="bg-white border-2 border-[#C55A11]/20 rounded-[2.5rem] p-8 shadow-sm">
-                                        <h3 className="text-[11px] font-black text-[#C55A11] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                                            <AlertCircle size={14} />
-                                            Action Immédiate Requise
-                                        </h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {initialProperties.flatMap(p => p.leases || []).flatMap((l:any) => l.reclamations || []).map((ticket: any, idx: number) => (
-                                                <div 
-                                                    key={idx} 
-                                                    className="bg-orange-50 border border-orange-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-orange-100 transition-all font-bold"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
-                                                            ⚖️
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
-                                                                Révision de Loyer (RCL)
-                                                            </div>
-                                                            <div className="text-[11px] font-bold text-orange-600 italic mt-0.5">
-                                                                Réponse attendue sous 72h
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <ChevronRight size={20} className="text-orange-300 group-hover:translate-x-1" />
-                                                </div>
-                                            ))}
-                                            {initialProperties.flatMap(p => p.leases || []).flatMap((l:any) => l.dossiersLitige || []).map((mrl: any, idx: number) => (
-                                                <div 
-                                                    key={idx} 
-                                                    className="bg-blue-50 border border-blue-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-blue-100 transition-all font-bold"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
-                                                            🤝
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
-                                                                Médiation (MRL-01)
-                                                            </div>
-                                                            <div className="text-[11px] font-bold text-blue-600 italic mt-0.5">
-                                                                Consentement requis
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <ChevronRight size={20} className="text-blue-300 group-hover:translate-x-1" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                        <div style={{padding:"14px 16px"}}>
+                            <div style={{background:`linear-gradient(135deg,${T.navy}08,${T.green}08)`,border:`1px solid ${T.navy}15`,borderRadius:16,padding:14}}>
+                                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Encaissement global</div>
+                                <div style={{fontSize:24,fontWeight:900,color:T.navy,marginTop:4}}>{fmt(stats.encaisse)} <span style={{fontSize:12}}>FCFA</span></div>
+                                <div style={{marginTop:12,height:6,background:T.grey1,borderRadius:4,overflow:"hidden"}}>
+                                    <div style={{height:"100%",width:`${(stats.encaisse/Math.max(stats.totalLoyers, 1))*100}%`,background:T.green,borderRadius:4}}/>
                                 </div>
-                            )}
-
-                            {/* Premium Stats Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {[
-                                    { label: "Logements gérés", value: initialProperties.length, unit: "Unités", icon: Building2, color: "text-orange-600 bg-orange-50", glow: "shadow-orange-200/40" },
-                                    { label: "Sécurisé (CDC)", value: stats.totalRent * 2.5, unit: "FCFA", icon: ShieldCheck, color: "text-blue-600 bg-blue-50", glow: "shadow-blue-200/40", isCurrency: true },
-                                    { label: "Conformité Fiscale", value: 100, unit: "% DGI", icon: FileText, color: "text-amber-600 bg-amber-50", glow: "shadow-amber-200/40" },
-                                    { label: "Performance / Mois", value: stats.occupancyRate, unit: "%", icon: Zap, color: "text-violet-600 bg-violet-50", glow: "shadow-violet-200/40" },
-                                ].map((stat, i) => (
-                                    <motion.div 
-                                        key={i}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.1 }}
-                                        className={`glass-card-premium p-8 rounded-[2.5rem] border border-white/40 shadow-xl ${stat.glow} flex flex-col justify-between min-h-[180px] relative group hover:scale-[1.02] transition-all`}
-                                    >
-                                        <div className="flex justify-between items-start relative z-10 font-bold">
-                                            <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400 mb-1 leading-none">{stat.label}</span>
-                                            <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
-                                                <stat.icon size={20} />
-                                            </div>
-                                        </div>
-                                        <div className="relative z-10 mt-6">
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-3xl font-black text-[#1F4E79] tracking-tighter leading-none">
-                                                    {stat.isCurrency ? fmt(stat.value) : stat.value}
-                                                </span>
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-400">{stat.unit}</span>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                {/* Command Panel */}
-                                <div className="lg:col-span-4 glass-card-premium p-8 rounded-[2.5rem] bg-gray-900 text-white overflow-hidden relative group border-none shadow-2xl">
-                                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-orange-600 blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                                    <div className="relative z-10 flex flex-col h-full space-y-8">
-                                        <div>
-                                            <h2 className="text-3xl font-black mb-3 leading-none uppercase tracking-tighter italic text-white">Actions.<br/>Directes</h2>
-                                            <p className="text-[10px] font-medium text-gray-400 leading-relaxed max-w-[180px]">Commandes ultra-rapides pour la gestion de votre parc immobilier.</p>
-                                        </div>
-                                        <div className="space-y-3 mt-auto">
-                                            <button onClick={() => resetNav("biens")} className="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 rounded-2xl transition-all group/link border border-white/5 hover:border-white/20 active:scale-95">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-white/10 rounded-lg"><Plus size={18} /></div>
-                                                    <span className="font-black tracking-[0.1em] text-[12px] uppercase">Nouveau Logement</span>
-                                                </div>
-                                                <ArrowRight size={16} className="opacity-40 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all" />
-                                            </button>
-                                            <button onClick={() => resetNav("quittances")} className="w-full flex items-center justify-between p-5 bg-[#C55A11] hover:bg-[#A54A0D] rounded-2xl transition-all group/link active:scale-95">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-white/20 rounded-lg"><Zap size={18} /></div>
-                                                    <span className="font-black tracking-[0.1em] text-[12px] uppercase">Générer Quittance</span>
-                                                </div>
-                                                <ChevronRight size={16} className="group-hover/link:translate-x-1 transition-transform" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Patrimoine List */}
-                                <div className="lg:col-span-8 glass-panel p-8 rounded-[2.5rem] border border-white/50 shadow-xl font-bold">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter italic">Patrimoine Actif.</h3>
-                                        <button onClick={() => resetNav("biens")} className="text-[10px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline">Voir tout le parc →</button>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {entities.slice(0, 3).map((e: any) => {
-                                            const s = getEntiteStats(e);
-                                            return (
-                                                <div 
-                                                    key={e.id} 
-                                                    onClick={() => { setSelectedEntite(e); setTab("biens"); }}
-                                                    className="p-6 bg-gray-50/50 hover:bg-white rounded-3xl flex items-center justify-between group hover:shadow-lg transition-all border border-transparent hover:border-gray-100"
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-14 h-14 bg-white flex items-center justify-center rounded-2xl text-[#1F4E79] shadow-sm border border-gray-50 group-hover:bg-[#1F4E79] group-hover:text-white transition-colors">
-                                                            {getEntiteIcon(e.type)}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[15px] font-black text-gray-900 uppercase tracking-tighter">{e.nom}</p>
-                                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{e.commune}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-[16px] font-black text-[#1F4E79] font-mono leading-none">{fmt(s.loyers)}</p>
-                                                        <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">FCFA/Mois</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- TAB: PATRIMOINE (List) --- */}
-                    {tab === "biens" && !selectedEntite && (
-                        <div className="p-4">
-                            <div className="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
-                                {["tous", "occupés", "vacants", "impayés"].map(f => (
-                                    <Chip key={f} label={f.charAt(0).toUpperCase() + f.slice(1)} active={filterBiens === f} onClick={() => setFilterBiens(f)} />
-                                ))}
                             </div>
                             
-                            <div className="mt-2 space-y-3">
-                                {entities.map((e: any) => {
-                                    const s = getEntiteStats(e);
-                                    const borderC = s.vacants > 0 ? T.orange : T.green;
+                            <div style={{marginTop:20}}>
+                                <SecTitle label="Mon patrimoine"/>
+                                {entities.slice(0, 3).map(e => {
+                                    const s = entiteStats(e);
                                     return (
-                                        <div 
-                                            key={e.id} 
-                                            onClick={() => setSelectedEntite(e)}
-                                            className="bg-white border border-[#D6DCE8] border-l-4 rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all"
-                                            style={{ borderLeftColor: borderC }}
-                                        >
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex gap-3">
-                                                    <div style={{ background: borderC + '15' }} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#0D2B6E]">{getEntiteIcon(e.type)}</div>
-                                                    <div>
-                                                        <div className="text-sm font-black text-[#0A1930]">{e.nom}</div>
-                                                        <div className="text-[10px] text-[#6A7D9E] mt-0.5">{e.adresse}</div>
-                                                        <div className="flex gap-2 mt-2">
-                                                            <Badge label={e.type} color="#0D2B6E" bg="#EEF2FA" />
-                                                            <Badge label={e.commune} color="#0E7490" bg="#E0F4F9" />
-                                                        </div>
-                                                    </div>
+                                        <div key={e.id} onClick={() => {setSelectedEntite(e); setTab("biens");}} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${s.impayes>0?T.red:T.green}`,borderRadius:12,padding:12,marginBottom:8,cursor:"pointer",display:"flex",justifyContent:"space-between"}}>
+                                            <div style={{display:"flex",gap:10}}>
+                                                <span style={{fontSize:20}}>{entiteIcon(e.type)}</span>
+                                                <div>
+                                                    <div style={{fontSize:12,fontWeight:700}}>{e.nom}</div>
+                                                    <div style={{fontSize:10,color:T.textLight}}>{e.unites.length} unités · {e.commune}</div>
                                                 </div>
-                                                <ChevronRight size={18} className="text-[#D6DCE8]" />
                                             </div>
-                                            <div className="mt-4 pt-4 border-t border-[#EEF2F7] flex justify-between items-end">
-                                                <div className="flex gap-2">
-                                                    <div className="bg-[#E8F5EE] px-2 py-1 rounded-md text-[9px] font-bold text-[#1A7A3C]">{s.occupes} Occupés</div>
-                                                    {s.vacants > 0 && <div className="bg-[#EEF2F7] px-2 py-1 rounded-md text-[9px] font-bold text-[#6A7D9E]">{s.vacants} Vacants</div>}
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-sm font-black text-[#0D2B6E] font-mono">{fmt(s.loyers)}</div>
-                                                    <div className="text-[9px] text-[#6A7D9E] uppercase font-bold tracking-tight">FCFA / Mois</div>
-                                                </div>
+                                            <div style={{textAlign:"right"}}>
+                                                <div style={{fontSize:12,fontWeight:800}}>{fmt(s.loyers)}</div>
+                                                <div style={{fontSize:8,color:T.textLight}}>FCFA/mois</div>
                                             </div>
                                         </div>
                                     )
                                 })}
+                                <button onClick={() => resetNav("biens")} style={{width:"100%",background:T.navyPale,border:"none",borderRadius:10,padding:10,fontSize:11,fontWeight:700,color:T.navy,cursor:"pointer"}}>Voir tout le parc →</button>
                             </div>
-
-                            <button className="w-full mt-6 border-2 border-dashed border-[#0D2B6E]/30 rounded-2xl py-4 text-[13px] font-extrabold text-[#0D2B6E] flex items-center justify-center gap-2 hover:bg-[#EEF2FA] transition-all">
-                                <Plus size={18} /> Ajouter un bien au portefeuille
-                            </button>
                         </div>
                     )}
 
-                    {/* --- TAB: ENTITE DETAILS --- */}
-                    {tab === "biens" && selectedEntite && !selectedUnite && (
-                        <div className="p-4 space-y-4 animate-in slide-in-from-right duration-300">
-                            <div className="flex justify-between items-center">
-                                <BackBtn label="Patrimoine" onClick={() => setSelectedEntite(null)} />
-                                <button className="text-[10px] font-bold text-[#A00000] bg-[#FEECEC] px-3 py-1.5 rounded-lg border border-[#A00000]/10 flex items-center gap-1">
-                                    <X size={12} /> Retirer
-                                </button>
+                    {/* PATRIMOINE - LISTE */}
+                    {tab === "biens" && !selectedEntite && (
+                        <div style={{padding:"14px 16px"}}>
+                            <div style={{display:"flex",gap:6,marginBottom:12}}>
+                                {["tous","occupés","vacants","impayés"].map(f => <Chip key={f} label={f.charAt(0).toUpperCase()+f.slice(1)} active={filterBiens===f} onClick={() => setFilterBiens(f)} />)}
                             </div>
-
-                            <div className="bg-[#EEF2F7] rounded-3xl p-4 border border-[#D6DCE8]">
-                                <div className="flex gap-4 items-start">
-                                    <div className="w-12 h-12 bg-[#0D2B6E] text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg">
-                                        {getEntiteIcon(selectedEntite.type)}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h2 className="text-base font-black text-[#0A1930]">{selectedEntite.nom}</h2>
-                                        <p className="text-[11px] text-[#6A7D9E] mt-1 line-clamp-1">{selectedEntite.adresse}</p>
-                                        <div className="flex gap-2 mt-2">
-                                            <Badge label={selectedEntite.type} color="#0D2B6E" bg="#EEF2FA" />
-                                            <Badge label="Gestion Directe" color="#1A7A3C" bg="#E8F5EE" />
+                            {entities.map(e => {
+                                const s = entiteStats(e);
+                                return (
+                                    <div key={e.id} onClick={() => setSelectedEntite(e)} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${s.impayes>0?T.red:T.green}`,borderRadius:14,padding:14,marginBottom:10,cursor:"pointer"}}>
+                                        <div style={{display:"flex",justifyContent:"space-between"}}>
+                                            <div style={{display:"flex",gap:10}}>
+                                                <div style={{width:40,height:40,background:T.navyPale,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{entiteIcon(e.type)}</div>
+                                                <div>
+                                                    <div style={{fontSize:13,fontWeight:800}}>{e.nom}</div>
+                                                    <div style={{fontSize:10,color:T.textLight}}>{e.adresse}</div>
+                                                    <div style={{display:"flex",gap:4,marginTop:5}}>
+                                                        <Badge label={e.type} color={T.navy} bg={T.navyPale}/>
+                                                        <Badge label={`${s.occupes} occupés`} color={T.green} bg={T.greenPale}/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span style={{fontSize:18,color:T.grey2}}>›</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="grid grid-cols-4 gap-2 mt-4">
-                                     {[
-                                         { label: "Unités", val: selectedEntite.unites.length },
-                                         { label: "Occupés", val: getEntiteStats(selectedEntite).occupes },
-                                         { label: "Vacants", val: getEntiteStats(selectedEntite).vacants },
-                                         { label: "Loyers", val: Math.round(getEntiteStats(selectedEntite).loyers / 1000) + "K" },
-                                     ].map((k, i) => (
-                                         <div key={i} className="bg-white rounded-xl p-2 text-center border border-[#D6DCE8]/50 shadow-sm">
-                                             <div className="text-[8px] text-[#6A7D9E] uppercase font-bold mb-1">{k.label}</div>
-                                             <div className="text-[11px] font-black text-[#0D2B6E]">{k.val}</div>
-                                         </div>
-                                     ))}
+                                )
+                            })}
+                        </div>
+                    )}
+
+                    {/* FICHE ENTITE */}
+                    {tab === "biens" && selectedEntite && !selectedUnite && (
+                        <div style={{padding:"14px 16px"}}>
+                            <BackBtn label="Patrimoine" onClick={() => setSelectedEntite(null)}/>
+                            <div style={{marginTop:12,padding:14,background:T.grey1,borderRadius:16}}>
+                                <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                                    <span style={{fontSize:24}}>{entiteIcon(selectedEntite.type)}</span>
+                                    <div>
+                                        <div style={{fontSize:14,fontWeight:800}}>{selectedEntite.nom}</div>
+                                        <div style={{fontSize:11,color:T.textLight}}>{selectedEntite.adresse}</div>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <SecTitle label="Unités locatives" />
-                                    <button className="text-[10px] font-bold text-white bg-[#0D2B6E] px-2 py-1 rounded flex items-center gap-1 active:scale-95 transition-transform">
-                                        <Plus size={12} /> Unité
-                                    </button>
-                                </div>
-                                <div className="space-y-2">
-                                    {selectedEntite.unites.map((u: any) => {
-                                        const activeLease = u.leases?.find((l: any) => l.status === 'ACTIVE');
-                                        return (
-                                            <div 
-                                                key={u.id} 
-                                                onClick={() => { setSelectedUnite(u); setUnitTab("info"); }}
-                                                className="bg-white border border-[#D6DCE8] border-l-4 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-[#F2F5FA] group transition-all"
-                                                style={{ borderLeftColor: pColor(u) }}
-                                            >
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[11px] font-bold text-[#0A1930]">{u.name || "Porte / Appt"}</span>
-                                                        <Badge label={u.propertyType} color="#0D2B6E" bg="#EEF2FA" size={8} />
-                                                    </div>
-                                                    <div className="text-[10px] text-[#6A7D9E] mt-1">
-                                                        {activeLease ? (activeLease.tenant?.fullName || activeLease.tenant?.name || "Locataire actif") : "Unité vacante"}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right flex items-center gap-3">
-                                                    <div>
-                                                        <div className="text-xs font-black text-[#0D2B6E] font-mono">{fmt(activeLease?.rentAmount || u.declaredRentFcfa || 0)}</div>
-                                                        <div className="text-[8px] text-[#6A7D9E] uppercase">FCFA/mois</div>
-                                                    </div>
-                                                    <ChevronRight size={16} className="text-[#D6DCE8] group-hover:translate-x-1 transition-transform" />
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
+                            <div style={{marginTop:20}}>
+                                <SecTitle label="Unités locatives"/>
+                                {selectedEntite.unites.map((u: any) => (
+                                    <div key={u.id} onClick={() => {setSelectedUnite(u); setUnitTab("info");}} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${pColor(u)}`,borderRadius:12,padding:12,marginBottom:8,cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                        <div>
+                                            <div style={{fontSize:12,fontWeight:700}}>{u.name || u.label}</div>
+                                            <div style={{fontSize:10,color:T.textLight}}>{u.locataire || "Vacant"}</div>
+                                        </div>
+                                        <div style={{textAlign:"right"}}>
+                                            <div style={{fontSize:12,fontWeight:800}}>{fmt(u.loyer)}</div>
+                                            <div style={{fontSize:8,color:T.textLight}}>FCFA</div>
+                                        </div>
+                                    </div>
+                                ))}
+                                <div style={{marginTop:20,borderTop:`1px solid ${T.grey1}`,paddingTop:15}}>
+                                    <button onClick={() => open("retirer")} style={{width:"100%",background:T.redPale,color:T.red,border:`1px solid ${T.red}20`,borderRadius:10,padding:12,fontSize:11,fontWeight:700}}>🗑 Retirer cette entité du portefeuille</button>
+                                    <p style={{fontSize:9,color:T.textLight,textAlign:"center",marginTop:6}}>Action irréversible · Archivage légal 10 ans</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* --- TAB: UNIT DETAILS --- */}
+                    {/* FICHE UNITE */}
                     {tab === "biens" && selectedEntite && selectedUnite && (
-                        <div className="p-4 space-y-4 animate-in slide-in-from-right duration-300">
-                             <div className="flex justify-between items-center">
-                                <BackBtn label={selectedEntite.nom} onClick={() => setSelectedUnite(null)} />
-                            </div>
-
-                            <div className="bg-[#EEF2F7] rounded-3xl p-5 border border-[#D6DCE8]">
-                                <h2 className="text-base font-black text-[#0A1930]">{selectedUnite.name || "Unité Locative"}</h2>
-                                <p className="text-[11px] text-[#6A7D9E] mt-1">{selectedEntite.nom} · {selectedEntite.commune}</p>
-                                <div className="flex gap-2 mt-3">
-                                    <Badge label={selectedUnite.propertyType} color="#0D2B6E" bg="#EEF2FA" />
-                                    <Badge label={selectedUnite.propertyCode} color="#6A7D9E" bg="#FFF" size={8} />
-                                    {selectedUnite.leases?.some((l:any) => l.status === 'ACTIVE') ? <Badge label="Occupé" color="#1A7A3C" bg="#E8F5EE" /> : <Badge label="Vacant" color="#6A7D9E" bg="#FFF" />}
+                        <div style={{padding:"14px 16px"}}>
+                            <BackBtn label={selectedEntite.nom} onClick={() => setSelectedUnite(null)}/>
+                            <div style={{marginTop:12,padding:14,background:T.grey1,borderRadius:16}}>
+                                <div style={{fontSize:14,fontWeight:800}}>{selectedUnite.name || selectedUnite.label}</div>
+                                <div style={{fontSize:11,color:T.textLight}}>{selectedEntite.nom} · {selectedEntite.commune}</div>
+                                <div style={{display:"flex",gap:5,marginTop:6}}>
+                                    <Badge label={selectedUnite.propertyType || "Unit"} color={T.navy} bg={T.navyPale}/>
+                                    {selectedUnite.statut === "occupé" ? <Badge label="Occupé" color={T.green} bg={T.greenPale}/> : <Badge label="Vacant" color={T.grey4} bg={T.grey1}/>}
                                 </div>
                             </div>
-
-                            {/* Sub-tabs for Unit */}
-                            <div className="flex border-b border-[#D6DCE8]">
-                                {["info", "bail", "locataire"].map(tid => (
-                                    <button 
-                                        key={tid} 
-                                        onClick={() => setUnitTab(tid)}
-                                        className={`flex-1 py-3 text-[11px] font-black uppercase tracking-widest transition-all ${unitTab === tid ? 'text-[#0D2B6E] border-b-2 border-[#0D2B6E]' : 'text-[#6A7D9E]'}`}
-                                    >
-                                        {tid}
-                                    </button>
+                            
+                            <div style={{display:"flex",borderBottom:`1px solid ${T.grey2}`,marginTop:15}}>
+                                {["info","bail","locataire","actions"].map(t => (
+                                    <button key={t} onClick={() => setUnitTab(t)} style={{flex:1,padding:8,fontSize:10,fontWeight:700,color:unitTab===t?T.navy:T.textLight,borderBottom:unitTab===t?`2px solid ${T.navy}`:"none",textTransform:"capitalize"}}>{t}</button>
                                 ))}
                             </div>
-
-                            <div className="py-2">
+                            
+                            <div style={{padding:"15px 0"}}>
                                 {unitTab === "info" && (
-                                    <div className="space-y-1">
-                                        <Row label="Code QAPRIL" value={selectedUnite.propertyCode} />
-                                        <Row label="Type" value={selectedUnite.propertyType} />
-                                        <Row label="Loyer mensuel" value={fmt(selectedUnite.leases?.[0]?.rentAmount || selectedUnite.declaredRentFcfa || 0) + " FCFA"} color={T.navy} />
-                                        <Row label="Statut" value={selectedUnite.status} color={selectedUnite.status === 'active' ? T.green : T.orange} />
-                                        <Row label="Commune" value={selectedUnite.commune} />
-                                    </div>
-                                )}
-                                {unitTab === "bail" && (
-                                    <div className="space-y-4">
-                                        {selectedUnite.leases?.length > 0 ? (
-                                            <>
-                                                <Row label="Référence" value={selectedUnite.leases[0].leaseReference} />
-                                                <Row label="Signature" value={new Date(selectedUnite.leases[0].startDate).toLocaleDateString()} />
-                                                <Row label="Type" value={selectedUnite.leases[0].typeBail || "Standard"} color={T.green} />
-                                                <div className="grid grid-cols-2 gap-2 mt-4">
-                                                    <button className="bg-[#EEF2FA] border border-[#0D2B6E]/20 rounded-xl py-3 text-[11px] font-bold text-[#0D2B6E] flex items-center justify-center gap-2">
-                                                        <FileText size={16} /> PDF
-                                                    </button>
-                                                    <button className="bg-[#E0F4F9] border border-[#0E7490]/20 rounded-xl py-3 text-[11px] font-bold text-[#0E7490] flex items-center justify-center gap-2">
-                                                        <RefreshCw size={16} /> Renouv.
-                                                    </button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className="text-center py-12 text-[#6A7D9E]">
-                                                <FileText size={48} className="mx-auto mb-4 opacity-20" />
-                                                <p className="text-xs font-bold">Aucun bail actif pour cette unité</p>
-                                                <button className="mt-4 bg-[#0D2B6E] text-white px-6 py-2 rounded-xl text-[11px] font-bold">Enregistrer un bail</button>
-                                            </div>
-                                        )}
+                                    <div>
+                                        <Row label="Code" value={selectedUnite.propertyCode}/>
+                                        <Row label="Loyer" value={fmt(selectedUnite.loyer)+" FCFA"} color={T.navy}/>
+                                        <Row label="Commune" value={selectedEntite.commune}/>
                                     </div>
                                 )}
                                 {unitTab === "locataire" && (
-                                    <div className="space-y-4">
-                                        {selectedUnite.leases?.find((l:any) => l.status === 'ACTIVE')?.tenant ? (
-                                            (() => {
-                                                const tenant = selectedUnite.leases.find((l:any) => l.status === 'ACTIVE').tenant;
-                                                return (
-                                                    <>
-                                                        <div className="flex items-center gap-4 bg-[#EEF2F7] p-4 rounded-2xl border border-[#D6DCE8]/50">
-                                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-[#0D2B6E] text-xl shadow-sm border border-[#D6DCE8]">
-                                                                <User />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="text-sm font-black text-[#0A1930]">{tenant.fullName || tenant.name}</h4>
-                                                                <p className="text-[11px] text-[#6A7D9E]">{tenant.phone || "Non renseigné"}</p>
-                                                            </div>
-                                                        </div>
-                                                        <Row label="Loyer Principal" value={fmt(selectedUnite.leases[0].rentAmount) + " FCFA"} color={T.navy} />
-                                                        <Row label="Date Paiement" value={"Le " + selectedUnite.leases[0].paymentDay + " du mois"} />
-                                                        <div className="grid grid-cols-2 gap-2 mt-4 text-center">
-                                                            <div className="bg-[#E8F5EE] border border-[#1A7A3C]/20 rounded-xl p-3">
-                                                                <div className="text-[8px] font-bold text-[#1A7A3C] uppercase mb-1">Paiement</div>
-                                                                <div className="text-[11px] font-black text-[#1A7A3C]">À JOUR</div>
-                                                            </div>
-                                                            <div className="bg-[#EDE9FE] border border-[#5B21B6]/20 rounded-xl p-3">
-                                                                <div className="text-[8px] font-bold text-[#5B21B6] uppercase mb-1">Caution</div>
-                                                                <div className="text-[11px] font-black text-[#5B21B6]">SÉCURISÉE</div>
-                                                            </div>
-                                                        </div>
-                                                        <button className="w-full bg-[#E8F5EE] border border-[#1A7A3C]/20 py-3 rounded-2xl text-[11px] font-bold text-[#1A7A3C] flex items-center justify-center gap-2 active:scale-95 transition-all">
-                                                            <Phone size={14} /> Contacter le locataire
-                                                        </button>
-                                                    </>
-                                                )
-                                            })()
-                                        ) : (
-                                            <div className="text-center py-12 text-[#6A7D9E]">
-                                                <User size={48} className="mx-auto mb-4 opacity-20" />
-                                                <p className="text-xs font-bold">Unité vacante — Aucun locataire</p>
-                                            </div>
-                                        )}
+                                    <div>
+                                        {selectedUnite.locataire ? (
+                                            <>
+                                                <Row label="Nom" value={selectedUnite.locataire}/>
+                                                <Row label="Paiement" value={selectedUnite.paiement} color={selectedUnite.paiement === "À jour" ? T.green : T.red}/>
+                                                {selectedUnite.paiement === "Impayé" && (
+                                                    <div style={{marginTop:10,display:"flex",gap:7}}>
+                                                        <button onClick={() => open("relance")} style={{flex:1,background:T.redPale,color:T.red,border:`1px solid ${T.red}20`,borderRadius:8,padding:8,fontSize:10,fontWeight:700}}>Relancer</button>
+                                                        <button onClick={() => open("clemence")} style={{flex:1,background:T.orangePale,color:T.orange,border:`1px solid ${T.orange}20`,borderRadius:8,padding:8,fontSize:10,fontWeight:700}}>Clémence</button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : <div style={{textAlign:"center",padding:20,color:T.textLight}}>Vacant</div>}
+                                    </div>
+                                )}
+                                {unitTab === "actions" && (
+                                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                                        <button onClick={() => open("emitQuit")} style={{background:T.greenPale,color:T.green,border:`1px solid ${T.green}20`,borderRadius:10,padding:12,fontSize:12,fontWeight:700,textAlign:"left"}}>🧾 Émettre une quittance</button>
+                                        <button style={{background:T.navyPale,color:T.navy,border:`1px solid ${T.navy}20`,borderRadius:10,padding:12,fontSize:12,fontWeight:700,textAlign:"left"}}>📄 Voir le bail PDF</button>
+                                        <button style={{background:T.redPale,color:T.red,border:`1px solid ${T.red}20`,borderRadius:10,padding:12,fontSize:12,fontWeight:700,textAlign:"left"}}>🗑 Résilier le bail</button>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
-                    {/* --- TAB: CANDIDATS (Agency Feature) --- */}
-                    {tab === "candidats" && (
-                        <div className="pb-10">
-                            <div className="p-8 pb-4">
-                                <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Candidats.</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Flux de dossiers qualifiés M-CAND</p>
-                            </div>
-                            <AgencyCandidateList />
-                        </div>
-                    )}
-
-                    {/* --- TAB: OUTILS (Agency Feature) --- */}
-                    {tab === "outils" && (
-                        <div className="pb-10">
-                            <div className="p-8 pb-4">
-                                <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Outils métier.</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Écosystème de gestion professionnelle certifiée</p>
-                            </div>
-                            <AgencyToolsGrid />
-                        </div>
-                    )}
                 </div>
 
-                {/* BOTTOM NAVIGATION (Fixed) */}
-                <div className="absolute bottom-0 inset-x-0 h-20 bg-white border-t border-[#D6DCE8] px-6 flex justify-between items-center z-50 rounded-b-[36px]">
-                    {[
-                        { id: "dashboard", icon: <BarChart3 size={18} />, label: "Tableau" },
-                        { id: "biens", icon: <Building2 size={18} />, label: "Biens" },
-                        { id: "candidats", icon: <Users size={18} />, label: "Candidats" },
-                        { id: "quittances", icon: <Receipt size={18} />, label: "Quittances" },
-                        { id: "outils", icon: <Settings2 size={18} />, label: "Outils" },
-                        { id: "cautions", icon: <ShieldCheck size={18} />, label: "Securité" },
-                        { id: "profil", icon: <User size={18} />, label: "Profil" },
-                    ].map(btn => {
-                        const active = tab === btn.id;
-                        return (
-                            <button 
-                                key={btn.id}
-                                onClick={() => resetNav(btn.id)}
-                                className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-[#0D2B6E] scale-110' : 'text-[#6A7D9E] opacity-60 hover:opacity-100'}`}
-                            >
-                                <div className={`${active ? 'bg-[#EEF2FA]' : ''} p-2 rounded-xl`}>{btn.icon}</div>
-                                <span className="text-[8px] font-bold uppercase tracking-widest">{btn.label}</span>
-                            </button>
-                        )
-                    })}
+                {/* NAVIGATION */}
+                <div style={{position:"absolute",bottom:0,width:"100%",background:T.white,borderTop:`1px solid ${T.grey2}`,display:"flex",padding:"10px 10px 24px"}}>
+                    {TABS.map(t => (
+                        <div key={t.id} onClick={() => resetNav(t.id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",cursor:"pointer",opacity:tab===t.id?1:.4}}>
+                            <span style={{fontSize:20}}>{t.icon}</span>
+                            <span style={{fontSize:8,fontWeight:900,marginTop:3,color:T.navy,textTransform:"uppercase"}}>{t.label}</span>
+                        </div>
+                    ))}
                 </div>
+                
+                {/* OVERLAYS */}
+                <Overlay open={O.relance} onClose={() => close("relance")} title="Relancer le locataire" titleColor={T.red}>
+                    <p style={{fontSize:12,color:T.textMid}}>Voulez-vous envoyer une relance SMS/WhatsApp au locataire ?</p>
+                    <button style={{width:"100%",background:T.red,color:T.white,borderRadius:10,padding:12,marginTop:20,fontWeight:800,border:"none"}}>Envoyer la relance</button>
+                </Overlay>
+
+                <Overlay open={O.clemence} onClose={() => close("clemence")} title="Accorder une clémence (M07)" titleColor={T.orange}>
+                    <p style={{fontSize:12,color:T.textMid}}>Accordez un délai supplémentaire ou un plan de paiement.</p>
+                    <button style={{width:"100%",background:T.orange,color:T.white,borderRadius:10,padding:12,marginTop:20,fontWeight:800,border:"none"}}>Valider la clémence</button>
+                </Overlay>
+
+                <Overlay open={O.emitQuit} onClose={() => close("emitQuit")} title="Émettre une quittance">
+                    <p style={{fontSize:12,color:T.textMid}}>Confirmez l'encaissement pour {selectedUnite?.label}.</p>
+                    <button style={{width:"100%",background:T.green,color:T.white,borderRadius:10,padding:12,marginTop:20,fontWeight:800,border:"none"}}>Confirmer & Certifier (SHA-256)</button>
+                </Overlay>
+
+                <Overlay open={O.retirer} onClose={() => close("retirer")} title="Retrait de bien (Règle Phase 2)" titleColor={T.red}>
+                    <div style={{background:T.redPale,padding:12,borderRadius:10,marginBottom:15}}>
+                        <div style={{fontSize:11,fontWeight:800,color:T.red,marginBottom:4}}>⚠️ AVERTISSEMENT CRITIQUE</div>
+                        <div style={{fontSize:10,color:T.red,lineHeight:1.4}}>
+                            1. Le bien sera archivé pendant 10 ans (DGI).<br/>
+                            2. SMS + WhatsApp seront envoyés aux locataires.<br/>
+                            3. Le mandat d'agence (si présent) sera résilié.
+                        </div>
+                    </div>
+                    <button onClick={() => alert("Action soft-delete lancée")} style={{width:"100%",background:T.red,color:T.white,borderRadius:10,padding:14,fontWeight:800,border:"none"}}>CONFIRMER LE RETRAIT</button>
+                    <button onClick={() => close("retirer")} style={{width:"100%",background:T.white,color:T.textLight,borderRadius:10,padding:10,marginTop:8,fontWeight:700,border:"none"}}>Annuler</button>
+                </Overlay>
+
             </div>
         </div>
     )

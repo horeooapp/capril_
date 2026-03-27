@@ -27,6 +27,7 @@ import { OwnerPortalDashboard } from "@/components/dashboard/owner/OwnerPortalDa
 import IntermediairePortalDashboard from "@/components/dashboard/intermediaire/IntermediairePortalDashboard"
 import DiasporaDashboard from "@/components/DiasporaDashboard"
 import { DiasporaDashboardData } from "@/types/diaspora"
+import { TenantPortalDashboard } from "@/components/dashboard/tenant/TenantPortalDashboard"
 
 interface DashboardProperty {
     id: string;
@@ -62,15 +63,39 @@ export default function DashboardOverviewClient({
     latestReport,
     regularizationAlert,
     diasporaData,
-    intermData
+    intermData,
+    tenantData
 }: { 
     user: any, 
     properties: any[],
     latestReport?: any,
     regularizationAlert?: React.ReactNode,
     diasporaData?: DiasporaDashboardData | null,
-    intermData?: any
+    intermData?: any,
+    tenantData?: { bail: any, receipts: any[] }
 }) {
+    if (user?.role === 'TENANT') {
+        const bailInfo = tenantData?.bail;
+        // Logic for bailleur masking MM-04b
+        const bailleurInfo = bailInfo ? (() => {
+            if (bailInfo.typeGestion === 'agreee') return { valeur: "AG-772", mention: "Agence agréée — substitution totale exclusive" };
+            return { valeur: bailInfo.landlord?.name || "Bailleur", mention: "Gestion directe" };
+        })() : { valeur: "—", mention: "Chargement..." };
+
+        return (
+            <TenantPortalDashboard 
+                user={user}
+                bail={bailInfo}
+                bailleur={bailleurInfo}
+                quittances={tenantData?.receipts || []}
+                abonnements={[]}
+                tickets={[]}
+                caution={null}
+                mrlDemandes={[]}
+            />
+        );
+    }
+
     if (user?.profileType === 'INTERMEDIARY') {
         return <IntermediairePortalDashboard data={intermData} session={{ user }} />;
     }
