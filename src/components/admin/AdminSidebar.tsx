@@ -23,7 +23,9 @@ import {
     Trophy,
     ClipboardCheck,
     User,
-    Home
+    Home,
+    Globe,
+    AlertCircle
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -37,6 +39,10 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
     const menuItems = [
         { href: "/admin", label: "Tableau de Bord", icon: <LayoutDashboard size={20} /> },
         { href: "/admin/agency", label: "Gestion Agence", icon: <Briefcase size={20} /> },
+        { href: "/admin/fiscal", label: "Fiscalité DGI", icon: <ShieldCheck size={20} /> },
+        { href: "/admin/candidates", label: "Candidatures", icon: <Users size={20} /> },
+        { href: "/admin/reclamations", label: "Réclamations RCL", icon: <AlertCircle size={20} /> },
+        { href: "/admin/diaspora", label: "Pack Diaspora", icon: <Globe size={20} /> },
         { href: "/admin/migration", label: "Migration Data", icon: <Database size={20} /> },
         { href: "/admin/reversals", label: "Paiements PGW", icon: <ArrowRightLeft size={20} /> },
         { href: "/admin/declarations", label: "Déclarations SMS/WA", icon: <ShieldAlert size={20} /> },

@@ -37,6 +37,7 @@ import { ShieldAlert, MapPin, BarChart } from "lucide-react"
 import RealEstateObservatory from "@/components/RealEstateObservatory"
 import GeographicRentAnalysis from "@/components/GeographicRentAnalysis"
 import RentRanking from "@/components/RentRanking"
+import ModuleRegistryGrid from "@/components/admin/ModuleRegistryGrid"
 
 export const dynamic = "force-dynamic"
 
@@ -254,6 +255,9 @@ export default async function AdminDashboardOverview() {
                         </div>
                     </div>
                 </div>
+
+                {/* THE CONTROL TOWER — REG-2026-001 Unified Module Hub */}
+                <ModuleRegistryGrid />
 
                 {/* Core Global Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
