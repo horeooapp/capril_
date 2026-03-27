@@ -31,13 +31,12 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
 
       <div className="space-y-3">
         {candidates.map((c, i) => {
-          // c.scoreQapril corresponds to ICL-CONSENT-01 score
           const scoreValue = c.scoreQapril || 0;
-          const scoreColor = scoreValue >= 850 ? T.gold : scoreValue >= 750 ? T.green : T.orange;
+          const scoreColor = scoreValue >= 750 ? T.green : scoreValue >= 600 ? T.orange : T.red;
           
-          // Rule ICL-CONSENT-01: Score visible only if status is APPROVED or similar
-          const scoreVisible = c.statut === "APPROVED" || c.statut === "VALIDATED";
+          const isApproved = c.statut === "CONSENT_APPROVED";
           const isRequested = c.statut === "CONSENT_REQUESTED";
+          const isRefused = c.statut === "CONSENT_REFUSED";
           
           return (
             <motion.div
@@ -55,38 +54,38 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
                   <div>
                     <div className="flex items-center gap-3">
                       <span className="text-[16px] font-black text-slate-800 uppercase tracking-tighter leading-none">
-                        {c.fullName || c.nom}
+                        {c.nom} {c.prenom}
                       </span>
-                      {scoreVisible && <Badge label={`✓ Autorisé ${c.autoDate}`} color={T.green} bg={T.greenPale} size={8} />}
+                      {isApproved && <Badge label="✓ Score Révélé" color={T.green} bg={T.greenPale} size={8} />}
                     </div>
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-[12px] font-black text-slate-400 leading-none">
-                        {c.profession || "Candidat"}
+                        {c.employeur || "Candidat"}
                       </span>
                       <span className="text-[12px] font-black text-indigo-600 uppercase tracking-widest">
-                        MAX {fmt(c.loyerSouhaite || 0)} FCFA
+                        MAX {fmt(c.revenuMensuel ? Math.round(c.revenuMensuel / 3.3) : 0)} FCFA
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6">
-                  {c.autorisation === "accordée" ? (
+                  {isApproved ? (
                     <div className="flex flex-col items-end pr-6 border-r border-slate-100">
                       <span className="text-3xl font-black tracking-tighter leading-none font-mono" style={{ color: scoreColor }}>
-                        {c.score}
+                        {scoreValue}
                       </span>
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Score ICL Certifié</span>
                     </div>
-                  ) : c.autorisation === "demande_envoyée" ? (
+                  ) : isRequested ? (
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-amber-500">
                         <span className="text-lg">⏳</span>
                         <span className="text-[9px] font-black uppercase tracking-widest mt-1">En attente</span>
                       </div>
-                      <Badge label="SMS Envoyé" color={T.orange} bg={T.orangePale} size={8} />
+                      <Badge label="SMS/WA Envoyé" color={T.orange} bg={T.orangePale} size={8} />
                     </div>
-                  ) : c.autorisation === "refusée" ? (
+                  ) : isRefused ? (
                     <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-rose-500">
                       <span className="text-lg">✕</span>
                       <span className="text-[9px] font-black uppercase tracking-widest mt-1">Accès Refusé</span>
@@ -95,7 +94,7 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
                     <div className="flex items-center gap-4">
                        <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-slate-300">
                         <span className="text-2xl">🔒</span>
-                        <span className="text-[9px] font-black uppercase tracking-widest mt-1">Données Protégées</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-1">Protégé</span>
                       </div>
                       <button 
                         onClick={() => handleRequestAccess(c.id)}

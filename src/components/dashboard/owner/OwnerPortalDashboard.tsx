@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Bell, AlertTriangle, ChevronRight, TrendingUp, CheckCircle, X } from "lucide-react"
 import Link from "next/link"
+import { retirerProperty } from "@/actions/property-actions"
 
 const T = {
   navy: "#0D2B6E", navyPale: "#EEF2FA",
@@ -21,6 +22,15 @@ const Badge = ({ label, color, bg, size = 10 }: any) => (
   <span className="inline-flex items-center rounded-md font-bold whitespace-nowrap px-2 py-0.5"
     style={{ background: bg, color, fontSize: size }}>{label}</span>
 );
+
+function PropSectionHeader({ label, right }: any) {
+  return (
+    <div className="flex justify-between items-center mb-4">
+      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] px-2">{label}</div>
+      {right}
+    </div>
+  );
+}
 
 const StatCard = ({ label, value, icon, color, bg, href }: any) => {
   const inner = (
@@ -58,19 +68,43 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
   const op = (k: string) => setSheets(s => ({ ...s, [k]: true }));
   const cl = (k: string) => setSheets(s => ({ ...s, [k]: false }));
 
+  const handleRemove = async () => {
+    try {
+      if (sheets.removeUnite && selectedUnite) {
+        await retirerProperty(selectedUnite.id);
+      } else if (sheets.removeEntite && selectedEntite) {
+        for (const u of selectedEntite.unites) {
+          await retirerProperty(u.id);
+        }
+      }
+      alert("Action effectuée : Bien retiré et notifications envoyées.");
+      window.location.reload(); // Refresh to update patrimoine
+    } catch (err: any) {
+      alert("Erreur: " + err.message);
+    } finally {
+      cl("removeEntite"); cl("removeUnite");
+      setSelectedEntite(null); setSelectedUnite(null);
+    }
+  };
+
   const entities = useMemo(() => {
     const grouped = initialProperties.reduce((acc: any, p: any) => {
-      const key = p.address;
+      // Group by address + propertyType to separate entities at same location
+      const key = `${p.address}-${p.propertyType}`;
       if (!acc[key]) {
         acc[key] = {
-          id: `E-${p.id}`, code: p.propertyCode || `IMM-${p.id}`,
-          nom: p.name || p.address, adresse: p.address, commune: p.commune,
+          id: `E-${p.id}`, 
+          code: p.propertyCode || `ENT-${p.id}`,
+          nom: p.name || p.address, 
+          adresse: p.address, 
+          commune: p.commune,
           type: p.propertyType === "building" ? "immeuble" : p.propertyType === "court" ? "cour" : "standalone",
           unites: []
         };
       }
       acc[key].unites.push({
-        ...p, label: p.name || "Unité",
+        ...p, 
+        label: p.name || `Unité ${p.unitNumber || ''}`,
         statut: p.status === "active" ? "occupé" : "vacant",
         paiement: p.leases?.[0]?.statutFiscal === "A_JOUR" ? "À jour" : p.leases?.[0]?.statutFiscal === "EN_RETARD" ? "Impayé" : "—",
         loyer: p.leases?.[0]?.rentAmount || p.declaredRentFcfa || 0,
@@ -78,7 +112,9 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
       });
       return acc;
     }, {});
+    
     return Object.values(grouped).map((e: any) => {
+      // If standalone with multiple units, it's actually a building or court
       if (e.unites.length > 1 && e.type === "standalone") e.type = "immeuble";
       return e;
     });
@@ -200,9 +236,9 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         </section>
 
 
-        {/* PATRIMOINE */}
+        {/* PATRIMOINE (LEVEL 1) */}
         <section className="space-y-6">
-          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] px-2">Mon patrimoine</h2>
+          <PropSectionHeader label="Mon patrimoine" />
           <div className="space-y-4">
             {entities.map((e: any) => {
               const s = entiteStats(e);
@@ -287,7 +323,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
             <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{selectedEntite?.adresse} · {selectedEntite?.commune}</p>
           </div>
           
-          <SecTitle label="Unités du patrimoine" />
+          <PropSectionHeader label="Unités du patrimoine" />
           <div className="space-y-3">
             {selectedEntite?.unites.map((u: any) => (
               <div key={u.id} className="bg-white border border-gray-100 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-gray-50 group"
@@ -337,7 +373,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           </div>
 
           <div className="space-y-4">
-            <SecTitle label="Actions disponibles" />
+            <PropSectionHeader label="Actions disponibles" />
             <div className="grid grid-cols-2 gap-3">
               <button className="bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50">Émettre Quittance</button>
               <button className="bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50">Renouveler Bail</button>
@@ -370,7 +406,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           </div>
 
           <button 
-            onClick={() => { alert("Action irréversible : Retrait et Notifications envoyées."); cl("removeEntite"); cl("removeUnite"); setSelectedEntite(null); setSelectedUnite(null); }}
+            onClick={handleRemove}
             className="w-full bg-red-600 text-white py-4 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-red-800 transition-colors shadow-lg">
             Confirmer + Notifier →
           </button>

@@ -150,7 +150,7 @@ export async function validateProperty(
 /**
  * PHASE 2 — RULE ABSOLUE N°3 : Retrait Portefeuille (Séquence Obligatoire)
  */
-export async function retirarProperty(propertyId: string) {
+export async function retirerProperty(propertyId: string) {
     const session = await auth()
     if (!session?.user?.id) throw new Error("Non autorisé.")
 
