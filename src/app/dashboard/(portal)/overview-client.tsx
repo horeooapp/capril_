@@ -24,6 +24,7 @@ import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
 import { AgencyPortalDashboard } from "@/components/dashboard/agency/AgencyPortalDashboard"
 import { OwnerPortalDashboard } from "@/components/dashboard/owner/OwnerPortalDashboard"
+import IntermediairePortalDashboard from "@/components/dashboard/intermediaire/IntermediairePortalDashboard"
 import DiasporaDashboard from "@/components/DiasporaDashboard"
 import { DiasporaDashboardData } from "@/types/diaspora"
 
@@ -60,14 +61,20 @@ export default function DashboardOverviewClient({
     properties,
     latestReport,
     regularizationAlert,
-    diasporaData
+    diasporaData,
+    intermData
 }: { 
     user: any, 
     properties: any[],
     latestReport?: any,
     regularizationAlert?: React.ReactNode,
-    diasporaData?: DiasporaDashboardData | null
+    diasporaData?: DiasporaDashboardData | null,
+    intermData?: any
 }) {
+    if (user?.profileType === 'INTERMEDIARY') {
+        return <IntermediairePortalDashboard data={intermData} session={{ user }} />;
+    }
+
     if (user?.role === 'AGENCY') {
         return <AgencyPortalDashboard user={user} properties={properties || []} />;
     }

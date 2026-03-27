@@ -58,17 +58,22 @@ async function getLocataireDashboardDataRaw(userId: string) {
         take: 3
     })
 
+    // Utilities (CIE/SODECI)
+    const facturesUtilities = activeBailIds.length > 0 ? await (prisma as any).factureUtility.findMany({
+        where: { leaseId: { in: activeBailIds } },
+        orderBy: { moisFacture: 'desc' },
+        take: 6
+    }) : []
+
     // Loyer du mois en cours
     const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
     const currentReceipt = quittances.find((q: any) => q.periodMonth === currentMonth)
 
     // Calculer la prochaine échéance
-    // Par défaut, le loyer est dû au jour `paymentDay` (souvent le 5).
     const paymentDay = bailsList.length > 0 ? (bailsList[0].paymentDay || 5) : 5
     const today = new Date()
     let expectedPaymentDate = new Date(today.getFullYear(), today.getMonth(), paymentDay)
     
-    // S'il a déjà payé ce mois-ci, la prochaine est le mois prochain
     if (currentReceipt && currentReceipt.status === 'paid') {
          expectedPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, paymentDay)
     }
@@ -82,6 +87,11 @@ async function getLocataireDashboardDataRaw(userId: string) {
         caution,
         quittances,
         currentReceipt,
+        facturesUtilities,
+        mobileMoney: [
+            { id: "MM-01", operateur: "Orange Money", numero: "+225 07 11 22 33", icon: "🟠", actif: true, defaut: true },
+            { id: "MM-02", operateur: "Wave", numero: "+225 05 44 55 66", icon: "🔵", actif: true, defaut: false },
+        ],
         nextPaymentInDays: diffDays > 0 ? diffDays : 0,
         expectedPaymentDate
     }
