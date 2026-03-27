@@ -166,21 +166,27 @@ export default function DashboardLayoutClient({
                             { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={24} /> },
                             { href: "/dashboard/matching", label: "Candidats", icon: <User size={24} /> },
                             { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={24} /> },
-                            { href: "/dashboard/receipts", label: "Comptes", icon: <FileText size={24} /> },
+                            { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={24} /> },
+                            { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={24} /> },
                             { href: "/dashboard/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                           ]
                         : [
                             { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
-                            { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
+                            { href: "/dashboard/wallet", label: "Wallet", icon: <Wallet size={24} /> },
+                            { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={24} /> },
                             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={24} /> },
                             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
+                            { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={24} /> },
+                            { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={24} /> },
+                            { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={24} /> },
+                            { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={24} /> },
                             { href: "/dashboard/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                           ]
                 } />
             </main>
 
-            {/* Footer de courtoisie Premium */}
-            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24">
+            {/* Footer de courtoisie Premium - Uniquement sur Desktop */}
+            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24 hidden lg:block">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2024 QAPRIL • Excellence en Gestion Immobilière</p>
                     <div className="flex gap-10">

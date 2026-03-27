@@ -59,9 +59,9 @@ export default function LocataireLayoutClient({
                     )}
                 </main>
                 
-                {/* Footer de courtoisie Premium */}
+                {/* Footer de courtoisie Premium - Uniquement sur Desktop */}
                 {session && (
-                    <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24">
+                    <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24 hidden lg:block">
                         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                             <p className="text-[14px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">© 2024 QAPRIL • Excellence en Gestion Immobilière de Précision</p>
                             <div className="flex gap-8">

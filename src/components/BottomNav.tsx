@@ -32,7 +32,7 @@ export default function BottomNav({ items }: BottomNavProps) {
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden">
-            <div className="bg-white/80 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-between px-6 pb-8 pt-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] gap-2">
+            <div className="bg-white/90 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-start px-6 pb-8 pt-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] gap-4 overflow-x-auto no-scrollbar scroll-smooth">
                 {navItems.map((item: any) => {
                     const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
                     
