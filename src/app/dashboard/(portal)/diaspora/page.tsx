@@ -4,6 +4,7 @@ import { getDiasporaDashboard } from "@/actions/diaspora-actions"
 import DiasporaDashboard from "@/components/DiasporaDashboard"
 import { Globe, ShieldCheck, Zap, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { DiasporaDashboardData } from "@/types/diaspora"
 
 export default async function DiasporaPage() {
   const session = await auth()
@@ -82,5 +83,5 @@ export default async function DiasporaPage() {
     )
   }
 
-  return <DiasporaDashboard data={result.data} user={session.user} />
+  return <DiasporaDashboard data={result.data as DiasporaDashboardData} user={session.user} />
 }

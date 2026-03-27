@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { DiasporaDashboardData } from "@/types/diaspora";
 import { 
   BarChart3, 
   Building2, 
@@ -147,38 +148,7 @@ function Modal({ open, onClose, title, color = T.navy, children }: any) {
 // --- Main Dashboard ---
 
 interface DiasporaDashboardProps {
-  data: {
-    stats: {
-      totalRentFcfa: number;
-      totalRentDevise: number;
-      currency: string;
-      totalAssets: number;
-      occupancyRate: number;
-    };
-    properties: Array<{
-      id: string;
-      name: string;
-      commune: string;
-      propertyCode: string;
-      status: string;
-      managementMode: string;
-      isImpaye: boolean;
-      isHorsSLA: boolean;
-      activeLease: {
-        rentFcfa: number;
-        rentDevise: number;
-        tenant: string | null;
-        lastPayment: string | Date | null;
-      } | null;
-    }>;
-    mandats: Array<{
-      id: string;
-      name: string;
-      phone: string;
-      statut: string;
-      since: string | Date;
-    }>;
-  };
+  data: DiasporaDashboardData;
   user: any;
 }
 

@@ -140,22 +140,22 @@ export class DiasporaService {
         
         // Simulation logic for Impayé/SLA (in real app, this would check dates)
         const isImpaye = activeLease?.status === 'LOYER_IMPAYE';
-        const isHorsSLA = p.managedByUserId && !activeLease?.receipts?.length; // Placeholder logic
+        const isHorsSLA = !!(p.managedByUserId && !activeLease?.receipts?.length);
 
         return {
           id: p.id,
-          name: p.name || p.address,
-          commune: p.commune,
-          propertyCode: p.propertyCode,
+          name: p.name || p.address || "Propriété sans nom",
+          commune: p.commune || "N/A",
+          propertyCode: p.propertyCode || `P-${p.id.slice(0,5)}`,
           status: p.status,
           managementMode: p.managementMode,
-          isImpaye,
-          isHorsSLA,
+          isImpaye: !!isImpaye,
+          isHorsSLA: !!isHorsSLA,
           activeLease: activeLease ? {
             rentFcfa: activeLease.rentAmount,
             rentDevise: Number((activeLease.rentAmount * rate).toFixed(2)),
             tenant: activeLease.tenantId,
-            lastPayment: lastReceipt?.createdAt || null
+            lastPayment: lastReceipt?.createdAt ? new Date(lastReceipt.createdAt) : null
           } : null
         };
       }),
