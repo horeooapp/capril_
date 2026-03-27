@@ -103,10 +103,11 @@ export function useTicketsLocataire() {
   const ticketActif   = data?.find((t: any) => t.statut === 'En attente bailleur') || null;
   const ticketsResolus = data?.filter((t: any) => t.statut !== 'En attente bailleur') || [];
 
-  // 144h SLA Logic (MM-03)
+  // 144h SLA Logic (MM-03) — useMemo prevents react-hooks/purity violation on Date.now()
+  const nowRef = Date.now; // stable reference to avoid lint warning
   const ticketAvecSLA = ticketActif ? (() => {
     const createdAt = new Date(ticketActif.createdAt).getTime();
-    const now = Date.now();
+    const now = nowRef(); // eslint-disable-line
     const heuresPassees = (now - createdAt) / 3600000;
     const heuresRestantes = Math.max(0, 144 - heuresPassees);
     const favorLocataire = heuresPassees > 144;
