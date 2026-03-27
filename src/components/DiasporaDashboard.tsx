@@ -119,6 +119,21 @@ function Modal({open,onClose,title,tc,children,maxW=600}: any){
   );
 }
 
+const MobileDialog = ({open,onClose,title,tc,children}: any)=>{
+  if(!open)return null;
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(7,26,69,.76)",display:"flex",alignItems:"flex-end",zIndex:500,backdropFilter:"blur(4px)"}}>
+      <motion.div initial={{y:"100%"}} animate={{y:0}} style={{background:T.white,borderRadius:"22px 22px 0 0",width:"100%",maxHeight:"90vh",overflowY:"auto",paddingBottom:24}}>
+        <div style={{padding:"16px 20px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{fontSize:14,fontWeight:800,color:tc||T.navy,textTransform:"uppercase",letterSpacing:1}}>{title}</span>
+          <button onClick={onClose} style={{background:T.grey1,border:"none",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>✕</button>
+        </div>
+        <div style={{padding:"0 20px"}}>{children}</div>
+      </motion.div>
+    </div>
+  );
+};
+
 const TABS=[
   {id:"dashboard",icon:<BarChart3 size={18}/>,label:"Tableau de bord"},
   {id:"biens",    icon:<Building2 size={18}/>,label:"Mes biens"},
@@ -132,6 +147,358 @@ interface DiasporaDashboardProps {
   data: DiasporaDashboardData;
   user: any;
 }
+
+const Sidebar = ({bp, sideOpen, tab, goTab, data}: any)=>(
+  <div style={{
+    width:bp.isMobile?280:bp.isDesktop?260:80,background:T.navyDark,
+    minHeight:"100vh",display:"flex",flexDirection:"column",flexShrink:0,
+    position:bp.isMobile?"fixed":"relative",
+    top:0,left:bp.isMobile?(sideOpen?0:-300):"auto",
+    zIndex:300,transition:"left .25s",
+    boxShadow: "10px 0 40px rgba(0,0,0,0.1)"
+  }}>
+    <div style={{padding:"32px 24px 24px",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
+      {(bp.isDesktop||bp.isMobile)?(
+        <div>
+          <div style={{fontSize:24,fontWeight:900,color:T.white,letterSpacing:2,fontStyle:"italic"}}>QAPRIL.</div>
+          <div style={{marginTop:8,display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(90deg,#C9A84C,#B8860B)",borderRadius:8,padding:"4px 12px shadow-lg"}}>
+            <Plane size={12} color={T.white} />
+            <span style={{fontSize:10,fontWeight:900,color:T.white,letterSpacing:1.5}}>DIASPORA</span>
+          </div>
+        </div>
+      ):<div style={{textAlign:"center",fontSize:22}}><Plane color={T.white} /></div>}
+    </div>
+    <nav style={{flex:1,padding:"20px 0"}}>
+      {TABS.map(t=>{
+        const active=tab===t.id;
+        return(
+          <button key={t.id} onClick={()=>goTab(t.id)} style={{
+            display:"flex",alignItems:"center",gap:bp.isDesktop||bp.isMobile?14:0,
+            justifyContent:bp.isDesktop||bp.isMobile?"flex-start":"center",
+            width:"100%",padding:bp.isDesktop||bp.isMobile?"14px 24px":"18px",
+            background:active?"rgba(255,255,255,.08)":"transparent",
+            border:"none",borderLeft:active?`4px solid ${T.gold}`:"4px solid transparent",
+            cursor:"pointer",transition:"all 0.2s"
+          }}>
+            <span style={{color:active?T.gold:T.white,opacity:active?1:0.5}}>{t.icon}</span>
+            {(bp.isDesktop||bp.isMobile)&&<span style={{fontSize:13,fontWeight:800,color:active?T.white:T.white,opacity:active?1:0.5,textTransform:"uppercase",letterSpacing:1}}>{t.label}</span>}
+          </button>
+        );
+      })}
+    </nav>
+    {(bp.isDesktop||bp.isMobile)&&(
+      <div style={{padding:"24px",borderTop:`1px solid rgba(255,255,255,.05)`,background:"rgba(0,0,0,0.1)"}}>
+        <div style={{fontSize:10,color:T.white,opacity:.4,marginBottom:6,fontWeight:800,textTransform:"uppercase"}}>Heure de référence</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.white}}>
+          {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:data.settings?.fuseau || "Europe/Paris"})} — {data.settings?.fuseau?.split("/")[1] || "Paris"}
+        </div>
+        <div style={{fontSize:10,color:T.gold,opacity:.8,marginTop:4,fontWeight:700}}>
+          Abidjan : {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Abidjan"})}
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+const Topbar = ({selBien, setSelBien, bp, setSideOpen, tab, user, data, devise, setDevise, op, impayesN, alertesSLA}: any)=>(
+  <div style={{height:72,background:T.white,borderBottom:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 32px",flexShrink:0,boxShadow:"0 4px 20px rgba(13,43,110,.03)",position:"sticky",top:0,zIndex:100}}>
+    <div style={{display:"flex",alignItems:"center",gap:20}}>
+      {selBien ? (
+        <button onClick={()=>setSelBien(null)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,color:T.navy,fontWeight:800}}>
+          <ArrowLeft size={18}/> {bp.isDesktop && "Retour"}
+        </button>
+      ) : bp.isTablet && (
+        <button onClick={()=>setSideOpen((s: any)=>!s)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer"}}><BarChart3 size={20}/></button>
+      )}
+      <div>
+        <div style={{fontSize:18,fontWeight:940,color:T.navy,textTransform:"uppercase",letterSpacing:1,display:"flex",alignItems:"center",gap:10}}>
+          {TABS.find(t=>t.id===tab)?.label}
+          {selBien && <span style={{color:T.gold,fontSize:14,fontWeight:800}}>— {selBien.name}</span>}
+        </div>
+        <div style={{fontSize:11,color:T.textLight,fontWeight:700}}>{user.fullName || user.name} · Diaspora Premium · {data.settings?.pays || "France"}</div>
+      </div>
+    </div>
+    <div style={{display:"flex",alignItems:"center",gap:20}}>
+      <div style={{background:T.grey1,borderRadius:12,padding:"6px",display:"flex",gap:4,boxShadow:"inset 0 2px 4px rgba(0,0,0,0.05)"}}>
+        {["FCFA","EUR"].map(d=>(
+          <button key={d} onClick={()=>setDevise(d)} style={{background:d===devise?T.navy:"transparent",border:"none",borderRadius:9,padding:"6px 16px",fontSize:11,fontWeight:800,color:d===devise?T.white:T.textLight,cursor:"pointer",transition:"all 0.2s"}}>
+            {d==="EUR"?"€ EUR":"XOF"}
+          </button>
+        ))}
+      </div>
+      <button onClick={()=>op("notifs")} style={{position:"relative",background:T.grey1,border:"none",borderRadius:12,padding:"10px 14px",cursor:"pointer",transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.background=T.grey2} onMouseLeave={e=>e.currentTarget.style.background=T.grey1}>
+        <Bell size={20} color={T.navy}/>
+        {(impayesN > 0 || alertesSLA > 0) && <span style={{position:"absolute",top:8,right:8,width:10,height:10,borderRadius:"50%",background:T.red,border:`2px solid ${T.white}`,boxShadow:"0 0 10px rgba(160,0,0,0.5)"}}/>}
+      </button>
+      <BtnPrim label="Inviter un gestionnaire" onClick={()=>op("inviter")} icon={<Smartphone size={16}/>}/>
+    </div>
+  </div>
+);
+
+const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA, properties, op, goTab, selBien, setSelBien, data}: any)=>(
+  <AnimatePresence mode="wait">
+    {tab === "dashboard" && (
+      <motion.div key="dash" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} style={{display:"flex",flexDirection:"column",gap:28}}>
+        {/* KPI Row */}
+        <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"repeat(4,1fr)":bp.isTablet?"1fr 1fr":"1fr",gap:20}}>
+          <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+            <div style={{width:48,height:48,borderRadius:12,background:T.navyPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CreditCard color={T.navy} size={24}/></div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Revenus</div>
+              <div style={{fontSize:18,fontWeight:900,color:T.navy}}>{affMontant(totalFCFA)}</div>
+            </div>
+          </Card>
+          <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+            <div style={{width:48,height:48,borderRadius:12,background:T.greenPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CheckCircle2 color={T.green} size={24}/></div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Recouvré</div>
+              <div style={{fontSize:18,fontWeight:900,color:T.green}}>{Math.round(encFCFA/totalFCFA*100)}%</div>
+            </div>
+          </Card>
+          <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+            <div style={{width:48,height:48,borderRadius:12,background:T.redPale,display:"flex",alignItems:"center",justifyContent:"center"}}><AlertTriangle color={T.red} size={24}/></div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Impayés</div>
+              <div style={{fontSize:18,fontWeight:900,color:T.red}}>{impayesN}</div>
+            </div>
+          </Card>
+          <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+            <div style={{width:48,height:48,borderRadius:12,background:T.purplePale,display:"flex",alignItems:"center",justifyContent:"center"}}><Clock color={T.purple} size={24}/></div>
+            <div>
+              <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Retards SLA</div>
+              <div style={{fontSize:18,fontWeight:900,color:T.purple}}>{alertesSLA}</div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Critical Alerts */}
+        {impayesN > 0 && (
+          <Card style={{borderLeft:`4px solid ${T.red}`}}>
+            <CardTitle label="🚨 Alertes Critiques" right={<BtnSec label="Tout voir" small onClick={()=>op("notifs")}/>}/>
+            {properties.filter((b: any)=>b.isImpaye).map((b: any)=>(
+              <div key={b.id} style={{display:"flex",gap:12,alignItems:"flex-start",background:T.redPale,borderRadius:12,padding:14,marginBottom:8}}>
+                <span style={{fontSize:18}}>🔴</span>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:T.text}}>{b.name} — Impayé détecté</div>
+                  <div style={{fontSize:11,color:T.textMid,marginTop:2}}>{b.locataire?.name || "Locataire inconnu"} · {affMontant(b.activeLease?.rentFcfa || 0)}</div>
+                </div>
+                <BtnPrim label="Agir" small onClick={()=>{setSelBien(b);goTab("biens");}} color={T.red}/>
+              </div>
+            ))}
+          </Card>
+        )}
+
+        {/* Treasury Card */}
+        <Card style={{background:`linear-gradient(135deg,${T.navy}05,${T.teal}05)`,border:`1px solid ${T.navy}10`,padding:"24px 28px"}}>
+          <CardTitle label="💶 Analyse de Trésorerie"/>
+          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
+            <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
+              <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Performance annuelle</div>
+              <div style={{fontSize:32,fontWeight:940,color:T.navy,marginBottom:8}}>{affMontant(totalFCFA * 12)}</div>
+              <div style={{fontSize:11,color:T.textMid,fontWeight:700}}>{fmt(totalFCFA)} FCFA / mois · Taux 0% QAPRIL</div>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <BtnPrim label="Configurer virements SEPA" onClick={()=>goTab("virements")} icon={<Euro size={16}/>}/>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                <button onClick={()=>op("virement")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
+                  <Download size={18} color={T.teal}/>
+                  <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>RIB</span>
+                </button>
+                <button onClick={()=>goTab("virements")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
+                  <FileText size={18} color={T.navy}/>
+                  <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>Historique</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Recent Properties */}
+        <div>
+          <SecTitle label="🏠 Patrimoine Récent" right={<button onClick={()=>goTab("biens")} style={{background:"none",border:"none",fontSize:11,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
+          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:16}}>
+            {properties.slice(0,2).map((b: any)=>(
+              <Card key={b.id} style={{cursor:"pointer"}} onClick={()=>{setSelBien(b);goTab("biens");}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                  <div style={{width:40,height:40,borderRadius:10,background:T.grey1,display:"flex",alignItems:"center",justifyContent:"center"}}><Building2 size={20} color={T.navy}/></div>
+                  <Badge label={b.managementMode === "AGENCY" ? "Agence" : "Direct"} color={T.teal} bg={T.tealPale}/>
+                </div>
+                <div style={{fontSize:15,fontWeight:800,color:T.navy,marginBottom:4}}>{b.name}</div>
+                <div style={{fontSize:11,color:T.textLight,marginBottom:16}}>{b.commune} · {b.propertyCode}</div>
+                <RowData label="Revenu" value={affMontant(b.activeLease?.rentFcfa || 0)}/>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    )}
+
+    {tab === "biens" && selBien && (
+      <motion.div key="bien-detail" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} style={{display:"flex",flexDirection:"column",gap:24}}>
+        <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
+          <div style={{display:"flex",flexDirection:"column",gap:24}}>
+            <Card>
+              <CardTitle label="ℹ️ Fiche d'identité du bien" right={<Badge label={selBien.propertyCode} color={T.navy} bg={T.navyPale}/>}/>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
+                <div style={{background:T.grey1,borderRadius:12,padding:16}}>
+                  <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Commune</div>
+                  <div style={{fontSize:14,fontWeight:800,color:T.navy,marginTop:4}}>{selBien.commune}</div>
+                </div>
+                <div style={{background:T.grey1,borderRadius:12,padding:16}}>
+                  <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Mode Gestion</div>
+                  <div style={{fontSize:14,fontWeight:800,color:T.teal,marginTop:4}}>{selBien.managementMode === "AGENCY" ? "Agence" : "Directe"}</div>
+                </div>
+              </div>
+              <RowData label="Type de bien" value="Appartement F4" />
+              <RowData label="Surface" value="120 m²" />
+              <RowData label="Statut Occup." value={selBien.status === "OCCUPIED" ? "Occupé" : "Vacant"} color={selBien.status === "OCCUPIED" ? T.green : T.orange} />
+            </Card>
+
+            <Card>
+              <CardTitle label="👤 Locataire Actuel" right={<BtnSec label="Détails" small />}/>
+              <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:20}}>
+                <div style={{width:56,height:56,borderRadius:28,background:T.navy,color:T.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900}}>{(selBien.activeLease?.tenant || "L").charAt(0)}</div>
+                <div>
+                  <div style={{fontSize:16,fontWeight:900,color:T.navy}}>{selBien.activeLease?.tenant || "M. Kouassi Jean"}</div>
+                  <div style={{fontSize:12,color:T.textLight}}>Bail signé le 12/01/2026</div>
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                <BtnSec label="Appeler" icon={<Smartphone size={14}/>} style={{width:"100%"}}/>
+                <BtnSec label="Message" icon={<Mail size={14}/>} style={{width:"100%"}}/>
+              </div>
+            </Card>
+          </div>
+
+          <div style={{display:"flex",flexDirection:"column",gap:24}}>
+            <Card style={{background:T.navy,color:T.white}}>
+              <CardTitle label="💰 Revenus Mensuels" />
+              <div style={{fontSize:32,fontWeight:940,marginBottom:8}}>{affMontant(selBien.activeLease?.rentFcfa || 0)}</div>
+              <div style={{fontSize:12,opacity:0.7,marginBottom:20}}>{Math.round((selBien.activeLease?.rentFcfa || 0) / FCFA_EUR)} € / mois</div>
+              <div style={{background: "rgba(255,255,255,0.1)", borderRadius:12, padding:12, display:"flex", justifyContent:"space-between"}}>
+                 <span style={{fontSize:11,fontWeight:700}}>Dernier paiement</span>
+                 <span style={{fontSize:11,fontWeight:900,color:T.gold}}>05 Mars 2026</span>
+              </div>
+            </Card>
+            <Card>
+              <CardTitle label="📑 Documents" />
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {["Contrat de Bail","EDL Entrée","Dernière Quittance"].map(d=>(
+                  <div key={d} style={{padding:"12px 14px",background:T.grey1,borderRadius:10,display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}>
+                    <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>{d}</span>
+                    <Download size={16} color={T.grey3}/>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </motion.div>
+    )}
+
+    {tab === "mobilemoney" && (
+      <motion.div key="mm" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+        <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:20}}>
+          {data.mobileMoney?.map((m: any,i: number)=>(
+             <Card key={i} style={{background: m.provider === "Orange" ? "#FF7900" : "#FFCC00", color: m.provider === "Orange" ? T.white : "#000"}}>
+               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:32}}>
+                 <div>
+                   <div style={{fontSize:12,fontWeight:700,opacity:0.8,textTransform:"uppercase"}}>{m.provider} Money</div>
+                   <div style={{fontSize:24,fontWeight:900,marginTop:4}}>{m.phone}</div>
+                 </div>
+                 <div style={{width:48,height:48,background:"rgba(255,255,255,0.2)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center"}}><Smartphone size={24}/></div>
+               </div>
+               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                 <div>
+                   <div style={{fontSize:10,fontWeight:700,opacity:0.6}}>Solde Actuel</div>
+                   <div style={{fontSize:18,fontWeight:900}}>{affMontant(m.solde)}</div>
+                 </div>
+                 <Badge label="Connecté" color={T.white} bg="rgba(0,0,0,0.2)"/>
+               </div>
+             </Card>
+          ))}
+        </div>
+
+        <SecTitle label="🔗 Webhooks de recouvrement" right={<Badge label="LIVE" color={T.green} bg={T.greenPale}/>}/>
+        <Card style={{padding:0,overflow:"hidden"}}>
+          <div style={{padding:20,background:T.navyPale,borderBottom:`1px solid ${T.grey2}`,fontSize:11,fontWeight:800,color:T.navy,textTransform:"uppercase"}}>Signaux Temps Réel</div>
+          {data.webhooks?.map((w: any,i: number)=>(
+            <div key={i} style={{padding:16,borderBottom:`1px solid ${T.grey1}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{display:"flex",gap:16,alignItems:"center"}}>
+                <div style={{width:36,height:36,borderRadius:8,background:T.white,border:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>📡</div>
+                <div>
+                  <div style={{fontSize:13,fontWeight:800,color:T.navy}}>{w.op} — {w.emetteur}</div>
+                  <div style={{fontSize:10,color:T.textLight}}>{w.date} · {w.bien}</div>
+                </div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontSize:14,fontWeight:900,color:T.navy}}>{affMontant(w.montant)}</div>
+                <div style={{fontSize:9,fontWeight:800,color:T.green}}>DÉTECTÉ</div>
+              </div>
+            </div>
+          ))}
+        </Card>
+      </motion.div>
+    )}
+
+    {tab === "delegation" && (
+      <motion.div key="delegation" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+         <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"2fr 1.2fr":"1fr",gap:24}}>
+           <div style={{display:"flex",flexDirection:"column",gap:24}}>
+             <Card>
+               <CardTitle label="📢 Gestionnaires Délégués" right={<BtnPrim label="Nouveau" small onClick={()=>op("inviter")} icon={<Plus size={14}/>}/>}/>
+               {data.mandats?.map((m: any,i: number)=>(
+                  <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                      <div style={{width:40,height:40,borderRadius:10,background:T.white,display:"flex",alignItems:"center",justifyContent:"center"}}><Handshake color={T.navy} size={20}/></div>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:800,color:T.navy}}>{m.agence || m.nom}</div>
+                        <div style={{fontSize:11,color:T.textLight}}>{m.scope || "Tous les biens"} · {m.role}</div>
+                      </div>
+                    </div>
+                    <Badge label={m.status} color={m.status === "Actif" ? T.green : T.orange} bg={m.status === "Actif" ? T.greenPale : T.orangePale}/>
+                  </div>
+               ))}
+             </Card>
+           </div>
+           <div style={{display:"flex",flexDirection:"column",gap:24}}>
+             <Card style={{background:T.teal,color:T.white}}>
+               <CardTitle label="⚡ Configuration SLA" />
+               <div style={{fontSize:11,opacity:0.8,marginBottom:20,lineHeight:1.4}}>Délai maximum autorisé pour la signalisation d'un incident majeur.</div>
+               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                 {["12h","24h","48h","72h"].map(h=>(
+                   <button key={h} style={{padding:"12px",borderRadius:10,background:h==="24h"?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.05)",border:"none",color:T.white,fontSize:13,fontWeight:900,cursor:"pointer"}}>{h}</button>
+                 ))}
+               </div>
+               <div style={{marginTop:20,fontSize:10,fontWeight:700,textAlign:"center",opacity:0.6}}>Paramètre actuel : 24h</div>
+             </Card>
+           </div>
+         </div>
+      </motion.div>
+    )}
+
+    {tab === "parametres" && (
+      <motion.div key="params" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+        <div style={{maxWidth:600}}>
+          <SecTitle label="⚙️ Préférences de compte" />
+          <Card style={{display:"flex",flexDirection:"column",gap:16}}>
+            <RowData label="Devise préférée" value={data.settings?.devise || "FCFA"} />
+            <RowData label="Fuseau Horaire" value={data.settings?.fuseau || "Europe/Paris"} />
+            <RowData label="Pays de résidence" value={data.settings?.pays || "France"} />
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0"}}>
+              <span style={{fontSize:11,color:T.textLight,fontWeight:700,textTransform:"uppercase"}}>Notifications Mail</span>
+              <div style={{width:40,height:20,background:T.green,borderRadius:10,position:"relative"}}><div style={{width:16,height:16,background:T.white,borderRadius:8,position:"absolute",right:2,top:2}}/></div>
+            </div>
+            <div style={{marginTop:20,display:"flex",gap:12}}>
+              <BtnPrim label="Sauvegarder les réglages" style={{flex:1}}/>
+              <BtnSec label="Déconnexion" color={T.red}/>
+            </div>
+          </Card>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps) {
   const bp = useBreakpoint();
@@ -159,380 +526,15 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   const affMontant = (fcfa: number) => devise === "EUR" ? `${fmtE(fcfa)} €` : `${fmt(fcfa)} FCFA`;
   const fmtDual = (fcfa: number) => `${fmt(fcfa)} FCFA  ≈  ${fmtE(fcfa)} €`;
 
-  const Dialog = bp.isMobile ? ({open,onClose,title,tc,children}: any)=>{
-    if(!open)return null;
-    return (
-      <div style={{position:"fixed",inset:0,background:"rgba(7,26,69,.76)",display:"flex",alignItems:"flex-end",zIndex:500,backdropFilter:"blur(4px)"}}>
-        <motion.div initial={{y:"100%"}} animate={{y:0}} style={{background:T.white,borderRadius:"22px 22px 0 0",width:"100%",maxHeight:"90vh",overflowY:"auto",paddingBottom:24}}>
-          <div style={{padding:"16px 20px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <span style={{fontSize:14,fontWeight:800,color:tc||T.navy,textTransform:"uppercase",letterSpacing:1}}>{title}</span>
-            <button onClick={onClose} style={{background:T.grey1,border:"none",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>✕</button>
-          </div>
-          <div style={{padding:"0 20px"}}>{children}</div>
-        </motion.div>
-      </div>
-    );
-  } : Modal;
-
-  const Sidebar = ()=>(
-    <div style={{
-      width:bp.isMobile?280:bp.isDesktop?260:80,background:T.navyDark,
-      minHeight:"100vh",display:"flex",flexDirection:"column",flexShrink:0,
-      position:bp.isMobile?"fixed":"relative",
-      top:0,left:bp.isMobile?(sideOpen?0:-300):"auto",
-      zIndex:300,transition:"left .25s",
-      boxShadow: "10px 0 40px rgba(0,0,0,0.1)"
-    }}>
-      <div style={{padding:"32px 24px 24px",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
-        {(bp.isDesktop||bp.isMobile)?(
-          <div>
-            <div style={{fontSize:24,fontWeight:900,color:T.white,letterSpacing:2,fontStyle:"italic"}}>QAPRIL.</div>
-            <div style={{marginTop:8,display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(90deg,#C9A84C,#B8860B)",borderRadius:8,padding:"4px 12px shadow-lg"}}>
-              <Plane size={12} color={T.white} />
-              <span style={{fontSize:10,fontWeight:900,color:T.white,letterSpacing:1.5}}>DIASPORA</span>
-            </div>
-          </div>
-        ):<div style={{textAlign:"center",fontSize:22}}><Plane color={T.white} /></div>}
-      </div>
-      <nav style={{flex:1,padding:"20px 0"}}>
-        {TABS.map(t=>{
-          const active=tab===t.id;
-          return(
-            <button key={t.id} onClick={()=>goTab(t.id)} style={{
-              display:"flex",alignItems:"center",gap:bp.isDesktop||bp.isMobile?14:0,
-              justifyContent:bp.isDesktop||bp.isMobile?"flex-start":"center",
-              width:"100%",padding:bp.isDesktop||bp.isMobile?"14px 24px":"18px",
-              background:active?"rgba(255,255,255,.08)":"transparent",
-              border:"none",borderLeft:active?`4px solid ${T.gold}`:"4px solid transparent",
-              cursor:"pointer",transition:"all 0.2s"
-            }}>
-              <span style={{color:active?T.gold:T.white,opacity:active?1:0.5}}>{t.icon}</span>
-              {(bp.isDesktop||bp.isMobile)&&<span style={{fontSize:13,fontWeight:800,color:active?T.white:T.white,opacity:active?1:0.5,textTransform:"uppercase",letterSpacing:1}}>{t.label}</span>}
-            </button>
-          );
-        })}
-      </nav>
-      {(bp.isDesktop||bp.isMobile)&&(
-        <div style={{padding:"24px",borderTop:`1px solid rgba(255,255,255,.05)`,background:"rgba(0,0,0,0.1)"}}>
-          <div style={{fontSize:10,color:T.white,opacity:.4,marginBottom:6,fontWeight:800,textTransform:"uppercase"}}>Heure de référence</div>
-          <div style={{fontSize:13,fontWeight:700,color:T.white}}>
-            {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:data.settings?.fuseau || "Europe/Paris"})} — {data.settings?.fuseau?.split("/")[1] || "Paris"}
-          </div>
-          <div style={{fontSize:10,color:T.gold,opacity:.8,marginTop:4,fontWeight:700}}>
-            Abidjan : {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Abidjan"})}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const Topbar = ()=>(
-    <div style={{height:72,background:T.white,borderBottom:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 32px",flexShrink:0,boxShadow:"0 4px 20px rgba(13,43,110,.03)",position:"sticky",top:0,zIndex:100}}>
-      <div style={{display:"flex",alignItems:"center",gap:20}}>
-        {selBien ? (
-          <button onClick={()=>setSelBien(null)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,color:T.navy,fontWeight:800}}>
-            <ArrowLeft size={18}/> {bp.isDesktop && "Retour"}
-          </button>
-        ) : bp.isTablet && (
-          <button onClick={()=>setSideOpen(s=>!s)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer"}}><BarChart3 size={20}/></button>
-        )}
-        <div>
-          <div style={{fontSize:18,fontWeight:940,color:T.navy,textTransform:"uppercase",letterSpacing:1,display:"flex",alignItems:"center",gap:10}}>
-            {TABS.find(t=>t.id===tab)?.label}
-            {selBien && <span style={{color:T.gold,fontSize:14,fontWeight:800}}>— {selBien.name}</span>}
-          </div>
-          <div style={{fontSize:11,color:T.textLight,fontWeight:700}}>{user.fullName || user.name} · Diaspora Premium · {data.settings?.pays || "France"}</div>
-        </div>
-      </div>
-      <div style={{display:"flex",alignItems:"center",gap:20}}>
-        <div style={{background:T.grey1,borderRadius:12,padding:"6px",display:"flex",gap:4,boxShadow:"inset 0 2px 4px rgba(0,0,0,0.05)"}}>
-          {["FCFA","EUR"].map(d=>(
-            <button key={d} onClick={()=>setDevise(d)} style={{background:d===devise?T.navy:"transparent",border:"none",borderRadius:9,padding:"6px 16px",fontSize:11,fontWeight:800,color:d===devise?T.white:T.textLight,cursor:"pointer",transition:"all 0.2s"}}>
-              {d==="EUR"?"€ EUR":"XOF"}
-            </button>
-          ))}
-        </div>
-        <button onClick={()=>op("notifs")} style={{position:"relative",background:T.grey1,border:"none",borderRadius:12,padding:"10px 14px",cursor:"pointer",transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.background=T.grey2} onMouseLeave={e=>e.currentTarget.style.background=T.grey1}>
-          <Bell size={20} color={T.navy}/>
-          {(impayesN > 0 || alertesSLA > 0) && <span style={{position:"absolute",top:8,right:8,width:10,height:10,borderRadius:"50%",background:T.red,border:`2px solid ${T.white}`,boxShadow:"0 0 10px rgba(160,0,0,0.5)"}}/>}
-        </button>
-        <BtnPrim label="Inviter un gestionnaire" onClick={()=>op("inviter")} icon={<Smartphone size={16}/>}/>
-      </div>
-    </div>
-  );
-
-  const Content = ()=>(
-    <AnimatePresence mode="wait">
-      {tab === "dashboard" && (
-        <motion.div key="dash" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} style={{display:"flex",flexDirection:"column",gap:28}}>
-          {/* KPI Row */}
-          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"repeat(4,1fr)":bp.isTablet?"1fr 1fr":"1fr",gap:20}}>
-            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
-              <div style={{width:48,height:48,borderRadius:12,background:T.navyPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CreditCard color={T.navy} size={24}/></div>
-              <div>
-                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Revenus</div>
-                <div style={{fontSize:18,fontWeight:900,color:T.navy}}>{affMontant(totalFCFA)}</div>
-              </div>
-            </Card>
-            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
-              <div style={{width:48,height:48,borderRadius:12,background:T.greenPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CheckCircle2 color={T.green} size={24}/></div>
-              <div>
-                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Recouvré</div>
-                <div style={{fontSize:18,fontWeight:900,color:T.green}}>{Math.round(encFCFA/totalFCFA*100)}%</div>
-              </div>
-            </Card>
-            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
-              <div style={{width:48,height:48,borderRadius:12,background:T.redPale,display:"flex",alignItems:"center",justifyContent:"center"}}><AlertTriangle color={T.red} size={24}/></div>
-              <div>
-                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Impayés</div>
-                <div style={{fontSize:18,fontWeight:900,color:T.red}}>{impayesN}</div>
-              </div>
-            </Card>
-            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
-              <div style={{width:48,height:48,borderRadius:12,background:T.purplePale,display:"flex",alignItems:"center",justifyContent:"center"}}><Clock color={T.purple} size={24}/></div>
-              <div>
-                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Retards SLA</div>
-                <div style={{fontSize:18,fontWeight:900,color:T.purple}}>{alertesSLA}</div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Critical Alerts */}
-          {impayesN > 0 && (
-            <Card style={{borderLeft:`4px solid ${T.red}`}}>
-              <CardTitle label="🚨 Alertes Critiques" right={<BtnSec label="Tout voir" small onClick={()=>op("notifs")}/>}/>
-              {properties.filter((b: any)=>b.isImpaye).map((b: any)=>(
-                <div key={b.id} style={{display:"flex",gap:12,alignItems:"flex-start",background:T.redPale,borderRadius:12,padding:14,marginBottom:8}}>
-                  <span style={{fontSize:18}}>🔴</span>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:13,fontWeight:700,color:T.text}}>{b.name} — Impayé détecté</div>
-                    <div style={{fontSize:11,color:T.textMid,marginTop:2}}>{b.locataire?.name || "Locataire inconnu"} · {affMontant(b.activeLease?.rentFcfa || 0)}</div>
-                  </div>
-                  <BtnPrim label="Agir" small onClick={()=>{setSelBien(b);setTab("biens");}} color={T.red}/>
-                </div>
-              ))}
-            </Card>
-          )}
-
-          {/* Treasury Card */}
-          <Card style={{background:`linear-gradient(135deg,${T.navy}05,${T.teal}05)`,border:`1px solid ${T.navy}10`,padding:"24px 28px"}}>
-            <CardTitle label="💶 Analyse de Trésorerie"/>
-            <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
-              <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
-                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Performance annuelle</div>
-                <div style={{fontSize:32,fontWeight:940,color:T.navy,marginBottom:8}}>{affMontant(totalFCFA * 12)}</div>
-                <div style={{fontSize:11,color:T.textMid,fontWeight:700}}>{fmt(totalFCFA)} FCFA / mois · Taux 0% QAPRIL</div>
-              </div>
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                <BtnPrim label="Configurer virements SEPA" onClick={()=>goTab("virements")} icon={<Euro size={16}/>}/>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                  <button onClick={()=>op("virement")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
-                    <Download size={18} color={T.teal}/>
-                    <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>RIB</span>
-                  </button>
-                  <button onClick={()=>goTab("virements")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
-                    <FileText size={18} color={T.navy}/>
-                    <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>Historique</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Recent Properties */}
-          <div>
-            <SecTitle label="🏠 Patrimoine Récent" right={<button onClick={()=>goTab("biens")} style={{background:"none",border:"none",fontSize:11,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
-            <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:16}}>
-              {properties.slice(0,2).map((b: any)=>(
-                <Card key={b.id} style={{cursor:"pointer"}} onClick={()=>{setSelBien(b);setTab("biens");}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-                    <div style={{width:40,height:40,borderRadius:10,background:T.grey1,display:"flex",alignItems:"center",justifyContent:"center"}}><Building2 size={20} color={T.navy}/></div>
-                    <Badge label={b.managementMode === "AGENCY" ? "Agence" : "Direct"} color={T.teal} bg={T.tealPale}/>
-                  </div>
-                  <div style={{fontSize:15,fontWeight:800,color:T.navy,marginBottom:4}}>{b.name}</div>
-                  <div style={{fontSize:11,color:T.textLight,marginBottom:16}}>{b.commune} · {b.propertyCode}</div>
-                  <RowData label="Revenu" value={affMontant(b.activeLease?.rentFcfa || 0)}/>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {tab === "biens" && selBien && (
-        <motion.div key="bien-detail" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} style={{display:"flex",flexDirection:"column",gap:24}}>
-          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
-            <div style={{display:"flex",flexDirection:"column",gap:24}}>
-              <Card>
-                <CardTitle label="ℹ️ Fiche d'identité du bien" right={<Badge label={selBien.propertyCode} color={T.navy} bg={T.navyPale}/>}/>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
-                  <div style={{background:T.grey1,borderRadius:12,padding:16}}>
-                    <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Commune</div>
-                    <div style={{fontSize:14,fontWeight:800,color:T.navy,marginTop:4}}>{selBien.commune}</div>
-                  </div>
-                  <div style={{background:T.grey1,borderRadius:12,padding:16}}>
-                    <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Mode Gestion</div>
-                    <div style={{fontSize:14,fontWeight:800,color:T.teal,marginTop:4}}>{selBien.managementMode === "AGENCY" ? "Agence" : "Directe"}</div>
-                  </div>
-                </div>
-                <RowData label="Type de bien" value="Appartement F4" />
-                <RowData label="Surface" value="120 m²" />
-                <RowData label="Statut Occup." value={selBien.status === "OCCUPIED" ? "Occupé" : "Vacant"} color={selBien.status === "OCCUPIED" ? T.green : T.orange} />
-              </Card>
-
-              <Card>
-                <CardTitle label="👤 Locataire Actuel" right={<BtnSec label="Détails" small />}/>
-                <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:20}}>
-                  <div style={{width:56,height:56,borderRadius:28,background:T.navy,color:T.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900}}>{(selBien.activeLease?.tenant || "L").charAt(0)}</div>
-                  <div>
-                    <div style={{fontSize:16,fontWeight:900,color:T.navy}}>{selBien.activeLease?.tenant || "M. Kouassi Jean"}</div>
-                    <div style={{fontSize:12,color:T.textLight}}>Bail signé le 12/01/2026</div>
-                  </div>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                  <BtnSec label="Appeler" icon={<Smartphone size={14}/>} style={{width:"100%"}}/>
-                  <BtnSec label="Message" icon={<Mail size={14}/>} style={{width:"100%"}}/>
-                </div>
-              </Card>
-            </div>
-
-            <div style={{display:"flex",flexDirection:"column",gap:24}}>
-              <Card style={{background:T.navy,color:T.white}}>
-                <CardTitle label="💰 Revenus Mensuels" />
-                <div style={{fontSize:32,fontWeight:940,marginBottom:8}}>{affMontant(selBien.activeLease?.rentFcfa || 0)}</div>
-                <div style={{fontSize:12,opacity:0.7,marginBottom:20}}>{Math.round((selBien.activeLease?.rentFcfa || 0) / FCFA_EUR)} € / mois</div>
-                <div style={{background: "rgba(255,255,255,0.1)", borderRadius:12, padding:12, display:"flex", justifyContent:"space-between"}}>
-                   <span style={{fontSize:11,fontWeight:700}}>Dernier paiement</span>
-                   <span style={{fontSize:11,fontWeight:900,color:T.gold}}>05 Mars 2026</span>
-                </div>
-              </Card>
-              <Card>
-                <CardTitle label="📑 Documents" />
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  {["Contrat de Bail","EDL Entrée","Dernière Quittance"].map(d=>(
-                    <div key={d} style={{padding:"12px 14px",background:T.grey1,borderRadius:10,display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}>
-                      <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>{d}</span>
-                      <Download size={16} color={T.grey3}/>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {tab === "mobilemoney" && (
-        <motion.div key="mm" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
-          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:20}}>
-            {data.mobileMoney?.map((m: any,i: number)=>(
-               <Card key={i} style={{background: m.provider === "Orange" ? "#FF7900" : "#FFCC00", color: m.provider === "Orange" ? T.white : "#000"}}>
-                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:32}}>
-                   <div>
-                     <div style={{fontSize:12,fontWeight:700,opacity:0.8,textTransform:"uppercase"}}>{m.provider} Money</div>
-                     <div style={{fontSize:24,fontWeight:900,marginTop:4}}>{m.phone}</div>
-                   </div>
-                   <div style={{width:48,height:48,background:"rgba(255,255,255,0.2)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center"}}><Smartphone size={24}/></div>
-                 </div>
-                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                   <div>
-                     <div style={{fontSize:10,fontWeight:700,opacity:0.6}}>Solde Actuel</div>
-                     <div style={{fontSize:18,fontWeight:900}}>{affMontant(m.solde)}</div>
-                   </div>
-                   <Badge label="Connecté" color={T.white} bg="rgba(0,0,0,0.2)"/>
-                 </div>
-               </Card>
-            ))}
-          </div>
-
-          <SecTitle label="🔗 Webhooks de recouvrement" right={<Badge label="LIVE" color={T.green} bg={T.greenPale}/>}/>
-          <Card style={{padding:0,overflow:"hidden"}}>
-            <div style={{padding:20,background:T.navyPale,borderBottom:`1px solid ${T.grey2}`,fontSize:11,fontWeight:800,color:T.navy,textTransform:"uppercase"}}>Signaux Temps Réel</div>
-            {data.webhooks?.map((w: any,i: number)=>(
-              <div key={i} style={{padding:16,borderBottom:`1px solid ${T.grey1}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div style={{display:"flex",gap:16,alignItems:"center"}}>
-                  <div style={{width:36,height:36,borderRadius:8,background:T.white,border:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>📡</div>
-                  <div>
-                    <div style={{fontSize:13,fontWeight:800,color:T.navy}}>{w.op} — {w.emetteur}</div>
-                    <div style={{fontSize:10,color:T.textLight}}>{w.date} · {w.bien}</div>
-                  </div>
-                </div>
-                <div style={{textAlign:"right"}}>
-                  <div style={{fontSize:14,fontWeight:900,color:T.navy}}>{affMontant(w.montant)}</div>
-                  <div style={{fontSize:9,fontWeight:800,color:T.green}}>DÉTECTÉ</div>
-                </div>
-              </div>
-            ))}
-          </Card>
-        </motion.div>
-      )}
-
-      {tab === "delegation" && (
-        <motion.div key="delegation" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
-           <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"2fr 1.2fr":"1fr",gap:24}}>
-             <div style={{display:"flex",flexDirection:"column",gap:24}}>
-               <Card>
-                 <CardTitle label="📢 Gestionnaires Délégués" right={<BtnPrim label="Nouveau" small onClick={()=>op("inviter")} icon={<Plus size={14}/>}/>}/>
-                 {data.mandats?.map((m: any,i: number)=>(
-                    <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <div style={{display:"flex",gap:12,alignItems:"center"}}>
-                        <div style={{width:40,height:40,borderRadius:10,background:T.white,display:"flex",alignItems:"center",justifyContent:"center"}}><Handshake color={T.navy} size={20}/></div>
-                        <div>
-                          <div style={{fontSize:14,fontWeight:800,color:T.navy}}>{m.agence || m.nom}</div>
-                          <div style={{fontSize:11,color:T.textLight}}>{m.scope || "Tous les biens"} · {m.role}</div>
-                        </div>
-                      </div>
-                      <Badge label={m.status} color={m.status === "Actif" ? T.green : T.orange} bg={m.status === "Actif" ? T.greenPale : T.orangePale}/>
-                    </div>
-                 ))}
-               </Card>
-             </div>
-             <div style={{display:"flex",flexDirection:"column",gap:24}}>
-               <Card style={{background:T.teal,color:T.white}}>
-                 <CardTitle label="⚡ Configuration SLA" />
-                 <div style={{fontSize:11,opacity:0.8,marginBottom:20,lineHeight:1.4}}>Délai maximum autorisé pour la signalisation d'un incident majeur.</div>
-                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                   {["12h","24h","48h","72h"].map(h=>(
-                     <button key={h} style={{padding:"12px",borderRadius:10,background:h==="24h"?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.05)",border:"none",color:T.white,fontSize:13,fontWeight:900,cursor:"pointer"}}>{h}</button>
-                   ))}
-                 </div>
-                 <div style={{marginTop:20,fontSize:10,fontWeight:700,textAlign:"center",opacity:0.6}}>Paramètre actuel : 24h</div>
-               </Card>
-             </div>
-           </div>
-        </motion.div>
-      )}
-
-      {tab === "parametres" && (
-        <motion.div key="params" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
-          <div style={{maxWidth:600}}>
-            <SecTitle label="⚙️ Préférences de compte" />
-            <Card style={{display:"flex",flexDirection:"column",gap:16}}>
-              <RowData label="Devise préférée" value={data.settings?.devise || "FCFA"} />
-              <RowData label="Fuseau Horaire" value={data.settings?.fuseau || "Europe/Paris"} />
-              <RowData label="Pays de résidence" value={data.settings?.pays || "France"} />
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0"}}>
-                <span style={{fontSize:11,color:T.textLight,fontWeight:700,textTransform:"uppercase"}}>Notifications Mail</span>
-                <div style={{width:40,height:20,background:T.green,borderRadius:10,position:"relative"}}><div style={{width:16,height:16,background:T.white,borderRadius:8,position:"absolute",right:2,top:2}}/></div>
-              </div>
-              <div style={{marginTop:20,display:"flex",gap:12}}>
-                <BtnPrim label="Sauvegarder les réglages" style={{flex:1}}/>
-                <BtnSec label="Déconnexion" color={T.red}/>
-              </div>
-            </Card>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  const DialogComp = bp.isMobile ? MobileDialog : Modal;
 
   return (
     <div style={{display:"flex",minHeight:"100vh",background:T.bg,fontFamily:"Inter, sans-serif",color:T.text}}>
-      <Sidebar />
+      <Sidebar bp={bp} sideOpen={sideOpen} tab={tab} goTab={goTab} data={data} />
       <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
-        <Topbar />
+        <Topbar selBien={selBien} setSelBien={setSelBien} bp={bp} setSideOpen={setSideOpen} tab={tab} user={user} data={data} devise={devise} setDevise={setDevise} op={op} impayesN={impayesN} alertesSLA={alertesSLA} />
         <div style={{flex:1,padding:bp.isMobile?"16px":"32px",overflowY:"auto"}}>
-          <Content />
+          <Content tab={tab} bp={bp} totalFCFA={totalFCFA} affMontant={affMontant} encFCFA={encFCFA} impayesN={impayesN} alertesSLA={alertesSLA} properties={properties} op={op} goTab={goTab} selBien={selBien} setSelBien={setSelBien} data={data} />
         </div>
         {bp.isMobile && (
           <div style={{height:64,background:T.navyDark,position:"fixed",bottom:0,left:0,right:0,display:"flex",alignItems:"center",justifyContent:"space-around",borderTop:`1px solid rgba(255,255,255,.1)`,zIndex:400}}>
@@ -551,7 +553,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
       </div>
 
       {/* ── OVERLAYS ── */}
-      <Dialog open={O.notifs} onClose={()=>cl("notifs")} title="Journaux de Bord" tc={T.navy}>
+      <DialogComp open={O.notifs} onClose={()=>cl("notifs")} title="Journaux de Bord" tc={T.navy}>
         <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:12}}>
           {data.webhooks?.map((w: any,i: number)=>(
             <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,display:"flex",gap:12,alignItems:"center"}}>
@@ -563,9 +565,9 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
             </div>
           ))}
         </div>
-      </Dialog>
+      </DialogComp>
       
-      <Dialog open={O.inviter} onClose={()=>cl("inviter")} title="Inviter un gestionnaire" tc={T.teal}>
+      <DialogComp open={O.inviter} onClose={()=>cl("inviter")} title="Inviter un gestionnaire" tc={T.teal}>
         <div style={{paddingTop:12}}>
           <div style={{padding:16,background:T.tealPale,borderRadius:12,fontSize:11,fontWeight:600,color:T.teal,marginBottom:20,lineHeight:1.5}}>
             Générez un accès sécurisé pour votre partenaire local (Agence ou Proche). Il pourra éditer les quittances et signaler les incidents.
@@ -583,7 +585,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
             <BtnPrim label="Générer l'invitation" onClick={()=>cl("inviter")} bg={T.teal} style={{width:"100%"}}/>
           </div>
         </div>
-      </Dialog>
+      </DialogComp>
     </div>
   );
 }
