@@ -31,6 +31,7 @@ export async function POST(req: Request) {
             operateur: operator,
             montantSuggere: amount,
             soldeAuMoment: (session.user as any).walletBalance || 0,
+            nbBailsActifs: 0, // Valeur par défaut pour génération manuelle
             urlGeneree: url,
             canalEnvoi: "WEB_UI",
             expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
