@@ -74,8 +74,16 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
               <span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
+          <a
+            href="/manual"
+            className="flex items-center gap-3 px-8 py-4 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all text-[#5B21B6] hover:bg-[#5B21B6]/10"
+          >
+            <FileText size={18} />
+            <span className="hidden sm:inline">Manuel</span>
+          </a>
         </div>
       </div>
+
 
       {/* Main Content Area */}
       <main className="min-h-[600px]">

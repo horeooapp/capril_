@@ -154,7 +154,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                 {/* NAVIGATION MODULES */}
                 <section className="space-y-6">
                     <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2">Console & Outils</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                         <button onClick={() => setTab('dashboard')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'dashboard' ? 'border-[#0D2B6E]' : 'border-transparent'}`} style={{ borderTopColor: tab === 'dashboard' ? '#0D2B6E' : '' }}>
                             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📊</div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Accueil</p>
@@ -175,6 +175,10 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">💼</div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Compte</p>
                         </button>
+                        <a href="/manual" className="glass-card-premium p-6 text-center group border-t-4 border-[#5B21B6]">
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📖</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#5B21B6]">Manuel</p>
+                        </a>
                     </div>
                 </section>
 

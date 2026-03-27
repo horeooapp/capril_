@@ -183,12 +183,13 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         {/* MODULES EN HAUT */}
         <section className="space-y-6">
           <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2 text-center">Outils de Pilotage</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-4xl mx-auto">
             {[
               { href: "/dashboard/properties", icon: "🏘️", label: "Biens",        color: T.teal },
               { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
               { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
               { href: "/dashboard/financial",  icon: "📊", label: "Finances",     color: T.gold },
+              { href: "/manual",               icon: "📖", label: "Manuel",       color: "#5B21B6" },
             ].map((m, i) => (
               <Link key={i} href={m.href}
                 className="glass-card-premium p-6 text-center group block border-t-4"

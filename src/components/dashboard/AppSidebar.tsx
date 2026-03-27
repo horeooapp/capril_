@@ -24,7 +24,8 @@ import {
     Zap,
     ShieldAlert,
     Receipt,
-    Wallet
+    Wallet,
+    BookOpen
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -47,6 +48,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
                 { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
                 { href: "/locataire/preferences", label: "Profil", icon: <User size={20} /> },
+                { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }
         
@@ -58,6 +60,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} /> },
                 { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} /> },
                 { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} /> },
+                { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }
         
@@ -75,6 +78,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={20} /> },
             ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={20} /> }] : []),
             ...(diasporaAbonnement ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),
+            { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
         ]
     }
 

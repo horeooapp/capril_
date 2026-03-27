@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen } from "lucide-react"
 
 interface LocataireLayoutClientProps {
     children: React.ReactNode
@@ -54,6 +54,7 @@ export default function LocataireLayoutClient({
                             { href: "/locataire/cie-sodeci", label: "CIE/SODECI", icon: <Zap size={24} /> },
                             { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
                             { href: "/locataire/preferences", label: "Profil", icon: <User size={24} /> },
+                            { href: "/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                         ]} />
                     )}
                 </main>

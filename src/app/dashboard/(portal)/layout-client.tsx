@@ -22,7 +22,8 @@ import {
     Trophy,
     Globe,
     Settings,
-    Wallet
+    Wallet,
+    BookOpen
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -166,14 +167,14 @@ export default function DashboardLayoutClient({
                             { href: "/dashboard/matching", label: "Candidats", icon: <User size={24} /> },
                             { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={24} /> },
                             { href: "/dashboard/receipts", label: "Comptes", icon: <FileText size={24} /> },
-                            { href: "/dashboard/profile", label: "Profil", icon: <Settings size={24} /> },
+                            { href: "/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                           ]
                         : [
                             { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
                             { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
                             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={24} /> },
                             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
-                            { href: "/dashboard/profile", label: "Profil", icon: <User size={24} /> },
+                            { href: "/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                           ]
                 } />
             </main>
