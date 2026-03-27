@@ -21,7 +21,7 @@ export const AgencyCandidateList: React.FC = () => {
 
       <div className="space-y-3">
         {candidats.map((c, i) => {
-          const scoreColor = c.score >= 750 ? T.green : c.score >= 600 ? T.orange : T.red;
+          const scoreColor = (c.score || 0) >= 850 ? T.gold : (c.score || 0) >= 750 ? T.green : T.orange;
           const scoreVisible = c.autorisation === "accordée";
           
           return (
@@ -30,53 +30,64 @@ export const AgencyCandidateList: React.FC = () => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
+              className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all group"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-50 flex items-center justify-center rounded-xl text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors">
-                    <User size={24} />
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 bg-slate-50 flex items-center justify-center rounded-2xl text-slate-400 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors">
+                    <User size={28} />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-black text-slate-800 uppercase tracking-tighter leading-none">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[16px] font-black text-slate-800 uppercase tracking-tighter leading-none">
                         {c.nom}
                       </span>
-                      <Badge 
-                        label={c.statut} 
-                        color={c.statut === "Qualifié" ? T.green : T.orange} 
-                        bg={c.statut === "Qualifié" ? T.greenPale : T.orangePale} 
-                        size={8} 
-                      />
+                      {scoreVisible && <Badge label={`✓ Autorisé ${c.autoDate}`} color={T.green} bg={T.greenPale} size={8} />}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] font-medium text-slate-400 leading-none">
-                        {c.emploi} · {fmt(c.loyer_max)} FCFA max
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-[12px] font-black text-slate-400 leading-none">
+                        {c.emploi}
                       </span>
-                      <span className="text-[10px] text-slate-300">
-                        {c.docs}/5 docs reçus
+                      <span className="text-[12px] font-black text-indigo-600 uppercase tracking-widest">
+                        MAX {fmt(c.loyerMax)} FCFA
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col items-center p-2 rounded-xl border border-slate-50 min-w-[60px]">
-                    {scoreVisible ? (
-                       <>
-                        <span className="text-xl font-black tracking-tighter leading-none" style={{ color: scoreColor }}>
-                          {c.score}
-                        </span>
-                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Score ICL</span>
-                       </>
-                    ) : (
-                      <>
-                        <span className="text-lg">🔒</span>
-                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Bloqué</span>
-                      </>
-                    )}
-                  </div>
-                  <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-600 transition-all" />
+                <div className="flex items-center gap-6">
+                  {c.autorisation === "accordée" ? (
+                    <div className="flex flex-col items-end pr-6 border-r border-slate-100">
+                      <span className="text-3xl font-black tracking-tighter leading-none font-mono" style={{ color: scoreColor }}>
+                        {c.score}
+                      </span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Score ICL Certifié</span>
+                    </div>
+                  ) : c.autorisation === "demande_envoyée" ? (
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-amber-500">
+                        <span className="text-lg">⏳</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-1">En attente</span>
+                      </div>
+                      <Badge label="SMS Envoyé" color={T.orange} bg={T.orangePale} size={8} />
+                    </div>
+                  ) : c.autorisation === "refusée" ? (
+                    <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-rose-500">
+                      <span className="text-lg">✕</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest mt-1">Accès Refusé</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                       <div className="flex flex-col items-end pr-6 border-r border-slate-100 text-slate-300">
+                        <span className="text-2xl">🔒</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest mt-1">Données Protégées</span>
+                      </div>
+                      <button className="px-4 py-2 bg-teal-50 text-teal-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-teal-100 transition-colors border border-teal-100">
+                        Demander accès
+                      </button>
+                    </div>
+                  )}
+                  <ChevronRight size={20} className="text-slate-300 group-hover:text-slate-900 transition-all group-hover:translate-x-1" />
                 </div>
               </div>
             </motion.div>

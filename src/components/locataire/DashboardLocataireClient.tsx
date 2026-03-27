@@ -11,7 +11,8 @@ import {
     Clock,
     FileText,
     Settings,
-    MessageSquare
+    MessageSquare,
+    ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -103,6 +104,64 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                 </div>
             </div>
 
+            {/* Alertes Procédures - RCL/MRL */}
+            {(data.bails?.some((b: any) => b.reclamations?.length > 0) || data.bails?.some((b: any) => b.dossiersLitige?.length > 0)) && (
+                <div className="px-2">
+                    <div className="bg-white border-2 border-orange-100 rounded-[2.5rem] p-8 shadow-sm">
+                        <h3 className="text-[11px] font-black text-orange-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                            <ShieldCheck size={14} />
+                            Procédures de Dialogue Actives
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {data.bails?.flatMap((b: any) => b.reclamations || []).map((ticket: any, idx: number) => (
+                                <Link 
+                                    key={idx} 
+                                    href="/locataire/rights"
+                                    className="bg-orange-50 border border-orange-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-orange-100 transition-all font-bold"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
+                                            ⚖️
+                                        </div>
+                                        <div>
+                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                                Révision de Loyer (RCL)
+                                            </div>
+                                            <div className="text-[11px] font-bold text-orange-600 italic mt-0.5">
+                                                En attente de réponse bailleur
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={20} className="text-orange-300 group-hover:translate-x-1" />
+                                </Link>
+                            ))}
+                            {data.bails?.flatMap((b: any) => b.dossiersLitige || []).map((mrl: any, idx: number) => (
+                                <Link 
+                                    key={idx} 
+                                    href="/locataire/rights"
+                                    className="bg-blue-50 border border-blue-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-blue-100 transition-all font-bold"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
+                                            🤝
+                                        </div>
+                                        <div>
+                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                                Médiation (MRL-01)
+                                            </div>
+                                            <div className="text-[11px] font-bold text-blue-600 italic mt-0.5">
+                                                Consentement requis
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={20} className="text-blue-300 group-hover:translate-x-1" />
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Middle Section: Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Prochaine échéance */}
@@ -153,6 +212,69 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </div>
                 </div>
             </div>
+
+            {/* Mon Bail Summary - Rule 3.2 Strict Anonymity */}
+            {data.bails?.length > 0 && (
+                <div className="px-2">
+                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white/40">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-xl shadow-sm">
+                                    🏠
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter leading-none italic">Mon Bail Actif.</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#C55A11] mt-1.5 flex items-center gap-2">
+                                        <ShieldCheck size={12} />
+                                        Protection des données (Rule 3.2)
+                                    </p>
+                                </div>
+                            </div>
+                            <Link href="/locataire/leases" className="px-6 py-2 bg-white/50 hover:bg-white border border-white/80 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 transition-all text-xs">
+                                Gérer mon bail
+                            </Link>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Propriétaire / Gestionnaire</span>
+                                <div className="space-y-1">
+                                    <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                        {data.bails[0].typeGestion === 'agreee' 
+                                            ? `Bailleur Masqué (${data.bails[0].landlord?.landlordCode || "AGREEE"})` 
+                                            : (data.bails[0].bailleurMasque 
+                                                ? `Bailleur Masqué (${data.bails[0].landlord?.landlordCode || "PRIVE"})` 
+                                                : (data.bails[0].landlord?.fullName || "Non renseigné"))}
+                                    </p>
+                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                        {data.bails[0].typeGestion === 'agreee' 
+                                            ? "Agence agréée — substitution totale" 
+                                            : (data.bails[0].bailleurMasque ? "Identité masquée" : "Gestion directe")}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Logement / Code</span>
+                                <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                    {data.bails[0].property?.propertyCode || "LOG-XXXX"}
+                                </p>
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                    {data.bails[0].property?.address || "Cocody, Abidjan"}
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Référence Bail</span>
+                                <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                    {data.bails[0].leaseReference || "BAIL-XXXX"}
+                                </p>
+                                <span className="text-[9px] font-bold text-[#C55A11] uppercase tracking-tighter italic">
+                                    SHA-256 Certifié {data.bails[0].sha?.substring(0, 8) || "..."}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Bottom Section: Quittances Récentes & Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

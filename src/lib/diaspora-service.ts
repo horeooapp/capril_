@@ -134,24 +134,37 @@ export class DiasporaService {
         totalAssets,
         occupancyRate: Math.round(occupancyRate),
       },
-      properties: user.propertiesOwned.map(p => ({
-        id: p.id,
-        name: p.name || p.address,
-        commune: p.commune,
-        status: p.status,
-        activeLease: p.leases[0] ? {
-          rentFcfa: p.leases[0].rentAmount,
-          rentDevise: Number((p.leases[0].rentAmount * rate).toFixed(2)),
-          tenant: p.leases[0].tenantId,
-          lastPayment: p.leases[0].receipts[0]?.createdAt || null
-        } : null
-      })),
+      properties: user.propertiesOwned.map(p => {
+        const activeLease = p.leases[0];
+        const lastReceipt = activeLease?.receipts[0];
+        
+        // Simulation logic for Impayé/SLA (in real app, this would check dates)
+        const isImpaye = activeLease?.status === 'LOYER_IMPAYE';
+        const isHorsSLA = p.managedByUserId && !activeLease?.receipts?.length; // Placeholder logic
+
+        return {
+          id: p.id,
+          name: p.name || p.address,
+          commune: p.commune,
+          propertyCode: p.propertyCode,
+          status: p.status,
+          managementMode: p.managementMode,
+          isImpaye,
+          isHorsSLA,
+          activeLease: activeLease ? {
+            rentFcfa: activeLease.rentAmount,
+            rentDevise: Number((activeLease.rentAmount * rate).toFixed(2)),
+            tenant: activeLease.tenantId,
+            lastPayment: lastReceipt?.createdAt || null
+          } : null
+        };
+      }),
       mandats: user.mandatsDonnes.map(m => ({
         id: m.id,
-        name: m.intermediaire.fullName,
+        name: m.intermediaire.fullName || m.intermediaire.name,
         phone: m.intermediaire.phone,
         statut: m.statut,
-        since: m.dateDebut
+        since: m.createdAt
       }))
     };
   }

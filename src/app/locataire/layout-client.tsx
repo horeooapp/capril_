@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User, LogOut } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert } from "lucide-react"
 
 interface LocataireLayoutClientProps {
     children: React.ReactNode
@@ -49,14 +49,11 @@ export default function LocataireLayoutClient({
                     {session && (
                         <BottomNav items={[
                             { href: "/locataire", label: "Accueil", icon: <Home size={24} /> },
-                            { href: "/locataire/leases", label: "Payer", icon: <Receipt size={24} /> },
-                            { href: "/locataire/signalements", label: "Alertes", icon: <Bell size={24} /> },
-                            { href: "/locataire/preferences", label: "Compte", icon: <User size={24} /> },
-                            { 
-                                onClick: onLogout, 
-                                label: "Quitter", 
-                                icon: <LogOut size={24} className="text-red-500" /> 
-                            },
+                            { href: "/locataire/leases", label: "Mon bail", icon: <FileText size={24} /> },
+                            { href: "/locataire/receipts", label: "Quittances", icon: <Receipt size={24} /> },
+                            { href: "/locataire/cie-sodeci", label: "CIE/SODECI", icon: <Zap size={24} /> },
+                            { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
+                            { href: "/locataire/preferences", label: "Profil", icon: <User size={24} /> },
                         ]} />
                     )}
                 </main>

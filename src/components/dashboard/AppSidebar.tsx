@@ -20,12 +20,15 @@ import {
     Send,
     User,
     BarChart3,
-    Settings
+    Settings,
+    Zap,
+    ShieldAlert,
+    Receipt
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
 interface AppSidebarProps {
-    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION'
+    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY'
     onLogout: () => void | Promise<void>
     userName?: string | null
     diasporaAbonnement?: boolean
@@ -37,24 +40,33 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
     const getNavLinks = () => {
         if (role === 'TENANT') {
             return [
-                { href: "/locataire", label: "Overview", icon: <LayoutDashboard size={20} /> },
-                { href: "/locataire/signalements", label: "Signalements", icon: <ClipboardList size={20} /> },
-                { href: "/locataire/cautions", label: "Ma Caution", icon: <Star size={20} /> },
-                { href: "/locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
-                { href: "/locataire/profil-public", label: "Profil Public", icon: <User size={20} /> },
-                { href: "/locataire/invitations", label: "Invitations", icon: <Send size={20} /> },
-                { href: "/locataire/leases", label: "Contrats", icon: <Handshake size={20} /> },
-                { href: "/locataire/preferences", label: "Paramètres", icon: <Settings size={20} /> },
-                { href: "/locataire/trust", label: "Indice ICL", icon: <Star size={20} /> },
+                { href: "/locataire", label: "Accueil", icon: <LayoutDashboard size={20} /> },
+                { href: "/locataire/leases", label: "Mon bail", icon: <FileText size={20} /> },
+                { href: "/locataire/receipts", label: "Quittances", icon: <Receipt size={20} /> },
+                { href: "/locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
+                { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
+                { href: "/locataire/preferences", label: "Profil", icon: <User size={20} /> },
             ]
         }
         
-        // Default Owner Links
+        if (role === 'AGENCY') {
+            return [
+                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} /> },
+                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={20} /> },
+                { href: "/dashboard/matching", label: "Candidats", icon: <User size={20} /> },
+                { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} /> },
+                { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} /> },
+                { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} /> },
+            ]
+        }
+        
+        // Owner / Default Links (5-tab focus + extras for desktop)
         return [
-            { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={20} /> },
+            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} /> },
             { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={20} /> },
             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={20} /> },
+            { href: "/dashboard/profile", label: "Profil", icon: <User size={20} /> },
             { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={20} /> },
             { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={20} /> },
             { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={20} /> },

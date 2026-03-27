@@ -31,7 +31,18 @@ async function getLocataireDashboardDataRaw(userId: string) {
             tenantId: userId,
             status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] }
         },
-        include: { property: true }
+        include: { 
+            property: true,
+            landlord: {
+                select: { fullName: true, landlordCode: true }
+            },
+            reclamations: {
+                where: { statut: { in: ['OUVERT', 'EN_COURS'] } }
+            },
+            dossiersLitige: {
+                where: { statut: { in: ['GENERE', 'TRANSMIS_CACI', 'MEDIATION_EN_COURS'] } }
+            }
+        }
     })
 
     // Récupérer la caution (si 1 seul bail, c'est plus simple)

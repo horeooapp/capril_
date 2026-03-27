@@ -85,15 +85,53 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> =
           >
             {activeTab === 'overview' && (
               <div className="space-y-10">
+                {/* Active Alerts - MM-07 Protocol */}
+                <div className="px-4">
+                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
+                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                       <ShieldCheck size={14} className="text-red-500" />
+                       Procédures MM-07 Actives
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       {properties.flatMap(p => p.leases || [])
+                        .filter(l => l.status === 'OVERDUE')
+                        .map((lease, idx) => (
+                          <div 
+                            key={idx} 
+                            className="bg-red-50 border border-red-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-red-100/50 transition-all"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm text-red-600">
+                                🚨
+                              </div>
+                              <div>
+                                <div className="text-[13px] font-black text-slate-800 uppercase tracking-tight">
+                                  Impayé J+12 — {lease.tenantName || "Locataire"}
+                                </div>
+                                <div className="text-[11px] font-bold text-red-600 italic mt-0.5">
+                                  Phase de recouvrement forcée active
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                               <div className="text-lg font-black text-red-600 font-mono">-{lease.rentAmount?.toLocaleString()} FCFA</div>
+                               <div className="text-[8px] font-black text-red-400 uppercase tracking-widest mt-1">Dossier #PR-0{idx+1}</div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+
                 <AgencyKpiCards properties={properties} />
                 <div className="px-4">
                   <div className="border-t border-slate-100 pt-8 mt-8">
-                    <AgencyPropertyList properties={properties} />
+                    <AgencyPropertyList properties={properties} user={user} />
                   </div>
                 </div>
               </div>
             )}
-            {activeTab === 'biens' && <AgencyPropertyList properties={properties} />}
+            {activeTab === 'biens' && <AgencyPropertyList properties={properties} user={user} />}
             {activeTab === 'candidats' && <AgencyCandidateList />}
             {activeTab === 'outils' && <AgencyToolsGrid />}
           </motion.div>

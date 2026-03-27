@@ -24,6 +24,7 @@ import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
 import { AgencyPortalDashboard } from "@/components/dashboard/agency/AgencyPortalDashboard"
 import { OwnerPortalDashboard } from "@/components/dashboard/owner/OwnerPortalDashboard"
+import DiasporaDashboard from "@/components/DiasporaDashboard"
 
 interface DashboardProperty {
     id: string;
@@ -57,18 +58,23 @@ export default function DashboardOverviewClient({
     user, 
     properties,
     latestReport,
-    regularizationAlert
+    regularizationAlert,
+    diasporaData
 }: { 
     user: any, 
     properties: any[],
     latestReport?: any,
-    regularizationAlert?: React.ReactNode
+    regularizationAlert?: React.ReactNode,
+    diasporaData?: any
 }) {
     if (user?.role === 'AGENCY') {
         return <AgencyPortalDashboard user={user} properties={properties || []} />;
     }
 
     if (user?.role === 'LANDLORD' || user?.role === 'LANDLORD_PRO') {
+        if (diasporaData) {
+            return <DiasporaDashboard data={diasporaData} user={user} />;
+        }
         return <OwnerPortalDashboard user={user} properties={properties || []} />;
     }
 

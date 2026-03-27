@@ -28,64 +28,74 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
 
   const stats = [
     {
-      label: "CA TOTAL ESTIMÉ",
+      icon: "💰",
+      label: "Loyers théoriques",
       value: `${fmt(totalLoyers)} FCFA`,
-      sub: "Loyer théorique mensuel",
-      icon: <DollarSign size={20} />,
+      sub: "Avril 2026",
       color: T.navy,
       bg: T.navyPale,
     },
     {
-      label: "ENCAISSÉ (MÉDIAN)",
+      icon: "✅",
+      label: "Encaissé",
       value: `${fmt(encaisse)} FCFA`,
-      sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du CA théorique` : "0% du CA théorique",
-      icon: <TrendingUp size={20} />,
+      sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du portefeuille` : "0% du portefeuille",
       color: T.green,
       bg: T.greenPale,
     },
     {
-      label: "IMPAYÉS / RETARD",
-      value: `${fmt(impayes)} FCFA`,
-      sub: impayes > 0 ? "Lots en situation de retard" : "Aucun retard détecté",
-      icon: <ShieldAlert size={20} />,
+      icon: "⚠️",
+      label: "Impayés",
+      value: `${activeLeases.filter(l => l.status === 'OVERDUE').length} bien(s)`,
+      sub: "Procédure M07 active",
       color: T.red,
       bg: T.redPale,
     },
     {
-      label: "VACANCE LOCATIVE",
-      value: `${txVacance}%`,
-      sub: `${vacants} bien(s) sans locataire`,
-      icon: <Home size={20} />,
-      color: T.orange,
-      bg: T.orangePale,
+      icon: "🏠",
+      label: "Portefeuille",
+      value: `${totalBiens} biens`,
+      sub: `${vacants} vacant${vacants > 1 ? "s" : ""}`,
+      color: T.teal,
+      bg: T.tealPale,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-      {stats.map((s, i) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+      {stats.map((k, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
-          className="p-4 rounded-2xl border"
-          style={{ backgroundColor: s.bg, borderColor: `${s.color}20` }}
+          className="rounded-[2rem] p-8 border shadow-sm group hover:scale-[1.02] transition-all"
+          style={{ 
+            backgroundColor: k.bg, 
+            borderColor: `${k.color}20` 
+          }}
         >
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 rounded-xl" style={{ backgroundColor: `${s.color}15`, color: s.color }}>
-              {s.icon}
+          <div className="flex justify-between items-start mb-10">
+            <div className="text-3xl">{k.icon}</div>
+            <div 
+              className="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest"
+              style={{ backgroundColor: `${k.color}15`, color: k.color }}
+            >
+              {k.sub}
             </div>
-            <span className="text-[10px] font-black tracking-widest uppercase opacity-50" style={{ color: s.color }}>
-              {s.label}
-            </span>
           </div>
           <div>
-            <div className="text-xl font-black tracking-tighter" style={{ color: s.color }}>
-              {s.value}
+            <div 
+              className="text-2xl font-black mb-2 font-mono leading-none"
+              style={{ color: k.color }}
+            >
+              {k.value}
             </div>
-            <div className="text-[11px] font-medium opacity-70 mt-1" style={{ color: s.color }}>
-              {s.sub}
+            <div 
+              className="text-[12px] font-black uppercase tracking-widest opacity-60"
+              style={{ color: k.color }}
+            >
+              {k.label}
             </div>
           </div>
         </motion.div>

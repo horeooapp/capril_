@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 
 const fmt = (v: number) => v.toLocaleString();
 
-export const AgencyPropertyList: React.FC<{ properties: any[] }> = ({ properties }) => {
+export const AgencyPropertyList: React.FC<{ properties: any[], user?: any }> = ({ properties, user }) => {
   const now = new Date();
   const currentMonthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const isCollaborator = user?.agencyRole === 'collaborateur';
 
   return (
     <div className="p-4 space-y-4">
@@ -22,19 +23,21 @@ export const AgencyPropertyList: React.FC<{ properties: any[] }> = ({ properties
         </button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {properties.map((p, i) => {
-          const activeLease = (p.leases || []).find((l: any) => l.status === 'ACTIVE');
+          const activeLease = (p.leases || []).find((l: any) => l.status === 'ACTIVE' || l.status === 'OVERDUE');
           const isOccupied = !!activeLease;
-          const statusLabel = isOccupied ? "occupé" : "vacant";
           const rent = activeLease ? activeLease.rentAmount : p.declaredRentFcfa;
+          const isOverdue = activeLease?.status === 'OVERDUE';
           
-          // Check payment status for current month if occupied
-          let paymentStatus = "N/A";
-          if (isOccupied) {
-            const paid = (activeLease.receipts || []).some((r: any) => r.periodMonth === currentMonthYear && r.status === 'paid');
-            paymentStatus = paid ? "Encaissé" : "En attente";
-          }
+          // Rule 5.2 - Anonymity Logic
+          const displayBailleur = isCollaborator || p.bailleurMasque 
+            ? (p.landlord?.landlordCode || "BAI-XXXX") 
+            : (p.landlord?.fullName || "Bailleur");
+            
+          const displayLocataire = isCollaborator 
+            ? "Locataire Masqué" 
+            : (activeLease?.tenantName || "Locataire");
 
           return (
             <motion.div
@@ -42,50 +45,54 @@ export const AgencyPropertyList: React.FC<{ properties: any[] }> = ({ properties
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
+              className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-xl transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-6"
+              style={{ borderLeft: `6px solid ${isOverdue ? T.red : (isOccupied ? T.green : T.grey2)}` }}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-50 flex items-center justify-center rounded-xl text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                    <Home size={24} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-black text-slate-800 uppercase tracking-tighter leading-none">
-                        {p.address?.split(',')[0] || "Adresse inconnue"}
-                      </span>
-                      <Badge 
-                        label={p.propertyCode || "CODE-X"} 
-                        color={T.navy} 
-                        bg={T.navyPale} 
-                        size={8} 
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] font-medium text-slate-400">
-                        {p.propertyType} · {fmt(rent)} FCFA
-                      </span>
-                      <Badge 
-                        label={statusLabel} 
-                        color={isOccupied ? T.green : T.orange} 
-                        bg={isOccupied ? T.greenPale : T.orangePale} 
-                        size={8} 
-                      />
-                    </div>
-                  </div>
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 bg-slate-50 flex items-center justify-center rounded-2xl text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all shadow-inner">
+                  <Home size={32} />
                 </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex flex-col items-end">
-                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Paiement</span>
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-[16px] font-black text-slate-900 uppercase tracking-tighter leading-none">
+                      {p.address?.split(',')[0] || "Adresse inconnue"}
+                    </span>
                     <Badge 
-                      label={paymentStatus} 
-                      color={paymentStatus === "Encaissé" ? T.green : paymentStatus === "En attente" ? T.orange : T.textLight} 
-                      bg={paymentStatus === "Encaissé" ? T.greenPale : paymentStatus === "En attente" ? T.orangePale : T.grey1} 
+                      label={p.propertyCode || "CODE-X"} 
+                      color={T.navy} 
+                      bg={T.navyPale} 
                       size={9} 
                     />
                   </div>
-                  <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
+                  <div className="flex items-center gap-4">
+                    <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest">
+                      {p.propertyType}
+                    </span>
+                    <div className="h-1 w-1 bg-slate-200 rounded-full"></div>
+                    <span className="text-xs font-bold text-slate-400">Proprio: <span className="text-[#1F4E79]">{displayBailleur}</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-8 justify-between sm:justify-end">
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-2 mb-2">
+                    {isOccupied && activeLease.isPaidThisMonth ? (
+                      <Badge label="✓ Encaissé" color={T.green} bg={T.greenPale} size={10} />
+                    ) : isOverdue ? (
+                      <Badge label="⚠ Impayé J+12" color={T.white} bg={T.red} size={10} />
+                    ) : isOccupied ? (
+                      <Badge label="En attente" color={T.orange} bg={T.orangePale} size={10} />
+                    ) : (
+                      <Badge label="Vacant" color={T.textLight} bg={T.grey1} size={10} />
+                    )}
+                  </div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                    {isOccupied ? displayLocataire : "Aucun bail actif"}
+                  </span>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-slate-900 group-hover:text-white transition-all group-hover:translate-x-1 shadow-sm">
+                   <ChevronRight size={24} />
                 </div>
               </div>
             </motion.div>

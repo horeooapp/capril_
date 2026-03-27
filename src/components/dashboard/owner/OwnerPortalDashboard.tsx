@@ -232,6 +232,63 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
                     {/* --- TAB: DASHBOARD (ACCUEIL) --- */}
                     {tab === "dashboard" && (
                         <div className="p-8 space-y-12">
+                            {/* Action Requise Alert - RCL/MRL */}
+                            {(initialProperties.some(p => p.leases?.some((l:any) => l.reclamations?.length > 0)) || 
+                              initialProperties.some(p => p.leases?.some((l:any) => l.dossiersLitige?.length > 0))) && (
+                                <div className="mb-10">
+                                    <div className="bg-white border-2 border-[#C55A11]/20 rounded-[2.5rem] p-8 shadow-sm">
+                                        <h3 className="text-[11px] font-black text-[#C55A11] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                            <AlertCircle size={14} />
+                                            Action Immédiate Requise
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {initialProperties.flatMap(p => p.leases || []).flatMap((l:any) => l.reclamations || []).map((ticket: any, idx: number) => (
+                                                <div 
+                                                    key={idx} 
+                                                    className="bg-orange-50 border border-orange-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-orange-100 transition-all font-bold"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
+                                                            ⚖️
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                                                Révision de Loyer (RCL)
+                                                            </div>
+                                                            <div className="text-[11px] font-bold text-orange-600 italic mt-0.5">
+                                                                Réponse attendue sous 72h
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight size={20} className="text-orange-300 group-hover:translate-x-1" />
+                                                </div>
+                                            ))}
+                                            {initialProperties.flatMap(p => p.leases || []).flatMap((l:any) => l.dossiersLitige || []).map((mrl: any, idx: number) => (
+                                                <div 
+                                                    key={idx} 
+                                                    className="bg-blue-50 border border-blue-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-blue-100 transition-all font-bold"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm">
+                                                            🤝
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                                                Médiation (MRL-01)
+                                                            </div>
+                                                            <div className="text-[11px] font-bold text-blue-600 italic mt-0.5">
+                                                                Consentement requis
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight size={20} className="text-blue-300 group-hover:translate-x-1" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Premium Stats Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {[

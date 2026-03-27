@@ -3,6 +3,7 @@ import { T, modules } from '@/constants/agency-data';
 import { Badge } from './Badge';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export const AgencyToolsGrid: React.FC = () => {
   return (
@@ -12,52 +13,79 @@ export const AgencyToolsGrid: React.FC = () => {
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Écosystème de rétention agence</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {modules.map((m, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.05 }}
-            className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group flex items-start gap-4"
-          >
-            <div 
-                className="w-12 h-12 flex items-center justify-center rounded-xl text-2xl flex-shrink-0 transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${m.color}10` }}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {modules.map((m, i) => {
+          const Content = (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+              className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:border-slate-200 transition-all cursor-pointer group flex flex-col justify-between h-full"
             >
-              {m.icon}
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[14px] font-black text-slate-800 uppercase tracking-tighter leading-none">
-                  {m.label}
-                </span>
-                <Badge 
-                  label={m.code} 
-                  color={m.color} 
-                  bg={`${m.color}15`} 
-                  size={8} 
-                />
-              </div>
-              <p className="text-[10px] font-medium text-slate-400 leading-relaxed mb-3">
-                {m.sub}
-              </p>
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-start mb-6">
+                <div 
+                    className="w-14 h-14 flex items-center justify-center rounded-2xl text-3xl flex-shrink-0 transition-transform group-hover:scale-110"
+                    style={{ backgroundColor: m.bg }}
+                >
+                  {m.icon}
+                </div>
                 <Badge 
                   label={m.kpi} 
-                  color={m.kpiColor} 
-                  bg={`${m.kpiColor}15`} 
-                  size={9} 
+                  color={m.color} 
+                  bg={`${m.color}15`} 
+                  size={10} 
                 />
-                <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                   <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Activer</span>
-                   <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-600 transition-colors" />
+              </div>
+              
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[15px] font-black text-slate-800 uppercase tracking-tighter leading-none">
+                    {m.label}
+                  </span>
+                  <Badge 
+                    label={m.code} 
+                    color={m.color} 
+                    bg={`${m.color}10`} 
+                    size={8} 
+                  />
+                </div>
+                <p className="text-[11px] font-medium text-slate-400 leading-relaxed mb-6">
+                  {m.sub}
+                </p>
+                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-slate-900 transition-colors">Démarrer le module</span>
+                  <ChevronRight size={16} className="text-slate-300 group-hover:text-slate-900 transition-colors group-hover:translate-x-1" />
                 </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+
+          if (m.code === 'M-EDL') {
+            return (
+              <Link key={i} href="/dashboard/edl-comparator">
+                {Content}
+              </Link>
+            );
+          }
+
+          if (m.code === 'M-SIGN') {
+            return (
+              <Link key={i} href="/dashboard/lease-wizard">
+                {Content}
+              </Link>
+            );
+          }
+
+          if (m.code === 'M-RCL') {
+            return (
+              <Link key={i} href="/dashboard/rcl-monitor">
+                {Content}
+              </Link>
+            );
+          }
+
+          return <div key={i}>{Content}</div>;
+        })}
       </div>
 
       <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6">

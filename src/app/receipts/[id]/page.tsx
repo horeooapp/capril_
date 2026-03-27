@@ -11,6 +11,7 @@ import { ShieldCheck } from "lucide-react"
 export default function ReceiptVerificationPage({ params }: { params: Promise<{ id: string }> }) {
     const [receipt, setReceipt] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [viewerRole, setViewerRole] = useState<string | null>(null)
 
     useEffect(() => {
         params.then((p) => {
@@ -18,6 +19,10 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                 setReceipt(data)
                 setLoading(false)
             })
+        })
+        // Fetch session for role-based masking
+        fetch('/api/auth/session').then(res => res.json()).then(session => {
+            setViewerRole(session?.user?.role || null)
         })
     }, [params])
 
@@ -63,8 +68,18 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                     <div>
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Bailleur / Landlord</h3>
                         <div className="space-y-1">
-                            <p className="text-xl font-black text-gray-900 leading-tight">{landlord.fullName || "Identification en cours"}</p>
-                            <p className="text-sm font-bold text-[#FF8200]">{landlord.phone}</p>
+                            <p className="text-xl font-black text-gray-900 leading-tight">
+                                {viewerRole === 'TENANT' && (lease.bailleurMasque || lease.typeGestion === 'AGREE')
+                                    ? "Bailleur QAPRIL"
+                                    : (landlord.fullName || "Identification en cours")
+                                }
+                            </p>
+                            <p className="text-sm font-bold text-[#FF8200]">
+                                {viewerRole === 'TENANT' && (lease.bailleurMasque || lease.typeGestion === 'AGREE')
+                                    ? "Protégé"
+                                    : landlord.phone
+                                }
+                            </p>
                             <p className="text-xs text-gray-400 font-medium">Membre Vérifié QAPRIL</p>
                         </div>
                     </div>

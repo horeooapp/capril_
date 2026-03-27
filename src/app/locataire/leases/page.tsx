@@ -69,6 +69,29 @@ export default async function TenantLeasesPage() {
                                     {/* Lease Details */}
                                     <div className="space-y-3">
                                         <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">Propriétaire / Gestionnaire</span>
+                                            <div className="text-right">
+                                                <span className="block font-extrabold text-[#1F4E79] uppercase">
+                                                    {lease.typeGestion === 'agreee' 
+                                                        ? `Bailleur Masqué (${lease.landlord?.landlordCode || "AGREEE"})` 
+                                                        : (lease.bailleurMasque 
+                                                            ? `Bailleur Masqué (${lease.landlord?.landlordCode || "PRIVE"})` 
+                                                            : (lease.landlord?.fullName || "Non renseigné"))}
+                                                </span>
+                                                <span className="block text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">
+                                                    {lease.typeGestion === 'agreee' 
+                                                        ? "Agence agréée — substitution totale exclusive" 
+                                                        : (lease.bailleurMasque 
+                                                            ? (lease.typeGestion === 'directe' 
+                                                                ? "Gestion directe — identité non divulguée" 
+                                                                : "Intermédiaire — identité non divulguée")
+                                                            : (lease.typeGestion === 'directe' 
+                                                                ? "Gestion directe — identité visible" 
+                                                                : "Intermédiaire de gestion"))}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">Date de début</span>
                                             <span className="font-bold text-gray-900">{new Date(lease.startDate).toLocaleDateString('fr-FR')}</span>
                                         </div>

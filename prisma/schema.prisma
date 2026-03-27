@@ -882,6 +882,9 @@ model Lease {
   dateLimitePaiement Int     @default(5) @map("date_limite_paiement") // Jour du mois avant lequel le loyer est dû (ex: 5, 10, personalized)
   paiementAvance     Boolean @default(true) @map("paiement_avance")    // TRUE = payé d'avance (standard CI)
 
+  typeGestion    String? @default("directe") @map("type_gestion")
+  bailleurMasque Boolean @default(false) @map("bailleur_masque")
+
   status     String @default("DRAFT")
   importMode Boolean     @default(false) @map("import_mode")
 

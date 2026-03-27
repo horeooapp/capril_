@@ -30,7 +30,13 @@ export async function getProperties() {
                             orderBy: { paidAt: 'desc' },
                             take: 10
                         },
-                        cdcDeposits: true
+                        cdcDeposits: true,
+                        reclamations: {
+                            where: { statut: { in: ['OUVERT', 'EN_COURS'] } }
+                        },
+                        dossiersLitige: {
+                            where: { statut: { in: ['GENERE', 'TRANSMIS_CACI', 'MEDIATION_EN_COURS'] } }
+                        }
                     }
                 }
             },
