@@ -34,11 +34,7 @@ export default function WalletPage() {
     rappelJour: 1
   })
 
-  useEffect(() => {
-    loadProfile()
-  }, [])
-
-  const loadProfile = async () => {
+  const loadProfile = React.useCallback(async () => {
     const data = await getWalletProfile()
     if (data) {
       setProfile(data)
@@ -51,9 +47,9 @@ export default function WalletPage() {
       })
     }
     setLoading(false)
-  }
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     setSaving(true)
     const res = await updateWalletPreferences(prefs)
     if (res.success) {
@@ -63,7 +59,11 @@ export default function WalletPage() {
       toast.error("Erreur lors de la sauvegarde")
     }
     setSaving(false)
-  }
+  }, [prefs, loadProfile]);
+
+  useEffect(() => {
+    loadProfile()
+  }, [loadProfile])
 
   if (loading) {
     return (
