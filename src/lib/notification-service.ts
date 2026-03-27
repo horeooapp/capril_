@@ -23,6 +23,7 @@ export type EventType =
   | "FACTURE_UTILITY_DISPO"
   | "FISCAL_DEADLINE_APPROACHING"
   | "FISCAL_PAYE_CONFIRME"
+  | "DIASPORA_SLA_ALARM"
 
 interface NotificationData {
   referenceId?: string

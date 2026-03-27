@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
         // 2. Alerter le Propriétaire Diaspora (Email/SMS)
         if (landlord) {
-            await NotificationService.envoyerNotification(landlord.id, "DIA_SLA_ALARM", {
+            await NotificationService.envoyerNotification(landlord.id, "DIASPORA_SLA_ALARM", {
                 payload: {
                     smsText: `QAPRIL ALERTE : Votre mandataire (${manager?.fullName || "Non assigné"}) n'a pas réagi au signalement #${sig.id.slice(0,6)} dans le délai SLA de ${threshold}h.`,
                     parameters: [manager?.fullName || "Mandataire", sig.id.slice(0,6), String(Math.floor(hoursSinceCreation))]
