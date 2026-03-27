@@ -54,7 +54,7 @@ export default function LocataireLayoutClient({
                             { href: "/locataire/cie-sodeci", label: "CIE/SODECI", icon: <Zap size={24} /> },
                             { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
                             { href: "/locataire/preferences", label: "Profil", icon: <User size={24} /> },
-                            { href: "/manual", label: "Manuel", icon: <BookOpen size={24} /> },
+                            { href: "/locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                         ]} />
                     )}
                 </main>

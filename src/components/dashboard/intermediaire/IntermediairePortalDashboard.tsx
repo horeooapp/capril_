@@ -175,7 +175,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">💼</div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Compte</p>
                         </button>
-                        <a href="/manual" className="glass-card-premium p-6 text-center group border-t-4 border-[#5B21B6]">
+                        <a href="/dashboard/manual" className="glass-card-premium p-6 text-center group border-t-4 border-[#5B21B6]">
                             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📖</div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-[#5B21B6]">Manuel</p>
                         </a>

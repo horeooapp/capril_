@@ -75,11 +75,6 @@ export const authConfig = {
 
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
             // Ensure logged in users are on the correct portal
-            // Allow all roles to access the shared manual page
-            if (pathname.startsWith("/manual")) {
-                return true;
-            }
-
             if (auth.user.role === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
                 return Response.redirect(new URL("/locataire", nextUrl));
             }

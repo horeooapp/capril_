@@ -17,7 +17,6 @@ import {
     LogOut,
     Home,
     ChevronRight,
-    Send,
     User,
     BarChart3,
     Settings,
@@ -48,7 +47,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
                 { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
                 { href: "/locataire/preferences", label: "Profil", icon: <User size={20} /> },
-                { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+                { href: "/locataire/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }
         
@@ -60,7 +59,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} /> },
                 { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} /> },
                 { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} /> },
-                { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+                { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }
         
@@ -78,7 +77,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={20} /> },
             ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={20} /> }] : []),
             ...(diasporaAbonnement ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),
-            { href: "/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+            { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
         ]
     }
 
@@ -114,7 +113,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                             <Home size={20} />
                         </span>
                         <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] flex-1">
-                            Retour à l'Accueil
+                            Retour à l&apos;Accueil
                         </span>
                     </Link>
 

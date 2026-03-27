@@ -189,7 +189,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
               { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
               { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
               { href: "/dashboard/financial",  icon: "📊", label: "Finances",     color: T.gold },
-              { href: "/manual",               icon: "📖", label: "Manuel",       color: "#5B21B6" },
+              { href: "/dashboard/manual",               icon: "📖", label: "Manuel",       color: "#5B21B6" },
             ].map((m, i) => (
               <Link key={i} href={m.href}
                 className="glass-card-premium p-6 text-center group block border-t-4"
