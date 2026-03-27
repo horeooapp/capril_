@@ -7,10 +7,10 @@ import { NextResponse } from "next/server";
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const link = await prisma.walletRechargeLink.findUnique({
       where: { id }
@@ -20,11 +20,12 @@ export async function GET(
       return NextResponse.json({ error: "Lien introuvable" }, { status: 404 });
     }
 
-    // 1. Incrémenter le compteur de clics (Tracking conversion)
+    // 1. Incrémenter le compteur de clics & marquer comme cliqué (Tracking conversion 2026)
     await prisma.walletRechargeLink.update({
       where: { id },
       data: {
         clicsCompteur: { increment: 1 },
+        clique: true,
         cliqueAt: new Date()
       }
     });
