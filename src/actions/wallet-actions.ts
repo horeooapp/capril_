@@ -4,44 +4,49 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
+import { calculateSuggestedRecharge } from "@/lib/wallet/calculator"
 
 /**
  * [WDL-05] Récupère le profil complet du wallet pour l'UI (ADD-07 v3).
  */
 export async function getWalletProfile() {
-    const session = await auth();
-    if (!session || !session.user || !session.user.id) return null;
+    try {
+        const session = await auth();
+        if (!session || !session.user || !session.user.id) return null;
 
-    const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        include: {
-            walletRechargeConfig: true,
-            walletRechargeLinks: {
-                orderBy: { createdAt: 'desc' },
-                take: 5
-            },
-            _count: {
-                select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            include: {
+                walletRechargeConfig: true,
+                walletRechargeLinks: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 5
+                },
+                _count: {
+                    select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
+                }
             }
-        }
-    });
+        });
 
-    if (!user) return null;
+        if (!user) return null;
 
-    // Calculer les suggestions de recharge
-    const { calculateSuggestedRecharge } = await import("@/lib/wallet/calculator");
-    const suggestions = await calculateSuggestedRecharge(user.id);
+        // Calculer les suggestions de recharge (ADD-07 v3)
+        const suggestions = await calculateSuggestedRecharge(user.id);
 
-    return {
-        balance: user.walletBalance,
-        operateur: user.walletOperateurPrefere || "WAVE",
-        canal: user.walletCanalAlertePref || "WHATSAPP",
-        seuil: user.walletSeuilAlerte || 500,
-        rappel: user.walletRechargeConfig,
-        recentLinks: user.walletRechargeLinks,
-        suggestions,
-        nbBails: user._count.leasesAsLandlord
-    };
+        return {
+            balance: user.walletBalance,
+            operateur: user.walletOperateurPrefere || "WAVE",
+            canal: user.walletCanalAlertePref || "WHATSAPP",
+            seuil: user.walletSeuilAlerte || 500,
+            rappel: user.walletRechargeConfig,
+            recentLinks: user.walletRechargeLinks,
+            suggestions,
+            nbBails: user._count.leasesAsLandlord
+        };
+    } catch (error) {
+        console.error("[GET_WALLET_PROFILE_ERROR]", error);
+        return null;
+    }
 }
 
 /**

@@ -35,18 +35,24 @@ export default function WalletPage() {
   })
 
   const loadProfile = React.useCallback(async () => {
-    const data = await getWalletProfile()
-    if (data) {
-      setProfile(data)
-      setPrefs({
-        operateur: data.operateur,
-        canal: data.canal,
-        seuil: data.seuil,
-        rappelActif: data.rappel?.rappelActif ?? true,
-        rappelJour: data.rappel?.jourDuMois ?? 1
-      })
+    try {
+      const data = await getWalletProfile()
+      if (data) {
+        setProfile(data)
+        setPrefs({
+          operateur: data.operateur,
+          canal: data.canal,
+          seuil: data.seuil,
+          rappelActif: data.rappel?.rappelActif ?? true,
+          rappelJour: data.rappel?.jourDuMois ?? 1
+        })
+      }
+    } catch (err) {
+      console.error("Failed to load wallet profile:", err)
+      toast.error("Impossible de charger votre profil wallet")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, []);
 
   const handleSave = React.useCallback(async () => {
