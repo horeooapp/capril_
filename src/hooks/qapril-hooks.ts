@@ -8,8 +8,11 @@ import { useState, useEffect, useCallback } from 'react';
 // --- UTILS ---
 
 async function apiFetch(path: string, opts: any = {}) {
-  // In Next.js App, we usually use relative paths for API routes if they are on the same domain
-  const res = await fetch(`/api${path}`, {
+  // Support both relative /api (web) and absolute URLs (mobile/Capacitor)
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+  const url = path.startsWith('http') ? path : `${baseUrl}${path}`;
+
+  const res = await fetch(url, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',

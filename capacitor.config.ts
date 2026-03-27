@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.qapril.app',
+  appId: 'ci.qapril.locataire',
   appName: 'QAPRIL',
   webDir: 'out',
   server: {
