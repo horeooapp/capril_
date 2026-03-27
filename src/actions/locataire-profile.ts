@@ -34,7 +34,7 @@ async function getLocataireDashboardDataRaw(userId: string) {
         include: { 
             property: true,
             landlord: {
-                select: { fullName: true, landlordCode: true }
+                select: { fullName: true }
             },
             reclamations: {
                 where: { statut: { in: ['OUVERT', 'EN_COURS'] } }
