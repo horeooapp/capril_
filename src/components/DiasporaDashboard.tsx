@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { DiasporaDashboardData } from "@/types/diaspora";
+import { generateDiasporaInvite, simulateSepaVirement } from "@/actions/diaspora-actions";
 import { 
   BarChart3, 
   Building2, 
@@ -511,7 +512,28 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
     addBien:false,deleguer:false,selBienId:null as string | null,
     mmConfig:false,mmAjout:false,
   });
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
   
+  const handleGenerateInvite = async () => {
+    setLoading(true);
+    const res = await generateDiasporaInvite(user.id);
+    if (res.success) setInviteUrl(res.inviteUrl || "");
+    setLoading(false);
+  };
+
+  const handleExecuteVirement = async (amount: number) => {
+    setLoading(true);
+    const res = await simulateSepaVirement(amount, devise);
+    if (res.success) {
+        setMsg(res.message || "Succès");
+        setTimeout(() => setMsg(null), 5000);
+    }
+    setLoading(false);
+    cl("virement");
+  };
+
   const op = (k: string,extra={})=>setO(o=>({...o,[k]:true,...extra}));
   const cl = (k: string)=>setO(o=>({...o,[k]:false,selBienId:null}));
   const goTab = (t: string)=>{setTab(t);setSelBien(null);setSideOpen(false);};
@@ -582,10 +604,51 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
             </div>
           </div>
           <div style={{marginTop:24}}>
-            <BtnPrim label="Générer l'invitation" onClick={()=>cl("inviter")} bg={T.teal} style={{width:"100%"}}/>
+            {inviteUrl ? (
+                <div style={{background:T.grey1, padding:16, borderRadius:12, marginBottom:16}}>
+                    <div style={{fontSize:10, fontWeight:700, color:T.textLight, marginBottom:8}}>Lien généré :</div>
+                    <div style={{fontSize:11, wordBreak:"break-all", color:T.navy, fontWeight:800}}>{inviteUrl}</div>
+                    <button 
+                        onClick={() => navigator.clipboard.writeText(inviteUrl)}
+                        style={{marginTop:12, width:"100%", padding:8, background:T.navy, color:"white", borderRadius:8, fontSize:10, fontWeight:700}}
+                    >
+                        Copier le lien
+                    </button>
+                </div>
+            ) : (
+                <BtnPrim 
+                    label="Générer l'invitation" 
+                    onClick={handleGenerateInvite} 
+                    bg={T.teal} 
+                    style={{width:"100%"}}
+                    disabled={loading}
+                />
+            )}
           </div>
         </div>
       </DialogComp>
+
+      {/* Virement Modal */}
+      <DialogComp open={O.virement} onClose={()=>cl("virement")} title="Exécuter Virement SEPA" tc={T.navy}>
+        <div style={{paddingTop:12}}>
+            <RowData label="Montant disponible" value={affMontant(totalFCFA)} color={T.green} />
+            <p style={{fontSize:11, color:T.textLight, marginTop:16, marginBottom:20}}>
+                Le transfert sera exécuté via le réseau SEPA vers votre compte enregistré (Rule SEPA-01).
+            </p>
+            <BtnPrim 
+                label={`Transférer ${affMontant(totalFCFA)}`} 
+                onClick={() => handleExecuteVirement(totalFCFA)}
+                style={{width:"100%"}}
+                disabled={loading}
+            />
+        </div>
+      </DialogComp>
+
+      {msg && (
+        <div style={{position:"fixed", bottom:80, right:32, background:T.navy, color:"white", padding:"12px 24px", borderRadius:16, boxShadow:"0 10px 30px rgba(0,0,0,0.2)", zIndex:1000, fontSize:12, fontWeight:800}}>
+            {msg}
+        </div>
+      )}
     </div>
   );
 }

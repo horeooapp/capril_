@@ -1,12 +1,22 @@
-import React from 'react';
-import { T, candidats } from '@/constants/agency-data';
+import React, { useState } from 'react';
+import { T } from '@/constants/agency-data';
 import { Badge } from './Badge';
-import { ChevronRight, User, ShieldCheck } from 'lucide-react';
+import { ChevronRight, User, ShieldCheck, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { requestCandidateConsent } from '@/actions/agency-actions';
 
 const fmt = (v: number) => v.toLocaleString();
 
-export const AgencyCandidateList: React.FC = () => {
+export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidates = [] }) => {
+  const [requestingId, setRequestingId] = useState<string | null>(null);
+
+  const handleRequestAccess = async (id: string) => {
+    setRequestingId(id);
+    await requestCandidateConsent(id);
+    setRequestingId(null);
+    // In a real app, we would revalidate or update local state
+  };
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center mb-6">
@@ -20,9 +30,14 @@ export const AgencyCandidateList: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {candidats.map((c, i) => {
-          const scoreColor = (c.score || 0) >= 850 ? T.gold : (c.score || 0) >= 750 ? T.green : T.orange;
-          const scoreVisible = c.autorisation === "accordée";
+        {candidates.map((c, i) => {
+          // c.scoreQapril corresponds to ICL-CONSENT-01 score
+          const scoreValue = c.scoreQapril || 0;
+          const scoreColor = scoreValue >= 850 ? T.gold : scoreValue >= 750 ? T.green : T.orange;
+          
+          // Rule ICL-CONSENT-01: Score visible only if status is APPROVED or similar
+          const scoreVisible = c.statut === "APPROVED" || c.statut === "VALIDATED";
+          const isRequested = c.statut === "CONSENT_REQUESTED";
           
           return (
             <motion.div
@@ -40,16 +55,16 @@ export const AgencyCandidateList: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-3">
                       <span className="text-[16px] font-black text-slate-800 uppercase tracking-tighter leading-none">
-                        {c.nom}
+                        {c.fullName || c.nom}
                       </span>
                       {scoreVisible && <Badge label={`✓ Autorisé ${c.autoDate}`} color={T.green} bg={T.greenPale} size={8} />}
                     </div>
                     <div className="flex items-center gap-4 mt-2">
                       <span className="text-[12px] font-black text-slate-400 leading-none">
-                        {c.emploi}
+                        {c.profession || "Candidat"}
                       </span>
                       <span className="text-[12px] font-black text-indigo-600 uppercase tracking-widest">
-                        MAX {fmt(c.loyerMax)} FCFA
+                        MAX {fmt(c.loyerSouhaite || 0)} FCFA
                       </span>
                     </div>
                   </div>
@@ -82,8 +97,12 @@ export const AgencyCandidateList: React.FC = () => {
                         <span className="text-2xl">🔒</span>
                         <span className="text-[9px] font-black uppercase tracking-widest mt-1">Données Protégées</span>
                       </div>
-                      <button className="px-4 py-2 bg-teal-50 text-teal-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-teal-100 transition-colors border border-teal-100">
-                        Demander accès
+                      <button 
+                        onClick={() => handleRequestAccess(c.id)}
+                        disabled={requestingId === c.id}
+                        className="px-4 py-2 bg-teal-50 text-teal-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-teal-100 transition-colors border border-teal-100 flex items-center gap-2"
+                      >
+                        {requestingId === c.id ? <Loader2 size={12} className="animate-spin" /> : "Demander accès"}
                       </button>
                     </div>
                   )}

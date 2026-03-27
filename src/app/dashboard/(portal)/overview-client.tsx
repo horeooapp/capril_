@@ -64,6 +64,7 @@ export default function DashboardOverviewClient({
     regularizationAlert,
     diasporaData,
     intermData,
+    agencyData,
     tenantData
 }: { 
     user: any, 
@@ -72,6 +73,7 @@ export default function DashboardOverviewClient({
     regularizationAlert?: React.ReactNode,
     diasporaData?: DiasporaDashboardData | null,
     intermData?: any,
+    agencyData?: any,
     tenantData?: { bail: any, receipts: any[] }
 }) {
     if (user?.role === 'TENANT') {
@@ -101,7 +103,11 @@ export default function DashboardOverviewClient({
     }
 
     if (user?.role === 'AGENCY') {
-        return <AgencyPortalDashboard user={user} properties={properties || []} />;
+        return <AgencyPortalDashboard 
+            user={agencyData?.user || user} 
+            properties={agencyData?.properties || properties || []} 
+            candidatures={agencyData?.candidatures || []} 
+        />;
     }
 
     if (user?.role === 'LANDLORD' || user?.role === 'LANDLORD_PRO') {

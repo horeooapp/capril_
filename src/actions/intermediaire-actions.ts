@@ -166,6 +166,7 @@ export async function emettreQuittanceIntermediaire(data: {
     dateEncaissement?: string
 }) {
     const session = await auth()
+    if (!session?.user?.id) throw new Error("Accès refusé. Veuillez vous reconnecter.")
     const userId = session.user.id
 
     try {
@@ -207,8 +208,7 @@ export async function emettreQuittanceIntermediaire(data: {
             paymentChannel: data.paymentChannel,
             paymentReference: data.paymentReference,
             receiptType: "LOYER",
-            creatorName: manager?.fullName || "Mandataire QAPRIL",
-            receiptHash // Pass pre-calculated hash
+            creatorName: manager?.fullName || "Mandataire QAPRIL"
         })
 
         revalidatePath("/dashboard")

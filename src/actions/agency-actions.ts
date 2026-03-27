@@ -68,5 +68,97 @@ export async function getAgencyKpis(agencyId: string) {
 export async function getMyAgencyId() {
     const session = await auth();
     if (!session?.user?.id) return null;
-    return session.user.id; // Dans ce modèle, l'ID utilisateur de type AGENCY est l'agenceId
+    return session.user.id;
+}
+
+export async function getAgencyDashboardData() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Accès refusé.");
+    const userId = session.user.id;
+
+    try {
+        // 1. Get Property Accesses
+        const accesses = await (prisma as any).propertyAccess.findMany({
+            where: { userId, statut: "ACTIF" },
+            include: {
+                property: {
+                    include: {
+                        owner: { select: { fullName: true, id: true } },
+                        leases: {
+                            where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },
+                            include: {
+                                tenant: { select: { fullName: true, id: true } }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Determine Role (Chef vs Collaborateur)
+        // Rule MM-04: Collaborateurs have limited visibility
+        const isChef = session.user.role === "AGENCY" || accesses.some((a: any) => a.profil === "chef");
+        const agencyRole = isChef ? "chef" : "collaborateur";
+
+        // 3. Process Properties with Masking (Rule MM-04)
+        const processedProperties = accesses.map((acc: any) => {
+            const p = acc.property;
+            const isMasked = !isChef; // Rule MM-04: Mask for collaborators
+
+            return {
+                ...p,
+                landlord: {
+                    ...p.owner,
+                    fullName: isMasked ? (p.owner.fullName.substring(0, 3) + "***") : p.owner.fullName
+                },
+                leases: p.leases.map((l: any) => ({
+                    ...l,
+                    tenantName: isMasked ? "Locataire Masqué" : (l.tenant?.fullName || "Anonyme")
+                }))
+            };
+        });
+
+        // 4. Fetch Candidatures (M-CAND)
+        const propertyIds = accesses.map((a: any) => a.propertyId);
+        const candidatures = await (prisma as any).candidature.findMany({
+            where: { logementId: { in: propertyIds } },
+            orderBy: { createdAt: "desc" }
+        });
+
+        // 5. Apply KPI Logic (Reusing or extending getAgencyKpis logic)
+        const kpis = await getAgencyKpis(userId);
+
+        return {
+            success: true,
+            data: {
+                user: { ...session.user, agencyRole },
+                properties: processedProperties,
+                candidatures,
+                kpis
+            }
+        };
+
+    } catch (error: any) {
+        console.error("[Agency Dashboard] Error:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function requestCandidateConsent(candidatureId: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Accès refusé.");
+
+    try {
+        // Rule ICL-CONSENT-01: Update status to track request
+        await (prisma as any).candidature.update({
+            where: { id: candidatureId },
+            data: { statut: "CONSENT_REQUESTED" }
+        });
+
+        // In a real scenario, this would trigger a WhatsApp/SMS alert to the candidate
+        // For now, we simulate the action
+        return { success: true, message: "Demande de consentement envoyée au candidat." };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 }

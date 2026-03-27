@@ -22,7 +22,7 @@ import { T } from '@/constants/agency-data';
 
 type TabType = 'overview' | 'biens' | 'candidats' | 'outils';
 
-export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> = ({ user, properties }) => {
+export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], candidatures?: any[] }> = ({ user, properties, candidatures = [] }) => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   const tabs = [
@@ -132,7 +132,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[] }> =
               </div>
             )}
             {activeTab === 'biens' && <AgencyPropertyList properties={properties} user={user} />}
-            {activeTab === 'candidats' && <AgencyCandidateList />}
+            {activeTab === 'candidats' && <AgencyCandidateList candidates={candidatures} />}
             {activeTab === 'outils' && <AgencyToolsGrid />}
           </motion.div>
         </AnimatePresence>
