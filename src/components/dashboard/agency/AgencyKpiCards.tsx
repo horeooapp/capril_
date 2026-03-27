@@ -89,7 +89,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
               {k.value}
             </div>
             <div 
-              className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40"
+              className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70"
               style={{ color: k.color }}
             >
               {k.label}

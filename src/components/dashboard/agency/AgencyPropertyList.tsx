@@ -16,7 +16,7 @@ export const AgencyPropertyList: React.FC<{ properties: any[], user?: any }> = (
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Portefeuille Actif.</h2>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Index de vos actifs gérés</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Index de vos actifs gérés</p>
         </div>
         <button className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-200 transition-colors">
           Voir tout le parc ({properties.length})

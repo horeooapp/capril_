@@ -42,8 +42,8 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
       <div className="px-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
-            <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
+            <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
               Console Agence.
             </h1>
             <p className="text-sm font-medium text-gray-500 mt-2 border-l-2 border-[#1F4E79] pl-4 uppercase tracking-widest flex items-center gap-2">

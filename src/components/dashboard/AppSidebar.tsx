@@ -96,7 +96,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                         />
                         <div className="flex flex-col">
                             <span className="text-[9px] font-black tracking-[0.2em] text-[#C55A11] uppercase mt-1">
-                                {role === 'TENANT' ? 'Portal Locataire' : 'Propriétaire'}
+                                {role === 'TENANT' ? 'Portal Locataire' : role === 'AGENCY' ? 'Portal Agence' : 'Propriétaire'}
                             </span>
                         </div>
                     </Link>
