@@ -23,11 +23,21 @@ export async function calculateReliabilityScore(userId: string) {
     let score = 750; // Base score for all
     const breakdown: any = { base: 750 };
 
-    // 1. KYC (+50 pts)
-    if (user.kycLevel >= 2) {
-        score += 50;
-        breakdown.kycBonus = 50;
-    }
+    // 1. KYC Granular (+50 pts max) - REG-2026-001
+    const kycDocs = await prisma.identityDocument.findMany({
+        where: { userId, status: 'verified' }
+    });
+
+    let kycBonus = 0;
+    if (kycDocs.some(d => d.docType === 'CNI_CI' || d.docType === 'PASS_CI')) kycBonus += 20;
+    if (user.kycStatus === 'verified' && user.kycLevel >= 2) kycBonus += 15; // Assumption: level 2 implies photo verified
+    // For more precision, we'd check specific metadata or fields.
+    // Let's stick to the rule as closely as possible with existing fields.
+    if (kycDocs.some(d => d.docType === 'JUSTIF_DOMICILE')) kycBonus += 10;
+    if (user.phone) kycBonus += 5; // Phone presence implies OTP verified at registration
+
+    score += Math.min(50, kycBonus);
+    breakdown.kycBonus = kycBonus;
 
     // 2. Locataire Rules
     if (user.role === 'TENANT') {
@@ -58,7 +68,8 @@ export async function calculateReliabilityScore(userId: string) {
         const allRcl = user.leasesAsLandlord.flatMap(l => l.reclamations);
         const overSlaCount = allRcl.filter(r => {
             const hours = (Date.now() - new Date(r.createdAt).getTime()) / 3600000;
-            return r.statut === 'OUVERT' && hours > 144;
+            // Penalty if OPEN > 144h OR already CLOSED automatically (REG-2026-001)
+            return (['OUVERT', 'VU', 'EN_COURS'].includes(r.statut) && hours > 144) || (r.statut === 'FERME_AUTO');
         }).length;
 
         const slaPenalties = overSlaCount * 2;

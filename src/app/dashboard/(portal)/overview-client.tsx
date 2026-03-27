@@ -80,9 +80,33 @@ export default function DashboardOverviewClient({
         const bailInfo = tenantData?.bail;
         // Logic for bailleur masking MM-04b
         const bailleurInfo = bailInfo ? (() => {
-            if (bailInfo.typeGestion === 'agreee') return { valeur: "AG-772", mention: "Agence agréée — substitution totale exclusive" };
-            return { valeur: bailInfo.landlord?.name || "Bailleur", mention: "Gestion directe" };
-        })() : { valeur: "—", mention: "Chargement..." };
+            const isAgree = bailInfo.typeGestion === 'agreee';
+            const isMasque = bailInfo.bailleurMasque === true;
+            const landlordCode = `BAI-${(bailInfo.landlord?.id || '000').slice(0, 3).toUpperCase()}`;
+
+            if (isAgree) {
+                return { 
+                    valeur: bailInfo.landlord?.name || "Agence de Gestion", 
+                    refBailleur: landlordCode,
+                    mention: "Agence agréée — substitution totale exclusive",
+                    type: "AGENCE"
+                };
+            }
+
+            if (isMasque) {
+                return { 
+                    valeur: landlordCode, 
+                    mention: "Le propriétaire a choisi de ne pas divulguer son identité",
+                    type: "BAILLEUR"
+                };
+            }
+
+            return { 
+                valeur: bailInfo.landlord?.name || "Bailleur", 
+                mention: bailInfo.typeGestion === 'non_agreee' ? "Intermédiaire de gestion — identité visible" : "Gestion directe — identité visible",
+                type: "BAILLEUR"
+            };
+        })() : { valeur: "—", mention: "Chargement...", type: "BAILLEUR" };
 
         return (
             <TenantPortalDashboard 

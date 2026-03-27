@@ -56,26 +56,44 @@ export class NotificationService {
       const canaux_voulus = (evenementsActifs && evenementsActifs[event]) || ["sms"];
       
       const heure_ci = this.getHeureCIActuelle();
-      const hors_plage = heure_ci < prefs.heureDebut || heure_ci > prefs.heureFin;
-      
+      const hors_plage = heure_ci < (prefs.heureDebut ?? 8) || heure_ci > (prefs.heureFin ?? 20);
+
+      // REG-2026-001 : Simultaneous SMS + WhatsApp for compliance events
+      const MANDATORY_COMPLIANCE: EventType[] = [
+        'QUITTANCE_GENEREE', 
+        'PAIEMENT_RECU', 
+        'IMPAYE_DETECTE', 
+        'RAPPEL_ECHEANCE', 
+        'RECLAMATION_RECUE', 
+        'TICKET_MAINTENANCE_RESOLU',
+        'PROPOSITION_LOYER'
+      ];
+
+      const isMandatory = MANDATORY_COMPLIANCE.includes(event);
+      let canaux_a_traiter = isMandatory ? ["sms", "wa"] : canaux_voulus;
+
+      // Ensure duplicates are removed if preferences already included them
+      canaux_a_traiter = Array.from(new Set(canaux_a_traiter));
+
       const CRITIQUES = ['QUITTANCE_GENEREE', 'PAIEMENT_RECU', 'IMPAYE_DETECTE'];
-      if (hors_plage && !CRITIQUES.includes(event)) {
+      if (hors_plage && !CRITIQUES.includes(event) && !isMandatory) {
          console.info(`[NotificationService] Événement non critique hors plage horaire.`);
          return;
       }
 
       let au_moins_un_succes = false;
 
-      for (const canalStr of canaux_voulus) {
-        if (canalStr === "wa" && prefs.waActif && prefs.waVerifie) {
+      for (const canalStr of canaux_a_traiter) {
+        if (canalStr === "wa") {
+          // Force WhatsApp number if mandatory, even if waActif is false in prefs
           const ok = await this.envoyerWhatsApp(prefs.waNumero, event, data, userId);
           if (ok) au_moins_un_succes = true;
         }
-        if (canalStr === "email" && prefs.emailActif && prefs.emailVerifie) {
+        if (canalStr === "email" && prefs.emailActif && (prefs.emailVerifie || isMandatory)) {
           const ok = await this.envoyerEmail(prefs.emailAdresse, event, data, userId);
           if (ok) au_moins_un_succes = true;
         }
-        if (canalStr === "sms" && prefs.smsActif) {
+        if (canalStr === "sms") {
           const ok = await this.envoyerSMS(userId, event, data);
           if (ok) au_moins_un_succes = true;
         }

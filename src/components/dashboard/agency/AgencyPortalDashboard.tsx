@@ -33,37 +33,41 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
   ];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Agency Header - Unified with the rest of the portal */}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Mesh Background (Admin Style) */}
+      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
+      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
       <div className="px-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
+          <div className="space-y-3">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
+            <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
               Console Agence.
             </h1>
-            <p className="text-[16px] text-gray-500 font-medium tracking-wide flex items-center gap-2">
-              <span className="text-[#1F4E79] font-black uppercase">{user?.fullName || user?.name || "Agence Sans Nom"}</span>
+            <p className="text-sm font-medium text-gray-500 mt-2 border-l-2 border-[#1F4E79] pl-4 uppercase tracking-widest flex items-center gap-2">
+              <span className="text-[#1F4E79] font-black">{user?.fullName || user?.name || "Agence Sans Nom"}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-              <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11]">
-                {user?.isCertified ? "Agence Agréée QAPRIL" : "Agence en cours d'agrément"}
+              <span className="text-[10px] font-black text-[#C55A11]">
+                {user?.isCertified ? "Agréée QAPRIL" : "Certification en cours"}
               </span>
             </p>
           </div>
-          
         </div>
       </div>
 
       {/* Internal Navigation Tabs */}
       <div className="px-4">
-        <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit">
+        <div className="flex gap-2 bg-white/50 backdrop-blur-md p-2 rounded-[2rem] w-fit border border-white/50 shadow-xl shadow-blue-900/5">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-3 px-8 py-4 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#1F4E79] text-white shadow-lg shadow-blue-900/10"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-200"
+                  ? "bg-[#1F4E79] text-white shadow-xl shadow-blue-900/20"
+                  : "text-gray-400 hover:text-[#1F4E79] hover:bg-white"
               }`}
             >
               {tab.icon}
@@ -84,13 +88,14 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
             transition={{ duration: 0.3 }}
           >
             {activeTab === 'overview' && (
-              <div className="space-y-10">
+              <div className="space-y-12">
                 {/* Active Alerts - MM-07 Protocol */}
                 <div className="px-4">
-                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm">
-                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                       <ShieldCheck size={14} className="text-red-500" />
-                       Procédures MM-07 Actives
+                  <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-red-500 blur-[120px] opacity-10 -mr-40 -mt-40 group-hover:opacity-20 transition-opacity"></div>
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 relative z-10">
+                       <ShieldCheck size={16} className="text-red-500" />
+                       Interventions Prioritaires • Protocole MM-07
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {properties.flatMap(p => p.leases || [])
@@ -138,6 +143,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
         </AnimatePresence>
       </main>
 
+    </div>
     </div>
   );
 };

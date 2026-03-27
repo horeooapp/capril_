@@ -69,30 +69,27 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.1 }}
-          className="rounded-[2rem] p-8 border shadow-sm group hover:scale-[1.02] transition-all"
-          style={{ 
-            backgroundColor: k.bg, 
-            borderColor: `${k.color}20` 
-          }}
+          className="glass-card-premium p-8 group overflow-hidden border-t-4"
+          style={{ borderTopColor: k.color }}
         >
           <div className="flex justify-between items-start mb-10">
-            <div className="text-3xl">{k.icon}</div>
+            <div className="text-3xl group-hover:scale-110 transition-transform duration-500">{k.icon}</div>
             <div 
-              className="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest"
-              style={{ backgroundColor: `${k.color}15`, color: k.color }}
+              className="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border"
+              style={{ backgroundColor: `${k.color}10`, color: k.color, borderColor: `${k.color}20` }}
             >
               {k.sub}
             </div>
           </div>
           <div>
             <div 
-              className="text-2xl font-black mb-2 font-mono leading-none"
+              className="text-3xl font-black mb-2 tracking-tighter leading-none"
               style={{ color: k.color }}
             >
               {k.value}
             </div>
             <div 
-              className="text-[12px] font-black uppercase tracking-widest opacity-60"
+              className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40"
               style={{ color: k.color }}
             >
               {k.label}

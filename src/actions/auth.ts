@@ -73,7 +73,16 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
             return { error: "Code OTP incorrect ou expiré." };
         }
 
-        return { success: true };
+        // Get user status to determine redirection
+        const user = await prisma.user.findFirst({
+            where: { email: email.toLowerCase().trim() },
+            select: { onboardingComplete: true }
+        });
+
+        return { 
+            success: true, 
+            onboardingComplete: user?.onboardingComplete || false 
+        };
     } catch (error: any) {
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
              return { success: true };

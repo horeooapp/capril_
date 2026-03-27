@@ -37,7 +37,7 @@ const T = {
   gold: "#C9A84C", goldPale: "#FDF6E3",
   teal: "#0E7490", tealPale: "#E0F4F9",
   purple: "#5B21B6", purplePale: "#EDE9FE",
-  white: "#FFFFFF", bg: "#F0F4FB",
+  white: "#FFFFFF", bg: "transparent",
   grey1: "#EEF2F7", grey2: "#D6DCE8", grey3: "#8FA0BC", grey4: "#4A5B7A",
   text: "#0A1930", textMid: "#2D3F5E", textLight: "#6A7D9E",
 };
@@ -126,36 +126,68 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
     const impayes = properties.filter((p: any) => p.leases?.some((l: any) => l.receipts?.length === 0 || l.receipts[0]?.status !== 'paid'))
 
     return (
-        <div className="min-h-screen bg-[#F0F4FB] font-sans pb-32">
-            <div className="max-w-[420px] mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden">
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Mesh Background (Admin Style) */}
+            <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
+            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
                 
                 {/* Header */}
-                <header className="px-6 pt-10 pb-6 flex justify-between items-center border-b border-slate-50">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
                     <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-black text-[#0D2B6E] bg-[#0D2B6E]/5 px-2 py-0.5 rounded-md uppercase tracking-widest leading-none italic">Intermédiaire</span>
-                            {session?.user?.isCertified && <ShieldCheck size={12} className="text-teal-600" />}
-                        </div>
-                        <h1 className="text-xl font-black text-[#0D2B6E] tracking-tight uppercase italic">{session?.user?.name || "Gérant"}</h1>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2">Module de Supervision • Intermédiaire</p>
+                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+                            Bonjour, {session?.user?.name || "Gérant"}.
+                        </h1>
+                        <p className="text-sm font-medium text-gray-500 mt-3 border-l-2 border-primary pl-4 uppercase tracking-widest flex items-center gap-2">
+                            {session?.user?.isCertified ? "Gestionnaire Agréé" : "Gestionnaire Mandaté"}
+                        </p>
                     </div>
-                    <div className="relative">
-                        <button onClick={() => setTab('notifs')} className="w-11 h-11 bg-[#F8FAFC] text-slate-400 rounded-2xl flex items-center justify-center border border-slate-100 hover:text-[#0D2B6E] transition-all">
-                            <Bell size={18} />
-                            <div className="absolute top-0 right-0 w-3 h-3 bg-red-600 border-2 border-white rounded-full" />
+                    <button onClick={() => setTab('notifs')} 
+                        className="w-12 h-12 rounded-[1.25rem] bg-white border border-gray-100 shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-50 transition-all relative group">
+                        <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+                        <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                    </button>
+                </div>
+
+                {/* NAVIGATION MODULES */}
+                <section className="space-y-6">
+                    <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2">Console & Outils</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                        <button onClick={() => setTab('dashboard')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'dashboard' ? 'border-[#0D2B6E]' : 'border-transparent'}`} style={{ borderTopColor: tab === 'dashboard' ? '#0D2B6E' : '' }}>
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📊</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Accueil</p>
+                        </button>
+                        <button onClick={() => setTab('biens')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'biens' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🏘️</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Biens</p>
+                        </button>
+                        <button onClick={() => setSheet('quittanceForm')} className="glass-card-premium p-6 text-center group border-t-4 border-[#1A7A3C]">
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🧾</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#1A7A3C]">Q-Cert</p>
+                        </button>
+                        <button onClick={() => setTab('quittances')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'quittances' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📜</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Histo</p>
+                        </button>
+                        <button onClick={() => setTab('compte')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'compte' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
+                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">💼</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Compte</p>
                         </button>
                     </div>
-                </header>
+                </section>
 
-                <main className="px-6 pt-6">
+                <main className="pt-6">
                     <AnimatePresence mode="wait">
                         {tab === 'dashboard' && (
                             <motion.div key="dashboard" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-6">
                                 {/* KPI Grid */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <KpiCard label="Encaissement" value={fmt(stats.encaisse)} unit="F" icon={TrendingUp} color={T.green} bg={T.greenPale} sub="Avril 2026" />
-                                    <KpiCard label="Commissions" value={fmt(Math.round(stats.totalCommissions))} unit="F" icon={Briefcase} color={T.gold} bg={T.goldPale} sub="Dues" />
-                                    <KpiCard label="Impayés" value={impayes.length} unit="Log." icon={AlertTriangle} color={T.red} bg={T.redPale} sub="J+5 Alert" />
-                                    <KpiCard label="Mandats" value={mandates.length} unit="Actifs" icon={ShieldCheck} color={T.navy} bg={T.navyPale} sub="Contrats" />
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                                    <KpiCard label="Encaissement" value={fmt(stats.encaisse)} unit="F" icon={TrendingUp} color={T.green} bg="white" sub="Collecte Mensuelle" />
+                                    <KpiCard label="Commissions" value={fmt(Math.round(stats.totalCommissions))} unit="F" icon={Briefcase} color={T.gold} bg="white" sub="Droit perçu" />
+                                    <KpiCard label="Impayés" value={impayes.length} unit="Log." icon={AlertTriangle} color={T.red} bg="white" sub="Alerte J+5" />
+                                    <KpiCard label="Mandats" value={mandates.length} unit="Actifs" icon={ShieldCheck} color={T.navy} bg="white" sub="Contrats Gérés" />
                                 </div>
 
                                 {/* Urgent Actions */}
@@ -367,19 +399,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                     </AnimatePresence>
                 </main>
 
-                {/* Bottom Navigation */}
-                <nav className="fixed bottom-0 left-0 right-0 max-w-[420px] mx-auto bg-white/95 backdrop-blur-xl border-t border-slate-100 px-3 py-2 flex justify-between items-center z-50">
-                    <TabBtn id="dashboard" icon={BarChart3} label="Accueil" active={tab} onClick={() => setTab('dashboard')} />
-                    <TabBtn id="biens" icon={Building2} label="Biens" active={tab} onClick={() => setTab('biens')} />
-                    <div className="flex flex-col items-center flex-1 -mt-10">
-                        <button onClick={() => { setSheet('quittanceForm'); }} className="w-14 h-14 bg-[#1A7A3C] text-white rounded-[22px] shadow-xl shadow-green-900/20 flex items-center justify-center rotate-45 active:scale-90 transition-all border-4 border-white">
-                            <Plus size={28} className="-rotate-45" />
-                        </button>
-                        <span className="text-[8px] font-black text-green-700 uppercase tracking-widest mt-2 bg-green-50 px-2 py-0.5 rounded-full leading-none">Q-Cert</span>
-                    </div>
-                    <TabBtn id="quittances" icon={Receipt} label="Quitt." active={tab} onClick={() => setTab('quittances')} />
-                    <TabBtn id="compte" icon={Wallet} label="Compte" active={tab} onClick={() => setTab('compte')} />
-                </nav>
+
 
                 {/* Sheets */}
                 <Sheet open={sheet === 'quittanceForm'} onClose={() => setSheet(null)} title="Certification Quittance">

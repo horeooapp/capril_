@@ -4,16 +4,16 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { updateProfile } from "@/actions/users"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 
 type Step = 'ROLE' | 'PROFILE' | 'KYC' | 'COMPLETE'
 
 const profiles = [
-    { id: 'LANDLORD', title: 'Propriétaire', icon: '🏠', desc: 'Je gère mes propres biens immobiliers.' },
-    { id: 'CERTIFIED_AGENCY', title: 'Agence Agréée', icon: '🏢', desc: 'Agence immobilière certifiée avec carte professionnelle.' },
-    { id: 'NON_CERTIFIED_AGENCY', title: 'Agence Non Agréée', icon: '🏘️', desc: 'Structure de gestion immobilière en cours de certification.' },
-    { id: 'INTERMEDIARY', title: 'Intermédiaire', icon: '🤝', desc: 'Apporteur d\'affaires ou démarcheur indépendant.' },
-    { id: 'DIASPORA', title: 'Diaspora', icon: '✈️', desc: 'Ivoirien résidant à l\'étranger gérant des biens au pays.' },
-    { id: 'TENANT', title: 'Locataire', icon: '🔑', desc: 'Je cherche ou je loue déjà un logement sur QAPRIL.' },
+    { id: 'LANDLORD', title: 'Propriétaire', icon: '🏠', desc: 'Gestion de patrimoine propre.' },
+    { id: 'CERTIFIED_AGENCY', title: 'Agence Agréée', icon: '🏢', desc: 'Certification & carte professionnelle.' },
+    { id: 'NON_CERTIFIED_AGENCY', title: 'Agence Non Agréée', icon: '🏘️', desc: 'Structure en cours de certification.' },
+    { id: 'INTERMEDIARY', title: 'Intermédiaire', icon: '🤝', desc: 'Apporteur d\'affaires indépendant.' },
+    { id: 'DIASPORA', title: 'Diaspora', icon: '✈️', desc: 'Ivoirien résidant à l\'étranger.' },
 ]
 
 export default function OnboardingPage() {
@@ -42,16 +42,16 @@ export default function OnboardingPage() {
     }
 
     const renderProgress = () => {
-        const steps = ['Rôle', 'Profil', 'Identité']
+        const steps = ['Type d\'accès', 'Profil', 'Identité']
         const currentIdx = step === 'ROLE' ? 0 : step === 'PROFILE' ? 1 : 2
         return (
-            <div className="flex items-center justify-between mb-8 max-w-xs mx-auto">
+            <div className="flex items-center justify-between mb-12 max-w-sm mx-auto">
                 {steps.map((s, i) => (
-                    <div key={s} className="flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${i <= currentIdx ? 'bg-[#FF8200] text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    <div key={s} className="flex flex-col items-center relative group">
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-black transition-all ${i <= currentIdx ? 'bg-[#C55A11] text-white shadow-lg shadow-orange-950/20' : 'bg-white/50 text-gray-400 border border-gray-100'}`}>
                             {i + 1}
                         </div>
-                        <span className={`text-[10px] mt-1 font-medium ${i <= currentIdx ? 'text-[#FF8200]' : 'text-gray-400'}`}>{s}</span>
+                        <span className={`text-[9px] mt-2 font-black uppercase tracking-widest ${i <= currentIdx ? 'text-[#C55A11]' : 'text-gray-400'}`}>{s}</span>
                     </div>
                 ))}
             </div>
@@ -59,46 +59,62 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center mb-4">
-                    <img src="/logo.png" alt="QAPRIL Logo" className="h-12 w-auto" />
+        <div className="min-h-screen relative flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans overflow-hidden">
+            {/* Mesh Background (Admin Style) */}
+            <div className="fixed inset-0 bg-mesh -z-20 opacity-80"></div>
+            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+
+            <div className="sm:mx-auto sm:w-full sm:max-w-2xl relative z-10">
+                <div className="flex justify-center mb-8">
+                    <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto drop-shadow-2xl" />
                 </div>
-                <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                    Configuration du compte
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-500">
-                    Complétez ces étapes pour commencer à utiliser QAPRIL.
-                </p>
+                <div className="text-center space-y-4 mb-16">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md border border-white/50 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-[#C55A11] shadow-sm">
+                        Certification État Ivroirien
+                    </div>
+                    <h2 className="text-5xl lg:text-6xl font-[1000] text-[#1F4E79] tracking-tighter uppercase leading-none">
+                        Configuration <br />
+                        <span className="italic font-serif normal-case text-gray-900">de votre supervision.</span>
+                    </h2>
+                </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-4xl relative z-10 px-4">
+                <div className="glass-card-premium py-12 px-8 sm:px-16 rounded-[3rem] border border-white/50 shadow-2xl">
                     {renderProgress()}
                     
                     {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-6">
+                        <div className="bg-red-50/50 backdrop-blur-md border border-red-100 text-red-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-10 flex items-center gap-3 animate-shake">
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                             {error}
                         </div>
                     )}
 
                     {step === 'ROLE' && (
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-black text-slate-800 mb-4 uppercase tracking-tighter">Quel est votre profil ?</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-10">
+                            <div className="text-center border-b border-gray-100 pb-8 mb-8">
+                                <h3 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Choisissez votre profil.</h3>
+                                <p className="text-[14px] text-gray-400 font-medium">Déterminez votre niveau d'accès à l'infrastructure.</p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {profiles.map((p) => (
                                     <div 
                                         key={p.id}
                                         onClick={() => setSelectedProfile(p.id)}
-                                        className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col gap-2 group ${selectedProfile === p.id ? 'border-[#FF8200] bg-orange-50/30' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}
+                                        className={`glass-card-premium p-8 cursor-pointer transition-all flex flex-col gap-6 relative group border ${selectedProfile === p.id ? 'border-[#C55A11] bg-orange-50/20' : 'border-white/40 hover:border-gray-200 bg-white/30'}`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="text-2xl group-hover:scale-110 transition-transform">{p.icon}</span>
-                                            {selectedProfile === p.id && <div className="w-5 h-5 bg-[#FF8200] rounded-full flex items-center justify-center text-[10px] text-white font-bold">✓</div>}
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform ${selectedProfile === p.id ? 'bg-[#C55A11] text-white' : 'bg-gray-100'}`}>
+                                                {p.icon}
+                                            </div>
+                                            {selectedProfile === p.id && (
+                                                <div className="w-6 h-6 bg-[#C55A11] rounded-xl flex items-center justify-center text-[10px] text-white font-bold shadow-lg shadow-orange-950/20">✓</div>
+                                            )}
                                         </div>
                                         <div>
-                                            <h4 className="font-black text-[13px] text-slate-900 uppercase tracking-tight">{p.title}</h4>
-                                            <p className="text-[10px] leading-tight text-slate-500 mt-1 font-medium italic">{p.desc}</p>
+                                            <h4 className="font-[1000] text-[16px] text-gray-900 uppercase tracking-tighter italic leading-none mb-2">{p.title}</h4>
+                                            <p className="text-[11px] leading-relaxed text-gray-500 font-medium uppercase tracking-widest opacity-60">{p.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -107,46 +123,56 @@ export default function OnboardingPage() {
                     )}
 
                     {step === 'PROFILE' && (
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Informations personnelles</h3>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Nom complet</label>
-                                <input 
-                                    type="text" 
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
-                                    placeholder="Ex: Jean Kouassi"
-                                />
+                        <div className="max-w-md mx-auto space-y-8 py-8 text-center">
+                             <div className="mb-12">
+                                <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Informations d'identité.</h3>
+                                <p className="text-[14px] text-gray-400 font-medium">Saisissez vos informations officielles.</p>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-                                <input 
-                                    type="email" 
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#FF8200] focus:border-[#FF8200] sm:text-sm"
-                                    placeholder="jean.k@exemple.com"
-                                />
+                            
+                            <div className="space-y-6 text-left">
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom Complet (État Civil)</label>
+                                    <input 
+                                        type="text" 
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-[#C55A11] outline-none transition-all font-bold text-gray-900"
+                                        placeholder="Ex: Jean Kouassi"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Adresse E-mail de Supervision</label>
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-[#C55A11] outline-none transition-all font-bold text-gray-900"
+                                        placeholder="votre@email.com"
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {step === 'KYC' && (
                         <KYCStep onComplete={() => {
-                            if (selectedProfile === 'TENANT') router.push('/locataire');
-                            else router.push('/dashboard');
+                            router.push('/dashboard');
                         }} />
                     )}
 
                     {step !== 'KYC' && (
-                        <div className="mt-8">
+                        <div className="mt-16 flex justify-center">
                             <button
                                 onClick={handleNext}
                                 disabled={isPending || (step === 'ROLE' && !selectedProfile) || (step === 'PROFILE' && (!fullName || !email))}
-                                className="w-full h-14 flex justify-center items-center px-4 border border-transparent rounded-[1.2rem] shadow-xl text-xs font-black uppercase tracking-[0.2em] text-white bg-[#FF8200] hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF8200] disabled:opacity-50 transition-all active:scale-95"
+                                className="px-16 py-6 bg-gray-900 hover:bg-black text-white rounded-3xl shadow-2xl shadow-gray-900/20 text-[11px] font-black uppercase tracking-[0.3em] transition-all active:scale-95 disabled:opacity-30 disabled:grayscale flex items-center gap-4"
                             >
-                                {isPending ? 'Mise à jour du profil...' : 'Suivant : Identité →'}
+                                {isPending ? 'Mise à jour...' : (
+                                    <>
+                                        {step === 'ROLE' ? 'Confirmer mon choix' : 'Passer à l\'identité'}
+                                        <ArrowRight size={18} />
+                                    </>
+                                )}
                             </button>
                         </div>
                     )}

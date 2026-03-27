@@ -44,7 +44,7 @@ const T = {
   gold:"#C9A84C",goldPale:"#FDF6E3",
   teal:"#0E7490",tealPale:"#E0F4F9",
   purple:"#5B21B6",purplePale:"#EDE9FE",
-  white:"#FFFFFF",bg:"#F0F4FB",
+  white:"#FFFFFF",bg:"transparent",
   grey1:"#EEF2F7",grey2:"#D6DCE8",grey3:"#8FA0BC",grey4:"#4A5B7A",
   text:"#0A1930",textMid:"#2D3F5E",textLight:"#6A7D9E",
   diaspora:"#0E3A8C",
@@ -79,18 +79,21 @@ const RowData=({label,value,color,sub}: any)=>(
 );
 
 const SecTitle = ({ label, right }: { label: string, right?: React.ReactNode }) => (
-  <div className="flex justify-between items-center mb-4">
-    <div className="text-[12px] font-black text-[#6A7D9E] tracking-[0.2em] uppercase">{label}</div>
+  <div className="flex justify-between items-center mb-6 px-2">
+    <div className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{label}</div>
     {right}
   </div>
 );
 
-const Card=({children,style={}}: any)=>(
-  <div style={{background:T.white,borderRadius:16,border:`1px solid ${T.grey2}`,boxShadow:"0 1px 6px rgba(13,43,110,.06)",padding:"20px 24px",...style}}>{children}</div>
+const Card = ({ children, className = "" }: any) => (
+  <div className={`glass-card-premium p-8 rounded-[2.5rem] border border-gray-100 ${className}`}>
+    {children}
+  </div>
 );
-const CardTitle=({label,right}: any)=>(
-  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-    <div style={{fontSize:13,fontWeight:800,color:T.text,textTransform:"uppercase",letterSpacing:1}}>{label}</div>
+
+const CardTitle = ({ label, right }: any) => (
+  <div className="flex justify-between items-center mb-6">
+    <div className="text-[11px] font-black text-gray-900 uppercase tracking-widest">{label}</div>
     {right}
   </div>
 );
@@ -150,24 +153,22 @@ interface DiasporaDashboardProps {
 }
 
 const Sidebar = ({bp, sideOpen, tab, goTab, data}: any)=>(
-  <div style={{
-    width:bp.isMobile?280:bp.isDesktop?260:80,background:T.navyDark,
-    minHeight:"100vh",display:"flex",flexDirection:"column",flexShrink:0,
-    position:bp.isMobile?"fixed":"relative",
-    top:0,left:bp.isMobile?(sideOpen?0:-300):"auto",
-    zIndex:300,transition:"left .25s",
-    boxShadow: "10px 0 40px rgba(0,0,0,0.1)"
-  }}>
-    <div style={{padding:"32px 24px 24px",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
-      {(bp.isDesktop||bp.isMobile)?(
+  <div className={`flex flex-col flex-shrink-0 transition-all duration-300 z-[300] border-r border-[#1a1a1a] shadow-2xl ${
+    bp.isMobile ? (sideOpen ? "fixed left-0 w-[280px]" : "fixed -left-[300px] w-[280px]") : (bp.isDesktop ? "w-[260px]" : "w-[80px]")
+  }`} style={{ background: "#0F172A", minHeight: "100vh" }}>
+    <div className="fixed inset-0 bg-mesh-dark opacity-10 pointer-events-none -z-10"></div>
+    <div className="p-10 border-b border-white/5 space-y-4">
+      {bp.isDesktop || bp.isMobile ? (
         <div>
-          <div style={{fontSize:24,fontWeight:900,color:T.white,letterSpacing:2,fontStyle:"italic"}}>QAPRIL.</div>
-          <div style={{marginTop:8,display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(90deg,#C9A84C,#B8860B)",borderRadius:8,padding:"4px 12px shadow-lg"}}>
-            <Plane size={12} color={T.white} />
-            <span style={{fontSize:10,fontWeight:900,color:T.white,letterSpacing:1.5}}>DIASPORA</span>
+          <div className="text-3xl font-black text-white tracking-tighter italic">QAPRIL.</div>
+          <div className="mt-4 inline-flex items-center gap-2 bg-primary/20 text-primary border border-primary/20 px-4 py-1.5 rounded-lg">
+            <Plane size={14} className="animate-pulse" />
+            <span className="text-[10px] font-black tracking-widest uppercase">DIASPORA</span>
           </div>
         </div>
-      ):<div style={{textAlign:"center",fontSize:22}}><Plane color={T.white} /></div>}
+      ) : (
+        <div className="flex justify-center text-white"><Plane size={24} /></div>
+      )}
     </div>
     <nav style={{flex:1,padding:"20px 0"}}>
       {TABS.map(t=>{
@@ -202,36 +203,42 @@ const Sidebar = ({bp, sideOpen, tab, goTab, data}: any)=>(
 );
 
 const Topbar = ({selBien, setSelBien, bp, setSideOpen, tab, user, data, devise, setDevise, op, impayesN, alertesSLA}: any)=>(
-  <div style={{height:72,background:T.white,borderBottom:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 32px",flexShrink:0,boxShadow:"0 4px 20px rgba(13,43,110,.03)",position:"sticky",top:0,zIndex:100}}>
-    <div style={{display:"flex",alignItems:"center",gap:20}}>
+  <div className="h-24 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-100 shadow-sm">
+    <div className="flex items-center gap-8">
       {selBien ? (
-        <button onClick={()=>setSelBien(null)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,color:T.navy,fontWeight:800}}>
-          <ArrowLeft size={18}/> {bp.isDesktop && "Retour"}
+        <button onClick={()=>setSelBien(null)} className="h-12 px-6 bg-gray-50 border border-gray-100 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest text-[#0D2B6E] flex items-center gap-3 hover:bg-white transition-all">
+          <ArrowLeft size={16}/> {bp.isDesktop && "Retour"}
         </button>
       ) : bp.isTablet && (
-        <button onClick={()=>setSideOpen((s: any)=>!s)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer"}}><BarChart3 size={20}/></button>
+        <button onClick={()=>setSideOpen((s: any)=>!s)} className="h-12 w-12 bg-gray-50 border border-gray-100 rounded-[1.25rem] flex items-center justify-center text-[#0D2B6E]"><BarChart3 size={20}/></button>
       )}
       <div>
-        <div style={{fontSize:18,fontWeight:940,color:T.navy,textTransform:"uppercase",letterSpacing:1,display:"flex",alignItems:"center",gap:10}}>
-          {TABS.find(t=>t.id===tab)?.label}
-          {selBien && <span style={{color:T.gold,fontSize:14,fontWeight:800}}>— {selBien.name}</span>}
+        <div className="flex items-center gap-4">
+          <p className="text-2xl font-black text-gray-900 tracking-tighter uppercase">
+            {TABS.find(t=>t.id===tab)?.label}
+          </p>
+          {selBien && <span className="text-primary font-black text-sm uppercase tracking-widest leading-none border-l-2 border-primary pl-4">{selBien.name}</span>}
         </div>
-        <div style={{fontSize:11,color:T.textLight,fontWeight:700}}>{user.fullName || user.name} · Diaspora Premium · {data.settings?.pays || "France"}</div>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">
+          {user.fullName || user.name} • Diaspora Premium • {data.settings?.pays || "France"}
+        </p>
       </div>
     </div>
-    <div style={{display:"flex",alignItems:"center",gap:20}}>
-      <div style={{background:T.grey1,borderRadius:12,padding:"6px",display:"flex",gap:4,boxShadow:"inset 0 2px 4px rgba(0,0,0,0.05)"}}>
+    <div className="flex items-center gap-6">
+      <div className="bg-gray-50 p-1.5 rounded-[1.25rem] border border-gray-100 flex gap-2">
         {["FCFA","EUR"].map(d=>(
-          <button key={d} onClick={()=>setDevise(d)} style={{background:d===devise?T.navy:"transparent",border:"none",borderRadius:9,padding:"6px 16px",fontSize:11,fontWeight:800,color:d===devise?T.white:T.textLight,cursor:"pointer",transition:"all 0.2s"}}>
+          <button key={d} onClick={()=>setDevise(d)} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${d===devise ? 'bg-primary text-white shadow-lg shadow-orange-500/20' : 'text-gray-400 hover:text-gray-600'}`}>
             {d==="EUR"?"€ EUR":"XOF"}
           </button>
         ))}
       </div>
-      <button onClick={()=>op("notifs")} style={{position:"relative",background:T.grey1,border:"none",borderRadius:12,padding:"10px 14px",cursor:"pointer",transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.background=T.grey2} onMouseLeave={e=>e.currentTarget.style.background=T.grey1}>
-        <Bell size={20} color={T.navy}/>
-        {(impayesN > 0 || alertesSLA > 0) && <span style={{position:"absolute",top:8,right:8,width:10,height:10,borderRadius:"50%",background:T.red,border:`2px solid ${T.white}`,boxShadow:"0 0 10px rgba(160,0,0,0.5)"}}/>}
+      <button onClick={()=>op("notifs")} className="w-12 h-12 bg-white border border-gray-100 rounded-[1.25rem] flex items-center justify-center relative group hover:bg-gray-50 transition-all">
+        <Bell size={20} className="text-gray-900 group-hover:rotate-12 transition-transform" />
+        {(impayesN > 0 || alertesSLA > 0) && <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />}
       </button>
-      <BtnPrim label="Inviter un gestionnaire" onClick={()=>op("inviter")} icon={<Smartphone size={16}/>}/>
+      <button onClick={()=>op("inviter")} className="h-12 px-8 bg-gray-900 text-white rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary transition-all shadow-xl shadow-gray-900/10">
+        INVITER GESTIONNAIRE
+      </button>
     </div>
   </div>
 );
@@ -551,27 +558,37 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   const DialogComp = bp.isMobile ? MobileDialog : Modal;
 
   return (
-    <div style={{display:"flex",minHeight:"100vh",background:T.bg,fontFamily:"Inter, sans-serif",color:T.text}}>
+    <>
+      <div className="flex min-h-screen relative overflow-hidden font-sans text-gray-900">
+      {/* Mesh Background (Admin Style) */}
+      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
+      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+
       <Sidebar bp={bp} sideOpen={sideOpen} tab={tab} goTab={goTab} data={data} />
-      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+
+      <div className="flex-1 flex flex-col min-w-0 relative z-10">
         <Topbar selBien={selBien} setSelBien={setSelBien} bp={bp} setSideOpen={setSideOpen} tab={tab} user={user} data={data} devise={devise} setDevise={setDevise} op={op} impayesN={impayesN} alertesSLA={alertesSLA} />
-        <div style={{flex:1,padding:bp.isMobile?"16px":"32px",overflowY:"auto"}}>
-          <Content tab={tab} bp={bp} totalFCFA={totalFCFA} affMontant={affMontant} encFCFA={encFCFA} impayesN={impayesN} alertesSLA={alertesSLA} properties={properties} op={op} goTab={goTab} selBien={selBien} setSelBien={setSelBien} data={data} />
-        </div>
-        {bp.isMobile && (
-          <div style={{height:64,background:T.navyDark,position:"fixed",bottom:0,left:0,right:0,display:"flex",alignItems:"center",justifyContent:"space-around",borderTop:`1px solid rgba(255,255,255,.1)`,zIndex:400}}>
-            {TABS.slice(0,4).map(t=>(
-              <button key={t.id} onClick={()=>goTab(t.id)} style={{background:"none",border:"none",color:tab===t.id?T.gold:T.white,opacity:tab===t.id?1:0.5,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-                {t.icon}
-                <span style={{fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{t.label.split(" ")[0]}</span>
-              </button>
-            ))}
-            <button onClick={()=>setSideOpen(true)} style={{background:"none",border:"none",color:T.white,opacity:0.5}}>
-              <Settings2 size={18}/>
-              <span style={{fontSize:9,fontWeight:700,textTransform:"uppercase"}}>Plus</span>
+        
+        <main className="flex-1 p-8 sm:p-12 overflow-y-auto">
+          <Content tab={tab} bp={bp} totalFCFA={totalFCFA} affMontant={affMontant} encFCFA={encFCFA} impayesN={impayesN} alertesSLA={alertesSLA} 
+                   properties={properties} op={op} goTab={goTab} selBien={selBien} setSelBien={setSelBien} data={data} />
+        </main>
+      </div>
+
+      {bp.isMobile && (
+        <div className="h-20 bg-gray-900/90 backdrop-blur-xl fixed bottom-0 left-0 right-0 flex items-center justify-around border-t border-white/10 z-[400] px-4">
+          {TABS.slice(0,4).map(t=>(
+            <button key={t.id} onClick={()=>goTab(t.id)} className={`flex flex-col items-center gap-1.5 transition-all ${tab===t.id ? 'text-primary' : 'text-white/40'}`}>
+              <div className={`p-2 rounded-xl ${tab===t.id ? 'bg-primary/10' : ''}`}>{t.icon}</div>
+              <span className="text-[8px] font-black uppercase tracking-widest">{t.label.split(" ")[0]}</span>
             </button>
-          </div>
-        )}
+          ))}
+          <button onClick={()=>setSideOpen(true)} className="flex flex-col items-center gap-1.5 text-white/40">
+            <div className="p-2 grow flex items-center justify-center"><Settings2 size={18}/></div>
+            <span className="text-[8px] font-black uppercase tracking-widest">Plus</span>
+          </button>
+        </div>
+      )}
       </div>
 
       {/* ── OVERLAYS ── */}
@@ -645,10 +662,10 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
       </DialogComp>
 
       {msg && (
-        <div style={{position:"fixed", bottom:80, right:32, background:T.navy, color:"white", padding:"12px 24px", borderRadius:16, boxShadow:"0 10px 30px rgba(0,0,0,0.2)", zIndex:1000, fontSize:12, fontWeight:800}}>
+        <div className="fixed bottom-20 right-8 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[1000] text-[10px] font-black uppercase tracking-widest border border-white/10 animate-slide-up">
             {msg}
         </div>
       )}
-    </div>
+    </>
   );
 }

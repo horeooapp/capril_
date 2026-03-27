@@ -63,17 +63,21 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
   const scColor = sc >= 850 ? T.green : sc >= 700 ? T.teal : sc >= 550 ? T.orange : T.red;
 
   return (
-    <div className="min-h-screen bg-[#F2F5FA]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Mesh Background (Admin Style) */}
+      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
+      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
 
         {/* HEADER */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <p className="text-[10px] text-[#8FA0BC] font-bold uppercase tracking-widest mb-1">Espace Locataire</p>
-            <h1 className="text-2xl font-black text-[#0D2B6E] uppercase">
-              Bonjour, {session?.user?.name?.split(" ")[0] || "Locataire"} 👋
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2">Espace Locataire • Supervision</p>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+              Bonjour, {session?.user?.name?.split(" ")[0] || "Locataire"}.
             </h1>
-            <p className="text-sm text-[#6A7D9E] mt-1">
+            <p className="text-sm font-medium text-gray-500 mt-3 border-l-2 border-primary pl-4 uppercase tracking-widest">
               Bail {mainBail?.leaseReference || "—"} · {mainBail?.property?.name || "—"}
             </p>
           </div>
@@ -85,9 +89,9 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
         </div>
 
         {/* MODULES EN HAUT */}
-        <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4 text-center">Mes modules</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        <section className="space-y-6">
+          <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2">Console & Outils</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             {[
               { href: "/locataire/leases",   icon: "📄", label: "Mon Bail",      color: T.teal },
               { href: "/locataire/receipts", icon: "🧾", label: "Paiements",     color: T.green },
@@ -96,10 +100,10 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
               { href: "/locataire/trust",    icon: "🎫", label: "Score ICL",     color: T.gold },
             ].map((m, i) => (
               <Link key={i} href={m.href}
-                className="bg-white border border-[#D6DCE8] rounded-2xl p-4 text-center hover:shadow-md transition-all group block"
-                style={{ borderTopWidth: 3, borderTopColor: m.color }}>
-                <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">{m.icon}</div>
-                <p className="text-[11px] font-black" style={{ color: m.color }}>{m.label}</p>
+                className="glass-card-premium p-6 text-center group block border-t-4"
+                style={{ borderTopColor: m.color }}>
+                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-500">{m.icon}</div>
+                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: m.color }}>{m.label}</p>
               </Link>
             ))}
           </div>
@@ -115,11 +119,8 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
             </div>
             <Link href="/locataire/leases" className="flex-shrink-0 bg-[#A00000] text-white px-4 py-2 rounded-xl text-xs font-black uppercase">Voir →</Link>
           </div>
-        )}
-
-        {/* KPIs */}
+        )}        {/* KPIs */}
         <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Indicateurs clés</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard label="Loyer / mois" value={`${fmt(mainBail?.rentAmount)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/locataire/leases" />
             <StatCard label="Quittances" value={data?.quittances?.length || 0} icon="🧾" color={T.green} bg={T.greenPale} href="/locataire/receipts" />
@@ -129,25 +130,25 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
         </section>
 
         {/* MON LOGEMENT */}
-        <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Mon installation</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <section className="space-y-6">
+          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] px-2">État de l&apos;installation</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Carte logement */}
-            <Link href="/locataire/leases" className="bg-white rounded-2xl p-6 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
-              <div className="flex justify-between items-start mb-4">
+            <Link href="/locataire/leases" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group">
+              <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h3 className="text-base font-black text-[#0D2B6E]">{mainBail?.property?.name || "Propriété"}</h3>
-                  <p className="text-xs text-[#6A7D9E] mt-1">{mainBail?.property?.address || "—"}</p>
+                  <h3 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">{mainBail?.property?.name || "Propriété"}</h3>
+                  <p className="text-xs font-medium text-gray-400 mt-2 uppercase tracking-widest">{mainBail?.property?.address || "—"}</p>
                 </div>
-                <Badge label={mainBail?.status || "ACTIF"} color={T.teal} bg={T.tealPale} />
+                <Badge label={mainBail?.status || "ACTIF"} color="white" bg={T.teal} />
               </div>
               <div className="flex gap-2 flex-wrap mb-4">
                 <Badge label="BAIL CERTIFIÉ" bg={T.navyPale} color={T.navy} size={9} />
                 <Badge label={`ÉCHÉANCE J-${data?.nextPaymentInDays ?? "?"}`} bg={T.orangePale} color={T.orange} size={9} />
               </div>
-              <div className="bg-[#F2F5FA] rounded-xl p-3 flex justify-between items-center text-xs">
-                <span className="text-[#6A7D9E] font-medium">Bailleur / Gestion</span>
-                <span className="font-black text-[#2D3F5E]">
+              <div className="bg-gray-50 rounded-2xl p-6 flex justify-between items-center text-xs border border-gray-100">
+                <span className="text-gray-400 font-black uppercase tracking-widest">Bailleur / Gestion</span>
+                <span className="font-black text-gray-900 uppercase tracking-tighter">
                   {mainBail?.typeGestion === "agreee"
                     ? `Masqué (Agence agréée)`
                     : (mainBail?.bailleurMasque ? "Identité masquée" : mainBail?.landlord?.fullName || "—")}
@@ -162,22 +163,23 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
             </Link>
 
             {/* Prochain paiement */}
-            <div className="bg-white rounded-2xl p-6 border border-[#D6DCE8] shadow-sm">
-              <h4 className="text-xs font-black text-[#6A7D9E] uppercase tracking-widest mb-4">Prochain paiement</h4>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-black flex-shrink-0"
-                  style={{ background: (data?.nextPaymentInDays <= 5 ? T.red : T.teal) + "20", color: data?.nextPaymentInDays <= 5 ? T.red : T.teal }}>
+            <div className="bg-gray-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary blur-[100px] opacity-20 -mr-32 -mt-32 group-hover:opacity-40 transition-opacity"></div>
+              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-8">Paiement Échéance</h4>
+              <div className="flex items-center gap-6 mb-10">
+                <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl font-black flex-shrink-0 border border-white/10 bg-white/5"
+                  style={{ color: data?.nextPaymentInDays <= 5 ? T.red : T.teal }}>
                   {data?.nextPaymentInDays ?? "?"}
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-[#0D2B6E]">{data?.nextPaymentInDays <= 5 ? "URGENT" : "jours"}</p>
-                  <p className="text-xs text-[#6A7D9E] mt-1">Loyer dû le {mainBail?.paymentDay || 5} du mois</p>
-                  <p className="text-sm font-black text-[#0D2B6E] mt-1">{fmt(mainBail?.rentAmount)} FCFA</p>
+                  <p className="text-3xl font-black tracking-tighter uppercase">{data?.nextPaymentInDays <= 5 ? "ALERTE" : "Jours"}</p>
+                  <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Échéance : {mainBail?.paymentDay || 5} du mois</p>
+                  <p className="text-xl font-black text-primary mt-2">{fmt(mainBail?.rentAmount)} FCFA</p>
                 </div>
               </div>
               <Link href="/locataire/leases"
-                className="w-full block text-center bg-[#0D2B6E] text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#071A45] transition-colors">
-                Accéder aux canaux de paiement →
+                className="w-full block text-center bg-white/10 hover:bg-primary text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/10 hover:border-transparent transition-all">
+                Canaux de Règlement →
               </Link>
             </div>
           </div>
@@ -187,12 +189,12 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
 
         {/* CIE / SODECI PREVIEW */}
         {data?.facturesUtilities?.length > 0 && (
-          <section>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em]">🔌 CIE / SODECI</h2>
-              <Link href="/locataire/utilities" className="text-xs font-black text-[#0E7490] uppercase tracking-widest">Tout voir →</Link>
+          <section className="space-y-6">
+            <div className="flex justify-between items-end px-2">
+              <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">🔌 Services & Utilités</h2>
+              <Link href="/locataire/utilities" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Configuration →</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
               {data.facturesUtilities.slice(0, 3).map((f: any, i: number) => (
                 <Link key={i} href="/locataire/utilities" className="bg-white rounded-2xl p-4 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
                   <div className="text-2xl mb-2">{f.typeUtility === "CIE" ? "⚡" : "💧"}</div>
@@ -207,12 +209,12 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
 
         {/* DERNIÈRES QUITTANCES */}
         {data?.quittances?.length > 0 && (
-          <section>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em]">Derniers paiements</h2>
-              <Link href="/locataire/receipts" className="text-xs font-black text-[#1A7A3C] uppercase tracking-widest">Tout voir →</Link>
+          <section className="space-y-6">
+            <div className="flex justify-between items-end px-2">
+              <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Historique des Flux</h2>
+              <Link href="/locataire/receipts" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Accéder aux reçus →</Link>
             </div>
-            <div className="bg-white rounded-2xl border border-[#D6DCE8] shadow-sm overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden">
               {data.quittances.slice(0, 4).map((q: any, i: number) => (
                 <Link key={q.id} href="/locataire/receipts" className={`flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors block ${i < data.quittances.slice(0, 4).length - 1 ? "border-b border-[#EEF2F7]" : ""}`}>
                   <div className="flex items-center gap-4">

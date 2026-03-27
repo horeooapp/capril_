@@ -85,7 +85,7 @@ export function TenantPortalDashboard({
     caution: any,
     mrlDemandes: any[]
 }) {
-  const [tab, setTab] = useState("dash");
+  const [tab, setTab] = useState<string>("dash");
   const [qSel, setQSel] = useState<any>(null);
   const [aSel, setASel] = useState<any>(null);
   const [dsec, setDsec] = useState<string | null>(null);
@@ -237,26 +237,30 @@ export function TenantPortalDashboard({
                     <Badge label={bail?.type || "Bail Standard"} color={T.teal} bg={T.tealPale}/>
                     <Badge label={`Éch. le ${bail?.paymentDay || 1}er`} color={T.navy} bg={T.navyPale}/>
                   </div>
-                  {/* bailleur conditionnel */}
-                  <div style={{background:T.grey1,borderRadius:9,padding:"8px 10px"}}>
-                    <div style={{display:"flex",justifyContent:"space-between"}}>
+                  {/* bailleur conditionnel (SPEC-UI-5.2) */}
+                  <div style={{background:T.grey1,borderRadius:9,padding:"10px 12px",marginTop:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
                       <div>
-                        <div style={{fontSize:9,color:T.textLight,fontWeight:700,letterSpacing:.5,marginBottom:2}}>{bail?.typeGestion==="agreee"?"AGENCE":"BAILLEUR"}</div>
-                        <div style={{fontSize:11,fontWeight:700,color:T.textMid}}>{bail?.typeGestion==="agreee" ? (bail?.agencyName || "Agence Agréée") : bailleur?.valeur}</div>
+                        <div style={{fontSize:9,color:T.textLight,fontWeight:700,letterSpacing:.5,marginBottom:2}}>{bailleur?.type || "BAILLEUR"}</div>
+                        <div style={{fontSize:12,fontWeight:800,color:T.navy}}>{bailleur?.valeur}</div>
                       </div>
-                      {bail?.typeGestion==="agreee"&&(
+                      {bailleur?.refBailleur && (
                         <div style={{textAlign:"right"}}>
                           <div style={{fontSize:9,color:T.textLight,fontWeight:700,marginBottom:2}}>RÉF. BAILLEUR</div>
-                          <div style={{fontSize:11,fontWeight:700,color:T.grey3}}>{bailleur?.valeur}</div>
+                          <div style={{fontSize:11,fontWeight:800,color:T.grey3}}>{bailleur.refBailleur}</div>
                         </div>
                       )}
                     </div>
-                    <div style={{fontSize:9,color:T.textLight,marginTop:5,fontStyle:"italic"}}>🔐 {bailleur?.mention}</div>
+                    <div style={{fontSize:9,color:T.textLight,fontWeight:600,borderTop:`1px solid ${T.grey2}`,paddingTop:4,marginTop:4,fontStyle:"italic"}}>
+                      {bailleur?.mention}
+                    </div>
                   </div>
                 </div>
               </div>
               {/* aperçu quittance */}
-              {(()=>{const q=quittances?.[0]; return q&&(
+              {(() => {
+                const q = quittances?.[0];
+                return q && (
                 <div style={{padding:"12px 16px 0"}}>
                   <SecTitle label="Dernière quittance" right={<button onClick={()=>go("quitt")} style={{background:"none",border:"none",fontSize:10,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
                   <div onClick={()=>{go("quitt");setQSel(q);}} style={{background:T.greenPale,border:`1px solid ${T.green}20`,borderLeft:`4px solid ${T.green}`,borderRadius:12,padding:"10px 12px",cursor:"pointer"}}>
@@ -266,9 +270,10 @@ export function TenantPortalDashboard({
                     </div>
                   </div>
                 </div>
-              );})()}
-            </div>
-          )}
+              );
+            })()}
+          </div>
+        )}
 
           {/* ══ MON BAIL ══ */}
           {tab==="bail"&&(
