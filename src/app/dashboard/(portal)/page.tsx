@@ -4,6 +4,7 @@ import DashboardOverviewClient from "./overview-client"
 import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
 import { getMonthlyReports } from "@/actions/rapports-mensuels"
 import { getDiasporaDashboard } from "@/actions/diaspora-actions"
+import { DiasporaDashboardData } from "@/types/diaspora"
 
 export const dynamic = "force-dynamic"
 
@@ -25,7 +26,7 @@ export default async function DashboardPage() {
             properties={properties || []}
             latestReport={latestReport}
             regularizationAlert={<RegularizationAlert />}
-            diasporaData={diasporaData?.success ? diasporaData.data : null}
+            diasporaData={diasporaData?.success ? (diasporaData.data as DiasporaDashboardData) : null}
         />
     )
 }

@@ -24,8 +24,8 @@ export interface DiasporaDashboardData {
   }>;
   mandats: Array<{
     id: string;
-    name: string;
-    phone: string;
+    name: string | null;
+    phone: string | null;
     statut: string;
     since: Date | string;
   }>;
