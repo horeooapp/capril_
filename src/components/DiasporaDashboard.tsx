@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { DiasporaDashboardData } from "@/types/diaspora";
 import { 
   BarChart3, 
@@ -24,54 +24,56 @@ import {
   FileText,
   Mail,
   MessageSquare,
-  ArrowLeft
+  ArrowLeft,
+  Smartphone,
+  Plus,
+  X,
+  Globe,
+  Settings2,
+  Lock,
+  ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const T = {
-  navy: "#0D2B6E",
-  navyDark: "#071A45",
-  navyPale: "#EEF2FA",
-  navyLight: "#1A3D8C",
-  green: "#1A7A3C",
-  greenPale: "#E8F5EE",
-  orange: "#C05B00",
-  orangePale: "#FFF3E0",
-  red: "#A00000",
-  redPale: "#FEECEC",
-  gold: "#C9A84C",
-  goldPale: "#FDF6E3",
-  teal: "#0E7490",
-  tealPale: "#E0F4F9",
-  purple: "#5B21B6",
-  purplePale: "#EDE9FE",
-  white: "#FFFFFF",
-  bg: "#F2F5FA",
-  grey1: "#EEF2F7",
-  grey2: "#D6DCE8",
-  grey3: "#8FA0BC",
-  grey4: "#4A5B7A",
-  text: "#0A1930",
-  textMid: "#2D3F5E",
-  textLight: "#6A7D9E",
+  navy:"#0D2B6E",navyDark:"#071A45",navyLight:"#1A3D8C",navyPale:"#EEF2FA",
+  green:"#1A7A3C",greenPale:"#E8F5EE",
+  orange:"#C05B00",orangePale:"#FFF3E0",
+  red:"#A00000",redPale:"#FEECEC",
+  gold:"#C9A84C",goldPale:"#FDF6E3",
+  teal:"#0E7490",tealPale:"#E0F4F9",
+  purple:"#5B21B6",purplePale:"#EDE9FE",
+  white:"#FFFFFF",bg:"#F0F4FB",
+  grey1:"#EEF2F7",grey2:"#D6DCE8",grey3:"#8FA0BC",grey4:"#4A5B7A",
+  text:"#0A1930",textMid:"#2D3F5E",textLight:"#6A7D9E",
+  diaspora:"#0E3A8C",
 };
 
 const FCFA_EUR = 655.957;
-const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
-const fmtE = (n: number) => ((n || 0) / FCFA_EUR).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+const fmt  = (n: number) => n?.toLocaleString("fr-FR") ?? "0";
+const fmtE = (n: number) => (n/FCFA_EUR).toLocaleString("fr-FR",{minimumFractionDigits:0,maximumFractionDigits:0});
+const FUSEAUX = ["Europe/Paris","Europe/London","America/Montreal","America/New_York","Africa/Abidjan"];
 
-// --- Shared Components ---
+function useBreakpoint(){
+  const [w,setW]=useState(typeof window!=="undefined"?window.innerWidth:1440);
+  useEffect(()=>{const h=()=>setW(window.innerWidth);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);
+  return{isMobile:w<768,isTablet:w>=768&&w<1100,isDesktop:w>=1100,w};
+}
 
-const Badge = ({ label, color, bg, size = 10 }: { label: string, color: string, bg: string, size?: number }) => (
-  <span className="inline-flex items-center font-bold px-2 py-0.5 rounded-md whitespace-nowrap" style={{ background: bg, color, fontSize: size }}>
-    {label}
-  </span>
+// ── COMPOSANTS ──
+const Badge=({label,color,bg,size=11}: any)=>(
+  <span style={{display:"inline-flex",alignItems:"center",background:bg,color,borderRadius:6,padding:"3px 9px",fontSize:size,fontWeight:700,whiteSpace:"nowrap"}}>{label}</span>
 );
-
-const Row = ({ label, value, color, mono }: { label: string, value: string, color?: string, mono?: boolean }) => (
-  <div className="flex justify-between items-center py-2 border-b border-[#EEF2F7]">
-    <span className="text-[11px] text-[#6A7D9E] uppercase tracking-wider font-bold">{label}</span>
-    <span className={`text-[13px] font-black ${mono ? 'font-mono' : ''}`} style={{ color: color || T.textMid }}>{value}</span>
+const Tag=({label,color}: any)=>(
+  <span style={{display:"inline-flex",alignItems:"center",background:color+"15",color,borderRadius:5,padding:"2px 8px",fontSize:10,fontWeight:700}}>{label}</span>
+);
+const RowData=({label,value,color,sub}: any)=>(
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",padding:"9px 0",borderBottom:`1px solid ${T.grey1}`}}>
+    <span style={{fontSize:11,color:T.textLight,flexShrink:0,marginRight:12,fontWeight:700,textTransform:"uppercase",letterSpacing:0.5}}>{label}</span>
+    <div style={{textAlign:"right"}}>
+      <div style={{fontSize:12,fontWeight:800,color:color||T.textMid}}>{value}</div>
+      {sub&&<div style={{fontSize:10,color:T.textLight,marginTop:1}}>{sub}</div>}
+    </div>
   </div>
 );
 
@@ -82,70 +84,49 @@ const SecTitle = ({ label, right }: { label: string, right?: React.ReactNode }) 
   </div>
 );
 
-const StatCard = ({ label, value, sub, icon: Icon, color, bg, onClick }: any) => (
-  <motion.div 
-    whileHover={{ y: -4 }}
-    onClick={onClick}
-    className="glass-card-premium p-6 rounded-[2rem] border border-white/40 shadow-xl cursor-pointer"
-  >
-    <div className="flex justify-between items-start mb-4">
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center`} style={{ background: bg, color }}>
-        <Icon size={24} />
-      </div>
-      <div className="text-right">
-        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</div>
-        <div className="text-2xl font-black text-[#1F4E79] tracking-tighter">{value}</div>
-      </div>
-    </div>
-    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{sub}</div>
-  </motion.div>
+const Card=({children,style={}}: any)=>(
+  <div style={{background:T.white,borderRadius:16,border:`1px solid ${T.grey2}`,boxShadow:"0 1px 6px rgba(13,43,110,.06)",padding:"20px 24px",...style}}>{children}</div>
 );
-
-const ActionCard = ({ icon: Icon, label, sub, color, bg, onClick, disabled }: any) => (
-  <div 
-    onClick={disabled ? undefined : onClick} 
-    className={`flex items-center gap-4 p-5 rounded-3xl border transition-all ${disabled ? 'opacity-50 cursor-not-allowed grayscale' : 'cursor-pointer hover:scale-[1.02]'}`}
-    style={{ background: bg, borderColor: `${color}30` }}
-  >
-    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${color}15`, color }}>
-      <Icon size={20} />
-    </div>
-    <div className="flex-1">
-      <div className="text-[14px] font-black" style={{ color }}>{label}</div>
-      {sub && <div className="text-[11px] text-[#6A7D9E] font-medium leading-none mt-1">{sub}</div>}
-    </div>
-    {!disabled && <ChevronRight size={16} style={{ color, opacity: 0.5 }} />}
+const CardTitle=({label,right}: any)=>(
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+    <div style={{fontSize:13,fontWeight:800,color:T.text,textTransform:"uppercase",letterSpacing:1}}>{label}</div>
+    {right}
   </div>
 );
+const BtnPrim=({label,onClick,small,color,bg,icon}: any)=>(
+  <button onClick={onClick} style={{background:bg||color||T.navy,border:"none",borderRadius:10,padding:small?"6px 14px":"9px 18px",fontSize:small?11:12,fontWeight:700,color:bg?color:T.white,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,whiteSpace:"nowrap",transition:"transform 0.1s"}} onMouseDown={e=>e.currentTarget.style.transform="scale(0.98)"} onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}>
+    {icon} {label}
+  </button>
+);
+const BtnSec=({label,onClick,small,color}: any)=>(
+  <button onClick={onClick} style={{background:"none",border:`1.5px solid ${color||T.navy}`,borderRadius:10,padding:small?"6px 14px":"9px 18px",fontSize:small?11:12,fontWeight:700,color:color||T.navy,cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.1s"}} onMouseEnter={e=>{e.currentTarget.style.background=`${color||T.navy}10`}} onMouseLeave={e=>{e.currentTarget.style.background="none"}}>
+    {label}
+  </button>
+);
 
-function Modal({ open, onClose, title, color = T.navy, children }: any) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        onClick={onClose}
-        className="absolute inset-0 bg-[#071A45]/80 backdrop-blur-sm"
-      />
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="bg-white rounded-[3rem] shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden max-h-[90vh] flex flex-col"
-      >
-        <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="text-xl font-black uppercase tracking-tighter" style={{ color }}>{title}</h3>
-          <button onClick={onClose} className="p-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
-            <ArrowLeft size={20} />
-          </button>
+function Modal({open,onClose,title,tc,children,maxW=600}: any){
+  if(!open)return null;
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(7,26,69,.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:500,padding:24,backdropFilter:"blur(4px)"}}>
+      <motion.div initial={{opacity:0,scale:0.95}} animate={{opacity:1,scale:1}} onClick={e=>e.stopPropagation()} style={{background:T.white,borderRadius:20,width:"100%",maxWidth:maxW,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 32px 100px rgba(7,26,69,.28)"}}>
+        <div style={{padding:"22px 28px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${T.grey1}`,position:"sticky",top:0,background:T.white,borderRadius:"20px 20px 0 0",zIndex:1}}>
+          <span style={{fontSize:17,fontWeight:800,color:tc||T.navy,textTransform:"uppercase",letterSpacing:1}}>{title}</span>
+          <button onClick={onClose} style={{background:T.grey1,border:"none",borderRadius:9,padding:"6px 14px",fontSize:12,fontWeight:700,color:T.textMid,cursor:"pointer"}}>✕ Fermer</button>
         </div>
-        <div className="p-8 overflow-y-auto flex-1">{children}</div>
+        <div style={{padding:"24px 28px"}}>{children}</div>
       </motion.div>
     </div>
   );
 }
 
-// --- Main Dashboard ---
+const TABS=[
+  {id:"dashboard",icon:<BarChart3 size={18}/>,label:"Tableau de bord"},
+  {id:"biens",    icon:<Building2 size={18}/>,label:"Mes biens"},
+  {id:"virements",icon:<Euro size={18}/>,label:"Virements"},
+  {id:"mobilemoney",icon:<Smartphone size={18}/>,label:"Mobile Money"},
+  {id:"delegation",icon:<Handshake size={18}/>,label:"Délégation"},
+  {id:"parametres",icon:<Settings2 size={18}/>,label:"Paramètres"},
+];
 
 interface DiasporaDashboardProps {
   data: DiasporaDashboardData;
@@ -153,519 +134,456 @@ interface DiasporaDashboardProps {
 }
 
 export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps) {
-  const [tab, setTab] = useState("dash");
-  const [selBien, setSelBien] = useState<any>(null);
-  const [bienTab, setBienTab] = useState("info");
-  const [devise, setDevise] = useState(user.diasporaDevise || "FCFA");
-  const [O, setO] = useState({
-    notifs: false, invite: false, sla: false,
-    virement: false, rapport: false,
-    gestEdit: false, relance: false, clemence: false,
+  const bp = useBreakpoint();
+  const [tab,setTab]           = useState("dashboard");
+  const [selBien,setSelBien]   = useState<any>(null);
+  const [sideOpen,setSideOpen] = useState(false);
+  const [devise, setDevise]    = useState(user.diasporaDevise || "FCFA");
+  const [O,setO] = useState({
+    notifs:false,inviter:false,sla:false,virement:false,
+    addBien:false,deleguer:false,selBienId:null as string | null,
+    mmConfig:false,mmAjout:false,
   });
-
-  const op = (k: string) => setO(o => ({ ...o, [k]: true }));
-  const cl = (k: string) => setO(o => ({ ...o, [k]: false }));
+  
+  const op = (k: string,extra={})=>setO(o=>({...o,[k]:true,...extra}));
+  const cl = (k: string)=>setO(o=>({...o,[k]:false,selBienId:null}));
+  const goTab = (t: string)=>{setTab(t);setSelBien(null);setSideOpen(false);};
 
   const properties = data.properties || [];
   const mandats = data.mandats || [];
-
-  const totalFCFA = properties.filter((b: any) => b.activeLease).reduce((s: number, b: any) => s + b.activeLease.rentFcfa, 0);
-  const encaisse = totalFCFA * 0.85; // Simulated for UI
+  const totalFCFA  = properties.filter((b: any) => b.activeLease).reduce((s: number, b: any) => s + b.activeLease.rentFcfa, 0);
+  const encFCFA    = totalFCFA * 0.85; // Simulated
   const alertesSLA = properties.filter((b: any) => b.isHorsSLA).length;
   const impayesN = properties.filter((b: any) => b.isImpaye).length;
 
   const affMontant = (fcfa: number) => devise === "EUR" ? `${fmtE(fcfa)} €` : `${fmt(fcfa)} FCFA`;
+  const fmtDual = (fcfa: number) => `${fmt(fcfa)} FCFA  ≈  ${fmtE(fcfa)} €`;
 
-  const tabs = [
-    { id: "dash", icon: BarChart3, label: "Tableau de Bord" },
-    { id: "biens", icon: Building2, label: "Patrimoine" },
-    { id: "virements", icon: Euro, label: "Flux SEPA" },
-    { id: "delegation", icon: Handshake, label: "Délégation" },
-    { id: "profil", icon: User, label: "Profil Diaspora" },
-  ];
+  const Dialog = bp.isMobile ? ({open,onClose,title,tc,children}: any)=>{
+    if(!open)return null;
+    return (
+      <div style={{position:"fixed",inset:0,background:"rgba(7,26,69,.76)",display:"flex",alignItems:"flex-end",zIndex:500,backdropFilter:"blur(4px)"}}>
+        <motion.div initial={{y:"100%"}} animate={{y:0}} style={{background:T.white,borderRadius:"22px 22px 0 0",width:"100%",maxHeight:"90vh",overflowY:"auto",paddingBottom:24}}>
+          <div style={{padding:"16px 20px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontSize:14,fontWeight:800,color:tc||T.navy,textTransform:"uppercase",letterSpacing:1}}>{title}</span>
+            <button onClick={onClose} style={{background:T.grey1,border:"none",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>✕</button>
+          </div>
+          <div style={{padding:"0 20px"}}>{children}</div>
+        </motion.div>
+      </div>
+    );
+  } : Modal;
 
-  return (
-    <div className="min-h-screen bg-[#F2F5FA] -mx-4 md:-mx-8 -my-8 p-4 md:p-12">
-      <div className="max-w-[1400px] mx-auto space-y-8 md:space-y-12">
-        
-        {/* Header Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-          <div className="space-y-4 w-full">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="px-4 py-1.5 bg-[#C9A84C] text-[#071A45] rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-gold/20">
-                <Plane size={12} className="inline mr-2" />
-                Package Diaspora
-              </div>
-              <div className="text-[10px] md:text-[12px] font-bold text-gray-400 uppercase tracking-widest">
-                 {user.paysResidence || "France 🇫🇷"} · {user.fuseauHoraire || "Europe/Paris"}
-              </div>
+  const Sidebar = ()=>(
+    <div style={{
+      width:bp.isMobile?280:bp.isDesktop?260:80,background:T.navyDark,
+      minHeight:"100vh",display:"flex",flexDirection:"column",flexShrink:0,
+      position:bp.isMobile?"fixed":"relative",
+      top:0,left:bp.isMobile?(sideOpen?0:-300):"auto",
+      zIndex:300,transition:"left .25s",
+      boxShadow: "10px 0 40px rgba(0,0,0,0.1)"
+    }}>
+      <div style={{padding:"32px 24px 24px",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
+        {(bp.isDesktop||bp.isMobile)?(
+          <div>
+            <div style={{fontSize:24,fontWeight:900,color:T.white,letterSpacing:2,fontStyle:"italic"}}>QAPRIL.</div>
+            <div style={{marginTop:8,display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(90deg,#C9A84C,#B8860B)",borderRadius:8,padding:"4px 12px shadow-lg"}}>
+              <Plane size={12} color={T.white} />
+              <span style={{fontSize:10,fontWeight:900,color:T.white,letterSpacing:1.5}}>DIASPORA</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-[#1F4E79] uppercase tracking-tighter leading-tight italic">
-              Dashboard.<span className="text-[#C55A11]">Diaspora</span>
-            </h1>
           </div>
-
-          <div className="flex flex-wrap items-center gap-4 md:gap-6 w-full lg:w-auto">
-             <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-2xl border border-white/60 shadow-xl w-full sm:w-auto">
-                {["FCFA", "EUR"].map(d => (
-                  <button 
-                    key={d} 
-                    onClick={() => setDevise(d)} 
-                    className={`flex-1 sm:flex-none px-6 py-2 rounded-xl text-xs font-black transition-all ${devise === d ? 'bg-[#1F4E79] text-white' : 'text-gray-400 hover:text-[#1F4E79]'}`}
-                  >
-                    {d}
-                  </button>
-                ))}
-             </div>
-             <button onClick={() => op("notifs")} className="relative w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl border border-white/60 group hover:bg-[#1F4E79] transition-colors">
-                <Bell size={24} className="text-[#1F4E79] group-hover:text-white transition-colors" />
-                {(impayesN > 0 || alertesSLA > 0) && (
-                  <span className="absolute top-3 right-3 md:top-4 md:right-4 w-3 h-3 bg-[#A00000] rounded-full border-2 border-white ring-4 ring-red-100" />
-                )}
-             </button>
+        ):<div style={{textAlign:"center",fontSize:22}}><Plane color={T.white} /></div>}
+      </div>
+      <nav style={{flex:1,padding:"20px 0"}}>
+        {TABS.map(t=>{
+          const active=tab===t.id;
+          return(
+            <button key={t.id} onClick={()=>goTab(t.id)} style={{
+              display:"flex",alignItems:"center",gap:bp.isDesktop||bp.isMobile?14:0,
+              justifyContent:bp.isDesktop||bp.isMobile?"flex-start":"center",
+              width:"100%",padding:bp.isDesktop||bp.isMobile?"14px 24px":"18px",
+              background:active?"rgba(255,255,255,.08)":"transparent",
+              border:"none",borderLeft:active?`4px solid ${T.gold}`:"4px solid transparent",
+              cursor:"pointer",transition:"all 0.2s"
+            }}>
+              <span style={{color:active?T.gold:T.white,opacity:active?1:0.5}}>{t.icon}</span>
+              {(bp.isDesktop||bp.isMobile)&&<span style={{fontSize:13,fontWeight:800,color:active?T.white:T.white,opacity:active?1:0.5,textTransform:"uppercase",letterSpacing:1}}>{t.label}</span>}
+            </button>
+          );
+        })}
+      </nav>
+      {(bp.isDesktop||bp.isMobile)&&(
+        <div style={{padding:"24px",borderTop:`1px solid rgba(255,255,255,.05)`,background:"rgba(0,0,0,0.1)"}}>
+          <div style={{fontSize:10,color:T.white,opacity:.4,marginBottom:6,fontWeight:800,textTransform:"uppercase"}}>Heure de référence</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.white}}>
+            {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:data.settings?.fuseau || "Europe/Paris"})} — {data.settings?.fuseau?.split("/")[1] || "Paris"}
+          </div>
+          <div style={{fontSize:10,color:T.gold,opacity:.8,marginTop:4,fontWeight:700}}>
+            Abidjan : {new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit",timeZone:"Africa/Abidjan"})}
           </div>
         </div>
+      )}
+    </div>
+  );
 
-        {/* Global Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-           <StatCard label="Revenus Mensuels" value={affMontant(totalFCFA)} sub="Total théorique" icon={CreditCard} color={T.navy} bg={T.navyPale} onClick={() => setTab("virements")} />
-           <StatCard label="Taux Encaissement" value={`${Math.round(encaisse/totalFCFA*100)}%`} sub={`${affMontant(encaisse)} encaissés`} icon={CheckCircle2} color={T.green} bg={T.greenPale} />
-           <StatCard label="Alertes Impayés" value={impayesN} sub={impayesN > 0 ? "Action requise" : "Tout est à jour"} icon={AlertTriangle} color={T.red} bg={T.redPale} onClick={() => setTab("biens")} />
-           <StatCard label="SLA Gestionnaires" value={alertesSLA || "OK"} sub={`${alertesSLA} retards détectés`} icon={Clock} color={T.purple} bg={T.purplePale} onClick={() => setTab("delegation")} />
+  const Topbar = ()=>(
+    <div style={{height:72,background:T.white,borderBottom:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 32px",flexShrink:0,boxShadow:"0 4px 20px rgba(13,43,110,.03)",position:"sticky",top:0,zIndex:100}}>
+      <div style={{display:"flex",alignItems:"center",gap:20}}>
+        {selBien ? (
+          <button onClick={()=>setSelBien(null)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,color:T.navy,fontWeight:800}}>
+            <ArrowLeft size={18}/> {bp.isDesktop && "Retour"}
+          </button>
+        ) : bp.isTablet && (
+          <button onClick={()=>setSideOpen(s=>!s)} style={{background:T.grey1,border:"none",borderRadius:10,padding:"10px 14px",cursor:"pointer"}}><BarChart3 size={20}/></button>
+        )}
+        <div>
+          <div style={{fontSize:18,fontWeight:940,color:T.navy,textTransform:"uppercase",letterSpacing:1,display:"flex",alignItems:"center",gap:10}}>
+            {TABS.find(t=>t.id===tab)?.label}
+            {selBien && <span style={{color:T.gold,fontSize:14,fontWeight:800}}>— {selBien.name}</span>}
+          </div>
+          <div style={{fontSize:11,color:T.textLight,fontWeight:700}}>{user.fullName || user.name} · Diaspora Premium · {data.settings?.pays || "France"}</div>
         </div>
-
-        {/* Main Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-white/40 backdrop-blur-md rounded-[2.5rem] border border-white/60 w-fit">
-          {tabs.map(t => (
-            <button 
-              key={t.id} 
-              onClick={() => { setTab(t.id); setSelBien(null); }}
-              className={`flex items-center gap-3 px-4 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-[1.8rem] text-[10px] md:text-[12px] font-black uppercase tracking-widest transition-all ${tab === t.id ? 'bg-[#1F4E79] text-white shadow-2xl shadow-blue-900/20' : 'text-gray-500 hover:bg-white hover:text-[#1F4E79]'}`}
-            >
-              <t.icon size={16} />
-              <span className="hidden sm:inline">{t.label}</span>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:20}}>
+        <div style={{background:T.grey1,borderRadius:12,padding:"6px",display:"flex",gap:4,boxShadow:"inset 0 2px 4px rgba(0,0,0,0.05)"}}>
+          {["FCFA","EUR"].map(d=>(
+            <button key={d} onClick={()=>setDevise(d)} style={{background:d===devise?T.navy:"transparent",border:"none",borderRadius:9,padding:"6px 16px",fontSize:11,fontWeight:800,color:d===devise?T.white:T.textLight,cursor:"pointer",transition:"all 0.2s"}}>
+              {d==="EUR"?"€ EUR":"XOF"}
             </button>
           ))}
         </div>
+        <button onClick={()=>op("notifs")} style={{position:"relative",background:T.grey1,border:"none",borderRadius:12,padding:"10px 14px",cursor:"pointer",transition:"all 0.2s"}} onMouseEnter={e=>e.currentTarget.style.background=T.grey2} onMouseLeave={e=>e.currentTarget.style.background=T.grey1}>
+          <Bell size={20} color={T.navy}/>
+          {(impayesN > 0 || alertesSLA > 0) && <span style={{position:"absolute",top:8,right:8,width:10,height:10,borderRadius:"50%",background:T.red,border:`2px solid ${T.white}`,boxShadow:"0 0 10px rgba(160,0,0,0.5)"}}/>}
+        </button>
+        <BtnPrim label="Inviter un gestionnaire" onClick={()=>op("inviter")} icon={<Smartphone size={16}/>}/>
+      </div>
+    </div>
+  );
 
-        {/* Content Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
-          <div className="lg:col-span-8 space-y-12">
-            
-            <AnimatePresence mode="wait">
-              {tab === "dash" && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-10">
-                  
-                  {/* Critical Alerts */}
-                  {(impayesN > 0 || alertesSLA > 0) && (
-                    <section>
-                      <SecTitle label="🚨 Vigilance Critique" />
-                      <div className="grid grid-cols-1 gap-4">
-                        {properties.filter((b:any) => b.isImpaye).map((b:any) => (
-                          <div key={b.id} className="p-8 bg-[#FEECEC] border border-[#A00000]25 rounded-[2.5rem] flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="flex gap-6 items-center flex-1">
-                              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-[#A00000] shadow-lg">
-                                <ShieldAlert size={32} />
-                              </div>
-                              <div>
-                                <h4 className="text-lg font-black text-[#0A1930] leading-none mb-1">{b.name}</h4>
-                                <p className="text-[#6A7D9E] text-sm font-bold uppercase tracking-widest">Impayé J+12 · {b.locataire?.name}</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-2xl font-black text-[#A00000] tracking-tighter mb-1">{affMontant(b.activeLease?.rentFcfa || 0)}</div>
-                              <button onClick={() => { setSelBien(b); setTab("biens"); }} className="px-6 py-2 bg-[#A00000] text-white text-[10px] font-black uppercase tracking-widest rounded-xl">Traiter</button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Consolidates Revenue Section */}
-                  <section>
-                    <SecTitle label="💶 Analyse de Trésorerie" />
-                    <div className="glass-card-premium p-10 rounded-[3.5rem] bg-gradient-to-br from-[#0D2B6E]05 to-[#0E7490]05 border border-[#0D2B6E]10">
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                          <div className="space-y-6">
-                            <div>
-                               <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Performance Avril 2026</p>
-                               <h3 className="text-5xl font-black text-[#1F4E79] tracking-tighter leading-none mb-6">
-                                 {affMontant(totalFCFA)}
-                               </h3>
-                               {devise === "EUR" && <p className="text-[#6A7D9E] font-bold text-sm tracking-widest">{fmt(totalFCFA)} FCFA · Taux fixe 655.957</p>}
-                            </div>
-                            <div className="space-y-3">
-                               <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">
-                                 <span>Encaissement</span>
-                                 <span>{Math.round(encaisse/totalFCFA*100)}%</span>
-                               </div>
-                               <div className="h-4 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                                 <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${Math.round(encaisse/totalFCFA*100)}%` }}
-                                    className="h-full bg-gradient-to-r from-[#1A7A3C] to-[#C9A84C] rounded-full"
-                                 />
-                               </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col justify-center gap-4">
-                             <button onClick={() => op("virement")} className="group p-8 bg-[#1F4E79] text-white rounded-3xl shadow-2xl shadow-blue-900/20 hover:scale-[1.02] transition-all flex items-center justify-between">
-                                <div className="space-y-1 text-left">
-                                   <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Compte Récepteur</p>
-                                   <p className="text-xl font-black tracking-tighter uppercase italic italic">Config. Virement SEPA</p>
-                                </div>
-                                <ArrowLeft className="rotate-180 group-hover:translate-x-2 transition-transform" />
-                             </button>
-                             <div className="grid grid-cols-2 gap-4">
-                               <button onClick={() => op("rapport")} className="p-6 bg-white rounded-3xl border border-gray-100 shadow-xl hover:shadow-2xl transition-all flex flex-col gap-3 group">
-                                  <Download className="text-[#C55A11] group-hover:animate-bounce transition-all" size={24} />
-                                  <span className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Rapport PDF</span>
-                               </button>
-                               <button onClick={() => setTab("virements")} className="p-6 bg-white rounded-3xl border border-gray-100 shadow-xl hover:shadow-2xl transition-all flex flex-col gap-3 group">
-                                  <FileText className="text-[#0E7490] group-hover:animate-bounce transition-all" size={24} />
-                                  <span className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Historique</span>
-                               </button>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-                  </section>
-
-                  {/* Property Quick List */}
-                  <section>
-                    <SecTitle label="🏠 Patrimoine Récent" right={<button onClick={() => setTab("biens")} className="text-[10px] font-black text-[#0E7490] hover:underline uppercase tracking-widest">Voir tout →</button>} />
-                    <div className="grid grid-cols-1 gap-4">
-                       {properties.slice(0, 3).map((b:any) => (
-                         <div key={b.id} onClick={() => { setSelBien(b); setTab("biens"); }} className="glass-panel p-8 rounded-[2.5rem] border border-white/60 shadow-lg hover:shadow-2xl hover:scale-[1.01] transition-all flex items-center justify-between group cursor-pointer">
-                            <div className="flex items-center gap-8">
-                               <div className="w-20 h-20 bg-[#F2F5FA] rounded-[1.5rem] flex items-center justify-center text-[#1F4E79] group-hover:bg-[#1F4E79] group-hover:text-white transition-all duration-500">
-                                  <Building2 size={32} />
-                               </div>
-                               <div>
-                                  <h4 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter italic italic mb-1 uppercase">{b.name}</h4>
-                                  <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em] mb-4">{b.commune}</p>
-                                  <div className="flex gap-3">
-                                    <Badge label={b.managementMode === "AGENCY" ? "Agence" : "Direct"} color={T.teal} bg={T.tealPale} />
-                                    {b.isHorsSLA && <Badge label="⏱ Hors SLA" color={T.red} bg={T.redPale} />}
-                                  </div>
-                               </div>
-                            </div>
-                            <div className="text-right flex items-center gap-12">
-                               <div className="hidden md:block">
-                                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 opacity-60">Revenu Net</p>
-                                  <p className="text-2xl font-black text-[#1F4E79] tracking-tighter leading-none">{affMontant(b.activeLease?.rentFcfa || 0)}</p>
-                               </div>
-                               <div className="w-14 h-14 rounded-2xl bg-[#0D2B6E]05 flex items-center justify-center text-gray-400 group-hover:bg-[#1F4E79] group-hover:text-white transition-all">
-                                  <ChevronRight size={24} />
-                               </div>
-                            </div>
-                         </div>
-                       ))}
-                    </div>
-                  </section>
-                </motion.div>
-              )}
-
-              {tab === "biens" && !selBien && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                      {properties.map((b:any) => (
-                        <div key={b.id} onClick={() => setSelBien(b)} className="glass-panel p-10 rounded-[3.5rem] border border-white/60 shadow-xl hover:shadow-2xl transition-all cursor-pointer group">
-                           <div className="flex justify-between items-start mb-8">
-                             <div className="w-16 h-16 bg-[#1F4E79] text-white rounded-2xl flex items-center justify-center shadow-lg">
-                               <Building2 size={24} />
-                             </div>
-                             <Badge label={b.isImpaye ? "⚠️ Impayé" : "✅ À Jour"} color={b.isImpaye ? T.red : T.green} bg={b.isImpaye ? T.redPale : T.greenPale} />
-                           </div>
-                           <h4 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic italic mb-2 uppercase">{b.name}</h4>
-                           <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-8">{b.commune} · {b.propertyCode}</p>
-                           <div className="flex justify-between items-end border-t border-gray-100 pt-8">
-                              <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Loyer</p>
-                                <p className="text-xl font-black text-[#1F4E79]">{affMontant(b.activeLease?.rentFcfa || 0)}</p>
-                              </div>
-                              <button className="p-4 bg-gray-100 rounded-2xl group-hover:bg-[#1F4E79] group-hover:text-white transition-all">
-                                <ChevronRight size={20} />
-                              </button>
-                           </div>
-                        </div>
-                      ))}
-                   </div>
-                </motion.div>
-              )}
-
-              {tab === "biens" && selBien && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
-                   <div className="flex items-center gap-4">
-                      <button onClick={() => setSelBien(null)} className="p-4 bg-white rounded-2xl shadow-lg border border-gray-100 text-[#1F4E79] hover:bg-[#1F4E79] hover:text-white transition-all">
-                        <ArrowLeft size={20} />
-                      </button>
-                      <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter italic italic uppercase">{selBien.name}</h3>
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="md:col-span-2 space-y-8">
-                         {/* Details Card */}
-                         <div className="glass-panel p-10 rounded-[3.5rem] border border-white/60 shadow-xl">
-                            <div className="flex gap-4 mb-8">
-                               {["info", "virements", "actions"].map(t => (
-                                 <button key={t} onClick={() => setBienTab(t)} className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${bienTab === t ? 'bg-[#1F4E79] text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                   {t}
-                                 </button>
-                               ))}
-                            </div>
-
-                            {bienTab === "info" && (
-                              <div className="space-y-2">
-                                <Row label="Code Logement" value={selBien.propertyCode} mono />
-                                <Row label="Commune" value={selBien.commune} />
-                                <Row label="Revenu Brut" value={affMontant(selBien.activeLease?.rentFcfa || 0)} color={T.navy} mono />
-                                <Row label="Locataire" value={selBien.locataire?.name || "Vacant"} />
-                                <Row label="Status" value={selBien.activeLease ? "Occupé" : "Disponible"} color={selBien.activeLease ? T.green : T.orange} />
-                              </div>
-                            )}
-
-                            {bienTab === "virements" && (
-                              <div className="space-y-6">
-                                <div className="p-6 bg-[#EEF2FA] rounded-3xl border border-[#1A3D8C]10">
-                                   <div className="flex justify-between items-center mb-4">
-                                      <p className="text-[10px] font-black text-[#1F4E79] uppercase tracking-widest">Historique Récent</p>
-                                      <Badge label="100% SEPA" color={T.navy} bg={T.white} />
-                                   </div>
-                                   <div className="space-y-3">
-                                      {[1, 2, 3].map(i => (
-                                        <div key={i} className="flex justify-between items-center py-2 border-b border-white/50">
-                                           <span className="text-[11px] font-bold text-[#6A7D9E]">Virement de Mars</span>
-                                           <span className="font-black text-[#1F4E79] text-xs uppercase tracking-widest italic italic">{affMontant(selBien.activeLease?.rentFcfa || 0)}</span>
-                                        </div>
-                                      ))}
-                                   </div>
-                                </div>
-                              </div>
-                            )}
-                         </div>
-                      </div>
-
-                      <div className="space-y-6">
-                         <div className="glass-panel p-8 rounded-[3rem] bg-[#071A45] text-white shadow-2xl relative overflow-hidden group">
-                             <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#C9A84C] opacity-10 blur-3xl group-hover:scale-150 transition-all duration-700"></div>
-                             <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-2">Gestionnaire</p>
-                             <h4 className="text-xl font-black mb-4 uppercase italic">Immo Golfe.</h4>
-                             <div className="space-y-4">
-                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
-                                   <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">SLA Performance</p>
-                                   <div className="flex justify-between items-end mt-1">
-                                      <p className="text-lg font-black tracking-tighter tracking-tighter uppercase italic italic">14h <span className="text-[10px] opacity-60">avg</span></p>
-                                      <span className="text-[9px] font-black text-[#1A7A3C] uppercase tracking-widest bg-[#E8F5EE] px-2 py-0.5 rounded">Excellent</span>
-                                   </div>
-                                </div>
-                                <button className="w-full py-4 bg-[#C55A11] hover:bg-[#A54A0D] text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-                                  <MessageSquare size={16} />
-                                  Contact Mandat
-                                </button>
-                             </div>
-                         </div>
-                      </div>
-                   </div>
-                </motion.div>
-              )}
-
-              {/* Other tabs implementation... (Délégation, Profil, etc.) simplified for EXECUTION speed */}
-              {tab === "virements" && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 text-[#1F4E79]">
-                   <h2 className="text-3xl font-black uppercase tracking-tighter italic italic uppercase">Virements Internationaux.</h2>
-                   <div className="glass-panel p-12 rounded-[4rem] border border-white/60 shadow-2xl bg-white/60">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                         <div className="space-y-10">
-                            <div>
-                               <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4 inline-block">Compte de Réception SEPA</label>
-                               <div className="p-8 bg-[#1F4E79] text-white rounded-[2.5rem] shadow-2xl relative overflow-hidden">
-                                  <div className="relative z-10">
-                                     <p className="text-xl font-black font-mono tracking-[0.2em] mb-4">FR76 3000 6000 0112 3456 …</p>
-                                     <div className="flex justify-between items-end">
-                                        <div>
-                                           <p className="text-[10px] opacity-50 uppercase tracking-widest">Banque Réceptrice</p>
-                                           <p className="font-black text-sm uppercase italic italic uppercase">Société Générale de France — Paris 12</p>
-                                        </div>
-                                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
-                                           <CreditCard size={24} />
-                                        </div>
-                                     </div>
-                                  </div>
-                               </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6">
-                               <div className="p-6 bg-[#E8F5EE] rounded-3xl border border-[#1A7A3C]10">
-                                  <TrendingUp className="text-[#1A7A3C] mb-3" />
-                                  <p className="text-[10px] font-black text-[#1A7A3C] uppercase tracking-widest">Taux Fixe</p>
-                                  <p className="text-lg font-black text-[#1A7A3C] tracking-tighter italic italic uppercase">655.957 <span className="text-[10px]">EUR/CFA</span></p>
-                               </div>
-                               <div className="p-6 bg-[#FDF6E3] rounded-3xl border border-[#C9A84C]10">
-                                  <ShieldCheck className="text-[#C9A84C] mb-3" />
-                                  <p className="text-[10px] font-black text-[#C9A84C] uppercase tracking-widest">Frais QAPRIL</p>
-                                  <p className="text-lg font-black text-[#C9A84C] tracking-tighter italic italic uppercase">0 <span className="text-[10px]">FCFA</span></p>
-                               </div>
-                            </div>
-                         </div>
-                         <div className="space-y-8">
-                            <SecTitle label="🔄 Flux Mensuels — Avril 2026" />
-                            <div className="space-y-3">
-                               {properties.filter((b:any) => b.activeLease).map((b:any) => (
-                                 <div key={b.id} className="flex justify-between items-center p-6 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                                    <div className="flex items-center gap-4">
-                                       <div className="w-10 h-10 bg-[#EEF2FA] rounded-xl flex items-center justify-center text-[#1A3D8C]">
-                                          <ArrowLeft className="rotate-[-45deg]" size={18} />
-                                       </div>
-                                       <div>
-                                          <p className="text-[13px] font-black text-[#1F4E79] uppercase italic italic italic uppercase">{b.name}</p>
-                                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Reçu le 05/04</p>
-                                       </div>
-                                    </div>
-                                    <div className="text-right">
-                                       <p className="text-lg font-black text-[#1F4E79] tracking-tighter italic italic italic uppercase">{affMontant(b.activeLease.rentFcfa)}</p>
-                                       <p className="text-[10px] text-[#1A7A3C] font-black uppercase tracking-widest italic italic">Statut: En virement</p>
-                                    </div>
-                                 </div>
-                               ))}
-                            </div>
-                         </div>
-                      </div>
-                   </div>
-                </motion.div>
-              )}
-              
-            </AnimatePresence>
+  const Content = ()=>(
+    <AnimatePresence mode="wait">
+      {tab === "dashboard" && (
+        <motion.div key="dash" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} style={{display:"flex",flexDirection:"column",gap:28}}>
+          {/* KPI Row */}
+          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"repeat(4,1fr)":bp.isTablet?"1fr 1fr":"1fr",gap:20}}>
+            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+              <div style={{width:48,height:48,borderRadius:12,background:T.navyPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CreditCard color={T.navy} size={24}/></div>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Revenus</div>
+                <div style={{fontSize:18,fontWeight:900,color:T.navy}}>{affMontant(totalFCFA)}</div>
+              </div>
+            </Card>
+            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+              <div style={{width:48,height:48,borderRadius:12,background:T.greenPale,display:"flex",alignItems:"center",justifyContent:"center"}}><CheckCircle2 color={T.green} size={24}/></div>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Recouvré</div>
+                <div style={{fontSize:18,fontWeight:900,color:T.green}}>{Math.round(encFCFA/totalFCFA*100)}%</div>
+              </div>
+            </Card>
+            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+              <div style={{width:48,height:48,borderRadius:12,background:T.redPale,display:"flex",alignItems:"center",justifyContent:"center"}}><AlertTriangle color={T.red} size={24}/></div>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Impayés</div>
+                <div style={{fontSize:18,fontWeight:900,color:T.red}}>{impayesN}</div>
+              </div>
+            </Card>
+            <Card style={{display:"flex",alignItems:"center",gap:16,background:T.white}}>
+              <div style={{width:48,height:48,borderRadius:12,background:T.purplePale,display:"flex",alignItems:"center",justifyContent:"center"}}><Clock color={T.purple} size={24}/></div>
+              <div>
+                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Retards SLA</div>
+                <div style={{fontSize:18,fontWeight:900,color:T.purple}}>{alertesSLA}</div>
+              </div>
+            </Card>
           </div>
 
-          <div className="lg:col-span-4 space-y-12">
-            
-            {/* Quick Access Area */}
-            <section className="space-y-6">
-              <SecTitle label="⚡ Accès Prioritaires" />
-              <div className="grid grid-cols-1 gap-4">
-                 <ActionCard icon={Link2} label="Inviter Gestionnaire" sub="Générer un lien HMAC unique" color={T.teal} bg={T.tealPale} onClick={() => op("invite")} />
-                 <ActionCard icon={Euro} label="Config. Virement" sub="IBAN SEPA & Fréquence" color={T.navy} bg={T.navyPale} onClick={() => op("virement")} />
-                 <ActionCard icon={Clock} label="Paramètres SLA" sub="Délais de réponse mandat" color={T.purple} bg={T.purplePale} onClick={() => op("sla")} />
-                 <ActionCard icon={FileText} label="Rapports Scellés" sub="Exports SHA-256 certifiés" color={T.gold} bg={T.goldPale} onClick={() => op("rapport")} />
-              </div>
-            </section>
-
-            {/* Account Insight Card */}
-            <section className="glass-card-premium p-10 rounded-[3rem] bg-[#071A45] text-white shadow-2xl relative overflow-hidden group">
-               <div className="absolute top-0 right-0 -m-20 w-80 h-80 bg-[#C55A11] opacity-20 blur-[100px] group-hover:opacity-40 transition-all duration-1000"></div>
-               <div className="relative z-10 space-y-8">
-                  <div className="flex items-center gap-4">
-                     <div className="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-xl backdrop-blur-md">
-                        👤
-                     </div>
-                     <div>
-                        <h4 className="text-xl font-black text-white italic tracking-tighter italic uppercase">{user.name || "Kouassi Adama"}</h4>
-                        <p className="text-white/40 text-[10px] font-black uppercase tracking-widest italic italic">Status Diaspora : Premium</p>
-                     </div>
+          {/* Critical Alerts */}
+          {impayesN > 0 && (
+            <Card style={{borderLeft:`4px solid ${T.red}`}}>
+              <CardTitle label="🚨 Alertes Critiques" right={<BtnSec label="Tout voir" small onClick={()=>op("notifs")}/>}/>
+              {properties.filter((b: any)=>b.isImpaye).map((b: any)=>(
+                <div key={b.id} style={{display:"flex",gap:12,alignItems:"flex-start",background:T.redPale,borderRadius:12,padding:14,marginBottom:8}}>
+                  <span style={{fontSize:18}}>🔴</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:13,fontWeight:700,color:T.text}}>{b.name} — Impayé détecté</div>
+                    <div style={{fontSize:11,color:T.textMid,marginTop:2}}>{b.locataire?.name || "Locataire inconnu"} · {affMontant(b.activeLease?.rentFcfa || 0)}</div>
                   </div>
-                  <div className="space-y-4">
-                     <div className="flex justify-between items-center py-2 border-b border-white/5">
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest italic italic">Résidence</span>
-                        <span className="font-black text-xs italic italic uppercase">{user.paysResidence || "France 🇫🇷"}</span>
-                     </div>
-                     <div className="flex justify-between items-center py-2 border-b border-white/5">
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest italic italic">Abonnement</span>
-                        <span className="font-black text-xs text-[#C9A84C] italic italic uppercase">7 € / mois</span>
-                     </div>
-                     <div className="flex justify-between items-center py-2">
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest italic italic">Next Report</span>
-                        <span className="font-black text-xs italic italic uppercase tracking-tighter italic uppercase">05 AVRIL 2026</span>
-                     </div>
-                  </div>
-                  <button onClick={() => setTab("profil")} className="w-full py-4 bg-white/10 hover:bg-white text-white/60 hover:text-[#1F4E79] rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border border-white/10 italic italic">
-                     Gérer Profil
-                  </button>
-               </div>
-            </section>
-
-            {/* Smart Monitoring Insight */}
-            <div className="glass-panel p-10 rounded-[3rem] border border-[#1A7A3C]20 bg-[#E8F5EE] shadow-xl overflow-hidden relative group">
-                <div className="relative z-10 space-y-6">
-                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#1A7A3C] shadow-lg">
-                      <ShieldAlert size={28} />
-                   </div>
-                   <h3 className="text-2xl font-black text-[#1A7A3C] tracking-tighter leading-none italic uppercase italic uppercase">Moniteur de<br/>Diligence.</h3>
-                   <p className="text-[#1A7A3C] text-sm font-medium leading-relaxed italic opacity-80">
-                      Vos gestionnaires sont surveillés 24/7. En cas de dépassement de SLA pour l'Appt 3B, une alerte est émise automatiquement.
-                   </p>
-                   <div className="pt-2">
-                      <div className="px-6 py-2 bg-white text-[#1A7A3C] text-[10px] font-black uppercase tracking-tighter rounded-xl w-fit shadow-md italic italic">
-                         Vigilance Active
-                      </div>
-                   </div>
+                  <BtnPrim label="Agir" small onClick={()=>{setSelBien(b);setTab("biens");}} color={T.red}/>
                 </div>
+              ))}
+            </Card>
+          )}
+
+          {/* Treasury Card */}
+          <Card style={{background:`linear-gradient(135deg,${T.navy}05,${T.teal}05)`,border:`1px solid ${T.navy}10`,padding:"24px 28px"}}>
+            <CardTitle label="💶 Analyse de Trésorerie"/>
+            <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
+                <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Performance annuelle</div>
+                <div style={{fontSize:32,fontWeight:940,color:T.navy,marginBottom:8}}>{affMontant(totalFCFA * 12)}</div>
+                <div style={{fontSize:11,color:T.textMid,fontWeight:700}}>{fmt(totalFCFA)} FCFA / mois · Taux 0% QAPRIL</div>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                <BtnPrim label="Configurer virements SEPA" onClick={()=>goTab("virements")} icon={<Euro size={16}/>}/>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  <button onClick={()=>op("virement")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
+                    <Download size={18} color={T.teal}/>
+                    <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>RIB</span>
+                  </button>
+                  <button onClick={()=>goTab("virements")} style={{background:T.white,border:`1px solid ${T.grey2}`,borderRadius:12,padding:12,display:"flex",flexDirection:"column",alignItems:"center",gap:6,cursor:"pointer"}}>
+                    <FileText size={18} color={T.navy}/>
+                    <span style={{fontSize:9,fontWeight:800,color:T.textMid,textTransform:"uppercase"}}>Historique</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Recent Properties */}
+          <div>
+            <SecTitle label="🏠 Patrimoine Récent" right={<button onClick={()=>goTab("biens")} style={{background:"none",border:"none",fontSize:11,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
+            <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:16}}>
+              {properties.slice(0,2).map((b: any)=>(
+                <Card key={b.id} style={{cursor:"pointer"}} onClick={()=>{setSelBien(b);setTab("biens");}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                    <div style={{width:40,height:40,borderRadius:10,background:T.grey1,display:"flex",alignItems:"center",justifyContent:"center"}}><Building2 size={20} color={T.navy}/></div>
+                    <Badge label={b.managementMode === "AGENCY" ? "Agence" : "Direct"} color={T.teal} bg={T.tealPale}/>
+                  </div>
+                  <div style={{fontSize:15,fontWeight:800,color:T.navy,marginBottom:4}}>{b.name}</div>
+                  <div style={{fontSize:11,color:T.textLight,marginBottom:16}}>{b.commune} · {b.propertyCode}</div>
+                  <RowData label="Revenu" value={affMontant(b.activeLease?.rentFcfa || 0)}/>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {tab === "biens" && selBien && (
+        <motion.div key="bien-detail" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} style={{display:"flex",flexDirection:"column",gap:24}}>
+          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
+            <div style={{display:"flex",flexDirection:"column",gap:24}}>
+              <Card>
+                <CardTitle label="ℹ️ Fiche d'identité du bien" right={<Badge label={selBien.propertyCode} color={T.navy} bg={T.navyPale}/>}/>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
+                  <div style={{background:T.grey1,borderRadius:12,padding:16}}>
+                    <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Commune</div>
+                    <div style={{fontSize:14,fontWeight:800,color:T.navy,marginTop:4}}>{selBien.commune}</div>
+                  </div>
+                  <div style={{background:T.grey1,borderRadius:12,padding:16}}>
+                    <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase"}}>Mode Gestion</div>
+                    <div style={{fontSize:14,fontWeight:800,color:T.teal,marginTop:4}}>{selBien.managementMode === "AGENCY" ? "Agence" : "Directe"}</div>
+                  </div>
+                </div>
+                <RowData label="Type de bien" value="Appartement F4" />
+                <RowData label="Surface" value="120 m²" />
+                <RowData label="Statut Occup." value={selBien.status === "OCCUPIED" ? "Occupé" : "Vacant"} color={selBien.status === "OCCUPIED" ? T.green : T.orange} />
+              </Card>
+
+              <Card>
+                <CardTitle label="👤 Locataire Actuel" right={<BtnSec label="Détails" small />}/>
+                <div style={{display:"flex",gap:16,alignItems:"center",marginBottom:20}}>
+                  <div style={{width:56,height:56,borderRadius:28,background:T.navy,color:T.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900}}>{(selBien.activeLease?.tenant || "L").charAt(0)}</div>
+                  <div>
+                    <div style={{fontSize:16,fontWeight:900,color:T.navy}}>{selBien.activeLease?.tenant || "M. Kouassi Jean"}</div>
+                    <div style={{fontSize:12,color:T.textLight}}>Bail signé le 12/01/2026</div>
+                  </div>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  <BtnSec label="Appeler" icon={<Smartphone size={14}/>} style={{width:"100%"}}/>
+                  <BtnSec label="Message" icon={<Mail size={14}/>} style={{width:"100%"}}/>
+                </div>
+              </Card>
             </div>
 
+            <div style={{display:"flex",flexDirection:"column",gap:24}}>
+              <Card style={{background:T.navy,color:T.white}}>
+                <CardTitle label="💰 Revenus Mensuels" />
+                <div style={{fontSize:32,fontWeight:940,marginBottom:8}}>{affMontant(selBien.activeLease?.rentFcfa || 0)}</div>
+                <div style={{fontSize:12,opacity:0.7,marginBottom:20}}>{Math.round((selBien.activeLease?.rentFcfa || 0) / FCFA_EUR)} € / mois</div>
+                <div style={{background: "rgba(255,255,255,0.1)", borderRadius:12, padding:12, display:"flex", justifyContent:"space-between"}}>
+                   <span style={{fontSize:11,fontWeight:700}}>Dernier paiement</span>
+                   <span style={{fontSize:11,fontWeight:900,color:T.gold}}>05 Mars 2026</span>
+                </div>
+              </Card>
+              <Card>
+                <CardTitle label="📑 Documents" />
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {["Contrat de Bail","EDL Entrée","Dernière Quittance"].map(d=>(
+                    <div key={d} style={{padding:"12px 14px",background:T.grey1,borderRadius:10,display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}>
+                      <span style={{fontSize:12,fontWeight:700,color:T.textMid}}>{d}</span>
+                      <Download size={16} color={T.grey3}/>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {tab === "mobilemoney" && (
+        <motion.div key="mm" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+          <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1fr 1fr":"1fr",gap:20}}>
+            {data.mobileMoney?.map((m: any,i: number)=>(
+               <Card key={i} style={{background: m.provider === "Orange" ? "#FF7900" : "#FFCC00", color: m.provider === "Orange" ? T.white : "#000"}}>
+                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:32}}>
+                   <div>
+                     <div style={{fontSize:12,fontWeight:700,opacity:0.8,textTransform:"uppercase"}}>{m.provider} Money</div>
+                     <div style={{fontSize:24,fontWeight:900,marginTop:4}}>{m.phone}</div>
+                   </div>
+                   <div style={{width:48,height:48,background:"rgba(255,255,255,0.2)",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center"}}><Smartphone size={24}/></div>
+                 </div>
+                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                   <div>
+                     <div style={{fontSize:10,fontWeight:700,opacity:0.6}}>Solde Actuel</div>
+                     <div style={{fontSize:18,fontWeight:900}}>{affMontant(m.solde)}</div>
+                   </div>
+                   <Badge label="Connecté" color={T.white} bg="rgba(0,0,0,0.2)"/>
+                 </div>
+               </Card>
+            ))}
           </div>
 
-        </div>
+          <SecTitle label="🔗 Webhooks de recouvrement" right={<Badge label="LIVE" color={T.green} bg={T.greenPale}/>}/>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <div style={{padding:20,background:T.navyPale,borderBottom:`1px solid ${T.grey2}`,fontSize:11,fontWeight:800,color:T.navy,textTransform:"uppercase"}}>Signaux Temps Réel</div>
+            {data.webhooks?.map((w: any,i: number)=>(
+              <div key={i} style={{padding:16,borderBottom:`1px solid ${T.grey1}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div style={{display:"flex",gap:16,alignItems:"center"}}>
+                  <div style={{width:36,height:36,borderRadius:8,background:T.white,border:`1px solid ${T.grey2}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>📡</div>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:800,color:T.navy}}>{w.op} — {w.emetteur}</div>
+                    <div style={{fontSize:10,color:T.textLight}}>{w.date} · {w.bien}</div>
+                  </div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{fontSize:14,fontWeight:900,color:T.navy}}>{affMontant(w.montant)}</div>
+                  <div style={{fontSize:9,fontWeight:800,color:T.green}}>DÉTECTÉ</div>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </motion.div>
+      )}
 
+      {tab === "delegation" && (
+        <motion.div key="delegation" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+           <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"2fr 1.2fr":"1fr",gap:24}}>
+             <div style={{display:"flex",flexDirection:"column",gap:24}}>
+               <Card>
+                 <CardTitle label="📢 Gestionnaires Délégués" right={<BtnPrim label="Nouveau" small onClick={()=>op("inviter")} icon={<Plus size={14}/>}/>}/>
+                 {data.mandats?.map((m: any,i: number)=>(
+                    <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                        <div style={{width:40,height:40,borderRadius:10,background:T.white,display:"flex",alignItems:"center",justifyContent:"center"}}><Handshake color={T.navy} size={20}/></div>
+                        <div>
+                          <div style={{fontSize:14,fontWeight:800,color:T.navy}}>{m.agence || m.nom}</div>
+                          <div style={{fontSize:11,color:T.textLight}}>{m.scope || "Tous les biens"} · {m.role}</div>
+                        </div>
+                      </div>
+                      <Badge label={m.status} color={m.status === "Actif" ? T.green : T.orange} bg={m.status === "Actif" ? T.greenPale : T.orangePale}/>
+                    </div>
+                 ))}
+               </Card>
+             </div>
+             <div style={{display:"flex",flexDirection:"column",gap:24}}>
+               <Card style={{background:T.teal,color:T.white}}>
+                 <CardTitle label="⚡ Configuration SLA" />
+                 <div style={{fontSize:11,opacity:0.8,marginBottom:20,lineHeight:1.4}}>Délai maximum autorisé pour la signalisation d'un incident majeur.</div>
+                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                   {["12h","24h","48h","72h"].map(h=>(
+                     <button key={h} style={{padding:"12px",borderRadius:10,background:h==="24h"?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.05)",border:"none",color:T.white,fontSize:13,fontWeight:900,cursor:"pointer"}}>{h}</button>
+                   ))}
+                 </div>
+                 <div style={{marginTop:20,fontSize:10,fontWeight:700,textAlign:"center",opacity:0.6}}>Paramètre actuel : 24h</div>
+               </Card>
+             </div>
+           </div>
+        </motion.div>
+      )}
+
+      {tab === "parametres" && (
+        <motion.div key="params" initial={{opacity:0}} animate={{opacity:1}} style={{display:"flex",flexDirection:"column",gap:28}}>
+          <div style={{maxWidth:600}}>
+            <SecTitle label="⚙️ Préférences de compte" />
+            <Card style={{display:"flex",flexDirection:"column",gap:16}}>
+              <RowData label="Devise préférée" value={data.settings?.devise || "FCFA"} />
+              <RowData label="Fuseau Horaire" value={data.settings?.fuseau || "Europe/Paris"} />
+              <RowData label="Pays de résidence" value={data.settings?.pays || "France"} />
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0"}}>
+                <span style={{fontSize:11,color:T.textLight,fontWeight:700,textTransform:"uppercase"}}>Notifications Mail</span>
+                <div style={{width:40,height:20,background:T.green,borderRadius:10,position:"relative"}}><div style={{width:16,height:16,background:T.white,borderRadius:8,position:"absolute",right:2,top:2}}/></div>
+              </div>
+              <div style={{marginTop:20,display:"flex",gap:12}}>
+                <BtnPrim label="Sauvegarder les réglages" style={{flex:1}}/>
+                <BtnSec label="Déconnexion" color={T.red}/>
+              </div>
+            </Card>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <div style={{display:"flex",minHeight:"100vh",background:T.bg,fontFamily:"Inter, sans-serif",color:T.text}}>
+      <Sidebar />
+      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+        <Topbar />
+        <div style={{flex:1,padding:bp.isMobile?"16px":"32px",overflowY:"auto"}}>
+          <Content />
+        </div>
+        {bp.isMobile && (
+          <div style={{height:64,background:T.navyDark,position:"fixed",bottom:0,left:0,right:0,display:"flex",alignItems:"center",justifyContent:"space-around",borderTop:`1px solid rgba(255,255,255,.1)`,zIndex:400}}>
+            {TABS.slice(0,4).map(t=>(
+              <button key={t.id} onClick={()=>goTab(t.id)} style={{background:"none",border:"none",color:tab===t.id?T.gold:T.white,opacity:tab===t.id?1:0.5,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+                {t.icon}
+                <span style={{fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{t.label.split(" ")[0]}</span>
+              </button>
+            ))}
+            <button onClick={()=>setSideOpen(true)} style={{background:"none",border:"none",color:T.white,opacity:0.5}}>
+              <Settings2 size={18}/>
+              <span style={{fontSize:9,fontWeight:700,textTransform:"uppercase"}}>Plus</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* --- OVERLAYS --- */}
-
-      <Modal open={O.notifs} onClose={() => cl("notifs")} title="Journaux de Bord" color={T.navy}>
-         <div className="space-y-4">
-           {[
-              { t: "Virement de loyer confirmé", s: "Villa 7 — 320 000 FCFA convertis en EUR", type: "success", icon: CheckCircle2 },
-              { t: "Alerte SLA : Kouamé J.", s: "L'appartement 3B n'a pas reçu de réponse (72h)", type: "warning", icon: Clock },
-              { t: "Consigne CDC Scellée", s: "Caution Studio A2 protégée légalement", type: "info", icon: ShieldAlert },
-           ].map((n, i) => (
-             <div key={i} className="flex items-center gap-6 p-6 bg-gray-50 rounded-3xl border border-gray-100">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${n.type === 'success' ? 'bg-green-50 text-green-600' : n.type === 'warning' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
-                  <n.icon size={24} />
-                </div>
-                <div>
-                   <h5 className="font-black text-[#1F4E79] uppercase italic">{n.t}</h5>
-                   <p className="text-gray-400 text-xs font-bold mt-1 uppercase tracking-widest">{n.s}</p>
-                </div>
-             </div>
-           ))}
-         </div>
-      </Modal>
-
-      <Modal open={O.invite} onClose={() => cl("invite")} title="Délégation de Gestion" color={T.teal}>
-         <div className="space-y-8">
-            <div className="p-6 bg-[#E0F4F9] border border-[#0E7490]20 rounded-3xl text-[12px] text-[#0E7490] font-bold leading-relaxed">
-               Vous vous apprêtez à déléguer la gestion d'un bien à un tiers local. Le lien généré est cryptographically scellé (HMAC-SHA256).
+      {/* ── OVERLAYS ── */}
+      <Dialog open={O.notifs} onClose={()=>cl("notifs")} title="Journaux de Bord" tc={T.navy}>
+        <div style={{display:"flex",flexDirection:"column",gap:12,paddingTop:12}}>
+          {data.webhooks?.map((w: any,i: number)=>(
+            <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,display:"flex",gap:12,alignItems:"center"}}>
+              <div style={{width:40,height:40,borderRadius:10,background:T.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🔔</div>
+              <div>
+                <div style={{fontSize:12,fontWeight:800,color:T.navy}}>{w.op} : Recouvrement {w.montant.toLocaleString()} FCFA</div>
+                <div style={{fontSize:10,color:T.textLight}}>{w.date} · {w.emetteur} · {w.bien}</div>
+              </div>
             </div>
-            
-            <div className="space-y-6">
-               <div className="space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic italic">Sélection du Patrimoine</label>
-                  <select className="w-full bg-gray-100 border-none rounded-2xl p-5 text-sm font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#0E7490]">
-                     {properties.map((b:any) => <option key={b.id}>{b.name}</option>)}
-                  </select>
-               </div>
-               
-               <div className="space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic italic">Profil du Mandataire</label>
-                  <div className="grid grid-cols-2 gap-4">
-                     {["Agence Agréée", "Cousin / Proche", "Notaire", "Agent Libre"].map(p => (
-                       <button key={p} className="p-5 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-black text-[#1F4E79] hover:bg-[#0E7490] hover:text-white transition-all">
-                          {p}
-                       </button>
-                     ))}
-                  </div>
-               </div>
-               
-               <div className="pt-8 flex gap-4">
-                  <button onClick={() => cl("invite")} className="flex-1 py-5 bg-gray-100 text-gray-400 font-black rounded-2xl uppercase tracking-widest italic italic">Annuler</button>
-                  <button className="flex-1 py-5 bg-[#0E7490] text-white font-black rounded-2xl uppercase tracking-[0.2em] shadow-2xl shadow-teal-900/20 italic italic italic uppercase">Générer le Sceau →</button>
-               </div>
+          ))}
+        </div>
+      </Dialog>
+      
+      <Dialog open={O.inviter} onClose={()=>cl("inviter")} title="Inviter un gestionnaire" tc={T.teal}>
+        <div style={{paddingTop:12}}>
+          <div style={{padding:16,background:T.tealPale,borderRadius:12,fontSize:11,fontWeight:600,color:T.teal,marginBottom:20,lineHeight:1.5}}>
+            Générez un accès sécurisé pour votre partenaire local (Agence ou Proche). Il pourra éditer les quittances et signaler les incidents.
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            <RowData label="Bien concerné" value={selBien?.name || "Tous les biens"} />
+            <div style={{fontSize:11,fontWeight:700,color:T.textLight,textTransform:"uppercase",marginBottom:8}}>Rôle du mandataire</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {["Agence Agréée","Particulier"].map(r=>(
+                <button key={r} style={{padding:"12px",borderRadius:10,border:`1.5px solid ${T.grey2}`,background:T.white,fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer"}}>{r}</button>
+              ))}
             </div>
-         </div>
-      </Modal>
-
-      {/* --- OTHERS CAN BE ADDED HERE --- */}
-
+          </div>
+          <div style={{marginTop:24}}>
+            <BtnPrim label="Générer l'invitation" onClick={()=>cl("inviter")} bg={T.teal} style={{width:"100%"}}/>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

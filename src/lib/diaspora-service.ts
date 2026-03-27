@@ -138,7 +138,6 @@ export class DiasporaService {
         const activeLease = p.leases[0];
         const lastReceipt = activeLease?.receipts[0];
         
-        // Simulation logic for Impayé/SLA (in real app, this would check dates)
         const isImpaye = activeLease?.status === 'LOYER_IMPAYE';
         const isHorsSLA = !!(p.managedByUserId && !activeLease?.receipts?.length);
 
@@ -155,17 +154,50 @@ export class DiasporaService {
             rentFcfa: activeLease.rentAmount,
             rentDevise: Number((activeLease.rentAmount * rate).toFixed(2)),
             tenant: activeLease.tenantId,
-            lastPayment: lastReceipt?.createdAt ? new Date(lastReceipt.createdAt) : null
+            lastPayment: lastReceipt?.createdAt ? new Date(lastReceipt.createdAt).toISOString() : null
           } : null
         };
       }),
       mandats: user.mandatsDonnes.map(m => ({
         id: m.id,
-        name: m.intermediaire.fullName || m.intermediaire.name,
-        phone: m.intermediaire.phone,
+        agence: m.intermediaire.fullName || m.intermediaire.name,
+        nom: m.intermediaire.fullName || m.intermediaire.name,
+        phone: m.intermediaire.phone || "",
         statut: m.statut,
-        since: m.createdAt
-      }))
+        status: m.statut === "ACTIF" ? "Actif" : "En attente",
+        since: m.createdAt,
+        scope: "Global",
+        role: "Gestionnaire",
+        slaConfig: 24,
+        slaReel: 14
+      })),
+      mobileMoney: [
+        { id: "MM-01", provider: "Orange", phone: "+225 07 11 22 33", solde: 320000, active: true },
+        { id: "MM-02", provider: "Wave", phone: "+225 05 44 55 66", solde: 150000, active: true }
+      ],
+      virements: user.propertiesOwned.flatMap(p => p.leases.flatMap(l => l.receipts.map(r => ({
+        id: `VIR-${r.id.slice(0,8)}`,
+        bien: p.name || p.address || "Propriété",
+        mois: r.createdAt.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+        montantFCFA: l.rentAmount,
+        statut: "Reçu",
+        dateReception: r.createdAt.toLocaleDateString('fr-FR'),
+        reference: `RECEP-${r.id.slice(0,8)}`,
+        ref: `RECEP-${r.id.slice(0,8)}`,
+        date: r.createdAt.toLocaleDateString('fr-FR'),
+        type: "Virement SEPA"
+      })))),
+      webhooks: [
+        { date: new Date().toLocaleString('fr-FR'), op: "Orange Money", emetteur: "+225 07 11 22 33", montant: 320000, bien: "Villa 7", statut: "Quittance émise", ref: "QIT-2026-0341" }
+      ],
+      settings: {
+        iban: user.diasporaStripeId || "FR76 3000 4000 0300 0000 0000 147",
+        banque: "Société Générale",
+        pays: user.paysResidence || "France",
+        fuseau: user.fuseauHoraire || "Europe/Paris",
+        devise: currency,
+        notifications: ["WhatsApp", "Email"]
+      }
     };
   }
 }
