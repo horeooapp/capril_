@@ -493,11 +493,11 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                             </div>
                          </div>
                          <div className="space-y-3">
-                            <button onClick={() => { cl('clemence'); activerClemenceM07(selectedProperty?.id, { type: 'delai', delaiJours: 7 }); }} className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all">
+                            <button onClick={() => { setSheet(null); activerClemenceM07(selectedProperty?.id, { type: 'delai', delaiJours: 7 }); }} className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all">
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option A: Délai de grâce (7 jours)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Zéro relance pendant 1 semaine</p>
                             </button>
-                            <button onClick={() => { cl('clemence'); activerClemenceM07(selectedProperty?.id, { type: 'delai', delaiJours: 15 }); }} className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all">
+                            <button onClick={() => { setSheet(null); activerClemenceM07(selectedProperty?.id, { type: 'delai', delaiJours: 15 }); }} className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all">
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option B: Délai étendu (15 jours)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Approbation mandataire nécessaire</p>
                             </button>
