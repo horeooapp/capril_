@@ -22,8 +22,13 @@ import {
     Download,
     AlertCircle,
     CheckCircle2,
-    X
+    X,
+    Users,
+    Settings2
 } from "lucide-react"
+
+import { AgencyCandidateList } from "../agency/AgencyCandidateList"
+import { AgencyToolsGrid } from "../agency/AgencyToolsGrid"
 
 // Theme Colors from Mockup
 const T = {
@@ -570,16 +575,40 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
                             </div>
                         </div>
                     )}
+
+                    {/* --- TAB: CANDIDATS (Agency Feature) --- */}
+                    {tab === "candidats" && (
+                        <div className="pb-10">
+                            <div className="p-8 pb-4">
+                                <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Candidats.</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Flux de dossiers qualifiés M-CAND</p>
+                            </div>
+                            <AgencyCandidateList />
+                        </div>
+                    )}
+
+                    {/* --- TAB: OUTILS (Agency Feature) --- */}
+                    {tab === "outils" && (
+                        <div className="pb-10">
+                            <div className="p-8 pb-4">
+                                <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Outils métier.</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Écosystème de gestion professionnelle certifiée</p>
+                            </div>
+                            <AgencyToolsGrid />
+                        </div>
+                    )}
                 </div>
 
                 {/* BOTTOM NAVIGATION (Fixed) */}
                 <div className="absolute bottom-0 inset-x-0 h-20 bg-white border-t border-[#D6DCE8] px-6 flex justify-between items-center z-50 rounded-b-[36px]">
                     {[
-                        { id: "dashboard", icon: <BarChart3 size={20} />, label: "Tableau" },
-                        { id: "biens", icon: <Building2 size={20} />, label: "Patrimoine" },
-                        { id: "quittances", icon: <Receipt size={20} />, label: "Quittances" },
-                        { id: "cautions", icon: <ShieldCheck size={20} />, label: "Cautions" },
-                        { id: "profil", icon: <User size={20} />, label: "Profil" },
+                        { id: "dashboard", icon: <BarChart3 size={18} />, label: "Tableau" },
+                        { id: "biens", icon: <Building2 size={18} />, label: "Biens" },
+                        { id: "candidats", icon: <Users size={18} />, label: "Candidats" },
+                        { id: "quittances", icon: <Receipt size={18} />, label: "Quittances" },
+                        { id: "outils", icon: <Settings2 size={18} />, label: "Outils" },
+                        { id: "cautions", icon: <ShieldCheck size={18} />, label: "Securité" },
+                        { id: "profil", icon: <User size={18} />, label: "Profil" },
                     ].map(btn => {
                         const active = tab === btn.id;
                         return (
