@@ -137,20 +137,29 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           </div>
         )}
 
-        {/* KPIs */}
+        {/* MODULES EN HAUT */}
         <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Indicateurs financiers</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatCard label="Loyers / mois" value={`${fmt(stats.totalLoyers)} F`} icon="💰" color={T.navy} bg={T.navyPale} />
-            <StatCard label="Encaissé" value={`${fmt(stats.encaisse)} F`} icon="✅" color={T.green} bg={T.greenPale} />
-            <StatCard label="Unités vacantes" value={stats.vacants} icon="🏚" color={stats.vacants > 0 ? T.orange : T.green} bg={stats.vacants > 0 ? T.orangePale : T.greenPale} />
-            <StatCard label="Impayés" value={stats.impayesN} icon="⚠️" color={stats.impayesN > 0 ? T.red : T.green} bg={stats.impayesN > 0 ? T.redPale : T.greenPale} />
+          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4 text-center">Outils & gestion</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
+            {[
+              { href: "/dashboard/properties", icon: "🏘️", label: "Biens",        color: T.teal },
+              { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
+              { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
+              { href: "/dashboard/financial",  icon: "📊", label: "Finances",     color: T.gold },
+            ].map((m, i) => (
+              <Link key={i} href={m.href}
+                className="bg-white border border-[#D6DCE8] rounded-2xl p-4 text-center hover:shadow-md transition-all group block"
+                style={{ borderTopWidth: 3, borderTopColor: m.color }}>
+                <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">{m.icon}</div>
+                <p className="text-[11px] font-black" style={{ color: m.color }}>{m.label}</p>
+              </Link>
+            ))}
           </div>
         </section>
 
-        {/* TAUX D'ENCAISSEMENT */}
-        <section>
-          <div className="bg-white rounded-2xl p-6 border border-[#D6DCE8] shadow-sm">
+        {/* TAUX D'ENCAISSEMENT PROMINENT */}
+        <section className="max-w-3xl mx-auto w-full">
+          <Link href="/dashboard/financial" className="bg-white rounded-2xl p-6 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
             <div className="flex justify-between items-end mb-3">
               <div>
                 <p className="text-xs text-[#6A7D9E] font-bold uppercase tracking-wider">Taux d'encaissement du mois</p>
@@ -166,8 +175,20 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
                 style={{ width: `${tauxEncaissement}%`, background: tauxEncaissement === 100 ? T.green : tauxEncaissement >= 80 ? T.teal : T.orange }} />
             </div>
             <p className="text-xs text-[#6A7D9E] mt-2">{fmt(stats.encaisse)} FCFA encaissés sur {fmt(stats.totalLoyers)} FCFA attendus</p>
+          </Link>
+        </section>
+
+        {/* KPIs */}
+        <section>
+          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Indicateurs financiers</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <StatCard label="Loyers / mois" value={`${fmt(stats.totalLoyers)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/dashboard/financial" />
+            <StatCard label="Encaissé" value={`${fmt(stats.encaisse)} F`} icon="✅" color={T.green} bg={T.greenPale} href="/dashboard/financial" />
+            <StatCard label="Unités vacantes" value={stats.vacants} icon="🏚" color={stats.vacants > 0 ? T.orange : T.green} bg={stats.vacants > 0 ? T.orangePale : T.greenPale} href="/dashboard/properties" />
+            <StatCard label="Impayés" value={stats.impayesN} icon="⚠️" color={stats.impayesN > 0 ? T.red : T.green} bg={stats.impayesN > 0 ? T.redPale : T.greenPale} href="/dashboard/leases" />
           </div>
         </section>
+
 
         {/* PATRIMOINE */}
         <section>
@@ -243,25 +264,6 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           </div>
         </section>
 
-        {/* MODULES RAPIDES */}
-        <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Outils & gestion</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { href: "/dashboard/properties", icon: "🏘️", label: "Biens",        color: T.teal },
-              { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
-              { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
-              { href: "/dashboard/financial",  icon: "📊", label: "Finances",     color: T.gold },
-            ].map((m, i) => (
-              <Link key={i} href={m.href}
-                className="bg-white border border-[#D6DCE8] rounded-2xl p-4 text-center hover:shadow-md transition-all group block"
-                style={{ borderTopWidth: 3, borderTopColor: m.color }}>
-                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{m.icon}</div>
-                <p className="text-xs font-black" style={{ color: m.color }}>{m.label}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
 
       </div>
 

@@ -84,6 +84,27 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           </button>
         </div>
 
+        {/* MODULES EN HAUT */}
+        <section>
+          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4 text-center">Mes modules</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+            {[
+              { href: "/locataire/leases",   icon: "📄", label: "Mon Bail",      color: T.teal },
+              { href: "/locataire/receipts", icon: "🧾", label: "Paiements",     color: T.green },
+              { href: "/locataire/utilities",icon: "⚡", label: "CIE / SODECI",  color: T.orange },
+              { href: "/locataire/rights",   icon: "⚖️", label: "Mes Droits",    color: T.purple },
+              { href: "/locataire/trust",    icon: "🎫", label: "Score ICL",     color: T.gold },
+            ].map((m, i) => (
+              <Link key={i} href={m.href}
+                className="bg-white border border-[#D6DCE8] rounded-2xl p-4 text-center hover:shadow-md transition-all group block"
+                style={{ borderTopWidth: 3, borderTopColor: m.color }}>
+                <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">{m.icon}</div>
+                <p className="text-[11px] font-black" style={{ color: m.color }}>{m.label}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* ALERTE IMPAYÉ */}
         {mainBail?.status === "LOYER_IMPAYE" && (
           <div className="bg-[#FEECEC] border border-red-200 rounded-2xl p-5 flex items-start gap-4">
@@ -102,8 +123,8 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard label="Loyer / mois" value={`${fmt(mainBail?.rentAmount)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/locataire/leases" />
             <StatCard label="Quittances" value={data?.quittances?.length || 0} icon="🧾" color={T.green} bg={T.greenPale} href="/locataire/receipts" />
-            <StatCard label="Score ICL" value={sc} icon="⭐" color={scColor} bg={scColor + "18"} />
-            <StatCard label="Caution" value={data?.caution ? "Séquestrée ✓" : "—"} icon="🔒" color={T.teal} bg={T.tealPale} />
+            <StatCard label="Score ICL" value={sc} icon="⭐" color={scColor} bg={scColor + "18"} href="/locataire/trust" />
+            <StatCard label="Caution" value={data?.caution ? "Séquestrée ✓" : "—"} icon="🔒" color={T.teal} bg={T.tealPale} href="/locataire/leases" />
           </div>
         </section>
 
@@ -162,27 +183,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           </div>
         </section>
 
-        {/* MODULES RAPIDES */}
-        <section>
-          <h2 className="text-xs font-black text-[#6A7D9E] uppercase tracking-[0.15em] mb-4">Mes modules</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[
-              { href: "/locataire/leases",   icon: "📄", label: "Mon Bail",     sub: "Contrat & certif.",  color: T.teal },
-              { href: "/locataire/receipts", icon: "🧾", label: "Paiements",    sub: "Quittances",          color: T.green },
-              { href: "/locataire/utilities",icon: "⚡", label: "CIE / SODECI", sub: "Charges",             color: T.orange },
-              { href: "/locataire/rights",   icon: "⚖️", label: "Mes Droits",   sub: "RCL, MRL, Préavis",  color: T.purple },
-              { href: "/locataire/trust",    icon: "🎫", label: "Mon Score ICL",sub: "Passeport locatif",  color: T.gold },
-            ].map((m, i) => (
-              <Link key={i} href={m.href}
-                className="bg-white border border-[#D6DCE8] rounded-2xl p-4 text-center hover:shadow-md transition-all group block"
-                style={{ borderTopWidth: 3, borderTopColor: m.color }}>
-                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{m.icon}</div>
-                <p className="text-xs font-black" style={{ color: m.color }}>{m.label}</p>
-                <p className="text-[9px] text-[#8FA0BC] font-medium mt-0.5 hidden sm:block">{m.sub}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+
 
         {/* CIE / SODECI PREVIEW */}
         {data?.facturesUtilities?.length > 0 && (
@@ -193,12 +194,12 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {data.facturesUtilities.slice(0, 3).map((f: any, i: number) => (
-                <div key={i} className="bg-white rounded-2xl p-4 border border-[#D6DCE8] shadow-sm">
+                <Link key={i} href="/locataire/utilities" className="bg-white rounded-2xl p-4 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
                   <div className="text-2xl mb-2">{f.typeUtility === "CIE" ? "⚡" : "💧"}</div>
                   <p className="text-xs font-black uppercase" style={{ color: f.typeUtility === "CIE" ? "#F97316" : T.teal }}>{f.typeUtility}</p>
                   <p className="text-lg font-black text-[#0D2B6E] mt-1">{fmt(f.montantTotal)} F</p>
                   <Badge label={f.statut} color={T.green} bg={T.greenPale} size={8} />
-                </div>
+                </Link>
               ))}
             </div>
           </section>
@@ -213,21 +214,23 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
             </div>
             <div className="bg-white rounded-2xl border border-[#D6DCE8] shadow-sm overflow-hidden">
               {data.quittances.slice(0, 4).map((q: any, i: number) => (
-                <div key={q.id} className={`flex items-center gap-4 px-5 py-3 ${i < data.quittances.slice(0, 4).length - 1 ? "border-b border-[#EEF2F7]" : ""}`}>
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm ${q.status === "paid" ? "bg-emerald-50" : "bg-red-50"}`}>
-                    {q.status === "paid" ? "🧾" : "⚠️"}
+                <Link key={q.id} href="/locataire/receipts" className={`flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors block ${i < data.quittances.slice(0, 4).length - 1 ? "border-b border-[#EEF2F7]" : ""}`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm ${q.status === "paid" ? "bg-emerald-50" : "bg-red-50"}`}>
+                      {q.status === "paid" ? "🧾" : "⚠️"}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-[#0D2B6E] uppercase">{q.periodMonth}</p>
+                      <p className="text-[10px] font-mono text-[#6A7D9E]">{q.receiptRef}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-[#0D2B6E]">{fmt(q.totalAmount)} F</p>
+                      <Badge label={q.status === "paid" ? "Payé" : "En attente"}
+                        color={q.status === "paid" ? T.green : T.red}
+                        bg={q.status === "paid" ? T.greenPale : T.redPale} size={8} />
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-black text-[#0D2B6E] uppercase">{q.periodMonth}</p>
-                    <p className="text-[10px] font-mono text-[#6A7D9E]">{q.receiptRef}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-[#0D2B6E]">{fmt(q.totalAmount)} F</p>
-                    <Badge label={q.status === "paid" ? "Payé" : "En attente"}
-                      color={q.status === "paid" ? T.green : T.red}
-                      bg={q.status === "paid" ? T.greenPale : T.redPale} size={8} />
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
