@@ -160,19 +160,9 @@ export default function DashboardLocataireV2({ data, session }: { data: any, ses
   ];
 
   return (
-    <div className="flex justify-center min-h-screen bg-[#F2F5FA] md:py-10 px-0 md:px-4">
-      {/* Container 390x844 (iPhone 12/13/14 format) */}
-      <div className="relative w-full max-w-[390px] h-screen md:h-[844px] bg-white md:rounded-[48px] shadow-2xl overflow-hidden border border-[#D6DCE8] flex flex-col">
-        
-        {/* TOP STATUS BAR (SIMULATED) */}
-        <div className="bg-[#071A45] px-8 pt-4 pb-1 flex justify-between items-center text-white/70">
-          <span className="text-[11px] font-black font-mono">9:41</span>
-          <div className="flex gap-2">
-            <span className="text-[10px]">▮▮▮</span>
-            <span className="text-[10px]">WiFi</span>
-            <span className="text-[10px]">🔋</span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#F2F5FA]">
+      {/* Full-width container — no phone frame */}
+      <div className="relative w-full max-w-4xl mx-auto flex flex-col min-h-screen">
 
         {/* COMPACT APP HEADER */}
         <div className="bg-gradient-to-br from-[#0D2B6E] to-[#0E7490] p-5 pb-6 relative overflow-hidden flex-shrink-0">
@@ -599,8 +589,8 @@ export default function DashboardLocataireV2({ data, session }: { data: any, ses
 
         </div>
 
-        {/* FIXED BOTTOM NAVIGATION */}
-        <div className="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-[#D6DCE8] px-4 pt-3 pb-8 flex justify-between items-center z-[200]">
+        {/* BOTTOM NAVIGATION — sticky on mobile, desktop uses sidebar */}
+        <div className="sticky bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-[#D6DCE8] px-4 pt-3 pb-6 flex justify-between items-center z-[200] lg:hidden">
           {TABS.map((t) => (
             <button 
               key={t.id} 
