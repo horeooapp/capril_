@@ -17,13 +17,39 @@ export default async function FeaturesPage() {
     redirect("/admin");
   }
 
-  // Récupérer les flags de la DB (avec fallback si vide ou table manquante)
+  // Récupérer les flags de la DB (avec auto-seed si vide ou table manquante)
   let features = [];
   try {
     if ((prisma as any).featureFlag) {
       features = await (prisma as any).featureFlag.findMany({
         orderBy: { id: "asc" }
       });
+
+      // Auto-seed si table vide en production
+      if (features.length === 0) {
+        const defaultFeatures = [
+          { id: "M01-M03", name: "Vérification KYC", description: "Gestion des documents d'identité et niveaux de certification", enabled: true },
+          { id: "M04", name: "Gestion des Baux", description: "Émission et suivi des contrats de location certifiés", enabled: true },
+          { id: "M05", name: "Mandats de Gestion", description: "Gestion des délégations entre propriétaires et agences", enabled: true },
+          { id: "M06-M09", name: "Maintenance & Incidents", description: "Suivi des interventions techniques et signalements locataires", enabled: true },
+          { id: "M10-M11", name: "Médiation & Contentieux", description: "Centre de résolution amiable et procédures CACI", enabled: true },
+          { id: "M16", name: "Fiscalité Immobilière", description: "Calcul automatique des taxes et aide à la déclaration", enabled: true },
+          { id: "M-PGW", name: "Passerelle de Paiement", description: "Intégration Mobile Money (Orange, Wave, MTN) et SEPA", enabled: true },
+          { id: "DIASPORA_PACKAGE", name: "Pack Diaspora", description: "Fonctionnalités premium pour les propriétaires résidant à l'étranger", enabled: true },
+          { id: "M-EDL", name: "États des Lieux", description: "EDL numériques avec photos et signature certifiée", enabled: true },
+          { id: "M-SIGN", name: "Signature Électronique", description: "Service de signature légale pour tous les documents", enabled: true },
+          { id: "NEWS_TICKER", name: "News Ticker", description: "Informations défilantes sur la page d'accueil", enabled: true },
+          { id: "SMS_NOTIFICATIONS", name: "Notifications SMS", description: "Alertes automatiques par SMS et WhatsApp", enabled: true },
+        ];
+        await Promise.all(defaultFeatures.map(f =>
+          (prisma as any).featureFlag.upsert({
+            where: { id: f.id },
+            update: {},
+            create: f,
+          })
+        ));
+        features = await (prisma as any).featureFlag.findMany({ orderBy: { id: "asc" } });
+      }
     }
   } catch (e) {
     console.error("[FeaturesPage] Impossible d'accéder à la table FeatureFlag :", e);
