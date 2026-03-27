@@ -6,8 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     androidScheme: 'https',
-    // Pour le développement local, décommentez la ligne suivante avec votre IP :
-    // url: 'http://192.168.1.XX:3000', 
+    url: 'https://www.qapril.ci',
     cleartext: true
   }
 };
