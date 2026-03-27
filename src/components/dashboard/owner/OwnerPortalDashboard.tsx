@@ -154,8 +154,8 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-2">Espace Propriétaire • Supervision</p>
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">Espace Propriétaire • Supervision</p>
+            <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
               Bonjour, {user?.name?.split(" ")[0] || "Propriétaire"}.
             </h1>
             <p className="text-sm font-medium text-gray-500 mt-3 border-l-2 border-primary pl-4 uppercase tracking-widest">

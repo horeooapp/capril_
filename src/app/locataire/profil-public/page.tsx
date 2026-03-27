@@ -12,7 +12,7 @@ export default async function ProfilPublicPage() {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">Gestion de mon Profil Public</h1>
+            <h1 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter mb-8">Profil Public Expert.</h1>
             <ProfilPublicLocataireClient 
                 userId={session.user.id} 
                 initialData={profil} 

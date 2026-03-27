@@ -241,10 +241,10 @@ export default async function AdminDashboardOverview() {
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
+                        <h1 className="text-4xl md:text-6xl font-black text-[#1F4E79] tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
                             Supervision.
                         </h1>
-                        <p className="text-gray-500 font-medium tracking-wide">
+                        <p className="text-[#C55A11] font-bold tracking-wide">
                             Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
                         </p>
                     </div>

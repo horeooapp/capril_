@@ -15,20 +15,22 @@ export default async function OwnerProfilePage() {
     return (
         <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Header / Hero */}
-            <div className="glass-panel p-8 md:p-12 rounded-[3rem] border border-white/40 shadow-xl bg-gradient-to-br from-[#1F4E79] to-[#163a5a] text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+            <div className="glass-panel p-8 md:p-12 rounded-[3rem] border border-white/40 shadow-xl bg-white/50 backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#1F4E79]/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl border border-white/20 shadow-2xl">
-                        <User size={48} />
+                    <div className="w-24 h-24 bg-[#1F4E79]/5 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl border border-[#1F4E79]/10 shadow-inner">
+                        <User size={48} className="text-[#1F4E79]" />
                     </div>
                     <div className="text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2">{user?.fullName || "Propriétaire QAPRIL"}</h1>
-                        <p className="text-white/60 font-medium">{user?.email}</p>
+                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
+                            {user?.fullName || "Propriétaire QAPRIL"}
+                        </h1>
+                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{user?.email}</p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
-                            <span className="px-4 py-1.5 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
+                            <span className="px-4 py-1.5 bg-white border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 shadow-sm">
                                 Niveau KYC : {user?.kycLevel || 1}
                             </span>
-                            <span className="px-4 py-1.5 bg-[#C55A11] rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                            <span className="px-4 py-1.5 bg-[#C55A11] rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-orange-900/20">
                                 {user?.role || "LANDLORD"}
                             </span>
                         </div>
