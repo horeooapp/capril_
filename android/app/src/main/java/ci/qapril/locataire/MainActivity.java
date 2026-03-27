@@ -1,4 +1,4 @@
-package com.qapril.app;
+package ci.qapril.locataire;
 
 import com.getcapacitor.BridgeActivity;
 

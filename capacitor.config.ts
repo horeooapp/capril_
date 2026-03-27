@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: 'QAPRIL',
   webDir: 'out',
   server: {
-    androidScheme: 'https',
-    url: 'https://www.qapril.ci',
+    androidScheme: 'http',
+    url: 'https://qapril.ci/',
+    allowNavigation: ['*'],
     cleartext: true
   }
 };
