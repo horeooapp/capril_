@@ -6,32 +6,86 @@ import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
 
 /**
- * ADD-09: Recharger le solde QAPRIL (Wallet) de l'utilisateur.
- * Ce endpoint serait typiquement appelé APRÈS une confirmation Webhook Wave/Orange.
+ * [WDL-05] Récupère le profil complet du wallet pour l'UI (ADD-07 v3).
  */
-export async function topUpWallet(amount: number, method: string) {
-    const session = await auth()
-    if (!session || !session.user || !session.user.id) {
-        return { error: "Non autorisé" }
-    }
+export async function getWalletProfile() {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) return null;
+
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: {
+            walletRechargeConfig: true,
+            walletRechargeLinks: {
+                orderBy: { createdAt: 'desc' },
+                take: 5
+            },
+            _count: {
+                select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
+            }
+        }
+    });
+
+    if (!user) return null;
+
+    // Calculer les suggestions de recharge
+    const { calculateSuggestedRecharge } = await import("@/lib/wallet/calculator");
+    const suggestions = await calculateSuggestedRecharge(user.id);
+
+    return {
+        balance: user.walletBalance,
+        operateur: user.walletOperateurPrefere || "WAVE",
+        canal: user.walletCanalAlertePref || "WHATSAPP",
+        seuil: user.walletSeuilAlerte || 500,
+        rappel: user.walletRechargeConfig,
+        recentLinks: user.walletRechargeLinks,
+        suggestions,
+        nbBails: user._count.leasesAsLandlord
+    };
+}
+
+/**
+ * [WDL-06] Met à jour les préférences de recharge auto (ADD-07 v3).
+ */
+export async function updateWalletPreferences(data: {
+    operateur?: string,
+    canal?: string,
+    seuil?: number,
+    rappelActif?: boolean,
+    rappelJour?: number
+}) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) return { error: "Non autorisé" };
 
     try {
-        const user = await prisma.user.update({
+        await prisma.user.update({
             where: { id: session.user.id },
-            data: { walletBalance: { increment: amount } }
-        })
+            data: {
+                walletOperateurPrefere: data.operateur,
+                walletCanalAlertePref: data.canal,
+                walletSeuilAlerte: data.seuil
+            }
+        });
 
-        await logAction({
-            action: "WALLET_TOPUP",
-            module: "BILLING",
-            entityId: session.user.id,
-            newValues: { amount, method, newBalance: user.walletBalance }
-        })
+        if (data.rappelActif !== undefined || data.rappelJour !== undefined) {
+            await prisma.walletRechargeConfig.upsert({
+                where: { userId: session.user.id },
+                update: {
+                    rappelActif: data.rappelActif,
+                    jourDuMois: data.rappelJour
+                },
+                create: {
+                    userId: session.user.id,
+                    rappelActif: data.rappelActif || false,
+                    jourDuMois: data.rappelJour || 1
+                }
+            });
+        }
 
-        revalidatePath("/dashboard")
-        return { success: true, newBalance: user.walletBalance }
+        revalidatePath("/dashboard/wallet");
+        return { success: true };
     } catch (e) {
-        console.error("[WALLET TOPUP] Erreur:", e)
-        return { error: "Erreur lors du rechargement statique du portefeuille" }
+        console.error("[WALLET PREFS] Erreur:", e);
+        return { error: "Erreur lors de la mise à jour des préférences" };
     }
 }

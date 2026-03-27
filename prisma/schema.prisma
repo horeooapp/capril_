@@ -3126,8 +3126,9 @@ model WalletRechargeLink {
   canalEnvoi      String          @map("canal_envoi") // WHATSAPP | SMS | PUSH
   messageEnvoye   String?         @map("message_envoye")
   
-  clique          Boolean         @default(false)
+    clique          Boolean         @default(false)
   cliqueAt        DateTime?       @map("clique_at")
+  clicsCompteur   Int             @default(0) @map("clics_compteur")
   rechargeEffectuee Boolean       @default(false) @map("recharge_effectuee")
   rechargeAt      DateTime?       @map("recharge_at")
   montantRecharge Float?        @map("montant_recharge")

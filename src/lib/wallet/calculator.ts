@@ -11,38 +11,46 @@ export interface RechargeOptions {
  * Formule: (nb_bails * prix_quittance * mois_couverture) - solde_actuel
  */
 export async function calculateSuggestedRecharge(userId: string): Promise<RechargeOptions> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      walletBalance: true,
-      _count: {
-        select: {
-          leasesAsLandlord: {
-            where: { status: "ACTIVE" }
+  const [user, configs] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        walletBalance: true,
+        _count: {
+          select: {
+            leasesAsLandlord: {
+              where: { status: "ACTIVE" }
+            }
           }
         }
       }
-    }
-  });
+    }),
+    prisma.configTarif.findMany({
+      where: {
+        cle: { in: ["quittance_ttc", "wallet_mois_couverture"] }
+      }
+    })
+  ]);
 
   if (!user) throw new Error("Utilisateur non trouvé");
 
-  const soldeActuel = user.walletBalance;
+  const soldeActuel = user.walletBalance || 0;
   const nbBails = user._count.leasesAsLandlord;
   
-  // Constantes (idéalement depuis ConfigTarif, mais ici en dur selon le CDC)
-  const PRIX_QUITTANCE = 75; // FCFA
-  const MOIS_COUVERTURE = 2; // Recommandé
+  // Constantes depuis ConfigTarif (ADD-07 v3)
+  const PRIX_QUITTANCE = configs.find(c => c.cle === "quittance_ttc")?.valeur || 75;
+  const MOIS_COUVERTURE = configs.find(c => c.cle === "wallet_mois_couverture")?.valeur || 2;
 
   const besoinBrut = (nbBails * PRIX_QUITTANCE * MOIS_COUVERTURE) - soldeActuel;
   
-  // Arrondi au 500 FCFA supérieur
+  // Arrondi au 500 FCFA supérieur (Strategie Zéro Friction)
   const vMinimum = Math.max(500, Math.ceil(besoinBrut / 500) * 500);
   
+  // Options suggérées selon le profil
   const options: RechargeOptions = {
     minimum: vMinimum,
-    recommande: Math.max(500, Math.ceil((vMinimum * 1.5) / 500) * 500),
-    confort: nbBails > 50 ? 20000 : 5000,
+    recommande: Math.max(vMinimum + 500, Math.ceil((vMinimum * 1.5) / 500) * 500),
+    confort: Math.max(vMinimum + 2500, nbBails > 20 ? 10000 : 5000),
   };
 
   return options;

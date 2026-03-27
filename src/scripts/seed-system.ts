@@ -54,8 +54,34 @@ async function main() {
       })
     }
     console.log('✅ News par défaut créées.')
-  } else {
-    console.log('⏩ News déjà présentes, saut de l\'étape.')
+  }
+
+  // 3. Initialisation des Configurations Tarifaires (ADD-12 / ADD-07 v3)
+  console.log('\n--- Seeding des ConfigTarifs (Calculs 2026) ---')
+  const defaultTarifs = [
+    { cle: "quittance_ttc", valeur: 75, description: "Prix unitaire d'une quittance certifiée (FCFA)" },
+    { cle: "wallet_seuil_alerte_defaut", valeur: 500, description: "Seuil critique de déclencheur recharge (FCFA)" },
+    { cle: "wallet_mois_couverture", valeur: 2, description: "Nombre de mois suggérés lors d'une recharge" },
+    { cle: "wallet_rappel_defaut_jour", valeur: 1, description: "Jour du mois par défaut pour le rappel wallet" },
+    { cle: "wallet_alerte_max_par_jour", valeur: 3, description: "Nombre max de notifications auto par 24h" },
+    { cle: "wallet_deeplink_wave_base", valeur: 0, description: "Template URL Wave CI", metadata: "https://pay.wave.com/m/QAPRIL_ID?amount={amt}&note=Recharge+Wallet+QAPRIL&ref={ref}" },
+    { cle: "wallet_deeplink_om_base", valeur: 0, description: "Template URL Orange Money", metadata: "orangemoney://pay?merchant=QAPRIL_OM&amount={amt}&reference={ref}&note=Recharge" },
+    { cle: "wallet_deeplink_mtn_base", valeur: 0, description: "Template URL MTN MoMo", metadata: "https://momo.mtn.ci/pay?receiver=QAPRIL_MTN&amount={amt}&externalId={ref}" },
+    { cle: "wallet_deeplink_fallback", valeur: 0, description: "URL de secours redirection manuelle", metadata: "https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}" }
+  ]
+
+  for (const tarif of defaultTarifs) {
+    await prisma.configTarif.upsert({
+      where: { cle: tarif.cle },
+      update: { valeur: tarif.valeur, description: tarif.description, metadata: tarif.metadata },
+      create: { 
+        cle: tarif.cle, 
+        valeur: tarif.valeur, 
+        description: tarif.description,
+        metadata: tarif.metadata
+      }
+    })
+    console.log(`✅ Config ${tarif.cle} : OK`)
   }
 
   console.log('\n✨ Initialisation terminée avec succès !')

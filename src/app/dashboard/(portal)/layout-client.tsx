@@ -21,7 +21,8 @@ import {
     Bot,
     Trophy,
     Globe,
-    Settings
+    Settings,
+    Wallet
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -42,6 +43,7 @@ export default function DashboardLayoutClient({
 
     const navLinks = [
         { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={18} /> },
+        { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
         { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} /> },
         { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
         { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },

@@ -23,7 +23,8 @@ import {
     Settings,
     Zap,
     ShieldAlert,
-    Receipt
+    Receipt,
+    Wallet
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -63,6 +64,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
         // Owner / Default Links (5-tab focus + extras for desktop)
         return [
             { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} /> },
+            { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={20} /> },
             { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={20} /> },
             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={20} /> },

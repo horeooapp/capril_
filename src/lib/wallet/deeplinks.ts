@@ -4,6 +4,7 @@ export type Operator = "WAVE" | "ORANGE" | "MTN" | "MOOV";
 
 /**
  * Génère un deep link de rechargement pour un opérateur et un montant donnés.
+ * ADD-07 v3 : Supporte Wave, Orange Money, MTN et Moov via ConfigTarif.
  */
 export async function generateDeepLink(
   operator: Operator,
@@ -12,16 +13,24 @@ export async function generateDeepLink(
 ): Promise<string> {
   // 1. Chercher la base d'URL dans config_tarifs
   const configKey = `wallet_deeplink_${operator.toLowerCase()}_base`;
-  const config = await prisma.configTarif.findUnique({
-    where: { cle: configKey }
+  const fallbackKey = `wallet_deeplink_fallback`;
+
+  const configs = await prisma.configTarif.findMany({
+    where: {
+      cle: { in: [configKey, fallbackKey] }
+    }
   });
 
-  // 3. Substitution des variables
-  const baseUrlTemplate = config?.metadata || config?.valeur.toString() || "https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}";
+  const operatorConfig = configs.find(c => c.cle === configKey);
+  const fallbackConfig = configs.find(c => c.cle === fallbackKey);
 
-  const result = baseUrlTemplate
+  // 2. Sélectionner le template (Priorité : Opérateur > Fallback > Hardcoded)
+  const template = operatorConfig?.metadata || fallbackConfig?.metadata || "https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}";
+
+  // 3. Substitution des variables
+  const result = template
     .replace(/{amt}/g, amount.toString())
-    .replace(/{ref}/g, reference)
+    .replace(/{ref}/g, encodeURIComponent(reference))
     .replace(/{op}/g, operator);
 
   return result;

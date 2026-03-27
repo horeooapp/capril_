@@ -27,38 +27,56 @@ export async function createReceipt(data: {
     const userId = session.user.id
 
     try {
-        // 1. Verify user and plan (Paywall)
-        const creator = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { activePlanTier: true, walletBalance: true, fullName: true, role: true }
-        });
+        // 1. Verify user, plan (Paywall) and ConfigTarif (ADD-07 v3)
+        const [creator, config] = await Promise.all([
+            prisma.user.findUnique({
+                where: { id: userId },
+                select: { id: true, activePlanTier: true, walletBalance: true, fullName: true, role: true }
+            }),
+            prisma.configTarif.findUnique({
+                where: { cle: "quittance_ttc" }
+            })
+        ]);
         
         if (!creator) return { error: "Utilisateur inconnu" };
-
         if (creator.role === "TENANT") {
             return { error: "Un locataire ne peut pas émettre de quittance." };
         }
 
-        const RECEIPT_COST = 150; // 150 FCFA
+        const RECEIPT_COST = config?.valeur || 75; // Défault 75 FCFA (ADD-07 v3)
+        const OVERDRAFT_LIMIT = -1500; // Limite de tolérance (REG-2026-001)
         
-        // ADD-09 Logic: Free 3 receipts for ESSENTIEL
+        // ADD-09 / ADD-11 Logic: Free 3 receipts for ESSENTIEL
+        let shouldDeduct = true;
         if (creator.activePlanTier === "ESSENTIEL") {
             const usageCount = await prisma.receipt.count({
                 where: { lease: { landlordId: userId } }
             });
+            if (usageCount < 3) shouldDeduct = false;
+        }
 
-            if (usageCount >= 3) {
-                if (creator.walletBalance < RECEIPT_COST) {
-                    return { 
-                        error: "INSUFFICIENT_FUNDS", 
-                        message: `Limite de 3 quittances gratuites atteinte. Solde insuffisant pour la suivante (${RECEIPT_COST} FCFA).`
-                    };
-                }
-                // Deduct from wallet
-                await prisma.user.update({
-                    where: { id: userId },
-                    data: { walletBalance: { decrement: RECEIPT_COST } }
-                });
+        if (shouldDeduct) {
+            const currentBalance = creator.walletBalance || 0;
+            const nextBalance = currentBalance - RECEIPT_COST;
+
+            // Bloquer seulement si on dépasse la limite critique de crédit (-1500 FCFA)
+            if (nextBalance < OVERDRAFT_LIMIT) {
+                return { 
+                    error: "INSUFFICIENT_FUNDS", 
+                    message: `Solde insuffisant (${currentBalance} FCFA). La limite de crédit de ${Math.abs(OVERDRAFT_LIMIT)} FCFA est atteinte.`
+                };
+            }
+
+            // Déduction effective (Peut devenir négatif)
+            await prisma.user.update({
+                where: { id: userId },
+                data: { walletBalance: { decrement: RECEIPT_COST } }
+            });
+
+            // TRIGGER IMMEDIAT: Si le solde devient négatif, on active le mode crédit (ADD-07 v3)
+            if (nextBalance < 0) {
+                const { triggerCreditGenere } = await import("@/lib/wallet/triggers");
+                triggerCreditGenere(creator.id).catch(err => console.error("[CREDIT_TRIGGER_ERROR]", err));
             }
         }
 
