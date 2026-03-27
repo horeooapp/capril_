@@ -12,7 +12,30 @@ export default async function LocataireDashboardPage() {
         redirect("/locataire/login")
     }
 
-    const dashboardData = await getLocataireDashboardData(session.user.id)
+    // Guard: should never happen if session is valid, but prevents Prisma crash
+    const userId = session.user.id
+    if (!userId) {
+        redirect("/locataire/login")
+    }
+
+    let dashboardData: any = null
+    try {
+        dashboardData = await getLocataireDashboardData(userId)
+    } catch (err) {
+        console.error("[LOCATAIRE_PAGE] Failed to load dashboard data:", err)
+        // Fallback empty state — dashboard will show graceful empty UI
+        dashboardData = {
+            profile: { scoreActuel: 0, scoreBadge: "D", tauxPaiement12m: 0 },
+            bails: [],
+            caution: null,
+            quittances: [],
+            currentReceipt: null,
+            facturesUtilities: [],
+            mobileMoney: [],
+            nextPaymentInDays: 0,
+            expectedPaymentDate: new Date().toISOString(),
+        }
+    }
 
     return (
         <DashboardLocataireV2 

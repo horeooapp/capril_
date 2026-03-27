@@ -14,6 +14,10 @@ export async function getLocataireDashboardData(userId: string) {
 }
 
 async function getLocataireDashboardDataRaw(userId: string) {
+    if (!userId) {
+        throw new Error("[LOCATAIRE] userId is required but was not provided")
+    }
+
     // Profil existant ou création si premier accès
     let profile = await (prisma as any).locataireProfile.findUnique({
         where: { userId }
