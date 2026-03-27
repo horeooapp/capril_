@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.qapril.app"
+    namespace = "ci.qapril.locataire"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.qapril.app"
+        applicationId "ci.qapril.locataire"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
