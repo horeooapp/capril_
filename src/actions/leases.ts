@@ -135,7 +135,7 @@ export async function getLeaseById(id: string) {
         where: { id },
         include: {
             property: true,
-            landlord: { select: { fullName: true, phone: true, email: true } },
+            landlord: { select: { fullName: true, phone: true, email: true, landlordCode: true } },
             tenant: { select: { id: true, fullName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
             procedurePhases: true,
             repaymentPlans: {
@@ -175,7 +175,7 @@ export async function getTenantLeases() {
             where: { tenantId: session.user.id },
             include: {
                 property: true,
-                landlord: { select: { fullName: true } },
+                landlord: { select: { fullName: true, landlordCode: true } },
                 receipts: {
                     where: { status: 'paid' },
                     orderBy: { periodMonth: 'desc' },

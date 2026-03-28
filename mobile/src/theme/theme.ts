@@ -1,0 +1,56 @@
+export const Colors = {
+  navy: "#0D2B6E",
+  navyDark: "#071A45",
+  navyPale: "#EEF2FA",
+  green: "#1A7A3C",
+  greenPale: "#E8F5EE",
+  orange: "#C05B00",
+  orangePale: "#FFF3E0",
+  red: "#A00000",
+  redPale: "#FEECEC",
+  gold: "#C9A84C",
+  goldPale: "#FDF6E3",
+  teal: "#0E7490",
+  tealPale: "#E0F4F9",
+  purple: "#5B21B6",
+  purplePale: "#EDE9FE",
+  white: "#FFFFFF",
+  bg: "#F2F5FA",
+  grey1: "#EEF2F7",
+  grey2: "#D6DCE8",
+  grey3: "#8FA0BC",
+  grey4: "#4A5B7A",
+  text: "#0A1930",
+  textMid: "#2D3F5E",
+  textLight: "#6A7D9E",
+  diaspora: "#0E3A8C",
+};
+
+export const Theme = {
+  colors: Colors,
+  radius: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 22,
+    full: 999,
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+  },
+  shadows: {
+    sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 2 },
+    md: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
+    lg: { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 },
+  },
+  gradients: {
+    premium: [Colors.navy, Colors.navyDark] as const,
+    accent: [Colors.gold, "#B8860B"] as const,
+    success: [Colors.green, "#15803D"] as const,
+  }
+};

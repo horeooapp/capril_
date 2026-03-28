@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
 import { parseTD1, parseTD3, generateIdentityHash, MRZResult } from '@/lib/kyc';
+import { savePhysicalFile } from '@/lib/storage';
 
 /**
  * Part 5: Identity Management (KYC)
@@ -28,8 +29,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Fichier et type de document requis' }, { status: 400 });
     }
 
-    // 1. Storage simulation
-    const scanS3Key = `kyc/${session.user.id}/${uuidv4()}-${file.name}`;
+    // 1. Storage implementation (Phase 12)
+    const storedPath = await savePhysicalFile(file, `kyc/${session.user.id}`);
+    const scanS3Key = storedPath; // We keep the variable name but it's a local Disk path now
 
     // 2. MRZ/Doc Validation (Part 5.2)
     let mrzResult: MRZResult | null = null;

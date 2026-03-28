@@ -182,3 +182,54 @@ export async function getReceiptsForTenant() {
 
     return receipts.map(serializeReceipt)
 }
+
+/**
+ * Part 8.3: Pay Receipt (Tenant Action)
+ * Marks a pending/unpaid receipt as PAID.
+ */
+export async function payReceipt(receiptId: string, channel: string = "WAVE_CI") {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) {
+        return { error: "Non autorisé" }
+    }
+
+    try {
+        const receipt = await prisma.receipt.findUnique({
+            where: { id: receiptId },
+            include: { lease: true }
+        })
+
+        if (!receipt) throw new Error("Quittance introuvable.")
+        if (receipt.lease.tenantId !== session.user.id) {
+            throw new Error("Vous n'êtes pas le locataire de ce bail.")
+        }
+
+        const updatedReceipt = await prisma.receipt.update({
+            where: { id: receiptId },
+            data: {
+                status: 'paid',
+                paymentMethod: channel,
+                paymentRef: "PAY-" + Math.random().toString(36).substring(7).toUpperCase(),
+                paidAt: new Date()
+            }
+        })
+
+        // Audit Log
+        await prisma.auditLog.create({
+            data: {
+                userId: session.user.id,
+                action: "RECEIPT_PAID",
+                module: "WALLET",
+                entityId: receiptId,
+                newValues: { channel, reference: updatedReceipt.paymentRef }
+            }
+        })
+
+        revalidatePath("/dashboard/wallet")
+        return { success: true, receipt: serializeReceipt(updatedReceipt as any) }
+
+    } catch (error: any) {
+        console.error("[PAY_RECEIPT_ERROR]", error)
+        return { error: error.message || "Erreur lors du paiement" }
+    }
+}

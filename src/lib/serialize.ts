@@ -38,11 +38,24 @@ export const serializeProperty = (property: any) => {
 export const serializeLease = (lease: any) => {
     if (!lease) return null
     
+    // MM-04b: Identity Masking logic
+    const shouldMask = lease.bailleurMasque || 
+                       (lease.typeGestion && lease.typeGestion.toLowerCase() === 'agreee') ||
+                       (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
+
+    const landlordData = lease.landlord ? {
+        fullName: shouldMask ? (lease.landlord.landlordCode || "BAI-CODE-PENDING") : (lease.landlord.fullName || lease.landlord.name || "N/A"),
+        phone: shouldMask ? null : (lease.landlord.phone || null),
+        email: shouldMask ? null : (lease.landlord.email || null),
+        landlordCode: lease.landlord.landlordCode || null
+    } : null;
+
     const tenantData = lease.tenant ? {
         id: lease.tenant.id || null,
-        fullName: lease.tenant.fullName,
+        fullName: lease.tenant.fullName || lease.tenant.name || null,
         phone: lease.tenant.phone || null,
-        reliabilityScore: lease.tenant.reliabilityScores?.[0]?.score || 750
+        // ICL-CONSENT-01: Score transparency requires explicit consent in the lease
+        reliabilityScore: lease.scoreConsent ? (lease.tenant.reliabilityScores?.[0]?.score || 750) : null
     } : null;
 
     return {
@@ -54,6 +67,7 @@ export const serializeLease = (lease: any) => {
         droitsEnregistrement: Number(lease.droitsEnregistrement || 0),
         fraisTimbre: Number(lease.fraisTimbre || 0),
         loyerTotalFcfa: Number(lease.loyerTotalFcfa || 0),
+        landlord: landlordData,
         tenant: tenantData,
         cdcDeposits: (lease.cdcDeposits || []).map((dep: any) => ({
             ...dep,

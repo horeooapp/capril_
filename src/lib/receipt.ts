@@ -61,6 +61,9 @@ export async function createAndNotifyReceipt(data: {
         receiptType: data.receiptType
     });
 
+    // Generate Robust QR Token (PHASE 1)
+    const qrToken = documentHash.slice(0, 12).toUpperCase();
+
     // 3. Database Record
     const receipt = await prisma.receipt.create({
         data: {
@@ -74,6 +77,7 @@ export async function createAndNotifyReceipt(data: {
             paymentRef: data.paymentReference,
             paidAt: new Date(),
             receiptHash: documentHash,
+            qrToken: qrToken,
             status: "PAID"
         }
     });
@@ -93,7 +97,7 @@ export async function createAndNotifyReceipt(data: {
         }
     }
 
-    // 5. PDF Generation & Delivery (M-DOC-PDF)
+    // 5. PDF Generation & Delivery (M-DOC-PDF - PHASE 1 ROBUST)
     if (lease.tenantId) {
         try {
             const { generateReceiptPDF } = await import('./pdf-generator');
@@ -109,10 +113,12 @@ export async function createAndNotifyReceipt(data: {
                 tenantName: lease.tenant?.fullName || 'Locataire',
                 propertyAddress: lease.property.address,
                 landlordName: data.creatorName || lease.landlord.fullName || 'Propriétaire QAPRIL',
+                receiptHash: documentHash,
+                qrToken: qrToken,
                 declarative: data.receiptType === 'DECLARATIVE'
             });
 
-            // Trigger Notification (Async)
+            // Trigger Notification (Async - Simultaneous SMS + WA)
             NotificationService.envoyerNotification(
                 lease.tenantId,
                 "QUITTANCE_GENEREE",
@@ -121,11 +127,12 @@ export async function createAndNotifyReceipt(data: {
                     receiptBuffer: pdfBuffer,
                     payload: {
                         parameters: [lease.tenant?.fullName || "Locataire", lease.property.address || "Propriété"],
-                        smsText: `QAPRIL: Votre quittance pour ${data.periodMonth} est disponible. Montant: ${data.rentAmount + data.chargesAmount} FCFA.`,
-                        html: `<p>Votre quittance pour le mois de ${data.periodMonth} a été générée.</p>`
+                        smsText: `[QAPRIL] Votre quittance Certifiée SHA-256 pour ${data.periodMonth} est disponible. Réf: ${receiptRef}.`,
+                        html: `<p>Votre quittance certifiée pour le mois de ${data.periodMonth} a été générée.</p>`
                     }
                 }
             ).catch(err => console.error("[NOTIF_ERROR]", err));
+
         } catch (e) {
             console.error("[PDF_ERROR]", e);
         }

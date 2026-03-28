@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { NotificationService } from "./notification-service";
+import { calculateReliabilityScore } from "./reliability";
 
 /**
  * RCL SERVICE - Automated Ticket Resolution (REG-2026-001 / RCL-Délai)
@@ -16,7 +17,7 @@ export class RclService {
         // Find tickets still open after 144h
         const lateTickets = await prisma.reclamationLocataire.findMany({
             where: {
-                statut: { in: ['OUVERT', 'VU'] },
+                statut: { in: ['OUVERT', 'VU', 'EN_COURS'] },
                 createdAt: { lt: SIX_DAYS_AGO }
             },
             include: {
@@ -41,9 +42,12 @@ export class RclService {
                     }
                 });
 
+                // 2. Trigger Score Recalculation (-2 pts rule)
+                await calculateReliabilityScore(ticket.lease.landlordId);
+
                 const ticketRef = `RCL-${ticket.id.slice(0, 4).toUpperCase()}`;
 
-                // 2. Notify Landlord (Sanction notification)
+                // 3. Notify Landlord (Sanction notification)
                 if (ticket.lease.landlord.phone) {
                     await NotificationService.envoyerNotification(
                         ticket.lease.landlordId,
@@ -56,7 +60,7 @@ export class RclService {
                     );
                 }
 
-                // 3. Notify Tenant (Success notification)
+                // 4. Notify Tenant (Success notification)
                 if (ticket.lease.tenant?.phone) {
                     await NotificationService.envoyerNotification(
                         ticket.lease.tenantId!,
@@ -69,7 +73,7 @@ export class RclService {
                     );
                 }
 
-                console.log(`[RCL-Cron] Ticket ${ticket.id} auto-closed.`);
+                console.log(`[RCL-Cron] Ticket ${ticket.id} auto-closed and score updated.`);
             } catch (err) {
                 console.error(`[RCL-Cron] Failed to close ticket ${ticket.id}:`, err);
             }
@@ -78,3 +82,4 @@ export class RclService {
         return lateTickets.length;
     }
 }
+

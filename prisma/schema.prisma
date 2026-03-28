@@ -599,6 +599,7 @@ model User {
 
   // ADD-09 Paywall (QAPRIL Wallet)
   walletBalance Int @default(0) @map("wallet_balance")
+  landlordCode  String? @unique @map("landlord_code") // Opaque BAI-XXX code
 
   // ADD-07 v3 Rechargement Automatique
   walletSeuilAlerte   Float? @default(500) @map("wallet_seuil_alerte")
@@ -960,6 +961,7 @@ model Lease {
   caution                CautionBail?
   preavis                PreavisBail[]
   alertesLoyer           AlerteLoyer[]
+  scoreConsent           Boolean @default(false) @map("score_consent")
   
   // ADD-16 Succession & Litige
   successions            SuccessionLocataire[]

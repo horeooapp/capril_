@@ -123,7 +123,7 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
-          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "DATABASE_URL=\"file:/home/github/capril_data/qapril.db\"" > .env
           echo "AUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "NEXTAUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "AUTH_URL=\"${{ secrets.AUTH_URL }}\"" >> .env
@@ -175,8 +175,9 @@ jobs:
           # We use su - github -c to ensure all commands run in a clean environment as the github user.
           # We use -H 0.0.0.0 to listen on all interfaces, allowing external access.
           sudo su - github -c "
+            mkdir -p /home/github/capril_data/uploads && \
             cd $DEPLOY_DEST && \
-            export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
+            export DATABASE_URL='file:/home/github/capril_data/qapril.db' && \
             npm ci --omit=dev && \
             # FIX: Automated cleanup of invalid JSONB defaults in migration files
             # We use a standalone script to avoid shell quoting issues and find {} substitution errors
@@ -190,6 +191,9 @@ jobs:
             cp -r public/* .next/standalone/public/ || true && \
             mkdir -p .next/standalone/.next/static && \
             cp -r .next/static/* .next/standalone/.next/static/ || true && \
+            # Link persistent uploads to the public folder
+            rm -rf .next/standalone/public/uploads || true && \
+            ln -s /home/github/capril_data/uploads .next/standalone/public/uploads && \
             (pm2 delete capril || true) && \
             pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production && \
             pm2 save

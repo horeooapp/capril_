@@ -38,6 +38,11 @@ export async function calculateReliabilityScore(userId: string) {
 
     score += Math.min(50, kycBonus);
     breakdown.kycBonus = kycBonus;
+    if (kycBonus > 0) {
+        await prisma.iclEvent.create({
+            data: { userId, type: 'KYC_BONUS', points: Math.min(50, kycBonus), description: "Bonus de certification d'identité" }
+        });
+    }
 
     // 2. Locataire Rules
     if (user.role === 'TENANT') {
@@ -48,17 +53,30 @@ export async function calculateReliabilityScore(userId: string) {
         const punctualityPoints = onTimeCount * 2;
         score += punctualityPoints;
         breakdown.punctualityPoints = punctualityPoints;
+        if (punctualityPoints > 0) {
+            await prisma.iclEvent.create({
+                data: { userId, type: 'PUNCTUALITY', points: punctualityPoints, description: `Bonus ponctualité (${onTimeCount} mois)` }
+            });
+        }
 
         // Retard (-10 per incident)
         const lateCount = allReceipts.filter(r => r.status === 'unpaid' || r.status === 'disputed').length;
         const penalties = lateCount * 10;
         score -= penalties;
         breakdown.latePenalties = -penalties;
+        if (penalties > 0) {
+            await prisma.iclEvent.create({
+                data: { userId, type: 'LATE_PENALTY', points: -penalties, description: `Pénalité retard de paiement (${lateCount} incidents)` }
+            });
+        }
 
         // Bonus Long Term (+20 unique after 24 months)
         if (onTimeCount >= 24) {
             score += 20;
             breakdown.longTermBonus = 20;
+            await prisma.iclEvent.create({
+                data: { userId, type: 'LONG_TERM_BONUS', points: 20, description: "Bonus fidélité (24 mois sans incident)" }
+            });
         }
     }
 
@@ -75,6 +93,11 @@ export async function calculateReliabilityScore(userId: string) {
         const slaPenalties = overSlaCount * 2;
         score -= slaPenalties;
         breakdown.slaPenalties = -slaPenalties;
+        if (slaPenalties > 0) {
+            await prisma.iclEvent.create({
+                data: { userId, type: 'SLA_PENALTY', points: -slaPenalties, description: `Pénalité SLA 144h non respecté (${overSlaCount} tickets)` }
+            });
+        }
     }
 
     // Caps
@@ -96,3 +119,4 @@ export async function calculateReliabilityScore(userId: string) {
         }
     });
 }
+

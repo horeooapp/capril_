@@ -78,4 +78,25 @@ export class LoyerService {
 
     return { proposition: status, consent };
   }
+
+  /**
+   * MRL-01: Auto-suspend propositions after 5 days (120h) without response.
+   */
+  static async autoSuspendPropositions() {
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+    const expiredPropositions = await prisma.propositionLoyer.updateMany({
+      where: {
+        statut: "EN_ATTENTE",
+        createdAt: { lt: fiveDaysAgo },
+      },
+      data: {
+        statut: "EXPIRE",
+      },
+    });
+
+    console.log(`[MRL-01] Suspended ${expiredPropositions.count} expired rent propositions.`);
+    return expiredPropositions.count;
+  }
 }

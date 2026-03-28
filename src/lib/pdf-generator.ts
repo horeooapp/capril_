@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import QRCode from 'qrcode';
 
 export async function generateReceiptPDF(receiptData: {
   receiptRef: string;
@@ -14,6 +15,8 @@ export async function generateReceiptPDF(receiptData: {
   tenantName: string;
   propertyAddress: string;
   landlordName: string;
+  receiptHash?: string;
+  qrToken?: string;
   declarative?: boolean;
 }): Promise<Buffer> {
   const pdfDoc = await PDFDocument.create();
@@ -21,6 +24,7 @@ export async function generateReceiptPDF(receiptData: {
   
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
   
   const { width, height } = page.getSize();
   
@@ -70,9 +74,29 @@ export async function generateReceiptPDF(receiptData: {
   currentY -= 20;
   drawText(`Reçu le : ${formattedDate}`, 50, currentY, font, 12);
   
+  // QR CODE & HASH (PHASE 1 ROBUST)
+  if (receiptData.qrToken) {
+    const validationUrl = `https://qapril.ci/v/${receiptData.qrToken}`;
+    const qrCodeDataUrl = await QRCode.toDataURL(validationUrl, { margin: 1, width: 200 });
+    const qrImage = await pdfDoc.embedPng(qrCodeDataUrl);
+    
+    page.drawImage(qrImage, {
+        x: width - 150,
+        y: currentY - 50,
+        width: 100,
+        height: 100
+    });
+    drawText('Scanner pour vérifier', width - 150, currentY - 60, font, 8, rgb(0.5, 0.5, 0.5));
+  }
+
+  if (receiptData.receiptHash) {
+    drawText(`SHA-256 Digest: ${receiptData.receiptHash}`, 50, 100, fontMono, 7, rgb(0.5, 0.5, 0.5));
+  }
+
   // Footer
-  drawText('Document sécurisé et émis par la plateforme QAPRIL (www.qapril.ci)', 50, 50, font, 10, rgb(0.5, 0.5, 0.5));
+  drawText('Document sécurisé et certifié par la plateforme QAPRIL (www.qapril.ci)', 50, 50, font, 10, rgb(0.5, 0.5, 0.5));
   
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
 }
+
