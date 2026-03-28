@@ -675,6 +675,7 @@ model User {
   successionsOwned       SuccessionProprio[]
   successionsAsTenant    SuccessionLocataire[] @relation("SuccessionAsTenant")
   reclamations           ReclamationLocataire[] @relation("TenantReclamations")
+  iclEvents              IclEvent[]
   
   // ADD-15 Rapports & Champions
   redactedEdls         EtatsDesLieux[]    @relation("RedacteurEdl")
@@ -1234,6 +1235,18 @@ model ReliabilityScore {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("reliability_scores")
+}
+
+model IclEvent {
+  id          String   @id @default(uuid()) @map("event_id")
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  type        String // KYC_BONUS | PUNCTUALITY | LATE_PENALTY | LONG_TERM_BONUS | SLA_PENALTY
+  points      Int
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("icl_events")
 }
 
 model Certificate {
