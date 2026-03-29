@@ -185,7 +185,7 @@ jobs:
             mkdir -p /home/github/capril_data/uploads && \
             cd $DEPLOY_DEST && \
             export DATABASE_URL='file:/home/github/capril_data/qapril.db' && \
-            npm ci --omit=dev && \
+            npm ci && \
             # FIX: Automated cleanup of invalid JSONB defaults in migration files
             # We use a standalone script to avoid shell quoting issues and find {} substitution errors
             # Synchronisation directe du schéma pour forcer la création des colonnes manquantes (ex: landlord_code)
