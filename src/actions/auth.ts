@@ -118,16 +118,22 @@ export async function loginWithAdminCredentials(email: string, password: string)
 
         // 2. User & Role Check (using JS validation to bypass Prisma Enum errors)
         const user = await prisma.user.findFirst({
-            where: { 
-                email: normalizedEmail
-            }
+            where: { email: normalizedEmail }
         });
 
-        if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
-            return { error: "Compte administrateur non trouvé ou accès refusé." };
+        if (!user) {
+            console.error(`[AUTH-ERROR] Admin login failed: User ${normalizedEmail} not found.`);
+            return { error: "Compte administrateur non trouvé." };
         }
 
-        console.log("[AUTH-DEBUG] Found user:", user.email, "Role:", user.role);
+        const userRole = String(user.role || '').toUpperCase().trim();
+        const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+
+        console.log(`[AUTH-DEBUG] Attempting admin login for: ${user.email} | Role in DB: ${user.role} | Normalized Role: ${userRole} | Match: ${isAdmin}`);
+
+        if (!isAdmin) {
+            return { error: "Accès refusé: Votre compte n'a pas les privilèges administrateur." };
+        }
 
         if (!user.password) {
             return { error: "Mot de passe non configuré pour ce compte." };
