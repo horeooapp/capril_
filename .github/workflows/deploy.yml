@@ -62,21 +62,25 @@ jobs:
           # App
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
 
+      - name: 📦 Bundle Standalone build
+        run: |
+          mkdir -p .next/standalone/public
+          cp -r public/* .next/standalone/public/ || true
+          mkdir -p .next/standalone/.next/static
+          cp -r .next/static/* .next/standalone/.next/static/ || true
+
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: build-output
           include-hidden-files: true
           path: |
-            .next
-            !.next/cache
-            public
+            .next/standalone
             prisma
+            scripts
+            server.js
             package.json
             package-lock.json
-            next.config.ts
-            server.js
-            scripts
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
@@ -106,14 +110,9 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # Sync the full Next.js project to the destination
-          # Use flags to ignore owner/group/perms from the build env
+          # Sync the standalone bundle elements to the destination
           rsync -rlptvz --no-owner --no-group --no-perms \
             --exclude='.env*' \
-            --exclude='node_modules' \
-            --exclude='*.db*' \
-            --exclude='.git' \
-            --exclude='.github' \
             ./ $DEPLOY_DEST/
 
       # Handled inside the restart block for better permission consistency
@@ -186,11 +185,6 @@ jobs:
             npx prisma@6.4.1 migrate deploy && \
             npx prisma@6.4.1 db seed && \
             npx prisma@6.4.1 generate && \
-            # FIX: Standalone mode requires public and .next/static to be inside the standalone folder
-            mkdir -p .next/standalone/public && \
-            cp -r public/* .next/standalone/public/ || true && \
-            mkdir -p .next/standalone/.next/static && \
-            cp -r .next/static/* .next/standalone/.next/static/ || true && \
             # Link persistent uploads to the public folder
             rm -rf .next/standalone/public/uploads || true && \
             ln -s /home/github/capril_data/uploads .next/standalone/public/uploads && \
