@@ -186,7 +186,8 @@ export async function loginWithAdminCredentials(email: string, password: string)
             stack: error?.stack
         });
         
-        return { error: "Identifiants incorrects ou erreur technique." };
+        // Debug fallback
+        return { error: `[DEBUG] Msg: ${error?.message?.substring(0,30)} | Type: ${error?.type} | Name: ${error?.name}` };
     }
 }
 

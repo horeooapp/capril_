@@ -62,13 +62,13 @@ const redisGlobal = global as typeof globalThis & {
     redis: any;
 };
 
-if (redisGlobal.redis) {
+if (redisGlobal.redis && typeof redisGlobal.redis.loadStore === 'function') {
     redis = redisGlobal.redis;
 } else {
     const useMock = process.env.ENABLE_REDIS_MOCK === 'true';
 
     if (useMock) {
-        console.log('[Redis] Using Mock implementation (Development Mode)');
+        console.log('[Redis] Using Mock implementation (Development Mode) - File Backed');
         redis = new MockRedis();
         redisGlobal.redis = redis;
     } else if (process.env.REDIS_URL) {
