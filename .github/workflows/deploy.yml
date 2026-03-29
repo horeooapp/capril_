@@ -62,24 +62,19 @@ jobs:
           # App
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
 
-      - name: 📦 Bundle Standalone build
-        run: |
-          # Copy static and public files into the standalone folder
-          cp -r public .next/standalone/ || true
-          mkdir -p .next/standalone/.next
-          cp -r .next/static .next/standalone/.next/ || true
-          # Copy essential config and scripts for production runtime
-          cp -r prisma .next/standalone/ || true
-          cp -r scripts .next/standalone/ || true
-          cp package.json .next/standalone/ || true
-          cp package-lock.json .next/standalone/ || true
-
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-output
           include-hidden-files: true
-          path: .next/standalone/
+          path: |
+            .next/
+            !.next/cache
+            public/
+            prisma/
+            scripts/
+            package.json
+            package-lock.json
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
@@ -109,15 +104,12 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # Sync all production files to the destination
-          # This now includes .next/static and public at the root of the artifact
-          rsync -rlptvz --no-owner --no-group --no-perms \
+          # Sync all production files (full build) to the destination
+          # Using --delete ensures we remove old chunks and stray files
+          rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
+            --exclude='*.db*' \
             ./ $DEPLOY_DEST/
-          
-          # Debug: List transferred files (non-recursive for speed, shows root structure)
-          ls -la $DEPLOY_DEST/
-          ls -la $DEPLOY_DEST/.next/ || true
 
       # Handled inside the restart block for better permission consistency
 
@@ -190,10 +182,11 @@ jobs:
             npx prisma@6.4.1 db seed && \
             npx prisma@6.4.1 generate && \
             # Link persistent uploads to the public folder
-            rm -rf .next/standalone/public/uploads || true && \
-            ln -s /home/github/capril_data/uploads .next/standalone/public/uploads && \
+            rm -rf public/uploads || true && \
+            ln -s /home/github/capril_data/uploads public/uploads && \
+            # Start/Restart using npm start to ensure static assets are served by Next.js
             (pm2 delete capril || true) && \
-            pm2 start server.js --name capril --cwd $DEPLOY_DEST --interpreter $(which node) --env production && \
+            pm2 start \"npm run start\" --name capril --cwd $DEPLOY_DEST --env production && \
             pm2 save
           "
 
