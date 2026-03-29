@@ -14,10 +14,10 @@ export default function CertificationButton({ userId }: { userId: string }) {
 
         startTransition(async () => {
             const result = await certifyAgency(userId)
-            if (result.success) {
+            if (result?.success) {
                 setSuccess(true)
             } else {
-                alert(result.error)
+                alert(result?.error || "Une erreur est survenue lors de la certification.")
             }
         })
     }

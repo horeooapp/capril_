@@ -44,10 +44,11 @@ export async function requestOTP(email: string) {
             return { error: `Échec de l'envoi de l'email de validation.` };
         }
 
+        console.log(`[AUTH] OTP ${otp} sent to ${normalizedEmail} (TTL: ${ttl}s)`);
         return { success: true };
-    } catch (error) {
-        console.error("[SERVER ACTION] requestOTP error:", error);
-        return { error: `Erreur technique lors de l'envoi du code.` };
+    } catch (error: any) {
+        console.error("[SERVER ACTION] requestOTP error:", error?.message || error);
+        return { error: `Erreur technique lors de l'envoi du code (${error?.message?.substring(0, 50)}).` };
     }
 }
 
@@ -84,26 +85,20 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
             onboardingComplete: user?.onboardingComplete || false 
         };
     } catch (error: any) {
-        if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-             return { success: true };
-        }
-        
-        let errorMsg = "Erreur interne";
-        if (error?.type === 'CredentialsSignin') {
-            errorMsg = "Code OTP incorrect ou expiré.";
-        } else if (error?.message) {
-            errorMsg = error.message.replace('CredentialsSignin', '').trim() || errorMsg;
-        }
-
-        // Log details to help debugging
+        // Explicitly handle failures with detailed logging
+        const errorCode = (error as any)?.code || (error as any)?.type || "UNKNOWN_ERROR";
         console.error("[SERVER ACTION] loginWithOTP Exception:", {
             message: error?.message,
-            stack: error?.stack,
-            type: error?.type,
-            name: error?.name
+            code: errorCode,
+            email: email,
+            role: role
         });
+        
+        if (errorCode === 'CredentialsSignin' || error?.message?.includes('CredentialsSignin')) {
+            return { error: "Code OTP incorrect ou expiré." };
+        }
 
-        return { error: `Échec de l'authentification: ${errorMsg}` };
+        return { error: `Échec de l'authentification: ${error?.message || "Erreur interne"}` };
     }
 }
 

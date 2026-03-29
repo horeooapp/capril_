@@ -124,8 +124,10 @@ export default function SystemPage() {
         const newStatus = !currentStatus
         
         const result = await toggleFeature(feature, newStatus)
-        if (result.success) {
+        if (result?.success) {
             setFlags({ ...flags, [feature]: newStatus })
+        } else if (result?.error) {
+            alert(result.error)
         }
         setUpdating(null)
     }

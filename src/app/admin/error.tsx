@@ -38,8 +38,11 @@ export default function AdminError({
         )}
 
         <p className="text-red-900 font-mono text-[11px] text-left whitespace-pre-wrap bg-red-50/50 p-4 rounded-xl border border-red-100">
-          {error.message || "Erreur de chargement des composants administratifs."}
+          {error.message || "Une erreur inconnue s'est produite lors du rendu des composants administratifs."}
         </p>
+        <div className="mt-4 text-[10px] text-gray-400 text-left">
+          Reference: {error.digest || 'no-digest'} | Time: {new Date().toISOString()}
+        </div>
       </div>
 
       <div className="flex gap-4">

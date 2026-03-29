@@ -20,8 +20,11 @@ export default function ValidationActions({ docId, currentStatus }: ValidationAc
         if (!confirm("Approuver ce document d'identité ?")) return
         startTransition(async () => {
             const res = await approveDocument(docId)
-            if (res.success) router.refresh()
-            else alert(res.error)
+            if (res?.success) {
+                router.refresh()
+            } else {
+                alert(res?.error || "Une erreur inconnue s'est produite lors de l'approbation.")
+            }
         })
     }
 
@@ -29,8 +32,11 @@ export default function ValidationActions({ docId, currentStatus }: ValidationAc
         if (!reason) return alert("Veuillez saisir un motif de rejet.")
         startTransition(async () => {
             const res = await rejectDocument(docId, reason)
-            if (res.success) router.refresh()
-            else alert(res.error)
+            if (res?.success) {
+                router.refresh()
+            } else {
+                alert(res?.error || "Une erreur inconnue s'est produite lors du rejet.")
+            }
         })
     }
 

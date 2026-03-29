@@ -38,6 +38,7 @@ import RealEstateObservatory from "@/components/RealEstateObservatory"
 import GeographicRentAnalysis from "@/components/GeographicRentAnalysis"
 import RentRanking from "@/components/RentRanking"
 import ModuleRegistryGrid from "@/components/admin/ModuleRegistryGrid"
+import SyncButton from "@/components/admin/SyncButton"
 
 export const dynamic = "force-dynamic"
 
@@ -230,12 +231,7 @@ export default async function AdminDashboardOverview() {
                             <h3 className="font-black text-red-900 uppercase">Synchronisation Base de Données Partielle</h3>
                             <p className="text-red-700/60 text-sm font-medium">Certaines tables (Payments, Fraud, SMS) semblent absentes de {process.env.DATABASE_URL?.split('@')[1] || "la base"}.</p>
                         </div>
-                        <button 
-                            onClick={() => window.location.reload()}
-                            className="px-6 py-3 bg-red-600 text-white font-black rounded-xl text-xs uppercase"
-                        >
-                            Démarrer Sync
-                        </button>
+                        <SyncButton />
                     </div>
                 )}
 
