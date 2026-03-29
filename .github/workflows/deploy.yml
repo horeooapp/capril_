@@ -64,23 +64,22 @@ jobs:
 
       - name: 📦 Bundle Standalone build
         run: |
-          mkdir -p .next/standalone/public
-          cp -r public/* .next/standalone/public/ || true
-          mkdir -p .next/standalone/.next/static
-          cp -r .next/static/* .next/standalone/.next/static/ || true
+          # Copy static and public files into the standalone folder
+          cp -r public .next/standalone/ || true
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/ || true
+          # Copy essential config and scripts for production runtime
+          cp -r prisma .next/standalone/ || true
+          cp -r scripts .next/standalone/ || true
+          cp package.json .next/standalone/ || true
+          cp package-lock.json .next/standalone/ || true
 
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-output
           include-hidden-files: true
-          path: |
-            .next/standalone
-            prisma
-            scripts
-            server.js
-            package.json
-            package-lock.json
+          path: .next/standalone/
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
@@ -110,10 +109,15 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # Sync the standalone bundle elements to the destination
+          # Sync all production files to the destination
+          # This now includes .next/static and public at the root of the artifact
           rsync -rlptvz --no-owner --no-group --no-perms \
             --exclude='.env*' \
             ./ $DEPLOY_DEST/
+          
+          # Debug: List transferred files (non-recursive for speed, shows root structure)
+          ls -la $DEPLOY_DEST/
+          ls -la $DEPLOY_DEST/.next/ || true
 
       # Handled inside the restart block for better permission consistency
 
