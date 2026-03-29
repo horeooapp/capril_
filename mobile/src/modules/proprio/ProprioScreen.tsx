@@ -20,6 +20,7 @@ import { Row } from '../../components/common/Row';
 import { SectionTitle } from '../../components/common/SectionTitle';
 import { WalletCard } from '../../components/common/WalletCard';
 import { BrandHeader } from '../../components/common/BrandHeader';
+import { BottomNav } from '../../components/common/BottomNav';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -63,7 +64,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
   const PATRIMOINE_DATA = patrimoine || [];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
@@ -76,7 +77,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
           onNotifPress={() => alert("Notifications Bailleur")}
         />
 
-        <View style={{ marginTop: -25 }}>
+        <View style={{ marginTop: -40, zIndex: 10 }}>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false} 
@@ -270,20 +271,18 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
       </ScrollView>
 
       {/* BOTTOM NAV BAR */}
-      <View style={styles.bottomNav}>
-        {[
+      <BottomNav 
+        tabs={[
           { id: "dash", icon: "📊", label: "Dashboard" },
           { id: "patrimoine", icon: "🏘", label: "Patrimoine" },
           { id: "quittances", icon: "🧾", label: "Quittances" },
           { id: "profil", icon: "👤", label: "Profil" },
-        ].map(n => (
-          <TouchableOpacity key={n.id} onPress={() => changeTab(n.id)} style={styles.navItem}>
-            <Text style={[styles.navIcon, { opacity: tab === n.id ? 1 : 0.4 }]}>{n.icon}</Text>
-            <Text style={[styles.navLabel, { color: tab === n.id ? Theme.colors.navy : Theme.colors.textLight }]}>{n.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </SafeAreaView>
+        ]}
+        activeTab={tab}
+        onChange={changeTab}
+        accentColor={Theme.colors.navy}
+      />
+    </View>
   );
 }
 
@@ -379,13 +378,18 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   kpiCard: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 14,
-    padding: 12,
-    width: 110,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 18,
+    padding: 14,
+    width: 120,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
   },
   kpiValue: {
     fontSize: 16,
@@ -411,10 +415,13 @@ const styles = StyleSheet.create({
   },
   alertCard: {
     backgroundColor: Theme.colors.white,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
+    borderRadius: 20,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 3,
   },
   alertHeader: {
     flexDirection: 'row',
@@ -464,11 +471,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Theme.colors.white,
-    borderRadius: 14,
-    padding: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   entiteIcon: {
     width: 44,
@@ -540,11 +550,14 @@ const styles = StyleSheet.create({
   },
   entiteCard: {
     backgroundColor: Theme.colors.white,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
   },
   entiteCardHeader: {
     flexDirection: 'row',
@@ -586,11 +599,14 @@ const styles = StyleSheet.create({
   profileCard: {
     alignItems: 'center',
     backgroundColor: Theme.colors.white,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 24,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 4,
   },
   avatar: {
     width: 70,
@@ -622,28 +638,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: Theme.colors.grey3,
   },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: Theme.colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Theme.colors.grey2,
-    flexDirection: 'row',
-    paddingVertical: 10,
-    paddingBottom: 25,
-    justifyContent: 'space-around',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    fontSize: 20,
-  },
-  navLabel: { fontSize: 9, marginTop: 2, fontWeight: '700' },
-  payoutBtn: { backgroundColor: '#FFF', borderRadius: 12, paddingVertical: 12, alignItems: 'center', marginTop: 10 },
-  payoutText: { color: Theme.colors.navy, fontWeight: '900', fontSize: 11 },
-  quittanceLine: { backgroundColor: Theme.colors.white, borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Theme.colors.grey2 },
+  payoutBtn: { backgroundColor: '#FFF', borderRadius: 16, paddingVertical: 14, alignItems: 'center', marginTop: 15, shadowColor: '#000', shadowOffset:{width:0, height:4}, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4 },
+  payoutText: { color: Theme.colors.navy, fontWeight: '900', fontSize: 12 },
+  quittanceLine: { backgroundColor: Theme.colors.white, borderRadius: 20, padding: 18, marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
   quittanceLineHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   quittanceLineRef: { fontSize: 13, fontWeight: '800' },
   quittanceLineLoc: { fontSize: 11, color: Theme.colors.textLight, marginBottom: 12 },
@@ -654,9 +651,9 @@ const styles = StyleSheet.create({
   breakdownLabelBold: { fontSize: 11, fontWeight: '800', color: Theme.colors.navy },
   breakdownValBold: { fontSize: 12, fontWeight: '900', color: Theme.colors.green },
   sectionTitle: { fontSize: 16, fontWeight: '800', color: Theme.colors.navy },
-  walletCard: { backgroundColor: Theme.colors.gold, borderRadius: 25, padding: 25, marginBottom: 20 },
-  walletLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  walletVal: { color: '#FFF', fontSize: 28, fontWeight: '900', marginVertical: 10 },
-  logoutBtn: { backgroundColor: Theme.colors.grey1, borderRadius: 12, paddingVertical: 15, alignItems: 'center', marginTop: 15, borderWidth: 1, borderColor: Theme.colors.grey2 },
-  logoutText: { color: Theme.colors.navy, fontWeight: '700', fontSize: 13 },
+  walletCard: { backgroundColor: Theme.colors.gold, borderRadius: 28, padding: 25, marginBottom: 20, shadowColor: Theme.colors.gold, shadowOffset:{width:0, height:10}, shadowOpacity: 0.3, shadowRadius: 15, elevation: 8 },
+  walletLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  walletVal: { color: '#FFF', fontSize: 32, fontWeight: '900', marginVertical: 10 },
+  logoutBtn: { backgroundColor: Theme.colors.grey1, borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 15 },
+  logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
 });

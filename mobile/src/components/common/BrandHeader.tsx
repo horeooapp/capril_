@@ -53,10 +53,15 @@ const styles = StyleSheet.create({
     header: {
         paddingTop: 15,
         paddingHorizontal: 20,
-        paddingBottom: 30,
-        borderBottomLeftRadius: 35,
-        borderBottomRightRadius: 35,
-        ...Theme.shadows.md,
+        paddingBottom: 60, // L'espace nécessaire pour que la carte KPIs flotte
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40,
+        shadowColor: Theme.colors.navy,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.25,
+        shadowRadius: 20,
+        elevation: 15,
+        zIndex: 1, // Garde le gradient bas pour que le bottom de la safe area ne masque pas
     },
     headerTop: {
         flexDirection: 'row',

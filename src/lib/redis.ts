@@ -1,27 +1,57 @@
 import Redis from 'ioredis';
 
-// Mock simple pour le développement ou les cas où Redis est HS
+import fs from 'fs';
+import path from 'path';
+
+// Mock simple pour le développement ou les cas où Redis est HS, sauvegardé sur disque.
 class MockRedis {
-    private store = new Map<string, { value: string, expiry: number }>();
+    private filePath = path.join(process.cwd(), '.redis-mock.json');
     status = 'mock';
 
+    private loadStore(): Record<string, { value: string, expiry: number }> {
+        try {
+            if (fs.existsSync(this.filePath)) {
+                return JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
+            }
+        } catch (e) {
+            console.error('[MockRedis] Error loading file:', e);
+        }
+        return {};
+    }
+
+    private saveStore(store: Record<string, { value: string, expiry: number }>) {
+        try {
+            fs.writeFileSync(this.filePath, JSON.stringify(store), 'utf-8');
+        } catch (e) {
+            console.error('[MockRedis] Error saving file:', e);
+        }
+    }
+
     async set(key: string, value: string, mode?: string, duration?: number) {
+        const store = this.loadStore();
         const expiry = Date.now() + (duration ? duration * 1000 : 3600000);
-        this.store.set(key, { value, expiry });
+        store[key] = { value, expiry };
+        this.saveStore(store);
         return 'OK';
     }
 
     async get(key: string) {
-        const item = this.store.get(key);
+        const store = this.loadStore();
+        const item = store[key];
         if (!item || item.expiry < Date.now()) {
-            this.store.delete(key);
+            if (item) {
+                delete store[key];
+                this.saveStore(store);
+            }
             return null;
         }
         return item.value;
     }
 
     async del(key: string) {
-        this.store.delete(key);
+        const store = this.loadStore();
+        delete store[key];
+        this.saveStore(store);
         return 1;
     }
 }

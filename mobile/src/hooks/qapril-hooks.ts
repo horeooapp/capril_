@@ -86,13 +86,13 @@ export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requestOTP = async (email: string) => {
+  const requestOTP = async (phone: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/otp/request', {
+      const res = await apiFetch('/auth/register', {
         method: 'POST',
-        body: { email }
+        body: { phone }
       });
       return res;
     } catch (e: any) {
@@ -103,13 +103,13 @@ export function useAuth() {
     }
   };
 
-  const verifyOTP = async (email: string, otp: string) => {
+  const verifyOTP = async (phone: string, otp: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/otp/verify', {
+      const res = await apiFetch('/auth/verify-otp', {
         method: 'POST',
-        body: { email, otp }
+        body: { phone, otp }
       });
       if (res.token) {
         setAuthToken(res.token);

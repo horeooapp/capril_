@@ -88,6 +88,13 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
              return { success: true };
         }
         
+        let errorMsg = "Erreur interne";
+        if (error?.type === 'CredentialsSignin') {
+            errorMsg = "Code OTP incorrect ou expiré.";
+        } else if (error?.message) {
+            errorMsg = error.message.replace('CredentialsSignin', '').trim() || errorMsg;
+        }
+
         // Log details to help debugging
         console.error("[SERVER ACTION] loginWithOTP Exception:", {
             message: error?.message,
@@ -96,7 +103,7 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
             name: error?.name
         });
 
-        return { error: `Échec de l'authentification: ${error?.message || "Erreur interne"}` };
+        return { error: `Échec de l'authentification: ${errorMsg}` };
     }
 }
 
@@ -147,14 +154,27 @@ export async function loginWithAdminCredentials(email: string, password: string)
 
         return { success: true };
     } catch (error: any) {
+        if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+             return { success: true }; // Should never happen with redirect: false, but safe.
+        }
+        
         const errorString = String(error);
         const errorStack = error?.stack || "";
+        
+        // Try to extract our CustomAuthError message from raw stack or code
+        let customMessage = "";
+        if (error?.type === 'CredentialsSignin') {
+             customMessage = error?.message || "Identifiants refusés";
+             if (customMessage.includes("CredentialsSignin")) {
+                 customMessage = "Mot de passe incorrect ou compte non trouvé.";
+             }
+             return { error: customMessage };
+        }
         
         if (
             error?.type === 'CallbackRouteError' || 
             error?.name === 'CallbackRouteError' || 
-            errorString.includes('CallbackRouteError') ||
-            errorStack.includes('CallbackRouteError')
+            errorString.includes('CallbackRouteError')
         ) {
              return { error: "Mot de passe incorrect." };
         }
@@ -166,7 +186,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
             stack: error?.stack
         });
         
-        return { error: "Une erreur technique est survenue." };
+        return { error: "Identifiants incorrects ou erreur technique." };
     }
 }
 

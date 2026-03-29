@@ -15,6 +15,7 @@ import { Badge } from '../../components/common/Badge';
 import { Row } from '../../components/common/Row';
 import { SectionTitle } from '../../components/common/SectionTitle';
 import { WalletCard } from '../../components/common/WalletCard';
+import { BottomNav } from '../../components/common/BottomNav';
 import { useDiaspora, useDiasporaStats, useDiasporaTransfer } from '../../hooks/qapril-hooks';
 
 const { width } = Dimensions.get('window');
@@ -46,7 +47,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
   const alertesSLA = D.properties?.filter((b: any) => b.isHorsSLA).length || 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
@@ -183,20 +184,18 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
       </ScrollView>
 
       {/* BOTTOM NAV */}
-      <View style={styles.bottomNav}>
-        {[
+      <BottomNav
+        tabs={[
           { id: "dash", icon: "📊", label: "Dashboard" },
           { id: "biens", icon: "🏢", label: "Biens" },
           { id: "virements", icon: "💶", label: "Virements" },
           { id: "profil", icon: "👤", label: "Profil" },
-        ].map(n => (
-          <TouchableOpacity key={n.id} onPress={() => setTab(n.id)} style={styles.navItem}>
-            <Text style={[styles.navIcon, { opacity: tab === n.id ? 1 : 0.4 }]}>{n.icon}</Text>
-            <Text style={[styles.navLabel, { color: tab === n.id ? Theme.colors.diaspora || '#0E3A8C' : Theme.colors.textLight }]}>{n.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </SafeAreaView>
+        ]}
+        activeTab={tab}
+        onChange={setTab}
+        accentColor={Theme.colors.diaspora || '#0E3A8C'}
+      />
+    </View>
   );
 }
 
@@ -209,7 +208,7 @@ const styles = StyleSheet.create({
   onlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ADE80', marginLeft: 10, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },
   userName: { fontSize: 22, fontWeight: '900', color: '#FFF', letterSpacing: -0.5 },
   userSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
-  iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   
   deviseSwitcher: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 12, padding: 4, marginBottom: 20 },
   deviseBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8 },
@@ -246,9 +245,4 @@ const styles = StyleSheet.create({
   profileSub: { fontSize: 13, color: Theme.colors.textLight, marginTop: 4 },
   logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
-
-  bottomNav: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', flexDirection: 'row', paddingVertical: 10, paddingBottom: 25, justifyContent: 'space-around' },
-  navItem: { alignItems: 'center' },
-  navIcon: { fontSize: 20 },
-  navLabel: { fontSize: 9, marginTop: 2, fontWeight: '700' },
 });

@@ -18,6 +18,7 @@ import { Theme } from '../../theme/theme';
 import { Badge } from '../../components/common/Badge';
 import { SectionTitle } from '../../components/common/SectionTitle';
 import { BrandHeader } from '../../components/common/BrandHeader';
+import { BottomNav } from '../../components/common/BottomNav';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -86,7 +87,7 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
   const fmtK = (n: number) => n >= 1000000 ? (n/1000000).toFixed(1)+"M" : (n/1000).toFixed(0)+"K";
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
@@ -99,7 +100,7 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
         />
 
         {/* KPI Strip - Floating over header */}
-        <View style={{ marginTop: -25 }}>
+        <View style={{ marginTop: -40, zIndex: 10 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.kpiStrip} contentContainerStyle={styles.kpiContainer}>
             {[
                { l: "Biens", v: AGENCY.biens.toString(), icon: "🏘", color: Theme.colors.white },
@@ -347,20 +348,18 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
       </ScrollView>
 
       {/* BOTTOM NAV */}
-      <View style={styles.bottomNav}>
-        {[
+      <BottomNav
+        tabs={[
           { id: "dash", icon: "📊", label: "Dashboard" },
           { id: "portefeuille", icon: "🏘", label: "Portefeuille" },
           { id: "candidats", icon: "🔍", label: "M-CAND" },
           { id: "profil", icon: "🏢", label: "Agence" },
-        ].map(n => (
-          <TouchableOpacity key={n.id} onPress={() => changeTab(n.id)} style={styles.navItem}>
-            <Text style={[styles.navIcon, { opacity: tab === n.id ? 1 : 0.4 }]}>{n.icon}</Text>
-            <Text style={[styles.navLabel, { color: tab === n.id ? Theme.colors.navy : Theme.colors.textLight }]}>{n.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </SafeAreaView>
+        ]}
+        activeTab={tab}
+        onChange={changeTab}
+        accentColor={Theme.colors.teal}
+      />
+    </View>
   );
 }
 
@@ -381,13 +380,13 @@ const styles = StyleSheet.create({
   notifBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
   notifDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: Theme.colors.red, borderWidth: 1.5, borderColor: Theme.colors.navy },
   kpiStrip: { marginTop: 25 },
-  kpiContainer: { gap: 12, paddingRight: 20 },
-  kpiCard: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, padding: 12, width: 110, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', alignItems: 'center' },
+  kpiContainer: { gap: 12, paddingRight: 20, paddingLeft: 16 },
+  kpiCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 14, width: 120, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
   kpiValue: { fontSize: 16, fontWeight: '900', marginTop: 4 },
   kpiLabel: { fontSize: 9, color: Theme.colors.white, opacity: 0.6, marginTop: 2 },
   body: { paddingHorizontal: 16 },
   section: { marginTop: 24 },
-  caCard: { backgroundColor: Theme.colors.white, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: Theme.colors.grey2 },
+  caCard: { backgroundColor: Theme.colors.white, borderRadius: 20, padding: 20, borderWidth: 1, borderColor: Theme.colors.grey2, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.05, shadowRadius: 15, elevation: 3 },
   caTitle: { fontSize: 10, fontWeight: '800', color: Theme.colors.textLight, letterSpacing: 1 },
   caRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 15 },
   caVal: { fontSize: 28, fontWeight: '900', color: Theme.colors.navy },
@@ -398,19 +397,19 @@ const styles = StyleSheet.create({
   progressBg: { height: 8, backgroundColor: Theme.colors.grey1, borderRadius: 4, marginTop: 15, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: Theme.colors.green, borderRadius: 4 },
   progressText: { fontSize: 10, color: Theme.colors.textLight, marginTop: 8, textAlign: 'center' },
-  alertCard: { flexDirection: 'row', backgroundColor: Theme.colors.redPale, borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: Theme.colors.red + '20' },
+  alertCard: { flexDirection: 'row', backgroundColor: Theme.colors.redPale, borderRadius: 18, padding: 16, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: Theme.colors.red + '20', shadowColor: Theme.colors.red, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 3 },
   alertLeft: { flex: 1 },
   alertTitle: { fontSize: 13, fontWeight: '800', color: Theme.colors.text },
   alertSub: { fontSize: 11, color: Theme.colors.textMid, marginTop: 2 },
   link: { fontSize: 12, color: Theme.colors.teal, fontWeight: '700' },
   quickGrid: { marginTop: 10 },
-  candRow: { flexDirection: 'row', backgroundColor: Theme.colors.white, padding: 12, borderRadius: 14, alignItems: 'center', marginBottom: 8, borderWidth: 1, borderColor: Theme.colors.grey2 },
+  candRow: { flexDirection: 'row', backgroundColor: Theme.colors.white, padding: 14, borderRadius: 18, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: Theme.colors.grey2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 },
   candAvatar: { width: 36, height: 36, borderRadius: 10, backgroundColor: Theme.colors.navyPale, alignItems: 'center', justifyContent: 'center' },
   candName: { fontSize: 13, fontWeight: '800', color: Theme.colors.text },
   candSub: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
   chevron: { fontSize: 18, color: Theme.colors.grey3 },
   infoText: { fontSize: 11, color: Theme.colors.textLight, marginBottom: 15 },
-  candCard: { backgroundColor: Theme.colors.white, borderRadius: 20, padding: 16, marginBottom: 15, borderWidth: 1, borderColor: Theme.colors.grey2 },
+  candCard: { backgroundColor: Theme.colors.white, borderRadius: 20, padding: 16, marginBottom: 15, borderWidth: 1, borderColor: Theme.colors.grey2, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 12, elevation: 3 },
   candCardTop: { flexDirection: 'row', alignItems: 'center' },
   candAvatarLarge: { width: 50, height: 50, borderRadius: 15, backgroundColor: Theme.colors.grey1, alignItems: 'center', justifyContent: 'center' },
   candCardName: { fontSize: 15, fontWeight: '900', color: Theme.colors.text },
@@ -424,16 +423,12 @@ const styles = StyleSheet.create({
   authBtnText: { color: Theme.colors.white, fontSize: 12, fontWeight: 'bold' },
   pendingBadge: { backgroundColor: Theme.colors.orangePale, borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
   pendingText: { color: Theme.colors.orange, fontSize: 11, fontWeight: '700' },
-  bienCard: { flexDirection: 'row', backgroundColor: Theme.colors.white, borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Theme.colors.grey2 },
+  bienCard: { flexDirection: 'row', backgroundColor: Theme.colors.white, borderRadius: 18, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Theme.colors.grey2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
   bienLeft: { flex: 1 },
   bienType: { fontSize: 9, fontWeight: '900', color: Theme.colors.textLight, letterSpacing: 1 },
   bienAddr: { fontSize: 13, fontWeight: '800', color: Theme.colors.text, marginTop: 4 },
   bienLoyer: { fontSize: 12, color: Theme.colors.navy, fontWeight: '700', marginTop: 6 },
   bienRight: { alignItems: 'flex-end', justifyContent: 'center' },
-  bottomNav: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: Theme.colors.white, borderTopWidth: 1, borderTopColor: Theme.colors.grey2, flexDirection: 'row', paddingVertical: 10, paddingBottom: 25, justifyContent: 'space-around' },
-  navItem: { alignItems: 'center' },
-  navIcon: { fontSize: 20 },
-  navLabel: { fontSize: 9, marginTop: 2, fontWeight: '700' },
   addBtn: { backgroundColor: Theme.colors.teal, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 },
   addBtnText: { color: Theme.colors.white, fontWeight: '700', fontSize: 12 },
   wizardOverlay: {

@@ -1,0 +1,47 @@
+# Web & Root dependencies (to hide from EAS)
+/node_modules/
+/package.json
+/package-lock.json
+/.npm/
+
+# Next.js & Web folders
+/.next/
+/out/
+/src/
+/public/
+/docs/
+/prisma/
+/scripts/
+/assets/
+/android/
+/ios/
+
+# Web configs
+/next.config.ts
+/tsconfig.json
+/tsconfig.tsbuildinfo
+/eslint.config.mjs
+/postcss.config.mjs
+/capacitor.config.ts
+
+# Misc
+/.idea/
+/.vscode/
+*.db
+*.db-journal
+*.log*
+ts_errors.txt
+
+# --- MOBILE PROJECT IGNORES ---
+# We ONLY want the mobile project files to be uploaded.
+# Below, we ignore the heavy generated folders inside mobile.
+/mobile/node_modules/
+/mobile/.expo/
+/mobile/android/
+/mobile/ios/
+/mobile/dist/
+/mobile/*.apk
+/mobile/*.aab
+/mobile/*.jks
+/mobile/*.keystore
+/mobile/.env*.local

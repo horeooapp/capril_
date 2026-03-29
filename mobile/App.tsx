@@ -5,44 +5,75 @@ import ProprioScreen from './src/modules/proprio/ProprioScreen';
 import AgencyScreen from './src/modules/agency/AgencyScreen';
 import DiasporaScreen from './src/modules/diaspora/DiasporaScreen';
 import IntermediaireScreen from './src/modules/intermediaire/IntermediaireScreen';
+import AuthScreen from './src/modules/auth/AuthScreen';
 import { Theme } from './src/theme/theme';
 
 const { width } = Dimensions.get('window');
 
+type PortalType = 'TENANT' | 'LANDLORD' | 'AGENCE' | 'DIASPORA' | 'INTERMEDIAIRE';
+
 export default function App() {
-  const [portal, setPortal] = useState<'TENANT' | 'LANDLORD' | 'AGENCE' | 'DIASPORA' | 'INTERMEDIAIRE' | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [portal, setPortal] = useState<PortalType | null>(null);
 
-  const portals = [
-    { id: 'TENANT', name: 'Locataire', icon: '🔑', desc: 'Gestion de bail & paiements' },
-    { id: 'LANDLORD', name: 'Propriétaire', icon: '🏠', desc: 'Suivi patrimoine & revenus' },
-    { id: 'AGENCE', name: 'Agence', icon: '🏢', desc: 'Gestion de portefeuille' },
-    { id: 'DIASPORA', name: 'Diaspora', icon: '🌍', desc: 'Investisseur étranger' },
-    { id: 'INTERMEDIAIRE', name: 'Intermédiaire', icon: '🤝', desc: 'Apporteur affaires' },
-  ];
+  const handleLogin = (user: any) => {
+    setUserProfile(user);
+    setIsAuthenticated(true);
+    
+    // Routage automatique basé sur le rôle reçu du backend
+    if (user?.role === 'TENANT') setPortal('TENANT');
+    else if (user?.role === 'LANDLORD') setPortal('LANDLORD');
+    else if (user?.role === 'AGENCE' || user?.role === 'AGENCY') setPortal('AGENCE');
+    else if (user?.role === 'DIASPORA') setPortal('DIASPORA');
+    else if (user?.role === 'INTERMEDIAIRE') setPortal('INTERMEDIAIRE');
+    else setPortal('TENANT'); // Fallback par défaut
+  };
 
-  if (portal === 'TENANT') return <WalletScreen onBack={() => setPortal(null)} />;
-  if (portal === 'LANDLORD') return <ProprioScreen onBack={() => setPortal(null)} />;
-  if (portal === 'AGENCE') return <AgencyScreen onBack={() => setPortal(null)} />;
-  if (portal === 'DIASPORA') return <DiasporaScreen onBack={() => setPortal(null)} />;
-  if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={() => setPortal(null)} />;
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserProfile(null);
+    setPortal(null);
+  };
 
+  // 1. Si non authentifié
+  if (!isAuthenticated) {
+    return <AuthScreen onLogin={handleLogin} />;
+  }
+
+  // 2. Écrans spécifiques aux rôles (avec fonction déconnexion)
+  if (portal === 'TENANT') return <WalletScreen onBack={handleLogout} />;
+  if (portal === 'LANDLORD') return <ProprioScreen onBack={handleLogout} />;
+  if (portal === 'AGENCE') return <AgencyScreen onBack={handleLogout} />;
+  if (portal === 'DIASPORA') return <DiasporaScreen onBack={handleLogout} />;
+  if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={handleLogout} />;
+
+  // 3. Fallback (Sélection manuelle si le routing a échoué)
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>QAPRIL MOBILE</Text>
-        <Text style={styles.sub}>Sélectionnez votre portail</Text>
+        <Text style={styles.sub}>Role non défini. Sélectionnez votre portail</Text>
         
-        {portals.map(p => (
+        {[
+          { id: 'TENANT', name: 'Locataire', icon: '🔑' },
+          { id: 'LANDLORD', name: 'Propriétaire', icon: '🏠' },
+          { id: 'AGENCE', name: 'Agence', icon: '🏢' },
+          { id: 'DIASPORA', name: 'Diaspora', icon: '🌍' },
+          { id: 'INTERMEDIAIRE', name: 'Intermédiaire', icon: '🤝' },
+        ].map(p => (
           <TouchableOpacity 
             key={p.id}
-            style={[styles.btn, { backgroundColor: p.id === 'TENANT' ? Theme.colors.navy : p.id === 'LANDLORD' ? Theme.colors.gold : p.id === 'AGENCE' ? Theme.colors.teal : p.id === 'DIASPORA' ? Theme.colors.diaspora : Theme.colors.orange }]} 
-            onPress={() => setPortal(p.id as any)}
+            style={[styles.btn, { backgroundColor: Theme.colors.navy }]} 
+            onPress={() => setPortal(p.id as PortalType)}
           >
             <Text style={styles.btnText}>Accès {p.name} {p.icon}</Text>
           </TouchableOpacity>
         ))}
         
-        <Text style={styles.version}>v0.2.0-alpha · QAPRIL Technologies</Text>
+        <TouchableOpacity style={{ marginTop: 20, padding: 10 }} onPress={handleLogout}>
+          <Text style={{ color: Theme.colors.red, fontWeight: 'bold' }}>Se déconnecter</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

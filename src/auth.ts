@@ -1,7 +1,15 @@
-import NextAuth from "next-auth"
+import NextAuth, { CredentialsSignin } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
+
+class CustomAuthError extends CredentialsSignin {
+  constructor(code: string) {
+    super();
+    this.code = code;
+  }
+}
+
 import { authConfig } from "./auth.config"
 import { redis } from "@/lib/redis"
 
@@ -36,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const isValid = storedOtp === otp;
 
                 if (!isValid) {
-                    throw new Error("Invalid or expired OTP");
+                    throw new CustomAuthError("Invalid or expired OTP");
                 }
 
                 try {
@@ -71,7 +79,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     } as any;
                 } catch (dbError: any) {
                     console.error("[AUTH] Database Error in authorize:", dbError.message || dbError);
-                    throw new Error(`Database error: ${dbError.message || "Unknown"}`);
+                    throw new CustomAuthError("Database error");
                 }
             }
         }),
@@ -92,7 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     // 1. Domain Restriction
                     if (!email.endsWith("@qapril.ci") && !email.endsWith("@qapril.net")) {
-                        throw new Error("Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)");
+                        throw new CustomAuthError("Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)");
                     }
 
                     const user = await prisma.user.findFirst({
@@ -103,11 +111,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (!user) {
-                        throw new Error("Admin non trouvé ou rôle insuffisant");
+                        throw new CustomAuthError("Admin non trouvé ou rôle insuffisant");
                     }
 
                     if (!user.password) {
-                        throw new Error("Mot de passe non configuré");
+                        throw new CustomAuthError("Mot de passe non configuré");
                     }
 
                     // 2. Verify password
@@ -115,7 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const isValidPassword = await compare(password, user.password);
 
                     if (!isValidPassword) {
-                        throw new Error("Mot de passe incorrect");
+                        throw new CustomAuthError("Mot de passe incorrect");
                     }
 
                     // 3. SuperAdmin Logic

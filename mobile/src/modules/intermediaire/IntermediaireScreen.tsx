@@ -18,6 +18,7 @@ import { Badge } from '../../components/common/Badge';
 import { Row } from '../../components/common/Row';
 import { SectionTitle } from '../../components/common/SectionTitle';
 import { BrandHeader } from '../../components/common/BrandHeader';
+import { BottomNav } from '../../components/common/BottomNav';
 import { useIntermediaire, useIntermediaireStats, useIntermediaireActions } from '../../hooks/qapril-hooks';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -65,7 +66,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
@@ -79,7 +80,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
         />
 
         {/* KPI Row - Floating */}
-        <View style={{ marginTop: -25, paddingHorizontal: 20 }}>
+        <View style={{ marginTop: -40, paddingHorizontal: 20, zIndex: 10 }}>
           <View style={styles.kpiRow}>
             <View style={styles.kpiCard}>
               <Text style={styles.kpiVal}>{fmt(S.encaisse || 0)} F</Text>
@@ -205,19 +206,17 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
       </ScrollView>
 
       {/* BOTTOM NAV */}
-      <View style={styles.bottomNav}>
-        {[
+      <BottomNav
+        tabs={[
           { id: "dash", icon: "📊", label: "Dashboard" },
           { id: "biens", icon: "🏘️", label: "Biens" },
           { id: "quittances", icon: "🧾", label: "Quittances" },
           { id: "compte", icon: "👤", label: "Compte" },
-        ].map(n => (
-          <TouchableOpacity key={n.id} onPress={() => changeTab(n.id)} style={styles.navItem}>
-             <Text style={[styles.navIcon, { opacity: tab === n.id ? 1 : 0.4 }]}>{n.icon}</Text>
-             <Text style={[styles.navLabel, { color: tab === n.id ? Theme.colors.navy : Theme.colors.textLight }]}>{n.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        ]}
+        activeTab={tab}
+        onChange={changeTab}
+        accentColor={Theme.colors.orange}
+      />
 
       {/* Action Sheet - Quittance */}
       {showSheet === 'quittance' && (
@@ -251,7 +250,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -267,7 +266,7 @@ const styles = StyleSheet.create({
   iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
 
   kpiRow: { flexDirection: 'row', gap: 10 },
-  kpiCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 20, padding: 15, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
+  kpiCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 20, padding: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
   kpiVal: { fontSize: 16, fontWeight: '900', color: Theme.colors.orange },
   kpiLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight, marginTop: 4, letterSpacing: 0.5 },
 
@@ -310,11 +309,6 @@ const styles = StyleSheet.create({
   
   logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
-
-  bottomNav: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', flexDirection: 'row', paddingVertical: 10, paddingBottom: 25, justifyContent: 'space-around' },
-  navItem: { alignItems: 'center' },
-  navIcon: { fontSize: 20 },
-  navLabel: { fontSize: 9, marginTop: 2, fontWeight: '700' },
 
   sheetOverlay: { position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', zIndex: 1000 },
   sheetContent: { backgroundColor: '#FFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 30, paddingBottom: 50 },

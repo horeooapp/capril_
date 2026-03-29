@@ -19,6 +19,7 @@ import { Row } from '../../components/common/Row';
 import { SectionTitle } from '../../components/common/SectionTitle';
 import { WalletCard } from '../../components/common/WalletCard';
 import { BrandHeader } from '../../components/common/BrandHeader';
+import { BottomNav } from '../../components/common/BottomNav';
 import { 
   useLocataire, 
   useBail, 
@@ -112,7 +113,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const scColor = LOC.score >= 850 ? Theme.colors.green : LOC.score >= 700 ? Theme.colors.teal : Theme.colors.orange;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
@@ -125,7 +126,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
         />
 
         {/* KPI Row - Floating */}
-        <View style={{ marginTop: -25, paddingHorizontal: 16 }}>
+        <View style={{ marginTop: -40, paddingHorizontal: 16, zIndex: 10 }}>
           <View style={styles.kpiRow}>
             {[
                { l: "Loyer/mois", v: fmt(BAIL.loyer) + "F", icon: "💰", tab: null },
@@ -412,21 +413,19 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
       </ScrollView>
 
       {/* BOTTOM NAV BAR */}
-      <View style={styles.bottomNav}>
-        {[
+      <BottomNav
+        tabs={[
           { id: "dash", icon: "🏠", label: "Accueil" },
           { id: "bail", icon: "📋", label: "Bail" },
           { id: "quitt", icon: "🧾", label: "Recus" },
           { id: "util", icon: "⚡", label: "Util" },
           { id: "profil", icon: "👤", label: "Profil" },
-        ].map(n => (
-          <TouchableOpacity key={n.id} onPress={() => changeTab(n.id)} style={styles.navItem}>
-            <Text style={[styles.navIcon, { opacity: tab === n.id ? 1 : 0.4 }]}>{n.icon}</Text>
-            <Text style={[styles.navLabel, { color: tab === n.id ? Theme.colors.navy : Theme.colors.textLight }]}>{n.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </SafeAreaView>
+        ]}
+        activeTab={tab}
+        onChange={changeTab}
+        accentColor={Theme.colors.teal}
+      />
+    </View>
   );
 }
 
@@ -523,12 +522,17 @@ const styles = StyleSheet.create({
   },
   kpiCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 10,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
   },
   kpiValue: {
     fontSize: 12,
@@ -548,9 +552,14 @@ const styles = StyleSheet.create({
     marginTop: 14,
     backgroundColor: Theme.colors.redPale,
     borderWidth: 1,
-    borderColor: 'rgba(160,0,0,0.25)',
-    borderRadius: 13,
-    padding: 12,
+    borderColor: 'rgba(160,0,0,0.15)',
+    borderRadius: 18,
+    padding: 16,
+    shadowColor: Theme.colors.red,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   alertTitle: {
     fontSize: 11,
@@ -602,11 +611,16 @@ const styles = StyleSheet.create({
     color: Theme.colors.teal,
   },
   logementCard: {
-    backgroundColor: 'rgba(13,43,110,0.05)',
+    backgroundColor: Theme.colors.white,
     borderWidth: 1,
-    borderColor: 'rgba(13,43,110,0.15)',
-    borderRadius: 14,
-    padding: 13,
+    borderColor: Theme.colors.grey2,
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 3,
   },
   logementTitle: {
     fontSize: 12,
@@ -696,17 +710,22 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   quittanceCard: {
-    backgroundColor: Theme.colors.greenPale,
+    backgroundColor: Theme.colors.white,
     borderWidth: 1,
-    borderColor: 'rgba(26,122,60,0.2)',
+    borderColor: Theme.colors.grey2,
     borderLeftWidth: 4,
     borderLeftColor: Theme.colors.green,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   quittanceLeft: {
     flex: 1,
@@ -761,13 +780,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Theme.colors.grey2,
     borderLeftWidth: 4,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 8,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 2,
   },
   quittanceListTitle: {
     fontSize: 11,
@@ -848,9 +872,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Theme.colors.grey2,
     borderLeftWidth: 4,
-    borderRadius: 13,
-    padding: 13,
-    marginBottom: 10,
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 2,
   },
   utilityTop: {
     flexDirection: 'row',
@@ -1002,28 +1031,5 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: Theme.colors.textLight,
     fontStyle: 'italic',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: Theme.colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Theme.colors.grey2,
-    flexDirection: 'row',
-    paddingVertical: 10,
-    paddingBottom: 25,
-    justifyContent: 'space-around',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    fontSize: 20,
-  },
-  navLabel: {
-    fontSize: 9,
-    marginTop: 2,
-    fontWeight: '700',
   },
 });
