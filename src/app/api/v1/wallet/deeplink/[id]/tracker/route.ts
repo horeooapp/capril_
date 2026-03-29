@@ -1,40 +1,42 @@
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 
 /**
- * [WDL-07] GET /api/v1/wallet/deeplink/[id]/tracker
- * Redirige l'utilisateur vers son app de paiement tout en comptabilisant le clic.
+ * GET /api/v1/wallet/deeplink/[id]/tracker
+ * Records the click and redirects the user to the provider's URL.
  */
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     const link = await prisma.walletRechargeLink.findUnique({
       where: { id }
     });
 
     if (!link) {
-      return NextResponse.json({ error: "Lien introuvable" }, { status: 404 });
+      return NextResponse.json({ error: 'Lien introuvable ou expiré' }, { status: 404 });
     }
 
-    // 1. Incrémenter le compteur de clics & marquer comme cliqué (Tracking conversion 2026)
+    // Mise à jour des stats de clic
     await prisma.walletRechargeLink.update({
       where: { id },
       data: {
-        clicsCompteur: { increment: 1 },
         clique: true,
-        cliqueAt: new Date()
+        cliqueAt: new Date(),
+        clicsCompteur: { increment: 1 }
       }
     });
 
-    // 2. Redirection vers l'URL générée (Wave/OM/MTN deep link)
-    return NextResponse.redirect(link.urlGeneree);
+    // Redirection vers l'URL générée (Wave, Orange, CinetPay...)
+    redirect(link.urlGeneree);
 
-  } catch (error) {
-    console.error("[WALLET_TRACKER_ERROR]", error);
-    return new Response("Erreur de redirection", { status: 500 });
+  } catch (error: any) {
+    if (error.message === 'NEXT_REDIRECT') throw error; // Handle redirect properly in Next.js
+    console.error('[WALLET_TRACKER] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

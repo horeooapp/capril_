@@ -17,18 +17,12 @@ export async function GET(req: Request) {
     const lease = await prisma.lease.findFirst({
       where: { 
         tenantId: user.id,
-        status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'PENDING_CONFIRMATION'] }
+        status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'PENDING_CONFIRMATION', 'LOYER_IMPAYE'] }
       },
       include: {
         property: true,
-        landlord: {
-          select: {
-            fullName: true,
-            phone: true,
-            email: true,
-            landlordCode: true
-          }
-        }
+        landlord: true,
+        agent: true
       },
       orderBy: { startDate: 'desc' }
     });
@@ -40,23 +34,24 @@ export async function GET(req: Request) {
     // Apply serialization which handles MM-04b masking
     const serialized = serializeLease(lease);
 
-    // Map to the specific structure expected by QAPRIL_API_MAPPING 3.2
     const mapping = {
       ref: serialized.leaseReference,
       type: serialized.typeBail,
-      logement: serialized.property?.title || serialized.property?.address || 'Mon logement',
+      logement: serialized.property?.name || serialized.property?.address || 'Mon logement',
       adresse: serialized.property?.address || 'N/A',
       code: serialized.property?.propertyCode || 'N/A',
       loyer: serialized.rentAmount,
+      charges: serialized.chargesAmount || 0,
+      total: serialized.rentAmount + (serialized.chargesAmount || 0),
       debut: serialized.startDate,
       fin: serialized.endDate || null,
-      echeanceJour: 1, // Default to 1st of month
+      echeanceJour: serialized.paymentDay || 5,
       pages: 4,
       sha: serialized.leaseHash || null,
-      statut: serialized.status === 'ACTIVE' ? 'À jour' : 'En attente',
-      retard: 0,
+      statut: serialized.status === 'ACTIVE' ? 'À jour' : 'Attention',
+      retard: serialized.status === 'LOYER_IMPAYE' ? 1 : 0,
       typeGestion: serialized.typeGestion || 'directe',
-      agence: serialized.landlord?.fullName || null,
+      agence: serialized.agent?.fullName || null,
       bailleurNom: serialized.landlord?.fullName,
       bailleurCode: serialized.landlord?.landlordCode,
       bailleurMasque: !!serialized.bailleurMasque

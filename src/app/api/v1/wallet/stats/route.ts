@@ -1,47 +1,56 @@
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { NextResponse } from 'next/server';
+import { getAuthUser } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
+import { WalletService } from '@/lib/wallet/transactions';
 
 /**
- * [WDL-08] GET /api/v1/wallet/stats
- * Statistiques de conversion des liens de recharge (Admin uniquement).
+ * GET /api/v1/wallet/stats
+ * Returns wallet balance, history, and usage projections.
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await auth();
-    if (!session || !session.user || (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN")) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Statistiques globales par déclencheur
-    const stats = await prisma.walletRechargeLink.groupBy({
-      by: ['declencheur'],
-      _count: {
-        _all: true,
-      },
-      _sum: {
-        clicsCompteur: true,
-        montantSuggere: true
+    const fullUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { 
+        walletBalance: true,
+        walletSeuilAlerte: true,
+        activePlanTier: true,
+        _count: {
+           select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
+        }
       }
     });
 
-    // Taux de conversion (Nombre de clics > 0 / Total)
-    const convertedLinks = await prisma.walletRechargeLink.count({
-        where: { clicsCompteur: { gt: 0 } }
-    });
-    const totalLinks = await prisma.walletRechargeLink.count();
+    if (!fullUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const history = await WalletService.getHistory(user.id, 10);
+    
+    // Projections QAPRIL (Standard 75 FCFA/quittance)
+    const nbBails = fullUser._count.leasesAsLandlord;
+    const consoMensuelle = nbBails * 75;
 
     return NextResponse.json({
-        byTrigger: stats,
-        overall: {
-            total: totalLinks,
-            clicked: convertedLinks,
-            conversionRate: totalLinks > 0 ? (convertedLinks / totalLinks) * 100 : 0
-        }
+      solde: fullUser.walletBalance || 0,
+      devise: 'FCFA',
+      seuilAlerte: fullUser.walletSeuilAlerte || 500,
+      decouvertMax: -1500,
+      historique: history,
+      stats: {
+         nbBails,
+         consoMensuelle,
+         autonomieMois: (fullUser.walletBalance || 0) > 0 ? Math.floor((fullUser.walletBalance || 0) / (consoMensuelle || 1)) : 0
+      }
     });
 
-  } catch (error) {
-    console.error("[WALLET_STATS_ERROR]", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  } catch (error: any) {
+    console.error('[WALLET_STATS] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

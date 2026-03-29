@@ -14,12 +14,27 @@ export async function GET(req: Request) {
     }
 
     const fullUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
+      include: {
+        propertiesManaged: {
+          include: {
+            leases: {
+              where: { status: 'ACTIVE' }
+            }
+          }
+        }
+      }
     });
 
     if (!fullUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const nbBiens = fullUser.propertiesManaged.length;
+    const caTheorique = fullUser.propertiesManaged.reduce((sum, p) => {
+      const activeLease = p.leases[0];
+      return sum + (activeLease ? (activeLease.rentAmount + (activeLease.chargesAmount || 0)) : 0);
+    }, 0);
 
     // Role-specific mapping 6.1
     const mapping = {
@@ -28,13 +43,13 @@ export async function GET(req: Request) {
       email: fullUser.email,
       telephone: fullUser.phone,
       code: fullUser.landlordCode || `AG-${fullUser.id.substring(0, 5)}`,
-      commune: 'Abidjan', // Default for now
-      agreement: 'CIMA/QAP-2026', // Static/Mock if not in DB
+      commune: fullUser.propertiesManaged[0]?.commune || 'Abidjan',
+      agreement: 'CIMA/QAP-2026',
       stats: {
-         biens: 0,
-         caTheorique: 0,
-         caEncaisse: 0,
-         candidats: 0
+         biens: nbBiens,
+         caTheorique: caTheorique,
+         caEncaisse: 0, // Should be calculated from monthly synthesis if needed
+         candidats: 0   // To be implemented
       }
     };
 

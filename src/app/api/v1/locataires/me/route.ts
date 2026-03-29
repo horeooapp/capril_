@@ -13,10 +13,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch again with more relations if needed
+    // Fetch user with profile and scores
     const fullUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
+        locataireProfile: true,
         reliabilityScores: {
           orderBy: { createdAt: 'desc' },
           take: 1
@@ -34,16 +35,16 @@ export async function GET(req: Request) {
       telephone: fullUser.phone,
       email: fullUser.email,
       depuis: fullUser.createdAt.toISOString(),
-      kyc: fullUser.kycStatus === 'VALIDATED' ? 'Validé' : 'En attente',
-      score: fullUser.reliabilityScores?.[0]?.score || 750,
-      scoreBase: 750,
-      scoreKyc: 800,
+      kyc: fullUser.kycStatus === 'verified' ? 'Validé' : 'En attente',
+      score: fullUser.locataireProfile?.scoreActuel || fullUser.reliabilityScores?.[0]?.score || 750,
+      scoreBadge: fullUser.locataireProfile?.scoreBadge || 'D',
+      walletBalance: fullUser.walletBalance || 0,
       kycComplet: fullUser.kycLevel >= 4,
       kycEtapes: [
         { label: 'Identité', pts: 50, ok: fullUser.kycLevel >= 1, icon: 'id-card' },
         { label: 'Revenus', pts: 100, ok: fullUser.kycLevel >= 2, icon: 'wallet' },
         { label: 'Bailleur', pts: 50, ok: fullUser.kycLevel >= 3, icon: 'home' },
-        { label: 'Vérification', pts: 'ICL 800', ok: fullUser.kycLevel >= 4, icon: 'verified' }
+        { label: 'Vérification', pts: 800, ok: fullUser.kycLevel >= 4, icon: 'verified' }
       ]
     };
 

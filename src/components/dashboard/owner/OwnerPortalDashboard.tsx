@@ -60,7 +60,10 @@ const Sheet = ({ open, onClose, title, tc, children }: any) => {
   );
 };
 
+import WalletDashboard from "./WalletDashboard"
+
 export function OwnerPortalDashboard({ user, properties: initialProperties }: { user: any, properties: any[] }) {
+  const [activeTab, setActiveTab] = useState<"overview" | "wallet">("overview");
   const [sheets, setSheets] = useState<Record<string, boolean>>({});
   const [selectedEntite, setSelectedEntite] = useState<any>(null);
   const [selectedUnite, setSelectedUnite] = useState<any>(null);
@@ -156,20 +159,37 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           <div>
             <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">Espace Propriétaire • Supervision</p>
             <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
-              Bonjour, {user?.name?.split(" ")[0] || "Propriétaire"}.
+              Bonjour, {user?.fullName?.split(" ")[0] || "Propriétaire"}.
             </h1>
-            <p className="text-sm font-medium text-gray-500 mt-3 border-l-2 border-primary pl-4 uppercase tracking-widest">
-              {entities.length} bien(s) • {stats.total} unité(s) locative(s)
-            </p>
+            
+            {/* TAB SELECTOR */}
+            <div className="flex items-center gap-6 mt-6">
+               <button 
+                  onClick={() => setActiveTab("overview")}
+                  className={`text-[12px] font-black uppercase tracking-[0.2em] pb-2 border-b-2 transition-all ${activeTab === "overview" ? "border-primary text-primary" : "border-transparent text-gray-400 hover:text-gray-600"}`}
+               >
+                 Aperçu Patrimoine
+               </button>
+               <button 
+                  onClick={() => setActiveTab("wallet")}
+                  className={`text-[12px] font-black uppercase tracking-[0.2em] pb-2 border-b-2 transition-all flex items-center gap-2 ${activeTab === "wallet" ? "border-[#C55A11] text-[#C55A11]" : "border-transparent text-gray-400 hover:text-gray-600"}`}
+               >
+                 Mon Wallet <span className="bg-[#C55A11] text-white text-[8px] px-1.5 py-0.5 rounded-full">NOUVEAU</span>
+               </button>
+            </div>
           </div>
           <button onClick={() => op("notifs")}
             className="w-12 h-12 rounded-[1.25rem] bg-white border border-gray-100 shadow-sm flex items-center justify-center text-gray-900 hover:bg-gray-50 transition-all relative group">
             <Bell size={20} className="group-hover:rotate-12 transition-transform" />
-            {stats.impayesN > 0 && <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />}
+            {(stats.impayesN > 0) && <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />}
           </button>
         </div>
 
-        {/* ALERTE IMPAYÉS */}
+        {activeTab === "wallet" ? (
+          <WalletDashboard />
+        ) : (
+          <>
+            {/* ALERTE IMPAYÉS */}
         {stats.impayesN > 0 && (
           <div className="bg-[#FEECEC] border border-red-200 rounded-2xl p-5 flex items-start gap-4">
             <AlertTriangle size={20} className="text-[#A00000] flex-shrink-0 mt-0.5" />
@@ -310,6 +330,8 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
             )}
           </div>
         </section>
+        </>
+        )}
 
 
       </div>

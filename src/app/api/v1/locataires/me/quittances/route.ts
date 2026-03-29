@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/jwt';
-import { serializeReceipt } from '@/lib/serialize';
+import { serializeObject } from '@/lib/serialize';
 
 /**
  * GET /api/v1/locataires/me/quittances
- * Returns the list of certified receipts for the authenticated tenant
+ * Returns the rent receipts history for the authenticated tenant
  */
 export async function GET(req: Request) {
   try {
@@ -14,27 +14,39 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const receipts = await prisma.receipt.findMany({
+    // Find active lease first
+    const lease = await prisma.lease.findFirst({
       where: { 
-        lease: { tenantId: user.id }
+        tenantId: user.id,
+        status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE', 'TERMINATED'] }
       },
-      orderBy: { periodMonth: 'desc' },
-      take: 24 // Reasonable history for mobile
+      select: { id: true }
     });
 
-    const mapping = receipts.map((rec: any) => ({
-      ref: rec.reference || rec.id,
-      mois: rec.periodMonth, // ex: "Mars 2026"
-      montant: Number(rec.amount || rec.totalAmount || 0),
-      statut: rec.status === 'paid' ? 'Certifiée' : 'Impayée',
-      date: rec.paidAt instanceof Date ? rec.paidAt.toISOString() : rec.paidAt,
-      sha: rec.receiptHash || null,
-      laposte: (rec as any).laPosteRef || null
+    if (!lease) {
+      return NextResponse.json([]);
+    }
+
+    const receipts = await prisma.receipt.findMany({
+      where: { leaseId: lease.id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Map to UI structure
+    const mapping = receipts.map(r => ({
+      id: r.id,
+      ref: r.receiptRef,
+      periode: r.periodMonth, // format YYYY-MM
+      montant: Number(r.totalAmount),
+      date: r.paidAt ? r.paidAt.toISOString() : r.createdAt.toISOString(),
+      statut: r.status === 'paid' ? 'Payée' : 'En attente',
+      certifie: true,
+      url: r.pdfUrl || null
     }));
 
     return NextResponse.json(mapping);
   } catch (error: any) {
-    console.error('[API LOCATAIRE] Get Quittances Error:', error);
+    console.error('[API LOCATAIRE] Get Receipts Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

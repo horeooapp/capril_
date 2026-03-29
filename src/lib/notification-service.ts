@@ -24,6 +24,7 @@ export type EventType =
   | "FISCAL_DEADLINE_APPROACHING"
   | "FISCAL_PAYE_CONFIRME"
   | "DIASPORA_SLA_ALARM"
+  | "CHAMPION_RELANCE"
 
 interface NotificationData {
   referenceId?: string

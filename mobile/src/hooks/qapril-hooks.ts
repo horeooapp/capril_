@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
  */
 
 // In development, use your computer's local IP (e.g. 192.168.x.x) if testing on a real device
-const API_BASE_URL = 'http://localhost:3000/api/v1'; // Adjust to your actual server URL
+const API_BASE_URL = 'https://api.qapril.ci/v1'; // Adjust to your actual server URL
 
 let AUTH_TOKEN: string | null = null;
 

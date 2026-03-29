@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/jwt';
-import { serializeProperty } from '@/lib/serialize';
 
 /**
  * GET /api/v1/proprietaires/patrimoine
- * Returns the list of properties and units for the authenticated landlord
+ * Returns the list of properties owned by the authenticated landlord
+ * with their active leases and tenants.
  */
 export async function GET(req: Request) {
   try {
@@ -18,33 +18,42 @@ export async function GET(req: Request) {
       where: { ownerUserId: user.id },
       include: {
         leases: {
-          where: { status: 'ACTIVE' },
-          include: { tenant: true }
+           include: {
+              tenant: {
+                 select: {
+                    fullName: true,
+                    phone: true,
+                    email: true
+                 }
+              }
+           }
         }
       }
     });
 
-    // Mapping 4.2: List of entities with their occupancy
-    const mapping = properties.map((p) => {
-        const activeLease = p.leases[0];
-        
-        return {
-            id: p.id,
-            code: p.propertyCode || `PRO-${p.id.substring(0,4)}`,
-            nom: p.name || p.address,
-            adresse: p.address,
-            type: p.propertyType === 'immeuble' ? 'immeuble' : 'standalone',
-            unites: 1, // 1 Property = 1 Unit
-            occupes: activeLease ? 1 : 0,
-            vacants: activeLease ? 0 : 1,
-            impayes: 0, // Placeholder
-            locataire: activeLease?.tenant?.fullName || null
-        };
-    });
+    // Mapping to match UI expectations (OwnerPortalDashboard)
+    const mapping = properties.map(p => ({
+       id: p.id,
+       code: p.propertyCode,
+       nom: p.name,
+       adresse: p.address,
+       commune: p.commune,
+       type: p.propertyType,
+       status: p.status,
+       leases: p.leases.map(l => ({
+          id: l.id,
+          reference: l.leaseReference,
+          status: l.status,
+          rentAmount: l.rentAmount,
+          tenantName: l.tenant?.fullName,
+          startDate: l.startDate,
+          endDate: l.endDate
+       }))
+    }));
 
     return NextResponse.json(mapping);
   } catch (error: any) {
-    console.error('[API PROPRIO] Get Patrimoine Error:', error);
+    console.error('[API PATRIMOINE] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

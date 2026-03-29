@@ -106,10 +106,90 @@ export class ChampionService {
         totalInscriptions: profile.totalInscriptions,
         totalCommissions: profile.totalCommissionsFcfa,
         objectif: profile.objectifMensuel,
-        progression: Math.round((profile.totalInscriptions / profile.objectifMensuel) * 100)
+        progression: Math.round((profile.totalInscriptions / (profile.objectifMensuel || 1)) * 100)
       },
       recentProspects: profile.prospects,
       recentCommissions: profile.commissions
     };
+  }
+
+  /**
+   * Get list of unpaid rents (arrears) for a champion's zone or general.
+   * ADD-06 v2: Recovery focus.
+   */
+  static async getRecoveryList(userId: string) {
+    // For now, Champions see all unpaid Direct Management leases.
+    // In production, we would filter by zone.
+    const arrears = await prisma.leaseArrear.findMany({
+      where: {
+        status: "unpaid",
+        lease: {
+           typeGestion: { notIn: ["agreee", "mandat"] }, // Focus on Direct Management
+           status: "ACTIVE"
+        }
+      },
+      include: {
+        lease: {
+          include: {
+             tenant: { select: { fullName: true, phone: true } },
+             property: { select: { address: true, propertyCode: true } },
+             landlord: { select: { fullName: true } }
+          }
+        }
+      },
+      orderBy: { dueDate: "asc" }
+    });
+
+    return arrears;
+  }
+
+  /**
+   * Send a personalized relance from the Champion.
+   */
+  static async triggerChampionRelance(arrearId: string, championId: string, canal: "sms" | "wa" = "wa") {
+    const arrear = await prisma.leaseArrear.findUnique({
+      where: { id: arrearId },
+      include: {
+        lease: {
+          include: {
+            tenant: true,
+            landlord: true
+          }
+        }
+      }
+    });
+
+    if (!arrear) throw new Error("Arréage introuvable");
+
+    const champion = await prisma.user.findUnique({ where: { id: championId } });
+    if (!champion) throw new Error("Champion introuvable");
+
+    const event = "CHAMPION_RELANCE" as any;
+    const amount = arrear.amount;
+    const tenantName = arrear.lease.tenant?.fullName || "Client";
+    
+    const payload = {
+      smsText: `QAPRIL: Bonjour ${tenantName}, je suis ${champion.fullName || 'votre agent'}, votre Champion QAPRIL. Votre loyer de ${amount} FCFA est en attente. Réglez-le via l'app pour éviter tout désagrément. Merci !`,
+      parameters: [tenantName, champion.fullName || "Champion", String(amount)]
+    };
+
+    const { NotificationService } = await import("./notification-service");
+    await NotificationService.envoyerNotification(arrear.lease.tenantId, event, {
+      referenceId: arrear.id,
+      payload
+    });
+
+    // Log the action in Audit
+    await prisma.auditLog.create({
+      data: {
+        userId: championId,
+        action: "CHAMPION_RELANCE_SENT",
+        module: "CHAMPION",
+        entityId: arrearId,
+        newValues: { canal, tenantId: arrear.lease.tenantId }
+      }
+    });
+
+    return { success: true };
   }
 }

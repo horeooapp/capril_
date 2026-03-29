@@ -22,10 +22,10 @@ import {
 } from "lucide-react"
 import MonthlyReportCard from "@/components/dashboard/reports/MonthlyReportCard"
 
-import { AgencyPortalDashboard } from "@/components/dashboard/agency/AgencyPortalDashboard"
-import { OwnerPortalDashboard } from "@/components/dashboard/owner/OwnerPortalDashboard"
+import AgencyPortalWrapper from "./agency/AgencyPortalWrapper"
+import OwnerPortalWrapper from "./owner/OwnerPortalWrapper"
 import IntermediairePortalDashboard from "@/components/dashboard/intermediaire/IntermediairePortalDashboard"
-import DiasporaDashboard from "@/components/DiasporaDashboard"
+import DiasporaPortalWrapper from "./diaspora/DiasporaPortalWrapper"
 import { DiasporaDashboardData } from "@/types/diaspora"
 import { TenantPortalDashboard } from "@/components/dashboard/tenant/TenantPortalDashboard"
 
@@ -127,18 +127,14 @@ export default function DashboardOverviewClient({
     }
 
     if (user?.role === 'AGENCY') {
-        return <AgencyPortalDashboard 
-            user={agencyData?.user || user} 
-            properties={agencyData?.properties || properties || []} 
-            candidatures={agencyData?.candidatures || []} 
-        />;
+        return <AgencyPortalWrapper />;
     }
 
     if (user?.role === 'LANDLORD' || user?.role === 'LANDLORD_PRO') {
         if (diasporaData) {
-            return <DiasporaDashboard data={diasporaData} user={user} />;
+            return <DiasporaPortalWrapper />;
         }
-        return <OwnerPortalDashboard user={user} properties={properties || []} />;
+        return <OwnerPortalWrapper />;
     }
 
     const startOfMonth = new Date()

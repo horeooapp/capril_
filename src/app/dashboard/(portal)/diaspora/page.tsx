@@ -1,10 +1,8 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { getDiasporaDashboard } from "@/actions/diaspora-actions"
-import DiasporaDashboard from "@/components/DiasporaDashboard"
-import { Globe, ShieldCheck, Zap, AlertCircle } from "lucide-react"
+import { Globe, ShieldCheck, Zap } from "lucide-react"
 import Link from "next/link"
-import { DiasporaDashboardData } from "@/types/diaspora"
+import DiasporaPortalWrapper from "./DiasporaPortalWrapper"
 
 export default async function DiasporaPage() {
   const session = await auth()
@@ -71,17 +69,5 @@ export default async function DiasporaPage() {
     )
   }
 
-  const result = await getDiasporaDashboard()
-
-  if (result.error || !result.data) {
-    return (
-      <div className="p-20 text-center">
-        <AlertCircle size={48} className="mx-auto text-red-500 mb-4" />
-        <h2 className="text-2xl font-black text-ivoire-dark">Erreur de chargement</h2>
-        <p className="text-gray-400 mt-2">{result.error || "Impossible de récupérer vos données."}</p>
-      </div>
-    )
-  }
-
-  return <DiasporaDashboard data={result.data as DiasporaDashboardData} user={session.user} />
+  return <DiasporaPortalWrapper />
 }

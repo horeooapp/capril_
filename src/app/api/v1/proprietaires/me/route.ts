@@ -14,12 +14,27 @@ export async function GET(req: Request) {
     }
 
     const fullUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user.id },
+      include: {
+        propertiesOwned: {
+          include: {
+            leases: {
+              where: { status: 'ACTIVE' }
+            }
+          }
+        }
+      }
     });
 
     if (!fullUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const nbBiens = fullUser.propertiesOwned.length;
+    const loyerTotal = fullUser.propertiesOwned.reduce((sum, p) => {
+      const activeLease = p.leases[0];
+      return sum + (activeLease ? activeLease.rentAmount : 0);
+    }, 0);
 
     // Role-specific mapping 4.1
     const mapping = {
@@ -27,17 +42,17 @@ export async function GET(req: Request) {
       nom: fullUser.fullName,
       email: fullUser.email,
       telephone: fullUser.phone,
-      code: (fullUser as any).landlordCode || 'BAI-XXX',
-      abonnement: (fullUser as any).subscriptionLevel || 'Gérant',
+      code: fullUser.landlordCode || 'BAI-XXX',
+      abonnement: fullUser.activePlanTier || 'ESSENTIEL',
       wallet: {
-        solde: (fullUser as any).walletBalance || 0,
+        solde: fullUser.walletBalance || 0,
         decouvert: -1500, // Fixed rule ADD-07 v3
         devise: 'FCFA',
-        statut: ((fullUser as any).walletBalance || 0) < 0 ? 'Débiteur' : 'Actif'
+        statut: (fullUser.walletBalance || 0) < 0 ? 'Débiteur' : 'Actif'
       },
       stats: {
-         entites: 0, // Should be calculated
-         loyerTheorique: 0
+         entites: nbBiens,
+         loyerTheorique: loyerTotal
       }
     };
 

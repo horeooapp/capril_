@@ -10,6 +10,7 @@ import {
   Search, Filter, MapPin
 } from "lucide-react";
 import { addProspect } from "@/actions/champion-actions";
+import ChampionRecoveryDashboard from "@/components/dashboard/champion/ChampionRecoveryDashboard";
 
 export default function ChampionDashboardClient({ 
   user, 
@@ -20,6 +21,7 @@ export default function ChampionDashboardClient({
   profile: any, 
   leaderboard: any[] 
 }) {
+  const [activeTab, setActiveTab] = useState<"growth" | "recovery">("growth");
   const [showAddForm, setShowAddForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,16 +62,36 @@ export default function ChampionDashboardClient({
             <h1 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase">{user.name}</h1>
           </div>
         </div>
-        <button 
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-orange-900/20 active:scale-95 transition-transform"
-        >
-          <Plus size={16} />
-          Nouveau Prospect
-        </button>
+        <div className="flex items-center gap-2">
+           <button 
+             onClick={() => setActiveTab("growth")}
+             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "growth" ? "bg-[#1F4E79] text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+           >
+             Croissance
+           </button>
+           <button 
+             onClick={() => setActiveTab("recovery")}
+             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "recovery" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+           >
+             Recouvrement
+           </button>
+        </div>
+        {activeTab === "growth" && (
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-orange-900/20 active:scale-95 transition-transform"
+          >
+            <Plus size={16} />
+            <span className="hidden md:inline">Nouveau Prospect</span>
+          </button>
+        )}
       </div>
 
-      {/* Quick Stats Slider (Mobile) / Grid (Desktop) */}
+      {activeTab === "recovery" ? (
+        <ChampionRecoveryDashboard />
+      ) : (
+        <>
+          {/* Quick Stats Slider (Mobile) / Grid (Desktop) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
         {stats.map((stat, i) => (
           <div key={i} className="glass-card-premium p-6 rounded-3xl border border-white/50 bg-white/40 shadow-xl flex items-center gap-4">
@@ -171,60 +193,8 @@ export default function ChampionDashboardClient({
         </div>
       </div>
 
-      {/* Add Prospect Modal */}
-      <AnimatePresence>
-        {showAddForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-               className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAddForm(false)} 
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-[3rem] p-10 shadow-2xl overflow-hidden"
-            >
-              <button onClick={() => setShowAddForm(false)} className="absolute top-8 right-8 p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <X size={24} className="text-gray-400" />
-              </button>
-              
-              <div className="mb-8">
-                 <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none mb-2">Ajouter un<br/>Prospect.</h2>
-                 <p className="text-xs text-gray-400 font-medium">Saisissez les informations clés pour le suivi.</p>
-              </div>
-
-              <form onSubmit={handleAddProspect} className="space-y-5">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Nom Complet</label>
-                  <input name="nom" required className="w-full' p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#C55A11] text-[14px]" placeholder="Ex: Jean Kouadio" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Téléphone (WhatsApp)</label>
-                  <input name="telephone" required className="w-full' p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#C55A11] text-[14px]" placeholder="+225 ..." />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Quartier</label>
-                    <input name="quartier" className="w-full' p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#C55A11] text-[14px]" placeholder="Ex: Cocody" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Nb Logements</label>
-                    <input name="nbLogements" className="w-full' p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#C55A11] text-[14px]" placeholder="Ex: 4 appart." />
-                  </div>
-                </div>
-                
-                <button 
-                  disabled={isSubmitting}
-                  className="w-full py-5' bg-gray-900 text-white rounded-[2rem] font-black uppercase tracking-widest text-[14px] shadow-xl hover:bg-black transition-all disabled:opacity-50 mt-4 h-[64px]"
-                >
-                  {isSubmitting ? "Enregistrement..." : "Enregistrer le Prospect"}
-                </button>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+        </>
+      )}
     </div>
   );
 }

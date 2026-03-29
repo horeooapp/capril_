@@ -4,7 +4,7 @@ import { getAuthUser } from '@/lib/jwt';
 
 /**
  * GET /api/v1/agences/portfolio
- * Returns the list of properties managed by the authenticated agency
+ * Returns the list of properties managed by the authenticated agency.
  */
 export async function GET(req: Request) {
   try {
@@ -17,26 +17,50 @@ export async function GET(req: Request) {
       where: { managedByUserId: user.id },
       include: {
         leases: {
-           where: { status: 'ACTIVE' },
-           include: { tenant: true }
+           include: {
+              tenant: {
+                 select: {
+                    fullName: true,
+                    phone: true,
+                    email: true
+                 }
+              }
+           }
+        },
+        owner: {
+           select: {
+              fullName: true,
+              phone: true,
+              email: true
+           }
         }
       }
     });
 
-    // Mapping 6.2
+    // Mapping to match UI expectations (AgencyPortalDashboard)
     const mapping = properties.map(p => ({
-        id: p.id,
-        adresse: p.address,
-        type: p.propertyType === 'immeuble' ? 'IMMEUBLE' : 'BIEN INDIVIDUEL',
-        loyer: p.declaredRentFcfa || 0,
-        statut: p.leases.length > 0 ? 'occupé' : 'vacant',
-        paiement: 'À jour', // Placeholder
-        units: 1 // In this schema, 1 Property = 1 Unit
+       id: p.id,
+       code: p.propertyCode,
+       nom: p.name,
+       adresse: p.address,
+       commune: p.commune,
+       type: p.propertyType,
+       status: p.status,
+       ownerName: p.owner?.fullName,
+       leases: p.leases.map(l => ({
+          id: l.id,
+          reference: l.leaseReference,
+          status: l.status,
+          rentAmount: l.rentAmount,
+          tenantName: l.tenant?.fullName,
+          startDate: l.startDate,
+          endDate: l.endDate
+       }))
     }));
 
     return NextResponse.json(mapping);
   } catch (error: any) {
-    console.error('[API AGENCE] Get Portfolio Error:', error);
+    console.error('[API PORTFOLIO] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
