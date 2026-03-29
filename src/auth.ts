@@ -104,14 +104,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     }
 
                     const user = await prisma.user.findFirst({
-                        where: { 
-                            email,
-                            role: { in: ['ADMIN', 'SUPER_ADMIN'] }
-                        }
+                        where: { email }
                     });
 
                     if (!user) {
-                        throw new CustomAuthError("Admin non trouvé ou rôle insuffisant");
+                        throw new CustomAuthError("Compte non trouvé.");
+                    }
+
+                    if (!['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
+                        throw new CustomAuthError("Rôle insuffisant pour accéder à la console");
                     }
 
                     if (!user.password) {
