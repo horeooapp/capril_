@@ -181,7 +181,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
         });
         
         // Debug fallback
-        return { error: `[DEBUG] Msg: ${error?.message?.substring(0,30)} | Type: ${error?.type} | Name: ${error?.name}` };
+        return { error: `[DEBUG] Prisma Error: Code=${error?.code} | Meta=${JSON.stringify(error?.meta || {})} | Msg: ${error?.message?.substring(0,30)}` };
     }
 }
 
