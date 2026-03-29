@@ -174,6 +174,7 @@ export class ChampionService {
     };
 
     const { NotificationService } = await import("./notification-service");
+    if (!arrear.lease.tenantId) throw new Error("Locataire introuvable");
     await NotificationService.envoyerNotification(arrear.lease.tenantId, event, {
       referenceId: arrear.id,
       payload

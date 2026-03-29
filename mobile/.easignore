@@ -11,3 +11,10 @@ android/
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+../node_modules/
+../.next/
+../out/
+../ios/
+../android/
+../.idea/
+../.git/

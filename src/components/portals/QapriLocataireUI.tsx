@@ -41,6 +41,7 @@ export interface QuittanceData {
   id: string;
   ref: string;
   periode: string;
+  mois?: string;
   montant: number;
   statut: string;
   date: string;
@@ -65,12 +66,20 @@ export interface AboData {
 
 export interface TicketData {
   id: string;
-  type: string;
-  description: string;
-  statut: string;
-  date: string;
-  echeance: string;
-  reference: string;
+  type?: string;
+  code?: string;
+  label?: string;
+  description?: string;
+  statut?: string;
+  date?: string;
+  echeance?: string;
+  reference?: string;
+  heures?: number;
+  montant?: number;
+  color?: string;
+  delai?: string;
+  resolution?: string;
+  timeline?: any[];
 }
 
 interface QapriLocataireUIProps {
@@ -176,22 +185,22 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
   };
   const BAILLEUR = getBailleur();
 
-  const [tab,setTab]               = useState("dash");
-  const [qSel,setQSel]             = useState(null);   // quittance sélectionnée
-  const [aSel,setASel]             = useState(null);   // abonnement sélectionné
-  const [dsec,setDsec]             = useState(null);   // section droits
-  const [rclCode,setRclCode]       = useState(null);   // type réclamation choisi
-  const [rclSent,setRclSent]       = useState(false);  // réclamation envoyée
-  const [tSel,setTSel]             = useState(null);   // ticket sélectionné
-  const [mrlChoice,setMrlChoice]   = useState(null);   // oui/non MRL
-  const [prStep,setPrStep]         = useState(1);      // préavis étape
+  const [tab,setTab]               = useState<string>("dash");
+  const [qSel,setQSel]             = useState<QuittanceData | null>(null);   // quittance sélectionnée
+  const [aSel,setASel]             = useState<AboData | null>(null);   // abonnement sélectionné
+  const [dsec,setDsec]             = useState<string | null>(null);   // section droits
+  const [rclCode,setRclCode]       = useState<string | null>(null);   // type réclamation choisi
+  const [rclSent,setRclSent]       = useState<boolean>(false);  // réclamation envoyée
+  const [tSel,setTSel]             = useState<TicketData | null>(null);   // ticket sélectionné
+  const [mrlChoice,setMrlChoice]   = useState<string | null>(null);   // oui/non MRL
+  const [prStep,setPrStep]         = useState<number>(1);      // préavis étape
   const [O,setO]                   = useState({score:false,caution:false,export:false,ussd:false,notifs:false});
-  const [travauxType, setTravauxType] = useState(null);  // type de travaux sélectionné
-  const [travauxUrgent, setTravauxUrgent] = useState(false);
-  const op = k => setO(o=>({...o,[k]:true}));
-  const cl = k => setO(o=>({...o,[k]:false}));
+  const [travauxType, setTravauxType] = useState<string | null>(null);  // type de travaux sélectionné
+  const [travauxUrgent, setTravauxUrgent] = useState<boolean>(false);
+  const op = (k: string) => setO(o=>({...o,[k]:true}));
+  const cl = (k: string) => setO(o=>({...o,[k]:false}));
 
-  const go = t => { setTab(t);setQSel(null);setASel(null);setDsec(null);setRclCode(null);setRclSent(false);setTSel(null);setMrlChoice(null);setPrStep(1);setTravauxType(null);setTravauxUrgent(false); };
+  const go = (t: string) => { setTab(t);setQSel(null);setASel(null);setDsec(null);setRclCode(null);setRclSent(false);setTSel(null);setMrlChoice(null);setPrStep(1);setTravauxType(null);setTravauxUrgent(false); };
 
   const sc = loc.score;
   const scColor = sc>=850?T.green:sc>=700?T.teal:sc>=550?T.orange:T.red;
@@ -435,14 +444,13 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
             </div>
           )}
           <div style={{padding:"0 16px"}}>
-            {qSel.statut==="Certifiée"?[
-              {icon:"📄",label:"Télécharger le PDF",color:T.navy,bg:T.navyPale},
-              {icon:"💬",label:"Envoyer par WhatsApp",color:T.green,bg:T.greenPale},
-              {icon:"🔗",label:"Lien de vérification (30j)",color:T.teal,bg:T.tealPale},
+            {(qSel.statut==="Certifiée"?[
+              {icon:"📄",label:"Télécharger le PDF",color:T.navy,bg:T.navyPale,act:undefined,sub:undefined},
+              {icon:"💬",label:"Envoyer par WhatsApp",color:T.green,bg:T.greenPale,act:undefined,sub:undefined},
+              {icon:"🔗",label:"Lien de vérification (30j)",color:T.teal,bg:T.tealPale,act:undefined,sub:undefined},
             ]:[
               {icon:"📸",label:"Soumettre ma preuve de paiement",sub:"Capture SMS Mobile Money ou reçu",color:T.navy,bg:T.navyPale,act:()=>{setQSel(null);go("droits");setDsec("rcl");setRclCode("RCL-02");}},
-              {icon:"🚨",label:"Signaler — ticket RCL-02",sub:"Délai bailleur : 144h · clôture auto si silence · −2 pts bailleur",color:T.red,bg:T.redPale,act:()=>{setQSel(null);go("droits");setDsec("rcl");setRclCode("RCL-02");}},
-            ].map((a,i)=><ACard key={i} icon={a.icon} label={a.label} sub={a.sub} color={a.color} bg={a.bg} onClick={a.act||undefined}/>)}
+            ]).map((a: any,i: number)=><ACard key={i} icon={a.icon} label={a.label} sub={a.sub} color={a.color} bg={a.bg} onClick={a.act||undefined}/>)}
           </div>
         </div>
       )}
@@ -473,7 +481,7 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
               {/* mini graphe */}
               <div style={{display:"flex",gap:3,alignItems:"flex-end",height:24,marginTop:10}}>
                 {a.hist.map((v,i)=>{
-                  const max=Math.max(...a.hist.filter(Boolean));
+                  const max=Math.max(...(a.hist.filter(v=>v!==null) as number[]));
                   return <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}}><div style={{width:"100%",background:v?a.color+"70":T.grey2,borderRadius:"3px 3px 0 0",height:v?`${Math.round((v/max)*18)}px`:"4px"}}/><div style={{fontSize:7,color:T.textLight}}>{"NDJFM"[i]}</div></div>;
                 })}
               </div>
@@ -503,7 +511,7 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
             <div style={{fontSize:10,fontWeight:700,color:T.textMid,marginBottom:8}}>Historique consommation</div>
             <div style={{display:"flex",gap:5,alignItems:"flex-end",height:60}}>
               {aSel.hist.map((v,i)=>{
-                const max=Math.max(...aSel.hist.filter(Boolean));
+                const max=Math.max(...(aSel.hist.filter(v=>v!==null) as number[]));
                 return(
                 <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
                   {v&&<div style={{fontSize:7,color:aSel.color,fontWeight:700}}>{v}K</div>}
@@ -539,16 +547,16 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
               <div style={{background:T.orangePale,border:`1.5px solid ${T.orange}30`,borderRadius:12,padding:"11px 13px",marginBottom:12}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                   <div>
-                    <div style={{display:"flex",gap:5,marginBottom:3}}><Badge label={t.code} color={T.purple} bg={T.purplePale} size={9}/><Badge label="En attente bailleur" color={T.orange} bg={T.white} size={9}/></div>
+                    <div style={{display:"flex",gap:5,marginBottom:3}}><Badge label={t.code||''} color={T.purple} bg={T.purplePale} size={9}/><Badge label="En attente bailleur" color={T.orange} bg={T.white} size={9}/></div>
                     <div style={{fontSize:11,fontWeight:700,color:T.text}}>{t.label}</div>
-                    <div style={{fontSize:9,color:T.textLight,marginTop:1}}>Soumis le {t.date} · {t.heures}h restantes</div>
+                    <div style={{fontSize:9,color:T.textLight,marginTop:1}}>Soumis le {t.date} · {t.heures || 0}h restantes</div>
                   </div>
-                  <div style={{textAlign:"right"}}><div style={{fontSize:15,fontWeight:900,color:T.orange,fontFamily:"monospace"}}>{fmt(t.montant)}</div><div style={{fontSize:8,color:T.textLight}}>FCFA</div></div>
+                  <div style={{textAlign:"right"}}><div style={{fontSize:15,fontWeight:900,color:T.orange,fontFamily:"monospace"}}>{fmt(t.montant||0)}</div><div style={{fontSize:8,color:T.textLight}}>FCFA</div></div>
                 </div>
                 {/* barre progression délai */}
                 <div style={{marginBottom:8}}>
                   <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:T.textLight,marginBottom:3}}>
-                    <span>⏳ 144h</span><span style={{color:T.orange,fontWeight:700}}>{t.heures}h restantes</span>
+                    <span>⏳ 144h</span><span style={{color:T.orange,fontWeight:700}}>{t.heures || 0}h restantes</span>
                   </div>
                   <div style={{height:5,background:T.grey1,borderRadius:4,overflow:"hidden"}}>
                     <div style={{height:"100%",width:`${Math.round((1-(t.heures||0)/144)*100)}%`,background:`linear-gradient(90deg,${T.green},${T.orange})`,borderRadius:4}}/>
@@ -556,7 +564,7 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
                   <div style={{fontSize:8,color:T.textLight,marginTop:2,textAlign:"right"}}>Clôture auto : {t.echeance}</div>
                 </div>
                 {/* mini timeline */}
-                {t.timeline.map((tl,i,arr)=>(
+                {(t.timeline||[]).map((tl,i,arr)=>(
                   <div key={i} style={{display:"flex",gap:8,marginBottom:5}}>
                     <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:12}}>
                       <div style={{width:8,height:8,borderRadius:"50%",background:tl.c}}/>
@@ -576,7 +584,7 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
           {tickets.filter(t=>t.statut==="Résolu").map(t=>(
             <div key={t.id} onClick={()=>setTSel(t)} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${T.green}`,borderRadius:12,padding:"10px 12px",marginBottom:12,cursor:"pointer"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div><div style={{display:"flex",gap:5,marginBottom:3}}><Badge label={t.code} color={T.purple} bg={T.purplePale} size={9}/><Badge label={t.statut} color={T.green} bg={T.greenPale} size={9}/></div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{t.label}</div><div style={{fontSize:9,color:T.textLight,marginTop:1}}>{t.date}</div></div>
+                <div><div style={{display:"flex",gap:5,marginBottom:3}}><Badge label={t.code||''} color={T.purple} bg={T.purplePale} size={9}/><Badge label={t.statut||''} color={T.green} bg={T.greenPale} size={9}/></div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{t.label}</div><div style={{fontSize:9,color:T.textLight,marginTop:1}}>{t.date||''}</div></div>
                 <span style={{fontSize:14,color:T.textLight}}>›</span>
               </div>
             </div>
@@ -595,18 +603,18 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
         <div>
           <div style={{padding:"10px 16px 0"}}><BackBtn label="Mes droits" onClick={()=>setTSel(null)}/></div>
           <div style={{margin:"0 16px 10px",background:T.greenPale,border:`1px solid ${T.green}20`,borderRadius:13,padding:"12px 13px"}}>
-            <div style={{display:"flex",gap:5,marginBottom:5}}><Badge label={tSel.code} color={T.purple} bg={T.purplePale}/><Badge label={tSel.statut} color={tSel.color||T.green} bg={(tSel.color||T.green)+"15"}/></div>
+            <div style={{display:"flex",gap:5,marginBottom:5}}><Badge label={tSel.code||''} color={T.purple} bg={T.purplePale}/><Badge label={tSel.statut||''} color={tSel.color||T.green} bg={(tSel.color||T.green)+"15"}/></div>
             <div style={{fontSize:13,fontWeight:800,color:T.text}}>{tSel.label}</div>
-            <div style={{fontSize:10,color:T.textLight,marginTop:2}}>{tSel.date} · Délai bailleur : {tSel.delai}</div>
+            <div style={{fontSize:10,color:T.textLight,marginTop:2}}>{tSel.date||''} · Délai bailleur : {tSel.delai||''}</div>
           </div>
           <div style={{padding:"0 16px"}}>
             <Row label="Ticket N°" value={tSel.id}/>
-            <Row label="Montant concerné" value={fmt(tSel.montant)+" FCFA"}/>
-            <Row label="Résolution" value={tSel.resolution} color={T.green}/>
+            <Row label="Montant concerné" value={fmt(tSel.montant||0)+" FCFA"}/>
+            <Row label="Résolution" value={tSel.resolution||''} color={T.green}/>
           </div>
           <div style={{padding:"10px 16px 0"}}>
             <SecTitle label="Historique"/>
-            {tSel.timeline.map((t,i,arr)=>(
+            {(tSel.timeline||[]).map((t,i,arr)=>(
               <div key={i} style={{display:"flex",gap:10,marginBottom:8}}>
                 <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:14,marginTop:2}}>
                   <div style={{width:10,height:10,borderRadius:"50%",background:t.c}}/>
@@ -666,7 +674,7 @@ export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }
             <div style={{marginBottom:12}}>
               <div style={{fontSize:10,fontWeight:700,color:T.textMid,marginBottom:6}}>Type de travaux <span style={{color:T.red}}>*</span></div>
               <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
-                {RCL.find(r=>r.code==="RCL-05")?.types.map((t,i)=>(
+                {RCL.find(r=>r.code==="RCL-05")?.types?.map((t,i)=>(
                   <div key={i} onClick={()=>setTravauxType(t)} style={{background:travauxType===t?T.orange:T.grey1,border:`1.5px solid ${travauxType===t?T.orange:T.grey2}`,borderRadius:8,padding:"5px 10px",fontSize:10,fontWeight:700,color:travauxType===t?T.white:T.textMid,cursor:"pointer"}}>
                     {t}
                   </div>
