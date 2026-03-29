@@ -120,7 +120,10 @@ export async function loginWithAdminCredentials(email: string, password: string)
         const user = await prisma.user.findFirst({
             where: { 
                 email: normalizedEmail,
-                role: { in: ['ADMIN', 'SUPER_ADMIN'] }
+                OR: [
+                    { role: 'ADMIN' },
+                    { role: 'SUPER_ADMIN' }
+                ]
             }
         });
 
