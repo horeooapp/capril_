@@ -116,18 +116,14 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)" };
         }
 
-        // 2. User & Role Check
+        // 2. User & Role Check (using JS validation to bypass Prisma Enum errors)
         const user = await prisma.user.findFirst({
             where: { 
-                email: normalizedEmail,
-                OR: [
-                    { role: 'ADMIN' },
-                    { role: 'SUPER_ADMIN' }
-                ]
+                email: normalizedEmail
             }
         });
 
-        if (!user) {
+        if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
             return { error: "Compte administrateur non trouvé ou accès refusé." };
         }
 
