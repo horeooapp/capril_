@@ -25,7 +25,7 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: 📦 Install dependencies
@@ -62,18 +62,23 @@ jobs:
           # App
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
 
+      - name: 📦 Create Deployment Package
+        run: |
+          mkdir -p dist_package
+          cp -r .next dist_package/
+          rm -rf dist_package/.next/cache
+          cp -r public dist_package/ || true
+          cp -r prisma dist_package/ || true
+          cp -r scripts dist_package/ || true
+          cp package.json dist_package/
+          cp package-lock.json dist_package/
+
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            .next/
-            !.next/cache
-            public/
-            prisma/
-            scripts/
-            package.json
-            package-lock.json
+          include-hidden-files: true
+          path: dist_package/
           retention-days: 1
 
   # ──────────────────────────────────────────────────────
@@ -88,19 +93,19 @@ jobs:
     steps:
       - name: 🧹 Cleanup workspace
         run: |
-          # Clean the workspace to prevent file conflicts
+          # Robust cleanup to prevent Runner 'file already exists' or 'missing file' errors
           find . -maxdepth 1 -not -path '*/.*' -delete || true
-          rm -rf .next public prisma scripts package.json package-lock.json || true
+          rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-output
 
       - name: 🟢 Setup Node.js (Runner Env)
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: 🚀 Transfer Files to VPS
         run: |
