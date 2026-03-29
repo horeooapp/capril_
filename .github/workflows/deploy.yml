@@ -74,9 +74,10 @@ jobs:
           cp package-lock.json dist_package/
 
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output
+          include-hidden-files: true
           path: dist_package/
           retention-days: 1
 
@@ -95,9 +96,11 @@ jobs:
           # Robust cleanup to prevent Runner 'file already exists' or 'missing file' errors
           find . -maxdepth 1 -not -path '*/.*' -delete || true
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
+          # Fix the artifact v4 telemetry bug on self-hosted runners by clearing the diagnostic pages
+          rm -rf /home/github/actions-runner/_diag/pages/* || true
 
       - name: 📥 Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-output
 
