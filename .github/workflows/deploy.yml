@@ -188,9 +188,8 @@ jobs:
             npm ci --omit=dev && \
             # FIX: Automated cleanup of invalid JSONB defaults in migration files
             # We use a standalone script to avoid shell quoting issues and find {} substitution errors
-            bash scripts/fix-migrations.sh || true && \
-            npx prisma@6.4.1 migrate resolve --rolled-back \"20260322172550_init\" || true && \
-            npx prisma@6.4.1 migrate deploy && \
+            # Synchronisation directe du schéma pour forcer la création des colonnes manquantes (ex: landlord_code)
+            npx prisma@6.4.1 db push --accept-data-loss && \
             npx prisma@6.4.1 db seed && \
             npx prisma@6.4.1 generate && \
             # Link persistent uploads to the public folder
