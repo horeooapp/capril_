@@ -29,7 +29,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
                 <View style={styles.left}>
                     <View style={styles.brandRow}>
                         <Image 
-                            source={require('../../../assets/icon.png')} 
+                            source={require('../../../assets/logo-qapril.png')} 
                             style={styles.logo}
                             resizeMode="contain"
                         />
