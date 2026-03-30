@@ -90,12 +90,20 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
         console.error("[SERVER ACTION] loginWithOTP Exception:", {
             message: error?.message,
             code: errorCode,
+            type: error?.type,
             email: email,
             role: role
         });
         
-        if (errorCode === 'CredentialsSignin' || error?.message?.includes('CredentialsSignin')) {
-            return { error: "Code OTP incorrect ou expiré." };
+        let customMessage = "";
+        // Check if the error code itself is the custom message we passed
+        if (errorCode && errorCode !== 'CredentialsSignin' && !errorCode.includes('signin') && errorCode !== 'UNKNOWN_ERROR') {
+             customMessage = errorCode;
+        }
+
+        const lowerMsg = (error?.message || "").toLowerCase();
+        if (lowerMsg.includes('credentialssignin') || error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin') {
+            return { error: customMessage || "Code OTP incorrect, expiré ou compte non autorisé." };
         }
 
         return { error: `Échec de l'authentification: ${error?.message || "Erreur interne"}` };

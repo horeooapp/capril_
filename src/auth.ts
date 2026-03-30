@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
 
 class CustomAuthError extends CredentialsSignin {
+  code: string;
   constructor(code: string) {
     super();
     this.code = code;
@@ -44,7 +45,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const isValid = storedOtp === otp;
 
                 if (!isValid) {
-                    throw new CustomAuthError("Invalid or expired OTP");
+                    throw new CustomAuthError("Code OTP incorrect ou expiré.");
                 }
 
                 try {
@@ -66,9 +67,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         let isAuthorized = false;
                         if (reqRole === 'TENANT') {
-                            isAuthorized = TENANT_ROLES.includes(userRole);
+                            isAuthorized = TENANT_ROLES.includes(userRole) || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
                         } else if (reqRole === 'LANDLORD') {
-                            isAuthorized = DASHBOARD_ROLES.includes(userRole);
+                            isAuthorized = DASHBOARD_ROLES.includes(userRole) || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
                         } else if (reqRole === 'ADMIN') {
                             isAuthorized = true; // Admin bypass
                         }
@@ -104,7 +105,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         diasporaAbonnement: (user as any).diasporaAbonnement
                     } as any;
                 } catch (dbError: any) {
-                    console.error("[AUTH] Database Error in authorize:", dbError.message || dbError);
+                    if (dbError instanceof CredentialsSignin) {
+                        throw dbError;
+                    }
+                    console.error("[AUTH] Database Error in authorize:", dbError?.message || dbError);
                     throw new CustomAuthError("Database error");
                 }
             }

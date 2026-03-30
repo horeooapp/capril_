@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; }
+    h1 { color: #1F4E79; border-bottom: 2px solid #C55A11; padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background-color: #1F4E79; color: white; padding: 12px; text-align: left; }
+    td { border-bottom: 1px solid #eee; padding: 10px; font-size: 14px; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .footer { margin-top: 30px; font-size: 10px; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
+</style>
+</head>
+<body>
+    <h1>QAPRIL - Liste des Tables de la Base de Données</h1>
+    <p>Ce document liste les 112 tables identifiées dans l'écosystème Qapril.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="10%">#</th>
+                <th>Nom de la Table</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>_CoopMembers</td></tr>
+            <tr><td>2</td><td>agences_regularisation</td></tr>
+            <tr><td>3</td><td>agenda_evenements</td></tr>
+            <tr><td>4</td><td>alertes_loyer</td></tr>
+            <tr><td>5</td><td>annonces</td></tr>
+            <tr><td>6</td><td>annonces_voisinage</td></tr>
+            <tr><td>7</td><td>audit_log</td></tr>
+            <tr><td>8</td><td>bails_declaratifs</td></tr>
+            <tr><td>9</td><td>bdq_conversation_states</td></tr>
+            <tr><td>10</td><td>bdq_historique_loyer</td></tr>
+            <tr><td>11</td><td>bdq_sms_log</td></tr>
+            <tr><td>12</td><td>bien_acces</td></tr>
+            <tr><td>13</td><td>candidatures</td></tr>
+            <tr><td>14</td><td>cautions_bail</td></tr>
+            <tr><td>15</td><td>cdc_deposits</td></tr>
+            <tr><td>16</td><td>certificates</td></tr>
+            <tr><td>17</td><td>certificats_fiscaux</td></tr>
+            <tr><td>18</td><td>champions_commissions</td></tr>
+            <tr><td>19</td><td>champions_profiles</td></tr>
+            <tr><td>20</td><td>champions_prospects</td></tr>
+            <tr><td>21</td><td>charges_parametrage</td></tr>
+            <tr><td>22</td><td>codes_promo</td></tr>
+            <tr><td>23</td><td>coloc_payments</td></tr>
+            <tr><td>24</td><td>colocataires</td></tr>
+            <tr><td>25</td><td>config_tarifs</td></tr>
+            <tr><td>26</td><td>config_tarifs_audit</td></tr>
+            <tr><td>27</td><td>consentements_loyer</td></tr>
+            <tr><td>28</td><td>consultations_profil</td></tr>
+            <tr><td>29</td><td>coop_groups</td></tr>
+            <tr><td>30</td><td>crg_mensuel</td></tr>
+            <tr><td>31</td><td>digital_deliveries</td></tr>
+            <tr><td>32</td><td>dispute_messages</td></tr>
+            <tr><td>33</td><td>disputes</td></tr>
+            <tr><td>34</td><td>dossiers_litige_certifies</td></tr>
+            <tr><td>35</td><td>etats_des_lieux</td></tr>
+            <tr><td>36</td><td>factures_utilities</td></tr>
+            <tr><td>37</td><td>feature_flags</td></tr>
+            <tr><td>38</td><td>fiscal_dossiers</td></tr>
+            <tr><td>39</td><td>fraud_blacklist</td></tr>
+            <tr><td>40</td><td>garde_fous_logs</td></tr>
+            <tr><td>41</td><td>icl_events</td></tr>
+            <tr><td>42</td><td>identity_documents</td></tr>
+            <tr><td>43</td><td>incidents</td></tr>
+            <tr><td>44</td><td>inspection_photos</td></tr>
+            <tr><td>45</td><td>inspection_rooms</td></tr>
+            <tr><td>46</td><td>inspections</td></tr>
+            <tr><td>47</td><td>insurance_claims</td></tr>
+            <tr><td>48</td><td>insurances</td></tr>
+            <tr><td>49</td><td>invitations_bail</td></tr>
+            <tr><td>50</td><td>land_lease_info</td></tr>
+            <tr><td>51</td><td>lease_arrears</td></tr>
+            <tr><td>52</td><td>leases</td></tr>
+            <tr><td>53</td><td>legal_entities</td></tr>
+            <tr><td>54</td><td>legal_procedures</td></tr>
+            <tr><td>55</td><td>locataire_profiles</td></tr>
+            <tr><td>56</td><td>locataire_profils_publics</td></tr>
+            <tr><td>57</td><td>mandate_history</td></tr>
+            <tr><td>58</td><td>mandates</td></tr>
+            <tr><td>59</td><td>mandats_gestion</td></tr>
+            <tr><td>60</td><td>market_data</td></tr>
+            <tr><td>61</td><td>mediation_messages</td></tr>
+            <tr><td>62</td><td>mediations</td></tr>
+            <tr><td>63</td><td>messagerie_bail</td></tr>
+            <tr><td>64</td><td>migration_sessions</td></tr>
+            <tr><td>65</td><td>migration_staging</td></tr>
+            <tr><td>66</td><td>monthly_rent_synthesis</td></tr>
+            <tr><td>67</td><td>news_tickers</td></tr>
+            <tr><td>68</td><td>notification_logs</td></tr>
+            <tr><td>69</td><td>notification_preferences</td></tr>
+            <tr><td>70</td><td>notifications</td></tr>
+            <tr><td>71</td><td>observatory_snapshots</td></tr>
+            <tr><td>72</td><td>offres_abonnements</td></tr>
+            <tr><td>73</td><td>passeports_locatifs</td></tr>
+            <tr><td>74</td><td>passports</td></tr>
+            <tr><td>75</td><td>payment_intents</td></tr>
+            <tr><td>76</td><td>payments_pgw</td></tr>
+            <tr><td>77</td><td>pgw_msisdn_lookup</td></tr>
+            <tr><td>78</td><td>pgw_reconciliation</td></tr>
+            <tr><td>79</td><td>pgw_webhooks</td></tr>
+            <tr><td>80</td><td>preavis_bails</td></tr>
+            <tr><td>81</td><td>prepayment_requests</td></tr>
+            <tr><td>82</td><td>prestataires</td></tr>
+            <tr><td>83</td><td>procedure_phases</td></tr>
+            <tr><td>84</td><td>procurations_numeriques</td></tr>
+            <tr><td>85</td><td>properties</td></tr>
+            <tr><td>86</td><td>property_documents</td></tr>
+            <tr><td>87</td><td>property_images</td></tr>
+            <tr><td>88</td><td>property_maintenance</td></tr>
+            <tr><td>89</td><td>propositions_loyer</td></tr>
+            <tr><td>90</td><td>rapports_mensuels</td></tr>
+            <tr><td>91</td><td>receipts</td></tr>
+            <tr><td>92</td><td>reclamations_locataire</td></tr>
+            <tr><td>93</td><td>regularisations_charges</td></tr>
+            <tr><td>94</td><td>reliability_scores</td></tr>
+            <tr><td>95</td><td>reminder_logs</td></tr>
+            <tr><td>96</td><td>repartitions_utilities</td></tr>
+            <tr><td>97</td><td>repayment_plans</td></tr>
+            <tr><td>98</td><td>reversal_transactions</td></tr>
+            <tr><td>99</td><td>signalements_locataire</td></tr>
+            <tr><td>100</td><td>signatures_electroniques</td></tr>
+            <tr><td>101</td><td>sms_declarations</td></tr>
+            <tr><td>102</td><td>subscription_audits</td></tr>
+            <tr><td>103</td><td>successions_locataire</td></tr>
+            <tr><td>104</td><td>successions_proprio</td></tr>
+            <tr><td>105</td><td>system_config</td></tr>
+            <tr><td>106</td><td>tarifs_negocie</td></tr>
+            <tr><td>107</td><td>tickets_maintenance</td></tr>
+            <tr><td>108</td><td>tva_transactions</td></tr>
+            <tr><td>109</td><td>users</td></tr>
+            <tr><td>110</td><td>wallet_recharge_configs</td></tr>
+            <tr><td>111</td><td>wallet_recharge_links</td></tr>
+            <tr><td>112</td><td>webhook_events</td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Document généré automatiquement par QAPRIL Core Support - 2026
+    </div>
+</body>
+</html>
