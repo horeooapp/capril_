@@ -53,7 +53,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     if (redis) await redis.del(`otp:${email}`);
 
                     // 3. Find or Create User
-                    let user = await prisma.user.findFirst({
+                    const user = await prisma.user.findFirst({
                         where: { email },
                         include: {
                             _count: {
