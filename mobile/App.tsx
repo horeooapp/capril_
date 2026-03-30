@@ -55,7 +55,7 @@ export default function App() {
           />
           <Text style={styles.title}>Qapril</Text>
           <View style={styles.titleUnderline} />
-          <Text style={styles.sub}>Choisissez votre espace d'accès QAPRIL</Text>
+          <Text style={styles.sub}>Choisissez votre espace d'accès Qapril</Text>
         </View>
         
         <View style={styles.grid}>

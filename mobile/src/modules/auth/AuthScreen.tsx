@@ -193,7 +193,7 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                   </View>
                   
                   <View style={styles.footer}>
-                    <Text style={styles.footerBrand}>QAPRIL Technologies SA © 2026</Text>
+                    <Text style={styles.footerBrand}>Qapril Technologies SA © 2026</Text>
                   </View>
 
                 </View>
