@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify, importPKCS8, importSPKI } from 'jose';
 import { prisma } from './prisma';
+import { auth } from '@/auth';
 
 const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
 const PUBLIC_KEY = process.env.JWT_PUBLIC_KEY;
@@ -51,28 +52,44 @@ export async function verifyJWT(token: string) {
  */
 export async function getAuthUser(req: Request) {
   const authHeader = req.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.split(' ')[1];
-  const decoded = await verifyJWT(token);
   
-  if (!decoded || !decoded.userId) {
-    return null;
+  // 1. JWT Strategy (Mobile / Bearer)
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    const decoded = await verifyJWT(token);
+    
+    if (decoded && decoded.userId) {
+      return await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          role: true,
+          fullName: true,
+          status: true,
+          onboardingComplete: true
+        }
+      });
+    }
   }
 
-  // Fetch full user from DB
-  return await prisma.user.findUnique({
-    where: { id: decoded.userId },
-    select: {
-      id: true,
-      email: true,
-      phone: true,
-      role: true,
-      fullName: true,
-      status: true,
-      onboardingComplete: true
-    }
-  });
+  // 2. Session Strategy (Web / Cookie)
+  const session = await auth();
+  if (session?.user?.id) {
+    return await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        role: true,
+        fullName: true,
+        status: true,
+        onboardingComplete: true
+      }
+    });
+  }
+
+  return null;
 }

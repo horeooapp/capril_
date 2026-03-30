@@ -56,6 +56,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         where: { email }
                     });
 
+                    if (user) {
+                        // ROLE ENFORCEMENT: Check if DB role matches requested space (Tenant/Landlord)
+                        const userRole = (user.role || '').toUpperCase();
+                        const reqRole = (requestedRole || '').toUpperCase();
+
+                        if (userRole !== reqRole && reqRole !== 'ADMIN') {
+                            let label = "Propriétaire";
+                            if (userRole === 'TENANT') label = "Locataire";
+                            if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') label = "Administrateur";
+                            
+                            throw new CustomAuthError(`Accès refusé : Ce compte est un compte ${label}. Veuillez utiliser l'espace de connexion dédié.`);
+                        }
+                    }
+
                     if (!user) {
                         user = await prisma.user.create({
                             data: {
