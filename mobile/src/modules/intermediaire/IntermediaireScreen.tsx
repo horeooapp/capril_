@@ -80,7 +80,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
         />
 
         {/* KPI Row - Floating */}
-        <View style={{ marginTop: -40, paddingHorizontal: 20, zIndex: 10 }}>
+        <View style={{ marginTop: -25, paddingHorizontal: 20, zIndex: 10 }}>
           <View style={styles.kpiRow}>
             <View style={styles.kpiCard}>
               <Text style={styles.kpiVal}>{fmt(S.encaisse || 0)} F</Text>
@@ -257,7 +257,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { paddingBottom: 100 },
-  header: { padding: 25, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
+  header: { padding: 15, paddingBottom: 25, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
   roleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   onlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ADE80', marginLeft: 10, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },

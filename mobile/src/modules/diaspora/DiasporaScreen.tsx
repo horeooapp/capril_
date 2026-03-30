@@ -90,18 +90,18 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
 
           {/* KPIs */}
           <View style={styles.kpiRow}>
-            <View style={styles.kpiCard}>
+            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Revenus totaux calculés en temps réel")}>
               <Text style={styles.kpiVal}>{aff(totalFCFA)}</Text>
               <Text style={styles.kpiLabel}>REVENUS / MOIS</Text>
-            </View>
-            <View style={styles.kpiCard}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Détails des impayés actifs")}>
               <Text style={[styles.kpiVal, { color: Theme.colors.red }]}>{impayesN}</Text>
               <Text style={styles.kpiLabel}>IMPAYÉS</Text>
-            </View>
-            <View style={styles.kpiCard}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Alertes de gestion (SLA)")}>
               <Text style={[styles.kpiVal, { color: Theme.colors.gold }]}>{alertesSLA}</Text>
               <Text style={styles.kpiLabel}>ALERTES SLA</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </LinearGradient>
 
@@ -202,7 +202,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { paddingBottom: 100 },
-  header: { padding: 25, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
+  header: { padding: 15, paddingBottom: 25, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
   roleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   onlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ADE80', marginLeft: 10, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },

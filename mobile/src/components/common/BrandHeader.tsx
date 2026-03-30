@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     header: {
         paddingTop: 15,
         paddingHorizontal: 20,
-        paddingBottom: 60, // L'espace nécessaire pour que la carte KPIs flotte
+        paddingBottom: 35, // Réduit pour production (MM-04)
         borderBottomLeftRadius: 40,
         borderBottomRightRadius: 40,
         shadowColor: Theme.colors.navy,

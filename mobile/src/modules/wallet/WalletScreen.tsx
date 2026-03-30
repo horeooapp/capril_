@@ -38,7 +38,7 @@ const { width } = Dimensions.get('window');
 
 export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState("dash");
-  const [email, setEmail] = useState("tenant@qapril.ci"); // Default for testing
+  const [email, setEmail] = useState(""); // Production: No default email
 
   const { data: locData, loading: locLoading } = useLocataire();
   const { data: bailData, loading: bailLoading } = useBail();
@@ -74,6 +74,10 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
     }
   };
 
+  const handleAction = (label: string) => {
+    alert(`Fonctionnalité "${label}" : Transmission en cours vers QAPRIL CI...`);
+  };
+
   const changeTab = (t: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setTab(t);
@@ -94,23 +98,23 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 40 }]}>
         <StatusBar barStyle="dark-content" />
         <View style={{ width: 100, height: 100, backgroundColor: Theme.colors.teal + '15', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-          <Text style={{ fontSize: 50 }}>🏠</Text>
+          <Text style={{ fontSize: 40 }}>🏠</Text>
         </View>
         <Text style={{ fontSize: 24, fontWeight: '900', color: Theme.colors.navy, textAlign: 'center', marginBottom: 12 }}>Bienvenue sur QAPRIL !</Text>
         <Text style={{ fontSize: 14, color: Theme.colors.textMid, textAlign: 'center', lineHeight: 22, marginBottom: 32 }}>
           Nous n'avons pas encore trouvé de bail actif lié à votre compte. {'\n\n'}
-          Une fois votre contrat validé par votre agence, vous retrouverez ici vos quittances certifiées et votre score ICL.
+          Demandez à votre propriétaire de digitaliser votre bail sur QAPRIL ou assurez-vous que votre numéro de téléphone est bien celui enregistré sur votre contrat.
         </Text>
         <TouchableOpacity 
           style={{ backgroundColor: Theme.colors.teal, paddingVertical: 16, paddingHorizontal: 32, borderRadius: 16, width: '100%' }}
-          onPress={() => alert("Support: +225 05 00 00 00 00")}
+          onPress={() => alert("Support: +225 05 000 000")}
         >
           <Text style={{ color: 'white', fontWeight: '800', textAlign: 'center' }}>Contacter mon agence</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
            style={{ marginTop: 24 }}
-           onPress={() => { setAuthToken(null); if (onBack) onBack(); }}
+           onPress={() => { if (onBack) onBack(); }}
         >
           <Text style={{ color: Theme.colors.grey3, fontWeight: '700' }}>Se déconnecter</Text>
         </TouchableOpacity>
@@ -118,8 +122,8 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
     );
   }
 
-  const fmt = (n: number) => n.toLocaleString("fr-FR");
-  const scColor = LOC.score >= 850 ? Theme.colors.green : LOC.score >= 700 ? Theme.colors.teal : Theme.colors.orange;
+  const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
+  const scColor = (LOC?.score || 0) >= 850 ? Theme.colors.green : (LOC?.score || 0) >= 700 ? Theme.colors.teal : Theme.colors.orange;
 
   return (
     <View style={styles.container}>
@@ -135,7 +139,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
         />
 
         {/* KPI Row - Floating */}
-        <View style={{ marginTop: -40, paddingHorizontal: 16, zIndex: 10 }}>
+        <View style={{ marginTop: -25, paddingHorizontal: 16, zIndex: 10 }}>
           <View style={styles.kpiRow}>
             {[
                { l: "Loyer/mois", v: fmt(BAIL.loyer) + "F", icon: "💰", tab: null },
@@ -244,7 +248,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                     { icon: "🔒", label: "Ma caution", sub: "Statut CDC", color: Theme.colors.teal, bg: Theme.colors.tealPale },
                     { icon: "📲", label: "USSD", sub: "*144*QAPRIL#", color: Theme.colors.green, bg: Theme.colors.greenPale },
                   ].map((a, i) => (
-                    <TouchableOpacity key={i} style={[styles.quickActionBox, { backgroundColor: a.bg, borderColor: `${a.color}2e` }]}>
+                    <TouchableOpacity key={i} onPress={() => handleAction(a.label)} style={[styles.quickActionBox, { backgroundColor: a.bg, borderColor: `${a.color}2e` }]}>
                       <Text style={{ fontSize: 18, marginBottom: 3 }}>{a.icon}</Text>
                       <Text style={[styles.quickActionLabel, { color: a.color }]}>{a.label}</Text>
                       <Text style={styles.quickActionSub}>{a.sub}</Text>

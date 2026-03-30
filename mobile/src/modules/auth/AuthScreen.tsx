@@ -90,8 +90,8 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                 {/* BRANDING SECTION (TOP) */}
                 <View style={styles.brandingSection}>
                   <View style={styles.logoCircle}>
-                     <Image 
-                        source={require('../../../assets/icon.png')} 
+                      <Image 
+                        source={require('../../../assets/logo-qapril.png')} 
                         style={styles.logoImage} 
                         resizeMode="contain"
                      />

@@ -11,7 +11,8 @@ import {
   FlatList,
   LayoutAnimation,
   Platform,
-  UIManager
+  UIManager,
+  ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -48,7 +49,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
   // Debug Login for testing
   const handleDebugLogin = async () => {
     try {
-      await verifyOTP("proprio@qapril.ci", "1234");
+      await verifyOTP("", "1234");
       refetchProprio();
     } catch (e) {
       console.error(e);
@@ -60,8 +61,21 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
     setTab(t);
   };
 
-  const PROPRIO_DATA = proprio || { nom: 'Chargement...', formule: '...', biens: 0, wallet: { solde: 0 } };
+  const PROPRIO_DATA = proprio || { nom: 'Bailleur', formulaire: '...', biens: 0, wallet: { solde: 0 } };
   const PATRIMOINE_DATA = patrimoine || [];
+
+  const handleAction = (label: string) => {
+    alert(`Fonctionnalité "${label}" : Transmission en cours vers QAPRIL CI...`);
+  };
+
+  // If loading, show spinner
+  if (loadProprio || loadPatrimoine) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Theme.colors.navy} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -77,7 +91,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
           onNotifPress={() => alert("Notifications Bailleur")}
         />
 
-        <View style={{ marginTop: -40, zIndex: 10 }}>
+        <View style={{ marginTop: -25, zIndex: 10 }}>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false} 
@@ -148,7 +162,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                 <SectionTitle label="Éclair" />
                 <View style={styles.quickGrid}>
                   {QUICK_ACTIONS.map((a, i) => (
-                    <TouchableOpacity key={i} style={[styles.quickBox, { backgroundColor: a.bg }]}>
+                    <TouchableOpacity key={i} onPress={() => handleAction(a.label)} style={[styles.quickBox, { backgroundColor: a.bg }]}>
                       <Text style={styles.quickIcon}>{a.icon}</Text>
                       <Text style={[styles.quickLabel, { color: a.color }]}>{a.label}</Text>
                     </TouchableOpacity>
