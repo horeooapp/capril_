@@ -25,7 +25,10 @@ export default function App() {
 
   const checkPersistedAuth = async () => {
     try {
-      const token = await SecureStore.getItemAsync('qapril_token');
+      const [token] = await Promise.all([
+        SecureStore.getItemAsync('qapril_token'),
+        new Promise(resolve => setTimeout(resolve, 2500)) // 2.5 seconds artificial delay
+      ]);
       if (token) {
         setIsAuthenticated(true);
         // On pourrait fetch le profil ici
@@ -54,6 +57,7 @@ export default function App() {
     }
   };
 
+  // 1. Loading State
   if (isLoading) {
     return (
       <View style={[styles.container, { backgroundColor: Theme.colors.navyDark, justifyContent: 'center', alignItems: 'center' }]}>
@@ -61,21 +65,26 @@ export default function App() {
         <View style={styles.splashLogoBox}>
            <Image source={require('./assets/icon.png')} style={styles.splashLogo} resizeMode="contain" />
         </View>
-        <Text style={styles.splashBrand}>Qapril mobile</Text>
+        <Text style={styles.splashBrand}>QAPRIL</Text>
         <ActivityIndicator size="small" color={Theme.colors.tealPale} style={{ marginTop: 30 }} />
       </View>
     );
   }
 
-  if (!isAuthenticated) {
-    return <AuthScreen onLogin={handleLogin} />;
+  // 2. Authenticated but portal chosen -> Direct Access
+  if (isAuthenticated && portal !== null) {
+    if (portal === 'TENANT') return <WalletScreen onBack={() => setPortal(null)} />;
+    if (portal === 'LANDLORD') return <ProprioScreen onBack={() => setPortal(null)} />;
+    if (portal === 'DIASPORA') return <DiasporaScreen onBack={() => setPortal(null)} />;
+    if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={() => setPortal(null)} />;
   }
 
-  if (portal === 'TENANT') return <WalletScreen onBack={() => setPortal(null)} />;
-  if (portal === 'LANDLORD') return <ProprioScreen onBack={() => setPortal(null)} />;
-  if (portal === 'DIASPORA') return <DiasporaScreen onBack={() => setPortal(null)} />;
-  if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={() => setPortal(null)} />;
+  // 3. Portal chosen but NOT authenticated -> Auth Screen
+  if (portal !== null && !isAuthenticated) {
+    return <AuthScreen onLogin={handleLogin} onCancel={() => setPortal(null)} />;
+  }
 
+  // 4. No portal chosen -> Show Menu
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -87,7 +96,7 @@ export default function App() {
                 <Image source={require('./assets/icon.png')} style={styles.logo} resizeMode="contain" />
               </View>
               <Text style={styles.welcome}>Bienvenue sur</Text>
-              <Text style={styles.userName}>Qapril mobile</Text>
+              <Text style={styles.userName}>QAPRIL</Text>
               <Text style={styles.instruction}>Veuillez sélectionner votre portail d'accès</Text>
             </View>
 
@@ -118,9 +127,11 @@ export default function App() {
               ))}
             </View>
 
-            <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-              <Text style={styles.logoutText}>DÉCONNEXION SÉCURISÉE 🚪</Text>
-            </TouchableOpacity>
+            {isAuthenticated && (
+                <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+                  <Text style={styles.logoutText}>DÉCONNEXION SÉCURISÉE 🚪</Text>
+                </TouchableOpacity>
+            )}
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>

@@ -24,9 +24,10 @@ const { width, height } = Dimensions.get('window');
 
 interface AuthScreenProps {
   onLogin: (user: any) => void;
+  onCancel?: () => void;
 }
 
-export default function AuthScreen({ onLogin }: AuthScreenProps) {
+export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
   const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -148,6 +149,17 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                             {loading ? <ActivityIndicator color={Theme.colors.white} /> : <Text style={styles.btnText}>Recevoir le code</Text>}
                           </LinearGradient>
                         </TouchableOpacity>
+                        
+                        {onCancel && (
+                           <TouchableOpacity 
+                             style={styles.cancelBtnSecondary}
+                             onPress={onCancel}
+                             disabled={loading}
+                             activeOpacity={0.8}
+                           >
+                             <Text style={styles.cancelBtnTextSecondary}>← Revenir au menu principal</Text>
+                           </TouchableOpacity>
+                        )}
                       </>
                     ) : (
                       <>
@@ -181,6 +193,17 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                         >
                           <Text style={styles.cancelBtnText}>Utiliser une autre adresse email</Text>
                         </TouchableOpacity>
+
+                        {onCancel && (
+                           <TouchableOpacity 
+                             style={styles.cancelBtnSecondary}
+                             onPress={onCancel}
+                             disabled={loading}
+                             activeOpacity={0.8}
+                           >
+                             <Text style={styles.cancelBtnTextSecondary}>← Retour au Menu Principal</Text>
+                           </TouchableOpacity>
+                        )}
                       </>
                     )}
                   </View>
@@ -228,7 +251,9 @@ const styles = StyleSheet.create({
   mainBtn: { height: 60, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   btnText: { color: Theme.colors.white, fontSize: 15, fontWeight: '900', letterSpacing: 1 },
   cancelBtn: { alignItems: 'center', marginTop: 15 },
+  cancelBtnSecondary: { alignItems: 'center', marginTop: 10, paddingVertical: 10 },
   cancelBtnText: { color: Theme.colors.textLight, fontSize: 12, fontWeight: '800' },
+  cancelBtnTextSecondary: { color: Theme.colors.grey3, fontSize: 12, fontWeight: '700' },
   footer: { alignItems: 'center', marginTop: 20 },
   footerBrand: { fontSize: 10, fontWeight: '900', color: '#CBD5E1', letterSpacing: 2 },
 });
