@@ -10,7 +10,8 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Platform,
-  UIManager
+  UIManager,
+  ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -33,35 +34,7 @@ import {
 const { width } = Dimensions.get('window');
 
 // --- Mock Data from Reference JSX ---
-const BAIL = {
-  ref: "BAIL-CI-2026-0042",
-  type: "BDQ",
-  logement: "Appt 3B — Résid. Lagune",
-  adresse: "Résid. Lagune · Plateau",
-  loyer: 150000,
-  debut: "01/01/2026",
-  fin: "31/12/2026",
-  statut: "Impayé",
-  retard: 12,
-  typeGestion: "agreee",
-  agence: "Immobilière du Golfe",
-  bailleurCode: "BAI-042",
-};
-
-const LOC = {
-  nom: "Traoré Souleymane",
-  score: 794,
-};
-
-const QUITTANCES = [
-  { ref: "QIT-2026-0155", mois: "Fév. 2026", montant: 150000, statut: "Certifiée", date: "02/02/2026" },
-  { ref: "QIT-MANQ-044", mois: "Mars 2026", montant: 150000, statut: "Impayée", date: "—" },
-];
-
-const ABOS = [
-  { id: "cie", icon: "⚡", label: "Électricité — CIE", color: Theme.colors.orange, bg: Theme.colors.orangePale, montant: 28500, status: "Payée", mois: "Fév. 2026" },
-  { id: "sodeci", icon: "💧", label: "Eau — SODECI", color: Theme.colors.teal, bg: Theme.colors.tealPale, montant: 9200, status: "Payée", mois: "Fév. 2026" },
-];
+// Mock data removed to prevent shadowing
 
 export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState("dash");
@@ -85,15 +58,11 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   };
 
   // Use real data or fallback to MOCK if not loaded
-  const LOC = locData || { nom: "Chargement...", score: 750 };
-  const BAIL = bailData?.noLease ? null : (bailData || { 
-    ref: "...", logement: "Chargement...", adresse: "...", loyer: 0, 
-    debut: "...", fin: "...", statut: "...", retard: 0, 
-    typeGestion: "...", agence: "...", bailleurCode: "..." 
-  });
-
-  const QUITTANCES = quittData || [];
-  const ABOS = abosData || [];
+  // Safe Data Mapping (MM-04)
+  const LOC = locData || { nom: "Locataire", score: 750 };
+  const BAIL = (bailData?.noLease || !bailData) ? null : bailData;
+  const QUITTANCES = Array.isArray(quittData) ? quittData : [];
+  const ABOS = Array.isArray(abosData) ? abosData : [];
 
   const handleDebugLogin = async () => {
     try {
@@ -110,8 +79,17 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
     setTab(t);
   };
 
+  // If loading, show spinner
+  if (locLoading || bailLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Theme.colors.navy} />
+      </View>
+    );
+  }
+
   // If no lease, show a friendly onboarding/welcome screen instead of the dashboard
-  if (bailData?.noLease) {
+  if (bailData?.noLease || !BAIL) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 40 }]}>
         <StatusBar barStyle="dark-content" />
@@ -149,8 +127,8 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
         <BrandHeader 
-          title={LOC.nom}
-          subtitle={`Occupant du ${BAIL.logement}`}
+          title={`Bonjour, ${(LOC?.nom || "Locataire").split(" ")[0]}`}
+          subtitle={`Occupant du ${BAIL?.logement || 'logement'}`}
           roleLabel="LOCATAIRE"
           roleColor={Theme.colors.teal}
           onNotifPress={() => alert("Notifications Locataire")}

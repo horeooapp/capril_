@@ -103,24 +103,30 @@ export function useCautionLocataire() {
 export function useTicketsLocataire() {
   const { data, loading, error, refetch } = useQuery('/locataires/me/tickets');
 
-  const ticketActif   = data?.find((t: any) => t.statut === 'En attente bailleur') || null;
-  const ticketsResolus = data?.filter((t: any) => t.statut !== 'En attente bailleur') || [];
+  // Defensive array initialization
+  const tickets = data || [];
+  const ticketActif = tickets.find((t: any) => t.statut === 'En attente bailleur') || null;
+  const ticketsResolus = tickets.filter((t: any) => t.statut !== 'En attente bailleur');
 
-  // 144h SLA Logic (MM-03) — useMemo prevents react-hooks/purity violation on Date.now()
-  const nowRef = Date.now; // stable reference to avoid lint warning
+  // 144h SLA Logic (MM-03)
   const ticketAvecSLA = ticketActif ? (() => {
-    const createdAt = new Date(ticketActif.createdAt).getTime();
-    const now = nowRef(); // eslint-disable-line
-    const heuresPassees = (now - createdAt) / 3600000;
-    const heuresRestantes = Math.max(0, 144 - heuresPassees);
-    const favorLocataire = heuresPassees > 144;
-    
-    return {
-      ...ticketActif,
-      heuresRestantes,
-      favorLocataire,
-      pourcentageTemps: Math.min(100, (heuresPassees / 144) * 100)
-    };
+    try {
+      if (!ticketActif.createdAt) throw new Error("Missing date");
+      const createdAt = new Date(ticketActif.createdAt).getTime();
+      const now = Date.now();
+      const heuresPassees = (now - createdAt) / 3600000;
+      const heuresRestantes = Math.max(0, 144 - heuresPassees);
+      const favorLocataire = heuresPassees > 144;
+      
+      return {
+        ...ticketActif,
+        heuresRestantes: isNaN(heuresRestantes) ? 144 : heuresRestantes,
+        favorLocataire: !!favorLocataire,
+        pourcentageTemps: Math.min(100, isNaN(heuresPassees) ? 0 : (heuresPassees / 144) * 100)
+      };
+    } catch (e) {
+      return { ...ticketActif, heuresRestantes: 144, favorLocataire: false, pourcentageTemps: 0 };
+    }
   })() : null;
 
   return { ticketActif: ticketAvecSLA, ticketsResolus, loading, error, refetch };

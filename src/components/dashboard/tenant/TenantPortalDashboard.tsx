@@ -147,7 +147,7 @@ export function TenantPortalDashboard({
           <div style={{display:"flex",gap:7,marginTop:14}}>
             {[
               {l:"Loyer/mois",v:fmt(bail?.loyer || 0)+"F",icon:"💰",nav:null},
-              {l:"Quittances",v:quittances?.filter(q=>q.statut?.includes("Cert")).length || 0,icon:"🧾",nav:()=>go("quitt")},
+              {l:"Quittances",v:(quittances || []).filter((q: any)=>q.statut?.includes("Cert")).length,icon:"🧾",nav:()=>go("quitt")},
               {l:"Score ICL",v:sc,icon:"⭐",nav:()=>op("score")},
               {l:"Caution",v:caution?.montant ? fmt(caution.montant)+"F" : "—",icon:"🔒",nav:()=>op("caution")},
             ].map((k,i)=>(

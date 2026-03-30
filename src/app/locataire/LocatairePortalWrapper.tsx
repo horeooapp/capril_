@@ -48,8 +48,8 @@ export default function LocatairePortalWrapper() {
     );
   }
 
-  // Handle "No Lease" state gracefully
-  if (data?.noLease) {
+  // Handle "No Lease" state gracefully (Note: noLease is inside bail object)
+  if (data?.bail?.noLease) {
     return (
       <div style={{
         height: '100vh',
@@ -64,8 +64,8 @@ export default function LocatairePortalWrapper() {
         <div style={{ width: 80, height: 80, background: '#EFF6FF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, marginBottom: 24 }}>🏠</div>
         <h2 style={{ color: '#1E293B', fontSize: 24, fontWeight: 900, marginBottom: 12 }}>Bienvenue sur QAPRIL !</h2>
         <p style={{ color: '#64748B', maxWidth: 400, lineHeight: 1.6, marginBottom: 32 }}>
-          Nous n'avons pas encore trouvé de bail actif lié à votre compte. 
-          Demandez à votre propriétaire de digitaliser votre bail sur QAPRIL ou assurez-vous que votre numéro de téléphone (<b>{data.loc?.telephone || 'non renseigné'}</b>) est bien celui enregistré sur votre contrat.
+          Nous n'avons pas encore trouvé de bail actif lié à votre compte. {'\n'}
+          Demandez à votre propriétaire de digitaliser votre bail sur QAPRIL ou assurez-vous que votre numéro de téléphone (<b>{data.loc?.phone || 'non renseigné'}</b>) est bien celui enregistré sur votre contrat.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
           <button 
@@ -85,9 +85,10 @@ export default function LocatairePortalWrapper() {
     );
   }
 
-  if (!data) return null;
+  if (!data?.loc || !data?.bail) return null;
 
-  // Prepare abos mapping if needed
+  // Prepare abos mapping defensively
+  const apiAbos = data.abos || {};
   const abos = [
     {
       id: 'cie',
@@ -97,7 +98,7 @@ export default function LocatairePortalWrapper() {
       color: '#C05B00',
       bg: '#FFF3E0',
       compteur: data.bail.cie || 'N/A',
-      montant: data.abos.cieAmount || 0,
+      montant: apiAbos.cieAmount || 0,
       statut: 'Payée',
       mois: 'Mars 2026',
       mode: 'Orange Money',
@@ -111,7 +112,7 @@ export default function LocatairePortalWrapper() {
       color: '#0E7490',
       bg: '#E0F4F9',
       compteur: data.bail.sodeci || 'N/A',
-      montant: data.abos.sodeciAmount || 0,
+      montant: apiAbos.sodeciAmount || 0,
       statut: 'Payée',
       mois: 'Mars 2026',
       mode: 'Wave',
@@ -121,11 +122,11 @@ export default function LocatairePortalWrapper() {
 
   return (
     <QAPRILLocataire 
-      loc={data.loc}
+      loc={data.loc || { nom: 'Locataire', score: 750 }}
       bail={data.bail}
-      quittances={data.quittances}
+      quittances={data.quittances || []}
       abos={abos}
-      tickets={data.tickets}
+      tickets={data.tickets || []}
     />
   );
 }

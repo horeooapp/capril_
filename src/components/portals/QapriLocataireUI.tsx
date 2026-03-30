@@ -35,6 +35,7 @@ export interface BailData {
   bailleurNom: string | null;
   bailleurCode: string | null;
   bailleurMasque: boolean;
+  noLease?: boolean;
 }
 
 export interface QuittanceData {
@@ -177,82 +178,92 @@ const TICKET_RESOLU_MOCK = {
 
 const TABS=[{id:"dash",icon:"🏠",label:"Accueil"},{id:"bail",icon:"📋",label:"Mon bail"},{id:"quitt",icon:"🧾",label:"Quittances"},{id:"util",icon:"⚡",label:"CIE/SODECI"},{id:"manual",icon:"📖",label:"Manuel"},{id:"droits",icon:"⚖️",label:"Mes droits"},{id:"profil",icon:"👤",label:"Profil"}];
 
-export default function QAPRILLocataire({ loc, bail, quittances, abos, tickets }: QapriLocataireUIProps) {
+export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [], tickets = [] }: QapriLocataireUIProps) {
   const getBailleur = () => {
-    if (bail.typeGestion==="agreee") return {val:bail.bailleurCode, masque:true, mention:"Agence agréée — substitution totale exclusive"};
-    if (bail.bailleurMasque)        return {val:bail.bailleurCode, masque:true, mention:"Le propriétaire a choisi de ne pas divulguer son identité"};
-    return {val:bail.bailleurNom, masque:false, mention:"Gestion directe — identité visible"};
+    if (!bail || bail.noLease) return { val: 'N/A', masque: true, mention: 'Aucun bail actif' };
+    if (bail.typeGestion === "agreee") return { val: bail.bailleurCode, masque: true, mention: "Agence agréée — substitution totale exclusive" };
+    if (bail.bailleurMasque) return { val: bail.bailleurCode, masque: true, mention: "Le propriétaire a choisi de ne pas divulguer son identité" };
+    return { val: bail.bailleurNom || 'Propriétaire', masque: false, mention: "Gestion directe — identité visible" };
   };
   const BAILLEUR = getBailleur();
 
-  const [tab,setTab]               = useState<string>("dash");
-  const [qSel,setQSel]             = useState<QuittanceData | null>(null);   // quittance sélectionnée
-  const [aSel,setASel]             = useState<AboData | null>(null);   // abonnement sélectionné
-  const [dsec,setDsec]             = useState<string | null>(null);   // section droits
-  const [rclCode,setRclCode]       = useState<string | null>(null);   // type réclamation choisi
-  const [rclSent,setRclSent]       = useState<boolean>(false);  // réclamation envoyée
-  const [tSel,setTSel]             = useState<TicketData | null>(null);   // ticket sélectionné
-  const [mrlChoice,setMrlChoice]   = useState<string | null>(null);   // oui/non MRL
-  const [prStep,setPrStep]         = useState<number>(1);      // préavis étape
-  const [O,setO]                   = useState({score:false,caution:false,export:false,ussd:false,notifs:false});
-  const [travauxType, setTravauxType] = useState<string | null>(null);  // type de travaux sélectionné
+  const [tab, setTab] = useState<string>("dash");
+  const [qSel, setQSel] = useState<QuittanceData | null>(null);
+  const [aSel, setASel] = useState<AboData | null>(null);
+  const [dsec, setDsec] = useState<string | null>(null);
+  const [rclCode, setRclCode] = useState<string | null>(null);
+  const [rclSent, setRclSent] = useState<boolean>(false);
+  const [tSel, setTSel] = useState<TicketData | null>(null);
+  const [mrlChoice, setMrlChoice] = useState<string | null>(null);
+  const [prStep, setPrStep] = useState<number>(1);
+  const [O, setO] = useState({ score: false, caution: false, export: false, ussd: false, notifs: false });
+  const [travauxType, setTravauxType] = useState<string | null>(null);
   const [travauxUrgent, setTravauxUrgent] = useState<boolean>(false);
-  const op = (k: string) => setO(o=>({...o,[k]:true}));
-  const cl = (k: string) => setO(o=>({...o,[k]:false}));
 
-  const go = (t: string) => { setTab(t);setQSel(null);setASel(null);setDsec(null);setRclCode(null);setRclSent(false);setTSel(null);setMrlChoice(null);setPrStep(1);setTravauxType(null);setTravauxUrgent(false); };
+  const op = (k: string) => setO(o => ({ ...o, [k]: true }));
+  const cl = (k: string) => setO(o => ({ ...o, [k]: false }));
 
-  const sc = loc.score;
-  const scColor = sc>=850?T.green:sc>=700?T.teal:sc>=550?T.orange:T.red;
+  const go = (t: string) => { 
+    setTab(t); setQSel(null); setASel(null); setDsec(null); 
+    setRclCode(null); setRclSent(false); setTSel(null); 
+    setMrlChoice(null); setPrStep(1); setTravauxType(null); setTravauxUrgent(false); 
+  };
+
+  const sc = loc?.score || 750;
+  const scColor = sc >= 850 ? T.green : sc >= 700 ? T.teal : sc >= 550 ? T.orange : T.red;
+
+  // Defensive array checks
+  const safeQuittances = Array.isArray(quittances) ? quittances : [];
+  const safeTickets = Array.isArray(tickets) ? tickets : [];
 
   return (
-  <div style={{fontFamily:"'DM Sans','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",display:"flex",justifyContent:"center",padding:"20px 16px"}}>
-  <div style={{width:390,background:T.white,borderRadius:36,boxShadow:`0 20px 70px ${T.navy}22`,overflow:"hidden",position:"relative",border:`1px solid ${T.grey2}`,minHeight:844}}>
+    <div style={{ fontFamily: "'DM Sans','Segoe UI',sans-serif", background: T.bg, minHeight: "100vh", display: "flex", justifyContent: "center", padding: "20px 16px" }}>
+      <div style={{ width: 390, background: T.white, borderRadius: 36, boxShadow: `0 20px 70px ${T.navy}22`, overflow: "hidden", position: "relative", border: `1px solid ${T.grey2}`, minHeight: 844 }}>
 
-    {/* STATUS */}
-    <div style={{background:T.navyDark,padding:"12px 24px 0",display:"flex",justifyContent:"space-between"}}>
-      <span style={{fontSize:11,fontWeight:700,color:T.white,opacity:.7,fontFamily:"monospace"}}>9:41</span>
-      <div style={{display:"flex",gap:5}}>{["▮▮▮","WiFi","🔋"].map((s,i)=><span key={i} style={{fontSize:9,color:T.white,opacity:.7}}>{s}</span>)}</div>
-    </div>
-
-    {/* HEADER */}
-    <div style={{background:`linear-gradient(145deg,${T.navy} 0%,${T.teal} 100%)`,padding:"14px 20px 18px",position:"relative",overflow:"hidden"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-        <div>
-          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
-            <div style={{background:T.teal,borderRadius:7,padding:"2px 9px",fontSize:9,fontWeight:900,color:T.white,letterSpacing:1.5,textTransform:"uppercase"}}>LOCATAIRE</div>
-            <div style={{width:6,height:6,borderRadius:"50%",background:"#5EE7B7"}}/>
-          </div>
-          <div style={{fontSize:16,fontWeight:800,color:T.white}}>{loc.nom.toUpperCase()}</div>
-          <div style={{fontSize:11,color:T.white,opacity:.6,marginTop:2}}>Depuis {bail.debut} · {bail.logement}</div>
+        {/* STATUS */}
+        <div style={{ background: T.navyDark, padding: "12px 24px 0", display: "flex", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: T.white, opacity: .7, fontFamily: "monospace" }}>9:41</span>
+          <div style={{ display: "flex", gap: 5 }}>{["▮▮▮", "WiFi", "🔋"].map((s, i) => <span key={i} style={{ fontSize: 9, color: T.white, opacity: .7 }}>{s}</span>)}</div>
         </div>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>
-          <div onClick={()=>op("notifs")} style={{width:38,height:38,borderRadius:12,background:T.white+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,cursor:"pointer"}}>🔔</div>
-          {bail.statut==="Impayé"&&<Badge label={`J+${bail.retard}`} color={T.white} bg={T.red} size={9}/>}
-        </div>
-      </div>
-      {/* KPI */}
-      <div style={{display:"flex",gap:7,marginTop:14}}>
-        {[
-          {l:"Loyer/mois",v:fmt(bail.loyer)+"F",icon:"💰",nav:null},
-          {l:"Quittances",v:quittances.filter(q=>q.statut==="Certifiée").length,icon:"🧾",nav:()=>go("quitt")},
-          {l:"Score ICL",v:sc,icon:"⭐",nav:()=>op("score")},
-          {l:"Caution",v:"—",icon:"🔒",nav:()=>op("caution")},
-        ].map((k,i)=>(
-          <div key={i} onClick={k.nav||undefined} style={{flex:1,background:T.white+"12",borderRadius:10,padding:"7px 5px",border:`1px solid ${T.white}15`,textAlign:"center",cursor:k.nav?"pointer":"default"}}>
-            <div style={{fontSize:13}}>{k.icon}</div>
-            <div style={{fontSize:12,fontWeight:800,color:T.white}}>{k.v}</div>
-            <div style={{fontSize:8,color:T.white,opacity:.55,marginTop:1}}>{k.l}</div>
+
+        {/* HEADER */}
+        <div style={{ background: `linear-gradient(145deg,${T.navy} 0%,${T.teal} 100%)`, padding: "14px 20px 18px", position: "relative", overflow: "hidden" }}>
+          <div style={{ display: "flex", justifySelf: "space-between", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                <div style={{ background: T.teal, borderRadius: 7, padding: "2px 9px", fontSize: 9, fontWeight: 900, color: T.white, letterSpacing: 1.5, textTransform: "uppercase" }}>LOCATAIRE</div>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#5EE7B7" }} />
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: T.white }}>{(loc?.nom || "Locataire").toUpperCase()}</div>
+              <div style={{ fontSize: 11, color: T.white, opacity: .6, marginTop: 2 }}>Depuis {bail?.debut || '...'} · {bail?.logement || 'Chargement...'}</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5 }}>
+              <div onClick={() => op("notifs")} style={{ width: 38, height: 38, borderRadius: 12, background: T.white + "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, cursor: "pointer" }}>🔔</div>
+              {bail?.statut === "Impayé" && <Badge label={`J+${bail.retard}`} color={T.white} bg={T.red} size={9} />}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
+          {/* KPI */}
+          <div style={{ display: "flex", gap: 7, marginTop: 14 }}>
+            {[
+              { l: "Loyer/mois", v: fmt(bail?.loyer || 0) + "F", icon: "💰", nav: null },
+              { l: "Quittances", v: safeQuittances.filter(q => q.statut === "Certifiée").length, icon: "🧾", nav: () => go("quitt") },
+              { l: "Score ICL", v: sc, icon: "⭐", nav: () => op("score") },
+              { l: "Caution", v: "—", icon: "🔒", nav: () => op("caution") },
+            ].map((k, i) => (
+              <div key={i} onClick={k.nav || undefined} style={{ flex: 1, background: T.white + "12", borderRadius: 10, padding: "7px 5px", border: `1px solid ${T.white}15`, textAlign: "center", cursor: k.nav ? "pointer" : "default" }}>
+                <div style={{ fontSize: 13 }}>{k.icon}</div>
+                <div style={{ fontSize: 12, fontWeight: 800, color: T.white }}>{k.v}</div>
+                <div style={{ fontSize: 8, color: T.white, opacity: .55, marginTop: 1 }}>{k.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-    {/* BODY */}
-    <div style={{overflowY:"auto",maxHeight:578,paddingBottom:90}}>
+        {/* BODY */}
+        <div style={{ overflowY: "auto", maxHeight: 578, paddingBottom: 90 }}>
 
-      {/* ══ ACCUEIL ══ */}
-      {tab==="dash"&&(
+          {/* ══ ACCUEIL ══ */}
+          {tab === "dash" && (
         <div>
           {/* alerte impayé */}
           {bail.statut==="Impayé"&&(

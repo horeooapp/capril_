@@ -188,7 +188,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
 
 
         {/* CIE / SODECI PREVIEW */}
-        {data?.facturesUtilities?.length > 0 && (
+        {(data?.facturesUtilities || []).length > 0 && (
           <section className="space-y-6">
             <div className="flex justify-between items-end px-2">
               <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">🔌 Services & Utilités</h2>
