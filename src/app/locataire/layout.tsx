@@ -28,10 +28,12 @@ export default async function LocataireLayout({
             select: { onboardingComplete: true }
         })
 
-        console.log(`[LOCATAIRE_LAYOUT] User ID: ${session.user.id}, DB onboardingComplete: ${user?.onboardingComplete}`);
+        if (!user) {
+            // User was probably deleted from DB but session cookie persists
+            redirect("/locataire/login")
+        }
 
-        if (!user?.onboardingComplete) {
-            console.log(`[LOCATAIRE_LAYOUT] Redirecting to onboarding because DB status is false`);
+        if (!user.onboardingComplete) {
             redirect("/onboarding/tenant")
         }
     }

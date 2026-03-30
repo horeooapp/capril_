@@ -44,9 +44,9 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const pathname = nextUrl.pathname;
+            const role = auth?.user?.role;
 
             // 1. PUBLIC PATHS (ALWAYS ALLOWED)
-            // We include all login pages and critical public assets
             const isPublic = 
                 pathname === "/" ||
                 pathname.includes("/login") ||
@@ -56,10 +56,9 @@ export const authConfig = {
                 ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/verify-request"].includes(pathname);
 
             if (isPublic) {
-                // If logged in and trying to access a login page, redirect to their dashboard
                 if (isLoggedIn && pathname.includes("/login")) {
-                    if (auth.user.role === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
-                    if (auth.user.role === 'ADMIN' || auth.user.role === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
+                    if (role === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
+                    if (role === 'ADMIN' || role === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
                     return Response.redirect(new URL("/dashboard", nextUrl));
                 }
                 return true;
@@ -67,23 +66,24 @@ export const authConfig = {
 
             // 2. PROTECTED ROUTES
             if (!isLoggedIn) {
-                // If not logged in, redirect to the relevant login page based on the path
                 if (pathname.startsWith("/admin")) return Response.redirect(new URL("/admin/login", nextUrl));
                 if (pathname.startsWith("/locataire")) return Response.redirect(new URL("/locataire/login", nextUrl));
                 return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
-            // Ensure logged in users are on the correct portal
-            if (auth.user.role === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
+            // Prevent users from accessing portals they don't belong to
+            if (role === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
                 return Response.redirect(new URL("/locataire", nextUrl));
             }
-            if ((auth.user.role === 'ADMIN' || auth.user.role === 'SUPER_ADMIN') && !pathname.startsWith("/admin")) {
+            
+            if ((role === 'ADMIN' || role === 'SUPER_ADMIN') && !pathname.startsWith("/admin")) {
                 if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
                      return Response.redirect(new URL("/admin", nextUrl));
                 }
             }
-            if ((auth.user.role === 'LANDLORD' || auth.user.role === 'LANDLORD_PRO' || auth.user.role === 'AGENCY') && (pathname.startsWith("/locataire") || pathname.startsWith("/admin"))) {
+            
+            if ((role === 'LANDLORD' || role === 'LANDLORD_PRO' || role === 'AGENCY') && (pathname.startsWith("/locataire") || pathname.startsWith("/admin"))) {
                 return Response.redirect(new URL("/dashboard", nextUrl));
             }
 
