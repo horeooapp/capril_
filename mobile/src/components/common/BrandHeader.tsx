@@ -28,11 +28,6 @@ export const BrandHeader: React.FC<BrandHeaderProps> = ({
             <View style={styles.headerTop}>
                 <View style={styles.left}>
                     <View style={styles.brandRow}>
-                        <Image 
-                            source={require('../../../assets/logo-qapril.png')} 
-                            style={styles.logo}
-                            resizeMode="contain"
-                        />
                         <View style={[styles.roleBadge, { backgroundColor: roleColor }]}>
                             <Text style={styles.roleText}>{roleLabel.toUpperCase()}</Text>
                         </View>

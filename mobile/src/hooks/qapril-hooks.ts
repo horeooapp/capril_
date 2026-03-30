@@ -1,27 +1,41 @@
 import { useState, useEffect, useCallback } from 'react';
+import * as SecureStore from 'expo-secure-store';
 
 /**
  * QAPRIL Mobile Hooks - REST API Connection
- * Handles the communication between the Expo app and the NestJS/Next.js backend.
+ * Aligned with QAPRIL_API_MAPPING.md (March 2026)
  */
 
-// In development, use your computer's local IP (e.g. 192.168.x.x) if testing on a real device
-const API_BASE_URL = 'https://qapril.ci/api/v1'; // Standard Next.js API path
+const API_BASE_URL = 'https://api.qapril.ci'; // Reference: QAPRIL_API_BASE_URL
 
 let AUTH_TOKEN: string | null = null;
+const TOKEN_KEY = 'QAPRIL_AUTH_TOKEN';
+
+/**
+ * Load token from SecureStore on startup
+ */
+export async function initAuth() {
+  AUTH_TOKEN = await SecureStore.getItemAsync(TOKEN_KEY);
+  return AUTH_TOKEN;
+}
 
 /**
  * Set the authentication token for subsequent requests
  */
-export function setAuthToken(token: string | null) {
+export async function setAuthToken(token: string | null) {
   AUTH_TOKEN = token;
+  if (token) {
+    await SecureStore.setItemAsync(TOKEN_KEY, token);
+  } else {
+    await SecureStore.deleteItemAsync(TOKEN_KEY);
+  }
 }
 
 /**
  * API Fetch wrapper for mobile
  */
 async function apiFetch(path: string, opts: any = {}) {
-  const url = `${API_BASE_URL}${path}`;
+  const url = `${API_BASE_URL}${path.startsWith('/api') ? path : `/api${path}`}`;
   
   const headers = {
     'Content-Type': 'application/json',
@@ -40,7 +54,7 @@ async function apiFetch(path: string, opts: any = {}) {
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.error || `Error ${res.status}: ${res.statusText}`);
+    throw new Error(errorBody.error || errorBody.message || `Error ${res.status}: ${res.statusText}`);
   }
 
   return res.json();
@@ -66,65 +80,47 @@ function useQuery(path: string, deps: any[] = []) {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, ...deps]);
 
   useEffect(() => {
     if (AUTH_TOKEN || path.includes('/auth/')) {
        fetchData();
     }
-  }, [fetchData]);
+  }, [fetchData, path]);
 
   return { data, loading, error, refetch: fetchData };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// AUTHENTICATION (EMAIL/OTP)
+// AUTHENTICATION (OTP)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requestOTP = async (email: string) => {
+  /**
+   * Login with Telephone and OTP
+   * Aligned with Section 2 of QAPRIL_API_MAPPING.md
+   */
+  const login = async (telephone: string, otp: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/otp/request', {
+      const res = await apiFetch('/auth/login', {
         method: 'POST',
-        body: { email }
-      });
-      return res;
-    } catch (e: any) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOTP = async (email: string, otp: string, role: string = 'TENANT') => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch('/auth/otp/verify', {
-        method: 'POST',
-        body: { email, otp, role }
+        body: { telephone, otp }
       });
       
       if (res.token) {
-        setAuthToken(res.token);
+        await setAuthToken(res.token);
       }
       
-      // Map 'token' success to a compatible structure for UI
       return {
         success: true,
         token: res.token,
-        user: {
-          id: res.userId,
-          role: res.profile?.toUpperCase(), // Ensure consistency
-          email: email
-        }
+        profil: res.profil,
+        userId: res.userId
       };
     } catch (e: any) {
       setError(e.message);
@@ -134,7 +130,7 @@ export function useAuth() {
     }
   };
 
-  return { requestOTP, verifyOTP, loading, error };
+  return { login, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -149,12 +145,80 @@ export function useBail() {
   return useQuery('/locataires/me/bail');
 }
 
-export function useQuittances() {
-  return useQuery('/locataires/me/quittances');
+export function useQuittances(params: { statut?: string, page?: number } = {}) {
+  const query = new URLSearchParams(params as any).toString();
+  return useQuery(`/locataires/me/quittances${query ? `?${query}` : ''}`, [query]);
 }
 
 export function useAbonnementsEnergie() {
   return useQuery('/locataires/me/abonnements-energie');
+}
+
+export function useTickets() {
+  return useQuery('/locataires/me/tickets');
+}
+
+export function useMrlDemandes() {
+  return useQuery('/locataires/me/mrl-demandes');
+}
+
+export function useLocataireMutations() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Submit RCL Ticket
+   * Body: { code, description, travauxType?, travauxUrgent? }
+   */
+  const submitTicket = async (data: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await apiFetch('/locataires/me/tickets', {
+        method: 'POST',
+        body: data
+      });
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const respondMRL = async (id: string, reponse: 'oui' | 'non') => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await apiFetch(`/locataires/me/mrl-demandes/${id}/repondre`, {
+        method: 'POST',
+        body: { reponse }
+      });
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitPreavis = async (data: { dateDepartSouhaitee: string, creneauEDL: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await apiFetch('/locataires/me/preavis', {
+        method: 'POST',
+        body: data
+      });
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { submitTicket, respondMRL, submitPreavis, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -166,7 +230,7 @@ export function useProprio() {
 }
 
 export function usePatrimoine() {
-  return useQuery('/proprietaires/patrimoine');
+  return useQuery('/proprietaires/me/patrimoine');
 }
 
 export function useProprioMutations() {
@@ -177,11 +241,10 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/proprietaires/me/patrimoine', {
+      return await apiFetch('/proprietaires/me/patrimoine', {
         method: 'POST',
         body: data
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -190,15 +253,17 @@ export function useProprioMutations() {
     }
   };
 
+  /**
+   * Remove Portefeuille - Soft Delete 10 years (Rule MM-04)
+   */
   const removeEntity = async (id: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/proprietaires/me/patrimoine/${id}`, {
+      return await apiFetch(`/proprietaires/me/patrimoine/${id}`, {
         method: 'DELETE',
         body: { confirmation: true }
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -207,15 +272,14 @@ export function useProprioMutations() {
     }
   };
 
-  const addUnit = async (entityId: string, data: any) => {
+  const updateWalletConfig = async (data: { payoutOperator: string, payoutNumber: string }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/proprietaires/me/patrimoine/${entityId}/unites`, {
-        method: 'POST',
+      return await apiFetch('/proprietaires/me/wallet-config', {
+        method: 'PATCH',
         body: data
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -224,47 +288,14 @@ export function useProprioMutations() {
     }
   };
 
-  return { addEntity, removeEntity, addUnit, loading, error };
-}
-
-// --- AGENCY HOOKS ---
-export function useAgency() {
-  return useQuery('/agences/me');
-}
-
-export function useAgencyPortfolio() {
-  return useQuery('/agences/portfolio');
-}
-
-export function useCandidates() {
-  return useQuery('/agences/candidates');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MODULE DIASPORA
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export function useDiaspora() {
-  return useQuery('/diaspora/me');
-}
-
-export function useDiasporaStats() {
-  return useQuery('/diaspora/stats');
-}
-
-export function useDiasporaTransfer() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const transfer = async (amountFcfa: number, currency: string) => {
+  const requestDisbursement = async (amount: number) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/diaspora/transfer', {
+      return await apiFetch('/proprietaires/me/wallet/disbursement', {
         method: 'POST',
-        body: { amountFcfa, currency }
+        body: { amount }
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -273,23 +304,7 @@ export function useDiasporaTransfer() {
     }
   };
 
-  const generateInvite = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch('/diaspora/invite', {
-        method: 'POST'
-      });
-      return res;
-    } catch (e: any) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { transfer, generateInvite, loading, error };
+  return { addEntity, removeEntity, updateWalletConfig, requestDisbursement, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -300,10 +315,6 @@ export function useIntermediaire() {
   return useQuery('/intermediaires/me');
 }
 
-export function useIntermediaireStats() {
-  return useQuery('/intermediaires/stats');
-}
-
 export function useIntermediaireActions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -312,11 +323,10 @@ export function useIntermediaireActions() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/intermediaires/actions', {
+      return await apiFetch('/intermediaires/actions', {
         method: 'POST',
         body: { action, ...params }
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -329,39 +339,52 @@ export function useIntermediaireActions() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MODULE BAUX / LEASES
+// MODULE DIASPORA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export function useDiaspora() {
+  return useQuery('/diaspora/me');
+}
+
+export function useDiasporaTransfer() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const transfer = async (amountFcfa: number, currency: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await apiFetch('/diaspora/transfer', {
+        method: 'POST',
+        body: { amountFcfa, currency }
+      });
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { transfer, loading, error };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LEASE ACTIONS (SHARED)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useLeaseActions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createLease = async (data: any) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch('/proprietaires/me/bails', {
-        method: 'POST',
-        body: data
-      });
-      return res;
-    } catch (e: any) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const requestMRL = async (bailRef: string, nouveauLoyer: number, dateEffet: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch(`/proprietaires/me/bails/${bailRef}/mrl-demande`, {
+      return await apiFetch(`/proprietaires/me/bails/${bailRef}/mrl-demande`, {
         method: 'POST',
         body: { nouveauLoyer, dateEffet }
       });
-      return res;
     } catch (e: any) {
       setError(e.message);
       throw e;
@@ -370,49 +393,5 @@ export function useLeaseActions() {
     }
   };
 
-  const nudgeArrears = async (leaseId: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch(`/agences/leasings/${leaseId}/nudge`, {
-        method: 'POST'
-      });
-      return res;
-    } catch (e: any) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { createLease, requestMRL, nudgeArrears, loading, error };
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MODULE WALLET / PAIEMENT
-// ═══════════════════════════════════════════════════════════════════════════════
-
-export function usePaymentActions() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const payReceipt = async (receiptId: string, channel: string = 'WAVE_CI') => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await apiFetch('/wallet/pay', {
-        method: 'POST',
-        body: { receiptId, channel }
-      });
-      return res;
-    } catch (e: any) {
-      setError(e.message);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { payReceipt, loading, error };
+  return { requestMRL, loading, error };
 }

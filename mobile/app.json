@@ -1,25 +1,25 @@
 {
   "expo": {
     "name": "Qapril",
-    "slug": "mobile",
+    "slug": "qapril",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo-qapril.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/logo-qapril.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#0D2B6E"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.qapril.app"
     },
     "android": {
-      "package": "com.qapril.mobile",
+      "package": "com.qapril.app",
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/logo-qapril.png",
-        "backgroundImage": "./assets/logo-qapril.png"
+        "backgroundColor": "#0D2B6E",
+        "foregroundImage": "./assets/icon.png"
       }
     },
     "web": {

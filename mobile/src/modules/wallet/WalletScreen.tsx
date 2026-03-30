@@ -7,11 +7,12 @@ import {
   TouchableOpacity, 
   StatusBar,
   Dimensions,
-  SafeAreaView,
   LayoutAnimation,
   Platform,
   UIManager,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput,
+  Alert
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -21,512 +22,397 @@ import { SectionTitle } from '../../components/common/SectionTitle';
 import { WalletCard } from '../../components/common/WalletCard';
 import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
+import { BottomSheet } from '../../components/common/BottomSheet';
 import { 
   useLocataire, 
   useBail, 
   useQuittances, 
   useAbonnementsEnergie, 
-  useAuth,
-  usePaymentActions,
-  setAuthToken 
+  useTickets,
+  useLocataireMutations,
+  usePaymentActions
 } from '../../hooks/qapril-hooks';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const { width } = Dimensions.get('window');
 
-// --- Mock Data from Reference JSX ---
-// Mock data removed to prevent shadowing
+const RCL_TYPES = [
+  { code: "RCL-01", label: "Quittance incorrecte", sub: "Montant, période ou nom erroné", icon: "🧾" },
+  { code: "RCL-02", label: "Paiement sans quittance", sub: "Preuve Mobile Money + aucune quittance émise", icon: "💸" },
+  { code: "RCL-03", label: "Charges non contractuelles", sub: "Montant hors bail enregistré", icon: "💰" },
+  { code: "RCL-04", label: "Harcèlement ou pression", sub: "Tentative expulsion informelle ou pressions", icon: "🚨" },
+  { code: "RCL-05", label: "Demande de travaux", sub: "Réparation urgente · entretien · mise en conformité", icon: "🔧", travaux: true },
+];
 
 export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState("dash");
-  const [email, setEmail] = useState(""); // Production: No default email
-
-  const { data: locData, loading: locLoading } = useLocataire();
-  const { data: bailData, loading: bailLoading } = useBail();
-  const { data: quittData, loading: quittLoading } = useQuittances();
-  const { data: abosData, loading: abosLoading } = useAbonnementsEnergie();
-  const { verifyOTP, loading: authLoading } = useAuth();
-  const { payReceipt, loading: paying } = usePaymentActions();
-
-  // --- RCL & Droits State ---
   const [dsec, setDsec] = useState<string | null>(null);
   const [rclCode, setRclCode] = useState<string | null>(null);
+  const [prStep, setPrStep] = useState(1);
+  const [preavisDate, setPreavisDate] = useState('');
   const [tSel, setTSel] = useState<any>(null);
-  const [mrlChoice, setMrlChoice] = useState<string | null>(null);
 
-  const handlePay = async (receiptId: string) => {
-    try {
-      await payReceipt(receiptId);
-      alert("Paiement réussi ! Votre quittance est désormais certifiée.");
-      // In a real app, we would revalidate. For simulation, alert is enough.
-    } catch (e: any) {
-      alert("Erreur de paiement: " + e.message);
-    }
-  };
+  // Form states
+  const [rclData, setRclData] = useState({ type: '', desc: '', urgent: false });
 
-  // Use real data or fallback to MOCK if not loaded
-  // Safe Data Mapping (MM-04)
-  const LOC = locData || { nom: "Locataire", score: 750 };
-  const BAIL = (bailData?.noLease || !bailData) ? null : bailData;
-  const QUITTANCES = Array.isArray(quittData) ? quittData : [];
-  const ABOS = Array.isArray(abosData) ? abosData : [];
-
-  const handleDebugLogin = async () => {
-    try {
-      // Simulate real OTP verification for development
-      const res = await verifyOTP(email, "1234");
-      alert("Authentifié ! Token reçu.");
-    } catch (e: any) {
-      alert("Erreur: " + e.message);
-    }
-  };
-
-  const handleAction = (label: string) => {
-    alert(`Fonctionnalité "${label}" : Transmission en cours vers QAPRIL CI...`);
-  };
+  const { data: locData, loading: locLoading, refetch: refetchLoc } = useLocataire();
+  const { data: bailData, loading: bailLoading } = useBail();
+  const { data: quittData, loading: quittLoading, refetch: refetchQuitt } = useQuittances();
+  const { data: abosData } = useAbonnementsEnergie();
+  const { data: ticketsData, refetch: refetchTickets } = useTickets();
+  const { payReceipt, loading: paying } = usePaymentActions();
+  const { submitTicket, respondMRL, submitPreavis, loading: mutationLoading } = useLocataireMutations();
 
   const changeTab = (t: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setTab(t);
     setDsec(null);
     setRclCode(null);
+    setPrStep(1);
     setTSel(null);
-    setMrlChoice(null);
   };
 
-  // If loading, show spinner
+  const handlePay = async (receiptId: string) => {
+    try {
+      await payReceipt(receiptId);
+      Alert.alert("Succès", "Paiement QAPRIL certifié SHA-256 enregistré.");
+      refetchQuitt();
+    } catch (e: any) {
+      Alert.alert("Erreur de paiement", e.message);
+    }
+  };
+
+  const handleMRL = async (choice: 'oui' | 'non') => {
+    try {
+      await respondMRL(locData?.pendingMRL?.id, choice);
+      Alert.alert(choice === 'oui' ? "Accord Enregistré" : "Refus Enregistré", "Le bailleur a été notifié. Règle MRL-01 appliquée.");
+      refetchLoc();
+      setDsec(null);
+    } catch (e: any) {
+      Alert.alert("Erreur", e.message);
+    }
+  };
+
+  const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
+
   if (locLoading || bailLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={Theme.colors.navy} />
+        <ActivityIndicator size="large" color={Theme.colors.teal} />
       </View>
     );
   }
 
-  // If no lease, show a friendly onboarding/welcome screen instead of the dashboard
-  if (bailData?.noLease || !BAIL) {
-    return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 40 }]}>
-        <StatusBar barStyle="dark-content" />
-        <View style={{ width: 100, height: 100, backgroundColor: Theme.colors.teal + '15', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-          <Text style={{ fontSize: 40 }}>🏠</Text>
-        </View>
-        <Text style={{ fontSize: 24, fontWeight: '900', color: Theme.colors.navy, textAlign: 'center', marginBottom: 12 }}>Bienvenue sur QAPRIL !</Text>
-        <Text style={{ fontSize: 14, color: Theme.colors.textMid, textAlign: 'center', lineHeight: 22, marginBottom: 32 }}>
-          Nous n'avons pas encore trouvé de bail actif lié à votre compte. {'\n\n'}
-          Demandez à votre propriétaire de digitaliser votre bail sur QAPRIL ou assurez-vous que votre numéro de téléphone est bien celui enregistré sur votre contrat.
-        </Text>
-        <TouchableOpacity 
-          style={{ backgroundColor: Theme.colors.teal, paddingVertical: 16, paddingHorizontal: 32, borderRadius: 16, width: '100%' }}
-          onPress={() => alert("Support: +225 05 000 000")}
-        >
-          <Text style={{ color: 'white', fontWeight: '800', textAlign: 'center' }}>Contacter mon agence</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-           style={{ marginTop: 24 }}
-           onPress={() => { if (onBack) onBack(); }}
-        >
-          <Text style={{ color: Theme.colors.grey3, fontWeight: '700' }}>Se déconnecter</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const LOC = locData || { fullName: "Locataire", score: 750, scoreBase: 750, scoreKyc: 800, kycComplet: false };
+  const BAIL = bailData || { logement: "Logement", loyer: 0, statut: "À jour", typeGestion: "agreee", bailleurNom: "...", bailleurCode: "...", bailleurMasque: true };
+  const QUITTANCES = quittData || [];
+  const ABOS = abosData || [];
+  const TICKETS = ticketsData || [];
 
-  const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
-  const scColor = (LOC?.score || 0) >= 850 ? Theme.colors.green : (LOC?.score || 0) >= 700 ? Theme.colors.teal : Theme.colors.orange;
+  const getBailleur = () => {
+    if (BAIL.typeGestion === "agreee") return { val: BAIL.bailleurCode, masque: true, mention: "Agence agréée — substitution totale" };
+    if (BAIL.bailleurMasque) return { val: BAIL.bailleurCode, masque: true, mention: "Identité masquée par le bailleur" };
+    return { val: BAIL.bailleurNom, masque: false, mention: "Gestion directe — identité visible" };
+  };
+  const BAILLEUR = getBailleur();
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
+      
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
         <BrandHeader 
-          title={`Bonjour, ${(LOC?.nom || "Locataire").split(" ")[0]}`}
-          subtitle={`Occupant du ${BAIL?.logement || 'logement'}`}
+          title={`Bonjour, ${LOC.fullName?.split(" ")[0] || 'Locataire'}`}
+          subtitle={`Occupant du ${BAIL.logement}`}
           roleLabel="LOCATAIRE"
           roleColor={Theme.colors.teal}
-          onNotifPress={() => alert("Notifications Locataire")}
+          onNotifPress={() => Alert.alert("Notifications", "Aucune notification urgente.")}
         />
 
-        {/* KPI Row - Floating */}
-        <View style={{ marginTop: -25, paddingHorizontal: 16, zIndex: 10 }}>
-          <View style={styles.kpiRow}>
-            {[
-               { l: "Loyer/mois", v: fmt(BAIL.loyer) + "F", icon: "💰", tab: null },
-               { l: "Quittances", v: QUITTANCES.length.toString(), icon: "🧾", tab: "quitt" },
-               { l: "Score ICL", v: LOC.score, icon: "⭐", tab: "profil" },
-               { l: "Caution", v: "—", icon: "🔒", tab: null },
-            ].map((k, i) => (
-              <TouchableOpacity 
-                key={i} 
-                onPress={() => k.tab && changeTab(k.tab)}
-                style={styles.kpiCard}
-              >
-                <Text style={{ fontSize: 13 }}>{k.icon}</Text>
-                <Text style={styles.kpiValue}>{k.v}</Text>
-                <Text style={styles.kpiLabel}>{k.l}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+        <View style={styles.kpiRowWrap}>
+           {[
+             { l: "LOYER", v: fmt(BAIL.loyer) + " F", icon: "💰" },
+             { l: "CERTIFIÉES", v: QUITTANCES.filter((q:any)=>q.statut==='Certifiée').length, icon: "🧾" },
+             { l: "SCORE ICL", v: LOC.score, icon: "⭐" },
+             { l: "CAUTION", v: "✓", icon: "🔒" },
+           ].map((k, i) => (
+             <View key={i} style={styles.kpiSquare}>
+               <Text style={styles.kpiSquareVal}>{k.v}</Text>
+               <Text style={styles.kpiSquareLabel}>{k.l}</Text>
+             </View>
+           ))}
         </View>
 
         <View style={styles.body}>
-          {/* ══ ACCUEIL ══ */}
           {tab === "dash" && (
             <>
-              {/* Alerte Impayé */}
               {BAIL.statut === "Impayé" && (
-                <View style={styles.alertCard}>
-                  <Text style={styles.alertTitle}>⚠ Loyer Mars 2026 — J+{BAIL.retard}</Text>
-                  <Text style={styles.alertSub}>{fmt(BAIL.loyer)} FCFA non encaissé. Si vous avez payé, soumettez votre justificatif.</Text>
-                  <View style={styles.alertActions}>
-                    <TouchableOpacity style={styles.alertBtnPrimary}>
-                      <Text style={styles.alertBtnText}>Signaler un problème</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.alertBtnSecondary} onPress={() => setTab("quitt")}>
-                      <Text style={styles.alertBtnTextSecondary}>Mes quittances</Text>
-                    </TouchableOpacity>
-                  </View>
+                <View style={styles.impayeCard}>
+                   <View style={styles.impayeHeader}>
+                      <Text style={styles.impayeTitle}>⚠ Loyer en retard (J+{BAIL.retard})</Text>
+                      <Badge label="RÈGLE ICL-10" color="#FFF" bg={Theme.colors.red} />
+                   </View>
+                   <Text style={styles.impayeSub}>Le non-paiement au 5 du mois entraîne un malus automatique (−10 pts) sur votre score ICL.</Text>
+                   <TouchableOpacity style={[styles.payBtn, { backgroundColor: Theme.colors.red }]} onPress={() => setTab("quitt")}>
+                      <Text style={styles.payBtnText}>RÉGULARISER MAINTENANT (WAVE/OM)</Text>
+                   </TouchableOpacity>
                 </View>
               )}
 
-              {/* Mon Logement */}
-              <View style={styles.section}>
-                <SectionTitle label="Mon logement" />
-                <TouchableOpacity style={styles.logementCard} onPress={() => setTab("bail")}>
-                  <Text style={styles.logementTitle}>{BAIL.logement}</Text>
-                  <View style={styles.badgeRow}>
+              <SectionTitle label="Logement & Gestion" />
+              <TouchableOpacity style={styles.logementBox} onPress={() => setTab("bail")}>
+                 <Text style={styles.logementName}>{BAIL.logement}</Text>
+                 <View style={styles.badgeRow}>
                     <Badge label={BAIL.type} color={Theme.colors.teal} bg={Theme.colors.tealPale} />
-                    <Badge label={`Fin : ${BAIL.fin}`} color={Theme.colors.textLight} bg={Theme.colors.grey1} />
-                  </View>
-                  <View style={styles.gestionInfo}>
-                    <View style={styles.gestionTop}>
-                      <View>
-                        <Text style={styles.gestionLabel}>AGENCE</Text>
-                        <Text style={styles.gestionValue}>{BAIL.agence}</Text>
-                      </View>
-                      <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.gestionLabel}>RÉF. BAILLEUR</Text>
-                        <Text style={styles.roleValue}>{BAIL.bailleurCode}</Text>
-                      </View>
+                    <Badge label={`Éch. le ${BAIL.echeance || 1}er`} color={Theme.colors.navy} bg={Theme.colors.navyPale} />
+                 </View>
+                 <View style={styles.bailleurStrip}>
+                    <View style={{ flex: 1 }}>
+                       <Text style={styles.bLabel}>{BAIL.typeGestion === "agreee" ? "AGENCE" : "BAILLEUR"}</Text>
+                       <Text style={styles.bVal}>{BAIL.typeGestion === "agreee" ? BAIL.agence : BAILLEUR.val}</Text>
                     </View>
-                    <Text style={styles.gestionMention}>🔐 Agence agréée — substitution totale exclusive</Text>
-                  </View>
-                </TouchableOpacity>
+                    <Text style={styles.bMention}>🔐 {BAILLEUR.mention}</Text>
+                 </View>
+              </TouchableOpacity>
+
+              <SectionTitle label="Factures & Abonnements" right={<TouchableOpacity onPress={() => setTab("util")}><Text style={styles.link}>Voir tout →</Text></TouchableOpacity>} />
+              <View style={styles.aboGrid}>
+                 {ABOS.map((a: any) => (
+                   <TouchableOpacity key={a.id} style={[styles.aboCard, { borderLeftColor: a.color || Theme.colors.teal }]} onPress={() => setTab("util")}>
+                      <Text style={{ fontSize: 20 }}>{a.icon || '⚡'}</Text>
+                      <Text style={[styles.aboType, { color: a.color || Theme.colors.teal }]}>{a.type || 'ABO'}</Text>
+                      <Text style={styles.aboPrice}>{fmt(a.montant || 0)} F</Text>
+                   </TouchableOpacity>
+                 ))}
               </View>
 
-              {/* Dernière quittance */}
-              <View style={styles.section}>
-                <SectionTitle 
-                  label="Dernière quittance" 
-                  right={<TouchableOpacity onPress={() => setTab("quitt")}><Text style={styles.sectionLink}>Tout voir →</Text></TouchableOpacity>} 
-                />
-                <TouchableOpacity style={styles.quittanceCard} onPress={() => setTab("quitt")}>
-                  <View style={styles.quittanceLeft}>
-                    <Text style={styles.quittanceMois}>Fév. 2026 — {fmt(150000)} FCFA</Text>
-                    <Text style={styles.quittanceRef}>QIT-2026-0155</Text>
-                  </View>
-                  <Badge label="✓ Certifiée" color={Theme.colors.green} bg={Theme.colors.white} />
-                </TouchableOpacity>
-              </View>
-
-              {/* CIE / SODECI */}
-              <View style={styles.section}>
-                <SectionTitle label="⚡ CIE / SODECI" right={<TouchableOpacity onPress={() => setTab("util")}><Text style={styles.sectionLink}>Voir →</Text></TouchableOpacity>} />
-                <View style={styles.aboRow}>
-                  {ABOS.map((a: any) => (
-                    <TouchableOpacity key={a.id} onPress={() => setTab("util")} style={[styles.aboCard, { backgroundColor: a.bg || Theme.colors.grey1, borderColor: `${a.color || Theme.colors.teal}33` }]}>
-                      <Text style={{ fontSize: 18, marginBottom: 2 }}>{a.icon || '⚡'}</Text>
-                      <Text style={[styles.aboType, { color: a.color || Theme.colors.teal }]}>{a.type ? a.type.toUpperCase() : a.id.toUpperCase()}</Text>
-                      <Text style={styles.aboAmount}>{fmt(a.montant || a.derniereFacture?.montant || 0)}</Text>
-                      <Text style={styles.aboSub}>FCFA · {a.mois || a.derniereFacture?.mois}</Text>
-                      <View style={{ marginTop: 4 }}>
-                        <Badge label={a.status || a.derniereFacture?.statut} color={Theme.colors.green} bg={Theme.colors.greenPale} size={8} />
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              {/* Accès Rapides */}
-              <View style={styles.section}>
-                <SectionTitle label="⚡ Accès rapides" />
-                <View style={styles.quickActionsGrid}>
-                  {[
-                    { icon: "📤", label: "Export certifié", sub: "36 mois · banque", color: Theme.colors.navy, bg: Theme.colors.navyPale },
-                    { icon: "⚖️", label: "Mes droits", sub: "Réclamation", color: Theme.colors.purple, bg: Theme.colors.purplePale },
-                    { icon: "🔒", label: "Ma caution", sub: "Statut CDC", color: Theme.colors.teal, bg: Theme.colors.tealPale },
-                    { icon: "📲", label: "USSD", sub: "*144*QAPRIL#", color: Theme.colors.green, bg: Theme.colors.greenPale },
-                  ].map((a, i) => (
-                    <TouchableOpacity key={i} onPress={() => handleAction(a.label)} style={[styles.quickActionBox, { backgroundColor: a.bg, borderColor: `${a.color}2e` }]}>
-                      <Text style={{ fontSize: 18, marginBottom: 3 }}>{a.icon}</Text>
-                      <Text style={[styles.quickActionLabel, { color: a.color }]}>{a.label}</Text>
-                      <Text style={styles.quickActionSub}>{a.sub}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+              <SectionTitle label="Actions Rapides" />
+              <View style={styles.toolsRow}>
+                 <TouchableOpacity style={styles.toolItem} onPress={() => setTab("droits")}>
+                    <Text style={{ fontSize: 24 }}>⚖️</Text>
+                    <Text style={styles.toolText}>Mes Droits</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity style={styles.toolItem} onPress={() => Alert.alert("Export", "Historique 36 mois certifié en cours de génération...")}>
+                    <Text style={{ fontSize: 24 }}>📤</Text>
+                    <Text style={styles.toolText}>Certificat</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity style={styles.toolItem} onPress={() => setTab("quitt")}>
+                    <Text style={{ fontSize: 24 }}>🧾</Text>
+                    <Text style={styles.toolText}>Quittances</Text>
+                 </TouchableOpacity>
               </View>
             </>
           )}
 
-          {/* ══ MON BAIL ══ */}
           {tab === "bail" && (
-            <View style={styles.section}>
-              <TouchableOpacity style={styles.logementCard}>
-                <Text style={styles.logementTitle}>{BAIL.logement}</Text>
-                <Text style={styles.logementSub}>{BAIL.adresse}</Text>
-                <View style={[styles.badgeRow, { marginTop: 8 }]}>
-                  <Badge label={BAIL.type} color={Theme.colors.teal} bg={Theme.colors.tealPale} />
-                  <Badge label={BAIL.ref} color={Theme.colors.textLight} bg={Theme.colors.grey1} size={9} />
-                  {BAIL.statut === "Impayé" ? <Badge label={`J+${BAIL.retard}`} color={Theme.colors.white} bg={Theme.colors.red} /> : <Badge label="À jour" color={Theme.colors.green} bg={Theme.colors.greenPale} />}
-                </View>
-                <View style={styles.bailKpiRow}>
-                  {[{ l: "Loyer", v: fmt(BAIL.loyer) + " F" }, { l: "Début", v: BAIL.debut }, { l: "Fin", v: BAIL.fin }].map((k, i) => (
-                    <View key={i} style={styles.bailKpiItem}>
-                      <Text style={styles.bailKpiLabel}>{k.l}</Text>
-                      <Text style={styles.bailKpiValue}>{k.v}</Text>
-                    </View>
-                  ))}
-                </View>
-              </TouchableOpacity>
-              
-              <View style={{ marginTop: 15 }}>
-                <Row label="Référence" value={BAIL.ref} />
-                <Row label="Type de bail" value={BAIL.type} color={Theme.colors.teal} />
-                <Row label="Loyer mensuel" value={fmt(BAIL.loyer) + " FCFA"} color={Theme.colors.navy} />
-                <Row label="Échéance" value="Le 1er de chaque mois" />
-                <Row label="Fin de bail" value={BAIL.fin} />
+            <View>
+              <SectionTitle label="Contrat de Bail Digital" />
+              <View style={styles.bailCard}>
+                 <Row label="Référence" value={BAIL.ref || 'Q-BAIL'} />
+                 <Row label="Loyer Net" value={fmt(BAIL.loyer) + " F"} color={Theme.colors.navy} />
+                 <Row label="Date Signature" value={BAIL.debut || '—'} />
               </View>
 
-              <View style={styles.gestionSection}>
-                <SectionTitle label="Bailleur & Gestion" />
-                <Row label="Agence" value={BAIL.agence} color={Theme.colors.teal} />
-                <Row label="Réf. bailleur" value={BAIL.bailleurCode} color={Theme.colors.grey3} />
-                <View style={styles.gestionNotice}>
-                  <Text style={styles.gestionNoticeText}>🔐 Agence agréée — substitution totale exclusive. Votre interlocuteur est uniquement l'agence.</Text>
-                </View>
+              <SectionTitle label="Canaux de Règlement" />
+              <View style={styles.mmHub}>
+                 <Text style={styles.mmInfo}>Utilisez ces canaux pour un règlement certifié instantané.</Text>
+                 {BAIL.mobileMoney?.map((mm: any) => (
+                   <TouchableOpacity key={mm.id} style={styles.mmBtn} onPress={() => Alert.alert("Paiement", `Ouverture ${mm.operateur}...`)}>
+                      <Text style={{ fontSize: 24 }}>{mm.icon}</Text>
+                      <View style={{ flex: 1, marginLeft: 12 }}>
+                         <Text style={styles.mmOp}>{mm.operateur}</Text>
+                         <Text style={styles.mmNum}>{mm.numero}</Text>
+                      </View>
+                      {mm.defaut && <Badge label="DÉFAUT" color={Theme.colors.teal} bg={Theme.colors.tealPale} />}
+                   </TouchableOpacity>
+                 ))}
               </View>
 
-              <View style={styles.actionSection}>
-                <SectionTitle label="Actions" />
-                <WalletCard icon="📄" label="Télécharger mon bail PDF" sub="SHA-256 certifié" color={Theme.colors.navy} bg={Theme.colors.navyPale} />
-                <WalletCard icon="🚪" label="Initier un préavis de sortie" sub="1 mois de délai légal" color={Theme.colors.orange} bg={Theme.colors.orangePale} />
-              </View>
+              <ACard icon="🚪" label="Initier un préavis" sub="Automatisé (1 mois loi CI)" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => { setTab("droits"); setDsec("preavis"); }} />
             </View>
           )}
 
-          {/* ══ QUITTANCES ══ */}
           {tab === "quitt" && (
-            <View style={styles.section}>
-              <View style={styles.quittanceSummaryRow}>
-                {[{ l: "Certifiées", v: "1", c: Theme.colors.green, bg: Theme.colors.greenPale }, { l: "Impayées", v: "1", c: Theme.colors.red, bg: Theme.colors.redPale }, { l: "Total", v: "150K", c: Theme.colors.navy, bg: Theme.colors.navyPale }].map((k, i) => (
-                  <View key={i} style={[styles.quittanceSummaryCard, { backgroundColor: k.bg, borderColor: `${k.c}33` }]}>
-                    <Text style={[styles.quittanceSummaryValue, { color: k.c }]}>{k.v}</Text>
-                    <Text style={styles.quittanceSummaryLabel}>{k.l}</Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.securityNotice}>
-                <Text style={styles.securityNoticeText}>🔐 SHA-256 · QR Code · Opposables juridiquement</Text>
-              </View>
-              {QUITTANCES.map((q: any, i: number) => (
-                <TouchableOpacity key={i} style={[styles.quittanceListItem, { borderLeftColor: q.statut === "Certifiée" ? Theme.colors.green : Theme.colors.red }]}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.quittanceListTitle}>{q.mois} — {fmt(q.montant)} FCFA</Text>
-                    <Text style={styles.quittanceListSub}>{q.ref} · {q.date}</Text>
-                    {q.statut === "Impayée" && (
-                      <TouchableOpacity 
-                        style={styles.payNowBtn} 
-                        onPress={() => handlePay(q.id || "SIM-ID")}
-                        disabled={paying}
-                      >
-                         <Text style={styles.payNowText}>{paying ? "TRAITEMENT..." : "💳 PAYER MAINTENANT"}</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  <Badge label={q.statut} color={q.statut === "Certifiée" ? Theme.colors.green : Theme.colors.red} bg={q.statut === "Certifiée" ? Theme.colors.greenPale : Theme.colors.redPale} />
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity style={styles.exportBtn}>
-                <Text style={styles.exportBtnText}>📤 Exporter l'historique certifié (36 mois)</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* ══ CIE / SODECI ══ */}
-          {tab === "util" && (
-            <View style={styles.section}>
-              <View style={styles.utilityNotice}>
-                <Text style={styles.utilityNoticeText}>⚡ Suivi de vos abonnements CIE et SODECI liés à votre logement.</Text>
-              </View>
-              {ABOS.map((a: any) => (
-                <TouchableOpacity key={a.id} style={[styles.utilityCard, { borderLeftColor: a.color || Theme.colors.teal }]}>
-                  <View style={styles.utilityTop}>
-                    <View style={styles.utilityIconContainer}>
-                      <View style={[styles.utilityIconBg, { backgroundColor: a.bg || Theme.colors.grey1 }]}>
-                        <Text style={{ fontSize: 22 }}>{a.icon || '⚡'}</Text>
-                      </View>
+             <View>
+                <SectionTitle label="Mes Quittances SHA-256" />
+                {QUITTANCES.map((q: any) => (
+                   <TouchableOpacity key={q.id} style={styles.qLine} onPress={() => Alert.alert("Preuve Digitale", `SHA-256: ${q.sha || '...a5d2c8'}\nLa Poste CI: ${q.laposte || '—'}`)}>
                       <View>
-                        <Text style={styles.utilityLabel}>{a.label || (a.type + ' — ' + a.contrat)}</Text>
-                        <Text style={styles.utilitySub}>N° {a.compteur || '...'}</Text>
-                        <View style={styles.utilityBadgeRow}>
-                          <Badge label={a.status || a.derniereFacture?.statut} color={Theme.colors.green} bg={Theme.colors.greenPale} />
-                          <Badge label={a.mois || a.derniereFacture?.mois} color={Theme.colors.textLight} bg={Theme.colors.grey1} />
-                        </View>
+                         <Text style={styles.qPeriod}>{q.mois || q.period}</Text>
+                         <Text style={styles.qMeta}>{q.ref} · {fmt(q.montant)} F</Text>
                       </View>
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                      <Text style={[styles.utilityAmount, { color: a.color || Theme.colors.teal }]}>{fmt(a.montant || a.derniereFacture?.montant || 0)}</Text>
-                      <Text style={styles.utilityCurrency}>FCFA</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-              <View style={{ marginTop: 15 }}>
-                <WalletCard icon="📲" label="Payer en ligne" sub="Orange · Wave · MTN" color={Theme.colors.green} bg={Theme.colors.greenPale} />
-                <WalletCard icon="🔔" label="Activer les rappels" sub="SMS + WhatsApp" color={Theme.colors.navy} bg={Theme.colors.navyPale} />
-              </View>
-            </View>
+                      {q.statut === 'Certifiée' ? (
+                        <Badge label="CERTIFIÉE" color={Theme.colors.green} bg={Theme.colors.greenPale} />
+                      ) : (
+                        <TouchableOpacity style={styles.qPayBtn} onPress={() => handlePay(q.id)} disabled={paying}>
+                           <Text style={styles.qPayText}>{paying ? "..." : "PAYER"}</Text>
+                        </TouchableOpacity>
+                      )}
+                   </TouchableOpacity>
+                ))}
+             </View>
           )}
 
-          {/* ══ MES DROITS ══ */}
           {tab === "droits" && (
-            <View style={styles.section}>
-              {!dsec && !tSel && (
-                <>
-                  <View style={{ backgroundColor: Theme.colors.purplePale, borderRadius: 15, padding: 15, marginBottom: 15 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '800', color: Theme.colors.purple, marginBottom: 4 }}>⚖️ Vos droits locataires</Text>
-                    <Text style={{ fontSize: 11, color: Theme.colors.textMid }}>Réclamations · Consentement loyer · Préavis · Inclusion</Text>
-                  </View>
-                  
-                  <SectionTitle label="Actions juridiques" />
-                  <WalletCard 
-                    icon="📋" 
-                    label="Soumettre une réclamation" 
-                    sub="Quittance · Charges · Travaux" 
-                    color={Theme.colors.purple} 
-                    bg={Theme.colors.purplePale}
-                    onClick={() => setDsec('rcl')}
-                  />
-                  <WalletCard 
-                    icon="✏️" 
-                    label="Consentement loyer" 
-                    sub="Règle MRL-01 mandatory" 
-                    color={Theme.colors.orange} 
-                    bg={Theme.colors.orangePale}
-                    onClick={() => setDsec('mrl')}
-                  />
-                  <WalletCard 
-                    icon="🚪" 
-                    label="Préavis de sortie" 
-                    sub="Générer l'avis de départ" 
-                    color={Theme.colors.navy} 
-                    bg={Theme.colors.navyPale}
-                    onClick={() => setDsec('preavis')}
-                  />
-                </>
-              )}
+            <View>
+               {!dsec ? (
+                 <>
+                   <SectionTitle label="Suivi de mes droits" />
+                   {TICKETS.map((t: any) => (
+                     <TouchableOpacity key={t.id} style={styles.ticketCard} onPress={() => setTSel(t)}>
+                        <View style={{ flex: 1 }}>
+                           <Text style={styles.ticketLabel}>{t.label}</Text>
+                           <Text style={styles.ticketMeta}>{t.date} · {t.id}</Text>
+                        </View>
+                        {t.statut === "En attente bailleur" && (
+                          <View style={{ alignItems: 'flex-end' }}>
+                             <Badge label="⏳ 144H" color={Theme.colors.orange} bg={Theme.colors.orangePale} />
+                             <Text style={styles.countdown}>Exp: {t.echeanceAuto?.split('T')[0]}</Text>
+                          </View>
+                        )}
+                        {t.statut === "Résolu" && <Badge label="✓ RÉSOLU" color={Theme.colors.green} bg={Theme.colors.greenPale} />}
+                     </TouchableOpacity>
+                   ))}
 
-              {dsec === 'rcl' && (
-                <View>
-                  <TouchableOpacity onPress={() => setDsec(null)} style={{ marginBottom: 10 }}>
-                    <Text style={{ fontWeight: '800', color: Theme.colors.teal }}>← Retour aux droits</Text>
-                  </TouchableOpacity>
-                  <SectionTitle label="Nouvelle Réclamation" />
-                  <Text style={{ fontSize: 12, color: Theme.colors.textMid, marginBottom: 15 }}>
-                    Délai bailleur : 144h. Sans réponse, ticket fermé en votre faveur.
-                  </Text>
-                  {[
-                    { id: 'RCL-01', l: 'Quittance incorrecte', s: 'Montant ou nom erroné' },
-                    { id: 'RCL-02', l: 'Paiement sans quittance', s: 'Capture Mobile Money à fournir' },
-                    { id: 'RCL-05', l: 'Demande de travaux', s: 'Urgence sécurité · Entretien' },
-                  ].map(r => (
-                    <TouchableOpacity key={r.id} style={styles.rclBtn} onPress={() => alert("Réclamation transmise au bailleur.")}>
-                       <Text style={styles.rclBtnTitle}>{r.l}</Text>
-                       <Text style={styles.rclBtnSub}>{r.s}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
-              {dsec === 'mrl' && (
-                <View>
-                  <TouchableOpacity onPress={() => setDsec(null)} style={{ marginBottom: 10 }}>
-                    <Text style={{ fontWeight: '800', color: Theme.colors.teal }}>← Retour</Text>
-                  </TouchableOpacity>
-                  <SectionTitle label="Consentement Loyer (MRL-01)" />
-                  <View style={styles.mrlCard}>
-                    <Text style={styles.mrlTitle}>PROPOSITION DU BAILLEUR</Text>
-                    <Text style={styles.mrlVal}>{fmt(BAIL.loyer + 15000)} F <Text style={{ fontSize: 10 }}>XOF</Text></Text>
-                    <Text style={styles.mrlSub}>+10% · Effet au 01/06/2026</Text>
-                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 15 }}>
-                       <TouchableOpacity style={styles.mrlBtnNo} onPress={() => { setMrlChoice('no'); alert("Refus enregistré. Ticket de médiation ouvert."); }}>
-                          <Text style={styles.mrlBtnText}>REFUSER</Text>
-                       </TouchableOpacity>
-                       <TouchableOpacity style={styles.mrlBtnYes} onPress={() => { setMrlChoice('yes'); alert("Accord enregistré."); }}>
-                          <Text style={styles.mrlBtnText}>ACCEPTER</Text>
-                       </TouchableOpacity>
-                    </View>
+                   <SectionTitle label="Actions Juridiques" />
+                   <ACard icon="📋" label="Soumettre une réclamation" sub="Quittance, Travaux, Harcèlement" color={Theme.colors.purple} bg={Theme.colors.purplePale} onClick={() => setDsec("rcl")} />
+                   <ACard icon="✏️" label="Consentement Loyers" sub="Révision MRL-01" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => setDsec("mrl")} />
+                   <ACard icon="🚪" label="Préavis de Sortie" sub="Formaliser mon départ" color={Theme.colors.navy} bg={Theme.colors.navyPale} onClick={() => setDsec("preavis")} />
+                 </>
+               ) : dsec === "rcl" ? (
+                 <View>
+                    <TouchableOpacity onPress={() => setDsec(null)} style={styles.backLink}><Text style={styles.linkText}>← Retour</Text></TouchableOpacity>
+                    <SectionTitle label="Nouvelle Réclamation" />
+                    {!rclCode ? (
+                      RCL_TYPES.map(r => (
+                        <TouchableOpacity key={r.code} style={styles.typePick} onPress={() => { setRclCode(r.code); setRclData({ ...rclData, type: r.label }); }}>
+                           <Text style={{ fontSize: 24 }}>{r.icon}</Text>
+                           <View style={{ flex: 1, marginLeft: 12 }}>
+                              <Text style={styles.typePickL}>{r.label}</Text>
+                              <Text style={styles.typePickS}>{r.sub}</Text>
+                           </View>
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <View>
+                         <Text style={styles.inputLabel}>Description précise</Text>
+                         <TextInput 
+                            style={styles.textInputArea} 
+                            multiline 
+                            placeholder="Détails du litige..." 
+                            numberOfLines={4}
+                            onChangeText={t => setRclData({ ...rclData, desc: t })}
+                         />
+                         <TouchableOpacity 
+                            style={styles.submitBtn} 
+                            disabled={mutationLoading}
+                            onPress={async () => {
+                              try {
+                                await submitTicket({ code: rclCode, description: rclData.desc });
+                                Alert.alert("Ticket Ouvert", "Votre réclamation a été transmise. Délai bailleur : 144h.");
+                                setTab("dash");
+                                refetchTickets();
+                              } catch (e: any) {
+                                Alert.alert("Erreur", e.message);
+                              }
+                            }}
+                         >
+                            <Text style={styles.submitBtnText}>{mutationLoading ? "ENVOI..." : "ENVOYER LA RÉCLAMATION"}</Text>
+                         </TouchableOpacity>
+                      </View>
+                    )}
+                 </View>
+               ) : dsec === "mrl" ? (
+                  <View>
+                     <TouchableOpacity onPress={() => setDsec(null)} style={styles.backLink}><Text style={styles.linkText}>← Retour</Text></TouchableOpacity>
+                     {LOC.pendingMRL ? (
+                        <View style={styles.mrlCardBox}>
+                           <Text style={styles.mrlLabel}>MRL-01 EN ATTENTE (5 jours max sans réponse)</Text>
+                           <Text style={styles.mrlAmount}>Nouveau Loyer Proposé: {fmt(LOC.pendingMRL.loyerPropose)} F</Text>
+                           <View style={styles.mrlActions}>
+                              <TouchableOpacity style={styles.mrlNo} onPress={() => handleMRL('non')}><Text style={styles.mrlBtnTextAction}>REFUSER</Text></TouchableOpacity>
+                              <TouchableOpacity style={styles.mrlYes} onPress={() => handleMRL('oui')}><Text style={styles.mrlBtnTextAction}>ACCEPTER</Text></TouchableOpacity>
+                           </View>
+                        </View>
+                     ) : <Text style={styles.emptyMsg}>Aucune demande MRL-01 en attente.</Text>}
                   </View>
-                </View>
-              )}
+               ) : dsec === "preavis" && (
+                  <View>
+                      <TouchableOpacity onPress={() => setDsec(null)} style={styles.backLink}><Text style={styles.linkText}>← Retour</Text></TouchableOpacity>
+                      <SectionTitle label={`Départ — Étape ${prStep}/3`} />
+                      {prStep === 1 && (
+                        <View>
+                           <Text style={styles.stepInfo}>Date de départ envisagée :</Text>
+                           <TextInput style={styles.textInput} placeholder="YYYY-MM-DD" value={preavisDate} onChangeText={setPreavisDate} />
+                           <TouchableOpacity style={styles.submitBtn} onPress={() => preavisDate ? setPrStep(2) : Alert.alert("Date requise")}>
+                              <Text style={styles.submitBtnText}>SUIVANT →</Text>
+                           </TouchableOpacity>
+                        </View>
+                      )}
+                      {prStep === 2 && (
+                         <View>
+                            <Text style={styles.stepInfo}>Confirmez-vous le créneau d'EDL ?</Text>
+                            <TouchableOpacity style={styles.slotBtn} onPress={() => setPrStep(3)}>
+                               <Text style={styles.slotText}>Valider le créneau proposé</Text>
+                            </TouchableOpacity>
+                         </View>
+                      )}
+                      {prStep === 3 && (
+                         <TouchableOpacity 
+                            style={styles.submitBtn} 
+                            disabled={mutationLoading}
+                            onPress={async () => {
+                              try {
+                                await submitPreavis({ dateDepartSouhaitee: preavisDate, creneauEDL: 'Matin' });
+                                Alert.alert("Préavis Envoyé", "Votre avis de départ a été enregistré.");
+                                setDsec(null);
+                                refetchLoc();
+                              } catch (e: any) {
+                                Alert.alert("Erreur", e.message);
+                              }
+                            }}
+                          >
+                            <Text style={styles.submitBtnText}>{mutationLoading ? "LOGGING..." : "FINALISER LE PRÉAVIS"}</Text>
+                         </TouchableOpacity>
+                      )}
+                  </View>
+               )}
             </View>
           )}
 
-          {/* ══ PROFIL ══ */}
           {tab === "profil" && (
-            <View style={styles.section}>
-              <LinearGradient
-                colors={[Theme.colors.navy, Theme.colors.teal]}
-                style={styles.profileHeader}
-              >
-                <View style={styles.avatar}>
-                  <Text style={{ fontSize: 26 }}>👤</Text>
-                </View>
-                <Text style={styles.profileName}>{LOC.nom}</Text>
-                <Text style={styles.profileTel}>+225 05 44 55 66</Text>
-                <View style={styles.profileBadgeRow}>
-                  <Badge label="KYC Validé" color={Theme.colors.white} bg={Theme.colors.green} />
-                  <Badge label="Locataire actif" color={Theme.colors.white} bg={Theme.colors.teal} />
-                </View>
-              </LinearGradient>
-
-              {/* Score ICL */}
-              <TouchableOpacity style={[styles.scoreCard, { backgroundColor: `${scColor}15`, borderColor: `${scColor}33` }]}>
-                <View style={styles.scoreTop}>
-                  <View>
-                    <Text style={styles.scoreLabel}>MON SCORE ICL</Text>
-                    <Text style={[styles.scoreValue, { color: scColor }]}>{LOC.score}</Text>
-                    <Text style={[styles.scoreStatus, { color: scColor }]}>Confiance {LOC.score >= 700 ? "satisfaisante" : "modérée"}</Text>
+            <View>
+               <SectionTitle label="Certification ICL" />
+               <View style={styles.profCard}>
+                  <Text style={styles.pName}>{LOC.fullName}</Text>
+                  <Text style={[styles.scVal, { color: LOC.score >= 800 ? Theme.colors.green : Theme.colors.orange }]}>{LOC.score}</Text>
+                  <Text style={styles.scLabel}>SCORE QAPRIL ACTIVE</Text>
+                  <View style={styles.scoreScale}>
+                     <View style={[styles.scaleProgress, { width: `${(LOC.score / 1000) * 100}%`, backgroundColor: LOC.score >= 800 ? Theme.colors.green : Theme.colors.orange }]} />
                   </View>
-                  <View style={[styles.scoreCircle, { borderColor: scColor }]}>
-                    <Text style={[styles.scorePercent, { color: scColor }]}>{Math.round((LOC.score - 300) / 700 * 100)}%</Text>
-                  </View>
-                </View>
-                <View style={styles.scoreBarContainer}>
-                  <View style={[styles.scoreBar, { width: `${Math.round((LOC.score - 300) / 700 * 100)}%`, backgroundColor: scColor }]} />
-                </View>
-                <View style={styles.scoreNotice}>
-                  <Text style={styles.scoreNoticeText}>🔐 Visible librement · Partageable sur votre autorisation — Règle ICL-CONSENT-01</Text>
-                </View>
-              </TouchableOpacity>
-
-              <SectionTitle label="Inclusion financière" />
-              <WalletCard icon="📄" label="Export certifié SHA-256" sub="Format banque · 36 mois" color={Theme.colors.navy} bg={Theme.colors.navyPale} />
-              <WalletCard icon="📊" label="Export CSV" color={Theme.colors.teal} bg={Theme.colors.tealPale} />
+                  <Text style={styles.scoreHint}>{LOC.score < 800 ? "Complétez votre KYC pour passer à 800 pts." : "Paiements à temps : +2 pts / mois."}</Text>
+               </View>
+               {onBack && (
+                  <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
+                    <Text style={styles.logoutText}>🚪 Retour Portail</Text>
+                  </TouchableOpacity>
+               )}
             </View>
           )}
         </View>
       </ScrollView>
 
-      {/* BOTTOM NAV BAR */}
       <BottomNav
         tabs={[
-          { id: "dash", icon: "🏠", label: "Accueil" },
+          { id: "dash", icon: "🏠", label: "Dashboard" },
           { id: "bail", icon: "📋", label: "Bail" },
           { id: "quitt", icon: "🧾", label: "Recus" },
           { id: "droits", icon: "⚖️", label: "Droits" },
-          { id: "profil", icon: "👤", label: "Profil" },
+          { id: "profil", icon: "👤", label: "Compte" },
         ]}
         activeTab={tab}
         onChange={changeTab}
@@ -536,667 +422,92 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   );
 }
 
+const ACard = ({ icon, label, sub, color, bg, onClick }: any) => (
+  <TouchableOpacity onPress={onClick} style={[styles.acard, { backgroundColor: bg, borderColor: color + '20' }]}>
+    <Text style={{ fontSize: 22 }}>{icon}</Text>
+    <View style={{ flex: 1, marginLeft: 12 }}>
+      <Text style={[styles.acardL, { color }]}>{label}</Text>
+      <Text style={styles.acardS}>{sub}</Text>
+    </View>
+    <Text style={{ fontSize: 16, color, opacity: 0.5 }}>›</Text>
+  </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Theme.colors.bg,
-  },
-  debugBar: {
-    backgroundColor: Theme.colors.navy,
-    padding: 8,
-    alignItems: 'center',
-  },
-  debugText: {
-    color: Theme.colors.white,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  header: {
-    paddingTop: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 36,
-    borderBottomRightRadius: 36,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  roleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  roleBadge: {
-    backgroundColor: Theme.colors.teal,
-    borderRadius: 7,
-    paddingHorizontal: 9,
-    paddingVertical: 2,
-    marginRight: 7,
-  },
-  roleText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: Theme.colors.white,
-    letterSpacing: 1.5,
-  },
-  onlineDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#5EE7B7',
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: Theme.colors.white,
-  },
-  userSub: {
-    fontSize: 11,
-    color: Theme.colors.white,
-    opacity: 0.6,
-    marginTop: 2,
-  },
-  notifBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notifBadge: {
-    position: 'absolute',
-    bottom: -5,
-    backgroundColor: Theme.colors.red,
-    borderRadius: 6,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-  },
-  notifBadgeText: {
-    color: Theme.colors.white,
-    fontSize: 9,
-    fontWeight: '700',
-  },
-  kpiRow: {
-    flexDirection: 'row',
-    marginTop: 20,
-    gap: 7,
-  },
-  kpiCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  kpiValue: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: Theme.colors.white,
-    marginTop: 2,
-  },
-  kpiLabel: {
-    fontSize: 8,
-    color: Theme.colors.white,
-    opacity: 0.55,
-  },
-  body: {
-    paddingHorizontal: 16,
-  },
-  alertCard: {
-    marginTop: 14,
-    backgroundColor: Theme.colors.redPale,
-    borderWidth: 1,
-    borderColor: 'rgba(160,0,0,0.15)',
-    borderRadius: 18,
-    padding: 16,
-    shadowColor: Theme.colors.red,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-  alertTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: Theme.colors.red,
-    marginBottom: 4,
-  },
-  alertSub: {
-    fontSize: 10,
-    color: Theme.colors.textMid,
-    marginBottom: 10,
-  },
-  alertActions: {
-    flexDirection: 'row',
-    gap: 7,
-  },
-  alertBtnPrimary: {
-    flex: 1,
-    backgroundColor: Theme.colors.red,
-    borderRadius: 9,
-    paddingVertical: 7,
-    alignItems: 'center',
-  },
-  alertBtnSecondary: {
-    flex: 1,
-    backgroundColor: Theme.colors.white,
-    borderWidth: 1,
-    borderColor: 'rgba(160,0,0,0.3)',
-    borderRadius: 9,
-    paddingVertical: 7,
-    alignItems: 'center',
-  },
-  alertBtnText: {
-    color: Theme.colors.white,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  alertBtnTextSecondary: {
-    color: Theme.colors.red,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  section: {
-    marginTop: 20,
-  },
-  sectionLink: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Theme.colors.teal,
-  },
-  logementCard: {
-    backgroundColor: Theme.colors.white,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
-    borderRadius: 20,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    elevation: 3,
-  },
-  logementTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: Theme.colors.text,
-    marginBottom: 4,
-  },
-  logementSub: {
-    fontSize: 10,
-    color: Theme.colors.textLight,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 5,
-    marginBottom: 10,
-  },
-  gestionInfo: {
-    backgroundColor: Theme.colors.grey1,
-    borderRadius: 9,
-    padding: 9,
-  },
-  gestionTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  gestionLabel: {
-    fontSize: 8,
-    color: Theme.colors.textLight,
-    fontWeight: '700',
-    marginBottom: 1,
-  },
-  gestionValue: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Theme.colors.textMid,
-  },
-  roleValue: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Theme.colors.grey3,
-  },
-  gestionMention: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginTop: 5,
-    fontStyle: 'italic',
-  },
-  bailKpiRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 12,
-  },
-  bailKpiItem: {
-    flex: 1,
-    backgroundColor: Theme.colors.white,
-    borderRadius: 9,
-    paddingVertical: 6,
-    alignItems: 'center',
-  },
-  bailKpiLabel: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginBottom: 2,
-  },
-  bailKpiValue: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: Theme.colors.textMid,
-  },
-  gestionSection: {
-    marginTop: 15,
-    backgroundColor: Theme.colors.grey1,
-    borderRadius: 12,
-    padding: 12,
-  },
-  gestionNotice: {
-    marginTop: 8,
-    backgroundColor: Theme.colors.navyPale,
-    borderRadius: 9,
-    padding: 8,
-  },
-  gestionNoticeText: {
-    fontSize: 9,
-    color: Theme.colors.textMid,
-  },
-  actionSection: {
-    marginTop: 15,
-  },
-  quittanceCard: {
-    backgroundColor: Theme.colors.white,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
-    borderLeftWidth: 4,
-    borderLeftColor: Theme.colors.green,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  quittanceLeft: {
-    flex: 1,
-  },
-  quittanceMois: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Theme.colors.text,
-  },
-  quittanceRef: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginTop: 1,
-  },
-  quittanceSummaryRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  quittanceSummaryCard: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  quittanceSummaryValue: {
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  quittanceSummaryLabel: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginTop: 2,
-  },
-  securityNotice: {
-    backgroundColor: Theme.colors.greenPale,
-    borderWidth: 1,
-    borderColor: 'rgba(26,122,60,0.2)',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
-  },
-  securityNoticeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Theme.colors.green,
-  },
-  quittanceListItem: {
-    backgroundColor: Theme.colors.white,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
-    borderLeftWidth: 4,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  quittanceListTitle: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Theme.colors.text,
-  },
-  quittanceListSub: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginTop: 1,
-  },
-  exportBtn: {
-    width: '100%',
-    backgroundColor: Theme.colors.navyPale,
-    borderWidth: 1,
-    borderColor: 'rgba(13,43,110,0.2)',
-    borderRadius: 11,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  exportBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Theme.colors.navy,
-  },
-  payNowBtn: {
-    backgroundColor: Theme.colors.green,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginTop: 10,
-    alignSelf: 'flex-start',
-  },
-  payNowText: {
-    color: Theme.colors.white,
-    fontSize: 10,
-    fontWeight: '900',
-  },
-  aboRow: {
-    flexDirection: 'row',
-    gap: 7,
-  },
-  aboCard: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 10,
-  },
-  aboType: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  aboAmount: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: Theme.colors.text,
-  },
-  aboSub: {
-    fontSize: 8,
-    color: Theme.colors.textLight,
-  },
-  utilityNotice: {
-    backgroundColor: Theme.colors.orangePale,
-    borderWidth: 1,
-    borderColor: 'rgba(192,91,0,0.2)',
-    borderRadius: 11,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    marginBottom: 12,
-  },
-  utilityNoticeText: {
-    fontSize: 10,
-    color: Theme.colors.textMid,
-  },
-  utilityCard: {
-    backgroundColor: Theme.colors.white,
-    borderWidth: 1,
-    borderColor: Theme.colors.grey2,
-    borderLeftWidth: 4,
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  utilityTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  utilityIconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  utilityIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  utilityLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: Theme.colors.text,
-  },
-  utilitySub: {
-    fontSize: 10,
-    color: Theme.colors.textLight,
-    marginTop: 1,
-  },
-  utilityBadgeRow: {
-    flexDirection: 'row',
-    gap: 5,
-    marginTop: 4,
-  },
-  utilityAmount: {
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  utilityCurrency: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 7,
-  },
-  quickActionBox: {
-    width: (width - 32 - 7) / 2,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 11,
-  },
-  quickActionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  quickActionSub: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    marginTop: 1,
-  },
-  profileHeader: {
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  profileName: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: Theme.colors.white,
-  },
-  profileTel: {
-    fontSize: 11,
-    color: Theme.colors.white,
-    opacity: 0.7,
-  },
-  profileBadgeRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 8,
-  },
-  scoreCard: {
-    borderWidth: 1.5,
-    borderRadius: 13,
-    padding: 13,
-    marginBottom: 12,
-  },
-  scoreTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  scoreLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Theme.colors.textLight,
-    letterSpacing: 1,
-  },
-  scoreValue: {
-    fontSize: 30,
-    fontWeight: '900',
-  },
-  scoreStatus: {
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  scoreCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scorePercent: {
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  scoreBarContainer: {
-    height: 5,
-    backgroundColor: Theme.colors.grey1,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  scoreBar: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  scoreNotice: {
-    marginTop: 8,
-    backgroundColor: Theme.colors.navyPale,
-    borderRadius: 7,
-    padding: 8,
-  },
-  scoreNoticeText: {
-    fontSize: 9,
-    color: Theme.colors.textLight,
-    fontStyle: 'italic',
-  },
-  rclBtn: {
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-  },
-  rclBtnTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: Theme.colors.navy,
-  },
-  rclBtnSub: {
-    fontSize: 10,
-    color: Theme.colors.textLight,
-    marginTop: 2,
-  },
-  mrlCard: {
-    backgroundColor: Theme.colors.orangePale,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: Theme.colors.orange + '40',
-  },
-  mrlTitle: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: Theme.colors.orange,
-    letterSpacing: 1,
-  },
-  mrlVal: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: Theme.colors.navy,
-    marginVertical: 4,
-  },
-  mrlSub: {
-    fontSize: 11,
-    color: Theme.colors.textMid,
-  },
-  mrlBtnNo: {
-    flex: 1,
-    backgroundColor: Theme.colors.red,
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-  },
-  mrlBtnYes: {
-    flex: 1,
-    backgroundColor: Theme.colors.green,
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-  },
-  mrlBtnText: {
-    color: '#FFF',
-    fontSize: 11,
-    fontWeight: '900',
-  },
+  container: { flex: 1, backgroundColor: '#F2F5FA' },
+  scrollContent: { paddingBottom: 100 },
+  body: { padding: 16 },
+  kpiRowWrap: { flexDirection: 'row', gap: 8, marginTop: -25, marginHorizontal: 16, zIndex: 10 },
+  kpiSquare: { flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  kpiSquareVal: { fontSize: 12, color: '#FFF', fontWeight: '800' },
+  kpiSquareLabel: { fontSize: 7, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginTop: 2 },
+  impayeCard: { backgroundColor: '#FEECEC', borderRadius: 18, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#A0000020' },
+  impayeHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  impayeTitle: { fontSize: 13, fontWeight: '900', color: Theme.colors.red },
+  impayeSub: { fontSize: 10, color: Theme.colors.textMid, marginBottom: 15 },
+  payBtn: { borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
+  payBtnText: { color: '#FFF', fontSize: 10, fontWeight: '900' },
+  logementBox: { backgroundColor: '#FFF', borderRadius: 18, padding: 16, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20 },
+  logementName: { fontSize: 14, fontWeight: '800', color: Theme.colors.text, marginBottom: 6 },
+  badgeRow: { flexDirection: 'row', gap: 6, marginBottom: 12 },
+  bailleurStrip: { backgroundColor: '#F8FAFC', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center' },
+  bLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight },
+  bVal: { fontSize: 12, fontWeight: '800', color: Theme.colors.textMid },
+  bMention: { fontSize: 9, color: Theme.colors.textLight, fontStyle: 'italic' },
+  aboGrid: { flexDirection: 'row', gap: 10, marginBottom: 20 },
+  aboCard: { flex: 1, backgroundColor: '#FFF', padding: 12, borderRadius: 15, borderLeftWidth: 3, borderWidth: 1, borderColor: '#EDF2F7' },
+  aboType: { fontSize: 9, fontWeight: '800', marginTop: 4 },
+  aboPrice: { fontSize: 14, fontWeight: '900', color: Theme.colors.text, marginTop: 2 },
+  link: { fontSize: 10, fontWeight: '800', color: Theme.colors.teal },
+  toolsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  toolItem: { width: (width - 32 - 16) / 3, backgroundColor: '#FFF', padding: 15, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7' },
+  toolText: { fontSize: 10, fontWeight: '800', color: Theme.colors.navy, marginTop: 8 },
+  bailCard: { backgroundColor: '#FFF', borderRadius: 18, padding: 16, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7' },
+  mmHub: { backgroundColor: '#E0F4F9', padding: 16, borderRadius: 18, marginBottom: 15 },
+  mmInfo: { fontSize: 10, color: Theme.colors.textMid, lineHeight: 15, marginBottom: 15 },
+  mmBtn: { flexDirection: 'row', backgroundColor: '#FFF', padding: 12, borderRadius: 12, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: '#FFF' },
+  mmOp: { fontSize: 12, fontWeight: '800', color: Theme.colors.text },
+  mmNum: { fontSize: 14, fontWeight: '900', color: Theme.colors.navy, marginTop: 2 },
+  acard: { flexDirection: 'row', padding: 14, borderRadius: 15, alignItems: 'center', marginBottom: 10, borderWidth: 1 },
+  acardL: { fontSize: 13, fontWeight: '800' },
+  acardS: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
+  qLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 8, borderWidth: 1, borderColor: '#EDF2F7' },
+  qPeriod: { fontSize: 13, fontWeight: '800', color: Theme.colors.navy },
+  qMeta: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
+  qPayBtn: { backgroundColor: Theme.colors.teal, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 },
+  qPayText: { color: '#FFF', fontSize: 10, fontWeight: '900' },
+  backLink: { marginBottom: 15 },
+  linkText: { fontSize: 12, color: Theme.colors.teal, fontWeight: '800' },
+  typePick: { flexDirection: 'row', backgroundColor: '#EDE9FE', padding: 15, borderRadius: 15, alignItems: 'center', marginBottom: 10 },
+  typePickL: { fontSize: 13, fontWeight: '800', color: Theme.colors.purple },
+  typePickS: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
+  inputLabel: { fontSize: 11, fontWeight: '800', color: Theme.colors.textMid, marginBottom: 8, marginTop: 15 },
+  textInput: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, borderWidth: 1, borderColor: '#EDF2F7', fontSize: 14 },
+  textInputArea: { backgroundColor: '#FFF', borderRadius: 12, padding: 15, borderWidth: 1, borderColor: '#EDF2F7', fontSize: 14, textAlignVertical: 'top' },
+  submitBtn: { backgroundColor: Theme.colors.navy, paddingVertical: 15, borderRadius: 15, alignItems: 'center', marginTop: 25 },
+  submitBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900' },
+  mrlCardBox: { backgroundColor: '#FFF3E0', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: '#C05B0030' },
+  mrlLabel: { fontSize: 9, fontWeight: '900', color: '#C05B00', letterSpacing: 1 },
+  mrlAmount: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy, marginVertical: 10 },
+  mrlActions: { flexDirection: 'row', gap: 10 },
+  mrlNo: { flex: 1, backgroundColor: '#FFF', paddingVertical: 12, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: Theme.colors.red + '30' },
+  mrlYes: { flex: 1, backgroundColor: '#C05B00', paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  mrlBtnTextAction: { fontSize: 11, fontWeight: '900', color: '#FFF' },
+  emptyMsg: { fontSize: 13, color: Theme.colors.textLight, textAlign: 'center', marginVertical: 40 },
+  stepInfo: { fontSize: 12, color: Theme.colors.textMid, marginBottom: 15 },
+  slotBtn: { backgroundColor: '#EEF2FA', padding: 15, borderRadius: 12, marginBottom: 8 },
+  slotText: { fontSize: 13, fontWeight: '800', color: Theme.colors.navy },
+  profCard: { backgroundColor: '#FFF', borderRadius: 24, padding: 25, alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7' },
+  pName: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy, marginBottom: 10 },
+  scVal: { fontSize: 32, fontWeight: '900', color: Theme.colors.green },
+  scLabel: { fontSize: 9, fontWeight: '900', color: Theme.colors.textLight },
+  logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center', marginTop: 30 },
+  logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
+  scoreScale: { width: '100%', height: 6, backgroundColor: '#EDF2F7', borderRadius: 3, marginVertical: 15, overflow: 'hidden' },
+  scaleProgress: { height: '100%', borderRadius: 3 },
+  scoreHint: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center' },
+  ticketCard: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 18, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7' },
+  ticketLabel: { fontSize: 13, fontWeight: '800', color: Theme.colors.navy },
+  ticketMeta: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
+  countdown: { fontSize: 8, fontWeight: '800', color: Theme.colors.orange, marginTop: 4 },
 });

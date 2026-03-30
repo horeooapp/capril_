@@ -7,7 +7,6 @@ import {
   TouchableOpacity, 
   StatusBar,
   Dimensions,
-  SafeAreaView,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -16,37 +15,52 @@ import { Theme } from '../../theme/theme';
 import { Badge } from '../../components/common/Badge';
 import { Row } from '../../components/common/Row';
 import { SectionTitle } from '../../components/common/SectionTitle';
-import { WalletCard } from '../../components/common/WalletCard';
+import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
-import { useDiaspora, useDiasporaStats, useDiasporaTransfer } from '../../hooks/qapril-hooks';
+import { BottomSheet } from '../../components/common/BottomSheet';
+import { useDiaspora, useDiasporaTransfer } from '../../hooks/qapril-hooks';
 
 const { width } = Dimensions.get('window');
-const FCFA_EUR = 655.957;
+const FCFA_EUR = 655.957; // Taux de change fixe (Zone Franc)
 
 export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState("dash");
   const [devise, setDevise] = useState("FCFA");
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
-  const { data: profile } = useDiaspora();
-  const { data: stats, loading, refetch } = useDiasporaStats();
-  const { transfer, generateInvite, loading: actionLoading } = useDiasporaTransfer();
+  const { data: profile, loading: profileLoading } = useDiaspora();
+  const { transfer, loading: actionLoading } = useDiasporaTransfer();
 
-  const fmt = (n: number) => n?.toLocaleString("fr-FR") ?? "0";
-  const fmtE = (n: number) => (n / FCFA_EUR).toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
+  const toEuro = (fcfa: number) => (fcfa / FCFA_EUR).toFixed(2);
+  const aff = (fcfa: number) => devise === "EUR" ? `${toEuro(fcfa)} €` : `${fmt(fcfa)} F`;
 
-  const aff = (fcfa: number) => devise === "EUR" ? `${fmtE(fcfa)} €` : `${fmt(fcfa)} FCFA`;
-
-  // Fallback data
-  const D = stats || { 
-    properties: [], 
-    settings: { pays: "France", fuseau: "Europe/Paris" },
-    mobileMoney: [], 
-    webhooks: [] 
+  const changeTab = (t: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setTab(t);
   };
 
-  const totalFCFA = D.properties?.filter((b: any) => b.activeLease).reduce((s: number, b: any) => s + (b.activeLease?.rentFcfa || 0), 0) || 0;
-  const impayesN = D.properties?.filter((b: any) => b.isImpaye).length || 0;
-  const alertesSLA = D.properties?.filter((b: any) => b.isHorsSLA).length || 0;
+  const handleTransfer = async () => {
+    const amount = profile?.soldeRecouvre || 0;
+    if (amount <= 0) return Alert.alert("Solde Insuffisant", "Aucun fonds à transférer pour le moment.");
+    
+    try {
+      await transfer(amount, devise);
+      Alert.alert("Succès", `Virement SEPA de ${aff(amount)} initié vers votre compte de réception.`);
+    } catch (e: any) {
+      Alert.alert("Erreur", e.message);
+    }
+  };
+
+  if (profileLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Theme.colors.navy} />
+      </View>
+    );
+  }
+
+  const DIASPORA = profile || { fullName: "Investisseur", soldeRecouvre: 425000, properties: [] };
 
   return (
     <View style={styles.container}>
@@ -54,143 +68,109 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
       
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
-        {/* HEADER */}
-        <LinearGradient
-          colors={[Theme.colors.diaspora || '#0E3A8C', Theme.colors.teal]}
-          style={styles.header}
-        >
-          <View style={styles.headerTop}>
-            <View>
-              <View style={styles.roleRow}>
-                <Badge label="DIASPORA PREMIUM" color={Theme.colors.gold} bg="rgba(0,0,0,0.3)" />
-                <View style={styles.onlineDot} />
-              </View>
-              <Text style={styles.userName}>{(profile?.fullName || "INVESTISSEUR").toUpperCase()}</Text>
-              <Text style={styles.userSub}>{profile?.paysResidence || 'Europe'} · {D.settings?.fuseau?.split('/')[1] || 'Paris'}</Text>
-            </View>
-            <View style={{ flexDirection: 'row' }}>
-               {onBack && (
-                  <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
-                    <Text style={{ fontSize: 18 }}>🔄</Text>
-                  </TouchableOpacity>
-               )}
-            </View>
-          </View>
+        <BrandHeader 
+          title={DIASPORA.fullName?.toUpperCase()}
+          subtitle="Investisseur Diaspora Premium"
+          roleLabel="DIASPORA"
+          roleColor={Theme.colors.navy}
+          onNotifPress={() => Alert.alert("Notifications", "Aucune alerte pour le moment.")}
+        />
 
-          {/* Devise Switcher */}
-          <View style={styles.deviseSwitcher}>
-            {["FCFA", "EUR"].map(d => (
-              <TouchableOpacity 
-                key={d} 
-                onPress={() => setDevise(d)}
-                style={[styles.deviseBtn, devise === d && styles.deviseBtnActive]}
-              >
-                <Text style={[styles.deviseText, devise === d && styles.deviseTextActive]}>{d === "EUR" ? "€ EUR" : "XOF"}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+        <View style={styles.currencySwitch}>
+           {["FCFA", "EUR"].map(d => (
+             <TouchableOpacity key={d} style={[styles.curBtn, devise === d && styles.curBtnActive]} onPress={() => setDevise(d)}>
+                <Text style={[styles.curText, devise === d && { color: '#FFF' }]}>{d}</Text>
+             </TouchableOpacity>
+           ))}
+        </View>
 
-          {/* KPIs */}
-          <View style={styles.kpiRow}>
-            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Revenus totaux calculés en temps réel")}>
-              <Text style={styles.kpiVal}>{aff(totalFCFA)}</Text>
-              <Text style={styles.kpiLabel}>REVENUS / MOIS</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Détails des impayés actifs")}>
-              <Text style={[styles.kpiVal, { color: Theme.colors.red }]}>{impayesN}</Text>
-              <Text style={styles.kpiLabel}>IMPAYÉS</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.kpiCard} onPress={() => alert("Alertes de gestion (SLA)")}>
-              <Text style={[styles.kpiVal, { color: Theme.colors.gold }]}>{alertesSLA}</Text>
-              <Text style={styles.kpiLabel}>ALERTES SLA</Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+        <View style={styles.kpiRow}>
+           <View style={styles.kpiBox}>
+              <Text style={styles.kpiVal}>{aff(DIASPORA.soldeRecouvre)}</Text>
+              <Text style={styles.kpiLabel}>LOYERS À RÉCUPÉRER</Text>
+           </View>
+           <View style={[styles.kpiBox, { borderLeftWidth: 1, borderColor: '#EEE' }]}>
+              <Text style={styles.kpiVal}>{DIASPORA.properties?.length || 0}</Text>
+              <Text style={styles.kpiLabel}>UNITÉS EN GESTION</Text>
+           </View>
+        </View>
 
         <View style={styles.body}>
           {tab === "dash" && (
             <>
-              <SectionTitle label="Analyse de Trésorerie" />
-              <TouchableOpacity style={styles.treasuryCard} onPress={() => {}}>
-                <View style={styles.treasuryTop}>
-                   <View>
-                      <Text style={styles.treasuryLabel}>DISPONIBLE SEPA</Text>
-                      <Text style={styles.treasuryVal}>{aff(totalFCFA)}</Text>
-                   </View>
-                   <View style={styles.euroCircle}>
-                      <Text style={{ fontSize: 20 }}>💶</Text>
-                   </View>
-                </View>
-                <TouchableOpacity 
-                    style={[styles.transferBtn, actionLoading && { opacity: 0.7 }]}
-                    disabled={actionLoading}
-                    onPress={async () => {
-                      try {
-                        const res = await transfer(totalFCFA, devise);
-                        Alert.alert("Transfert Initié", res.message || "Votre virement SEPA est en cours de traitement.");
-                      } catch (e: any) {
-                        Alert.alert("Échec du Transfert", e.message);
-                      }
-                    }}
-                >
-                  {actionLoading ? (
-                    <ActivityIndicator color="#FFF" />
-                  ) : (
-                    <Text style={styles.transferBtnText}>INITIER LE VIREMENT SEPA</Text>
-                  )}
-                </TouchableOpacity>
+              <SectionTitle label="Virement International" />
+              <TouchableOpacity style={styles.transferCard} onPress={handleTransfer} disabled={actionLoading}>
+                 <LinearGradient colors={[Theme.colors.navy, '#1e3a8a']} style={styles.gradCard}>
+                    <Text style={styles.tLabel}>SOLDE DISPONIBLE SEPA</Text>
+                    <Text style={styles.tVal}>{aff(DIASPORA.soldeRecouvre)}</Text>
+                    <View style={styles.tBtn}>
+                       <Text style={styles.tBtnText}>{actionLoading ? "TRAITEMENT..." : "INITIER LE TRANSFERT SEPA"}</Text>
+                    </View>
+                 </LinearGradient>
               </TouchableOpacity>
+              <Text style={styles.rateHint}>Cours du jour (Fixe RCI) : 1 EUR = {FCFA_EUR} FCFA</Text>
 
-              <SectionTitle label="Patrimoine Local (RCI)" />
-              {D.properties?.map((p: any) => (
-                <View key={p.id} style={styles.propertyCard}>
-                  <View style={styles.propertyHeader}>
-                    <Text style={styles.propertyName}>{p.name}</Text>
-                    <Badge 
-                        label={p.managementMode === "AGENCY" ? "AGENCE" : "DIRECT"} 
-                        color={Theme.colors.teal} 
-                        bg={Theme.colors.tealPale} 
-                    />
-                  </View>
-                  <Row label="Revenu" value={aff(p.activeLease?.rentFcfa || 0)} />
-                  <Row label="Localisation" value={`${p.commune} · ${p.propertyCode}`} />
-                </View>
+              <SectionTitle label="Suivi de mes Biens" />
+              {(DIASPORA.properties || []).slice(0, 2).map((p: any) => (
+                 <TouchableOpacity key={p.id} style={styles.propLine} onPress={() => setTab("biens")}>
+                    <View style={{ flex: 1 }}>
+                       <Text style={styles.pName}>{p.name}</Text>
+                       <Text style={styles.pSub}>{p.commune} · {aff(p.loyer)}</Text>
+                    </View>
+                    <Badge label={p.statut} color={Theme.colors.green} bg={Theme.colors.greenPale} />
+                 </TouchableOpacity>
               ))}
-
-              <SectionTitle label="Mandataires & Gestion" />
-              <TouchableOpacity 
-                style={styles.inviteCard}
-                onPress={async () => {
-                    const res = await generateInvite();
-                    alert("Lien d'invitation généré : " + res.inviteUrl);
-                }}
-              >
-                <Text style={{ fontSize: 24, marginBottom: 8 }}>🤝</Text>
-                <Text style={styles.inviteTitle}>INVITER UN GESTIONNAIRE</Text>
-                <Text style={styles.inviteSub}>Donnez un accès sécurisé à un proche en RCI</Text>
-              </TouchableOpacity>
             </>
           )}
 
-          {tab === "profil" && (
-            <View style={styles.section}>
-                <View style={styles.profileCard}>
-                   <View style={styles.avatar}><Text style={{ fontSize: 32 }}>👤</Text></View>
-                   <Text style={styles.profileName}>{profile?.fullName || "Investisseur Diaspora"}</Text>
-                   <Text style={styles.profileSub}>{profile?.email}</Text>
-                </View>
+          {tab === "biens" && (
+             <View>
+                <SectionTitle label="Mes Investissements au Pays" />
+                {(DIASPORA.properties || []).map((p: any) => (
+                   <View key={p.id} style={styles.propCard}>
+                      <View style={styles.pTop}>
+                         <Text style={styles.pCardName}>{p.name}</Text>
+                         <Badge label="GÉRÉ" color={Theme.colors.navy} bg={Theme.colors.navyPale} />
+                      </View>
+                      <Row label="Loyer mensuel" value={aff(p.loyer)} />
+                      <Row label="Paiement Locataire" value={p.paiement || "À jour"} color={Theme.colors.green} />
+                      <Row label="Délai SLA" value="24h" />
+                   </View>
+                ))}
+             </View>
+          )}
 
+          {tab === "virements" && (
+             <View>
+                <SectionTitle label="Réception Europe" />
+                <View style={styles.ibanCard}>
+                   <Text style={styles.ibanLabel}>VOTRE IBAN CERTIFIÉ</Text>
+                   <Text style={styles.ibanVal}>{DIASPORA.iban || 'FR76 XXXX XXXX XXXX XXXX XXXX XXX'}</Text>
+                   <Text style={styles.ibanBank}>{DIASPORA.bankName || 'REVOLUT / BOURSORAMA'}</Text>
+                </View>
+                <Text style={styles.legalInfo}>Les virements SEPA sont effectués chaque mardi à 10h (GMT). Archive fiscale disponible sur demande.</Text>
+             </View>
+          )}
+
+          {tab === "profil" && (
+             <View>
+                <SectionTitle label="Compte Premium" />
+                <View style={styles.profCard}>
+                   <View style={styles.avatar}><Text style={{ fontSize: 32 }}>🤴</Text></View>
+                   <Text style={styles.userName}>{DIASPORA.fullName}</Text>
+                   <Text style={styles.userRes}>Résident : {DIASPORA.paysResidence || 'Europe'}</Text>
+                </View>
                 {onBack && (
                   <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
-                    <Text style={styles.logoutText}>🚪 Changer de portail</Text>
+                     <Text style={styles.logoutText}>🚪 Retour Portail</Text>
                   </TouchableOpacity>
                 )}
-            </View>
+             </View>
           )}
         </View>
+
       </ScrollView>
 
-      {/* BOTTOM NAV */}
       <BottomNav
         tabs={[
           { id: "dash", icon: "📊", label: "Dashboard" },
@@ -200,7 +180,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
         ]}
         activeTab={tab}
         onChange={setTab}
-        accentColor={Theme.colors.diaspora || '#0E3A8C'}
+        accentColor={Theme.colors.navy}
       />
     </View>
   );
@@ -209,47 +189,37 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { paddingBottom: 100 },
-  header: { padding: 15, paddingBottom: 25, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
-  roleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  onlineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ADE80', marginLeft: 10, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },
-  userName: { fontSize: 22, fontWeight: '900', color: '#FFF', letterSpacing: -0.5 },
-  userSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
-  iconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-  
-  deviseSwitcher: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 12, padding: 4, marginBottom: 20 },
-  deviseBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8 },
-  deviseBtnActive: { backgroundColor: '#FFF' },
-  deviseText: { fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.5)' },
-  deviseTextActive: { color: '#0E3A8C' },
-
-  kpiRow: { flexDirection: 'row', gap: 10 },
-  kpiCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 15, padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  kpiVal: { fontSize: 15, fontWeight: '900', color: '#FFF' },
-  kpiLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.5)', marginTop: 4, letterSpacing: 1 },
-
   body: { padding: 20 },
-  treasuryCard: { backgroundColor: '#FFF', borderRadius: 25, padding: 20, borderBottomWidth: 4, borderBottomColor: Theme.colors.diaspora || '#0E3A8C', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
-  treasuryTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  treasuryLabel: { fontSize: 10, fontWeight: '800', color: Theme.colors.textLight, letterSpacing: 1 },
-  treasuryVal: { fontSize: 24, fontWeight: '900', color: Theme.colors.navy, marginTop: 4 },
-  euroCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: Theme.colors.goldPale, alignItems: 'center', justifyContent: 'center' },
-  transferBtn: { backgroundColor: Theme.colors.diaspora || '#0E3A8C', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
-  transferBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900', letterSpacing: 1 },
-
-  propertyCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 15, marginBottom: 12, borderWidth: 1, borderColor: '#EDF2F7' },
-  propertyHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  propertyName: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
-  
-  inviteCard: { backgroundColor: Theme.colors.navy, borderRadius: 20, padding: 25, alignItems: 'center', marginTop: 10 },
-  inviteTitle: { color: '#FFF', fontSize: 13, fontWeight: '900', letterSpacing: 1 },
-  inviteSub: { color: 'rgba(255,255,255,0.6)', fontSize: 10, marginTop: 4, textAlign: 'center' },
-
-  section: { marginTop: 10 },
-  profileCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 25, alignItems: 'center', marginBottom: 20 },
-  avatar: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
-  profileName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
-  profileSub: { fontSize: 13, color: Theme.colors.textLight, marginTop: 4 },
+  currencySwitch: { flexDirection: 'row', backgroundColor: '#E2E8F0', borderRadius: 12, padding: 4, marginHorizontal: 30, marginTop: 10 },
+  curBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10 },
+  curBtnActive: { backgroundColor: Theme.colors.navy },
+  curText: { fontSize: 11, fontWeight: '900', color: Theme.colors.textLight },
+  kpiRow: { flexDirection: 'row', marginTop: 20, marginHorizontal: 20, backgroundColor: '#FFF', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  kpiBox: { flex: 1, alignItems: 'center' },
+  kpiVal: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy },
+  kpiLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight, marginTop: 4, textAlign: 'center' },
+  transferCard: { marginTop: 10, borderRadius: 25, overflow: 'hidden' },
+  gradCard: { padding: 25, alignItems: 'center' },
+  tLabel: { fontSize: 9, color: 'rgba(255,255,255,0.7)', fontWeight: '800', letterSpacing: 1 },
+  tVal: { fontSize: 32, fontWeight: '900', color: '#FFF', marginVertical: 10 },
+  tBtn: { backgroundColor: '#FFF', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 15, marginTop: 10 },
+  tBtnText: { color: Theme.colors.navy, fontSize: 11, fontWeight: '900' },
+  rateHint: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', marginTop: 10, fontStyle: 'italic' },
+  propLine: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9' },
+  pName: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
+  pSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
+  propCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7' },
+  pTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, alignItems: 'center' },
+  pCardName: { fontSize: 15, fontWeight: '800', color: Theme.colors.navy },
+  ibanCard: { backgroundColor: Theme.colors.navy, padding: 25, borderRadius: 25 },
+  ibanLabel: { fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: '800', letterSpacing: 1 },
+  ibanVal: { fontSize: 16, color: '#FFF', fontWeight: '900', marginVertical: 10, fontFamily: 'monospace' },
+  ibanBank: { fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: '700' },
+  legalInfo: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', paddingHorizontal: 30, marginTop: 25 },
+  profCard: { backgroundColor: '#FFF', borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20 },
+  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EDF2F7', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+  userName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
+  userRes: { fontSize: 12, color: Theme.colors.textLight, marginTop: 5 },
   logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
 });

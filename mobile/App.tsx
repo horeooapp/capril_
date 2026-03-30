@@ -1,196 +1,147 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Dimensions, StatusBar, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Dimensions, StatusBar, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as SecureStore from 'expo-secure-store';
 import WalletScreen from './src/modules/wallet/WalletScreen';
 import ProprioScreen from './src/modules/proprio/ProprioScreen';
 import DiasporaScreen from './src/modules/diaspora/DiasporaScreen';
 import IntermediaireScreen from './src/modules/intermediaire/IntermediaireScreen';
-import AgencyScreen from './src/modules/agency/AgencyScreen';
 import AuthScreen from './src/modules/auth/AuthScreen';
 import { Theme } from './src/theme/theme';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-type PortalType = 'TENANT' | 'LANDLORD' | 'AGENCE' | 'DIASPORA' | 'INTERMEDIAIRE';
+type PortalType = 'TENANT' | 'LANDLORD' | 'DIASPORA' | 'INTERMEDIAIRE';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [portal, setPortal] = useState<PortalType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    checkPersistedAuth();
+  }, []);
+
+  const checkPersistedAuth = async () => {
+    try {
+      const token = await SecureStore.getItemAsync('qapril_token');
+      if (token) {
+        setIsAuthenticated(true);
+        // On pourrait fetch le profil ici
+      }
+    } catch (e) {
+      console.error("Auth restore failed", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = (user: any) => {
     setUserProfile(user);
     setIsAuthenticated(true);
-    // Manual routing disabled to allow user choice (MM-01)
     setPortal(null); 
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserProfile(null);
-    setPortal(null);
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('qapril_token');
+      setIsAuthenticated(false);
+      setUserProfile(null);
+      setPortal(null);
+    } catch (e) {
+      console.error("Logout failed", e);
+    }
   };
 
-  // 1. Si non authentifié
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Theme.colors.navy} />
+      </View>
+    );
+  }
+
   if (!isAuthenticated) {
     return <AuthScreen onLogin={handleLogin} />;
   }
 
-  // 2. Écrans spécifiques aux rôles (avec fonction déconnexion)
-  if (portal === 'TENANT') return <WalletScreen onBack={handleLogout} />;
-  if (portal === 'LANDLORD') return <ProprioScreen onBack={handleLogout} />;
-  if (portal === 'DIASPORA') return <DiasporaScreen onBack={handleLogout} />;
-  if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={handleLogout} />;
-  if (portal === 'AGENCE') return <AgencyScreen onBack={handleLogout} />;
+  if (portal === 'TENANT') return <WalletScreen onBack={() => setPortal(null)} />;
+  if (portal === 'LANDLORD') return <ProprioScreen onBack={() => setPortal(null)} />;
+  if (portal === 'DIASPORA') return <DiasporaScreen onBack={() => setPortal(null)} />;
+  if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={() => setPortal(null)} />;
 
-  // 3. Fallback (Sélection manuelle / Espace Bienvenue)
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Image 
-            source={require('./assets/logo-qapril.png')} 
-            style={{ width: 80, height: 80, marginBottom: 20 }} 
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Qapril</Text>
-          <View style={styles.titleUnderline} />
-          <Text style={styles.sub}>Choisissez votre espace d'accès Qapril</Text>
-        </View>
-        
-        <View style={styles.grid}>
-          {[
-            { id: 'TENANT', name: 'Locataire', icon: '🔑', desc: 'Vos baux, quittances & score ICL' },
-            { id: 'LANDLORD', name: 'Propriétaire', icon: '🏠', desc: 'Gestion de vos biens & revenus' },
-            { id: 'AGENCE', name: 'Agence', icon: '🏢', desc: 'Gestion mandats & recouvrement' },
-            { id: 'DIASPORA', name: 'Diaspora', icon: '🌍', desc: 'Suivi de vos projets à distance' },
-            { id: 'INTERMEDIAIRE', name: 'Intermédiaire', icon: '🤝', desc: 'Supervision & mandats' },
-          ].map(p => (
-            <TouchableOpacity 
-              key={p.id}
-              activeOpacity={0.7}
-              style={styles.card} 
-              onPress={() => setPortal(p.id as PortalType)}
-            >
-              <View style={styles.cardIconBox}>
-                <Text style={styles.cardIcon}>{p.icon}</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <LinearGradient colors={[Theme.colors.navyDark, Theme.colors.navy]} style={styles.gradBg}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.scroll}>
+            <View style={styles.header}>
+              <View style={styles.logoBox}>
+                <Image source={require('./assets/icon.png')} style={styles.logo} resizeMode="contain" />
               </View>
-              <View style={styles.cardText}>
-                <Text style={styles.cardTitle}>{p.name}</Text>
-                <Text style={styles.cardDesc}>{p.desc}</Text>
-              </View>
-              <Text style={styles.cardArrow}>›</Text>
+              <Text style={styles.welcome}>Bienvenue sur</Text>
+              <Text style={styles.userName}>Qapril</Text>
+              <Text style={styles.instruction}>Veuillez sélectionner votre portail d'accès</Text>
+            </View>
+
+            <View style={styles.menu}>
+              {[
+                { id: 'TENANT', name: 'PORTAIL LOCATAIRE', icon: '🔑', desc: 'Loyers, quittances & score ICL', color: Theme.colors.teal, bg: Theme.colors.tealPale },
+                { id: 'LANDLORD', name: 'PORTAIL PROPRIÉTAIRE', icon: '🏠', desc: 'Gestion du patrimoine & wallet', color: Theme.colors.navy, bg: '#E2E8F0' },
+                { id: 'DIASPORA', name: 'PORTAIL DIASPORA', icon: '🌍', desc: 'Suivi RCI & virements SEPA', color: '#0E3A8C', bg: '#D0E1FD' },
+                { id: 'INTERMEDIAIRE', name: 'PORTAIL INTERMÉDIAIRE', icon: '🤝', desc: 'Mandats, M-EDL & Médiation', color: Theme.colors.orange, bg: Theme.colors.orangePale },
+              ].map(p => (
+                <TouchableOpacity 
+                  key={p.id}
+                  activeOpacity={0.8}
+                  style={styles.card} 
+                  onPress={() => setPortal(p.id as PortalType)}
+                >
+                  <View style={[styles.iconBox, { backgroundColor: p.bg }]}>
+                    <Text style={styles.iconText}>{p.icon}</Text>
+                  </View>
+                  <View style={styles.cardBody}>
+                    <Text style={[styles.cardTitle, { color: Theme.colors.navy }]}>{p.name}</Text>
+                    <Text style={styles.cardDesc}>{p.desc}</Text>
+                  </View>
+                  <View style={styles.arrowBox}>
+                    <Text style={{ color: Theme.colors.teal, fontWeight: '900', fontSize: 20 }}>›</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+              <Text style={styles.logoutText}>DÉCONNEXION SÉCURISÉE 🚪</Text>
             </TouchableOpacity>
-          ))}
-        </View>
-        
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Se déconnecter 🚪</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 28,
-    paddingTop: 60,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: Theme.colors.navy,
-    letterSpacing: 2,
-  },
-  titleUnderline: {
-    width: 60,
-    height: 4,
-    backgroundColor: Theme.colors.teal,
-    marginTop: 8,
-    borderRadius: 2,
-  },
-  sub: {
-    fontSize: 14,
-    color: Theme.colors.textLight,
-    marginTop: 16,
-    fontWeight: '600',
-    opacity: 0.8,
-  },
-  grid: {
-    gap: 16,
-  },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 20,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#EEF2F7',
-    shadowColor: '#0D2B6E',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  cardIconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardIcon: {
-    fontSize: 24,
-  },
-  cardText: {
-    flex: 1,
-    paddingLeft: 16,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: Theme.colors.navy,
-    marginBottom: 4,
-  },
-  cardDesc: {
-    fontSize: 11,
-    color: '#8FA0BC',
-    fontWeight: '600',
-  },
-  cardArrow: {
-    fontSize: 24,
-    color: Theme.colors.teal,
-    opacity: 0.4,
-    paddingLeft: 10,
-  },
-  logoutBtn: {
-    marginTop: 'auto',
-    marginBottom: 40,
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  logoutText: {
-    color: Theme.colors.red,
-    fontWeight: '800',
-    fontSize: 14,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
+  container: { flex: 1 },
+  gradBg: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' },
+  scroll: { padding: 30, paddingBottom: 50 },
+  header: { marginTop: 20, marginBottom: 40 },
+  logoBox: { width: 70, height: 70, backgroundColor: '#FFF', borderRadius: 20, padding: 10, marginBottom: 25, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 10 },
+  logo: { width: '100%', height: '100%' },
+  welcome: { fontSize: 18, color: 'rgba(255,255,255,0.7)', fontWeight: '700' },
+  userName: { fontSize: 32, fontWeight: '900', color: '#FFF', marginTop: 5 },
+  instruction: { fontSize: 13, color: Theme.colors.tealPale, marginTop: 10, fontWeight: '600', opacity: 0.8 },
+  menu: { gap: 15 },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 25, padding: 18, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 15, elevation: 5 },
+  iconBox: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  iconText: { fontSize: 26 },
+  cardBody: { flex: 1, paddingLeft: 16 },
+  cardTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 0.5 },
+  cardDesc: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4, fontWeight: '600' },
+  arrowBox: { paddingLeft: 10 },
+  logoutBtn: { marginTop: 40, alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 30 },
+  logoutText: { color: 'rgba(255,255,255,0.5)', fontWeight: '900', fontSize: 12, letterSpacing: 2 },
 });
