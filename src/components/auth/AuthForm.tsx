@@ -23,7 +23,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
         e.preventDefault()
         setError(null)
         startTransition(async () => {
-            const result = await requestOTP(phone)
+            const result = await requestOTP(phone) // Variable name remains 'phone' but it holds the email string
             if (result.success) {
                 setStep('OTP')
             } else {
@@ -36,7 +36,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
         e.preventDefault()
         setError(null)
         startTransition(async () => {
-            const result = await loginWithOTP(phone, otp)
+            const result = await loginWithOTP(phone, otp, role)
             if (result.success) {
                 router.push(redirectPath)
                 router.refresh()
@@ -65,7 +65,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                 <form className="space-y-6" onSubmit={handleRequestOTP}>
                     <div>
                         <label htmlFor="phone" className="block text-[14px] font-black text-[#1F4E79] uppercase tracking-widest mb-2">
-                            Numéro de téléphone
+                            Votre Email
                         </label>
                         <div className="mt-1">
                             <input
@@ -76,7 +76,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                                 className="appearance-none block w-full px-5 py-4 border border-gray-200 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55A11] focus:border-[#C55A11] text-[16px] font-bold"
-                                placeholder="+225 00 00 00 00 00"
+                                placeholder="votre@email.com"
                             />
                         </div>
                     </div>

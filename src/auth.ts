@@ -57,11 +57,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (user) {
-                        // ROLE ENFORCEMENT: Check if DB role matches requested space (Tenant/Landlord)
+                        // ROLE ENFORCEMENT: Check if DB role matches requested space category
                         const userRole = (user.role || '').toUpperCase();
                         const reqRole = (requestedRole || '').toUpperCase();
 
-                        if (userRole !== reqRole && reqRole !== 'ADMIN') {
+                        const DASHBOARD_ROLES = ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'];
+                        const TENANT_ROLES = ['TENANT'];
+
+                        let isAuthorized = false;
+                        if (reqRole === 'TENANT') {
+                            isAuthorized = TENANT_ROLES.includes(userRole);
+                        } else if (reqRole === 'LANDLORD') {
+                            isAuthorized = DASHBOARD_ROLES.includes(userRole);
+                        } else if (reqRole === 'ADMIN') {
+                            isAuthorized = true; // Admin bypass
+                        }
+
+                        if (!isAuthorized) {
                             let label = "Propriétaire";
                             if (userRole === 'TENANT') label = "Locataire";
                             if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') label = "Administrateur";
