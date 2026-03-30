@@ -48,6 +48,43 @@ export default function LocatairePortalWrapper() {
     );
   }
 
+  // Handle "No Lease" state gracefully
+  if (data?.noLease) {
+    return (
+      <div style={{
+        height: '100vh',
+        background: '#F8FAFC',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '60px 20px',
+        textAlign: 'center',
+        fontFamily: 'sans-serif'
+      }}>
+        <div style={{ width: 80, height: 80, background: '#EFF6FF', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, marginBottom: 24 }}>🏠</div>
+        <h2 style={{ color: '#1E293B', fontSize: 24, fontWeight: 900, marginBottom: 12 }}>Bienvenue sur QAPRIL !</h2>
+        <p style={{ color: '#64748B', maxWidth: 400, lineHeight: 1.6, marginBottom: 32 }}>
+          Nous n'avons pas encore trouvé de bail actif lié à votre compte. 
+          Demandez à votre propriétaire de digitaliser votre bail sur QAPRIL ou assurez-vous que votre numéro de téléphone (<b>{data.loc?.telephone || 'non renseigné'}</b>) est bien celui enregistré sur votre contrat.
+        </p>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ padding: '14px 28px', background: '#0D2B6E', color: '#FFF', border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer', boxShadow: '0 10px 15px -3px rgba(13, 43, 110, 0.2)' }}
+          >
+            Actualiser
+          </button>
+          <a
+            href="/"
+            style={{ padding: '14px 28px', background: '#FFF', color: '#1E293B', border: '1px solid #E2E8F0', borderRadius: 12, fontWeight: 700, textDecoration: 'none' }}
+          >
+            Retour
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (!data) return null;
 
   // Prepare abos mapping if needed

@@ -35,6 +35,7 @@ export function useTenantData() {
     abos: any;
     tickets: any[];
     caution: any;
+    noLease?: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
