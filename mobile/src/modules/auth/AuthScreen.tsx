@@ -12,7 +12,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Dimensions,
-  StatusBar
+  StatusBar,
+  Image
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -25,8 +26,8 @@ interface AuthScreenProps {
 }
 
 export default function AuthScreen({ onLogin }: AuthScreenProps) {
-  const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const { requestOTP, verifyOTP, loading, error } = useAuth();
   
@@ -34,21 +35,17 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
 
   const handleRequestOTP = async () => {
     setLocalError(null);
-    let formattedPhone = phone.trim();
+    const trimmedEmail = email.trim().toLowerCase();
     
-    if (formattedPhone.length < 8) {
-      setLocalError("Numéro de téléphone trop court.");
+    // Basic email validation
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setLocalError("Veuillez entrer une adresse email valide.");
       return;
     }
 
-    if (!formattedPhone.startsWith('+')) {
-      if (formattedPhone.length === 10) formattedPhone = '+225' + formattedPhone;
-      else formattedPhone = '+' + formattedPhone;
-    }
-
     try {
-      await requestOTP(formattedPhone);
-      setPhone(formattedPhone);
+      await requestOTP(trimmedEmail);
+      setEmail(trimmedEmail);
       setStep('OTP');
     } catch (e: any) {
       // hook catches it
@@ -63,11 +60,11 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
     }
     
     try {
-      const res = await verifyOTP(phone, otp.trim());
+      const res = await verifyOTP(email, otp.trim());
       if (res && res.success && res.user) {
         onLogin(res.user);
-      } else if (res && res.error) {
-        setLocalError(res.error);
+      } else if (res && (res as any).error) {
+        setLocalError((res as any).error);
       }
     } catch (e: any) {
     }
@@ -84,7 +81,7 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
       >
         <SafeAreaView style={styles.safeArea}>
           <KeyboardAvoidingView 
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={styles.keyboardView}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -93,12 +90,11 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                 {/* BRANDING SECTION (TOP) */}
                 <View style={styles.brandingSection}>
                   <View style={styles.logoCircle}>
-                    <LinearGradient
-                      colors={[Theme.colors.gold, '#B8860B']}
-                      style={styles.logoGradient}
-                    >
-                      <Text style={styles.logoChar}>Q</Text>
-                    </LinearGradient>
+                     <Image 
+                        source={require('../../../assets/icon.png')} 
+                        style={styles.logoImage} 
+                        resizeMode="contain"
+                     />
                   </View>
                   <Text style={styles.brandTitle}>QAPRIL</Text>
                   <Text style={styles.brandSubtitle}>
@@ -111,17 +107,17 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                 </View>
 
                 {/* FORM SECTION (BOTTOM SHEET) */}
-                <View style={[styles.bottomSheet, step === 'OTP' ? { height: height * 0.55 } : null]}>
+                <View style={[styles.bottomSheet, { minHeight: step === 'OTP' ? height * 0.55 : height * 0.45 }]}>
                   
                   <View style={styles.sheetIndicator} />
                   
                   <Text style={styles.sheetTitle}>
-                    {step === 'PHONE' ? "Identifiez-vous" : "Vérification"}
+                    {step === 'EMAIL' ? "Identifiez-vous" : "Vérification"}
                   </Text>
                   <Text style={styles.sheetDesc}>
-                    {step === 'PHONE' 
+                    {step === 'EMAIL' 
                       ? "Accédez à votre portefeuille de biens, vos baux et vos loyers certifiés en toute sécurité." 
-                      : `Un code temporaire a été envoyé au\n${phone}`}
+                      : `Un code temporaire a été envoyé à l'adresse\n${email}`}
                   </Text>
 
                   {displayError && (
@@ -131,20 +127,18 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                   )}
 
                   <View style={styles.formContainer}>
-                    {step === 'PHONE' ? (
+                    {step === 'EMAIL' ? (
                       <>
-                        <Text style={styles.inputLabel}>Numéro de téléphone</Text>
+                        <Text style={styles.inputLabel}>Adresse Email</Text>
                         <View style={styles.inputWrapper}>
-                          <View style={styles.prefixBox}>
-                            <Text style={styles.prefixText}>🇨🇮 +225</Text>
-                          </View>
-                          <TextInput 
-                            style={styles.input}
-                            placeholder="0700000000"
+                           <TextInput 
+                            style={[styles.input, { paddingLeft: 20 }]}
+                            placeholder="votre@email.ci"
                             placeholderTextColor={Theme.colors.grey3}
-                            keyboardType="phone-pad"
-                            value={phone.replace('+225', '')}
-                            onChangeText={setPhone}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            value={email}
+                            onChangeText={setEmail}
                             autoFocus
                           />
                         </View>
@@ -189,10 +183,10 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                         
                         <TouchableOpacity 
                           style={styles.cancelBtn}
-                          onPress={() => { setStep('PHONE'); setOtp(''); setLocalError(null); }}
+                          onPress={() => { setStep('EMAIL'); setOtp(''); setLocalError(null); }}
                           disabled={loading}
                         >
-                          <Text style={styles.cancelBtnText}>Utiliser un autre numéro</Text>
+                          <Text style={styles.cancelBtnText}>Utiliser une autre adresse</Text>
                         </TouchableOpacity>
                       </>
                     )}
@@ -235,27 +229,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   logoCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    padding: 2,
-    marginBottom: 20,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    marginBottom: 28,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-  },
-  logoGradient: {
-    flex: 1,
-    borderRadius: 18,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoChar: {
-    color: Theme.colors.white,
-    fontSize: 34,
-    fontWeight: '900',
+  logoImage: {
+    width: '90%',
+    height: '90%',
   },
   brandTitle: {
     fontSize: 32,
@@ -336,7 +326,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   formContainer: {
-    flex: 1,
+    paddingBottom: 20,
   },
   inputLabel: {
     fontSize: 12,

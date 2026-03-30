@@ -144,6 +144,55 @@ export class ChampionService {
   }
 
   /**
+   * Scan for pending receipts and generate LeaseArrear entries.
+   * This populates the pipeline for Champions.
+   */
+  static async discoverArrears() {
+    // Find all receipts that are not paid and are older than today
+    const pendingReceipts = await prisma.receipt.findMany({
+      where: {
+        status: "pending",
+        declarative: false, // Only formal receipts
+      },
+      include: {
+        lease: true
+      }
+    });
+
+    let count = 0;
+    for (const receipt of pendingReceipts) {
+      // Check if an arrear already exists for this lease and period
+      // We use the 1st of the periodMonth as a reference for dueDate
+      const [year, month] = receipt.periodMonth.split('-').map(Number);
+      const dueDate = new Date(year, month - 1, 5); // 5th of the month
+
+      const existing = await prisma.leaseArrear.findFirst({
+        where: {
+          leaseId: receipt.leaseId,
+          dueDate: {
+            gte: new Date(year, month - 1, 1),
+            lte: new Date(year, month - 1, 28)
+          }
+        }
+      });
+
+      if (!existing) {
+        await prisma.leaseArrear.create({
+          data: {
+            leaseId: receipt.leaseId,
+            amount: receipt.totalAmount,
+            dueDate: dueDate,
+            status: "unpaid"
+          }
+        });
+        count++;
+      }
+    }
+
+    return { discovered: pendingReceipts.length, created: count };
+  }
+
+  /**
    * Send a personalized relance from the Champion.
    */
   static async triggerChampionRelance(arrearId: string, championId: string, canal: "sms" | "wa" = "wa") {
@@ -168,9 +217,12 @@ export class ChampionService {
     const amount = arrear.amount;
     const tenantName = arrear.lease.tenant?.fullName || "Client";
     
+    // Generate a payment link (mock for now, but following the pattern)
+    const paymentUrl = `https://qapril.ci/pay/${arrear.id}`;
+
     const payload = {
-      smsText: `QAPRIL: Bonjour ${tenantName}, je suis ${champion.fullName || 'votre agent'}, votre Champion QAPRIL. Votre loyer de ${amount} FCFA est en attente. Réglez-le via l'app pour éviter tout désagrément. Merci !`,
-      parameters: [tenantName, champion.fullName || "Champion", String(amount)]
+      smsText: `QAPRIL: Bonjour ${tenantName}, je suis ${champion.fullName || 'votre agent'}, votre Champion QAPRIL. Votre loyer de ${amount.toLocaleString()} FCFA est en attente. Réglez-le ici : ${paymentUrl}. Merci !`,
+      parameters: [tenantName, champion.fullName || "Champion", String(amount), paymentUrl]
     };
 
     const { NotificationService } = await import("./notification-service");
@@ -187,10 +239,10 @@ export class ChampionService {
         action: "CHAMPION_RELANCE_SENT",
         module: "CHAMPION",
         entityId: arrearId,
-        newValues: { canal, tenantId: arrear.lease.tenantId }
+        newValues: { canal, tenantId: arrear.lease.tenantId, paymentUrl }
       }
     });
 
-    return { success: true };
+    return { success: true, paymentUrl };
   }
 }

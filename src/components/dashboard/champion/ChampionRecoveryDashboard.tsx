@@ -31,9 +31,26 @@ export default function ChampionRecoveryDashboard() {
 
   const fetchArrears = async () => {
     try {
+      setLoading(true);
       const res = await fetch('/api/v1/champions/recovery/list');
       const data = await res.json();
-      setArrears(data);
+      setArrears(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDiscovery = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/v1/champions/recovery/discovery', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message);
+        await fetchArrears();
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -156,6 +173,13 @@ export default function ChampionRecoveryDashboard() {
                     className="pl-12 pr-6 py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all w-64"
                  />
               </div>
+              <button 
+                 onClick={handleDiscovery}
+                 className="flex items-center gap-2 px-6 py-4 bg-[#1F4E79] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
+              >
+                <Zap size={16} />
+                <span>Lancer la prospection</span>
+              </button>
               <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-[#1F4E79] hover:bg-gray-50 transition-all shadow-sm">
                 <Filter size={20} />
               </button>

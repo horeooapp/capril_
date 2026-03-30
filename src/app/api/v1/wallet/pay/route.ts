@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAuthUser } from "@/lib/jwt";
 import { payReceipt } from "@/actions/receipts";
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   try {
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const { receiptId, channel } = await req.json();
     if (!receiptId) return NextResponse.json({ error: "Missing receiptId" }, { status: 400 });
 
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (e: any) {
+    console.error("[API WALLET] Pay Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

@@ -86,11 +86,12 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
 
   // Use real data or fallback to MOCK if not loaded
   const LOC = locData || { nom: "Chargement...", score: 750 };
-  const BAIL = bailData || { 
+  const BAIL = bailData?.noLease ? null : (bailData || { 
     ref: "...", logement: "Chargement...", adresse: "...", loyer: 0, 
     debut: "...", fin: "...", statut: "...", retard: 0, 
     typeGestion: "...", agence: "...", bailleurCode: "..." 
-  };
+  });
+
   const QUITTANCES = quittData || [];
   const ABOS = abosData || [];
 
@@ -108,6 +109,36 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setTab(t);
   };
+
+  // If no lease, show a friendly onboarding/welcome screen instead of the dashboard
+  if (bailData?.noLease) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 40 }]}>
+        <StatusBar barStyle="dark-content" />
+        <View style={{ width: 100, height: 100, backgroundColor: Theme.colors.teal + '15', borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+          <Text style={{ fontSize: 50 }}>🏠</Text>
+        </View>
+        <Text style={{ fontSize: 24, fontWeight: '900', color: Theme.colors.navy, textAlign: 'center', marginBottom: 12 }}>Bienvenue sur QAPRIL !</Text>
+        <Text style={{ fontSize: 14, color: Theme.colors.textMid, textAlign: 'center', lineHeight: 22, marginBottom: 32 }}>
+          Nous n'avons pas encore trouvé de bail actif lié à votre compte. {'\n\n'}
+          Une fois votre contrat validé par votre agence, vous retrouverez ici vos quittances certifiées et votre score ICL.
+        </Text>
+        <TouchableOpacity 
+          style={{ backgroundColor: Theme.colors.teal, paddingVertical: 16, paddingHorizontal: 32, borderRadius: 16, width: '100%' }}
+          onPress={() => alert("Support: +225 05 00 00 00 00")}
+        >
+          <Text style={{ color: 'white', fontWeight: '800', textAlign: 'center' }}>Contacter mon agence</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+           style={{ marginTop: 24 }}
+           onPress={() => { setAuthToken(null); if (onBack) onBack(); }}
+        >
+          <Text style={{ color: Theme.colors.grey3, fontWeight: '700' }}>Se déconnecter</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const fmt = (n: number) => n.toLocaleString("fr-FR");
   const scColor = LOC.score >= 850 ? Theme.colors.green : LOC.score >= 700 ? Theme.colors.teal : Theme.colors.orange;

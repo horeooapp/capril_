@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
  */
 
 // In development, use your computer's local IP (e.g. 192.168.x.x) if testing on a real device
-const API_BASE_URL = 'https://api.qapril.ci/v1'; // Adjust to your actual server URL
+const API_BASE_URL = 'https://qapril.ci/api/v1'; // Standard Next.js API path
 
 let AUTH_TOKEN: string | null = null;
 
@@ -79,20 +79,20 @@ function useQuery(path: string, deps: any[] = []) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// AUTHENTICATION
+// AUTHENTICATION (EMAIL/OTP)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requestOTP = async (phone: string) => {
+  const requestOTP = async (email: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/register', {
+      const res = await apiFetch('/auth/otp/request', {
         method: 'POST',
-        body: { phone }
+        body: { email }
       });
       return res;
     } catch (e: any) {
@@ -103,18 +103,29 @@ export function useAuth() {
     }
   };
 
-  const verifyOTP = async (phone: string, otp: string) => {
+  const verifyOTP = async (email: string, otp: string, role: string = 'TENANT') => {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/verify-otp', {
+      const res = await apiFetch('/auth/otp/verify', {
         method: 'POST',
-        body: { phone, otp }
+        body: { email, otp, role }
       });
+      
       if (res.token) {
         setAuthToken(res.token);
       }
-      return res;
+      
+      // Map 'token' success to a compatible structure for UI
+      return {
+        success: true,
+        token: res.token,
+        user: {
+          id: res.userId,
+          role: res.profile?.toUpperCase(), // Ensure consistency
+          email: email
+        }
+      };
     } catch (e: any) {
       setError(e.message);
       throw e;

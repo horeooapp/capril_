@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import WalletScreen from './src/modules/wallet/WalletScreen';
 import ProprioScreen from './src/modules/proprio/ProprioScreen';
-import AgencyScreen from './src/modules/agency/AgencyScreen';
 import DiasporaScreen from './src/modules/diaspora/DiasporaScreen';
 import IntermediaireScreen from './src/modules/intermediaire/IntermediaireScreen';
 import AuthScreen from './src/modules/auth/AuthScreen';
@@ -24,7 +23,6 @@ export default function App() {
     // Routage automatique basé sur le rôle reçu du backend
     if (user?.role === 'TENANT') setPortal('TENANT');
     else if (user?.role === 'LANDLORD') setPortal('LANDLORD');
-    else if (user?.role === 'AGENCE' || user?.role === 'AGENCY') setPortal('AGENCE');
     else if (user?.role === 'DIASPORA') setPortal('DIASPORA');
     else if (user?.role === 'INTERMEDIAIRE') setPortal('INTERMEDIAIRE');
     else setPortal('TENANT'); // Fallback par défaut
@@ -44,7 +42,6 @@ export default function App() {
   // 2. Écrans spécifiques aux rôles (avec fonction déconnexion)
   if (portal === 'TENANT') return <WalletScreen onBack={handleLogout} />;
   if (portal === 'LANDLORD') return <ProprioScreen onBack={handleLogout} />;
-  if (portal === 'AGENCE') return <AgencyScreen onBack={handleLogout} />;
   if (portal === 'DIASPORA') return <DiasporaScreen onBack={handleLogout} />;
   if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={handleLogout} />;
 
@@ -58,7 +55,6 @@ export default function App() {
         {[
           { id: 'TENANT', name: 'Locataire', icon: '🔑' },
           { id: 'LANDLORD', name: 'Propriétaire', icon: '🏠' },
-          { id: 'AGENCE', name: 'Agence', icon: '🏢' },
           { id: 'DIASPORA', name: 'Diaspora', icon: '🌍' },
           { id: 'INTERMEDIAIRE', name: 'Intermédiaire', icon: '🤝' },
         ].map(p => (
