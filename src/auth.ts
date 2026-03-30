@@ -54,37 +54,75 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     // 3. Find or Create User
                     let user = await prisma.user.findFirst({
-                        where: { email }
+                        where: { email },
+                        include: {
+                            _count: {
+                                select: {
+                                    propertiesOwned: true,
+                                    leasesAsTenant: true,
+                                    mandates: true
+                                }
+                            }
+                        }
                     });
 
                     if (user) {
-                        // ROLE ENFORCEMENT: Check if DB role matches requested space category
+                        // ROLE DETECTION & ENFORCEMENT
                         const userRole = (user.role || '').toUpperCase();
+                        const isDiaspora = (user as any).diasporaAbonnement === true;
+                        const isLandlord = userRole === 'LANDLORD' || userRole === 'LANDLORD_PRO' || user._count.propertiesOwned > 0;
+                        const isTenant = userRole === 'TENANT' || user._count.leasesAsTenant > 0;
+                        const isAgency = userRole === 'AGENCY' || user._count.mandates > 0;
+                        const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+
+                        // Compile eligible roles
+                        const eligibleRoles: string[] = [];
+                        if (isLandlord) eligibleRoles.push('LANDLORD');
+                        if (isTenant) eligibleRoles.push('TENANT');
+                        if (isAgency) eligibleRoles.push('AGENCY');
+                        if (isDiaspora) eligibleRoles.push('DIASPORA');
+                        if (isAdmin) eligibleRoles.push('ADMIN');
+
                         const reqRole = (requestedRole || '').toUpperCase();
 
+                        // Basic check: is the user authorized for the requested portal at all?
                         const DASHBOARD_ROLES = ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'];
                         const TENANT_ROLES = ['TENANT'];
 
-                        let isAuthorized = false;
+                        let isAuthorizedForRequested = false;
                         if (reqRole === 'TENANT') {
-                            isAuthorized = TENANT_ROLES.includes(userRole) || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+                            isAuthorizedForRequested = isTenant || isAdmin;
                         } else if (reqRole === 'LANDLORD') {
-                            isAuthorized = DASHBOARD_ROLES.includes(userRole) || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+                            isAuthorizedForRequested = isLandlord || isAgency || isDiaspora || isAdmin;
                         } else if (reqRole === 'ADMIN') {
-                            isAuthorized = true; // Admin bypass
+                            isAuthorizedForRequested = isAdmin;
                         }
 
-                        if (!isAuthorized) {
-                            let label = "Propriétaire";
-                            if (userRole === 'TENANT') label = "Locataire";
-                            if (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') label = "Administrateur";
-                            
-                            throw new CustomAuthError(`Accès refusé : Ce compte est un compte ${label}. Veuillez utiliser l'espace de connexion dédié.`);
+                        if (!isAuthorizedForRequested && eligibleRoles.length > 0) {
+                            // User is trying to access a portal they don't have, but they have OTHER roles
+                            throw new CustomAuthError(`Accès refusé : Ce compte n'a pas les permissions requises pour cet espace.`);
                         }
+
+                        if (eligibleRoles.length === 0) {
+                             throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
+                        }
+
+                        return {
+                            id: user.id,
+                            email: user.email,
+                            phone: user.phone,
+                            role: user.role,
+                            status: user.status,
+                            fullName: user.fullName,
+                            onboardingComplete: (user as any).onboardingComplete,
+                            diasporaAbonnement: (user as any).diasporaAbonnement,
+                            eligibleRoles: eligibleRoles,
+                            requiresRoleSelection: eligibleRoles.length > 1
+                        } as any;
                     }
 
                     if (!user) {
-                        user = await prisma.user.create({
+                        const newUser = await prisma.user.create({
                             data: {
                                 email,
                                 role: requestedRole as any,
@@ -92,18 +130,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 phone: `PENDING_${Date.now()}` // Bypass NOT NULL constraint in production DB
                             }
                         });
+                        
+                        return {
+                            id: newUser.id,
+                            email: newUser.email,
+                            phone: newUser.phone,
+                            role: newUser.role,
+                            status: newUser.status,
+                            fullName: newUser.fullName,
+                            onboardingComplete: false,
+                            eligibleRoles: [requestedRole],
+                            requiresRoleSelection: false
+                        } as any;
                     }
-
-                    return {
-                        id: user.id,
-                        email: user.email,
-                        phone: user.phone,
-                        role: user.role,
-                        status: user.status,
-                        fullName: user.fullName,
-                        onboardingComplete: (user as any).onboardingComplete,
-                        diasporaAbonnement: (user as any).diasporaAbonnement
-                    } as any;
                 } catch (dbError: any) {
                     if (dbError instanceof CredentialsSignin) {
                         throw dbError;

@@ -9,6 +9,7 @@ import { Home, Receipt, Bell, User } from "lucide-react"
 
 import LocataireLayoutClient from "./layout-client"
 import { prisma } from "@/lib/prisma"
+import { isRoleGloballyActive } from "@/lib/role-lock"
 
 export default async function LocataireLayout({
     children,
@@ -16,15 +17,25 @@ export default async function LocataireLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
+    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
+    
+    if (session?.user) {
+        // CRITICAL: Verify Global Role Concurrency Lock
+        const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
+        if (!isGloballyActive) {
+            // This browser has a stale role, force logout
+            redirect("/api/auth/signout")
+        }
 
-    if (session?.user && session.user.role !== "TENANT") {
-        redirect("/dashboard")
+        if (activeRole !== "TENANT") {
+            redirect("/dashboard")
+        }
     }
 
     // 3. Security: Check onboarding but with extreme robustness
-    if (session?.user?.role === "TENANT") {
+    if (activeRole === "TENANT") {
         try {
-            if (!session.user.id) {
+            if (!session?.user?.id) {
                 // Should not happen, but prevents Prisma crash
                 return redirect("/locataire/login")
             }

@@ -8,6 +8,7 @@ import BottomNav from "@/components/BottomNav"
 import AdminSidebar from "@/components/admin/AdminSidebar"
 import { LayoutDashboard, Briefcase, Users, Settings2, ShieldCheck, Database, ShieldAlert, ArrowRightLeft, BarChart3, Newspaper, Scale, Bot } from "lucide-react"
 import { unstable_noStore as noStore } from 'next/cache';
+import { isRoleGloballyActive } from "@/lib/role-lock"
 
 export default async function AdminLayout({
     children,
@@ -21,7 +22,16 @@ export default async function AdminLayout({
         redirect("/admin/login")
     }
 
-    if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
+    const activeRole = (session.user as any).chosenRole || session.user.role;
+
+    // CRITICAL: Verify Global Role Concurrency Lock
+    const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
+    if (!isGloballyActive) {
+        // This browser has a stale role, force logout
+        redirect("/api/auth/signout")
+    }
+
+    if (activeRole !== "ADMIN" && activeRole !== "SUPER_ADMIN") {
         redirect("/dashboard")
     }
 

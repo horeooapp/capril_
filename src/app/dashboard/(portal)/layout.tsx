@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import DashboardLayoutClient from "./layout-client"
+import { isRoleGloballyActive } from "@/lib/role-lock"
 
 export const dynamic = "force-dynamic"
 
@@ -26,11 +27,21 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    if (session.user.role === "TENANT" || dbUser.role === "TENANT") {
+    // CRITICAL: Verify Global Role Concurrency Lock
+    const activeRole = (session.user as any).chosenRole || session.user.role;
+    const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
+    if (!isGloballyActive) {
+        // This browser has a stale role, force logout
+        redirect("/api/auth/signout")
+    }
+
+    // Role Enforcement based on activeRole, NOT hardcoded dbUser.role
+    // because a user with dbUser.role === "TENANT" is allowed here if activeRole === "LANDLORD".
+    if (activeRole === "TENANT") {
         redirect("/locataire")
     }
 
-    if (session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN") {
+    if (activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") {
         redirect("/admin")
     }
 

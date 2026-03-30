@@ -24,6 +24,16 @@ export const authConfig = {
                 token.fullName = (user as any).fullName
                 token.onboardingComplete = (user as any).onboardingComplete
                 token.diasporaAbonnement = (user as any).diasporaAbonnement
+                token.eligibleRoles = (user as any).eligibleRoles
+                token.requiresRoleSelection = (user as any).requiresRoleSelection
+                
+                // Only default to a role if there's only one choice.
+                // Otherwise, leave null to trigger the selection page.
+                if ((user as any).eligibleRoles?.length === 1) {
+                    token.chosenRole = (user as any).eligibleRoles[0]
+                } else {
+                    token.chosenRole = (user as any).chosenRole || null
+                }
             }
             return token
         },
@@ -37,7 +47,10 @@ export const authConfig = {
                 session.user.fullName = token.fullName as string
                 session.user.onboardingComplete = token.onboardingComplete as boolean;
                 (session.user as any).profileType = token.profileType as string;
-                (session.user as any).diasporaAbonnement = token.diasporaAbonnement as boolean
+                (session.user as any).diasporaAbonnement = token.diasporaAbonnement as boolean;
+                (session.user as any).eligibleRoles = token.eligibleRoles as string[];
+                (session.user as any).chosenRole = token.chosenRole as string;
+                (session.user as any).requiresRoleSelection = token.requiresRoleSelection as boolean;
             }
             return session
         },
@@ -53,12 +66,20 @@ export const authConfig = {
                 pathname.startsWith("/api/webhooks") ||
                 pathname.startsWith("/api/public") ||
                 pathname.startsWith("/auth/") ||
+                pathname === "/auth/choose-role" ||
                 ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/verify-request"].includes(pathname);
 
             if (isPublic) {
                 if (isLoggedIn && pathname.includes("/login")) {
-                    if (role === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
-                    if (role === 'ADMIN' || role === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
+                    const chosenRole = (auth?.user as any)?.chosenRole;
+                    const requiresChoice = (auth?.user as any)?.requiresRoleSelection;
+
+                    if (requiresChoice && !chosenRole) {
+                         return Response.redirect(new URL("/auth/choose-role", nextUrl));
+                    }
+
+                    if (chosenRole === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
+                    if (chosenRole === 'ADMIN' || chosenRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
                     return Response.redirect(new URL("/dashboard", nextUrl));
                 }
                 return true;
@@ -71,9 +92,19 @@ export const authConfig = {
                 return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
+            // 2.5 MANDATORY ROLE SELECTION
+            const chosenRole = (auth?.user as any)?.chosenRole;
+            const requiresChoice = (auth?.user as any)?.requiresRoleSelection;
+
+            if (requiresChoice && !chosenRole && pathname !== "/auth/choose-role") {
+                return Response.redirect(new URL("/auth/choose-role", nextUrl));
+            }
+
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
-            // Prevent users from accessing portals they don't belong to
-            if (role === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
+            // Use chosenRole instead of default role if available
+            const activeRole = chosenRole || role;
+
+            if (activeRole === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
                 return Response.redirect(new URL("/locataire", nextUrl));
             }
             
