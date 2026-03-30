@@ -10,7 +10,9 @@ import {
   SafeAreaView,
   LayoutAnimation,
   Platform,
-  UIManager
+  UIManager,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -46,11 +48,15 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
   const handleAction = async (action: string, params: any) => {
     try {
       const res = await performAction(action, params);
-      alert(res.success ? "Succès !" : "Erreur: " + res.error);
+      if (res.success || res.id) {
+        Alert.alert("Succès Q-Cert", "La quittance a été certifiée avec succès.");
+      } else {
+        Alert.alert("Erreur", "Une erreur est survenue lors de la certification.");
+      }
       setShowSheet(null);
       refetch();
     } catch (e: any) {
-      alert(e.message);
+      Alert.alert("Erreur Système", e.message);
     }
   };
 

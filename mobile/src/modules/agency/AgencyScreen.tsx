@@ -23,7 +23,15 @@ import { BottomNav } from '../../components/common/BottomNav';
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
-import { useAgency, useAgencyPortfolio, useCandidates, useLeaseActions } from '../../hooks/qapril-hooks';
+import { 
+  useAgency, 
+  useAgencyPortfolio, 
+  useCandidates, 
+  useLeaseActions, 
+  useProprioMutations 
+} from '../../hooks/qapril-hooks';
+import { BottomSheet } from '../../components/common/BottomSheet';
+import { Alert, ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -52,10 +60,15 @@ const PORTFOLIO = [
 export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
   const [tab, setTab] = useState("dash");
   const [requested, setRequested] = useState<Record<string, boolean>>({});
+  const [showWizard, setShowWizard] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
   const [wizardData, setWizardData] = useState({ propertyId: '', tenantPhone: '', rent: '150000', duration: '12' });
 
+  const { data: agency, loading: loadAgency } = useAgency();
+  const { data: portfolio, loading: loadPort, refetch: refetchPort } = useAgencyPortfolio();
+  const { data: candidates, loading: loadCand } = useCandidates();
   const { createLease, loading: creatingLease } = useLeaseActions();
+  const { nudgeArrears, loading: nudging } = useLeaseActions();
 
   const handleCreateLease = async () => {
     try {
@@ -69,22 +82,44 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
       };
       
       const res = await createLease(payload);
-      alert("Félicitations ! Le bail " + res.lease.leaseReference + " a été créé.");
+      Alert.alert("Succès", "Le bail " + res.lease.leaseReference + " a été créé.");
       setShowWizard(false);
       setWizardStep(1);
+      refetchPort();
     } catch (e: any) {
-      alert("Erreur: " + e.message);
+      Alert.alert("Erreur", e.message);
     }
   };
-  const [showWizard, setShowWizard] = useState(false);
+
+  const handleNudge = async (leaseId: string) => {
+    try {
+      await nudgeArrears(leaseId);
+      Alert.alert("Relance envoyée", "SMS + WhatsApp transmis au locataire.");
+    } catch (e: any) {
+      Alert.alert("Erreur", e.message);
+    }
+  };
 
   const changeTab = (t: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setTab(t);
   };
 
-  const fmt = (n: number) => n.toLocaleString("fr-FR");
+  const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
   const fmtK = (n: number) => n >= 1000000 ? (n/1000000).toFixed(1)+"M" : (n/1000).toFixed(0)+"K";
+
+  if (loadAgency || loadPort || loadCand || nudging) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Theme.colors.teal} />
+        {nudging && <Text style={{ marginTop: 10, color: Theme.colors.teal, fontWeight: 'bold' }}>Relance en cours...</Text>}
+      </View>
+    );
+  }
+
+  const AGENCY_DATA = agency || { nom: 'AGENCE', code: '...', caTheorique: 0, caEncaisse: 0, biens: 0 };
+  const PORTFOLIO_DATA = portfolio || [];
+  const CANDIDATES_DATA = candidates || [];
 
   return (
     <View style={styles.container}>
@@ -92,21 +127,21 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         
         <BrandHeader 
-          title={AGENCY.nom}
-          subtitle={`${AGENCY.code} · ${AGENCY.commune}`}
+          title={AGENCY_DATA.nom}
+          subtitle={`${AGENCY_DATA.code} · ${AGENCY_DATA.commune || 'Côte d\'Ivoire'}`}
           roleLabel="AGENCE AGRÉÉE"
           roleColor={Theme.colors.teal}
-          onNotifPress={() => alert("Notifications QAPRIL")}
+          onNotifPress={() => Alert.alert("Notifications QAPRIL", "Aucune notification critique.")}
         />
 
         {/* KPI Strip - Floating over header */}
         <View style={{ marginTop: -40, zIndex: 10 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.kpiStrip} contentContainerStyle={styles.kpiContainer}>
             {[
-               { l: "Biens", v: AGENCY.biens.toString(), icon: "🏘", color: Theme.colors.white },
+               { l: "Biens", v: AGENCY_DATA.biens.toString(), icon: "🏘", color: Theme.colors.white },
                { l: "Taux Occ.", v: "85%", icon: "📊", color: Theme.colors.white },
-               { l: "Impayés", v: "3", icon: "⚠️", color: "#FF8080" },
-               { l: "Vacance", v: "4", icon: "🔓", color: Theme.colors.white },
+               { l: "Impayés", v: PORTFOLIO_DATA.filter((b: any) => b.paiement === 'Impayé').length.toString(), icon: "⚠️", color: "#FF8080" },
+               { l: "Vacance", v: PORTFOLIO_DATA.filter((b: any) => b.statut === 'vacant').length.toString(), icon: "🔓", color: Theme.colors.white },
             ].map((k, i) => (
               <View key={i} style={styles.kpiCard}>
                 <Text style={{ fontSize: 16 }}>{k.icon}</Text>
@@ -126,24 +161,26 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
                 <View style={styles.caCard}>
                   <Text style={styles.caTitle}>LOIERS THÉORIQUES — AVRIL 2026</Text>
                   <View style={styles.caRow}>
-                    <Text style={styles.caVal}>{fmtK(AGENCY.caTheorique)} <Text style={styles.caUnit}>FCFA</Text></Text>
+                    <Text style={styles.caVal}>{fmtK(AGENCY_DATA.caTheorique)} <Text style={styles.caUnit}>FCFA</Text></Text>
                     <View style={styles.caEncaisseContainer}>
                        <Text style={styles.caEncaisseSub}>Encaissé</Text>
-                       <Text style={styles.caEncaisseVal}>{fmtK(AGENCY.caEncaisse)}</Text>
+                       <Text style={styles.caEncaisseVal}>{fmtK(AGENCY_DATA.caEncaisse)}</Text>
                     </View>
                   </View>
                   <View style={styles.progressBg}>
-                    <View style={[styles.progressFill, { width: `${(AGENCY.caEncaisse/AGENCY.caTheorique)*100}%` }]} />
+                    <View style={[styles.progressFill, { width: AGENCY_DATA.caTheorique > 0 ? `${(AGENCY_DATA.caEncaisse/AGENCY_DATA.caTheorique)*100}%` : '0%' }]} />
                   </View>
-                  <Text style={styles.progressText}>{Math.round((AGENCY.caEncaisse/AGENCY.caTheorique)*100)}% de recouvrement mensuel</Text>
+                  <Text style={styles.progressText}>
+                    {AGENCY_DATA.caTheorique > 0 ? Math.round((AGENCY_DATA.caEncaisse/AGENCY_DATA.caTheorique)*100) : 0}% de recouvrement mensuel
+                  </Text>
                 </View>
               </View>
 
               {/* Alertes Prioritaires */}
               <View style={styles.section}>
                 <SectionTitle label="🚨 Alertes recouvrement" />
-                {PORTFOLIO.filter(b => b.paiement === 'Impayé').map(b => (
-                  <TouchableOpacity key={b.id} style={styles.alertCard}>
+                {PORTFOLIO_DATA.filter((b: any) => b.paiement === 'Impayé').map((b: any) => (
+                  <TouchableOpacity key={b.id} style={styles.alertCard} onPress={() => handleNudge(b.id)}>
                     <View style={styles.alertLeft}>
                       <Text style={styles.alertTitle}>{b.adresse.split('·')[0].trim()}</Text>
                       <Text style={styles.alertSub}>J+{b.retard} · {fmt(b.loyer)} FCFA</Text>
@@ -157,7 +194,7 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
               <View style={styles.section}>
                  <SectionTitle label="M-CAND" right={<TouchableOpacity onPress={() => setTab("candidats")}><Text style={styles.link}>Voir tout →</Text></TouchableOpacity>} />
                  <View style={styles.quickGrid}>
-                    {CANDIDATES.slice(0, 2).map((c, i) => (
+                    {CANDIDATES_DATA.slice(0, 2).map((c: any, i: number) => (
                        <TouchableOpacity key={i} style={styles.candRow} onPress={() => setTab("candidats")}>
                           <View style={styles.candAvatar}><Text style={{ fontWeight: 'bold', color: Theme.colors.navy }}>{c.nom.charAt(0)}</Text></View>
                           <View style={{ flex: 1, marginLeft: 12 }}>
@@ -178,7 +215,7 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
                <SectionTitle label="Base Candidats (M-CAND)" />
                <Text style={styles.infoText}>ICL-CONSENT-01 : Autorisation requise pour voir le score.</Text>
                
-               {CANDIDATES.map((c, i) => (
+               {CANDIDATES_DATA.map((c: any, i: number) => (
                  <View key={i} style={styles.candCard}>
                     <View style={styles.candCardTop}>
                        <View style={styles.candAvatarLarge}><Text style={{ fontSize: 20 }}>👤</Text></View>
@@ -231,10 +268,10 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
                     <Text style={styles.addBtnText}>+ Nouveau Bail</Text>
                   </TouchableOpacity>
                 </View>
-                {PORTFOLIO.map(b => (
+                {PORTFOLIO_DATA.map((b: any) => (
                    <TouchableOpacity key={b.id} style={styles.bienCard}>
                       <View style={styles.bienLeft}>
-                         <Text style={styles.bienType}>{b.type.toUpperCase()}</Text>
+                         <Text style={styles.bienType}>{b.type?.toUpperCase() || 'UNITÉ'}</Text>
                          <Text style={styles.bienAddr}>{b.adresse}</Text>
                          <Text style={styles.bienLoyer}>{fmt(b.loyer)} FCFA/mois</Text>
                       </View>
@@ -258,8 +295,8 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
                   <View style={styles.candCardTop}>
                      <View style={styles.candAvatarLarge}><Text style={{ fontSize: 24 }}>🏢</Text></View>
                      <View style={{ flex: 1, marginLeft: 15 }}>
-                        <Text style={styles.candCardName}>{AGENCY.nom}</Text>
-                        <Text style={styles.candCardSub}>{AGENCY.code} · {AGENCY.commune}</Text>
+                        <Text style={styles.candCardName}>{AGENCY_DATA.nom}</Text>
+                        <Text style={styles.candCardSub}>{AGENCY_DATA.code} · {AGENCY_DATA.commune || 'Abidjan'}</Text>
                      </View>
                   </View>
                </View>

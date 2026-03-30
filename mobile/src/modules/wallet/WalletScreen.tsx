@@ -47,6 +47,12 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const { verifyOTP, loading: authLoading } = useAuth();
   const { payReceipt, loading: paying } = usePaymentActions();
 
+  // --- RCL & Droits State ---
+  const [dsec, setDsec] = useState<string | null>(null);
+  const [rclCode, setRclCode] = useState<string | null>(null);
+  const [tSel, setTSel] = useState<any>(null);
+  const [mrlChoice, setMrlChoice] = useState<string | null>(null);
+
   const handlePay = async (receiptId: string) => {
     try {
       await payReceipt(receiptId);
@@ -81,6 +87,10 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const changeTab = (t: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setTab(t);
+    setDsec(null);
+    setRclCode(null);
+    setTSel(null);
+    setMrlChoice(null);
   };
 
   // If loading, show spinner
@@ -379,6 +389,90 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
             </View>
           )}
 
+          {/* ══ MES DROITS ══ */}
+          {tab === "droits" && (
+            <View style={styles.section}>
+              {!dsec && !tSel && (
+                <>
+                  <View style={{ backgroundColor: Theme.colors.purplePale, borderRadius: 15, padding: 15, marginBottom: 15 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: Theme.colors.purple, marginBottom: 4 }}>⚖️ Vos droits locataires</Text>
+                    <Text style={{ fontSize: 11, color: Theme.colors.textMid }}>Réclamations · Consentement loyer · Préavis · Inclusion</Text>
+                  </View>
+                  
+                  <SectionTitle label="Actions juridiques" />
+                  <WalletCard 
+                    icon="📋" 
+                    label="Soumettre une réclamation" 
+                    sub="Quittance · Charges · Travaux" 
+                    color={Theme.colors.purple} 
+                    bg={Theme.colors.purplePale}
+                    onClick={() => setDsec('rcl')}
+                  />
+                  <WalletCard 
+                    icon="✏️" 
+                    label="Consentement loyer" 
+                    sub="Règle MRL-01 mandatory" 
+                    color={Theme.colors.orange} 
+                    bg={Theme.colors.orangePale}
+                    onClick={() => setDsec('mrl')}
+                  />
+                  <WalletCard 
+                    icon="🚪" 
+                    label="Préavis de sortie" 
+                    sub="Générer l'avis de départ" 
+                    color={Theme.colors.navy} 
+                    bg={Theme.colors.navyPale}
+                    onClick={() => setDsec('preavis')}
+                  />
+                </>
+              )}
+
+              {dsec === 'rcl' && (
+                <View>
+                  <TouchableOpacity onPress={() => setDsec(null)} style={{ marginBottom: 10 }}>
+                    <Text style={{ fontWeight: '800', color: Theme.colors.teal }}>← Retour aux droits</Text>
+                  </TouchableOpacity>
+                  <SectionTitle label="Nouvelle Réclamation" />
+                  <Text style={{ fontSize: 12, color: Theme.colors.textMid, marginBottom: 15 }}>
+                    Délai bailleur : 144h. Sans réponse, ticket fermé en votre faveur.
+                  </Text>
+                  {[
+                    { id: 'RCL-01', l: 'Quittance incorrecte', s: 'Montant ou nom erroné' },
+                    { id: 'RCL-02', l: 'Paiement sans quittance', s: 'Capture Mobile Money à fournir' },
+                    { id: 'RCL-05', l: 'Demande de travaux', s: 'Urgence sécurité · Entretien' },
+                  ].map(r => (
+                    <TouchableOpacity key={r.id} style={styles.rclBtn} onPress={() => alert("Réclamation transmise au bailleur.")}>
+                       <Text style={styles.rclBtnTitle}>{r.l}</Text>
+                       <Text style={styles.rclBtnSub}>{r.s}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {dsec === 'mrl' && (
+                <View>
+                  <TouchableOpacity onPress={() => setDsec(null)} style={{ marginBottom: 10 }}>
+                    <Text style={{ fontWeight: '800', color: Theme.colors.teal }}>← Retour</Text>
+                  </TouchableOpacity>
+                  <SectionTitle label="Consentement Loyer (MRL-01)" />
+                  <View style={styles.mrlCard}>
+                    <Text style={styles.mrlTitle}>PROPOSITION DU BAILLEUR</Text>
+                    <Text style={styles.mrlVal}>{fmt(BAIL.loyer + 15000)} F <Text style={{ fontSize: 10 }}>XOF</Text></Text>
+                    <Text style={styles.mrlSub}>+10% · Effet au 01/06/2026</Text>
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 15 }}>
+                       <TouchableOpacity style={styles.mrlBtnNo} onPress={() => { setMrlChoice('no'); alert("Refus enregistré. Ticket de médiation ouvert."); }}>
+                          <Text style={styles.mrlBtnText}>REFUSER</Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity style={styles.mrlBtnYes} onPress={() => { setMrlChoice('yes'); alert("Accord enregistré."); }}>
+                          <Text style={styles.mrlBtnText}>ACCEPTER</Text>
+                       </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
           {/* ══ PROFIL ══ */}
           {tab === "profil" && (
             <View style={styles.section}>
@@ -431,7 +525,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
           { id: "dash", icon: "🏠", label: "Accueil" },
           { id: "bail", icon: "📋", label: "Bail" },
           { id: "quitt", icon: "🧾", label: "Recus" },
-          { id: "util", icon: "⚡", label: "Util" },
+          { id: "droits", icon: "⚖️", label: "Droits" },
           { id: "profil", icon: "👤", label: "Profil" },
         ]}
         activeTab={tab}
@@ -1044,5 +1138,65 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: Theme.colors.textLight,
     fontStyle: 'italic',
+  },
+  rclBtn: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+  },
+  rclBtnTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: Theme.colors.navy,
+  },
+  rclBtnSub: {
+    fontSize: 10,
+    color: Theme.colors.textLight,
+    marginTop: 2,
+  },
+  mrlCard: {
+    backgroundColor: Theme.colors.orangePale,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: Theme.colors.orange + '40',
+  },
+  mrlTitle: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: Theme.colors.orange,
+    letterSpacing: 1,
+  },
+  mrlVal: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: Theme.colors.navy,
+    marginVertical: 4,
+  },
+  mrlSub: {
+    fontSize: 11,
+    color: Theme.colors.textMid,
+  },
+  mrlBtnNo: {
+    flex: 1,
+    backgroundColor: Theme.colors.red,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  mrlBtnYes: {
+    flex: 1,
+    backgroundColor: Theme.colors.green,
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  mrlBtnText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '900',
   },
 });

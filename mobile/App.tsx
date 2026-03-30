@@ -4,6 +4,7 @@ import WalletScreen from './src/modules/wallet/WalletScreen';
 import ProprioScreen from './src/modules/proprio/ProprioScreen';
 import DiasporaScreen from './src/modules/diaspora/DiasporaScreen';
 import IntermediaireScreen from './src/modules/intermediaire/IntermediaireScreen';
+import AgencyScreen from './src/modules/agency/AgencyScreen';
 import AuthScreen from './src/modules/auth/AuthScreen';
 import { Theme } from './src/theme/theme';
 
@@ -39,6 +40,7 @@ export default function App() {
   if (portal === 'LANDLORD') return <ProprioScreen onBack={handleLogout} />;
   if (portal === 'DIASPORA') return <DiasporaScreen onBack={handleLogout} />;
   if (portal === 'INTERMEDIAIRE') return <IntermediaireScreen onBack={handleLogout} />;
+  if (portal === 'AGENCE') return <AgencyScreen onBack={handleLogout} />;
 
   // 3. Fallback (Sélection manuelle / Espace Bienvenue)
   return (
@@ -51,7 +53,7 @@ export default function App() {
             style={{ width: 80, height: 80, marginBottom: 20 }} 
             resizeMode="contain"
           />
-          <Text style={styles.title}>BIENVENUE</Text>
+          <Text style={styles.title}>Qapril</Text>
           <View style={styles.titleUnderline} />
           <Text style={styles.sub}>Choisissez votre espace d'accès QAPRIL</Text>
         </View>
@@ -60,6 +62,7 @@ export default function App() {
           {[
             { id: 'TENANT', name: 'Locataire', icon: '🔑', desc: 'Vos baux, quittances & score ICL' },
             { id: 'LANDLORD', name: 'Propriétaire', icon: '🏠', desc: 'Gestion de vos biens & revenus' },
+            { id: 'AGENCE', name: 'Agence', icon: '🏢', desc: 'Gestion mandats & recouvrement' },
             { id: 'DIASPORA', name: 'Diaspora', icon: '🌍', desc: 'Suivi de vos projets à distance' },
             { id: 'INTERMEDIAIRE', name: 'Intermédiaire', icon: '🤝', desc: 'Supervision & mandats' },
           ].map(p => (

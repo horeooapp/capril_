@@ -7,7 +7,9 @@ import {
   TouchableOpacity, 
   StatusBar,
   Dimensions,
-  SafeAreaView
+  SafeAreaView,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -120,17 +122,22 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                    </View>
                 </View>
                 <TouchableOpacity 
-                    style={styles.transferBtn}
+                    style={[styles.transferBtn, actionLoading && { opacity: 0.7 }]}
+                    disabled={actionLoading}
                     onPress={async () => {
                       try {
                         const res = await transfer(totalFCFA, devise);
-                        alert(res.message);
+                        Alert.alert("Transfert Initié", res.message || "Votre virement SEPA est en cours de traitement.");
                       } catch (e: any) {
-                        alert(e.message);
+                        Alert.alert("Échec du Transfert", e.message);
                       }
                     }}
                 >
-                  <Text style={styles.transferBtnText}>INITIER LE VIREMENT SEPA</Text>
+                  {actionLoading ? (
+                    <ActivityIndicator color="#FFF" />
+                  ) : (
+                    <Text style={styles.transferBtnText}>INITIER LE VIREMENT SEPA</Text>
+                  )}
                 </TouchableOpacity>
               </TouchableOpacity>
 

@@ -169,6 +169,64 @@ export function usePatrimoine() {
   return useQuery('/proprietaires/patrimoine');
 }
 
+export function useProprioMutations() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const addEntity = async (data: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch('/proprietaires/me/patrimoine', {
+        method: 'POST',
+        body: data
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeEntity = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`/proprietaires/me/patrimoine/${id}`, {
+        method: 'DELETE',
+        body: { confirmation: true }
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addUnit = async (entityId: string, data: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`/proprietaires/me/patrimoine/${entityId}/unites`, {
+        method: 'POST',
+        body: data
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { addEntity, removeEntity, addUnit, loading, error };
+}
+
 // --- AGENCY HOOKS ---
 export function useAgency() {
   return useQuery('/agences/me');
@@ -282,7 +340,7 @@ export function useLeaseActions() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/agences/leases/create', {
+      const res = await apiFetch('/proprietaires/me/bails', {
         method: 'POST',
         body: data
       });
@@ -295,7 +353,40 @@ export function useLeaseActions() {
     }
   };
 
-  return { createLease, loading, error };
+  const requestMRL = async (bailRef: string, nouveauLoyer: number, dateEffet: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`/proprietaires/me/bails/${bailRef}/mrl-demande`, {
+        method: 'POST',
+        body: { nouveauLoyer, dateEffet }
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const nudgeArrears = async (leaseId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch(`/agences/leasings/${leaseId}/nudge`, {
+        method: 'POST'
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { createLease, requestMRL, nudgeArrears, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

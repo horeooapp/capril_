@@ -96,7 +96,7 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                         resizeMode="contain"
                      />
                   </View>
-                  <Text style={styles.brandTitle}>QAPRIL</Text>
+                  <Text style={styles.brandTitle}>Qapril</Text>
                   <Text style={styles.brandSubtitle}>
                     Plateforme Nationale de{'\n'}Gestion Locative Certifiée
                   </Text>
