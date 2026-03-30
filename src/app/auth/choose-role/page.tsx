@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useSession, SessionProvider } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
@@ -59,7 +59,7 @@ const ROLE_METADATA: Record<string, {
     }
 }
 
-export default function ChooseRolePage() {
+function ChooseRoleContent() {
     const { data: session, update } = useSession()
     const router = useRouter()
     const [selecting, setSelecting] = useState<string | null>(null)
@@ -182,5 +182,13 @@ export default function ChooseRolePage() {
                 </motion.div>
             </div>
         </div>
+    )
+}
+
+export default function ChooseRolePage() {
+    return (
+        <SessionProvider>
+            <ChooseRoleContent />
+        </SessionProvider>
     )
 }
