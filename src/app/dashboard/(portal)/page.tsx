@@ -12,7 +12,10 @@ export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
     const user = await getCurrentUser();
-    if (!user) return null;
+    if (!user) {
+        const { redirect } = await import("next/navigation");
+        redirect("/dashboard/login");
+    }
 
     const [properties, reports, diasporaData, intermData, agencyData, tenantBail, tenantReceipts] = await Promise.all([
         getProperties() as Promise<any[]>,

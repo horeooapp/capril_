@@ -170,6 +170,8 @@ export default async function Home() {
           <Footer />
         </div>
       );
+    } else if (session?.user?.role === 'TENANT') {
+      redirect("/locataire");
     } else if (!isAdmin) {
       redirect("/dashboard");
     }

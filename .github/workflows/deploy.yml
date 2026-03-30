@@ -94,9 +94,11 @@ jobs:
       - name: 🧹 Critical Runner Cleanup
         run: |
           # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
-          # We try both standard and sudo cleanup to reach files with restricted permissions
+          # We also clear the _temp directory to avoid 'Missing file' errors during artifact download
           sudo rm -rf /home/github/actions-runner/_diag/pages/* || true
+          sudo rm -rf /home/github/actions-runner/_work/_temp/* || true
           rm -rf /home/github/actions-runner/_diag/pages/* || true
+          rm -rf /home/github/actions-runner/_work/_temp/* || true
           
           # Standard workspace cleanup
           find . -maxdepth 1 -not -path '*/.*' -delete || true
