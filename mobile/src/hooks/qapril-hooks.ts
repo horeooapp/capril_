@@ -35,7 +35,7 @@ export async function setAuthToken(token: string | null) {
  * API Fetch wrapper for mobile
  */
 async function apiFetch(path: string, opts: any = {}) {
-  const url = `${API_BASE_URL}${path.startsWith('/api') ? path : `/api${path}`}`;
+  const url = `${API_BASE_URL}${path.startsWith('/api') ? path : `/api/v1${path}`}`;
   
   const headers = {
     'Content-Type': 'application/json',
@@ -226,11 +226,11 @@ export function useLocataireMutations() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useProprio() {
-  return useQuery('/proprietaires/me');
+  return useQuery('/v1/proprietaires/me');
 }
 
 export function usePatrimoine() {
-  return useQuery('/proprietaires/me/patrimoine');
+  return useQuery('/v1/proprietaires/patrimoine');
 }
 
 export function useProprioMutations() {
@@ -241,7 +241,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch('/proprietaires/me/patrimoine', {
+      return await apiFetch('/v1/proprietaires/patrimoine', {
         method: 'POST',
         body: data
       });
@@ -260,7 +260,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch(`/proprietaires/me/patrimoine/${id}`, {
+      return await apiFetch(`/v1/proprietaires/patrimoine/${id}`, {
         method: 'DELETE',
         body: { confirmation: true }
       });

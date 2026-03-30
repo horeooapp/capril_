@@ -114,8 +114,9 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
 
   const getBailleur = () => {
     if (BAIL.typeGestion === "agreee") return { val: BAIL.bailleurCode, masque: true, mention: "Agence agréée — substitution totale" };
-    if (BAIL.bailleurMasque) return { val: BAIL.bailleurCode, masque: true, mention: "Identité masquée par le bailleur" };
-    return { val: BAIL.bailleurNom, masque: false, mention: "Gestion directe — identité visible" };
+    return { val: "Bailleur #Q-" + (BAIL.id?.substring(0,4) || "1204"), masque: true, mention: "Identité strictement confidentielle (Loi RGPD/Bailleur)" };
+    // if (BAIL.bailleurMasque) ...
+    // return { val: BAIL.bailleurNom, masque: false, mention: "Gestion directe — identité visible" };
   };
   const BAILLEUR = getBailleur();
 
@@ -386,7 +387,18 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
 
           {tab === "profil" && (
             <View>
-               <SectionTitle label="Certification ICL" />
+               
+                 <View style={{backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7'}}>
+                    <Text style={{fontSize: 12, fontWeight: '800', color: Theme.colors.navy, marginBottom: 5}}>🔌 Mode Hors Connexion (USSD)</Text>
+                    <Text style={{fontSize: 10, color: Theme.colors.textLight}}>Composez le <Text style={{fontWeight:'900', color:Theme.colors.orange}}>*144*QAPRIL#</Text> depuis votre téléphone pour accéder à vos 3 dernières quittances, votre caution, ou ouvrir un ticket RCL sans internet pleine 24h/24 !</Text>
+                 </View>
+
+                 <SectionTitle label="Certification ICL" />
+                 <TouchableOpacity style={[styles.kpiCard, {marginTop: 10, padding: 15, backgroundColor: Theme.colors.teal}]} onPress={() => Alert.alert("Consentement ICL-01", "Vous autorisez la génération d'un lien sécurisé actif pendant 30 jours permettant à un tiers (Banque/Employeur) de vérifier votre historique locatif. Continuer ?")}>
+                    <Text style={{color: '#FFF', fontWeight: '900', textAlign: 'center'}}>🔗 PARTAGER MON SCORE ICL (LIEN 30J)</Text>
+                 </TouchableOpacity>
+                 <View style={{height: 15}} />
+                 <Text style={{fontSize: 10, color: Theme.colors.textLight, fontStyle: 'italic', textAlign: 'center', marginBottom: 20}}>Ce partage requiert votre autorisation explicite selon la norme ICL-CONSENT-01.</Text>
                <View style={styles.profCard}>
                   <Text style={styles.pName}>{LOC.fullName}</Text>
                   <Text style={[styles.scVal, { color: LOC.score >= 800 ? Theme.colors.green : Theme.colors.orange }]}>{LOC.score}</Text>

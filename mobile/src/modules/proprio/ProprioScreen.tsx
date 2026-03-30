@@ -232,6 +232,13 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                        <Row label="Paiement" value={selectedUnit.paiement || "—"} color={selectedUnit.paiement === 'À jour' ? Theme.colors.green : Theme.colors.red} />
                        <Row label="Référence Bail" value={selectedUnit.leaseReference || "—"} />
                     </View>
+                    <TouchableOpacity style={[styles.actionRow, {marginTop: 15, marginBottom: 5}]} onPress={() => Alert.alert("Génération de Bail Numérique", "La signature du bail standard sera facturée 3 000 FCFA (10 000 FCFA pour Cour Entière) directement sur votre Wallet. Continuer ?")}>
+                       <Text style={{ fontSize: 20 }}>✍️</Text>
+                       <View style={{ flex: 1, marginLeft: 15 }}>
+                          <Text style={styles.actionRowTitle}>Générer Sousing/Bail Numérique</Text>
+                          <Text style={styles.actionRowSub}>Facturation Wallet automatique</Text>
+                       </View>
+                    </TouchableOpacity>
 
                     {selectedUnit.statut === 'occupé' && (
                        <>
@@ -241,6 +248,27 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                              <View style={{ flex: 1, marginLeft: 15 }}>
                                 <Text style={styles.actionRowTitle}>Réviser le loyer (MRL-01)</Text>
                                 <Text style={styles.actionRowSub}>Proposition officielle au locataire</Text>
+                             </View>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Clémence M07", "Souhaitez-vous accorder un délai ou un échéancier à ce locataire ?")}>
+                             <Text style={{ fontSize: 20 }}>🤝</Text>
+                             <View style={{ flex: 1, marginLeft: 15 }}>
+                                <Text style={styles.actionRowTitle}>Clémence Exceptionnelle (M07)</Text>
+                                <Text style={styles.actionRowSub}>Délai 7-30j / Échéancier amiable</Text>
+                             </View>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Émission", "L'émission de cette quittance SHA-256 débitera automatiquement 90 FCFA de votre Wallet QAPRIL. Continuer ?")}>
+                             <Text style={{ fontSize: 20 }}>📜</Text>
+                             <View style={{ flex: 1, marginLeft: 15 }}>
+                                <Text style={styles.actionRowTitle}>Émettre Quittance SHA-256</Text>
+                                <Text style={styles.actionRowSub}>Coût: 90 FCFA (Prélèvement automatique)</Text>
+                             </View>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Délégation", "Générez un mandat partiel pour confier l'encaissement ou les relances à un gestionnaire.")}>
+                             <Text style={{ fontSize: 20 }}>👔</Text>
+                             <View style={{ flex: 1, marginLeft: 15 }}>
+                                <Text style={styles.actionRowTitle}>Mandater un Gestionnaire</Text>
+                                <Text style={styles.actionRowSub}>Délégation (AGENCE NON AGRÉÉE / ACT-05)</Text>
                              </View>
                           </TouchableOpacity>
                        </>
@@ -276,7 +304,21 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
 
           {tab === "profil" && (
             <View>
-               <SectionTitle label="Paramètres du Compte" />
+               <SectionTitle label="Score SLA & Confidentialité" />
+               <View style={[styles.infoCard, {backgroundColor: '#FFF5F5', borderColor: '#FED7D7', marginBottom: 15}]}>
+                  <Text style={{fontSize: 12, fontWeight: '800', color: Theme.colors.red, marginBottom: 5}}>⚠️ Score QAPRIL Avertissement</Text>
+                  <Text style={{fontSize: 10, color: Theme.colors.textLight}}>Vous risquez une pénalité de <Text style={{fontWeight:'800', color:Theme.colors.red}}>-2 pts</Text> si vous laissez un ticket de réclamation locataire (RCL) expirer le <Text style={{fontWeight:'800'}}>délai SLA de 144 heures !</Text></Text>
+               </View>
+
+               <TouchableOpacity style={[styles.settingCard, { backgroundColor: Theme.colors.navy }]} onPress={() => Alert.alert("Mode Confidentiel Activé", "Votre Alias d'anonymisation est désormais BAI-6893. Votre véritable nom n'apparaîtra plus aux gestionnaires, intermédiaires et locataires.")}>
+                  <Text style={{ fontSize: 24 }}>🕵️‍♂️</Text>
+                  <View style={{ flex: 1, marginLeft: 15 }}>
+                     <Text style={[styles.settingTitle, { color: '#FFF' }]}>Mode Confidentiel (BAI-NNN)</Text>
+                     <Text style={[styles.settingSub, { color: 'rgba(255,255,255,0.7)' }]}>Masque identité bailleur (Cliquez pour activer)</Text>
+                  </View>
+               </TouchableOpacity>
+
+               <SectionTitle label="Paramètres Financiers" />
                <TouchableOpacity style={styles.settingCard} onPress={() => setShowWalletConfig(true)}>
                   <Text style={{ fontSize: 24 }}>📱</Text>
                   <View style={{ flex: 1, marginLeft: 15 }}>
@@ -285,12 +327,26 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                   </View>
                </TouchableOpacity>
                
-               <SectionTitle label="Sessions" />
-               {onBack && (
-                  <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
-                    <Text style={styles.logoutText}>🚪 Changer de Portail</Text>
-                  </TouchableOpacity>
-               )}
+               <SectionTitle label="Mes Informations Personnelles" />
+                 <View style={styles.kycForm}>
+                    <Text style={styles.inputLabel}>Nom & Prénom exacts</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>{PROPRIO.fullName || "Bailleur"}</Text></View>
+                    <Text style={styles.inputLabel}>Numéro de Téléphone principal</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>+225 07 XX XX XX XX</Text></View>
+                    <Text style={styles.inputLabel}>Numéro Pièce d'Identité (CNI/Passeport)</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>CIXXXXXXXXXXX</Text></View>
+                    
+                    <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.orange, marginTop: 25, marginBottom: 20 }]} onPress={() => Alert.alert("Sécurité", "La modification de votre identité nécessite une nouvelle validation KYC. Continuer ?")}>
+                       <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>METTRE À JOUR MES DONNÉES</Text></View>
+                    </TouchableOpacity>
+                 </View>
+
+                 <SectionTitle label="Sessions" />
+                 {onBack && (
+                    <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
+                      <Text style={styles.logoutText}>🚪 Changer de Portail</Text>
+                    </TouchableOpacity>
+                 )}
             </View>
           )}
         </View>

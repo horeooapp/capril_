@@ -101,7 +101,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
         <View style={styles.kpiWrap}>
            <View style={styles.kpiBox}>
               <Text style={styles.kpiVal}>{fmt(INTER.commissionDue)} F</Text>
-              <Text style={styles.kpiLabel}>COMMISSIONS DUES</Text>
+              <Text style={styles.kpiLabel}>COMMISSIONS (Loyer Encaissé)</Text>
            </View>
            <View style={[styles.kpiBox, { borderLeftWidth: 1, borderColor: '#EEE' }]}>
               <Text style={styles.kpiVal}>{INTER.activeMandates}</Text>
@@ -171,13 +171,17 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
                        <TouchableOpacity style={styles.bAction} onPress={() => { setSelectedPropId(b.id); setShowQCert(true); }}>
                           <Text style={styles.bActionText}>🧾 Q-CERT</Text>
                        </TouchableOpacity>
+                       <TouchableOpacity style={[styles.bAction, { backgroundColor: Theme.colors.navy }]} onPress={() => Alert.alert("Consentement ICL", "Consentement locataire (ICL-CONSENT-01) requis pour déverrouiller le Score ICL de ce foyer.")}>
+                          <Text style={styles.bActionText}>📊 SCORE ICL</Text>
+                       </TouchableOpacity>
                        <TouchableOpacity style={[styles.bAction, { backgroundColor: Theme.colors.teal }]} onPress={() => Alert.alert("Encaisser", "Activation MM-Transfert...")}>
                           <Text style={styles.bActionText}>💸 ENCAISSER</Text>
                        </TouchableOpacity>
                     </View>
                  </View>
               ))}
-              <Text style={styles.lockMsg}>⚠️ En tant qu'intermédiaire, vous ne pouvez pas modifier les loyers (MRL-01) ni résilier de bail.</Text>
+              <Text style={styles.lockMsg}>⚠️ STRICT INTERDIT : Vous ne pouvez ni modifier les loyers (MRL-01), ni résilier de bail, ni restituer de caution CDC, ni configurer la trésorerie. Seul le Bailleur détient ce pouvoir.</Text>
+               <Text style={[styles.lockMsg, {marginTop: 5, color: Theme.colors.red, fontWeight: '800'}]}>🚨 Attention: Votre session et accès peuvent être Révocables Instantanément (< 60s) par le propriétaire.</Text>
             </View>
           )}
 

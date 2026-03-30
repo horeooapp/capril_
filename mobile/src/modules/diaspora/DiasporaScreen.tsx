@@ -8,7 +8,8 @@ import {
   StatusBar,
   Dimensions,
   ActivityIndicator,
-  Alert
+  Alert,
+  LayoutAnimation
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../theme/theme';
@@ -60,7 +61,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
     );
   }
 
-  const DIASPORA = profile || { fullName: "Investisseur", soldeRecouvre: 425000, properties: [] };
+  const DIASPORA = profile || { fullName: "Bailleur", soldeRecouvre: 425000, properties: [] };
 
   return (
     <View style={styles.container}>
@@ -70,7 +71,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
         
         <BrandHeader 
           title={DIASPORA.fullName?.toUpperCase()}
-          subtitle="Investisseur Diaspora Premium"
+          subtitle="Bailleur Diaspora"
           roleLabel="DIASPORA"
           roleColor={Theme.colors.navy}
           onNotifPress={() => Alert.alert("Notifications", "Aucune alerte pour le moment.")}
@@ -109,6 +110,9 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                  </LinearGradient>
               </TouchableOpacity>
               <Text style={styles.rateHint}>Cours du jour (Fixe RCI) : 1 EUR = {FCFA_EUR} FCFA</Text>
+              <Text style={[styles.rateHint, { marginTop: 4, color: Theme.colors.navy }]}>
+                 * Ce virement permet le rapatriement sécurisé de vos revenus locatifs collectés en Côte d'Ivoire vers votre compte européen certifié.
+              </Text>
 
               <SectionTitle label="Suivi de mes Biens" />
               {(DIASPORA.properties || []).slice(0, 2).map((p: any) => (
@@ -137,6 +141,13 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                       <Row label="Délai SLA" value="24h" />
                    </View>
                 ))}
+
+                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 25 }]} onPress={() => Alert.alert("Action refusée", "Contactez votre gestionnaire de compte pour valider un nouveau bien.")}>
+                    <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>+ AJOUTER UN BIEN AU PAYS</Text></View>
+                 </TouchableOpacity>
+                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.teal, marginTop: 10 }]} onPress={() => Alert.alert("Action refusée", "Un locataire doit être vérifié avant rattachement.")}>
+                    <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>+ RATTACHER UN LOCATAIRE GÉRÉ</Text></View>
+                 </TouchableOpacity>
              </View>
           )}
 
@@ -148,18 +159,45 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                    <Text style={styles.ibanVal}>{DIASPORA.iban || 'FR76 XXXX XXXX XXXX XXXX XXXX XXX'}</Text>
                    <Text style={styles.ibanBank}>{DIASPORA.bankName || 'REVOLUT / BOURSORAMA'}</Text>
                 </View>
-                <Text style={styles.legalInfo}>Les virements SEPA sont effectués chaque mardi à 10h (GMT). Archive fiscale disponible sur demande.</Text>
+                <Text style={styles.legalInfo}>Règle stricte: Acheminement SEPA Automatisé vers IBAN certifié dès l'émission de la quittance validée. Archive fiscale 10 ans disponible sur demande.</Text>
              </View>
           )}
 
           {tab === "profil" && (
              <View>
-                <SectionTitle label="Compte Premium" />
+                <SectionTitle label="Profil Identité KYC" />
                 <View style={styles.profCard}>
-                   <View style={styles.avatar}><Text style={{ fontSize: 32 }}>🤴</Text></View>
-                   <Text style={styles.userName}>{DIASPORA.fullName}</Text>
-                   <Text style={styles.userRes}>Résident : {DIASPORA.paysResidence || 'Europe'}</Text>
-                </View>
+                    <View style={styles.avatar}><Text style={{ fontSize: 32 }}>👤</Text></View>
+                    <Text style={styles.userName}>{DIASPORA.fullName}</Text>
+                    <Text style={styles.userRes}>Résident : {DIASPORA.paysResidence || 'Europe'}</Text>
+                 </View>
+
+                 <SectionTitle label="SLA & Délégation Mandataire" />
+                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 5, marginBottom: 15 }]} onPress={() => Alert.alert("Lien Généré", "https://qapril.ci/d/8xP9a (Valide 7 Jours, chiffré HMAC-SHA256)")}>
+                    <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>🔗 GÉNÉRER LIEN D'INVITATION (7J)</Text></View>
+                 </TouchableOpacity>
+                 <View style={styles.kycForm}>
+                    <Text style={[styles.inputLabel, {marginTop: 0}]}>Niveau d'exigence SLA (Délai Relance)</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>Urgente (12h) | Correspondant (24h) | Agence (48h)</Text></View>
+                    <Text style={styles.inputLabel}>Fuseau Horaire Reporting</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>Europe/Paris (Standard GMT+1)</Text></View>
+                    <Text style={styles.inputLabel}>Fréquence PDF Q-Cert</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>Hebdomadaire (Vendredi, 18H)</Text></View>
+                 </View>
+                 
+                 <SectionTitle label="Mon Profil de Résident" />
+                 <View style={styles.kycForm}>
+                    <Text style={styles.inputLabel}>Nom & Prénom exacts</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>{DIASPORA.fullName}</Text></View>
+                    <Text style={styles.inputLabel}>Numéro de Téléphone</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>+33 6 XX XX XX XX</Text></View>
+                    <Text style={styles.inputLabel}>Email de contact</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>contact@bailleur.com</Text></View>
+                    
+                    <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.orange, marginTop: 25 }]} onPress={() => Alert.alert("Sécurité", "La modification de votre identité légale nécessite une nouvelle validation KYC de la part des administrateurs Qapril. Continuer ?")}>
+                       <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>METTRE À JOUR MES DONNÉES</Text></View>
+                    </TouchableOpacity>
+                 </View>
                 {onBack && (
                   <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
                      <Text style={styles.logoutText}>🚪 Retour Portail</Text>
@@ -220,6 +258,13 @@ const styles = StyleSheet.create({
   avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EDF2F7', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   userName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
   userRes: { fontSize: 12, color: Theme.colors.textLight, marginTop: 5 },
-  logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
+  logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center', marginTop: 30 },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
+  submitBtn: { borderRadius: 15, marginTop: 20, overflow: 'hidden' },
+  gradientBtn: { paddingVertical: 15, alignItems: 'center' },
+  submitBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900' },
+  kycForm: { backgroundColor: '#FFF', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20 },
+  inputLabel: { fontSize: 10, fontWeight: '800', color: Theme.colors.textLight, marginBottom: 5, marginTop: 10 },
+  inputVal: { backgroundColor: '#F8FAFC', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#EDF2F7' },
+  inputText: { fontSize: 13, fontWeight: '700', color: Theme.colors.navy },
 });
