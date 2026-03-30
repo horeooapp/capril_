@@ -100,16 +100,16 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Login with Telephone and OTP
+   * Login with Email and OTP
    * Aligned with Section 2 of QAPRIL_API_MAPPING.md
    */
-  const login = async (telephone: string, otp: string) => {
+  const login = async (email: string, otp: string) => {
     setLoading(true);
     setError(null);
     try {
       const res = await apiFetch('/auth/login', {
         method: 'POST',
-        body: { telephone, otp }
+        body: { email, otp }
       });
       
       if (res.token) {

@@ -56,8 +56,13 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Theme.colors.navy} />
+      <View style={[styles.container, { backgroundColor: Theme.colors.navyDark, justifyContent: 'center', alignItems: 'center' }]}>
+        <StatusBar barStyle="light-content" />
+        <View style={styles.splashLogoBox}>
+           <Image source={require('./assets/icon.png')} style={styles.splashLogo} resizeMode="contain" />
+        </View>
+        <Text style={styles.splashBrand}>Qapril mobile</Text>
+        <ActivityIndicator size="small" color={Theme.colors.tealPale} style={{ marginTop: 30 }} />
       </View>
     );
   }
@@ -82,7 +87,7 @@ export default function App() {
                 <Image source={require('./assets/icon.png')} style={styles.logo} resizeMode="contain" />
               </View>
               <Text style={styles.welcome}>Bienvenue sur</Text>
-              <Text style={styles.userName}>Qapril</Text>
+              <Text style={styles.userName}>Qapril mobile</Text>
               <Text style={styles.instruction}>Veuillez sélectionner votre portail d'accès</Text>
             </View>
 
@@ -126,7 +131,9 @@ export default function App() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   gradBg: { flex: 1 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' },
+  splashLogoBox: { width: 120, height: 120, backgroundColor: '#FFF', borderRadius: 30, padding: 15, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 20, elevation: 15 },
+  splashLogo: { width: '100%', height: '100%' },
+  splashBrand: { fontSize: 28, fontWeight: '900', color: '#FFF', letterSpacing: 1.5 },
   scroll: { padding: 30, paddingBottom: 50 },
   header: { marginTop: 20, marginBottom: 40 },
   logoBox: { width: 70, height: 70, backgroundColor: '#FFF', borderRadius: 20, padding: 10, marginBottom: 25, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 10 },

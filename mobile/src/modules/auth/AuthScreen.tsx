@@ -27,8 +27,8 @@ interface AuthScreenProps {
 }
 
 export default function AuthScreen({ onLogin }: AuthScreenProps) {
-  const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const { login, loading, error } = useAuth();
   
@@ -36,10 +36,11 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
 
   const handleRequestOTP = async () => {
     setLocalError(null);
-    const cleaned = phone.replace(/\s/g, '');
+    const cleaned = email.trim();
     
-    if (cleaned.length < 8) {
-      setLocalError("Veuillez entrer un numéro de téléphone valide.");
+    // Basic email validation
+    if (!cleaned.includes('@') || cleaned.length < 5) {
+      setLocalError("Veuillez entrer une adresse e-mail valide.");
       return;
     }
 
@@ -56,7 +57,7 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
     }
     
     try {
-      const res = await login(phone, otp.trim());
+      const res = await login(email.trim(), otp.trim());
       if (res && res.success) {
         onLogin(res.profil);
       }
@@ -107,12 +108,12 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                   <View style={styles.sheetIndicator} />
                   
                   <Text style={styles.sheetTitle}>
-                    {step === 'PHONE' ? "Bienvenue" : "Vérification SMS"}
+                    {step === 'EMAIL' ? "Connexion" : "Vérification E-mail"}
                   </Text>
                   <Text style={styles.sheetDesc}>
-                    {step === 'PHONE' 
-                      ? "Identifiez-vous avec votre numéro de téléphone pour accéder à votre espace certifié." 
-                      : `Saisissez le code de sécurité envoyé au\n${phone}`}
+                    {step === 'EMAIL' 
+                      ? "Identifiez-vous avec votre adresse e-mail pour accéder à votre espace certifié." 
+                      : `Saisissez le code de sécurité envoyé à\n${email}`}
                   </Text>
 
                   {displayError && (
@@ -122,20 +123,19 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                   )}
 
                   <View style={styles.formContainer}>
-                    {step === 'PHONE' ? (
+                    {step === 'EMAIL' ? (
                       <>
-                        <Text style={styles.inputLabel}>Numéro de Téléphone</Text>
+                        <Text style={styles.inputLabel}>Adresse E-mail</Text>
                         <View style={styles.inputWrapper}>
-                           <View style={styles.prefixBox}>
-                              <Text style={styles.prefixText}>+225</Text>
-                           </View>
                            <TextInput 
                             style={styles.input}
-                            placeholder="01 02 03 04 05"
+                            placeholder="vous@exemple.com"
                             placeholderTextColor={Theme.colors.grey3}
-                            keyboardType="phone-pad"
-                            value={phone}
-                            onChangeText={setPhone}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            value={email}
+                            onChangeText={setEmail}
                             autoFocus
                           />
                         </View>
@@ -176,10 +176,10 @@ export default function AuthScreen({ onLogin }: AuthScreenProps) {
                         
                         <TouchableOpacity 
                           style={styles.cancelBtn}
-                          onPress={() => { setStep('PHONE'); setOtp(''); setLocalError(null); }}
+                          onPress={() => { setStep('EMAIL'); setOtp(''); setLocalError(null); }}
                           disabled={loading}
                         >
-                          <Text style={styles.cancelBtnText}>Utiliser un autre numéro</Text>
+                          <Text style={styles.cancelBtnText}>Utiliser une autre adresse email</Text>
                         </TouchableOpacity>
                       </>
                     )}
@@ -221,9 +221,7 @@ const styles = StyleSheet.create({
   formContainer: { paddingBottom: 10 },
   inputLabel: { fontSize: 11, fontWeight: '900', color: Theme.colors.navy, marginBottom: 8, letterSpacing: 0.5 },
   inputWrapper: { flexDirection: 'row', backgroundColor: '#F8FAFC', borderWidth: 2, borderColor: '#EDF2F7', borderRadius: 18, height: 60, marginBottom: 20, overflow: 'hidden' },
-  prefixBox: { width: 70, backgroundColor: '#EDF2F7', alignItems: 'center', justifyContent: 'center' },
-  prefixText: { fontSize: 15, fontWeight: '900', color: Theme.colors.navy },
-  input: { flex: 1, fontSize: 18, fontWeight: '800', color: Theme.colors.navy, paddingLeft: 15 },
+  input: { flex: 1, fontSize: 16, fontWeight: '700', color: Theme.colors.navy, paddingHorizontal: 15 },
   otpWrapper: { backgroundColor: '#F8FAFC', borderWidth: 2, borderColor: '#EDF2F7', borderRadius: 18, height: 65, marginBottom: 20 },
   otpInput: { flex: 1, fontSize: 24, fontWeight: '900', color: Theme.colors.navy, textAlign: 'center', letterSpacing: 10 },
   btnShadow: { shadowColor: Theme.colors.navy, shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
