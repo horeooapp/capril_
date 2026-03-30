@@ -91,13 +91,16 @@ jobs:
     environment: production
 
     steps:
-      - name: 🧹 Cleanup workspace
+      - name: 🧹 Critical Runner Cleanup
         run: |
-          # Robust cleanup to prevent Runner 'file already exists' or 'missing file' errors
+          # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
+          # We try both standard and sudo cleanup to reach files with restricted permissions
+          sudo rm -rf /home/github/actions-runner/_diag/pages/* || true
+          rm -rf /home/github/actions-runner/_diag/pages/* || true
+          
+          # Standard workspace cleanup
           find . -maxdepth 1 -not -path '*/.*' -delete || true
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
-          # Fix the artifact v4 telemetry bug on self-hosted runners by clearing the diagnostic pages
-          rm -rf /home/github/actions-runner/_diag/pages/* || true
 
       - name: 📥 Download build artifact
         uses: actions/download-artifact@v4
