@@ -21,20 +21,31 @@ export default async function LocataireLayout({
         redirect("/dashboard")
     }
 
-    // Force onboarding for tenants - Check DB as JWT might be stale
+    // 3. Security: Check onboarding but with extreme robustness
     if (session?.user?.role === "TENANT") {
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { onboardingComplete: true }
-        })
+        try {
+            if (!session.user.id) {
+                // Should not happen, but prevents Prisma crash
+                return redirect("/locataire/login")
+            }
 
-        if (!user) {
-            // User was probably deleted from DB but session cookie persists
-            redirect("/locataire/login")
-        }
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { onboardingComplete: true }
+            })
 
-        if (!user.onboardingComplete) {
-            redirect("/onboarding/tenant")
+            if (!user) {
+                // User probably deleted after DB reset
+                return redirect("/locataire/login")
+            }
+
+            if (!user.onboardingComplete) {
+                return redirect("/onboarding/tenant")
+            }
+        } catch (dbError) {
+            console.error("[LAYOUT-LOCATAIRE] Critical Error in Onboarding Check:", dbError)
+            // If DB is failing, better to allow access with a console log than to crash everything
+            // or we could redirect to a maintenance page
         }
     }
 

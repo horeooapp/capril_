@@ -1,4 +1,4 @@
-# Trigger: 2026-03-30 02:13 UTC (Fix No Active Lease + Robust Lookup + Fallback BDQ)
+# Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
 name: 🚀 Deploy QAPRIL v3.0 to Hostinger
 
 env:

@@ -89,7 +89,7 @@ export async function GET(req: Request) {
         retard: 0,
         isDeclarative: true,
         bdqStatus: bdq.statut,
-        bailleurNom: bdq.bailleur.fullName || bdq.bailleur.name
+        bailleurNom: bdq.bailleur?.fullName || bdq.bailleur?.name || 'Bailleur Inconnu'
       });
     }
 
