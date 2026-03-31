@@ -20,6 +20,7 @@ import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
 import { BottomSheet } from '../../components/common/BottomSheet';
 import { useDiaspora, useDiasporaTransfer } from '../../hooks/qapril-hooks';
+import { User, Link as LinkIcon, DoorOpen } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const FCFA_EUR = 655.957; // Taux de change fixe (Zone Franc)
@@ -164,30 +165,33 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
           )}
 
           {tab === "profil" && (
-             <View>
-                <SectionTitle label="Profil Identité KYC" />
-                <View style={styles.profCard}>
-                    <View style={styles.avatar}><Text style={{ fontSize: 32 }}>👤</Text></View>
-                    <Text style={styles.userName}>{DIASPORA.fullName}</Text>
-                    <Text style={styles.userRes}>Résident : {DIASPORA.paysResidence || 'Europe'}</Text>
-                 </View>
+              <View>
+                 <SectionTitle label="Profil Identité KYC" />
+                 <View style={styles.profCard}>
+                     <View style={styles.avatar}><User size={38} color={Theme.colors.navy} /></View>
+                     <Text style={styles.userName}>{DIASPORA.fullName}</Text>
+                     <Text style={styles.userRes}>Résident : {DIASPORA.paysResidence || 'Europe'}</Text>
+                  </View>
 
                  <SectionTitle label="SLA & Délégation Mandataire" />
-                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 5, marginBottom: 15 }]} onPress={() => {
-                    Alert.alert("Génération d'Invitation", "Créer un lien sécurisé actif pendant 7 Jours ?", [
-                        { text: "Annuler", style: "cancel" },
-                        { text: "Oui, créer", onPress: async () => {
-                            try {
-                                const { apiFetch } = require('../../hooks/qapril-hooks');
-                                const res = await apiFetch('/diaspora/invite', { method: 'POST', body: { email: 'agence@test.ci' } });
-                                Alert.alert("Lien Généré", `${res.link}\n(Copié dans le presse-papier)`);
-                            } catch(e: any) { Alert.alert("Erreur", e.message); }
-                        }}
-                    ]);
-                 }}>
-                    <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>🔗 GÉNÉRER LIEN D'INVITATION (7J)</Text></View>
-                 </TouchableOpacity>
-                 <View style={styles.kycForm}>
+                  <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 5, marginBottom: 15 }]} onPress={() => {
+                     Alert.alert("Génération d'Invitation", "Créer un lien sécurisé actif pendant 7 Jours ?", [
+                         { text: "Annuler", style: "cancel" },
+                         { text: "Oui, créer", onPress: async () => {
+                             try {
+                                 const { apiFetch } = require('../../hooks/qapril-hooks');
+                                 const res = await apiFetch('/diaspora/invite', { method: 'POST', body: { email: 'agence@test.ci' } });
+                                 Alert.alert("Lien Généré", `${res.link}\n(Copié dans le presse-papier)`);
+                             } catch(e: any) { Alert.alert("Erreur", e.message); }
+                         }}
+                     ]);
+                  }}>
+                     <View style={[styles.gradientBtn, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 }]}>
+                        <LinkIcon size={16} color="#FFF" />
+                        <Text style={styles.submitBtnText}>GÉNÉRER LIEN D'INVITATION (7J)</Text>
+                     </View>
+                  </TouchableOpacity>
+                  <View style={styles.kycForm}>
                     <Text style={[styles.inputLabel, {marginTop: 0}]}>Niveau d'exigence SLA (Délai Relance)</Text>
                     <View style={styles.inputVal}><Text style={styles.inputText}>Urgente (12h) | Correspondant (24h) | Agence (48h)</Text></View>
                     <Text style={styles.inputLabel}>Fuseau Horaire Reporting</Text>
@@ -243,9 +247,9 @@ const styles = StyleSheet.create({
   curBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10 },
   curBtnActive: { backgroundColor: Theme.colors.navy },
   curText: { fontSize: 11, fontWeight: '900', color: Theme.colors.textLight },
-  kpiRow: { flexDirection: 'row', marginTop: 20, marginHorizontal: 20, backgroundColor: '#FFF', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  kpiRow: { flexDirection: 'row', marginTop: 20, marginHorizontal: 20, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 5, borderWidth: 1, borderColor: '#EDF2F7' },
   kpiBox: { flex: 1, alignItems: 'center' },
-  kpiVal: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy },
+  kpiVal: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
   kpiLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight, marginTop: 4, textAlign: 'center' },
   transferCard: { marginTop: 10, borderRadius: 25, overflow: 'hidden' },
   gradCard: { padding: 25, alignItems: 'center' },
@@ -254,28 +258,28 @@ const styles = StyleSheet.create({
   tBtn: { backgroundColor: '#FFF', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 15, marginTop: 10 },
   tBtnText: { color: Theme.colors.navy, fontSize: 11, fontWeight: '900' },
   rateHint: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', marginTop: 10, fontStyle: 'italic' },
-  propLine: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9' },
-  pName: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
-  pSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
-  propCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7' },
+  propLine: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.85)', padding: 18, borderRadius: 18, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
+  pName: { fontSize: 14, fontWeight: '900', color: Theme.colors.navy },
+  pSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4 },
+  propCard: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 20, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
   pTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, alignItems: 'center' },
-  pCardName: { fontSize: 15, fontWeight: '800', color: Theme.colors.navy },
-  ibanCard: { backgroundColor: Theme.colors.navy, padding: 25, borderRadius: 25 },
-  ibanLabel: { fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: '800', letterSpacing: 1 },
-  ibanVal: { fontSize: 16, color: '#FFF', fontWeight: '900', marginVertical: 10, fontFamily: 'monospace' },
-  ibanBank: { fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: '700' },
-  legalInfo: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', paddingHorizontal: 30, marginTop: 25 },
-  profCard: { backgroundColor: '#FFF', borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20 },
+  pCardName: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy },
+  ibanCard: { backgroundColor: Theme.colors.navy, padding: 30, borderRadius: 25, shadowColor: Theme.colors.navy, shadowOpacity: 0.3, shadowRadius: 15, elevation: 6 },
+  ibanLabel: { fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: '900', letterSpacing: 1.5 },
+  ibanVal: { fontSize: 18, color: '#FFF', fontWeight: '900', marginVertical: 12, fontFamily: 'monospace' },
+  ibanBank: { fontSize: 11, color: 'rgba(255,255,255,0.8)', fontWeight: '800' },
+  legalInfo: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', paddingHorizontal: 30, marginTop: 25, lineHeight: 16 },
+  profCard: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 15, elevation: 4 },
   avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EDF2F7', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   userName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
   userRes: { fontSize: 12, color: Theme.colors.textLight, marginTop: 5 },
   logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center', marginTop: 30 },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
-  submitBtn: { borderRadius: 15, marginTop: 20, overflow: 'hidden' },
-  gradientBtn: { paddingVertical: 15, alignItems: 'center' },
-  submitBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900' },
-  kycForm: { backgroundColor: '#FFF', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20 },
-  inputLabel: { fontSize: 10, fontWeight: '800', color: Theme.colors.textLight, marginBottom: 5, marginTop: 10 },
-  inputVal: { backgroundColor: '#F8FAFC', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#EDF2F7' },
-  inputText: { fontSize: 13, fontWeight: '700', color: Theme.colors.navy },
+  submitBtn: { borderRadius: 16, marginTop: 20, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 },
+  gradientBtn: { paddingVertical: 16, alignItems: 'center' },
+  submitBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
+  kycForm: { backgroundColor: 'rgba(255,255,255,0.85)', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
+  inputLabel: { fontSize: 10, fontWeight: '800', color: Theme.colors.textLight, marginBottom: 6, marginTop: 12 },
+  inputVal: { backgroundColor: '#F8FAFC', padding: 16, borderRadius: 15, borderWidth: 1, borderColor: '#EDF2F7' },
+  inputText: { fontSize: 13, fontWeight: '800', color: Theme.colors.navy },
 });

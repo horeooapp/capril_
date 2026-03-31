@@ -23,6 +23,7 @@ import { WalletCard } from '../../components/common/WalletCard';
 import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
 import { BottomSheet } from '../../components/common/BottomSheet';
+import { Home, Settings, Wallet, PenSquare, Scale, Handshake, ScrollText, BriefcaseBusiness, ShieldAlert, Smartphone } from 'lucide-react-native';
 import { 
   useProprio, 
   usePatrimoine, 
@@ -155,15 +156,15 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
               <SectionTitle label="Gestion & Patrimoine" />
               <View style={styles.actionGrid}>
                  <TouchableOpacity style={styles.actionBox} onPress={() => setTab("patrimoine")}>
-                    <Text style={{ fontSize: 24 }}>🏠</Text>
+                    <Home size={28} color={Theme.colors.navy} strokeWidth={2} />
                     <Text style={styles.actionLabel}>Patrimoine</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.actionBox} onPress={() => setTab("profil")}>
-                    <Text style={{ fontSize: 24 }}>⚙️</Text>
+                    <Settings size={28} color={Theme.colors.teal} strokeWidth={2} />
                     <Text style={styles.actionLabel}>Profil</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.actionBox} onPress={() => setTab("quittances")}>
-                    <Text style={{ fontSize: 24 }}>💰</Text>
+                    <Wallet size={28} color={Theme.colors.orange} strokeWidth={2} />
                     <Text style={styles.actionLabel}>Wallet</Text>
                  </TouchableOpacity>
               </View>
@@ -234,7 +235,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                        <Row label="Référence Bail" value={selectedUnit.leaseReference || "—"} />
                     </View>
                     <TouchableOpacity style={[styles.actionRow, {marginTop: 15, marginBottom: 5}]} onPress={() => Alert.alert("Génération de Bail Numérique", "La signature du bail standard sera facturée 3 000 FCFA (10 000 FCFA pour Cour Entière) directement sur votre Wallet. Continuer ?")}>
-                       <Text style={{ fontSize: 20 }}>✍️</Text>
+                       <PenSquare size={24} color={Theme.colors.orange} />
                        <View style={{ flex: 1, marginLeft: 15 }}>
                           <Text style={styles.actionRowTitle}>Générer Sousing/Bail Numérique</Text>
                           <Text style={styles.actionRowSub}>Facturation Wallet automatique</Text>
@@ -245,28 +246,28 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                        <>
                           <SectionTitle label="Actions" />
                           <TouchableOpacity style={styles.actionRow} onPress={() => setShowMRL(true)}>
-                             <Text style={{ fontSize: 20 }}>⚖️</Text>
+                             <Scale size={24} color={Theme.colors.navy} />
                              <View style={{ flex: 1, marginLeft: 15 }}>
                                 <Text style={styles.actionRowTitle}>Réviser le loyer (MRL-01)</Text>
                                 <Text style={styles.actionRowSub}>Proposition officielle au locataire</Text>
                              </View>
                           </TouchableOpacity>
                           <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Clémence M07", "Souhaitez-vous accorder un délai ou un échéancier à ce locataire ?")}>
-                             <Text style={{ fontSize: 20 }}>🤝</Text>
+                             <Handshake size={24} color={Theme.colors.green} />
                              <View style={{ flex: 1, marginLeft: 15 }}>
                                 <Text style={styles.actionRowTitle}>Clémence Exceptionnelle (M07)</Text>
                                 <Text style={styles.actionRowSub}>Délai 7-30j / Échéancier amiable</Text>
                              </View>
                           </TouchableOpacity>
                           <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Émission", "L'émission de cette quittance SHA-256 débitera automatiquement 90 FCFA de votre Wallet QAPRIL. Continuer ?")}>
-                             <Text style={{ fontSize: 20 }}>📜</Text>
+                             <ScrollText size={24} color={Theme.colors.teal} />
                              <View style={{ flex: 1, marginLeft: 15 }}>
                                 <Text style={styles.actionRowTitle}>Émettre Quittance SHA-256</Text>
                                 <Text style={styles.actionRowSub}>Coût: 90 FCFA (Prélèvement automatique)</Text>
                              </View>
                           </TouchableOpacity>
                           <TouchableOpacity style={styles.actionRow} onPress={() => Alert.alert("Délégation", "Générez un mandat partiel pour confier l'encaissement ou les relances à un gestionnaire.")}>
-                             <Text style={{ fontSize: 20 }}>👔</Text>
+                             <BriefcaseBusiness size={24} color={Theme.colors.purple} />
                              <View style={{ flex: 1, marginLeft: 15 }}>
                                 <Text style={styles.actionRowTitle}>Mandater un Gestionnaire</Text>
                                 <Text style={styles.actionRowSub}>Délégation (AGENCE NON AGRÉÉE / ACT-05)</Text>
@@ -311,7 +312,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                   <Text style={{fontSize: 10, color: Theme.colors.textLight}}>Vous risquez une pénalité de <Text style={{fontWeight:'800', color:Theme.colors.red}}>-2 pts</Text> si vous laissez un ticket de réclamation locataire (RCL) expirer le <Text style={{fontWeight:'800'}}>délai SLA de 144 heures !</Text></Text>
                </View>
 
-               <TouchableOpacity style={[styles.settingCard, { backgroundColor: Theme.colors.navy }]} onPress={() => Alert.alert("Mode Confidentiel", "Activer ou désactiver l'anonymisation BAI-NNN ?", [
+               <TouchableOpacity style={[styles.settingCard, { backgroundColor: Theme.colors.navy, borderColor: Theme.colors.navy }]} onPress={() => Alert.alert("Mode Confidentiel", "Activer ou désactiver l'anonymisation BAI-NNN ?", [
                    { text: "Annuler", style: "cancel" },
                    { text: "Confirmer Activation", onPress: async () => {
                        try {
@@ -321,7 +322,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                        } catch(e: any) { Alert.alert("Erreur", e.message); }
                    }}
                ])}>
-                  <Text style={{ fontSize: 24 }}>🕵️‍♂️</Text>
+                  <ShieldAlert size={26} color="#FFF" />
                   <View style={{ flex: 1, marginLeft: 15 }}>
                      <Text style={[styles.settingTitle, { color: '#FFF' }]}>Mode Confidentiel (BAI-NNN)</Text>
                      <Text style={[styles.settingSub, { color: 'rgba(255,255,255,0.7)' }]}>Masque identité bailleur (Cliquez pour activer)</Text>
@@ -330,7 +331,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
 
                <SectionTitle label="Paramètres Financiers" />
                <TouchableOpacity style={styles.settingCard} onPress={() => setShowWalletConfig(true)}>
-                  <Text style={{ fontSize: 24 }}>📱</Text>
+                  <Smartphone size={26} color={Theme.colors.navy} />
                   <View style={{ flex: 1, marginLeft: 15 }}>
                      <Text style={styles.settingTitle}>Coordonnées de versement</Text>
                      <Text style={styles.settingSub}>Mobile Money par défaut</Text>
@@ -361,7 +362,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
           )}
         </View>
 
-        <BottomSheet visible={showMRL} onClose={() => setShowMRL(false)} title="⚖️ PROPOSITION MRL-01">
+        <BottomSheet visible={showMRL} onClose={() => setShowMRL(false)} title="PROPOSITION MRL-01">
             <Text style={styles.modalSub}>Note : Le locataire dispose de 5 jours pour accepter ou refuser cette proposition de révision.</Text>
             <Text style={styles.inputLabel}>Nouveau Loyer Proposé (FCFA)</Text>
             <TextInput style={styles.input} keyboardType="numeric" placeholder="Ex: 350000" onChangeText={t => setMrlData({...mrlData, rent: t})} />
@@ -372,7 +373,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
             </TouchableOpacity>
          </BottomSheet>
 
-         <BottomSheet visible={showRetrait} onClose={() => setShowRetrait(false)} title="✕ CONFIRMATION DE RETRAIT">
+         <BottomSheet visible={showRetrait} onClose={() => setShowRetrait(false)} title="CONFIRMATION DE RETRAIT">
             <View style={styles.warningBox}>
                <Text style={styles.warningText}>ATTENTION : Conformément aux exigences de la DGI Côte d'Ivoire, les données de ce bien seront archivées pendant 10 ans.</Text>
             </View>
@@ -394,7 +395,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
             </TouchableOpacity>
          </BottomSheet>
 
-         <BottomSheet visible={showWalletConfig} onClose={() => setShowWalletConfig(false)} title="📱 CONFIGURATION PAYOUT">
+         <BottomSheet visible={showWalletConfig} onClose={() => setShowWalletConfig(false)} title="CONFIGURATION PAYOUT">
             <Text style={styles.modalSub}>Choisissez l'opérateur pour vos virements automatiques.</Text>
             <View style={styles.operatorRow}>
                {['WAVE', 'ORANGE', 'MTN'].map(op => (
@@ -410,7 +411,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
             </TouchableOpacity>
          </BottomSheet>
 
-         <BottomSheet visible={showAddProperty} onClose={() => setShowAddProperty(false)} title="🏠 NOUVELLE ENTITÉ">
+         <BottomSheet visible={showAddProperty} onClose={() => setShowAddProperty(false)} title="NOUVELLE ENTITÉ">
             <Text style={styles.inputLabel}>Nom ou Libellé du Bien</Text>
             <TextInput style={styles.input} placeholder="Ex: Résidence Harmony" value={newEntity.name} onChangeText={t => setNewEntity({...newEntity, name: t})} />
             
@@ -487,36 +488,36 @@ const styles = StyleSheet.create({
   kpiLabel: { fontSize: 9, color: Theme.colors.textLight, fontWeight: '800' },
   kpiVal: { fontSize: 16, fontWeight: '900', color: Theme.colors.navy, marginTop: 2 },
   actionGrid: { flexDirection: 'row', gap: 10 },
-  actionBox: { flex: 1, backgroundColor: '#FFF', borderRadius: 15, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7' },
-  actionLabel: { fontSize: 9, fontWeight: '800', color: Theme.colors.navy, marginTop: 5 },
-  entityCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 15, marginBottom: 12, borderWidth: 1, borderColor: '#EDF2F7' },
+  actionBox: { flex: 1, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 15, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 },
+  actionLabel: { fontSize: 10, fontWeight: '800', color: Theme.colors.navy, marginTop: 8 },
+  entityCard: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
   entityTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  entityName: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
+  entityName: { fontSize: 15, fontWeight: '900', color: Theme.colors.navy },
   entityAddr: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4 },
-  entityStats: { marginTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 8 },
-  statLine: { fontSize: 10, fontWeight: '700', color: Theme.colors.textMid },
-  addFullBtn: { backgroundColor: Theme.colors.navy, borderRadius: 15, paddingVertical: 18, alignItems: 'center', marginTop: 10 },
+  entityStats: { marginTop: 12, borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 10 },
+  statLine: { fontSize: 11, fontWeight: '800', color: Theme.colors.textMid },
+  addFullBtn: { backgroundColor: Theme.colors.navy, borderRadius: 18, paddingVertical: 18, alignItems: 'center', marginTop: 15, shadowColor: Theme.colors.navy, shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 },
   addFullBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900', letterSpacing: 1 },
-  entityHero: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7' },
-  heroNom: { fontSize: 20, fontWeight: '900', color: Theme.colors.navy },
-  heroAddr: { fontSize: 12, color: Theme.colors.textLight, marginTop: 4 },
-  heroSub: { fontSize: 10, color: Theme.colors.textLight, marginTop: 8 },
-  unitCard: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 8, alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9' },
-  unitName: { fontSize: 13, fontWeight: '800', color: Theme.colors.navy },
-  unitSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
-  unitHero: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', padding: 20, borderRadius: 20, marginBottom: 20 },
-  unitHeroName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
-  infoCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginBottom: 15 },
-  actionRow: { flexDirection: 'row', backgroundColor: '#FFF', padding: 20, borderRadius: 20, alignItems: 'center', marginBottom: 15 },
-  actionRowTitle: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
-  actionRowSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
-  walletHero: { borderRadius: 25, padding: 25, alignItems: 'center', marginBottom: 20 },
-  walletHeroLabel: { fontSize: 9, fontWeight: '800', color: 'rgba(255,255,255,0.6)', letterSpacing: 1 },
-  walletHeroVal: { fontSize: 32, fontWeight: '900', color: '#FFF', marginVertical: 10 },
-  payoutHint: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', paddingHorizontal: 40 },
-  virementBtn: { backgroundColor: Theme.colors.green, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 15 },
-  virementBtnText: { color: '#FFF', fontSize: 11, fontWeight: '900' },
-  settingCard: { flexDirection: 'row', backgroundColor: '#FFF', padding: 20, borderRadius: 20, alignItems: 'center', marginBottom: 15 },
+  entityHero: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 20, padding: 22, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 12, elevation: 4 },
+  heroNom: { fontSize: 22, fontWeight: '900', color: Theme.colors.navy },
+  heroAddr: { fontSize: 12, color: Theme.colors.textLight, marginTop: 6 },
+  heroSub: { fontSize: 10, color: Theme.colors.textLight, marginTop: 10 },
+  unitCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.85)', padding: 16, borderRadius: 18, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
+  unitName: { fontSize: 14, fontWeight: '900', color: Theme.colors.navy },
+  unitSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4 },
+  unitHero: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', padding: 22, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 },
+  unitHeroName: { fontSize: 20, fontWeight: '900', color: Theme.colors.navy },
+  infoCard: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 20, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8 },
+  actionRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.9)', padding: 18, borderRadius: 18, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
+  actionRowTitle: { fontSize: 13, fontWeight: '900', color: Theme.colors.navy },
+  actionRowSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4 },
+  walletHero: { borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20, shadowColor: Theme.colors.navy, shadowOpacity: 0.3, shadowRadius: 15, elevation: 6 },
+  walletHeroLabel: { fontSize: 10, fontWeight: '900', color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5 },
+  walletHeroVal: { fontSize: 36, fontWeight: '900', color: '#FFF', marginVertical: 15 },
+  payoutHint: { fontSize: 11, color: Theme.colors.textMid, textAlign: 'center', paddingHorizontal: 30, lineHeight: 18 },
+  virementBtn: { backgroundColor: Theme.colors.green, paddingHorizontal: 25, paddingVertical: 14, borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10 },
+  virementBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
+  settingCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.85)', padding: 18, borderRadius: 18, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
   settingTitle: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
   settingSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 2 },
   logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center', marginTop: 20 },

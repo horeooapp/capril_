@@ -23,6 +23,7 @@ import { WalletCard } from '../../components/common/WalletCard';
 import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
 import { BottomSheet } from '../../components/common/BottomSheet';
+import { Coins, Receipt, Star, ShieldCheck, Scale, FileBadge, ReceiptText, Zap, Droplet, LogOut, ChevronRight, AlertCircle, FileText, FileLock2, ClipboardList, PenLine, DoorOpen } from 'lucide-react-native';
 import { 
   useLocataire, 
   useBail, 
@@ -39,11 +40,11 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 const { width } = Dimensions.get('window');
 
 const RCL_TYPES = [
-  { code: "RCL-01", label: "Quittance incorrecte", sub: "Montant, période ou nom erroné", icon: "🧾" },
-  { code: "RCL-02", label: "Paiement sans quittance", sub: "Preuve Mobile Money + aucune quittance émise", icon: "💸" },
-  { code: "RCL-03", label: "Charges non contractuelles", sub: "Montant hors bail enregistré", icon: "💰" },
-  { code: "RCL-04", label: "Harcèlement ou pression", sub: "Tentative expulsion informelle ou pressions", icon: "🚨" },
-  { code: "RCL-05", label: "Demande de travaux", sub: "Réparation urgente · entretien · mise en conformité", icon: "🔧", travaux: true },
+  { code: "RCL-01", label: "Quittance incorrecte", sub: "Montant, période ou nom erroné", Icon: ReceiptText },
+  { code: "RCL-02", label: "Paiement sans quittance", sub: "Preuve Mobile Money + aucune quittance émise", Icon: FileText },
+  { code: "RCL-03", label: "Charges non contractuelles", sub: "Montant hors bail enregistré", Icon: Coins },
+  { code: "RCL-04", label: "Harcèlement ou pression", sub: "Tentative expulsion informelle ou pressions", Icon: AlertCircle },
+  { code: "RCL-05", label: "Demande de travaux", sub: "Réparation urgente · entretien · mise en conformité", Icon: PenLine, travaux: true },
 ];
 
 export default function WalletScreen({ onBack }: { onBack?: () => void }) {
@@ -109,7 +110,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const LOC = locData || { fullName: "Locataire", score: 750, scoreBase: 750, scoreKyc: 800, kycComplet: false };
   const BAIL = bailData || { logement: "Logement", loyer: 0, statut: "À jour", typeGestion: "agreee", bailleurNom: "...", bailleurCode: "...", bailleurMasque: true };
   const QUITTANCES = quittData || [];
-  const ABOS = abosData || [];
+  const ABOS = Array.isArray(abosData) ? abosData : (abosData?.history || []);
   const TICKETS = ticketsData || [];
 
   const getBailleur = () => {
@@ -136,12 +137,13 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
 
         <View style={styles.kpiRowWrap}>
            {[
-             { l: "LOYER", v: fmt(BAIL.loyer) + " F", icon: "💰" },
-             { l: "CERTIFIÉES", v: QUITTANCES.filter((q:any)=>q.statut==='Certifiée').length, icon: "🧾" },
-             { l: "SCORE ICL", v: LOC.score, icon: "⭐" },
-             { l: "CAUTION", v: "✓", icon: "🔒" },
+             { l: "LOYER", v: fmt(BAIL.loyer) + " F", Icon: Coins, color: Theme.colors.teal },
+             { l: "CERTIFIÉES", v: QUITTANCES.filter((q:any)=>q.statut==='Certifiée').length, Icon: Receipt, color: Theme.colors.navy },
+             { l: "SCORE ICL", v: LOC.score, Icon: Star, color: Theme.colors.orange },
+             { l: "CAUTION", v: "✓", Icon: ShieldCheck, color: Theme.colors.green },
            ].map((k, i) => (
              <View key={i} style={styles.kpiSquare}>
+               <k.Icon size={20} color={k.color} strokeWidth={2.5} />
                <Text style={styles.kpiSquareVal}>{k.v}</Text>
                <Text style={styles.kpiSquareLabel}>{k.l}</Text>
              </View>
@@ -152,15 +154,20 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
           {tab === "dash" && (
             <>
               {BAIL.statut === "Impayé" && (
-                <View style={styles.impayeCard}>
-                   <View style={styles.impayeHeader}>
-                      <Text style={styles.impayeTitle}>⚠ Loyer en retard (J+{BAIL.retard})</Text>
-                      <Badge label="RÈGLE ICL-10" color="#FFF" bg={Theme.colors.red} />
+                <View style={[styles.impayeCard, { flexDirection: 'row', alignItems: 'flex-start' }]}>
+                   <View style={{ marginRight: 15, marginTop: 2 }}>
+                     <AlertCircle size={24} color={Theme.colors.red} />
                    </View>
-                   <Text style={styles.impayeSub}>Le non-paiement au 5 du mois entraîne un malus automatique (−10 pts) sur votre score ICL.</Text>
-                   <TouchableOpacity style={[styles.payBtn, { backgroundColor: Theme.colors.red }]} onPress={() => setTab("quitt")}>
-                      <Text style={styles.payBtnText}>RÉGULARISER MAINTENANT (WAVE/OM)</Text>
-                   </TouchableOpacity>
+                   <View style={{ flex: 1 }}>
+                     <View style={styles.impayeHeader}>
+                        <Text style={styles.impayeTitle}>Loyer en retard (J+{BAIL.retard})</Text>
+                        <Badge label="RÈGLE ICL-10" color="#FFF" bg={Theme.colors.red} />
+                     </View>
+                     <Text style={styles.impayeSub}>Le non-paiement au 5 du mois entraîne un malus automatique (−10 pts) sur votre score ICL.</Text>
+                     <TouchableOpacity style={[styles.payBtn, { backgroundColor: Theme.colors.red }]} onPress={() => setTab("quitt")}>
+                        <Text style={styles.payBtnText}>RÉGULARISER MAINTENANT (WAVE/OM)</Text>
+                     </TouchableOpacity>
+                   </View>
                 </View>
               )}
 
@@ -176,33 +183,39 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                        <Text style={styles.bLabel}>{BAIL.typeGestion === "agreee" ? "AGENCE" : "BAILLEUR"}</Text>
                        <Text style={styles.bVal}>{BAIL.typeGestion === "agreee" ? BAIL.agence : BAILLEUR.val}</Text>
                     </View>
-                    <Text style={styles.bMention}>🔐 {BAILLEUR.mention}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                       <FileLock2 size={12} color={Theme.colors.textLight} />
+                       <Text style={[styles.bMention, { marginLeft: 4 }]}>{BAILLEUR.mention}</Text>
+                    </View>
                  </View>
               </TouchableOpacity>
 
               <SectionTitle label="Factures & Abonnements" right={<TouchableOpacity onPress={() => setTab("util")}><Text style={styles.link}>Voir tout →</Text></TouchableOpacity>} />
               <View style={styles.aboGrid}>
-                 {ABOS.map((a: any) => (
-                   <TouchableOpacity key={a.id} style={[styles.aboCard, { borderLeftColor: a.color || Theme.colors.teal }]} onPress={() => setTab("util")}>
-                      <Text style={{ fontSize: 20 }}>{a.icon || '⚡'}</Text>
-                      <Text style={[styles.aboType, { color: a.color || Theme.colors.teal }]}>{a.type || 'ABO'}</Text>
-                      <Text style={styles.aboPrice}>{fmt(a.montant || 0)} F</Text>
-                   </TouchableOpacity>
-                 ))}
+                 {ABOS.map((a: any) => {
+                   const TypeIcon = a.type === 'SODECI' ? Droplet : Zap;
+                   return (
+                     <TouchableOpacity key={a.id} style={[styles.aboCard, { borderLeftColor: a.color || Theme.colors.teal }]} onPress={() => setTab("util")}>
+                        <TypeIcon size={22} color={a.color || Theme.colors.teal} />
+                        <Text style={[styles.aboType, { color: a.color || Theme.colors.teal }]}>{a.type || 'ABO'}</Text>
+                        <Text style={styles.aboPrice}>{fmt(a.montant || 0)} F</Text>
+                     </TouchableOpacity>
+                   );
+                 })}
               </View>
 
               <SectionTitle label="Actions Rapides" />
               <View style={styles.toolsRow}>
                  <TouchableOpacity style={styles.toolItem} onPress={() => setTab("droits")}>
-                    <Text style={{ fontSize: 24 }}>⚖️</Text>
+                    <Scale size={26} color={Theme.colors.teal} strokeWidth={2} />
                     <Text style={styles.toolText}>Mes Droits</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.toolItem} onPress={() => Alert.alert("Export", "Historique 36 mois certifié en cours de génération...")}>
-                    <Text style={{ fontSize: 24 }}>📤</Text>
+                    <FileBadge size={26} color={Theme.colors.navy} strokeWidth={2} />
                     <Text style={styles.toolText}>Certificat</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.toolItem} onPress={() => setTab("quitt")}>
-                    <Text style={{ fontSize: 24 }}>🧾</Text>
+                    <ReceiptText size={26} color={Theme.colors.purple} strokeWidth={2} />
                     <Text style={styles.toolText}>Quittances</Text>
                  </TouchableOpacity>
               </View>
@@ -223,7 +236,6 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                  <Text style={styles.mmInfo}>Utilisez ces canaux pour un règlement certifié instantané.</Text>
                  {BAIL.mobileMoney?.map((mm: any) => (
                    <TouchableOpacity key={mm.id} style={styles.mmBtn} onPress={() => Alert.alert("Paiement", `Ouverture ${mm.operateur}...`)}>
-                      <Text style={{ fontSize: 24 }}>{mm.icon}</Text>
                       <View style={{ flex: 1, marginLeft: 12 }}>
                          <Text style={styles.mmOp}>{mm.operateur}</Text>
                          <Text style={styles.mmNum}>{mm.numero}</Text>
@@ -233,7 +245,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                  ))}
               </View>
 
-              <ACard icon="🚪" label="Initier un préavis" sub="Automatisé (1 mois loi CI)" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => { setTab("droits"); setDsec("preavis"); }} />
+              <ACard IconComp={DoorOpen} label="Initier un préavis" sub="Automatisé (1 mois loi CI)" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => { setTab("droits"); setDsec("preavis"); }} />
             </View>
           )}
 
@@ -243,7 +255,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                 {QUITTANCES.map((q: any) => (
                    <TouchableOpacity key={q.id} style={styles.qLine} onPress={() => Alert.alert("Preuve Digitale", `SHA-256: ${q.sha || '...a5d2c8'}\nLa Poste CI: ${q.laposte || '—'}`)}>
                       <View>
-                         <Text style={styles.qPeriod}>{q.mois || q.period}</Text>
+                         <Text style={styles.qPeriod}>{q.periode || q.mois || q.period}</Text>
                          <Text style={styles.qMeta}>{q.ref} · {fmt(q.montant)} F</Text>
                       </View>
                       {q.statut === 'Certifiée' ? (
@@ -266,7 +278,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                    {TICKETS.map((t: any) => (
                      <TouchableOpacity key={t.id} style={styles.ticketCard} onPress={() => setTSel(t)}>
                         <View style={{ flex: 1 }}>
-                           <Text style={styles.ticketLabel}>{t.label}</Text>
+                           <Text style={styles.ticketLabel}>{t.label || t.type || 'Ticket'}</Text>
                            <Text style={styles.ticketMeta}>{t.date} · {t.id}</Text>
                         </View>
                         {t.statut === "En attente bailleur" && (
@@ -280,9 +292,9 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                    ))}
 
                    <SectionTitle label="Actions Juridiques" />
-                   <ACard icon="📋" label="Soumettre une réclamation" sub="Quittance, Travaux, Harcèlement" color={Theme.colors.purple} bg={Theme.colors.purplePale} onClick={() => setDsec("rcl")} />
-                   <ACard icon="✏️" label="Consentement Loyers" sub="Révision MRL-01" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => setDsec("mrl")} />
-                   <ACard icon="🚪" label="Préavis de Sortie" sub="Formaliser mon départ" color={Theme.colors.navy} bg={Theme.colors.navyPale} onClick={() => setDsec("preavis")} />
+                   <ACard IconComp={ClipboardList} label="Soumettre une réclamation" sub="Quittance, Travaux, Harcèlement" color={Theme.colors.purple} bg={Theme.colors.purplePale} onClick={() => setDsec("rcl")} />
+                   <ACard IconComp={PenLine} label="Consentement Loyers" sub="Révision MRL-01" color={Theme.colors.orange} bg={Theme.colors.orangePale} onClick={() => setDsec("mrl")} />
+                   <ACard IconComp={DoorOpen} label="Préavis de Sortie" sub="Formaliser mon départ" color={Theme.colors.navy} bg={Theme.colors.navyPale} onClick={() => setDsec("preavis")} />
                  </>
                ) : dsec === "rcl" ? (
                  <View>
@@ -291,7 +303,9 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                     {!rclCode ? (
                       RCL_TYPES.map(r => (
                         <TouchableOpacity key={r.code} style={styles.typePick} onPress={() => { setRclCode(r.code); setRclData({ ...rclData, type: r.label }); }}>
-                           <Text style={{ fontSize: 24 }}>{r.icon}</Text>
+                           <View style={{ backgroundColor: '#FFF', padding: 10, borderRadius: 12 }}>
+                             <r.Icon size={24} color={Theme.colors.purple} />
+                           </View>
                            <View style={{ flex: 1, marginLeft: 12 }}>
                               <Text style={styles.typePickL}>{r.label}</Text>
                               <Text style={styles.typePickS}>{r.sub}</Text>
@@ -388,8 +402,8 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
           {tab === "profil" && (
             <View>
                
-                 <View style={{backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7'}}>
-                    <Text style={{fontSize: 12, fontWeight: '800', color: Theme.colors.navy, marginBottom: 5}}>🔌 Mode Hors Connexion (USSD)</Text>
+                 <View style={{backgroundColor: 'rgba(255,255,255,0.7)', padding: 15, borderRadius: 18, marginBottom: 20, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10}}>
+                    <Text style={{fontSize: 12, fontWeight: '800', color: Theme.colors.navy, marginBottom: 5}}>Mode Hors Connexion (USSD)</Text>
                     <Text style={{fontSize: 10, color: Theme.colors.textLight}}>Composez le <Text style={{fontWeight:'900', color:Theme.colors.orange}}>*144*QAPRIL#</Text> depuis votre téléphone pour accéder à vos 3 dernières quittances, votre caution, ou ouvrir un ticket RCL sans internet pleine 24h/24 !</Text>
                  </View>
 
@@ -445,14 +459,14 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   );
 }
 
-const ACard = ({ icon, label, sub, color, bg, onClick }: any) => (
+const ACard = ({ IconComp, label, sub, color, bg, onClick }: any) => (
   <TouchableOpacity onPress={onClick} style={[styles.acard, { backgroundColor: bg, borderColor: color + '20' }]}>
-    <Text style={{ fontSize: 22 }}>{icon}</Text>
+    <IconComp size={24} color={color} strokeWidth={2.5} />
     <View style={{ flex: 1, marginLeft: 12 }}>
       <Text style={[styles.acardL, { color }]}>{label}</Text>
       <Text style={styles.acardS}>{sub}</Text>
     </View>
-    <Text style={{ fontSize: 16, color, opacity: 0.5 }}>›</Text>
+    <ChevronRight size={20} color={color} style={{ opacity: 0.5 }} />
   </TouchableOpacity>
 );
 
@@ -460,39 +474,39 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F5FA' },
   scrollContent: { paddingBottom: 100 },
   body: { padding: 16 },
-  kpiRowWrap: { flexDirection: 'row', gap: 8, marginTop: -25, marginHorizontal: 16, zIndex: 10 },
-  kpiCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 10 },
-  kpiSquare: { flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
-  kpiSquareVal: { fontSize: 12, color: '#FFF', fontWeight: '800' },
-  kpiSquareLabel: { fontSize: 7, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginTop: 2 },
-  impayeCard: { backgroundColor: '#FEECEC', borderRadius: 18, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: '#A0000020' },
-  impayeHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  impayeTitle: { fontSize: 13, fontWeight: '900', color: Theme.colors.red },
-  impayeSub: { fontSize: 10, color: Theme.colors.textMid, marginBottom: 15 },
-  payBtn: { borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
-  payBtnText: { color: '#FFF', fontSize: 10, fontWeight: '900' },
-  logementBox: { backgroundColor: '#FFF', borderRadius: 18, padding: 16, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20 },
-  logementName: { fontSize: 14, fontWeight: '800', color: Theme.colors.text, marginBottom: 6 },
-  badgeRow: { flexDirection: 'row', gap: 6, marginBottom: 12 },
-  bailleurStrip: { backgroundColor: '#F8FAFC', borderRadius: 10, padding: 10, flexDirection: 'row', alignItems: 'center' },
-  bLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight },
-  bVal: { fontSize: 12, fontWeight: '800', color: Theme.colors.textMid },
-  bMention: { fontSize: 9, color: Theme.colors.textLight, fontStyle: 'italic' },
+  kpiRowWrap: { flexDirection: 'row', gap: 8, marginTop: -35, marginHorizontal: 16, zIndex: 10 },
+  kpiCard: { backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 10 },
+  kpiSquare: { flex: 1, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 18, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: '#FFF', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 5 },
+  kpiSquareVal: { fontSize: 13, color: Theme.colors.navy, fontWeight: '900', marginTop: 6 },
+  kpiSquareLabel: { fontSize: 7, color: Theme.colors.textLight, fontWeight: '800', marginTop: 2 },
+  impayeCard: { backgroundColor: 'rgba(254, 236, 236, 0.8)', borderRadius: 20, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: '#A0000030', shadowColor: Theme.colors.red, shadowOpacity: 0.08, shadowRadius: 15, elevation: 3 },
+  impayeHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+  impayeTitle: { fontSize: 14, fontWeight: '900', color: Theme.colors.red },
+  impayeSub: { fontSize: 11, color: Theme.colors.textMid, marginBottom: 15, lineHeight: 16 },
+  payBtn: { borderRadius: 12, paddingVertical: 12, alignItems: 'center', shadowColor: Theme.colors.red, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },
+  payBtnText: { color: '#FFF', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 },
+  logementBox: { backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 20, padding: 18, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 3 },
+  logementName: { fontSize: 15, fontWeight: '900', color: Theme.colors.navy, marginBottom: 8 },
+  badgeRow: { flexDirection: 'row', gap: 6, marginBottom: 15 },
+  bailleurStrip: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center' },
+  bLabel: { fontSize: 9, fontWeight: '800', color: Theme.colors.textLight, letterSpacing: 0.5 },
+  bVal: { fontSize: 13, fontWeight: '900', color: Theme.colors.navy, marginTop: 2 },
+  bMention: { fontSize: 10, color: Theme.colors.textLight, fontStyle: 'italic' },
   aboGrid: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  aboCard: { flex: 1, backgroundColor: '#FFF', padding: 12, borderRadius: 15, borderLeftWidth: 3, borderWidth: 1, borderColor: '#EDF2F7' },
-  aboType: { fontSize: 9, fontWeight: '800', marginTop: 4 },
-  aboPrice: { fontSize: 14, fontWeight: '900', color: Theme.colors.text, marginTop: 2 },
-  link: { fontSize: 10, fontWeight: '800', color: Theme.colors.teal },
-  toolsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  toolItem: { width: (width - 32 - 16) / 3, backgroundColor: '#FFF', padding: 15, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7' },
-  toolText: { fontSize: 10, fontWeight: '800', color: Theme.colors.navy, marginTop: 8 },
-  bailCard: { backgroundColor: '#FFF', borderRadius: 18, padding: 16, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7' },
-  mmHub: { backgroundColor: '#E0F4F9', padding: 16, borderRadius: 18, marginBottom: 15 },
-  mmInfo: { fontSize: 10, color: Theme.colors.textMid, lineHeight: 15, marginBottom: 15 },
-  mmBtn: { flexDirection: 'row', backgroundColor: '#FFF', padding: 12, borderRadius: 12, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: '#FFF' },
-  mmOp: { fontSize: 12, fontWeight: '800', color: Theme.colors.text },
-  mmNum: { fontSize: 14, fontWeight: '900', color: Theme.colors.navy, marginTop: 2 },
-  acard: { flexDirection: 'row', padding: 14, borderRadius: 15, alignItems: 'center', marginBottom: 10, borderWidth: 1 },
+  aboCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', padding: 14, borderRadius: 18, borderLeftWidth: 4, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 },
+  aboType: { fontSize: 10, fontWeight: '900', marginTop: 8 },
+  aboPrice: { fontSize: 15, fontWeight: '900', color: Theme.colors.navy, marginTop: 4 },
+  link: { fontSize: 11, fontWeight: '900', color: Theme.colors.teal },
+  toolsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
+  toolItem: { width: (width - 32 - 20) / 3, backgroundColor: 'rgba(255,255,255,0.8)', padding: 16, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 },
+  toolText: { fontSize: 11, fontWeight: '800', color: Theme.colors.navy, marginTop: 10 },
+  bailCard: { backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 },
+  mmHub: { backgroundColor: '#E0F4F9', padding: 18, borderRadius: 20, marginBottom: 15, borderWidth: 1, borderColor: '#C0EBF5' },
+  mmInfo: { fontSize: 11, color: Theme.colors.textMid, lineHeight: 16, marginBottom: 15 },
+  mmBtn: { flexDirection: 'row', backgroundColor: '#FFF', padding: 14, borderRadius: 16, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: '#FFF', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  mmOp: { fontSize: 12, fontWeight: '900', color: Theme.colors.navy },
+  mmNum: { fontSize: 15, fontWeight: '900', color: Theme.colors.teal, marginTop: 2, letterSpacing: 0.5 },
+  acard: { flexDirection: 'row', padding: 16, borderRadius: 18, alignItems: 'center', marginBottom: 12, borderWidth: 1, shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6, elevation: 2 },
   acardL: { fontSize: 13, fontWeight: '800' },
   acardS: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
   qLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 8, borderWidth: 1, borderColor: '#EDF2F7' },

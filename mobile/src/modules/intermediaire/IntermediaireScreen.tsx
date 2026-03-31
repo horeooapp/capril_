@@ -22,6 +22,7 @@ import { BrandHeader } from '../../components/common/BrandHeader';
 import { BottomNav } from '../../components/common/BottomNav';
 import { BottomSheet } from '../../components/common/BottomSheet';
 import { useIntermediaire, useIntermediaireActions } from '../../hooks/qapril-hooks';
+import { FileSignature, Camera, Building2, Handshake, UserCircle2, LogOut } from 'lucide-react-native';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -115,19 +116,19 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
               <SectionTitle label="Actions Métier" />
               <View style={styles.toolsGrid}>
                  <TouchableOpacity style={styles.toolBtn} onPress={() => setShowQCert(true)}>
-                    <Text style={{ fontSize: 24 }}>🧾</Text>
+                    <FileSignature size={28} color={Theme.colors.navy} />
                     <Text style={styles.toolText}>Q-Cert</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.toolBtn} onPress={() => setShowEDL(true)}>
-                    <Text style={{ fontSize: 24 }}>📸</Text>
+                    <Camera size={28} color={Theme.colors.orange} />
                     <Text style={styles.toolText}>M-EDL</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.toolBtn} onPress={() => setTab("biens")}>
-                    <Text style={{ fontSize: 24 }}>🏘️</Text>
+                    <Building2 size={28} color={Theme.colors.teal} />
                     <Text style={styles.toolText}>Gestion</Text>
                  </TouchableOpacity>
                  <TouchableOpacity style={styles.toolBtn} onPress={() => setShowM07(true)}>
-                    <Text style={{ fontSize: 24 }}>🤝</Text>
+                    <Handshake size={28} color={Theme.colors.purple} />
                     <Text style={styles.toolText}>Médiation</Text>
                  </TouchableOpacity>
               </View>
@@ -203,13 +204,14 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
              <View>
                 <SectionTitle label="Profil Certifié" />
                 <View style={styles.profBox}>
-                   <View style={styles.profAvatar}><Text style={{ fontSize: 32 }}>🤵</Text></View>
+                   <View style={styles.profAvatar}><UserCircle2 size={40} color={Theme.colors.orange} /></View>
                    <Text style={styles.profName}>{INTER.fullName}</Text>
                    <Text style={styles.profSub}>{INTER.id || 'CDAIM-041'}</Text>
                 </View>
                 {onBack && (
                    <TouchableOpacity style={styles.logoutBtn} onPress={onBack}>
-                      <Text style={styles.logoutText}>🚪 Retour Portail</Text>
+                      <LogOut size={18} color={Theme.colors.navy} />
+                      <Text style={styles.logoutText}> Retour Portail</Text>
                    </TouchableOpacity>
                 )}
              </View>
@@ -278,20 +280,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { paddingBottom: 100 },
   body: { padding: 20 },
-  kpiWrap: { flexDirection: 'row', marginTop: -25, marginHorizontal: 20, backgroundColor: '#FFF', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  kpiWrap: { flexDirection: 'row', marginTop: -25, marginHorizontal: 20, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 5, borderWidth: 1, borderColor: '#EDF2F7' },
   kpiBox: { flex: 1, alignItems: 'center' },
   kpiVal: { fontSize: 18, fontWeight: '900', color: Theme.colors.orange },
   kpiLabel: { fontSize: 8, fontWeight: '800', color: Theme.colors.textLight, marginTop: 4, letterSpacing: 1 },
   toolsGrid: { flexDirection: 'row', gap: 10, marginBottom: 25 },
-  toolBtn: { flex: 1, backgroundColor: '#FFF', padding: 15, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7' },
-  toolText: { fontSize: 10, fontWeight: '800', color: Theme.colors.navy, marginTop: 8 },
-  alertCard: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 15, alignItems: 'center', borderLeftWidth: 4, borderLeftColor: Theme.colors.red, marginBottom: 25, borderWidth: 1, borderColor: '#EDF2F7' },
+  toolBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.85)', padding: 15, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 10, elevation: 2 },
+  toolText: { fontSize: 10, fontWeight: '900', color: Theme.colors.navy, marginTop: 10 },
+  alertCard: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.85)', padding: 15, borderRadius: 15, alignItems: 'center', borderLeftWidth: 4, borderLeftColor: Theme.colors.red, marginBottom: 25, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 6 },
   alertTitle: { fontSize: 13, fontWeight: '800', color: Theme.colors.red },
   alertSub: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
-  mandateStrip: { flexDirection: 'row', backgroundColor: '#FFF', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9' },
-  mName: { fontSize: 14, fontWeight: '800', color: Theme.colors.navy },
-  mSub: { fontSize: 10, color: Theme.colors.textLight, marginTop: 2 },
-  bienCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7' },
+  mandateStrip: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.85)', padding: 16, borderRadius: 16, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.02, shadowRadius: 5 },
+  mName: { fontSize: 14, fontWeight: '900', color: Theme.colors.navy },
+  mSub: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4 },
+  bienCard: { backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 20, padding: 20, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 },
   bienTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   bienName: { fontSize: 15, fontWeight: '800', color: Theme.colors.navy },
   bienAddr: { fontSize: 11, color: Theme.colors.textLight, marginBottom: 15 },
@@ -299,21 +301,21 @@ const styles = StyleSheet.create({
   bAction: { flex: 1, backgroundColor: Theme.colors.orange, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   bActionText: { color: '#FFF', fontSize: 10, fontWeight: '900' },
   lockMsg: { fontSize: 10, color: Theme.colors.textLight, fontStyle: 'italic', textAlign: 'center', paddingHorizontal: 30, marginTop: 20 },
-  walletHero: { borderRadius: 25, padding: 25, alignItems: 'center', marginBottom: 20 },
-  heroLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  heroVal: { fontSize: 32, fontWeight: '900', color: '#FFF', marginVertical: 10 },
-  cashoutBtn: { backgroundColor: '#FFF', paddingHorizontal: 25, paddingVertical: 12, borderRadius: 15 },
-  cashoutText: { color: Theme.colors.orange, fontSize: 12, fontWeight: '900' },
-  legalInfo: { fontSize: 9, color: Theme.colors.textLight, textAlign: 'center', marginTop: 15 },
-  profBox: { backgroundColor: '#FFF', borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20 },
+  walletHero: { borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20, shadowColor: Theme.colors.orange, shadowOpacity: 0.3, shadowRadius: 15, elevation: 6 },
+  heroLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1.5 },
+  heroVal: { fontSize: 36, fontWeight: '900', color: '#FFF', marginVertical: 12 },
+  cashoutBtn: { backgroundColor: '#FFF', paddingHorizontal: 25, paddingVertical: 14, borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
+  cashoutText: { color: Theme.colors.orange, fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
+  legalInfo: { fontSize: 10, color: Theme.colors.textLight, textAlign: 'center', marginTop: 15, lineHeight: 16 },
+  profBox: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 25, padding: 30, alignItems: 'center', marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 12 },
   profAvatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: Theme.colors.orangePale, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  profName: { fontSize: 18, fontWeight: '900', color: Theme.colors.navy },
-  profSub: { fontSize: 12, color: Theme.colors.textLight, marginTop: 4 },
-  logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 15, paddingVertical: 15, alignItems: 'center' },
+  profName: { fontSize: 20, fontWeight: '900', color: Theme.colors.navy },
+  profSub: { fontSize: 12, color: Theme.colors.textLight, marginTop: 6 },
+  logoutBtn: { backgroundColor: '#F1F5F9', borderRadius: 16, paddingVertical: 15, alignItems: 'center' },
   logoutText: { color: Theme.colors.navy, fontWeight: '800', fontSize: 13 },
-  sheetSub: { fontSize: 12, color: Theme.colors.textLight, textAlign: 'center', marginBottom: 25 },
-  submitBtn: { backgroundColor: Theme.colors.navy, borderRadius: 15, paddingVertical: 18, alignItems: 'center', marginTop: 20 },
-  submitBtnText: { color: '#FFF', fontSize: 14, fontWeight: '900' },
+  sheetSub: { fontSize: 12, color: Theme.colors.textLight, textAlign: 'center', marginBottom: 25, lineHeight: 18 },
+  submitBtn: { backgroundColor: Theme.colors.navy, borderRadius: 16, paddingVertical: 18, alignItems: 'center', marginTop: 20, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 },
+  submitBtnText: { color: '#FFF', fontSize: 14, fontWeight: '900', letterSpacing: 0.5 },
   stepWrap: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 25 },
   stepDot: { width: 30, height: 4, borderRadius: 2, backgroundColor: '#F1F5F9' },
   uploadArea: { height: 180, backgroundColor: '#F8FAFC', borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderStyle: 'dashed', borderWidth: 2, borderColor: '#CBD5E1' },

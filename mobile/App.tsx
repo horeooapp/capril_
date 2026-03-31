@@ -8,6 +8,7 @@ import DiasporaScreen from './src/modules/diaspora/DiasporaScreen';
 import IntermediaireScreen from './src/modules/intermediaire/IntermediaireScreen';
 import AuthScreen from './src/modules/auth/AuthScreen';
 import { Theme } from './src/theme/theme';
+import { Key, Home, Globe, Handshake, ChevronRight } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -102,10 +103,10 @@ export default function App() {
 
             <View style={styles.menu}>
               {[
-                { id: 'TENANT', name: 'PORTAIL LOCATAIRE', icon: '🔑', desc: 'Loyers, quittances & score ICL', color: Theme.colors.teal, bg: Theme.colors.tealPale },
-                { id: 'LANDLORD', name: 'PORTAIL PROPRIÉTAIRE', icon: '🏠', desc: 'Gestion du patrimoine & wallet', color: Theme.colors.navy, bg: '#E2E8F0' },
-                { id: 'DIASPORA', name: 'PORTAIL DIASPORA', icon: '🌍', desc: 'Suivi RCI & virements SEPA', color: '#0E3A8C', bg: '#D0E1FD' },
-                { id: 'INTERMEDIAIRE', name: 'PORTAIL INTERMÉDIAIRE', icon: '🤝', desc: 'Mandats, M-EDL & Médiation', color: Theme.colors.orange, bg: Theme.colors.orangePale },
+                { id: 'TENANT', name: 'PORTAIL LOCATAIRE', Icon: Key, desc: 'Loyers, quittances & score ICL', color: Theme.colors.teal, bg: 'rgba(20, 184, 166, 0.15)', iconColor: Theme.colors.teal },
+                { id: 'LANDLORD', name: 'PORTAIL PROPRIÉTAIRE', Icon: Home, desc: 'Gestion du patrimoine & wallet', color: '#FFF', bg: 'rgba(255, 255, 255, 0.1)', iconColor: '#FFF' },
+                { id: 'DIASPORA', name: 'PORTAIL DIASPORA', Icon: Globe, desc: 'Suivi RCI & virements SEPA', color: '#93C5FD', bg: 'rgba(147, 197, 253, 0.15)', iconColor: '#93C5FD' },
+                { id: 'INTERMEDIAIRE', name: 'PORTAIL INTERMÉDIAIRE', Icon: Handshake, desc: 'Mandats, M-EDL & Médiation', color: Theme.colors.orange, bg: 'rgba(249, 115, 22, 0.15)', iconColor: Theme.colors.orange },
               ].map(p => (
                 <TouchableOpacity 
                   key={p.id}
@@ -114,14 +115,14 @@ export default function App() {
                   onPress={() => setPortal(p.id as PortalType)}
                 >
                   <View style={[styles.iconBox, { backgroundColor: p.bg }]}>
-                    <Text style={styles.iconText}>{p.icon}</Text>
+                    <p.Icon size={24} color={p.iconColor} strokeWidth={2.5} />
                   </View>
                   <View style={styles.cardBody}>
-                    <Text style={[styles.cardTitle, { color: Theme.colors.navy }]}>{p.name}</Text>
+                    <Text style={[styles.cardTitle, { color: p.color }]}>{p.name}</Text>
                     <Text style={styles.cardDesc}>{p.desc}</Text>
                   </View>
                   <View style={styles.arrowBox}>
-                    <Text style={{ color: Theme.colors.teal, fontWeight: '900', fontSize: 20 }}>›</Text>
+                    <ChevronRight size={20} color="rgba(255,255,255,0.3)" strokeWidth={3} />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -153,12 +154,11 @@ const styles = StyleSheet.create({
   userName: { fontSize: 32, fontWeight: '900', color: '#FFF', marginTop: 5 },
   instruction: { fontSize: 13, color: Theme.colors.tealPale, marginTop: 10, fontWeight: '600', opacity: 0.8 },
   menu: { gap: 15 },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 25, padding: 18, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 15, elevation: 5 },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 25, padding: 18, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 5 },
   iconBox: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  iconText: { fontSize: 26 },
   cardBody: { flex: 1, paddingLeft: 16 },
   cardTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 0.5 },
-  cardDesc: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4, fontWeight: '600' },
+  cardDesc: { fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 4, fontWeight: '600' },
   arrowBox: { paddingLeft: 10 },
   logoutBtn: { marginTop: 40, alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 30 },
   logoutText: { color: 'rgba(255,255,255,0.5)', fontWeight: '900', fontSize: 12, letterSpacing: 2 },
