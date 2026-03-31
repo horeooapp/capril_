@@ -24,7 +24,8 @@ import {
   Briefcase,
   History,
   Wallet,
-  MessageSquare
+  MessageSquare,
+  BookOpen
 } from 'lucide-react'
 import { emettreQuittanceIntermediaire, activerClemenceM07 } from '@/actions/intermediaire-actions'
 
@@ -154,31 +155,37 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                 {/* NAVIGATION MODULES */}
                 <section className="space-y-6">
                     <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2">Console & Outils</h2>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-                        <button onClick={() => setTab('dashboard')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'dashboard' ? 'border-[#0D2B6E]' : 'border-transparent'}`} style={{ borderTopColor: tab === 'dashboard' ? '#0D2B6E' : '' }}>
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📊</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Accueil</p>
-                        </button>
-                        <button onClick={() => setTab('biens')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'biens' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🏘️</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Biens</p>
-                        </button>
-                        <button onClick={() => setSheet('quittanceForm')} className="glass-card-premium p-6 text-center group border-t-4 border-[#1A7A3C]">
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🧾</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#1A7A3C]">Q-Cert</p>
-                        </button>
-                        <button onClick={() => setTab('quittances')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'quittances' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📜</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Histo</p>
-                        </button>
-                        <button onClick={() => setTab('compte')} className={`glass-card-premium p-6 text-center group border-t-4 ${tab === 'compte' ? 'border-[#0D2B6E]' : 'border-transparent'}`}>
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">💼</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0D2B6E]">Compte</p>
-                        </button>
-                        <a href="/dashboard/manual" className="glass-card-premium p-6 text-center group border-t-4 border-[#5B21B6]">
-                            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📖</div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-[#5B21B6]">Manuel</p>
-                        </a>
+                    <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
+                        {[
+                          { action: () => setTab('dashboard'), icon: <BarChart3 strokeWidth={2.5} size={28} />, label: "Accueil", color: T.navy, active: tab === 'dashboard' },
+                          { action: () => setTab('biens'), icon: <Building2 strokeWidth={2.5} size={28} />, label: "Biens", color: T.teal, active: tab === 'biens' },
+                          { action: () => setSheet('quittanceForm'), icon: <Receipt strokeWidth={2.5} size={28} />, label: "Q-Cert", color: T.green, active: false },
+                          { action: () => setTab('quittances'), icon: <History strokeWidth={2.5} size={28} />, label: "Histo", color: T.orange, active: tab === 'quittances' },
+                          { action: () => setTab('compte'), icon: <Briefcase strokeWidth={2.5} size={28} />, label: "Compte", color: T.gold, active: tab === 'compte' },
+                          { href: "/dashboard/manual", icon: <BookOpen strokeWidth={2.5} size={28} />, label: "Manuel", color: T.purple, active: false },
+                        ].map((m, i) => {
+                          const inner = (
+                            <>
+                              <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-transparent pointer-events-none"></div>
+                              <div 
+                                className={`absolute -right-6 -top-6 w-28 h-28 rounded-full blur-2xl transition-opacity duration-500 pointer-events-none ${m.active ? 'opacity-40' : 'opacity-10 group-hover:opacity-30'}`} 
+                                style={{ backgroundColor: m.color }}
+                              ></div>
+                              <div className={`relative z-10 w-16 h-16 rounded-[1.25rem] flex items-center justify-center transform transition-transform duration-500 shadow-sm border ${m.active ? 'scale-110 border-white shadow-md' : 'border-white/60 group-hover:scale-110'}`}
+                                style={{ background: `linear-gradient(135deg, ${m.color}${m.active ? '30' : '15'}, ${m.color}${m.active ? '50' : '30'})`, color: m.color }}
+                              >
+                                {m.icon}
+                              </div>
+                              <p className="relative z-10 text-[10px] font-black uppercase tracking-widest mt-1" style={{ color: m.color }}>{m.label}</p>
+                            </>
+                          );
+                          const className = `relative overflow-hidden bg-white/60 backdrop-blur-2xl border p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col items-center justify-center gap-3 w-full ${m.active ? 'border-white hover:-translate-y-1' : 'border-white/50 hover:-translate-y-1 block'}`;
+                          
+                          if (m.href) {
+                            return <a key={i} href={m.href} className={className}>{inner}</a>;
+                          }
+                          return <button key={i} onClick={m.action} className={className}>{inner}</button>;
+                        })}
                     </div>
                 </section>
 
