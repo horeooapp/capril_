@@ -10,10 +10,10 @@ export default async function OwnerProfilePage() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { documents: { orderBy: { createdAt: "desc" }, take: 1 } }
+        include: { identityDocuments: { orderBy: { createdAt: "desc" }, take: 1 } }
     })
 
-    const primaryDoc = user?.documents?.[0];
+    const primaryDoc = user?.identityDocuments?.[0];
 
     return (
         <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-1000">
