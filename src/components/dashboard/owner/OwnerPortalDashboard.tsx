@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Bell, AlertTriangle, ChevronRight, TrendingUp, CheckCircle, X } from "lucide-react"
+import { Bell, AlertTriangle, ChevronRight, TrendingUp, CheckCircle, X, Building2, FileSignature, Receipt, Wallet, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { retirerProperty } from "@/actions/property-actions"
 
@@ -205,17 +205,26 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2 text-center">Outils de Pilotage</h2>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-4xl mx-auto">
             {[
-              { href: "/dashboard/properties", icon: "🏘️", label: "Biens",        color: T.teal },
-              { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
-              { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
-              { href: "/dashboard/wallet",  icon: "📊", label: "Finances",     color: T.gold },
-              { href: "/dashboard/manual",               icon: "📖", label: "Manuel",       color: "#5B21B6" },
+              { href: "/dashboard/properties", icon: <Building2 strokeWidth={2.5} size={28} />, label: "Biens",        color: T.teal },
+              { href: "/dashboard/leases",     icon: <FileSignature strokeWidth={2.5} size={28} />, label: "Baux",          color: T.navy },
+              { href: "/dashboard/receipts",   icon: <Receipt strokeWidth={2.5} size={28} />, label: "Quittances",   color: T.green },
+              { href: "/dashboard/wallet",     icon: <Wallet strokeWidth={2.5} size={28} />, label: "Finances",     color: T.gold },
+              { href: "/dashboard/manual",     icon: <BookOpen strokeWidth={2.5} size={28} />, label: "Manuel",       color: "#5B21B6" },
             ].map((m, i) => (
               <Link key={i} href={m.href}
-                className="glass-card-premium p-6 text-center group block border-t-4"
-                style={{ borderTopColor: m.color }}>
-                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-500">{m.icon}</div>
-                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: m.color }}>{m.label}</p>
+                className="relative overflow-hidden bg-white/60 backdrop-blur-2xl border border-white p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col items-center justify-center gap-3 hover:-translate-y-1"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-transparent pointer-events-none"></div>
+                <div 
+                  className="absolute -right-6 -top-6 w-28 h-28 rounded-full blur-2xl opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none" 
+                  style={{ backgroundColor: m.color }}
+                ></div>
+                <div className="relative z-10 w-16 h-16 rounded-[1.25rem] flex items-center justify-center transform group-hover:scale-110 transition-transform duration-500 shadow-sm border border-white/60"
+                  style={{ background: `linear-gradient(135deg, ${m.color}15, ${m.color}30)`, color: m.color }}
+                >
+                  {m.icon}
+                </div>
+                <p className="relative z-10 text-[10px] font-black uppercase tracking-widest mt-1" style={{ color: m.color }}>{m.label}</p>
               </Link>
             ))}
           </div>
