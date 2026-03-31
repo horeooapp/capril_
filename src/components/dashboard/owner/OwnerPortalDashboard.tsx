@@ -208,7 +208,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
               { href: "/dashboard/properties", icon: "🏘️", label: "Biens",        color: T.teal },
               { href: "/dashboard/leases",     icon: "📄", label: "Baux",          color: T.navy },
               { href: "/dashboard/receipts",   icon: "🧾", label: "Quittances",   color: T.green },
-              { href: "/dashboard/financial",  icon: "📊", label: "Finances",     color: T.gold },
+              { href: "/dashboard/wallet",  icon: "📊", label: "Finances",     color: T.gold },
               { href: "/dashboard/manual",               icon: "📖", label: "Manuel",       color: "#5B21B6" },
             ].map((m, i) => (
               <Link key={i} href={m.href}
@@ -223,7 +223,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
 
         {/* TAUX D'ENCAISSEMENT PROMINENT */}
         <section className="max-w-4xl mx-auto w-full">
-          <Link href="/dashboard/financial" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group relative overflow-hidden">
+          <Link href="/dashboard/wallet" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary blur-[100px] opacity-10 -mr-32 -mt-32 group-hover:opacity-20 transition-opacity"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-end mb-8">
@@ -249,8 +249,8 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         <section className="space-y-6">
           <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] px-2">Indicateurs financiers</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            <StatCard label="Loyers / mois" value={`${fmt(stats.totalLoyers)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/dashboard/financial" />
-            <StatCard label="Encaissé" value={`${fmt(stats.encaisse)} F`} icon="✅" color={T.green} bg={T.greenPale} href="/dashboard/financial" />
+            <StatCard label="Loyers / mois" value={`${fmt(stats.totalLoyers)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/dashboard/wallet" />
+            <StatCard label="Encaissé" value={`${fmt(stats.encaisse)} F`} icon="✅" color={T.green} bg={T.greenPale} href="/dashboard/wallet" />
             <StatCard label="Unités vacantes" value={stats.vacants} icon="🏚" color={stats.vacants > 0 ? T.orange : T.green} bg={stats.vacants > 0 ? T.orangePale : T.greenPale} href="/dashboard/properties" />
             <StatCard label="Impayés" value={stats.impayesN} icon="⚠️" color={stats.impayesN > 0 ? T.red : T.green} bg={stats.impayesN > 0 ? T.redPale : T.greenPale} href="/dashboard/leases" />
           </div>
