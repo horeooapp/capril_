@@ -8,7 +8,7 @@ import { getAuthUser } from '@/lib/jwt';
  */
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getAuthUser(req);
@@ -16,7 +16,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const leaseId = params.id;
+    const resolvedParams = await params;
+    const leaseId = resolvedParams.id;
     if (!leaseId) {
        return NextResponse.json({ error: 'Lease ID is required' }, { status: 400 });
     }
