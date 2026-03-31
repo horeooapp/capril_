@@ -3242,7 +3242,8 @@ model FactureUtility {
   montantTotal        Float       @map("montant_total")
   dateLimitePaiement  DateTime?     @map("date_limite_paiement")
   statut UtilityStatus @default(EN_COURS)
-  source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | ...
+  source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | OCR_QAPRIL
+  invoiceUrl          String?       @map("invoice_url")
   modeUtilities       String   @map("mode_utilities")
   datePaiement        DateTime?     @map("date_paiement")
   createdAt           DateTime      @default(now()) @map("created_at")

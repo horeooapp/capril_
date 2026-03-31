@@ -68,29 +68,29 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     const edls = showEdl ? await getEdlsByLease(leaseId) : []
 
     return (
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-8">
+        <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Hybrid Automation: Arrears Procedural Action */}
             {proceduralState.active && (
                 <ArrearsProceduralBox leaseId={leaseId} proceduralState={proceduralState} />
             )}
 
-            <div className="flex justify-between items-center bg-white shadow-sm p-4 rounded-xl border border-gray-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] p-6 md:p-8 rounded-[2rem] border border-qgrey-2 gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Détails du Bail</h1>
-                    <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {tLease.leaseReference}</p>
+                    <h1 className="text-3xl md:text-4xl font-black text-qnavy-dark tracking-tighter uppercase">Détails du Bail</h1>
+                    <p className="text-sm font-black text-qorange uppercase tracking-widest mt-2">{tLease.leaseReference}</p>
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap gap-3">
                     {(tLease.status === "DRAFT" || tLease.status === "PENDING_SIGNATURE" || tLease.status === "PENDING_CONFIRMATION") && (
                         <Link
                             href={`/dashboard/leases/${tLease.id}/edit`}
-                            className="inline-flex items-center px-4 py-2 border-2 border-[#1F4E79] shadow-sm text-sm font-black rounded-md text-[#1F4E79] bg-blue-50 hover:bg-blue-100 transition-all uppercase tracking-widest"
+                            className="inline-flex items-center px-6 py-3 border border-qnavy/20 shadow-sm text-[11px] font-black rounded-xl text-qnavy bg-qnavy-pale hover:bg-qnavy hover:text-white transition-all uppercase tracking-widest"
                         >
-                            ✏️ Éditer
+                            ✏️ Éditer Intégralement
                         </Link>
                     )}
                     <Link
                         href={`/dashboard/certificates/${tLease.id}`}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all font-bold"
+                        className="inline-flex items-center px-6 py-3 border border-qgrey-2 shadow-sm text-[11px] font-black rounded-xl text-qnavy-dark bg-white hover:bg-qgrey-1 transition-all uppercase tracking-widest"
                     >
                         📄 Certificat
                     </Link>
@@ -100,80 +100,84 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
             {/* Alerte Signature si PENDING_SIGNATURE */}
             {(tLease.status === "PENDING_SIGNATURE" || tLease.status === "DRAFT") && (
-                <div className="mb-8 p-6 bg-orange-50 border-2 border-orange-200 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-lg shadow-orange-100 animate-pulse">
-                    <div className="mb-4 md:mb-0">
-                        <h3 className="text-lg font-black text-orange-800 uppercase tracking-tight">Validation Requise ✍️</h3>
-                        <p className="text-orange-700 text-sm font-medium">Ce contrat de bail est en attente de signature numérique bilatérale.</p>
+                <div className="p-6 bg-qorange-pale border border-qorange/20 rounded-[2rem] flex flex-col md:flex-row justify-between items-center shadow-lg shadow-qorange/10 animate-pulse gap-6">
+                    <div>
+                        <h3 className="text-lg font-black text-qorange uppercase tracking-widest flex items-center gap-2"><span>✍️</span> Validation Requise</h3>
+                        <p className="text-qorange-dark text-sm font-bold mt-1">Ce contrat global (BDQ/Numérique) est en attente de signature bilatérale.</p>
                     </div>
                     <Link 
                         href={`/dashboard/leases/${tLease.id}/signature`}
-                        className="px-8 py-3 bg-orange-500 text-white font-black rounded-xl hover:bg-orange-600 transition-all uppercase tracking-widest text-sm shadow-md"
+                        className="px-8 py-4 bg-qorange text-white font-black rounded-[1.2rem] hover:opacity-90 transition-opacity uppercase tracking-widest text-[11px] shadow-[0_8px_20px_rgba(255,130,0,0.3)] shrink-0"
                     >
                         Accéder à la Signature
                     </Link>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Main Info */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Parties Section */}
-                    <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
-                            <span className="mr-2">🤝</span> Parties au Contrat
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-white rounded-[2rem] p-8 border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.06)] relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-qnavy-pale rounded-bl-[100%] z-0"></div>
+                        <h2 className="text-xl font-black text-qnavy-dark mb-6 border-b border-qgrey-2 pb-4 flex items-center relative z-10 uppercase tracking-widest">
+                            <span className="mr-3 text-qorange">🤝</span> Parties Actives
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Locataire</h3>
-                                <p className="text-lg font-bold">{tLease.tenant?.fullName || "N/A"}</p>
-                                <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded inline-block">{tLease.tenant?.email}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                            <div className="space-y-3 bg-background p-6 rounded-3xl border border-qgrey-2">
+                                <h3 className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Preneur (Locataire)</h3>
+                                <p className="text-xl font-black text-qnavy-dark">{tLease.tenant?.fullName || "Non défini"}</p>
+                                <p className="text-[11px] text-qtext-mid font-black px-3 py-1 bg-qgrey-1 rounded-lg inline-block">{tLease.tenant?.email || "En attente d'inscription"}</p>
                                 <div className="pt-2">
                                     <ReliabilityBadge score={tLease.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
                             </div>
                             {/* Property Details Column */}
-                        <div className="space-y-6">
-                            {/* Hybrid Automation: CDC Restitution */}
-                            {tLease.cdcDeposits?.[0] && (tLease.status === "TERMINATED" || tLease.status === "ACTIVE") && (
-                                <CDCRestitutionBox leaseId={leaseId} deposit={tLease.cdcDeposits[0]} />
-                            )}
-                                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Logement</h3>
-                                <p className="text-lg font-bold">{tLease.property.name || tLease.property.address}</p>
-                                <p className="text-sm text-gray-600">{tLease.property.commune}</p>
-                                <p className="text-xs text-gray-400 font-medium">Type: {tLease.property.propertyType}</p>
+                            <div className="space-y-4">
+                                {/* Hybrid Automation: CDC Restitution */}
+                                {tLease.cdcDeposits?.[0] && (tLease.status === "TERMINATED" || tLease.status === "ACTIVE") && (
+                                    <CDCRestitutionBox leaseId={leaseId} deposit={tLease.cdcDeposits[0]} />
+                                )}
+                                <div className="bg-qnavy-pale p-6 rounded-3xl border border-qnavy/10 h-full">
+                                    <h3 className="text-[10px] font-black text-qnavy uppercase tracking-widest mb-3">Bien Immobilier Concédé</h3>
+                                    <p className="text-lg font-black text-qnavy-dark leading-tight">{tLease.property.name || tLease.property.address}</p>
+                                    <p className="text-sm font-bold text-qtext-mid mt-1">{tLease.property.commune}</p>
+                                    <span className="mt-3 inline-block px-3 py-1 bg-white text-qnavy text-[10px] font-black uppercase tracking-widest rounded-md border border-qnavy/20">
+                                        Type: {tLease.property.propertyType}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Financial Summary Section */}
-                    <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
-                            <span className="mr-2">💳</span> Conditions Financières
+                    <div className="bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] rounded-[2rem] p-8 border border-qgrey-2">
+                        <h2 className="text-xl font-black text-qnavy-dark mb-6 border-b border-qgrey-2 pb-4 flex items-center uppercase tracking-widest">
+                            <span className="mr-3 text-qgreen">💳</span> Bilan Financier
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="space-y-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase">Loyer Mensuel</p>
-                                <p className="text-xl font-black text-gray-900">{Number(tLease.rentAmount).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
+                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Loyer Net</p>
+                                <p className="text-2xl font-black text-qnavy-dark italic">{Number(tLease.rentAmount).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase">Charges</p>
-                                <p className="text-xl font-black text-gray-900">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
+                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Charges</p>
+                                <p className="text-2xl font-black text-qtext-mid italic">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase">Caution</p>
-                                <p className="text-xl font-black text-gray-900">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-xs font-normal">FCFA</span></p>
+                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
+                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Caution</p>
+                                <p className="text-2xl font-black text-qtext-mid italic">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-xs font-bold text-gray-400 uppercase">Status</p>
+                            <div className="space-y-1.5 pt-2">
+                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest mb-2">Cycle de vie</p>
                                 <div>
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-sm ${
+                                    <span className={`inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
                                         tLease.status === 'ACTIVE' 
-                                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                                            ? 'bg-qgreen-pale text-qgreen border-qgreen/20' 
                                             : tLease.status === 'LOYER_IMPAYE' || tLease.status === 'MISE_EN_DEMEURE'
-                                                ? 'bg-red-100 text-red-800 border border-red-200 animate-pulse'
-                                                : 'bg-orange-100 text-orange-800 border border-orange-200'
+                                                ? 'bg-qred-pale text-qred border-qred/20 animate-pulse'
+                                                : 'bg-qorange-pale text-qorange border-qorange/20'
                                     }`}>
-                                        <span className={`w-2 h-2 rounded-full mr-2 ${tLease.status === 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                        <span className={`w-1.5 h-1.5 rounded-full mr-2 ${tLease.status === 'ACTIVE' ? 'bg-qgreen' : 'bg-qred'}`}></span>
                                         {tLease.status}
                                     </span>
                                 </div>
@@ -279,59 +283,65 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Security Pack (Escrow/CDC) */}
                     {(showCdc || showInsurance) && (
-                        <div className="bg-white shadow rounded-2xl p-6 border-t-4 border-primary border-x border-b border-gray-100">
-                            <h2 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight">Pack Sécurité & Preuve</h2>
+                        <div className="bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] rounded-[2rem] p-8 border-t-[6px] border-qnavy border-x border-b border-qgrey-2 overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(circle_at_top_right,var(--color-qnavy-pale),transparent_70%)] pointer-events-none"></div>
+                            <h2 className="text-[13px] font-black text-qnavy-dark mb-6 uppercase tracking-[0.2em]">Pack Sécurité & Preuve</h2>
 
-                            <div className="space-y-4">
+                            <div className="space-y-5 relative z-10">
                                 {showCdc && (
-                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-inner">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Caution Sécurisée</p>
+                                    <div className="p-5 bg-background rounded-[1.5rem] border border-qgrey-2">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Caution Demandée</p>
+                                            <span className="text-[12px] font-black text-qnavy-dark">{Number(tLease.depositAmount || 0).toLocaleString()} FCFA</span>
+                                        </div>
+                                        
                                         {tLease.cdcDeposits?.[0] ? (
-                                            <div className="mt-2 text-center py-2">
-                                                <p className="text-sm font-black text-green-700">✅ CONSIGNATION CDC</p>
-                                                <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {tLease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
+                                            <div className="mt-4 text-center py-4 bg-qgreen-pale rounded-xl border border-qgreen/20">
+                                                <p className="text-[11px] font-black text-qgreen uppercase tracking-widest flex items-center justify-center gap-2">
+                                                    ✓ CAUTION SÉCURISÉE (CDC)
+                                                </p>
+                                                <p className="text-[9px] text-qgreen-dark font-bold mt-2">Réf: {tLease.cdcDeposits[0].cdcReference || "Traitement..."}</p>
                                             </div>
                                         ) : (
-                                            <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center flex flex-col items-center">
-                                                <p className="text-xs font-bold text-red-600 mb-1">Non sécurisé</p>
-                                                <p className="text-[10px] text-red-400 leading-tight mb-3">La caution est détenue hors système QAPRIL. Risque de litige élevé.</p>
-                                                {tLease.status === 'ACTIVE' && (
-                                                    <Link 
-                                                        href={`/dashboard/payments/simulate?tid=CAUT_${tLease.id}&amount=${tLease.depositAmount}`}
-                                                        className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-700 shadow-sm transition-all shadow-red-200"
-                                                    >
-                                                        💳 SÉCURISER MAINTENANT
-                                                    </Link>
-                                                )}
+                                            <div className="mt-4 p-5 bg-qred-pale border border-qred/20 rounded-xl flex flex-col items-center shadow-[inset_0_2px_10px_rgba(255,0,0,0.03)]">
+                                                <p className="text-[13px] font-black text-qred uppercase tracking-widest mb-1">Non sécurisé</p>
+                                                <p className="text-[10px] text-qred font-bold leading-relaxed text-center mb-4 max-w-[200px]">La caution n'a pas été versée numériquement. Risque de litige et perte de preuve.</p>
+                                                
+                                                <Link 
+                                                    href={`/dashboard/payments/simulate?tid=CAUT_${tLease.id}&amount=${tLease.depositAmount}`}
+                                                    className="w-full text-center px-4 py-3.5 bg-qred text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all shadow-md shadow-qred/30 active:scale-95"
+                                                >
+                                                    Paiement Caution (Carte/Wave)
+                                                </Link>
                                             </div>
                                         )}
                                     </div>
                                 )}
 
                                 {showInsurance && (
-                                    <div className={`p-5 rounded-2xl border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-green-50 border-green-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm'}`}>
+                                    <div className={`p-5 rounded-[1.5rem] border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-qgreen-pale border-qgreen/20' : 'bg-[linear-gradient(135deg,var(--color-qnavy-light)_0%,var(--color-qnavy)_100%)] border-qnavy-dark shadow-[0_8px_20px_rgba(13,43,110,0.2)]'}`}>
                                         <div className="flex justify-between items-start mb-3">
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Assurance Impayés</p>
+                                            <p className={`text-[10px] font-black uppercase tracking-widest ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'text-qgreen-dark' : 'text-white/70'}`}>Assurance Impayés</p>
                                             {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
-                                                <span className="text-[10px] bg-green-600 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
+                                                <span className="text-[10px] bg-qgreen text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
                                             ) : (
-                                                <span className="text-[10px] bg-gray-400 text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ABSENTE</span>
+                                                <span className="text-[10px] bg-white/20 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest backdrop-blur-sm">ABSENTE</span>
                                             )}
                                         </div>
                                         {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
                                             <div className="mt-2">
-                                                <p className="text-md font-black text-gray-900 flex items-center">
+                                                <p className="text-md font-black text-qgreen-dark flex items-center">
                                                     <span className="mr-2">🛡️</span> {tLease.insurance.provider}
                                                 </p>
-                                                <p className="text-[10px] text-gray-500 mt-2 font-mono italic tracking-tight bg-white/50 px-2 py-1 rounded">Police N°: {tLease.insurance.policyNo}</p>
+                                                <p className="text-[10px] text-qgreen mt-2 font-bold uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-lg border border-qgreen/10">Police: {tLease.insurance.policyNo}</p>
                                             </div>
                                         ) : (
                                             <div className="mt-2">
-                                                <p className="text-xs text-blue-900 font-bold leading-snug">Prenez l&apos;option Assurance QAPRIL pour protéger 100% de vos revenus.</p>
-                                                <button className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-3 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">
-                                                    Activer la Protection
+                                                <p className="text-[11px] text-white font-bold leading-relaxed">Couvrez 100% de vos risques locatifs avec QAPRIL Assurance.</p>
+                                                <button className="mt-4 w-full bg-white hover:bg-qgrey-1 text-qnavy text-[10px] font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">
+                                                    Activer Protection
                                                 </button>
-                                                <p className="text-[9px] text-blue-400 text-center mt-3 font-medium uppercase tracking-tighter">Partenariat Strategique RCI</p>
+                                                <p className="text-[8px] text-white/50 text-center mt-3 font-bold uppercase tracking-[0.2em]">Partenariat National</p>
                                             </div>
                                         )}
                                     </div>
@@ -341,7 +351,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     )}
 
                     {/* Procedure Actions Sidebar */}
-                    <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 shadow-red-100/50">
+                    <div className="bg-white rounded-[2rem] p-6 border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.06)]">
                         <LeaseProcedureActions leaseId={leaseId} currentStatus={tLease.status} />
                     </div>
                 </div>

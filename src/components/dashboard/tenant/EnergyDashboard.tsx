@@ -13,6 +13,7 @@ import {
   Clock,
   ShieldCheck
 } from 'lucide-react';
+import UploadFactureOCR from "@/components/dashboard/utilities/UploadFactureOCR";
 
 const T = {
   navy: "#071A45",
@@ -165,6 +166,11 @@ export const EnergyDashboard: React.FC = () => {
                </div>
             ))}
          </div>
+      </div>
+
+      {/* OCR Scanner Section */}
+      <div className="mt-8 mb-8">
+        <UploadFactureOCR leaseId="LOCATAIRE_SESSION_MOCK" />
       </div>
 
       {/* Invoice List */}
