@@ -592,6 +592,7 @@ model User {
   whiteLabelConfig Json?   @map("white_label_config")
   companyRegNumber String? @map("company_reg_number")
   taxId            String? @map("tax_id")
+  agencyConfig     Json?   @map("agency_config") // { isManager: boolean, permissions: string[], inviteToken?: string }
 
   procurationsDonnees ProcurationNumerique[] @relation("Mandant")
   procurationsRecues  ProcurationNumerique[] @relation("Mandataire")

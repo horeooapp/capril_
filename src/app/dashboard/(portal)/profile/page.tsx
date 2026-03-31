@@ -10,10 +10,14 @@ export default async function OwnerProfilePage() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { identityDocuments: { orderBy: { createdAt: "desc" }, take: 1 } }
+        include: { identityDocuments: { orderBy: { createdAt: "desc" } } }
     })
 
-    const primaryDoc = user?.identityDocuments?.[0];
+    const primaryDoc = user?.identityDocuments?.find(d => !['DFE','RCCM','NIF','AGREMENT'].includes(d.docType)) || user?.identityDocuments?.[0];
+    const dfeDoc = user?.identityDocuments?.find(d => d.docType === 'DFE');
+    const rccmDoc = user?.identityDocuments?.find(d => d.docType === 'RCCM');
+    const nifDoc = user?.identityDocuments?.find(d => d.docType === 'NIF');
+    const agrementDoc = user?.identityDocuments?.find(d => d.docType === 'AGREMENT');
     const activeRole = (session.user as any)?.chosenRole || session.user.role;
     
     let displayRole = "PROPRIÉTAIRE";
@@ -59,18 +63,27 @@ export default async function OwnerProfilePage() {
                         <Settings size={22} className="text-gray-400" />
                         Mise à jour du Profil
                     </h3>
-                    <ProfileUpdateForm initialData={{
-                        firstName: user?.firstName,
-                        lastName: user?.lastName,
-                        birthDate: user?.birthDate,
-                        birthPlace: user?.birthPlace,
-                        neighborhood: user?.neighborhood,
-                        phone: user?.phone,
-                        avatarUrl: user?.avatarUrl,
-                        email: user?.email,
-                        docType: primaryDoc?.docType,
-                        docNumber: primaryDoc?.docNumber
-                    }} />
+                    <ProfileUpdateForm 
+                        activeRole={activeRole}
+                        initialData={{
+                            firstName: user?.firstName,
+                            lastName: user?.lastName,
+                            birthDate: user?.birthDate,
+                            birthPlace: user?.birthPlace,
+                            neighborhood: user?.neighborhood,
+                            phone: user?.phone,
+                            avatarUrl: user?.avatarUrl,
+                            email: user?.email,
+                            // Perso
+                            docType: primaryDoc?.docType,
+                            docNumber: primaryDoc?.docNumber,
+                            // Agency
+                            dfe: dfeDoc?.docNumber,
+                            rccm: rccmDoc?.docNumber,
+                            nif: nifDoc?.docNumber,
+                            agrement: agrementDoc?.docNumber
+                        }} 
+                    />
                 </div>
 
                 {/* Score & Trust Portfolio */}

@@ -24,7 +24,8 @@ import {
     ShieldAlert,
     Receipt,
     Wallet,
-    BookOpen
+    BookOpen,
+    Users
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -33,9 +34,10 @@ interface AppSidebarProps {
     onLogout: () => void | Promise<void>
     userName?: string | null
     diasporaAbonnement?: boolean
+    agencyConfig?: { isManager?: boolean, permissions?: string[] } | null
 }
 
-export default function AppSidebar({ role, onLogout, userName, diasporaAbonnement }: AppSidebarProps) {
+export default function AppSidebar({ role, onLogout, userName, diasporaAbonnement, agencyConfig }: AppSidebarProps) {
     const pathname = usePathname()
 
     const getNavLinks = () => {
@@ -52,15 +54,21 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
         }
         
         if (role === 'AGENCY') {
-            return [
-                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} /> },
-                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={20} /> },
-                { href: "/dashboard/matching", label: "Candidats", icon: <User size={20} /> },
-                { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} /> },
-                { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} /> },
-                { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} /> },
-                { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+            const isManager = agencyConfig?.isManager !== false // Default to manager if undefined to prevent locking out legacy users
+            const perms = agencyConfig?.permissions || []
+
+            const allLinks = [
+                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} />, id: "READ_DASHBOARD" },
+                { href: "/dashboard/matching", label: "Candidats", icon: <User size={20} />, id: "MANAGE_TENANTS" },
+                { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={20} />, id: "MANAGE_MANDATES" },
+                { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} />, id: "SETTINGS" },
+                { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} />, id: "MANUAL" },
+                ...(isManager ? [{ href: "/dashboard/team", label: "Mon Équipe", icon: <Users size={20} />, id: "TEAM" }] : [])
             ]
+
+            return allLinks.filter(l => isManager || ["SETTINGS", "MANUAL"].includes(l.id) || perms.includes(l.id))
         }
         
         // Owner / Default Links (5-tab focus + extras for desktop)

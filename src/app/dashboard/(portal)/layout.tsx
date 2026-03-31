@@ -46,7 +46,7 @@ export default async function DashboardLayout({
     }
 
     return (
-        <DashboardLayoutClient session={session}>
+        <DashboardLayoutClient session={session} agencyConfig={(dbUser as any).agencyConfig}>
             {children}
         </DashboardLayoutClient>
     )

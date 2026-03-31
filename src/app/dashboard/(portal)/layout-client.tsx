@@ -23,7 +23,8 @@ import {
     Globe,
     Settings,
     Wallet,
-    BookOpen
+    BookOpen,
+    Users
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -36,34 +37,58 @@ import AppSidebar from "@/components/dashboard/AppSidebar"
 export default function DashboardLayoutClient({
     children,
     session,
+    agencyConfig,
 }: {
     children: React.ReactNode
     session: any
+    agencyConfig?: any
 }) {
     const pathname = usePathname()
 
-    const navLinks = [
-        { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={18} /> },
-        { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
-        { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} /> },
-        { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
-        { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },
-        { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
-        ...(session?.user?.role === 'TENANT' 
-            ? [{ href: "/dashboard/certificates", label: "Passeport", icon: <FileCheck2 size={18} /> }]
-            : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
-        ),
-        { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
-        { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-        ...(session?.user?.role === 'CHAMPION' 
-            ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
-            : []
-        ),
-        ...(session?.user?.diasporaAbonnement 
-            ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }]
-            : []
-        ),
-    ];
+    const role = session?.user?.chosenRole || session?.user?.role;
+    const isAgency = role === 'AGENCY';
+    const isManager = isAgency && agencyConfig?.isManager !== false;
+    const perms = agencyConfig?.permissions || [];
+
+    const getNavLinks = () => {
+        if (isAgency) {
+            const allLinks = [
+                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={18} />, id: "READ_DASHBOARD" },
+                { href: "/dashboard/matching", label: "Candidats", icon: <Handshake size={18} />, id: "MANAGE_TENANTS" },
+                { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={18} />, id: "MANAGE_MANDATES" },
+                { href: "/dashboard/receipts", label: "Compta", icon: <FileText size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={18} />, id: "SETTINGS" },
+                ...(isManager ? [{ href: "/dashboard/team", label: "Équipe", icon: <Users size={18} />, id: "TEAM" }] : [])
+            ];
+            return allLinks.filter(l => isManager || ["SETTINGS", "MANUAL"].includes(l.id) || perms.includes(l.id));
+        }
+
+        return [
+            { href: "/dashboard", label: "Overview", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
+            { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={18} /> },
+            { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },
+            { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
+            ...(role === 'TENANT' 
+                ? [{ href: "/dashboard/certificates", label: "Passeport", icon: <FileCheck2 size={18} /> }]
+                : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
+            ),
+            { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
+            { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
+            ...(role === 'CHAMPION' 
+                ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
+                : []
+            ),
+            ...(session?.user?.diasporaAbonnement 
+                ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }]
+                : []
+            ),
+        ];
+    }
+
+    const navLinks = getNavLinks();
 
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
@@ -75,10 +100,11 @@ export default function DashboardLayoutClient({
             {/* Vertical Sidebar - Only for Desktop */}
             {session?.user && (
                 <AppSidebar 
-                    role={session.user.role as any} 
-                    onLogout={handleLogout}
-                    userName={session.user.name || session.user.email}
+                    role={session.user.chosenRole || session.user.role} 
+                    onLogout={() => signOut()} 
+                    userName={session.user.fullName || session.user.name}
                     diasporaAbonnement={session.user.diasporaAbonnement}
+                    agencyConfig={agencyConfig}
                 />
             )}
 
@@ -149,7 +175,7 @@ export default function DashboardLayoutClient({
                                     links={navLinks} 
                                     session={session} 
                                     variant="dark" 
-                                    onLogout={handleLogout} 
+                                    onLogout={() => signOut()} 
                                 />
                             </div>
                         </div>
@@ -166,30 +192,9 @@ export default function DashboardLayoutClient({
                     {children}
                 </motion.div>
                 
-                <BottomNav items={
-                    session.user.role === 'AGENCY'
-                        ? [
-                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
-                            { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={24} /> },
-                            { href: "/dashboard/matching", label: "Candidats", icon: <User size={24} /> },
-                            { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={24} /> },
-                            { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={24} /> },
-                            { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={24} /> },
-                            { href: "/dashboard/manual", label: "Manuel", icon: <BookOpen size={24} /> },
-                          ]
-                        : [
-                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
-                            { href: "/dashboard/wallet", label: "Wallet", icon: <Wallet size={24} /> },
-                            { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={24} /> },
-                            { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={24} /> },
-                            { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={24} /> },
-                            { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={24} /> },
-                            { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={24} /> },
-                            { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={24} /> },
-                            { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={24} /> },
-                            { href: "/dashboard/manual", label: "Manuel", icon: <BookOpen size={24} /> },
-                          ]
-                } />
+                {session?.user && (
+                    <BottomNav items={navLinks} />
+                )}
             </main>
 
             {/* Footer de courtoisie Premium - Uniquement sur Desktop */}

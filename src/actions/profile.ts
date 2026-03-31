@@ -20,6 +20,11 @@ export async function updateUserProfile(data: {
     avatarUrl?: string;
     docType?: string;
     docNumber?: string;
+    isAgency?: boolean;
+    dfe?: string;
+    rccm?: string;
+    nif?: string;
+    agrement?: string;
 }) {
     const session = await auth()
     if (!session || !session.user || !session.user.id) {
@@ -48,10 +53,15 @@ export async function updateUserProfile(data: {
         const isIdentityLocked = !!tenantLease;
 
         // If locked, we MUST ignore incoming identity fields to prevent tampering
-        const finalFirstName = isIdentityLocked ? user.firstName : data.firstName;
-        const finalLastName = isIdentityLocked ? user.lastName : data.lastName;
-        const finalBirthDate = isIdentityLocked ? user.birthDate : data.birthDate;
-        const finalBirthPlace = isIdentityLocked ? user.birthPlace : data.birthPlace;
+        const finalLastName = isIdentityLocked ? (user as any).lastName : data.lastName;
+        let finalFirstName = isIdentityLocked ? (user as any).firstName : data.firstName;
+        
+        if (data.isAgency) {
+            finalFirstName = null; // Les agences n'ont pas de prénoms en général
+        }
+
+        const finalBirthDate = isIdentityLocked ? (user as any).birthDate : data.birthDate;
+        const finalBirthPlace = isIdentityLocked ? (user as any).birthPlace : data.birthPlace;
         
         const fullName = `${finalFirstName?.trim() || ''} ${finalLastName?.trim() || ''}`.trim() || undefined;
 
@@ -72,35 +82,80 @@ export async function updateUserProfile(data: {
                 }
             });
 
-            // Upsert Identity Document (ONLY if not locked)
-            if (!isIdentityLocked && data.docType && data.docNumber) {
-                const existingDoc = await tx.identityDocument.findFirst({
-                    where: { userId: session.user.id }
-                });
+            // Logic pour Documents d'Identité ou d'Entreprise
+            if (!isIdentityLocked) {
+                if (data.isAgency) {
+                    const agencyDocs = [
+                        { type: 'DFE', value: data.dfe },
+                        { type: 'RCCM', value: data.rccm },
+                        { type: 'NIF', value: data.nif },
+                        { type: 'AGREMENT', value: data.agrement },
+                    ].filter(d => Boolean(d.value));
 
-                if (existingDoc) {
-                    await tx.identityDocument.update({
-                        where: { id: existingDoc.id },
-                        data: {
-                            docType: data.docType,
-                            docNumber: data.docNumber,
-                            docNumberHash: data.docNumber, // Using actual number for simplicity
-                            fullName: fullName,
-                            birthDate: data.birthDate
+                    for (const ad of agencyDocs) {
+                        const existingDoc = await tx.identityDocument.findFirst({
+                            where: { userId: session.user.id, docType: ad.type }
+                        });
+
+                        const composedHash = `${session.user.id}_${ad.type}_${ad.value}`;
+
+                        if (existingDoc) {
+                            await tx.identityDocument.update({
+                                where: { id: existingDoc.id },
+                                data: {
+                                    docNumber: ad.value!,
+                                    docNumberHash: composedHash,
+                                    fullName: fullName
+                                }
+                            });
+                        } else {
+                            await tx.identityDocument.create({
+                                data: {
+                                    userId: session.user.id,
+                                    docType: ad.type,
+                                    docNumber: ad.value!,
+                                    docNumberHash: composedHash,
+                                    status: "pending",
+                                    fullName: fullName
+                                }
+                            });
                         }
-                    });
-                } else {
-                    await tx.identityDocument.create({
-                        data: {
+                    }
+                } else if (data.docType && data.docNumber) {
+                    const existingDoc = await tx.identityDocument.findFirst({
+                        where: { 
                             userId: session.user.id,
-                            docType: data.docType,
-                            docNumber: data.docNumber,
-                            docNumberHash: data.docNumber,
-                            status: "pending",
-                            fullName: fullName,
-                            birthDate: data.birthDate
+                            docType: { notIn: ['DFE', 'RCCM', 'NIF', 'AGREMENT'] }
                         }
                     });
+
+                    // For standard documents, maintain previous logic but ensure hash isn't colliding between users
+                    const standardHash = `${session.user.id}_${data.docType}_${data.docNumber}`;
+
+                    if (existingDoc) {
+                        await tx.identityDocument.update({
+                            where: { id: existingDoc.id },
+                            data: {
+                                docType: data.docType,
+                                docNumber: data.docNumber,
+                                docNumberHash: standardHash,
+                                fullName: fullName,
+                                birthDate: data.birthDate
+                            }
+                        });
+                    } else {
+                        await tx.identityDocument.create({
+                            data: {
+                                userId: session.user.id,
+                                docType: data.docType,
+                                docNumber: data.docNumber,
+                                docNumberHash: standardHash,
+                                status: "pending",
+                                fullName: fullName,
+                                birthDate: data.birthDate
+                            }
+                        });
+                    }
                 }
             }
         });

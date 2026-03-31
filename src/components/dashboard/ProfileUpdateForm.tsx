@@ -5,11 +5,13 @@ import { updateUserProfile } from "@/actions/profile"
 import { CheckCircle2, User, Camera, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { initialData: any, isIdentityLocked?: boolean }) => {
+export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activeRole }: { initialData: any, isIdentityLocked?: boolean, activeRole?: string }) => {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
+
+    const isAgency = activeRole === "AGENCY";
 
     const [formData, setFormData] = useState({
         firstName: initialData?.firstName || "",
@@ -20,7 +22,12 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { i
         phone: initialData?.phone || "",
         avatarUrl: initialData?.avatarUrl || "",
         docType: initialData?.docType || "CNI_CI",
-        docNumber: initialData?.docNumber || ""
+        docNumber: initialData?.docNumber || "",
+        // Agency
+        dfe: initialData?.dfe || "",
+        rccm: initialData?.rccm || "",
+        nif: initialData?.nif || "",
+        agrement: initialData?.agrement || ""
     })
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +57,11 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { i
                 avatarUrl: formData.avatarUrl,
                 docType: formData.docType,
                 docNumber: formData.docNumber,
+                isAgency,
+                dfe: formData.dfe,
+                rccm: formData.rccm,
+                nif: formData.nif,
+                agrement: formData.agrement
             })
 
             if (result.error) {
@@ -100,29 +112,33 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { i
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`grid grid-cols-1 ${isAgency ? '' : 'md:grid-cols-2'} gap-6`}>
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Nom</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">
+                        {isAgency ? "Nom de l'entreprise / Agence" : "Nom"}
+                    </label>
                     <input 
                         required 
                         readOnly={isIdentityLocked}
                         value={formData.lastName}
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                         className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
-                        placeholder="Ex: Koné"
+                        placeholder={isAgency ? "Ex: QAPRIL IMMOBILIER" : "Ex: Koné"}
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Prénoms</label>
-                    <input 
-                        required 
-                        readOnly={isIdentityLocked}
-                        value={formData.firstName}
-                        onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
-                        placeholder="Ex: Adama"
-                    />
-                </div>
+                {!isAgency && (
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Prénoms</label>
+                        <input 
+                            required 
+                            readOnly={isIdentityLocked}
+                            value={formData.firstName}
+                            onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
+                            placeholder="Ex: Adama"
+                        />
+                    </div>
+                )}
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Date de naissance</label>
                     <input 
@@ -167,40 +183,90 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { i
                 </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] space-y-4">
-                <h4 className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-2">
-                    <ShieldCheck size={16} /> Pièce d'Identité (Obligatoire KYC 2)
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Type de Document</label>
-                        <select 
-                            required
-                            disabled={isIdentityLocked}
-                            value={formData.docType}
-                            onChange={(e) => setFormData({...formData, docType: e.target.value})}
-                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-50"
-                        >
-                            <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
-                            <option value="PASS_CI">Passeport</option>
-                            <option value="ATTESTATION">Attestation d'Identité</option>
-                            <option value="PERMIS">Permis de Conduire</option>
-                            <option value="CARTE_CONSULAIRE">Carte Consulaire</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de la pièce</label>
-                        <input 
-                            required 
-                            readOnly={isIdentityLocked}
-                            value={formData.docNumber}
-                            onChange={(e) => setFormData({...formData, docNumber: e.target.value})}
-                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed readOnly:bg-gray-50" 
-                            placeholder="Ex: CI000000000"
-                        />
+            {!isAgency ? (
+                <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] space-y-4">
+                    <h4 className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-2">
+                        <ShieldCheck size={16} /> Pièce d'Identité (Obligatoire KYC 2)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Type de Document</label>
+                            <select 
+                                required
+                                disabled={isIdentityLocked}
+                                value={formData.docType}
+                                onChange={(e) => setFormData({...formData, docType: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-50"
+                            >
+                                <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
+                                <option value="PASS_CI">Passeport</option>
+                                <option value="ATTESTATION">Attestation d'Identité</option>
+                                <option value="PERMIS">Permis de Conduire</option>
+                                <option value="CARTE_CONSULAIRE">Carte Consulaire</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de la pièce</label>
+                            <input 
+                                required 
+                                readOnly={isIdentityLocked}
+                                value={formData.docNumber}
+                                onChange={(e) => setFormData({...formData, docNumber: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed readOnly:bg-gray-50" 
+                                placeholder="Ex: CI000000000"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="p-6 bg-blue-50/50 border border-blue-100 rounded-[2rem] space-y-4">
+                    <h4 className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-2">
+                        <ShieldCheck size={16} /> Documents d'Entreprise (Obligatoire KYC 2)
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro DFE</label>
+                            <input 
+                                required 
+                                value={formData.dfe}
+                                onChange={(e) => setFormData({...formData, dfe: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                                placeholder="Déclaration Fiscale d'Existence"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro RCCM</label>
+                            <input 
+                                required 
+                                value={formData.rccm}
+                                onChange={(e) => setFormData({...formData, rccm: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                                placeholder="Registre de Commerce"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Compte Contribuable (NIF)</label>
+                            <input 
+                                required 
+                                value={formData.nif}
+                                onChange={(e) => setFormData({...formData, nif: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                                placeholder="N° Compte Contribuable"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro d'Agrément</label>
+                            <input 
+                                required 
+                                value={formData.agrement}
+                                onChange={(e) => setFormData({...formData, agrement: e.target.value})}
+                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                                placeholder="N° Agrément Ministériel"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="space-y-2 opacity-60">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Adresse Email (Identifiant)</label>
