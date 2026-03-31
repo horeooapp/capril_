@@ -14,6 +14,12 @@ export default async function OwnerProfilePage() {
     })
 
     const primaryDoc = user?.identityDocuments?.[0];
+    const activeRole = (session.user as any)?.chosenRole || session.user.role;
+    
+    let displayRole = "PROPRIÉTAIRE";
+    if (activeRole === "AGENCY") displayRole = "AGENCE";
+    if (activeRole === "DIASPORA") displayRole = "DIASPORA";
+    if (activeRole === "CHAMPION") displayRole = "CHAMPION";
 
     return (
         <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -38,7 +44,7 @@ export default async function OwnerProfilePage() {
                                 Niveau KYC : {user?.kycLevel || 1}
                             </span>
                             <span className="px-4 py-1.5 bg-[#C55A11] rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-orange-900/20">
-                                {user?.role || "LANDLORD"}
+                                {displayRole}
                             </span>
                         </div>
                     </div>
@@ -75,7 +81,7 @@ export default async function OwnerProfilePage() {
                     </h3>
                     <div className="p-6 bg-white rounded-[2rem] border border-indigo-100 shadow-inner flex items-center justify-between mb-6">
                         <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Score Propriétaire</p>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Score {displayRole}</p>
                             <p className="text-3xl font-black text-indigo-600">890 <span className="text-sm">/ 1000</span></p>
                         </div>
                         <div className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[12px] uppercase tracking-widest border border-indigo-100">

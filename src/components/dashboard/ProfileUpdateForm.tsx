@@ -5,7 +5,7 @@ import { updateUserProfile } from "@/actions/profile"
 import { CheckCircle2, User, Camera, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
+export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false }: { initialData: any, isIdentityLocked?: boolean }) => {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
@@ -77,6 +77,12 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                 </div>
             )}
 
+            {isIdentityLocked && (
+                <div className="bg-orange-50 text-orange-700 p-4 rounded-2xl text-[11px] uppercase tracking-widest font-black flex items-center gap-2 border border-orange-200 shadow-sm animate-in fade-in">
+                    <ShieldCheck size={18} /> Identité verrouillée par un contrat de bail. Modification interdite.
+                </div>
+            )}
+
             {/* Photo Upload Simulation */}
             <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-200 bg-gray-50 rounded-[2rem] relative group overflow-hidden">
                 {formData.avatarUrl ? (
@@ -99,9 +105,10 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Nom</label>
                     <input 
                         required 
+                        readOnly={isIdentityLocked}
                         value={formData.lastName}
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                         placeholder="Ex: Koné"
                     />
                 </div>
@@ -109,9 +116,10 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Prénoms</label>
                     <input 
                         required 
+                        readOnly={isIdentityLocked}
                         value={formData.firstName}
                         onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                         placeholder="Ex: Adama"
                     />
                 </div>
@@ -119,19 +127,21 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Date de naissance</label>
                     <input 
                         required 
+                        readOnly={isIdentityLocked}
                         type="date"
                         value={formData.birthDate}
                         onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                     />
                 </div>
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Lieu de naissance</label>
                     <input 
                         required 
+                        readOnly={isIdentityLocked}
                         value={formData.birthPlace}
                         onChange={(e) => setFormData({...formData, birthPlace: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                         placeholder="Ex: Abidjan"
                     />
                 </div>
@@ -166,9 +176,10 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Type de Document</label>
                         <select 
                             required
+                            disabled={isIdentityLocked}
                             value={formData.docType}
                             onChange={(e) => setFormData({...formData, docType: e.target.value})}
-                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer"
+                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-50"
                         >
                             <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
                             <option value="PASS_CI">Passeport</option>
@@ -181,9 +192,10 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de la pièce</label>
                         <input 
                             required 
+                            readOnly={isIdentityLocked}
                             value={formData.docNumber}
                             onChange={(e) => setFormData({...formData, docNumber: e.target.value})}
-                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed readOnly:bg-gray-50" 
                             placeholder="Ex: CI000000000"
                         />
                     </div>

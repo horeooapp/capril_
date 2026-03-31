@@ -28,13 +28,12 @@ export async function updateUserProfile(data: {
 
     try {
         const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { kycLevel: true }
+            where: { id: session.user.id }
         })
 
         if (!user) throw new Error("Utilisateur introuvable.")
 
-        let newKycLevel = user.kycLevel;
+        let newKycLevel = user.kycLevel || 0;
 
         // Automatically upgrade to Level 2 if basic info is provided
         const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.phone && data.docType && data.docNumber;
@@ -42,27 +41,39 @@ export async function updateUserProfile(data: {
             newKycLevel = 2;
         }
 
-        const fullName = `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`.trim() || undefined;
+        // Security: Check if user is locked (Tenant with a lease)
+        const tenantLease = await prisma.lease.findFirst({
+            where: { tenantId: session.user.id }
+        });
+        const isIdentityLocked = !!tenantLease;
+
+        // If locked, we MUST ignore incoming identity fields to prevent tampering
+        const finalFirstName = isIdentityLocked ? user.firstName : data.firstName;
+        const finalLastName = isIdentityLocked ? user.lastName : data.lastName;
+        const finalBirthDate = isIdentityLocked ? user.birthDate : data.birthDate;
+        const finalBirthPlace = isIdentityLocked ? user.birthPlace : data.birthPlace;
+        
+        const fullName = `${finalFirstName?.trim() || ''} ${finalLastName?.trim() || ''}`.trim() || undefined;
 
         await prisma.$transaction(async (tx) => {
             // Update User
             await tx.user.update({
                 where: { id: session.user.id },
                 data: {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
+                    firstName: finalFirstName,
+                    lastName: finalLastName,
                     fullName: fullName,
-                    birthDate: data.birthDate,
-                    birthPlace: data.birthPlace,
-                    neighborhood: data.neighborhood,
-                    phone: data.phone,
-                    ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
+                    birthDate: finalBirthDate,
+                    birthPlace: finalBirthPlace,
+                    neighborhood: data.neighborhood, // Allowed
+                    phone: data.phone,               // Allowed
+                    ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Allowed
                     kycLevel: newKycLevel
                 }
             });
 
-            // Upsert Identity Document
-            if (data.docType && data.docNumber) {
+            // Upsert Identity Document (ONLY if not locked)
+            if (!isIdentityLocked && data.docType && data.docNumber) {
                 const existingDoc = await tx.identityDocument.findFirst({
                     where: { userId: session.user.id }
                 });
@@ -95,6 +106,8 @@ export async function updateUserProfile(data: {
         });
 
         revalidatePath('/dashboard/profile')
+        revalidatePath('/locataire/profile')
+        revalidatePath('/locataire')
 
         // Audit Log
         try {
