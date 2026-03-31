@@ -42,7 +42,7 @@ const mockData = {
   ]
 };
 
-export const EnergyDashboard: React.FC = () => {
+export const EnergyDashboard: React.FC<{ leaseId?: string }> = ({ leaseId }) => {
   const [activeProvider, setActiveProvider] = useState<'cie' | 'sodeci'>('cie');
   const data = activeProvider === 'cie' ? mockData.cie : mockData.sodeci;
   const unit = activeProvider === 'cie' ? 'kWh' : 'm³';
@@ -170,7 +170,7 @@ export const EnergyDashboard: React.FC = () => {
 
       {/* OCR Scanner Section */}
       <div className="mt-8 mb-8">
-        <UploadFactureOCR leaseId="LOCATAIRE_SESSION_MOCK" />
+        <UploadFactureOCR leaseId={leaseId || "LOCATAIRE_SESSION_MOCK"} />
       </div>
 
       {/* Invoice List */}

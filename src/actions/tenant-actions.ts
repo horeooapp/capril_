@@ -72,7 +72,7 @@ export async function getTenantDashboard() {
                 totalArrears
             },
             utilities,
-            score: locataireProfile?.scoreICL || 750
+            score: locataireProfile?.scoreActuel || 750
         }
 
     } catch (error: any) {
