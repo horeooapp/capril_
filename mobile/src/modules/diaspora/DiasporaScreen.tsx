@@ -179,7 +179,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                         { text: "Oui, créer", onPress: async () => {
                             try {
                                 const { apiFetch } = require('../../hooks/qapril-hooks');
-                                const res = await apiFetch('/v1/diaspora/invite', { method: 'POST', body: { email: 'agence@test.ci' } });
+                                const res = await apiFetch('/diaspora/invite', { method: 'POST', body: { email: 'agence@test.ci' } });
                                 Alert.alert("Lien Généré", `${res.link}\n(Copié dans le presse-papier)`);
                             } catch(e: any) { Alert.alert("Erreur", e.message); }
                         }}

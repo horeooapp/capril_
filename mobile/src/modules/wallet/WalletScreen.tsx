@@ -400,7 +400,7 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                       { text: "Confirmer", onPress: async () => {
                           try {
                             const { apiFetch } = require('../../hooks/qapril-hooks');
-                            const res = await apiFetch('/v1/locataires/icl/share', { method: 'POST' });
+                            const res = await apiFetch('/locataires/icl/share', { method: 'POST' });
                             Alert.alert("Lien ICL Actif (30J)", `${res.message}\n\nMémo: ${res.link}`);
                           } catch (e: any) { Alert.alert("Erreur", e.message); }
                       }}

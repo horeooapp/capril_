@@ -315,7 +315,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                    { text: "Confirmer Activation", onPress: async () => {
                        try {
                            const { apiFetch } = require('../../hooks/qapril-hooks');
-                           const res = await apiFetch('/v1/proprietaires/me/confidentiel', { method: 'PATCH', body: { isConfidential: true } });
+                           const res = await apiFetch('/proprietaires/me/confidentiel', { method: 'PATCH', body: { isConfidential: true } });
                            Alert.alert("Sécurité", res.message);
                        } catch(e: any) { Alert.alert("Erreur", e.message); }
                    }}

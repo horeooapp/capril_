@@ -293,7 +293,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch('/proprietaires/me/wallet-config', {
+      return await apiFetch('/wallet/config', {
         method: 'PATCH',
         body: data
       });
@@ -309,7 +309,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch('/proprietaires/me/wallet/disbursement', {
+      return await apiFetch('/wallet/pay', {
         method: 'POST',
         body: { amount }
       });
@@ -398,7 +398,7 @@ export function useLeaseActions() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch(`/proprietaires/me/bails/${bailRef}/mrl-demande`, {
+      return await apiFetch(`/baux/${bailRef}/mrl`, {
         method: 'POST',
         body: { nouveauLoyer, dateEffet }
       });
