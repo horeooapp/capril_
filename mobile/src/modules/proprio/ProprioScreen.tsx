@@ -47,6 +47,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
   const [showWalletConfig, setShowWalletConfig] = useState(false);
   const [mrlData, setMrlData] = useState({ rent: '', date: '' });
   const [walletData, setWalletData] = useState({ operator: 'WAVE', phone: '' });
+  const [newEntity, setNewEntity] = useState({ name: '', type: 'RESIDENTIAL', commune: '' });
 
   const { data: proprioData, loading: proprioLoading, refetch: refetchProprio } = useProprio();
   const { data: patrimoineData, loading: patrimoineLoading, refetch: refetchPatrimoine } = usePatrimoine();
@@ -411,26 +412,46 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
 
          <BottomSheet visible={showAddProperty} onClose={() => setShowAddProperty(false)} title="🏠 NOUVELLE ENTITÉ">
             <Text style={styles.inputLabel}>Nom ou Libellé du Bien</Text>
-            <TextInput style={styles.input} placeholder="Ex: Résidence Harmony" />
-            <Text style={styles.inputLabel}>Type de Bien</Text>
+            <TextInput style={styles.input} placeholder="Ex: Résidence Harmony" value={newEntity.name} onChangeText={t => setNewEntity({...newEntity, name: t})} />
+            
+            <Text style={styles.inputLabel}>Type d'Exploitation</Text>
             <View style={styles.operatorRow}>
-               {['immeuble', 'cour', 'standalone'].map(t => (
-                  <TouchableOpacity key={t} style={styles.opBtn} onPress={() => {}}>
-                     <Text style={styles.opText}>{t.toUpperCase()}</Text>
+               {['RESIDENTIAL', 'COMMERCIAL'].map(t => (
+                  <TouchableOpacity key={t} style={[styles.opBtn, newEntity.type === t && {borderColor: Theme.colors.teal, backgroundColor: Theme.colors.tealPale}]} onPress={() => setNewEntity({...newEntity, type: t})}>
+                     <Text style={[styles.opText, newEntity.type === t && {color: Theme.colors.teal}]}>{t}</Text>
                   </TouchableOpacity>
                ))}
             </View>
+
+            <Text style={styles.inputLabel}>Commune (Sélection)</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom: 15, paddingBottom: 5}}>
+                {['Abobo', 'Cocody', 'Plateau', 'Yopougon', 'Marcory', 'Treichville', 'Koumassi', 'Adjamé', 'Bingerville', 'Anyama', 'Port-Bouët', 'Autre'].map(c => (
+                    <TouchableOpacity key={c} style={[styles.opBtn, {marginRight: 6}, newEntity.commune === c && {borderColor: Theme.colors.teal, backgroundColor: Theme.colors.tealPale}]} onPress={() => setNewEntity({...newEntity, commune: c})}>
+                       <Text style={[styles.opText, newEntity.commune === c && {color: Theme.colors.teal}]}>{c}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+
             <TouchableOpacity 
-               style={styles.submitBtn}
+               style={[styles.submitBtn, (!newEntity.name || !newEntity.commune) && {opacity: 0.5}]}
+               disabled={!newEntity.name || !newEntity.commune || mutationLoading}
                onPress={async () => {
                   try {
-                    await addEntity({ name: 'Nouveau Bien', type: 'immeuble' });
+                    await addEntity({ 
+                        name: newEntity.name, 
+                        leaseType: newEntity.type.toLowerCase(), 
+                        propertyType: newEntity.type === 'COMMERCIAL' ? 'COMMERCE' : 'APARTMENT',
+                        commune: newEntity.commune,
+                        address: `${newEntity.name}, ${newEntity.commune}`,
+                        declaredRentFcfa: 0
+                    });
                     setShowAddProperty(false);
+                    setNewEntity({ name: '', type: 'RESIDENTIAL', commune: '' });
                     refetchPatrimoine();
                   } catch (e: any) { Alert.alert("Erreur", e.message); }
                }}
             >
-               <View style={[styles.gradientBtn, { backgroundColor: Theme.colors.teal }]}><Text style={styles.submitBtnText}>ENREGISTRER AU PATRIMOINE</Text></View>
+               <View style={[styles.gradientBtn, { backgroundColor: Theme.colors.teal }]}><Text style={styles.submitBtnText}>{mutationLoading ? "ENREGISTREMENT..." : "ENREGISTRER AU PATRIMOINE"}</Text></View>
             </TouchableOpacity>
          </BottomSheet>
 

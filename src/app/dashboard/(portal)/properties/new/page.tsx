@@ -82,7 +82,22 @@ export default function NewPropertyPage() {
 
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Commune</label>
-                                <input required name="commune" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: Cocody" />
+                                <select required name="commune" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none">
+                                    <option value="">Sélectionner une commune...</option>
+                                    <option value="Abobo">Abobo</option>
+                                    <option value="Adjamé">Adjamé</option>
+                                    <option value="Anyama">Anyama</option>
+                                    <option value="Attécoubé">Attécoubé</option>
+                                    <option value="Bingerville">Bingerville</option>
+                                    <option value="Cocody">Cocody</option>
+                                    <option value="Koumassi">Koumassi</option>
+                                    <option value="Marcory">Marcory</option>
+                                    <option value="Plateau">Plateau</option>
+                                    <option value="Port-Bouët">Port-Bouët</option>
+                                    <option value="Treichville">Treichville</option>
+                                    <option value="Yopougon">Yopougon</option>
+                                    <option value="Autre (Hors Abidjan)">Autre (Hors Abidjan)</option>
+                                </select>
                             </div>
 
                             <div>
