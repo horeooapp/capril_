@@ -76,35 +76,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
 
                         // Compile eligible roles
-                        const eligibleRoles: string[] = [];
-                        if (isLandlord) eligibleRoles.push('LANDLORD');
-                        if (isTenant) eligibleRoles.push('TENANT');
-                        if (isAgency) eligibleRoles.push('AGENCY');
-                        if (isDiaspora) eligibleRoles.push('DIASPORA');
-                        if (isAdmin) eligibleRoles.push('ADMIN');
+                        const eligibleRolesSet = new Set<string>();
+                        if (isLandlord) eligibleRolesSet.add('LANDLORD');
+                        if (isTenant) eligibleRolesSet.add('TENANT');
+                        if (isAgency) eligibleRolesSet.add('AGENCY');
+                        if (isDiaspora) eligibleRolesSet.add('DIASPORA');
+                        if (isAdmin) eligibleRolesSet.add('ADMIN');
 
                         const reqRole = (requestedRole || '').toUpperCase();
 
-                        // Basic check: is the user authorized for the requested portal at all?
-                        const DASHBOARD_ROLES = ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'];
-                        const TENANT_ROLES = ['TENANT'];
-
-                        let isAuthorizedForRequested = false;
-                        if (reqRole === 'TENANT') {
-                            isAuthorizedForRequested = isTenant || isAdmin;
-                        } else if (reqRole === 'LANDLORD' || reqRole === 'AGENCY' || reqRole === 'DIASPORA') {
-                            isAuthorizedForRequested = isLandlord || isAgency || isDiaspora || isAdmin;
-                        } else if (reqRole === 'ADMIN') {
-                            isAuthorizedForRequested = isAdmin;
+                        // Autorisation dynamique de rôle : si l'utilisateur demande à se connecter
+                        // depuis un portail public (Locataire, Propriétaire, Agence, Diaspora), 
+                        // on lui accorde dynamiquement l'accès à cet espace pour sa session.
+                        if (['TENANT', 'LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole)) {
+                            eligibleRolesSet.add(reqRole);
+                        } else if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
+                            if (!isAdmin) {
+                                throw new CustomAuthError("Accès refusé : Privilèges administrateur requis.");
+                            }
                         }
 
-                        if (!isAuthorizedForRequested && eligibleRoles.length > 0) {
-                            // User is trying to access a portal they don't have, but they have OTHER roles
-                            throw new CustomAuthError(`Accès refusé : Ce compte n'a pas les permissions requises pour cet espace.`);
-                        }
+                        const eligibleRoles = Array.from(eligibleRolesSet);
 
                         if (eligibleRoles.length === 0) {
                              throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
+                        }
+
+                        let finalChosenRole: string | null = null;
+                        let requiresSelection = false;
+
+                        if (reqRole === 'TENANT') {
+                            finalChosenRole = 'TENANT';
+                        } else if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
+                            finalChosenRole = reqRole;
+                        } else {
+                            // Côté Bailleur/Dashboard, un utilisateur peut avoir plusieurs casquettes.
+                            const dashboardRoles = eligibleRoles.filter(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
+                            
+                            if (dashboardRoles.length > 1) {
+                                requiresSelection = true;
+                                finalChosenRole = null; // Va forcer l'affichage de /auth/choose-role
+                            } else {
+                                finalChosenRole = dashboardRoles[0] || reqRole;
+                            }
                         }
 
                         return {
@@ -117,7 +131,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
                             eligibleRoles: eligibleRoles,
-                            requiresRoleSelection: eligibleRoles.length > 1
+                            chosenRole: finalChosenRole,
+                            requiresRoleSelection: requiresSelection
                         } as any;
                     }
 
