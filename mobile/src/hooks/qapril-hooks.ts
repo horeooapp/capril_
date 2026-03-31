@@ -243,11 +243,11 @@ export function useLocataireMutations() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useProprio() {
-  return useQuery('/v1/proprietaires/me');
+  return useQuery('/proprietaires/me');
 }
 
 export function usePatrimoine() {
-  return useQuery('/v1/proprietaires/patrimoine');
+  return useQuery('/proprietaires/patrimoine');
 }
 
 export function useProprioMutations() {
@@ -258,7 +258,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch('/v1/proprietaires/patrimoine', {
+      return await apiFetch('/proprietaires/patrimoine', {
         method: 'POST',
         body: data
       });
@@ -277,7 +277,7 @@ export function useProprioMutations() {
     setLoading(true);
     setError(null);
     try {
-      return await apiFetch(`/v1/proprietaires/patrimoine/${id}`, {
+      return await apiFetch(`/proprietaires/patrimoine/${id}`, {
         method: 'DELETE',
         body: { confirmation: true }
       });
