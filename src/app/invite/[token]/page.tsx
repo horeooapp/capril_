@@ -8,8 +8,8 @@ export const metadata = {
     title: "Invitation Équipe | M-AGENCE QAPRIL"
 }
 
-export default async function InviteAcceptPage({ params }: { params: { token: string } }) {
-    const token = params.token
+export default async function InviteAcceptPage({ params }: { params: Promise<{ token: string }> }) {
+    const { token } = await params
 
     try {
         const matchedUser = await validateInvitationToken(token)
