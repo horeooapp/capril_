@@ -37,9 +37,26 @@ export default function LeaseRegistrationPage() {
         getProperties().then(setProperties).catch(console.error)
     }, [])
 
+    useEffect(() => {
+        if (rentAmount >= 0) {
+            setAgencyFees(Math.round(rentAmount * 0.06))
+        }
+    }, [rentAmount])
+
     const handleNext = () => {
         if (step === 1 && (!propertyId || !tenantPhone)) {
             return setError("Veuillez remplir tous les champs de cette étape.")
+        }
+        if (step === 2) {
+            if (depositAmount > rentAmount * 2) {
+                return setError("Oups ! La loi limite la caution à 2 mois de loyer maximum.")
+            }
+            if (advanceMonths > 2) {
+                return setError("Oups ! L'avance sur loyer est strictement limitée à 2 mois.")
+            }
+            if (agencyFees > rentAmount) {
+                return setError("Les frais d'agence ne peuvent excéder 1 mois de loyer.")
+            }
         }
         setError(null)
         setStep(step + 1)
@@ -209,8 +226,8 @@ export default function LeaseRegistrationPage() {
                                         <input type="number" value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-600">Frais d&apos;agence (FCFA)</label>
-                                        <input type="number" value={agencyFees || ''} onChange={(e) => setAgencyFees(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" />
+                                        <label className="text-xs font-bold text-gray-600">Frais d&apos;agence (6% du Loyer)</label>
+                                        <input readOnly type="number" value={agencyFees || 0} className="w-full px-5 py-4 bg-gray-100 border border-gray-200 rounded-2xl text-gray-500 cursor-not-allowed font-medium" />
                                     </div>
                                 </div>
                             </div>

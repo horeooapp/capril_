@@ -2,14 +2,14 @@ import { User, Settings, ShieldCheck, CreditCard, Bell, LogOut, Star } from "luc
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
+import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
 
 export default async function OwnerProfilePage() {
     const session = await auth()
     if (!session?.user) return null
 
     const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { fullName: true, email: true, phone: true, kycLevel: true, role: true }
+        where: { id: session.user.id }
     })
 
     return (
@@ -18,12 +18,16 @@ export default async function OwnerProfilePage() {
             <div className="glass-panel p-8 md:p-12 rounded-[3rem] border border-white/40 shadow-xl bg-white/50 backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#1F4E79]/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-24 h-24 bg-[#1F4E79]/5 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl border border-[#1F4E79]/10 shadow-inner">
-                        <User size={48} className="text-[#1F4E79]" />
+                    <div className="w-24 h-24 bg-[#1F4E79]/5 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl border border-[#1F4E79]/10 shadow-inner overflow-hidden">
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            <User size={48} className="text-[#1F4E79]" />
+                        )}
                     </div>
                     <div className="text-center md:text-left">
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
-                            {user?.fullName || "Propriétaire QAPRIL"}
+                            {user?.fullName || "Utilisateur QAPRIL"}
                         </h1>
                         <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{user?.email}</p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
@@ -40,25 +44,22 @@ export default async function OwnerProfilePage() {
 
             {/* Profile Sections */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Information Personnelle */}
+                {/* Information Personnelle (Interactive) */}
                 <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white">
                     <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter mb-6 flex items-center gap-3">
                         <Settings size={22} className="text-gray-400" />
-                        Paramètres du Compte
+                        Mise à jour du Profil
                     </h3>
-                    <div className="space-y-4">
-                        <div className="flex justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Téléphone</span>
-                            <span className="text-sm font-black text-[#1F4E79]">{user?.phone || "Non renseigné"}</span>
-                        </div>
-                        <div className="flex justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Langue</span>
-                            <span className="text-sm font-black text-[#1F4E79]">Français (CI)</span>
-                        </div>
-                    </div>
-                    <button className="w-full mt-6 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg hover:bg-black transition-all">
-                        Modifier mes informations
-                    </button>
+                    <ProfileUpdateForm initialData={{
+                        firstName: user?.firstName,
+                        lastName: user?.lastName,
+                        birthDate: user?.birthDate,
+                        birthPlace: user?.birthPlace,
+                        neighborhood: user?.neighborhood,
+                        phone: user?.phone,
+                        avatarUrl: user?.avatarUrl,
+                        email: user?.email
+                    }} />
                 </div>
 
                 {/* Score & Trust Portfolio */}

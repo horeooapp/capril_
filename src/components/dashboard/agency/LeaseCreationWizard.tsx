@@ -39,7 +39,13 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
 
   const selectedProperty = properties.find(p => p.id === formData.propertyId);
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4));
+  const nextStep = () => {
+    if (currentStep === 3 && formData.deposit > formData.rent * 2) {
+      alert("La loi Ivoirienne limite la caution à un maximum de 2 mois de loyer.")
+      return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 4))
+  };
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   return (
