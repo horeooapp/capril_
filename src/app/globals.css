@@ -1,29 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ivoire-orange: hsl(28, 100%, 53%);
-  --color-ivoire-white: #FFFFFF;
-  --color-ivoire-green: hsl(160, 84%, 39%);
-  --color-ivoire-dark: #0F172A;
+  --color-qnavy: #0D2B6E;
+  --color-qnavy-dark: #071A45;
+  --color-qnavy-light: #1A3D8C;
+  --color-qnavy-pale: #EEF2FA;
+  
+  --color-qgreen: #1A7A3C;
+  --color-qgreen-light: #22A050;
+  --color-qgreen-pale: #E8F5EE;
+  
+  --color-qorange: #C05B00;
+  --color-qorange-pale: #FFF3E0;
+  
+  --color-qred: #A00000;
+  --color-qred-pale: #FEECEC;
+  
+  --color-qgold: #C9A84C;
+  --color-qgold-pale: #FDF6E3;
+  
+  --color-qteal: #0E7490;
+  --color-qteal-pale: #E0F4F9;
+  
+  --color-qpurple: #5B21B6;
+  --color-qpurple-pale: #EDE9FE;
+  
+  --color-qgrey-1: #EEF2F7;
+  --color-qgrey-2: #D6DCE8;
+  --color-qgrey-3: #8FA0BC;
+  --color-qgrey-4: #4A5B7A;
+  
+  --color-qtext: #0A1930;
+  --color-qtext-mid: #2D3F5E;
+  --color-qtext-light: #6A7D9E;
 
-  --color-primary: var(--color-ivoire-orange);
-  --color-secondary: var(--color-ivoire-green);
-  --color-primary-foreground: var(--color-ivoire-white);
-  --color-secondary-foreground: var(--color-ivoire-white);
+  --color-primary: var(--color-qnavy);
+  --color-secondary: var(--color-qgreen);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary-foreground: #FFFFFF;
 }
 
 :root {
-  --background: #FDFEFE;
-  --foreground: #0F172A;
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.08);
+  --background: #F2F5FA;
+  --foreground: #0A1930;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 24px 80px rgba(13, 43, 110, 0.05); /* Navy 5% */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 

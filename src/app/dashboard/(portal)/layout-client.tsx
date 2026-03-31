@@ -68,10 +68,9 @@ export default function DashboardLayoutClient({
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
     return (
-        <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
-            {/* Mesh Background */}
-            <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
+        <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden">
+            {/* Solid QAPRIL background */}
+            <div className="fixed inset-0 bg-[#F2F5FA] -z-20"></div>
             
             {/* Vertical Sidebar - Only for Desktop */}
             {session?.user && (
@@ -89,9 +88,12 @@ export default function DashboardLayoutClient({
                     <motion.div 
                         initial={{ y: -20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-200/50"
+                        className="h-24 px-8 rounded-[2.25rem] flex items-center justify-between border border-qnavy/10 shadow-[0_24px_80px_rgba(13,43,110,0.15)] bg-[linear-gradient(145deg,var(--color-qnavy-dark)_0%,var(--color-qgreen)_100%)] relative overflow-hidden"
                     >
-                        <div className="flex items-center gap-10">
+                        {/* Motif décoratif V4 */}
+                        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white opacity-5 mix-blend-overlay"></div>
+                        
+                        <div className="flex items-center gap-10 relative z-10">
                             {/* Mobile Logo Only or Sidebar Toggle */}
                             <Link href="/dashboard" className="flex lg:hidden items-center space-x-5 group">
                                 <ProtectedLogo 
@@ -102,34 +104,39 @@ export default function DashboardLayoutClient({
                             </Link>
 
                             <div className="hidden lg:block">
-                                <h2 className="text-[14px] font-black tracking-[0.2em] text-[#1F4E79] uppercase opacity-60">Console d'Excellence Immobilière</h2>
+                                <h2 className="text-[12px] font-black tracking-[0.2em] text-white uppercase opacity-70">Console d'Excellence Immobilière</h2>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="hidden lg:flex items-center gap-6 px-6 border-r border-gray-100/50 h-10">
-                                <button className="text-gray-400 hover:text-gray-900 transition-colors">
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="hidden lg:flex items-center gap-6 px-6 border-r border-white/20 h-10">
+                                <button className="text-white/60 hover:text-white transition-colors">
                                     <Search size={18} />
                                 </button>
-                                <NotificationCenter />
+                                <div className="text-white/80 hover:text-white transition-colors">
+                                    <NotificationCenter />
+                                </div>
                             </div>
 
                             {session?.user && (
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-4">
                                     <div className="hidden sm:flex flex-col items-end">
-                                        <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">{session.user.name || session.user.email?.split('@')[0]}</span>
-                                        <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">
-                                            {session.user.role === 'CHAMPION' ? 'Champion QAPRIL' : 'Propriétaire Certifié'}
-                                        </span>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <div className="bg-qgreen rounded-md px-2 py-0.5 text-[8px] font-black text-white tracking-[0.2em] uppercase">
+                                                {session.user.role === 'CHAMPION' ? 'Champion' : 'Certifié'}
+                                            </div>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
+                                        </div>
+                                        <span className="text-[16px] font-black tracking-tight text-white uppercase drop-shadow-sm">{session.user.name || session.user.email?.split('@')[0]}</span>
                                     </div>
-                                    <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer">
+                                    <div className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 text-white flex items-center justify-center shadow-lg group hover:bg-white/20 transition-all cursor-pointer">
                                         <User size={20} />
                                     </div>
 
                                     {/* Quick Logout Button */}
                                     <button 
                                         onClick={handleLogout}
-                                        className="flex items-center justify-center h-10 w-10 bg-white border border-gray-200 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
+                                        className="hidden sm:flex items-center justify-center h-11 w-11 bg-white/5 border border-white/10 text-white/50 rounded-[14px] hover:bg-qred hover:text-white hover:border-qred transition-all active:scale-95 group"
                                         title="Déconnexion"
                                     >
                                         <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
@@ -137,11 +144,11 @@ export default function DashboardLayoutClient({
                                 </div>
                             )}
                             
-                            <div className="flex xl:hidden">
+                            <div className="flex xl:hidden text-white drop-shadow-sm">
                                 <MobileMenu 
                                     links={navLinks} 
                                     session={session} 
-                                    variant="light" 
+                                    variant="dark" 
                                     onLogout={handleLogout} 
                                 />
                             </div>

@@ -41,6 +41,13 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                 </div>
                 <div className="flex gap-4">
                      <Link 
+                        href={`/dashboard/leases/new?propertyId=${id}`}
+                        className="px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm"
+                    >
+                        <Plus size={18} />
+                        Créer un Bail
+                    </Link>
+                     <Link 
                         href={`/dashboard/properties/${id}/passport`}
                         className="px-6 py-3 bg-white border border-gray-200 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm"
                     >

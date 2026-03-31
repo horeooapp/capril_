@@ -80,6 +80,14 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     <p className="text-sm text-gray-500 font-mono text-[#FF8200] font-bold">Référence: {tLease.leaseReference}</p>
                 </div>
                 <div className="flex space-x-3">
+                    {(tLease.status === "DRAFT" || tLease.status === "PENDING_SIGNATURE" || tLease.status === "PENDING_CONFIRMATION") && (
+                        <Link
+                            href={`/dashboard/leases/${tLease.id}/edit`}
+                            className="inline-flex items-center px-4 py-2 border-2 border-[#1F4E79] shadow-sm text-sm font-black rounded-md text-[#1F4E79] bg-blue-50 hover:bg-blue-100 transition-all uppercase tracking-widest"
+                        >
+                            ✏️ Éditer
+                        </Link>
+                    )}
                     <Link
                         href={`/dashboard/certificates/${tLease.id}`}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all font-bold"
@@ -284,9 +292,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                                 <p className="text-[10px] text-gray-500 font-mono mt-1">Réf: {tLease.cdcDeposits[0].cdcReference || "Paiement en attente"}</p>
                                             </div>
                                         ) : (
-                                            <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center">
+                                            <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-xl text-center flex flex-col items-center">
                                                 <p className="text-xs font-bold text-red-600 mb-1">Non sécurisé</p>
-                                                <p className="text-[10px] text-red-400 leading-tight">La caution est détenue hors système QAPRIL. Risque de litige élevé.</p>
+                                                <p className="text-[10px] text-red-400 leading-tight mb-3">La caution est détenue hors système QAPRIL. Risque de litige élevé.</p>
+                                                {tLease.status === 'ACTIVE' && (
+                                                    <Link 
+                                                        href={`/dashboard/payments/simulate?tid=CAUT_${tLease.id}&amount=${tLease.depositAmount}`}
+                                                        className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-700 shadow-sm transition-all shadow-red-200"
+                                                    >
+                                                        💳 SÉCURISER MAINTENANT
+                                                    </Link>
+                                                )}
                                             </div>
                                         )}
                                     </div>

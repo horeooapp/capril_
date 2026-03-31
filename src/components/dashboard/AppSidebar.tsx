@@ -85,35 +85,36 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-[60] p-6 hidden lg:block">
-            <div className="h-full glass-panel border border-white/20 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden">
+            <div className="h-full bg-white border border-qgrey-2 rounded-[2.25rem] shadow-[0_24px_80px_rgba(13,43,110,0.05)] flex flex-col overflow-hidden relative">
                 {/* Brand Logo Section */}
-                <div className="p-8 border-b border-white/10 shrink-0">
-                    <Link href={role === 'TENANT' ? "/locataire" : "/dashboard"} className="flex items-center gap-4 group">
+                <div className="p-8 shrink-0 flex items-center justify-between">
+                    <Link href={role === 'TENANT' ? "/locataire" : "/dashboard"} className="flex flex-col gap-2 group">
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL" 
-                            className="h-10 w-auto group-hover:scale-110 transition-transform duration-500 rounded-xl" 
+                            className="h-9 w-auto group-hover:scale-105 transition-transform duration-500 rounded-lg" 
                         />
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black tracking-[0.2em] text-[#C55A11] uppercase mt-1">
-                                {role === 'TENANT' ? 'Portal Locataire' : role === 'AGENCY' ? 'Portal Agence' : 'Propriétaire'}
-                            </span>
+                        <div className="flex items-center gap-2 mt-1">
+                            <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase">
+                                {role === 'TENANT' ? 'Locataire' : role === 'AGENCY' ? 'Agence' : 'PROPRIÉTAIRE'}
+                            </div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                         </div>
                     </Link>
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar mt-4">
+                <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5 no-scrollbar">
                     {/* Public Home Link */}
                     <Link 
                         href="/"
-                        className="relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all text-gray-400 hover:text-[#C55A11] hover:bg-[#C55A11]/5 border border-dashed border-gray-100 hover:border-[#C55A11]/30 mb-4"
+                        className="relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all text-qtext-light hover:text-qorange hover:bg-qorange-pale border border-dashed border-qgrey-2 hover:border-qorange/30 mb-6"
                     >
                         <span className="relative z-10 transition-transform group-hover:scale-110">
-                            <Home size={20} />
+                            <Home size={18} />
                         </span>
-                        <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] flex-1">
-                            Retour à l&apos;Accueil
+                        <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.15em] flex-1">
+                            Accueil Public
                         </span>
                     </Link>
 
@@ -123,32 +124,32 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                             <Link 
                                 key={item.href} 
                                 href={item.href}
-                                className={`relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${
+                                className={`relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all ${
                                     isActive 
                                     ? "text-white" 
-                                    : "text-gray-500 hover:text-[#1F4E79] hover:bg-white/40"
+                                    : "text-qtext-light hover:text-qnavy hover:bg-qnavy-pale"
                                 }`}
                             >
                                 {isActive && (
                                     <motion.div 
                                         layoutId="sidebar-active-pill"
-                                        className="absolute inset-0 bg-[#1F4E79] rounded-2xl shadow-lg shadow-[#1F4E79]/20"
+                                        className="absolute inset-0 bg-qnavy rounded-xl shadow-[0_8px_16px_rgba(13,43,110,0.2)]"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                                 <span className={`relative z-10 transition-transform ${isActive ? "scale-110" : "group-hover:translate-x-1"}`}>
                                     {item.icon}
                                 </span>
-                                <span className="relative z-10 text-[13px] font-bold uppercase tracking-widest flex-1">
+                                <span className="relative z-10 text-[12px] font-black uppercase tracking-widest flex-1">
                                     {item.label}
                                 </span>
                                 {isActive && (
                                     <motion.span 
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        className="relative z-10"
+                                        className="relative z-10 text-white"
                                     >
-                                        <ChevronRight size={14} />
+                                        <ChevronRight size={16} />
                                     </motion.span>
                                 )}
                             </Link>
@@ -157,19 +158,19 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 </nav>
 
                 {/* Footer Section */}
-                <div className="p-6 mt-auto border-t border-white/10">
+                <div className="p-6 mt-auto border-t border-qgrey-1 bg-qgrey-1/30">
                     <button 
                         onClick={onLogout}
-                        className="w-full h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-red-100 transition-all active:scale-95 group shadow-sm"
+                        className="w-full h-12 bg-qred-pale text-qred rounded-xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-qred hover:text-white transition-all active:scale-95 group shadow-sm"
                     >
                         <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
                         Déconnexion
                     </button>
                     
-                    <div className="mt-6 text-center">
-                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-relaxed">
-                            QAPRIL Portal v3.2 <br/>
-                            <span className="opacity-50 italic">{userName || 'Compte Certifié'}</span>
+                    <div className="mt-5 text-center">
+                        <p className="text-[9px] font-black text-qtext-light uppercase tracking-widest leading-relaxed">
+                            QAPRIL Portal V4 <br/>
+                            <span className="opacity-70">{userName || 'Compte Certifié'}</span>
                         </p>
                     </div>
                 </div>

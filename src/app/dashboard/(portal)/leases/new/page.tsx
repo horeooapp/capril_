@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useTransition, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { createLease } from "@/actions/leases"
 import { createBDQ } from "@/actions/bdq"
@@ -13,15 +13,17 @@ enum TypeBail {
     DECLARATIF_BDQ = "DECLARATIF_BDQ"
 }
 
-export default function LeaseRegistrationPage() {
+function LeaseRegistrationForm() {
     const router = useRouter()
     const [error, setError] = useState<string | null>(null)
     const [properties, setProperties] = useState<any[]>([])
     const [step, setStep] = useState(1)
     
+    const searchParams = useSearchParams()
+    
     // Form State
     const [typeBail, setTypeBail] = useState<TypeBail>(TypeBail.ECRIT)
-    const [propertyId, setPropertyId] = useState("")
+    const [propertyId, setPropertyId] = useState(searchParams.get('propertyId') || "")
     const [tenantPhone, setTenantPhone] = useState("")
     const [tenantName, setTenantName] = useState("")
     const [propertyDescription, setPropertyDescription] = useState("")
@@ -273,5 +275,13 @@ export default function LeaseRegistrationPage() {
                 </form>
             </div>
         </div>
+    )
+}
+
+export default function LeaseRegistrationPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F4E79]"></div></div>}>
+            <LeaseRegistrationForm />
+        </Suspense>
     )
 }
