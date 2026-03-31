@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
-import { User, Settings, ShieldCheck, ArrowLeft, Stamp } from "lucide-react"
+import PreferencesLocataireClient from "@/components/locataire/PreferencesLocataireClient"
+import { User, Settings, ShieldCheck, ArrowLeft, Stamp, Bell } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 
@@ -111,6 +112,29 @@ export default async function TenantProfilePage() {
                     }} 
                 />
             </div>
+
+            {/* Préférences des Alertes */}
+            {user?.locataireProfile && (
+                <div className="bg-white p-8 md:p-10 rounded-[2rem] border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.04)] mt-8">
+                     <div className="flex items-center gap-3 border-b-2 border-qgrey-1 pb-6 mb-8">
+                        <div className="w-12 h-12 bg-[#C55A11]/10 rounded-xl flex items-center justify-center">
+                            <Bell size={22} className="text-[#C55A11]" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-qnavy-dark uppercase tracking-widest">
+                                Paramètres d'Alertes
+                            </h3>
+                            <p className="text-[11px] font-bold text-qtext-light uppercase tracking-widest mt-1">
+                                Vos rappels de loyer et communications
+                            </p>
+                        </div>
+                    </div>
+                    <PreferencesLocataireClient 
+                        profile={user.locataireProfile} 
+                        userId={user.id} 
+                    />
+                </div>
+            )}
 
             {/* Alert / Notice */}
             <div className="bg-[linear-gradient(135deg,#FDF6E3_0%,#F5E6BE_100%)] p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm flex items-start gap-4">

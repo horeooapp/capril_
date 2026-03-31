@@ -46,7 +46,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/locataire/receipts", label: "Quittances", icon: <Receipt size={20} /> },
                 { href: "/locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
                 { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
-                { href: "/locataire/preferences", label: "Profil", icon: <User size={20} /> },
+                { href: "/locataire/profile", label: "Profil", icon: <User size={20} /> },
                 { href: "/locataire/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }

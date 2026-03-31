@@ -338,7 +338,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                  </div>
                              </div>
                          </div>
-                         <Link href="/locataire/preferences" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">
+                         <Link href="/locataire/profile" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">
                              Configurer mes canaux (SMS/WhatsApp)
                          </Link>
                     </div>
