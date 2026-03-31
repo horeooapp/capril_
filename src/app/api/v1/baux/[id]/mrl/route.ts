@@ -40,7 +40,7 @@ export async function POST(
       data: {
         ticketRef,
         leaseId: lease.id,
-        locataireId: lease.locataireId || lease.landlordId, // Locataire cible
+        locataireId: lease.tenantId || lease.landlordId, // Locataire cible
         categorie: "MRL-01",
         description: `Modification Loyer. Ancien: ${lease.rentAmount} FCFA -> Nouveau: ${newRentAmount} FCFA. Motif: ${reason}`,
         statut: "EN_ATTENTE",

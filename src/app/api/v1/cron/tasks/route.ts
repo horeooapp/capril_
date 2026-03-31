@@ -105,21 +105,21 @@ export async function GET(req: Request) {
                         userId: lease.landlordId,
                         type: 'INFO',
                         title: `Expiration de Bail (${alertType})`,
-                        message: `Le bail expire dans ${diffDays} jours. Pensez au renouvellement.`,
-                        data: JSON.stringify({ leaseId: lease.id }),
-                        isRead: false
+                        content: `Le bail expire dans ${diffDays} jours. Pensez au renouvellement.`,
+                        link: JSON.stringify({ leaseId: lease.id }),
+                        read: false
                     }
                  });
                  // Et pour le locataire :
-                 if (lease.locataireId) {
+                 if (lease.tenantId) {
                      await prisma.notification.create({
                         data: {
-                            userId: lease.locataireId,
+                            userId: lease.tenantId,
                             type: 'INFO',
                             title: `Expiration de Bail (${alertType})`,
-                            message: `Votre bail expire dans ${diffDays} jours. Voudriez-vous renouveler ?`,
-                            data: JSON.stringify({ leaseId: lease.id }),
-                            isRead: false
+                            content: `Votre bail expire dans ${diffDays} jours. Voudriez-vous renouveler ?`,
+                            link: JSON.stringify({ leaseId: lease.id }),
+                            read: false
                         }
                      });
                  }

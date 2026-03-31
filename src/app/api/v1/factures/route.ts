@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const lease = await prisma.lease.findUnique({
       where: { id: leaseId },
       include: { 
-          locataire: true
+          tenant: true
       }
     });
 
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       data: {
         ticketRef,
         leaseId: lease.id,
-        locataireId: lease.locataireId || lease.landlordId, // Le locataire est le débiteur
+        locataireId: lease.tenantId || lease.landlordId, // Le locataire est le débiteur
         categorie: "FACTURE_UTILITY",
         description,
         statut: "EN_ATTENTE", // Devient "Cloturé" quand le locataire paie
@@ -51,15 +51,15 @@ export async function POST(req: Request) {
     });
 
     // Envoyer Notif
-    if (lease.locataireId) {
+    if (lease.tenantId) {
         await prisma.notification.create({
             data: {
-                userId: lease.locataireId,
+                userId: lease.tenantId,
                 type: 'BILL',
                 title: `Nouvelle Facture ${fournisseur}`,
-                message: description,
-                data: JSON.stringify({ ticketId: factureTicket.id, amount: montant }),
-                isRead: false
+                content: description,
+                link: JSON.stringify({ ticketId: factureTicket.id, amount: montant }),
+                read: false
             }
         });
     }

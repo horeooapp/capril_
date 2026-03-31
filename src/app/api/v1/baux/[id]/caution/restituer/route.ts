@@ -55,11 +55,7 @@ export async function POST(
       }
     });
 
-    // Optionnel: Mettre à jour le champ cautionRestituee du Bail pour retrocompat
-    await prisma.lease.update({
-        where: { id: lease.id },
-        data: { cautionRestituee: true }
-    });
+    // Cautionbails updated directly
 
     return NextResponse.json({ 
       success: true, 
