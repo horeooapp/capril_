@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react"
 import { updateUserProfile } from "@/actions/profile"
-import { CheckCircle2, User, Camera } from "lucide-react"
+import { CheckCircle2, User, Camera, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
@@ -18,7 +18,9 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
         birthPlace: initialData?.birthPlace || "",
         neighborhood: initialData?.neighborhood || "",
         phone: initialData?.phone || "",
-        avatarUrl: initialData?.avatarUrl || ""
+        avatarUrl: initialData?.avatarUrl || "",
+        docType: initialData?.docType || "CNI_CI",
+        docNumber: initialData?.docNumber || ""
     })
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +48,8 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                 neighborhood: formData.neighborhood,
                 phone: formData.phone,
                 avatarUrl: formData.avatarUrl,
+                docType: formData.docType,
+                docNumber: formData.docNumber,
             })
 
             if (result.error) {
@@ -150,6 +154,39 @@ export const ProfileUpdateForm = ({ initialData }: { initialData: any }) => {
                         className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
                         placeholder="+225 00000000"
                     />
+                </div>
+            </div>
+
+            <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] space-y-4">
+                <h4 className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-2">
+                    <ShieldCheck size={16} /> Pièce d'Identité (Obligatoire KYC 2)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Type de Document</label>
+                        <select 
+                            required
+                            value={formData.docType}
+                            onChange={(e) => setFormData({...formData, docType: e.target.value})}
+                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer"
+                        >
+                            <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
+                            <option value="PASS_CI">Passeport</option>
+                            <option value="ATTESTATION">Attestation d'Identité</option>
+                            <option value="PERMIS">Permis de Conduire</option>
+                            <option value="CARTE_CONSULAIRE">Carte Consulaire</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de la pièce</label>
+                        <input 
+                            required 
+                            value={formData.docNumber}
+                            onChange={(e) => setFormData({...formData, docNumber: e.target.value})}
+                            className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                            placeholder="Ex: CI000000000"
+                        />
+                    </div>
                 </div>
             </div>
 

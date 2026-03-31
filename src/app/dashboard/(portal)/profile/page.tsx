@@ -9,8 +9,11 @@ export default async function OwnerProfilePage() {
     if (!session?.user) return null
 
     const user = await prisma.user.findUnique({
-        where: { id: session.user.id }
+        where: { id: session.user.id },
+        include: { documents: { orderBy: { createdAt: "desc" }, take: 1 } }
     })
+
+    const primaryDoc = user?.documents?.[0];
 
     return (
         <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -58,7 +61,9 @@ export default async function OwnerProfilePage() {
                         neighborhood: user?.neighborhood,
                         phone: user?.phone,
                         avatarUrl: user?.avatarUrl,
-                        email: user?.email
+                        email: user?.email,
+                        docType: primaryDoc?.docType,
+                        docNumber: primaryDoc?.docNumber
                     }} />
                 </div>
 

@@ -305,6 +305,22 @@ export function useProprioMutations() {
     }
   };
 
+  const updateProfile = async (data: { firstName: string, lastName: string, birthDate: string, birthPlace: string, neighborhood: string, phone: string, docType?: string, docNumber?: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await apiFetch('/proprietaires/me/profile', {
+        method: 'PATCH',
+        body: data
+      });
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const requestDisbursement = async (amount: number) => {
     setLoading(true);
     setError(null);
@@ -321,7 +337,7 @@ export function useProprioMutations() {
     }
   };
 
-  return { addEntity, removeEntity, updateWalletConfig, requestDisbursement, loading, error };
+  return { addEntity, removeEntity, updateWalletConfig, updateProfile, requestDisbursement, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

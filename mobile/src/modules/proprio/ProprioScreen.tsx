@@ -49,10 +49,12 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
   const [mrlData, setMrlData] = useState({ rent: '', date: '' });
   const [walletData, setWalletData] = useState({ operator: 'WAVE', phone: '' });
   const [newEntity, setNewEntity] = useState({ name: '', type: 'RESIDENTIAL', commune: '' });
+  const [showKycProfile, setShowKycProfile] = useState(false);
+  const [kycData, setKycData] = useState({ firstName: '', lastName: '', birthDate: '', birthPlace: '', neighborhood: '', phone: '', docType: 'CNI_CI', docNumber: '' });
 
   const { data: proprioData, loading: proprioLoading, refetch: refetchProprio } = useProprio();
   const { data: patrimoineData, loading: patrimoineLoading, refetch: refetchPatrimoine } = usePatrimoine();
-  const { addEntity, removeEntity, updateWalletConfig, requestDisbursement, loading: mutationLoading } = useProprioMutations();
+  const { addEntity, removeEntity, updateWalletConfig, updateProfile, requestDisbursement, loading: mutationLoading } = useProprioMutations();
   const { requestMRL, loading: leaseLoading } = useLeaseActions();
 
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
@@ -340,15 +342,15 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                
                <SectionTitle label="Mes Informations Personnelles" />
                  <View style={styles.kycForm}>
-                    <Text style={styles.inputLabel}>Nom & Prénom exacts</Text>
-                    <View style={styles.inputVal}><Text style={styles.inputText}>{PROPRIO.fullName || "Bailleur"}</Text></View>
+                    <Text style={styles.inputLabel}>Nom Complet (Identité)</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>{PROPRIO.fullName || "—"}</Text></View>
                     <Text style={styles.inputLabel}>Numéro de Téléphone principal</Text>
-                    <View style={styles.inputVal}><Text style={styles.inputText}>+225 07 XX XX XX XX</Text></View>
-                    <Text style={styles.inputLabel}>Numéro Pièce d'Identité (CNI/Passeport)</Text>
-                    <View style={styles.inputVal}><Text style={styles.inputText}>CIXXXXXXXXXXX</Text></View>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>{PROPRIO.telephone || "—"}</Text></View>
+                    <Text style={styles.inputLabel}>Identifiant (Email)</Text>
+                    <View style={styles.inputVal}><Text style={styles.inputText}>{PROPRIO.email}</Text></View>
                     
-                    <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.orange, marginTop: 25, marginBottom: 20 }]} onPress={() => Alert.alert("Sécurité", "La modification de votre identité nécessite une nouvelle validation KYC. Continuer ?")}>
-                       <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>METTRE À JOUR MES DONNÉES</Text></View>
+                    <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.orange, marginTop: 25, marginBottom: 20 }]} onPress={() => setShowKycProfile(true)}>
+                       <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>METTRE À JOUR MES DONNÉES (KYC)</Text></View>
                     </TouchableOpacity>
                  </View>
 
@@ -433,7 +435,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                 ))}
             </ScrollView>
 
-            <TouchableOpacity 
+             <TouchableOpacity 
                style={[styles.submitBtn, (!newEntity.name || !newEntity.commune) && {opacity: 0.5}]}
                disabled={!newEntity.name || !newEntity.commune || mutationLoading}
                onPress={async () => {
@@ -453,6 +455,66 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                }}
             >
                <View style={[styles.gradientBtn, { backgroundColor: Theme.colors.teal }]}><Text style={styles.submitBtnText}>{mutationLoading ? "ENREGISTREMENT..." : "ENREGISTRER AU PATRIMOINE"}</Text></View>
+            </TouchableOpacity>
+         </BottomSheet>
+
+         <BottomSheet visible={showKycProfile} onClose={() => setShowKycProfile(false)} title="MISE À JOUR KYC NIVEAU 2">
+            <Text style={styles.modalSub}>Ces informations sont requises pour sécuriser votre compte selon la règlementation.</Text>
+            
+            <ScrollView style={{ maxHeight: Dimensions.get('window').height * 0.5 }}>
+               <Text style={styles.inputLabel}>Nom (de famille)</Text>
+               <TextInput style={styles.input} placeholder="Ex: Koné" onChangeText={t => setKycData({...kycData, lastName: t})} />
+               
+               <Text style={styles.inputLabel}>Prénoms</Text>
+               <TextInput style={styles.input} placeholder="Ex: Adama" onChangeText={t => setKycData({...kycData, firstName: t})} />
+               
+               <Text style={styles.inputLabel}>Date de naissance (AAAA-MM-JJ)</Text>
+               <TextInput style={styles.input} placeholder="1980-05-24" onChangeText={t => setKycData({...kycData, birthDate: t})} />
+               
+               <Text style={styles.inputLabel}>Lieu de Naissance</Text>
+               <TextInput style={styles.input} placeholder="Ex: Abidjan" onChangeText={t => setKycData({...kycData, birthPlace: t})} />
+               
+               <Text style={styles.inputLabel}>Quartier d'habitation</Text>
+               <TextInput style={styles.input} placeholder="Ex: Cocody Angré" onChangeText={t => setKycData({...kycData, neighborhood: t})} />
+               
+               <Text style={styles.inputLabel}>Numéro de Téléphone Ex: +225...</Text>
+               <TextInput style={styles.input} placeholder="+22507000000" keyboardType="phone-pad" onChangeText={t => setKycData({...kycData, phone: t})} />
+               
+               <Text style={[styles.inputLabel, {marginTop: 15}]}>Type de Pièce (KYC)</Text>
+               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginBottom: 10, paddingBottom: 5}}>
+                  {[
+                     {id: 'CNI_CI', label: 'CNI'},
+                     {id: 'PASS_CI', label: 'Passeport'},
+                     {id: 'ATTESTATION', label: 'Attestation'},
+                     {id: 'PERMIS', label: 'Permis'}
+                  ].map(doc => (
+                     <TouchableOpacity key={doc.id} style={[styles.opBtn, {marginRight: 6}, kycData.docType === doc.id && {borderColor: Theme.colors.green, backgroundColor: Theme.colors.green + '11'}]} onPress={() => setKycData({...kycData, docType: doc.id})}>
+                        <Text style={[styles.opText, kycData.docType === doc.id && {color: Theme.colors.green}]}>{doc.label}</Text>
+                     </TouchableOpacity>
+                  ))}
+               </ScrollView>
+
+               <Text style={styles.inputLabel}>Numéro de la pièce</Text>
+               <TextInput style={[styles.input, {marginBottom: 20}]} placeholder="Ex: CI000000000" onChangeText={t => setKycData({...kycData, docNumber: t})} />
+            </ScrollView>
+
+            <TouchableOpacity 
+               style={styles.submitBtn} 
+               disabled={mutationLoading}
+               onPress={async () => {
+                 if(!kycData.firstName || !kycData.lastName || !kycData.birthDate || !kycData.phone || !kycData.docNumber) {
+                   Alert.alert("Requis", "Veuillez remplir au minimum votre identité, téléphone, date de naissance, et numéro de pièce d'identité.");
+                   return;
+                 }
+                 try {
+                   await updateProfile(kycData);
+                   Alert.alert("Succès", "Votre profil a été mis à jour et validé KYC Niveau 2.");
+                   setShowKycProfile(false);
+                   refetchProprio();
+                 } catch (e: any) { Alert.alert("Erreur", e.message); }
+               }}
+            >
+               <View style={[styles.gradientBtn, { backgroundColor: Theme.colors.green }]}><Text style={styles.submitBtnText}>{mutationLoading ? "VALIDATION..." : "VALIDER MON IDENTITÉ"}</Text></View>
             </TouchableOpacity>
          </BottomSheet>
 

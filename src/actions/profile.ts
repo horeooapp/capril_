@@ -18,6 +18,8 @@ export async function updateUserProfile(data: {
     neighborhood: string;
     phone: string;
     avatarUrl?: string;
+    docType?: string;
+    docNumber?: string;
 }) {
     const session = await auth()
     if (!session || !session.user || !session.user.id) {
@@ -35,25 +37,60 @@ export async function updateUserProfile(data: {
         let newKycLevel = user.kycLevel;
 
         // Automatically upgrade to Level 2 if basic info is provided
-        const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.phone;
+        const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.phone && data.docType && data.docNumber;
         if (hasAllRequired && newKycLevel < 2) {
             newKycLevel = 2;
         }
 
         const fullName = `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`.trim() || undefined;
 
-        await prisma.user.update({
-            where: { id: session.user.id },
-            data: {
-                firstName: data.firstName,
-                lastName: data.lastName,
-                fullName: fullName,
-                birthDate: data.birthDate,
-                birthPlace: data.birthPlace,
-                neighborhood: data.neighborhood,
-                phone: data.phone,
-                ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
-                kycLevel: newKycLevel
+        await prisma.$transaction(async (tx) => {
+            // Update User
+            await tx.user.update({
+                where: { id: session.user.id },
+                data: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    fullName: fullName,
+                    birthDate: data.birthDate,
+                    birthPlace: data.birthPlace,
+                    neighborhood: data.neighborhood,
+                    phone: data.phone,
+                    ...(data.avatarUrl && { avatarUrl: data.avatarUrl }),
+                    kycLevel: newKycLevel
+                }
+            });
+
+            // Upsert Identity Document
+            if (data.docType && data.docNumber) {
+                const existingDoc = await tx.identityDocument.findFirst({
+                    where: { userId: session.user.id }
+                });
+
+                if (existingDoc) {
+                    await tx.identityDocument.update({
+                        where: { id: existingDoc.id },
+                        data: {
+                            docType: data.docType,
+                            docNumber: data.docNumber,
+                            docNumberHash: data.docNumber, // Using actual number for simplicity
+                            fullName: fullName,
+                            birthDate: data.birthDate
+                        }
+                    });
+                } else {
+                    await tx.identityDocument.create({
+                        data: {
+                            userId: session.user.id,
+                            docType: data.docType,
+                            docNumber: data.docNumber,
+                            docNumberHash: data.docNumber,
+                            status: "pending",
+                            fullName: fullName,
+                            birthDate: data.birthDate
+                        }
+                    });
+                }
             }
         });
 
