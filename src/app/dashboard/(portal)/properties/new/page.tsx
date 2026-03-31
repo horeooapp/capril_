@@ -20,7 +20,7 @@ export default function NewPropertyPage() {
             address: formData.get("addressLine1") as string,
             commune: formData.get("commune") as string,
             declaredRentFcfa: parseInt(formData.get("rent") as string),
-            propertyType: formData.get("propertyType") as string,
+            propertyType: (formData.get("propertyType") as string) || (category === 'COMMERCIAL' ? 'COMMERCE' : 'UNKNOWN'),
             rooms: parseInt(formData.get("rooms") as string) || undefined,
             areaSqm: parseFloat(formData.get("area") as string) || undefined,
         }
@@ -107,6 +107,14 @@ export default function NewPropertyPage() {
                                 </>
                             ) : (
                                 <>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Type de local</label>
+                                        <select name="propertyType" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none">
+                                            <option value="COMMERCE">Boutique / Commerce</option>
+                                            <option value="BUREAU">Bureaux</option>
+                                            <option value="ENTREPOT">Magasin / Entrepôt</option>
+                                        </select>
+                                    </div>
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Surface utile (m²)</label>
                                         <input type="number" name="area" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: 85" />
