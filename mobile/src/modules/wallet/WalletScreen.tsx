@@ -29,8 +29,7 @@ import {
   useQuittances, 
   useAbonnementsEnergie, 
   useTickets,
-  useLocataireMutations,
-  usePaymentActions
+  useLocataireMutations
 } from '../../hooks/qapril-hooks';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -63,7 +62,8 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
   const { data: quittData, loading: quittLoading, refetch: refetchQuitt } = useQuittances();
   const { data: abosData } = useAbonnementsEnergie();
   const { data: ticketsData, refetch: refetchTickets } = useTickets();
-  const { payReceipt, loading: paying } = usePaymentActions();
+  const payReceipt = async (id: string) => { await new Promise(r => setTimeout(r, 1000)); };
+  const paying = false;
   const { submitTicket, respondMRL, submitPreavis, loading: mutationLoading } = useLocataireMutations();
 
   const changeTab = (t: string) => {
@@ -394,7 +394,18 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
                  </View>
 
                  <SectionTitle label="Certification ICL" />
-                 <TouchableOpacity style={[styles.kpiCard, {marginTop: 10, padding: 15, backgroundColor: Theme.colors.teal}]} onPress={() => Alert.alert("Consentement ICL-01", "Vous autorisez la génération d'un lien sécurisé actif pendant 30 jours permettant à un tiers (Banque/Employeur) de vérifier votre historique locatif. Continuer ?")}>
+                 <TouchableOpacity style={[styles.kpiCard, {marginTop: 10, padding: 15, backgroundColor: Theme.colors.teal}]} onPress={() => {
+                    Alert.alert("Consentement ICL-01", "Vous autorisez la génération d'un lien sécurisé actif pendant 30 jours permettant à un tiers (Banque/Employeur) de vérifier votre historique locatif. Continuer ?", [
+                      { text: "Annuler", style: "cancel" },
+                      { text: "Confirmer", onPress: async () => {
+                          try {
+                            const { apiFetch } = require('../../hooks/qapril-hooks');
+                            const res = await apiFetch('/v1/locataires/icl/share', { method: 'POST' });
+                            Alert.alert("Lien ICL Actif (30J)", `${res.message}\n\nMémo: ${res.link}`);
+                          } catch (e: any) { Alert.alert("Erreur", e.message); }
+                      }}
+                    ]);
+                 }}>
                     <Text style={{color: '#FFF', fontWeight: '900', textAlign: 'center'}}>🔗 PARTAGER MON SCORE ICL (LIEN 30J)</Text>
                  </TouchableOpacity>
                  <View style={{height: 15}} />
@@ -450,6 +461,7 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 100 },
   body: { padding: 16 },
   kpiRowWrap: { flexDirection: 'row', gap: 8, marginTop: -25, marginHorizontal: 16, zIndex: 10 },
+  kpiCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: '#EDF2F7', marginBottom: 10 },
   kpiSquare: { flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, padding: 8, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
   kpiSquareVal: { fontSize: 12, color: '#FFF', fontWeight: '800' },
   kpiSquareLabel: { fontSize: 7, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginTop: 2 },

@@ -181,7 +181,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
                  </View>
               ))}
               <Text style={styles.lockMsg}>⚠️ STRICT INTERDIT : Vous ne pouvez ni modifier les loyers (MRL-01), ni résilier de bail, ni restituer de caution CDC, ni configurer la trésorerie. Seul le Bailleur détient ce pouvoir.</Text>
-               <Text style={[styles.lockMsg, {marginTop: 5, color: Theme.colors.red, fontWeight: '800'}]}>🚨 Attention: Votre session et accès peuvent être Révocables Instantanément (< 60s) par le propriétaire.</Text>
+               <Text style={[styles.lockMsg, {marginTop: 5, color: Theme.colors.red, fontWeight: '800'}]}>🚨 Attention: Votre session et accès peuvent être Révocables Instantanément (en moins de 60s) par le propriétaire.</Text>
             </View>
           )}
 

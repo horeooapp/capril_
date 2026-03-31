@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "423cabfc-dc67-4b55-b662-5abb31472c72"
+      }
+    },
+    "android": {
+      "package": "com.qapril.capril_"
+    }
+  }
+}

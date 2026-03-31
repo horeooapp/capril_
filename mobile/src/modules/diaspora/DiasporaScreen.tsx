@@ -173,7 +173,18 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
                  </View>
 
                  <SectionTitle label="SLA & Délégation Mandataire" />
-                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 5, marginBottom: 15 }]} onPress={() => Alert.alert("Lien Généré", "https://qapril.ci/d/8xP9a (Valide 7 Jours, chiffré HMAC-SHA256)")}>
+                 <TouchableOpacity style={[styles.submitBtn, { backgroundColor: Theme.colors.navy, marginTop: 5, marginBottom: 15 }]} onPress={() => {
+                    Alert.alert("Génération d'Invitation", "Créer un lien sécurisé actif pendant 7 Jours ?", [
+                        { text: "Annuler", style: "cancel" },
+                        { text: "Oui, créer", onPress: async () => {
+                            try {
+                                const { apiFetch } = require('../../hooks/qapril-hooks');
+                                const res = await apiFetch('/v1/diaspora/invite', { method: 'POST', body: { email: 'agence@test.ci' } });
+                                Alert.alert("Lien Généré", `${res.link}\n(Copié dans le presse-papier)`);
+                            } catch(e: any) { Alert.alert("Erreur", e.message); }
+                        }}
+                    ]);
+                 }}>
                     <View style={styles.gradientBtn}><Text style={styles.submitBtnText}>🔗 GÉNÉRER LIEN D'INVITATION (7J)</Text></View>
                  </TouchableOpacity>
                  <View style={styles.kycForm}>

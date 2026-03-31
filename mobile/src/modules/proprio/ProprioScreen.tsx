@@ -310,7 +310,16 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
                   <Text style={{fontSize: 10, color: Theme.colors.textLight}}>Vous risquez une pénalité de <Text style={{fontWeight:'800', color:Theme.colors.red}}>-2 pts</Text> si vous laissez un ticket de réclamation locataire (RCL) expirer le <Text style={{fontWeight:'800'}}>délai SLA de 144 heures !</Text></Text>
                </View>
 
-               <TouchableOpacity style={[styles.settingCard, { backgroundColor: Theme.colors.navy }]} onPress={() => Alert.alert("Mode Confidentiel Activé", "Votre Alias d'anonymisation est désormais BAI-6893. Votre véritable nom n'apparaîtra plus aux gestionnaires, intermédiaires et locataires.")}>
+               <TouchableOpacity style={[styles.settingCard, { backgroundColor: Theme.colors.navy }]} onPress={() => Alert.alert("Mode Confidentiel", "Activer ou désactiver l'anonymisation BAI-NNN ?", [
+                   { text: "Annuler", style: "cancel" },
+                   { text: "Confirmer Activation", onPress: async () => {
+                       try {
+                           const { apiFetch } = require('../../hooks/qapril-hooks');
+                           const res = await apiFetch('/v1/proprietaires/me/confidentiel', { method: 'PATCH', body: { isConfidential: true } });
+                           Alert.alert("Sécurité", res.message);
+                       } catch(e: any) { Alert.alert("Erreur", e.message); }
+                   }}
+               ])}>
                   <Text style={{ fontSize: 24 }}>🕵️‍♂️</Text>
                   <View style={{ flex: 1, marginLeft: 15 }}>
                      <Text style={[styles.settingTitle, { color: '#FFF' }]}>Mode Confidentiel (BAI-NNN)</Text>
@@ -505,4 +514,7 @@ const styles = StyleSheet.create({
   backBtnText: { fontSize: 12, color: Theme.colors.navy, fontWeight: '800' },
   warningBox: { backgroundColor: Theme.colors.redPale, padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: Theme.colors.red + '20' },
   warningText: { color: Theme.colors.red, fontSize: 11, fontWeight: '800', lineHeight: 16 },
+  kycForm: { backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginBottom: 15 },
+  inputVal: { backgroundColor: '#F8FAFC', borderRadius: 12, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#EDF2F7', flexDirection: 'row', alignItems: 'center' },
+  inputText: { fontSize: 13, color: Theme.colors.navy, fontWeight: '700', flex: 1 },
 });

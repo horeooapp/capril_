@@ -31,7 +31,7 @@ export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
   const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const { login, loading, error } = useAuth();
+  const { login, requestOtp, loading, error } = useAuth();
   
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -45,9 +45,12 @@ export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
       return;
     }
 
-    // In a real scenario, we'd call a requestOTP endpoint here.
-    // For now, based on hook alignment, we proceed to OTP entry.
-    setStep('OTP');
+    try {
+      await requestOtp(cleaned);
+      setStep('OTP');
+    } catch (e: any) {
+      setLocalError(e.message || "Impossible d'envoyer le code.");
+    }
   };
 
   const handleVerifyOTP = async () => {

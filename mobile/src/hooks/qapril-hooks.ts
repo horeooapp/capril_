@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
  * Aligned with QAPRIL_API_MAPPING.md (March 2026)
  */
 
-const API_BASE_URL = 'https://api.qapril.ci'; // Reference: QAPRIL_API_BASE_URL
+const API_BASE_URL = 'https://qapril.ci'; // Reference: QAPRIL_API_BASE_URL
 
 let AUTH_TOKEN: string | null = null;
 const TOKEN_KEY = 'QAPRIL_AUTH_TOKEN';
@@ -34,7 +34,7 @@ export async function setAuthToken(token: string | null) {
 /**
  * API Fetch wrapper for mobile
  */
-async function apiFetch(path: string, opts: any = {}) {
+export async function apiFetch(path: string, opts: any = {}) {
   const url = `${API_BASE_URL}${path.startsWith('/api') ? path : `/api/v1${path}`}`;
   
   const headers = {
@@ -107,7 +107,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/auth/login', {
+      const res = await apiFetch('/auth/otp/verify', {
         method: 'POST',
         body: { email, otp }
       });
@@ -119,7 +119,7 @@ export function useAuth() {
       return {
         success: true,
         token: res.token,
-        profil: res.profil,
+        profil: res.profile || 'locataire',
         userId: res.userId
       };
     } catch (e: any) {
@@ -130,7 +130,24 @@ export function useAuth() {
     }
   };
 
-  return { login, loading, error };
+  const requestOtp = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch('/auth/otp/request', {
+        method: 'POST',
+        body: { email }
+      });
+      return res;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { login, requestOtp, loading, error };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
