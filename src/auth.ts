@@ -85,21 +85,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         const reqRole = (requestedRole || '').toUpperCase();
 
-                        // Autorisation dynamique de rôle : si l'utilisateur demande à se connecter
-                        // depuis un portail public (Locataire, Propriétaire, Agence, Diaspora), 
-                        // on lui accorde dynamiquement l'accès à cet espace pour sa session.
-                        if (['TENANT', 'LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole)) {
-                            eligibleRolesSet.add(reqRole);
-                        } else if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
+                        // Gestion stricte des privilèges d'administration
+                        if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
                             if (!isAdmin) {
                                 throw new CustomAuthError("Accès refusé : Privilèges administrateur requis.");
                             }
+                            eligibleRolesSet.add(reqRole);
                         }
 
                         const eligibleRoles = Array.from(eligibleRolesSet);
 
                         if (eligibleRoles.length === 0) {
                              throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
+                        }
+
+                        // VÉRIFICATION STRICTE DE COMPARTIMENTALISATION
+                        const isDashboardRequest = ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole);
+                        
+                        if (isDashboardRequest) {
+                            // Le portail de gestion exige au moins un de ces rôles
+                            const hasAnyDashboardRole = eligibleRoles.some(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
+                            if (!hasAnyDashboardRole) {
+                                throw new CustomAuthError("Accès refusé : Ce compte n'a pas accès au portail de gestion.");
+                            }
+                        } else if (reqRole === 'TENANT') {
+                            if (!eligibleRoles.includes('TENANT')) {
+                                throw new CustomAuthError("Accès refusé : Cet espace est réservé aux locataires.");
+                            }
                         }
 
                         let finalChosenRole: string | null = null;
