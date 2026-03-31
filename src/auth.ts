@@ -92,7 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         let isAuthorizedForRequested = false;
                         if (reqRole === 'TENANT') {
                             isAuthorizedForRequested = isTenant || isAdmin;
-                        } else if (reqRole === 'LANDLORD') {
+                        } else if (reqRole === 'LANDLORD' || reqRole === 'AGENCY' || reqRole === 'DIASPORA') {
                             isAuthorizedForRequested = isLandlord || isAgency || isDiaspora || isAdmin;
                         } else if (reqRole === 'ADMIN') {
                             isAuthorizedForRequested = isAdmin;
