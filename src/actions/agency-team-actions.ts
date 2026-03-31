@@ -4,15 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { v4 as uuidv4 } from "uuid"
 
-// Dictionnaire des permissions possibles (RBAC)
-export const AGENCY_PERMISSIONS = {
-    READ_DASHBOARD: "Accès au Tableau de Bord global",
-    MANAGE_PROPERTIES: "Gérer le patrimoine (Ajout/Modif de Biens)",
-    MANAGE_LEASES: "Gérer les baux et contrats",
-    MANAGE_TENANTS: "Communiquer/Gérer les locataires",
-    MANAGE_ACCOUNTING: "Accès à la comptabilité (Quittances, Wallet)",
-    MANAGE_MANDATES: "Gérer les mandats de gestion",
-}
+
 
 function generateRandomPassword() {
     return Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + "!"

@@ -1,8 +1,18 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { inviteCollaborator, AGENCY_PERMISSIONS } from "@/actions/agency-team-actions"
+import { inviteCollaborator } from "@/actions/agency-team-actions"
 import { Plus, CheckCircle2, ShieldAlert, X } from "lucide-react"
+
+// Dictionnaire des permissions possibles (RBAC) pour l'Agence
+export const AGENCY_PERMISSIONS = {
+    READ_DASHBOARD: "Accès au Tableau de Bord global",
+    MANAGE_PROPERTIES: "Gérer le patrimoine (Ajout/Modif de Biens)",
+    MANAGE_LEASES: "Gérer les baux et contrats",
+    MANAGE_TENANTS: "Communiquer/Gérer les locataires",
+    MANAGE_ACCOUNTING: "Accès à la comptabilité (Quittances, Wallet)",
+    MANAGE_MANDATES: "Gérer les mandats de gestion",
+}
 
 export function CollaboratorInvitationModal() {
     const [isOpen, setIsOpen] = useState(false)
