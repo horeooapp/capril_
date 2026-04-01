@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
 import { calculateSuggestedRecharge } from "@/lib/wallet/calculator"
+import { genererDeepLink } from "./wallet.actions"
 
 /**
  * [WDL-05] Récupère le profil complet du wallet pour l'UI (ADD-07 v3).
@@ -94,3 +95,17 @@ export async function updateWalletPreferences(data: {
         return { error: "Erreur lors de la mise à jour des préférences" };
     }
 }
+
+/**
+ * [WDL-07] Appelé par le tiroir de recharge (RechargeDrawer) pour instancier le lien de paiement.
+ */
+export async function processRechargeLink(amount: number, operator: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Non autorisé");
+    
+    // Génère le deep link à partir du dictionnaire des opérateurs
+    const { url, ref } = await genererDeepLink(session.user.id, operator as any, amount);
+    
+    return { url, ref };
+}
+

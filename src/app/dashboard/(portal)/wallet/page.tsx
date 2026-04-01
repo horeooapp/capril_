@@ -17,8 +17,9 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react"
-import { getWalletProfile, updateWalletPreferences } from "@/actions/wallet-actions"
+import { getWalletProfile, updateWalletPreferences, processRechargeLink } from "@/actions/wallet-actions"
 import { toast } from "sonner"
+import RechargeDrawer from "@/components/dashboard/owner/RechargeDrawer"
 
 export default function WalletPage() {
   const [profile, setProfile] = useState<any>(null)
@@ -33,6 +34,19 @@ export default function WalletPage() {
     rappelActif: true,
     rappelJour: 1
   })
+
+  // Drawer state
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [drawerAmount, setDrawerAmount] = useState(2000)
+
+  const handleOpenDrawer = (amount: number) => {
+    setDrawerAmount(amount)
+    setDrawerOpen(true)
+  }
+
+  const handleRechargeSubmit = async (amount: number, operator: string, method: string) => {
+    return processRechargeLink(amount, operator)
+  }
 
   const loadProfile = React.useCallback(async () => {
     try {
@@ -137,6 +151,7 @@ export default function WalletPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Option 1: Minimum */}
               <motion.button 
+                onClick={() => handleOpenDrawer(profile?.suggestions?.minimum || 1000)}
                 whileHover={{ y: -5 }}
                 className="p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-[#C55A11]/30 hover:bg-[#C55A11]/5 transition-all text-left space-y-4 group"
               >
@@ -152,6 +167,7 @@ export default function WalletPage() {
 
               {/* Option 2: Recommandé (Zéro Friction) */}
               <motion.button 
+                onClick={() => handleOpenDrawer(profile?.suggestions?.recommande || 2000)}
                 whileHover={{ y: -5 }}
                 className="p-6 rounded-3xl border-2 border-[#C55A11] bg-[#C55A11]/5 shadow-lg shadow-[#C55A11]/10 text-left space-y-4 relative overflow-hidden"
               >
@@ -170,6 +186,7 @@ export default function WalletPage() {
 
               {/* Option 3: Confort */}
               <motion.button 
+                onClick={() => handleOpenDrawer(profile?.suggestions?.confort || 5000)}
                 whileHover={{ y: -5 }}
                 className="p-6 rounded-3xl border-2 border-[#1F4E79]/20 hover:border-[#1F4E79] hover:bg-[#1F4E79]/5 transition-all text-left space-y-4 group"
               >
@@ -338,6 +355,13 @@ export default function WalletPage() {
           </div>
         </div>
       </div>
+
+      <RechargeDrawer 
+        isOpen={isDrawerOpen} 
+        onClose={() => setDrawerOpen(false)} 
+        suggestedAmount={drawerAmount} 
+        onRecharge={handleRechargeSubmit} 
+      />
     </div>
   )
 }
