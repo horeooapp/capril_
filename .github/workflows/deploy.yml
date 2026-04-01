@@ -1,10 +1,6 @@
 # Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
 name: 🚀 Deploy QAPRIL v3.0 to Hostinger
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-
 on:
   push:
     branches:
@@ -75,9 +71,10 @@ jobs:
           cp package-lock.json dist_package/
 
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output
+          include-hidden-files: true
           path: dist_package/
           retention-days: 1
 
@@ -103,7 +100,7 @@ jobs:
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-output
 
