@@ -102,7 +102,7 @@ jobs:
           rm -rf /home/github/actions-runner/_work/_temp/* || true
           
           # Standard workspace cleanup
-          find . -maxdepth 1 -not -path '*/.*' -delete || true
+          find . -maxdepth 1 -mindepth 1 -not -path '*/.*' -exec rm -rf {} + || true
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
@@ -127,6 +127,7 @@ jobs:
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='*.db*' \
+            --exclude='node_modules' \
             ./ $DEPLOY_DEST/
 
       # Handled inside the restart block for better permission consistency
