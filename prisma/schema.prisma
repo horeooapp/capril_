@@ -2048,6 +2048,7 @@ model TicketMaintenance {
   dateSignalement    DateTime            @default(now()) @map("date_signalement")
   datePriseEnCharge  DateTime?           @map("date_prise_en_charge")
   dateResolution     DateTime?           @map("date_resolution")
+  proprioVuAt        DateTime?           @map("proprio_vu_at")
   nbReouvertures     Int                 @default(0) @map("nb_reouvertures")
   commentaireProprio String?             @map("commentaire_proprio")
   confirmationLoc    Boolean?            @map("confirmation_locataire")
