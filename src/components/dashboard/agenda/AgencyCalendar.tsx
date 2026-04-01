@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, 
-  MapPin, Clock, User, Phone, Briefcase, Plus, Search
+  MapPin, Clock, User, Phone, Briefcase, Plus, Search, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -26,6 +26,7 @@ interface AgencyCalendarProps {
 export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
+  const [isScheduling, setIsScheduling] = useState(false);
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -57,6 +58,7 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
   const selectedDayEvents = selectedDay ? eventsByDay[selectedDay] || [] : [];
 
   return (
+    <>
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 h-full min-h-[600px]">
       {/* Calendar Grid */}
       <div className="lg:col-span-3 bg-gray-900 border border-gray-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
@@ -80,7 +82,7 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
             <button onClick={prevMonth} className="p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all"><ChevronLeft /></button>
             <button onClick={nextMonth} className="p-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all"><ChevronRight /></button>
             <button 
-              onClick={onAddEvent}
+              onClick={() => onAddEvent ? onAddEvent() : setIsScheduling(true)}
               className="ml-4 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20"
             >
               <Plus className="w-5 h-5" /> Planifier
@@ -156,7 +158,7 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
                 <Search className="w-12 h-12 text-gray-700 mx-auto mb-4" />
                 <p className="text-gray-500 font-medium">Aucun événement prévu.</p>
                 <button 
-                  onClick={onAddEvent}
+                  onClick={() => onAddEvent ? onAddEvent() : setIsScheduling(true)}
                   className="mt-4 text-xs font-bold text-indigo-500 hover:text-indigo-400 uppercase tracking-widest"
                 >
                   Planifier quelque chose
@@ -207,5 +209,72 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
         </div>
       </div>
     </div>
+
+    <AnimatePresence>
+      {isScheduling && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-gray-900 border border-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+          >
+            <button 
+              onClick={() => setIsScheduling(false)}
+              className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <h3 className="text-xl font-black text-white uppercase tracking-tighter mb-6 flex items-center gap-2">
+              <CalendarIcon className="text-indigo-500" />
+              Planifier un événement
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Titre de l'événement</label>
+                <input type="text" placeholder="Ex: État des lieux - Appartement B" className="w-full bg-gray-950 border border-gray-800 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Date</label>
+                  <input type="date" className="w-full bg-gray-950 border border-gray-800 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Heure</label>
+                  <input type="time" className="w-full bg-gray-950 border border-gray-800 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1 block">Type</label>
+                <select className="w-full bg-gray-950 border border-gray-800 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors appearance-none">
+                  <option>🏢 Visite Logement</option>
+                  <option>📝 État des Lieux</option>
+                  <option>🤝 Rendez-vous Client</option>
+                  <option>⚠️ Relance Impayé</option>
+                  <option>🔧 Intervention Maintenance</option>
+                </select>
+              </div>
+
+              <div className="pt-4">
+                <button 
+                  onClick={() => {
+                    setIsScheduling(false);
+                    alert("Événement planifié ! (Simulation)");
+                  }}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black uppercase tracking-widest text-[11px] transition-all shadow-lg shadow-indigo-600/20"
+                >
+                  Enregistrer l'événement
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }
