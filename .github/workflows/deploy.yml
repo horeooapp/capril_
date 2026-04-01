@@ -99,9 +99,9 @@ jobs:
           sudo rm -rf /home/github/actions-runner/_diag/pages/* || true
           rm -rf /home/github/actions-runner/_diag/pages/* || true
           
-          # Clean _temp but keep the currently executing shell scripts
-          sudo find /home/github/actions-runner/_work/_temp/ -mindepth 1 -maxdepth 1 -not -name "*.sh" -not -name "*.cmd" -exec rm -rf {} + || true
-          find /home/github/actions-runner/_work/_temp/ -mindepth 1 -maxdepth 1 -not -name "*.sh" -not -name "*.cmd" -exec rm -rf {} + || true
+          # Clean _temp but keep the currently executing shell scripts and runner state folders
+          sudo find /home/github/actions-runner/_work/_temp/ -mindepth 1 -maxdepth 1 -not -name "*.sh" -not -name "*.cmd" -not -name "_*" -exec rm -rf {} + || true
+          find /home/github/actions-runner/_work/_temp/ -mindepth 1 -maxdepth 1 -not -name "*.sh" -not -name "*.cmd" -not -name "_*" -exec rm -rf {} + || true
           
           # Standard workspace cleanup
           find . -maxdepth 1 -mindepth 1 -not -path '*/.*' -exec rm -rf {} + || true
