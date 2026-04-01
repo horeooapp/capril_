@@ -101,7 +101,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           nom: p.name || p.address, 
           adresse: p.address, 
           commune: p.commune,
-          type: p.propertyType === "building" ? "immeuble" : p.propertyType === "court" ? "cour" : "standalone",
+          type: p.propertyType === "building" ? "immeuble" : p.propertyType === "court" ? "cour" : p.propertyType === "COURS_COMMUNE" ? "cour commune" : "standalone",
           unites: []
         };
       }

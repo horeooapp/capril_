@@ -111,7 +111,7 @@ export default function PropertiesClient({ properties }: { properties: Property[
                                         {property.propertyType === 'VILLA' ? <Home size={24} /> : <Building2 size={24} />}
                                     </div>
                                     <h3 className="text-2xl font-black text-gray-900 leading-tight uppercase tracking-tighter italic">
-                                        {property.propertyType === 'VILLA' ? 'Villa' : property.propertyType === 'APARTMENT' ? 'Appart' : 'Bien'} {property.commune}
+                                        {property.propertyType === 'VILLA' ? 'Villa' : property.propertyType === 'COURS_COMMUNE' ? 'Cours com.' : property.propertyType === 'APARTMENT' ? 'Appart' : 'Bien'} {property.commune}
                                     </h3>
                                 </div>
                                 <div className="flex items-center gap-2 mb-12">

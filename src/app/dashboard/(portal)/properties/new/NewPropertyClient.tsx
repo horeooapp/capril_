@@ -127,6 +127,7 @@ export default function NewPropertyClient() {
                                             <option value="APARTMENT">Appartement</option>
                                             <option value="VILLA">Villa</option>
                                             <option value="STUDIO">Studio</option>
+                                            <option value="COURS_COMMUNE">Cours commune</option>
                                         </select>
                                     </div>
                                     <div>
