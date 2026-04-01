@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
+import { SubscriptionManager } from "@/components/dashboard/SubscriptionManager"
 
 export default async function OwnerProfilePage() {
     const session = await auth()
@@ -132,24 +133,7 @@ export default async function OwnerProfilePage() {
                 </div>
 
                 {/* Wallet / Abonnement */}
-                <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white">
-                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter mb-6 flex items-center gap-3">
-                        <CreditCard size={22} className="text-[#C55A11]" />
-                        Services & Abonnement
-                    </h3>
-                    <div className="p-6 bg-[#C55A11]/5 rounded-[2rem] border border-[#C55A11]/10 mb-6">
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Plan Actuel</p>
-                                <p className="text-xl font-black text-[#C55A11]">PREMIUM AGREE</p>
-                            </div>
-                            <span className="px-3 py-1 bg-white rounded-lg text-[9px] font-black text-[#C55A11] border border-[#C55A11]/20 shadow-sm">ACTIVE</span>
-                        </div>
-                    </div>
-                    <button className="w-full py-4 bg-white border border-gray-100 text-[#1F4E79] rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-sm hover:bg-gray-50 transition-all">
-                        Gérer mon abonnement
-                    </button>
-                </div>
+                <SubscriptionManager currentPlan="PREMIUM AGREE" />
             </div>
 
             {/* Disclaimer */}
