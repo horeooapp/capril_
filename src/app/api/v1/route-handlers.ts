@@ -39,12 +39,13 @@ export async function POST_BauxDraft(req: NextRequest) {
 // ════════════════════════════════════════════════════════════════
 export async function PUT_BauxDraft(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
     const { sauvegarderDraftLease } = await import('@/actions/lease.actions');
-    const result = await sauvegarderDraftLease({ ...body, leaseId: params.id });
+    const result = await sauvegarderDraftLease({ ...body, leaseId: id });
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -58,12 +59,13 @@ export async function PUT_BauxDraft(
 // ════════════════════════════════════════════════════════════════
 export async function POST_BauxValider(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
     const { validerLease } = await import('@/actions/lease.actions');
-    const result = await validerLease(params.id, body);
+    const result = await validerLease(id, body);
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -119,9 +121,10 @@ export async function POST_Receipts(req: NextRequest) {
 // ════════════════════════════════════════════════════════════════
 export async function GET_ReceiptVerify(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // const { searchParams } = new URL(req.url);
     // const sha = searchParams.get('sha');
 
@@ -157,7 +160,7 @@ export async function GET_ReceiptVerify(
 
     return NextResponse.json({
       valid:        true,
-      reference:    `QUI-${params.id}`,
+      reference:    `QUI-${id}`,
       moisConcerne: '2026-03',
       montant:      185000,
       statut:       'PAID',
@@ -212,11 +215,12 @@ export async function GET_Properties(req: NextRequest) {
 // ════════════════════════════════════════════════════════════════
 export async function GET_PremierMoisImpaye(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { getPremierMoisImpaye } = await import('@/actions/receipt.actions');
-    const mois = await getPremierMoisImpaye(params.id);
+    const mois = await getPremierMoisImpaye(id);
     if (!mois) return NextResponse.json({ mois: null, message: 'Aucun impayé' });
     return NextResponse.json({ mois });
   } catch (error: any) {
