@@ -46,15 +46,15 @@ export default function WalletDashboard() {
         <motion.div 
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className="lg:col-span-8 glass-card-premium p-12 rounded-[4rem] bg-[#1F4E79] text-white relative overflow-hidden group shadow-blue-900/40 shadow-2xl"
+           className="lg:col-span-8 p-12 rounded-[4rem] bg-[#1F4E79] text-white relative overflow-hidden group shadow-blue-900/40 shadow-2xl border border-white/10"
         >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-ivoire-orange blur-[120px] opacity-10 -mr-20 -mt-20 group-hover:opacity-20 transition-opacity"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#C55A11] blur-[120px] opacity-10 -mr-20 -mt-20 group-hover:opacity-20 transition-opacity"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row justify-between h-full gap-12">
             <div className="space-y-12 flex-1">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <Wallet size={20} className="text-ivoire-orange" />
+                  <Wallet size={20} className="text-[#C55A11]" />
                 </div>
                 <span className="text-[12px] font-black uppercase tracking-[0.3em] text-white/60">Solde Disponible.</span>
               </div>
@@ -64,7 +64,7 @@ export default function WalletDashboard() {
                   {solde.toLocaleString()} <span className="text-3xl font-normal opacity-50 not-italic">FCFA</span>
                 </h1>
                 {isOverdrawn && (
-                  <div className="flex items-center gap-2 text-ivoire-orange font-black text-xs uppercase tracking-widest animate-pulse">
+                  <div className="flex items-center gap-2 text-[#C55A11] font-black text-xs uppercase tracking-widest animate-pulse">
                     <AlertTriangle size={16} />
                     Mode Crédit Activé (Découvert autorisé)
                   </div>
@@ -86,7 +86,7 @@ export default function WalletDashboard() {
             <div className="flex flex-col justify-end gap-4 w-full md:w-64">
                <button 
                   onClick={() => setIsRechargeOpen(true)}
-                  className="w-full py-6 bg-ivoire-orange text-white rounded-[2rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-950/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-6 bg-[#C55A11] text-white rounded-[2rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-950/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
                >
                  <Zap size={20} />
                  Recharger
