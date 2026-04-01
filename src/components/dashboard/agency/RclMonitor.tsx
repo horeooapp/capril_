@@ -23,6 +23,8 @@ const mockRclTickets = [
 
 export const RclMonitor: React.FC = () => {
   const [tickets, setTickets] = useState(mockRclTickets);
+  const [isAdjusting, setIsAdjusting] = useState(false);
+  const [globalThreshold, setGlobalThreshold] = useState(144);
 
   const simulateResolution = (id: number) => {
     setTickets(tickets.filter(t => t.id !== id));
@@ -111,7 +113,7 @@ export const RclMonitor: React.FC = () => {
                                         cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" 
                                         strokeDasharray={150.8}
                                         initial={{ strokeDashoffset: 150.8 }}
-                                        animate={{ strokeDashoffset: 150.8 - (150.8 * (144 - t.hoursLeft)) / 144 }}
+                                        animate={{ strokeDashoffset: 150.8 - (150.8 * (globalThreshold - t.hoursLeft)) / globalThreshold }}
                                         transition={{ duration: 1.5 }}
                                         className={t.status === 'critical' ? 'text-red-500' : t.status === 'warning' ? 'text-[#C55A11]' : 'text-emerald-500'}
                                       />
@@ -144,9 +146,9 @@ export const RclMonitor: React.FC = () => {
                     <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
                        <Clock size={20} className="text-orange-400" />
                     </div>
-                    <div>
+                     <div>
                        <h5 className="text-[12px] font-black uppercase tracking-widest">Délai Légal</h5>
-                       <p className="text-[12px] text-white/60 font-medium">144 heures (6 jours calendaires) pour valider ou contester.</p>
+                       <p className="text-[12px] text-white/60 font-medium">{globalThreshold} heures ({(globalThreshold/24).toFixed(1)} jours) pour valider ou contester.</p>
                     </div>
                  </div>
                  <div className="flex gap-4">
@@ -182,10 +184,49 @@ export const RclMonitor: React.FC = () => {
                     <span className="font-black text-red-500">12%</span>
                  </div>
                  <div className="pt-4 border-t border-slate-50">
-                    <button className="w-full py-4 bg-orange-50 text-[#C55A11] rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-orange-100 transition-all flex items-center justify-center gap-2">
-                       Ajuster les seuils
-                       <ArrowUpRight size={14} />
-                    </button>
+                    <AnimatePresence mode="wait">
+                       {!isAdjusting ? (
+                          <motion.button 
+                             key="btn"
+                             initial={{ opacity: 0 }}
+                             animate={{ opacity: 1 }}
+                             exit={{ opacity: 0 }}
+                             onClick={() => setIsAdjusting(true)}
+                             className="w-full py-4 bg-orange-50 text-[#C55A11] rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-orange-100 transition-all flex items-center justify-center gap-2"
+                          >
+                             Ajuster les seuils
+                             <ArrowUpRight size={14} />
+                          </motion.button>
+                       ) : (
+                          <motion.div 
+                             key="form"
+                             initial={{ opacity: 0, height: 0 }}
+                             animate={{ opacity: 1, height: 'auto' }}
+                             exit={{ opacity: 0, height: 0 }}
+                             className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-100"
+                          >
+                             <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Seuil d'alerte (Heures)</span>
+                                <span className="text-lg font-black text-[#C55A11]">{globalThreshold}h</span>
+                             </div>
+                             <input 
+                                type="range" 
+                                min="24" max="240" step="24"
+                                value={globalThreshold}
+                                onChange={(e) => setGlobalThreshold(Number(e.target.value))}
+                                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#C55A11]"
+                             />
+                             <div className="flex gap-2">
+                                <button 
+                                   onClick={() => setIsAdjusting(false)}
+                                   className="flex-1 py-3 bg-[#1F4E79] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-900 transition-colors"
+                                >
+                                   Sauvegarder
+                                </button>
+                             </div>
+                          </motion.div>
+                       )}
+                    </AnimatePresence>
                  </div>
               </div>
            </div>
