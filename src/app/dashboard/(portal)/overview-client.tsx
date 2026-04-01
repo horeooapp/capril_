@@ -222,9 +222,9 @@ export default function DashboardOverviewClient({
                         <span className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Wallet QAPRIL</span>
                         <div className="flex items-center gap-3">
                             <span className="text-[16px] font-black text-qnavy-dark leading-none">{user?.walletBalance !== undefined ? user.walletBalance.toLocaleString() : '0'} <span className="text-[12px]">FCFA</span></span>
-                            <button className="p-1 bg-qorange text-white rounded-md hover:opacity-80 transition-colors shadow-sm" title="Recharger">
+                            <Link href="/dashboard/wallet" className="p-1.5 bg-qorange text-white rounded-md hover:opacity-80 transition-colors shadow-sm" title="Recharger">
                                 <Plus size={14} />
-                            </button>
+                            </Link>
                         </div>
                     </div>
                     {user && <ReliabilityBadge score={100 - (user?.fraudScore || 15)} />}
