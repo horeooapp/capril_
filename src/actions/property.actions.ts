@@ -72,12 +72,12 @@ export async function creerBien(data: {
 }
 
 // Adresse complete pour quittances et baux - RG-BAIL-ADRESSE
-export function formaterAdresseBien(bien: {
+export async function formaterAdresseBien(bien: {
   unitLabel?: string | null;
   address: string;
   commune: string;
   parentProperty?: { name?: string | null; address: string } | null;
-}): string {
+}): Promise<string> {
   const parts: string[] = [];
   if (bien.parentProperty?.name) parts.push(bien.parentProperty.name);
   if (bien.unitLabel) parts.push(bien.unitLabel);
