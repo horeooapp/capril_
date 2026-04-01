@@ -94,17 +94,13 @@ jobs:
           sudo rm -rf /home/github/actions-runner/_diag/pages || true
           mkdir -p /home/github/actions-runner/_diag/pages || true
           
-          # Fix the runner's internal state: recreate the output commands directory if previous cleanups nuked it
-          mkdir -p /home/github/actions-runner/_work/_temp/_runner_file_commands || true
-          sudo chown -R $USER:$USER /home/github/actions-runner/_work/_temp || true
-          sudo chmod -R 777 /home/github/actions-runner/_work/_temp || true
-          
           # Standard workspace cleanup
           find . -maxdepth 1 -mindepth 1 -not -path '*/.*' -exec rm -rf {} + || true
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: build-output
 
