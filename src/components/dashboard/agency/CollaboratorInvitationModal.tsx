@@ -2,16 +2,29 @@
 
 import React, { useState, useTransition } from "react"
 import { inviteCollaborator } from "@/actions/agency-team-actions"
-import { Plus, CheckCircle2, ShieldAlert, X } from "lucide-react"
+import { Plus, CheckCircle2, ShieldAlert, X, Briefcase } from "lucide-react"
 
-// Dictionnaire des permissions possibles (RBAC) pour l'Agence
-export const AGENCY_PERMISSIONS = {
-    READ_DASHBOARD: "Accès au Tableau de Bord global",
-    MANAGE_PROPERTIES: "Gérer le patrimoine (Ajout/Modif de Biens)",
-    MANAGE_LEASES: "Gérer les baux et contrats",
-    MANAGE_TENANTS: "Communiquer/Gérer les locataires",
-    MANAGE_ACCOUNTING: "Accès à la comptabilité (Quittances, Wallet)",
-    MANAGE_MANDATES: "Gérer les mandats de gestion",
+export const POSTES_AGENCE = {
+    MANAGER_ADJOINT: {
+        label: "Manager Adjoint",
+        description: "Accès total à tous les modules de l'agence (Superviseur)",
+        permissions: ["READ_DASHBOARD", "MANAGE_PROPERTIES", "MANAGE_LEASES", "MANAGE_TENANTS", "MANAGE_ACCOUNTING", "MANAGE_MANDATES"]
+    },
+    GESTIONNAIRE_LOCATIF: {
+        label: "Gestionnaire Locatif",
+        description: "Gestion quotidienne des biens, baux, mandats et locataires",
+        permissions: ["READ_DASHBOARD", "MANAGE_PROPERTIES", "MANAGE_LEASES", "MANAGE_TENANTS", "MANAGE_MANDATES"]
+    },
+    COMPTABLE: {
+        label: "Comptable",
+        description: "Gestion financière, suivi des loyers, quittances et wallet",
+        permissions: ["READ_DASHBOARD", "MANAGE_ACCOUNTING"]
+    },
+    AGENT_TERRAIN: {
+        label: "Agent Terrain",
+        description: "Interventions physiques (Visites, États des Lieux, Maintenance)",
+        permissions: ["READ_DASHBOARD", "MANAGE_PROPERTIES", "MANAGE_TENANTS"]
+    }
 }
 
 export function CollaboratorInvitationModal() {
@@ -22,29 +35,26 @@ export function CollaboratorInvitationModal() {
 
     const [formData, setFormData] = useState({
         email: "",
-        permissions: [] as string[]
+        poste: "GESTIONNAIRE_LOCATIF" // Par défaut
     })
-
-    const handleTogglePermission = (key: string) => {
-        setFormData(prev => {
-            const current = [...prev.permissions]
-            if (current.includes(key)) return { ...prev, permissions: current.filter(p => p !== key) }
-            return { ...prev, permissions: [...current, key] }
-        })
-    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
         setSuccessLink(null)
 
-        if (formData.permissions.length === 0) {
-            setError("Veuillez sélectionner au moins une permission pour ce collaborateur.")
+        const selectedPoste = POSTES_AGENCE[formData.poste as keyof typeof POSTES_AGENCE]
+        if (!selectedPoste) {
+            setError("Veuillez sélectionner un poste valide.")
             return
         }
 
         startTransition(async () => {
-            const res = await inviteCollaborator(formData)
+            const res = await inviteCollaborator({
+                email: formData.email,
+                poste: formData.poste,
+                permissions: selectedPoste.permissions
+            })
             if (!res.success) {
                 setError(res.error || "Une erreur est survenue")
             } else {
@@ -57,7 +67,7 @@ export function CollaboratorInvitationModal() {
         setIsOpen(false)
         setSuccessLink(null)
         setError(null)
-        setFormData({ email: "", permissions: [] })
+        setFormData({ email: "", poste: "GESTIONNAIRE_LOCATIF" })
     }
 
     return (
@@ -122,39 +132,42 @@ export function CollaboratorInvitationModal() {
                                 type="email"
                                 value={formData.email}
                                 onChange={e => setFormData({...formData, email: e.target.value})}
-                                placeholder="ex: assistant@monagence.com"
+                                placeholder="ex: jean@monagence.com"
                                 className="w-full bg-qgrey-50 border border-qgrey-2 rounded-2xl p-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none"
                             />
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-qgrey-400 pl-2 cursor-pointer" onClick={() => {
-                                const perms = Object.keys(AGENCY_PERMISSIONS)
-                                if (formData.permissions.length === perms.length) setFormData({...formData, permissions: []})
-                                else setFormData({...formData, permissions: perms})
-                            }}>
-                                Fonctionnalités Autorisées
+                            <label className="text-[10px] uppercase font-black tracking-widest text-qgrey-400 pl-2 flex items-center gap-2">
+                                <Briefcase size={14} /> Attribuer un Poste
                             </label>
 
-                            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                                {Object.entries(AGENCY_PERMISSIONS).map(([key, label]) => {
-                                    const isSelected = formData.permissions.includes(key)
+                            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                {Object.entries(POSTES_AGENCE).map(([key, data]) => {
+                                    const isSelected = formData.poste === key
                                     return (
                                         <div 
                                             key={key}
-                                            onClick={() => handleTogglePermission(key)}
-                                            className={`p-4 border-2 rounded-xl flex items-center gap-3 cursor-pointer transition-colors ${
-                                                isSelected ? "border-qgreen bg-qgreen-pale/30" : "border-qgrey-2 bg-white"
+                                            onClick={() => setFormData({...formData, poste: key})}
+                                            className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                                isSelected ? "border-qorange bg-orange-50/50 shadow-sm" : "border-qgrey-2 bg-white hover:border-qgrey-300"
                                             }`}
                                         >
-                                            <div className={`w-5 h-5 rounded-md flex justify-center items-center shrink-0 border-2 ${
-                                                isSelected ? "bg-qgreen border-qgreen text-white" : "border-qgrey-400 bg-transparent"
-                                            }`}>
-                                                {isSelected && <CheckCircle2 size={14} />}
+                                            <div className="flex items-start gap-3">
+                                                <div className={`mt-1 w-5 h-5 rounded-full flex justify-center items-center shrink-0 border-2 transition-colors ${
+                                                    isSelected ? "bg-qorange border-qorange text-white" : "border-qgrey-400 bg-transparent"
+                                                }`}>
+                                                    {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                                                </div>
+                                                <div>
+                                                    <span className={`block text-sm font-black uppercase tracking-wider ${isSelected ? "text-qorange" : "text-qnavy"}`}>
+                                                        {data.label}
+                                                    </span>
+                                                    <p className={`text-xs mt-1 ${isSelected ? "text-orange-800/70" : "text-qgrey-400"}`}>
+                                                        {data.description}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <span className={`text-sm font-bold ${isSelected ? "text-qnavy" : "text-qgrey-400"}`}>
-                                                {label}
-                                            </span>
                                         </div>
                                     )
                                 })}

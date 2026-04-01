@@ -53,6 +53,7 @@ export async function listAgencyCollaborators() {
                 email: c.email,
                 fullName: c.fullName || c.lastName || "Collaborateur",
                 joinedAt: c.createdAt,
+                poste: conf?.poste || "COLLABORATEUR",
                 status: conf?.status || "INVITED",
                 permissions: conf?.permissions || []
             }
@@ -62,7 +63,7 @@ export async function listAgencyCollaborators() {
     }
 }
 
-export async function inviteCollaborator(formData: { email: string, permissions: string[] }) {
+export async function inviteCollaborator(formData: { email: string, permissions: string[], poste?: string }) {
     try {
         const manager = await authorizeAgencyManager()
 
@@ -81,6 +82,7 @@ export async function inviteCollaborator(formData: { email: string, permissions:
             isManager: false,
             managerId: manager.id,
             permissions: formData.permissions,
+            poste: formData.poste || "COLLABORATEUR",
             status: "INVITED",
             inviteToken: token,
             invitedAt: new Date().toISOString()

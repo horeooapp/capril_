@@ -59,7 +59,7 @@ export default async function AgencyTeamPage() {
                             <thead className="bg-qgrey-50 border-b border-qgrey-2">
                                 <tr>
                                     <th className="py-4 px-6 text-[10px] font-black uppercase tracking-[0.15em] text-qgrey-400">Collaborateur</th>
-                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-[0.15em] text-qgrey-400">Permissions</th>
+                                    <th className="py-4 px-6 text-[10px] font-black uppercase tracking-[0.15em] text-qgrey-400">Poste Assigné</th>
                                     <th className="py-4 px-6 text-[10px] font-black uppercase tracking-[0.15em] text-qgrey-400">Statut</th>
                                     <th className="py-4 px-6 text-[10px] font-black uppercase tracking-[0.15em] text-qgrey-400 text-right">Actions</th>
                                 </tr>
@@ -87,16 +87,9 @@ export default async function AgencyTeamPage() {
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className="flex flex-wrap gap-2">
-                                                    {member.permissions.slice(0, 2).map((perm: string) => (
-                                                        <span key={perm} className="px-2 py-1 bg-qgrey-50 border border-qgrey-2 rounded-md text-[10px] font-bold text-qtext-light uppercase tracking-wider">
-                                                            {perm.replace("MANAGE_", "")}
-                                                        </span>
-                                                    ))}
-                                                    {member.permissions.length > 2 && (
-                                                        <span className="px-2 py-1 bg-qgrey-50 border border-qgrey-2 rounded-md text-[10px] font-bold text-qtext-light uppercase tracking-wider">
-                                                            +{member.permissions.length - 2}
-                                                        </span>
-                                                    )}
+                                                    <span className="px-3 py-1 bg-orange-50 border border-orange-200 text-orange-700 rounded-lg text-[10px] font-black uppercase tracking-[0.1em]">
+                                                        {(member.poste || "COLLABORATEUR").replace(/_/g, " ")}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6">
