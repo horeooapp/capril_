@@ -22,10 +22,11 @@ interface RechargeDrawerProps {
 }
 
 const operators = [
-  { id: 'WAVE', name: 'Wave CI', color: 'bg-blue-500', icon: '🌊', method: 'DEEP_LINK' },
-  { id: 'ORANGE', name: 'Orange Money', color: 'bg-orange-500', icon: '🍊', method: 'DEEP_LINK' },
-  { id: 'MTN', name: 'MTN MoMo', color: 'bg-yellow-400', icon: '💎', method: 'DEEP_LINK' },
-  { id: 'CARD', name: 'Carte Bancaire / Autres', color: 'bg-gray-800', icon: '💳', method: 'CINETPAY' },
+  { id: 'WAVE', name: 'Wave CI', color: 'bg-white', border: 'border-blue-100', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Wave_Mobile_Money_logo.svg/256px-Wave_Mobile_Money_logo.svg.png', method: 'DEEP_LINK' },
+  { id: 'ORANGE', name: 'Orange Money', color: 'bg-white', border: 'border-orange-100', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg', method: 'DEEP_LINK' },
+  { id: 'MTN', name: 'MTN MoMo', color: 'bg-white', border: 'border-yellow-200', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg', method: 'DEEP_LINK' },
+  { id: 'MOOV', name: 'Moov Money', color: 'bg-white', border: 'border-blue-200', logoUrl: 'https://upload.wikimedia.org/wikipedia/fr/a/a2/Moov_Africa_Logo.png', method: 'DEEP_LINK' },
+  { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', logos: ['https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg', 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg'], method: 'CINETPAY' },
 ];
 
 export default function RechargeDrawer({ 
@@ -137,8 +138,14 @@ export default function RechargeDrawer({
                         }`}
                      >
                        <div className="flex items-center gap-4 relative z-10">
-                          <div className={`w-12 h-12 ${op.color} text-white rounded-xl flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-transform`}>
-                            {op.icon}
+                          <div className={`w-16 h-12 ${op.color} border border-gray-100 rounded-lg flex items-center justify-center p-1 shadow-sm group-hover:scale-105 transition-transform overflow-hidden shrink-0`}>
+                            {op.logoUrl ? (
+                              <img src={op.logoUrl} alt={op.name} className="w-full h-full object-contain" />
+                            ) : op.logos ? (
+                              <div className="flex gap-1 items-center justify-center w-full h-full p-0.5">
+                                {op.logos.map((l, i) => <img key={i} src={l} alt="card logo" className="w-1/2 h-full object-contain" />)}
+                              </div>
+                            ) : null}
                           </div>
                           <span className={`font-black text-[14px] uppercase tracking-widest ${selectedOp.id === op.id ? 'text-[#1F4E79]' : 'text-gray-500'}`}>
                             {op.name}
