@@ -808,6 +808,14 @@ model Property {
   rooms                Int?
   bedrooms             Int?
   name                 String?  @map("name")
+
+  // CORRECTIF C-01 - Hierarchie bien
+  unitLabel         String?  @map("unit_label")
+  typeStructure     String   @default("INDEPENDANT") @map("type_structure")
+  parentPropertyId  String?  @map("parent_property_id")
+  parentProperty    Property? @relation("PropertyUnits", fields: [parentPropertyId], references: [id])
+  units             Property[] @relation("PropertyUnits")
+
   city                 String?  @map("city")
   declaredRentFcfa     Float? @map("declared_rent_fcfa")
   digitalPostalAddress String?  @map("digital_postal_address")
@@ -2007,6 +2015,11 @@ model SignatureElectronique {
   ipAddress    String? @map("ip_address")
   userAgent    String? @map("user_agent")
   hashDocument String? @map("hash_document")
+
+  // CORRECTIF C-02 - Certification PSCE
+  psceCertifId  String?  @map("psce_certif_id")
+  psceCertifAt  DateTime? @map("psce_certif_at")
+  psceProvider  String?  @map("psce_provider")
 
   signedAt  DateTime? @map("signed_at")
   expiresAt DateTime? @map("expires_at")
@@ -3361,4 +3374,27 @@ model RepartitionUtility {
   @@index([factureId])
   @@index([locataireId])
   @@map("repartitions_utilities")
+}
+
+// CORRECTIF C-03 - Nouveau modele Lead
+model Lead {
+  id              String    @id @default(uuid()) @map("lead_id")
+
+  telephone       String
+  profilDeclare   String    @map("profil_declare")
+  
+  sourceDocument  String?   @map("source_document")
+  sourceToken     String?   @map("source_token")
+
+  statut          String    @default("NOUVEAU")
+
+  noteCommerciale String?   @map("note_commerciale")
+  convertedUserId String?   @map("converted_user_id")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([statut, createdAt])
+  @@index([profilDeclare])
+  @@map("leads")
 }

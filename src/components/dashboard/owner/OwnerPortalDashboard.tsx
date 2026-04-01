@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { Bell, AlertTriangle, ChevronRight, TrendingUp, CheckCircle, X, Building2, FileSignature, Receipt, Wallet, BookOpen } from "lucide-react"
 import Link from "next/link"
-import { retirerProperty } from "@/actions/property-actions"
+import { retirerProperty } from "@/actions/property.actions"
 
 const T = {
   navy: "#0D2B6E", navyPale: "#EEF2FA",
