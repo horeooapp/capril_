@@ -9,6 +9,7 @@ export default function NewPropertyClient() {
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState("")
     const [category, setCategory] = useState<'RESIDENTIAL' | 'COMMERCIAL'>('RESIDENTIAL')
+    const [propertyType, setPropertyType] = useState('APARTMENT')
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -123,7 +124,12 @@ export default function NewPropertyClient() {
                                 <>
                                     <div>
                                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Type de bien</label>
-                                        <select name="propertyType" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none">
+                                        <select 
+                                            name="propertyType" 
+                                            value={propertyType}
+                                            onChange={(e) => setPropertyType(e.target.value)}
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none"
+                                        >
                                             <option value="APARTMENT">Appartement</option>
                                             <option value="VILLA">Villa</option>
                                             <option value="STUDIO">Studio</option>
@@ -131,8 +137,10 @@ export default function NewPropertyClient() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nombre de pièces</label>
-                                        <input type="number" name="rooms" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder="Ex: 3" />
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                                            {propertyType === 'COURS_COMMUNE' ? 'Nombre de portes' : 'Nombre de pièces'}
+                                        </label>
+                                        <input type="number" name="rooms" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all outline-none" placeholder={propertyType === 'COURS_COMMUNE' ? "Ex: 10" : "Ex: 3"} />
                                     </div>
                                 </>
                             ) : (
