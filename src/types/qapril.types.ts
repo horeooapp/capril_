@@ -31,6 +31,7 @@ export type TicketUrgence = "URGENTE" | "NORMALE" | "BASSE";
 export type WalletMontantOption = "MINIMUM" | "RECOMMANDE" | "CONFORT";
 
 export interface DashboardBailleur {
+  landlordName: string;
   walletBalance: number;
   walletSeuilAlerte: number;
   biensActifs: number;
