@@ -28,8 +28,17 @@ export default function NewPropertyClient() {
 
         startTransition(async () => {
             const result = await registerProperty(data)
-            if (result.error) {
-                setError(result.error)
+            if (result?.error) {
+                if (result.error.includes("existe deja dans cette structure")) {
+                    setError(
+                        "Ce nom est deja utilise dans cette " +
+                        (propertyType === "COURS_COMMUNE" ? "cour" :
+                         propertyType === "IMMEUBLE" ? "immeuble" : "residence") +
+                        ". Choisissez un nom different (ex : Porte 4, Apt 3C...)"
+                    );
+                } else {
+                    setError(result.error)
+                }
             } else {
                 router.push("/dashboard/properties")
                 router.refresh()

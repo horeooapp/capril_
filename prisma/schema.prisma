@@ -873,6 +873,14 @@ model Property {
   @@index([ownerUserId])
   @@index([commune])
   @@index([status])
+  @@index([parentPropertyId])
+
+  // CONTRAINTE C-06 : unicite unitLabel insensible casse dans un parent
+  // Gere par : index SQL raw idx_property_unit_unique_ci (C-06A)
+  //            + validation dans creerBien() (C-06C)
+  // Prisma ne supporte pas LOWER() dans @@unique sur SQLite
+  // La contrainte est active en base via le CREATE UNIQUE INDEX
+
   @@map("properties")
 }
 

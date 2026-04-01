@@ -39,15 +39,46 @@ export async function creerBien(data: {
     if (!parent) throw new Error("Structure parente introuvable");
   }
 
+  // Validation C-06 : unicite unitLabel insensible a la casse
+  if (data.typeStructure !== "INDEPENDANT" && data.unitLabel && data.parentPropertyId) {
+    const unitesExistantes = await prisma.property.findMany({
+      where: {
+        parentPropertyId: data.parentPropertyId,
+        unitLabel: { not: null }
+      },
+      select: { unitLabel: true }
+    });
+
+    const labelNormalise = data.unitLabel.trim().toLowerCase();
+    const doublon = unitesExistantes.find(
+      u => u.unitLabel?.trim().toLowerCase() === labelNormalise
+    );
+
+    if (doublon) {
+      throw new Error(
+        `Une unite "${doublon.unitLabel}" existe deja dans cette structure. ` +
+        `Chaque unite doit avoir un nom unique (insensible a la casse).`
+      );
+    }
+  }
+
+  // Normalisation : stocker toujours en format standard
+  // "apt 2b" → "Apt 2B" (premiere lettre majuscule de chaque mot)
+  const unitLabelNormalise = data.unitLabel
+    ?.trim()
+    .replace(/\w\S*/g, txt =>
+      txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+    );
+
   // Reference auto - format HAB-ABJ-COM-NNNNN[-UNIT]
   const count = await prisma.property.count({
     where: { ownerUserId: data.ownerUserId }
   });
   const communeCode = data.commune.slice(0,3).toUpperCase();
   const num = String(count + 1).padStart(5, "0");
-  const unitSuffix = data.unitLabel
-    ? "-" + data.unitLabel.replace(/[^a-zA-Z0-9]/g,"").toUpperCase().slice(0,4)
-    : "";
+  const unitSuffix = document ? unitLabelNormalise
+    ? "-" + unitLabelNormalise.replace(/[^a-zA-Z0-9]/g,"").toUpperCase().slice(0,4)
+    : "" : "";
   const propertyCode = `HAB-ABJ-${communeCode}-${num}${unitSuffix}`;
 
   const bien = await prisma.property.create({
@@ -58,7 +89,7 @@ export async function creerBien(data: {
       commune:          data.commune,
       address:          data.address,
       name:             data.name,
-      unitLabel:        data.unitLabel,
+      unitLabel:        unitLabelNormalise,
       typeStructure:    data.typeStructure,
       parentPropertyId: data.parentPropertyId,
       declaredRentFcfa: data.declaredRentFcfa,
