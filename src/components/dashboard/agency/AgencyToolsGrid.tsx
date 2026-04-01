@@ -60,31 +60,25 @@ export const AgencyToolsGrid: React.FC = () => {
             </motion.div>
           );
 
-          if (m.code === 'M-EDL') {
-            return (
-              <Link key={i} href="/dashboard/edl-comparator">
-                {Content}
-              </Link>
-            );
-          }
+          const getHref = (code: string) => {
+            switch (code) {
+              case 'M-EDL': return "/dashboard/edl-comparator";
+              case 'M-SIGN': return "/dashboard/lease-wizard";
+              case 'M-RCL': return "/dashboard/rcl-monitor";
+              case 'M-MAINT': return "/dashboard/maintenance";
+              case 'M-CHARGES': return "/dashboard/receipts";
+              case 'M-COMPTA': return "/dashboard/receipts";
+              case 'M-AGENDA': return "/dashboard/agenda";
+              case 'M-ANNONCES': return "/dashboard/properties";
+              default: return "#";
+            }
+          };
 
-          if (m.code === 'M-SIGN') {
-            return (
-              <Link key={i} href="/dashboard/lease-wizard">
-                {Content}
-              </Link>
-            );
-          }
-
-          if (m.code === 'M-RCL') {
-            return (
-              <Link key={i} href="/dashboard/rcl-monitor">
-                {Content}
-              </Link>
-            );
-          }
-
-          return <div key={i}>{Content}</div>;
+          return (
+            <Link key={i} href={getHref(m.code)}>
+              {Content}
+            </Link>
+          );
         })}
       </div>
 
