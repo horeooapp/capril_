@@ -40,8 +40,16 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
         }
 
+        const { searchParams } = new URL(req.url);
+        const status = searchParams.get('status');
+        const groupeId = searchParams.get('groupeId');
+
         const properties = await prisma.property.findMany({
-            where: { ownerUserId: session.user.id },
+            where: { 
+                ownerUserId: session.user.id,
+                ...(status ? { status } : {}),
+                ...(groupeId ? { groupeId } : {})
+            },
             orderBy: { createdAt: 'desc' }
         });
 

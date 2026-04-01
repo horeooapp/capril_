@@ -778,7 +778,24 @@ model IdentityDocument {
 // ═══════════════════════════════════════════════════════
 // PROPERTIES (Part 6)
 // ═══════════════════════════════════════════════════════
+
+enum TypePropriete {
+  IMMEUBLE
+  COUR
+  RESIDENCE
+}
+
 model Property {
+  groupeId      String?         @map("groupeId")
+  typePropriete TypePropriete?  @map("typePropriete")
+  nomBien       String?         @map("nomBien")
+  nomComplet    String?         @map("nomComplet")
+  niveau        String?
+  estCourEntiere Boolean        @default(false) @map("estCourEntiere")
+
+  groupe        Property?       @relation("PropertyGroupe", fields: [groupeId], references: [id])
+  biens         Property[]      @relation("PropertyGroupe")
+
   id                   String   @id @default(uuid()) @map("property_id")
   propertyCode         String   @unique @map("property_code") // HAB-ABJ-YOP-00001
   ownerUserId          String   @map("owner_id")
@@ -865,6 +882,31 @@ model PropertyImage {
 // LEASES (Part 7 & 8)
 // ═══════════════════════════════════════════════════════
 model Lease {
+  // ── CDC Formulaires : Intégrité & QR Code
+  sha256Hash        String?   @map("sha256Hash")
+  sha256CalculeLe   DateTime? @map("sha256CalculeLe")
+  qrCodeUrl         String?   @map("qrCodeUrl")
+
+  // ── CDC Formulaires : Cycle de vie draft
+  statutDraft       String    @default("ACTIF") @map("statutDraft")
+  versionDraft      Int       @default(1)       @map("versionDraft")
+  draftData         Json?     @map("draftData")
+
+  // ── CDC Formulaires : Légal & Fiscal
+  loiApplicable     String    @default("Loi N°2018-575 du 13 juin 2018") @map("loiApplicable")
+  droitsDgiCalcules Float?    @map("droitsDgiCalcules")
+  fraisQapril       Float?    @map("fraisQapril")
+
+  // ── CDC Formulaires : Alertes expiration
+  alerte90j         Boolean   @default(true) @map("alerte90j")
+  alerte60j         Boolean   @default(true) @map("alerte60j")
+  alerte30j         Boolean   @default(true) @map("alerte30j")
+
+  // ── CDC Formulaires : Seuils impayé
+  seuilJ3           Boolean   @default(true) @map("seuilJ3")
+  seuilJ7           Boolean   @default(true) @map("seuilJ7")
+  seuilJ15          Boolean   @default(true) @map("seuilJ15")
+
   id               String       @id @default(uuid()) @map("lease_id")
   leaseReference   String       @unique @map("lease_reference") // BAIL-2026-00123
   propertyId       String       @map("property_id")
@@ -1027,6 +1069,26 @@ model PaymentIntent {
 }
 
 model Receipt {
+  // ── CDC Formulaires : SHA-256 & QR Code
+  sha256Hash          String?   @map("sha256Hash")
+  sha256CalculeLe     DateTime? @map("sha256CalculeLe")
+  qrCodeUrl           String?   @map("qrCodeUrl")
+
+  // ── CDC Formulaires : Mois quittancé
+  moisConcerne        String?   @map("moisConcerne")
+  dateEncaissement    DateTime? @map("dateEncaissement")
+
+  // ── CDC Formulaires : Traçabilité webhook
+  flagWebhookNonRecu  Boolean   @default(false) @map("flagWebhookNonRecu")
+  preuveUrl           String?   @map("preuveUrl")
+
+  // ── CDC Formulaires : Certification ARC
+  arcDemande          Boolean   @default(false) @map("arcDemande")
+  arcCertificationId  String?   @map("arcCertificationId")
+  arcHorodatage       DateTime? @map("arcHorodatage")
+
+  commentaireInterne  String?   @map("commentaireInterne")
+
   id            String       @id @default(uuid()) @map("receipt_id")
   receiptRef    String       @unique @map("receipt_ref") // REC-2026-04-00123AB (or QR- format)
   leaseId       String       @map("lease_id")
