@@ -22,11 +22,44 @@ interface RechargeDrawerProps {
 }
 
 const operators = [
-  { id: 'WAVE', name: 'Wave CI', color: 'bg-white', border: 'border-blue-100', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Wave_Mobile_Money_logo.svg/256px-Wave_Mobile_Money_logo.svg.png', method: 'DEEP_LINK' },
-  { id: 'ORANGE', name: 'Orange Money', color: 'bg-white', border: 'border-orange-100', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg', method: 'DEEP_LINK' },
-  { id: 'MTN', name: 'MTN MoMo', color: 'bg-white', border: 'border-yellow-200', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg', method: 'DEEP_LINK' },
-  { id: 'MOOV', name: 'Moov Money', color: 'bg-white', border: 'border-blue-200', logoUrl: 'https://upload.wikimedia.org/wikipedia/fr/a/a2/Moov_Africa_Logo.png', method: 'DEEP_LINK' },
-  { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', logos: ['https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg', 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg'], method: 'CINETPAY' },
+  { id: 'WAVE', name: 'Wave CI', color: 'bg-white', border: 'border-blue-100', method: 'DEEP_LINK', 
+    renderLogo: () => <div className="text-[#1c1df5] font-black tracking-tighter text-3xl italic" style={{fontFamily:'Impact, Arial Black, sans-serif'}}>wave</div> 
+  },
+  { id: 'ORANGE', name: 'Orange Money', color: 'bg-white', border: 'border-orange-100', method: 'DEEP_LINK',
+    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" className="w-full h-full object-contain" />
+  },
+  { id: 'MTN', name: 'MTN MoMo', color: 'bg-white', border: 'border-yellow-200', method: 'DEEP_LINK',
+    renderLogo: () => (
+      <svg viewBox="0 0 100 60" className="w-full h-full">
+        <ellipse cx="50" cy="30" rx="45" ry="25" fill="#FFCC00" />
+        <text x="50" y="38" fontSize="24" fontFamily="Arial Black, Impact, sans-serif" fontWeight="900" fill="#003366" textAnchor="middle">MoMo</text>
+      </svg>
+    )
+  },
+  { id: 'MOOV', name: 'Moov Money', color: 'bg-white', border: 'border-blue-200', method: 'DEEP_LINK',
+    renderLogo: () => (
+      <svg viewBox="0 0 100 40" className="w-full h-full">
+        <text x="50" y="28" fontSize="22" fontFamily="Arial Black, sans-serif" fontWeight="900" textAnchor="middle">
+          <tspan fill="#0055A5">moov</tspan>
+          <tspan fill="#F5A800">money</tspan>
+        </text>
+      </svg>
+    )
+  },
+  { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', method: 'CINETPAY',
+    renderLogo: () => (
+      <div className="flex gap-1 items-center justify-center w-full h-full px-1">
+        <svg viewBox="0 0 300 100" className="w-1/2 h-full" fill="#1434CB">
+          <path d="M127.3 22l-17.5 54h-28l17.5-54h28zm64.4 0c-7.6 0-28 3.5-28 23.3 0 11.6 15.7 18.6 23.3 23.9 8.2 4.6 11.6 8.2 11.6 12.8 0 7-9.3 10.5-17.5 10.5-10 0-16.3-1.2-23.3-4.6l-3.5 16.3c5.8 2.9 17.5 5.8 29.1 5.8 26.2 0 43.1-12.8 43.1-32.6 0-19.2-26.8-21-26.8-29.7 0-3.5 4.6-8.7 14.6-9.9 5.8-.6 14.6 0 21.6 3.5l3.5-16.3c-4.7-1.7-13.4-2.9-24.5-2.9zm75.8 0l-15.1 61.2-1.7-9.3c-3.5-8.7-14.6-19.2-27.4-23.3l7.6 59.4h28.5l43.1-88h-35zM62.9 22h-22.1c-5.8 0-10 1.7-11.6 7L.2 88h29.1l5.8-16.9h35.5L78 88h27.4L62.9 22zm-12.8 40.8l10-27.4 5.8 27.4H50.1z"/>
+        </svg>
+        <svg viewBox="0 0 300 180" className="w-1/2 h-full">
+          <circle cx="100" cy="90" r="70" fill="#EB001B"/>
+          <circle cx="200" cy="90" r="70" fill="#F79E1B"/>
+          <path d="M150 49.5c18 10 30 29 30 50.5s-12 40.5-30 50.5c-18-10-30-29-30-50.5s12-40.5 30-50.5z" fill="#FF5F00"/>
+        </svg>
+      </div>
+    )
+  },
 ];
 
 export default function RechargeDrawer({ 
@@ -138,14 +171,8 @@ export default function RechargeDrawer({
                         }`}
                      >
                        <div className="flex items-center gap-4 relative z-10">
-                          <div className={`w-16 h-12 ${op.color} border border-gray-100 rounded-lg flex items-center justify-center p-1 shadow-sm group-hover:scale-105 transition-transform overflow-hidden shrink-0`}>
-                            {op.logoUrl ? (
-                              <img src={op.logoUrl} alt={op.name} className="w-full h-full object-contain" />
-                            ) : op.logos ? (
-                              <div className="flex gap-1 items-center justify-center w-full h-full p-0.5">
-                                {op.logos.map((l, i) => <img key={i} src={l} alt="card logo" className="w-1/2 h-full object-contain" />)}
-                              </div>
-                            ) : null}
+                          <div className={`w-16 h-12 ${op.color} border border-gray-100 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden shrink-0`}>
+                            {op.renderLogo()}
                           </div>
                           <span className={`font-black text-[14px] uppercase tracking-widest ${selectedOp.id === op.id ? 'text-[#1F4E79]' : 'text-gray-500'}`}>
                             {op.name}
