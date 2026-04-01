@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { ShieldCheck, MessageSquareWarning, FileSignature, Receipt, Gavel, FileLock2, Info } from "lucide-react"
+import { RightsActionManager } from "@/components/dashboard/tenant/RightsActionManager"
 
 export const dynamic = "force-dynamic"
 
@@ -11,40 +12,7 @@ export default async function TenantRightsPage() {
         redirect("/locataire/login")
     }
 
-    const rightsActions = [
-        {
-            title: "Demande d'Intervention (Travaux)",
-            description: "Plomberie, électricité, étanchéité. Signalez un sinistre à votre propriétaire via la règle d'assistance sécurisée (RCL-05).",
-            icon: <MessageSquareWarning size={20} className="text-qorange" />,
-            badge: "Délai 144h Max",
-            bgColor: "bg-qorange-pale",
-            borderColor: "border-qorange/30"
-        },
-        {
-            title: "Contester une modification",
-            description: "Opposition à une hausse de loyer ou modification de bail non justifiée. La règle MRL-01 requiert votre consentement formel.",
-            icon: <FileSignature size={20} className="text-qred" />,
-            badge: "Suspension",
-            bgColor: "bg-qred-pale",
-            borderColor: "border-qred/30"
-        },
-        {
-            title: "Réclamation Quittance",
-            description: "Paiement envoyé mais quittance certifiée manquante. Forcer l'édition avec preuve de paiement Mobile Money.",
-            icon: <Receipt size={20} className="text-qnavy" />,
-            badge: "Pénalité J+3",
-            bgColor: "bg-qnavy-pale",
-            borderColor: "border-qnavy/30"
-        },
-        {
-            title: "Initier un préavis de sortie",
-            description: "Annoncer de façon formelle et numérique votre intention de quitter les lieux (Délai légal de 1 mois en Côte d'Ivoire).",
-            icon: <FileLock2 size={20} className="text-qgreen" />,
-            badge: "Avis Électronique",
-            bgColor: "bg-qgreen-pale",
-            borderColor: "border-qgreen/30"
-        }
-    ]
+
 
     return (
         <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
@@ -82,34 +50,7 @@ export default async function TenantRightsPage() {
             </div>
 
             {/* Actions Grid */}
-            <div>
-                 <h2 className="text-lg font-black text-qnavy-dark mb-6 flex items-center gap-2 uppercase tracking-widest">
-                     <Info size={18} className="text-qtext-light" /> Ouvrir un nouveau dossier
-                 </h2>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {rightsActions.map((action, idx) => (
-                         <button 
-                            key={idx} 
-                            className={`flex flex-col text-left p-6 sm:p-8 rounded-[2rem] border ${action.borderColor} bg-white shadow-sm hover:shadow-lg transition-all group`}
-                         >
-                             <div className="flex justify-between items-start mb-4">
-                                 <div className={`w-12 h-12 ${action.bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                                     {action.icon}
-                                 </div>
-                                 <span className="bg-qgrey-1 text-qtext-mid text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-qgrey-2">
-                                     {action.badge}
-                                 </span>
-                             </div>
-                             <h3 className="text-sm font-black text-qnavy-dark uppercase tracking-widest mb-2 leading-tight">
-                                 {action.title}
-                             </h3>
-                             <p className="text-xs font-medium text-qtext-light leading-relaxed">
-                                 {action.description}
-                             </p>
-                         </button>
-                     ))}
-                 </div>
-            </div>
+            <RightsActionManager />
 
             {/* Active Tickets Simulation */}
             <div className="mt-12">
