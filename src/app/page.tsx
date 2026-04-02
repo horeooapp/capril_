@@ -22,14 +22,14 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   let session = null;
   let dbNews: any[] = [];
-  let isLandingPageRestricted = true;
+  let isLandingPageEnabled = false;
   let stats = { totalLeases: 450, totalSecuredFunds: 125000000, totalFiscal: 15400000, totalUsers: 1200 }; // Fallbacks
   let flags = { impact: true, observatory: true, geo: true, ranking: true };
 
   try {
     session = await auth();
     dbNews = await getActiveNews();
-    isLandingPageRestricted = await isFeatureEnabled("LANDING_PAGE");
+    isLandingPageEnabled = await isFeatureEnabled("LANDING_PAGE");
     
     // Fetch Global Impact Stats & Feature Flags
     const [tLeases, tSecured, tFiscal, tUsers, fImpact, fObs, fGeo, fRank] = await Promise.all([
@@ -80,7 +80,7 @@ export default async function Home() {
         redirect("/dashboard");
     }
 
-    if (isLandingPageRestricted) {
+    if (!isLandingPageEnabled) {
         // Show Premium Lock Portal (Black)
         return (
             <div className="relative min-h-screen bg-black overflow-hidden flex flex-col font-sans">

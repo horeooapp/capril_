@@ -247,6 +247,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }
                     }
 
+                    if (['ADMIN', 'SUPER_ADMIN'].includes(role)) {
+                        // Désactivation automatique de la landing page lorsqu'un admin se connecte
+                        await prisma.featureFlag.upsert({
+                            where: { id: "LANDING_PAGE" },
+                            update: { enabled: false },
+                            create: { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Active ou désactive la Landing Page marketing pour les utilisateurs connectés.", enabled: false }
+                        }).catch(e => console.error("Failed to auto-disable landing page:", e));
+                    }
+
                     return {
                         id: user.id,
                         email: user.email,
