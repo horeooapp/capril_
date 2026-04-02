@@ -40,6 +40,7 @@ export default async function FeaturesPage() {
           { id: "M-SIGN", name: "Signature Électronique", description: "Service de signature légale pour tous les documents", enabled: true },
           { id: "NEWS_TICKER", name: "News Ticker", description: "Informations défilantes sur la page d'accueil", enabled: true },
           { id: "SMS_NOTIFICATIONS", name: "Notifications SMS", description: "Alertes automatiques par SMS et WhatsApp", enabled: true },
+          { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Active ou désactive la Landing Page marketing", enabled: true },
         ];
         await Promise.all(defaultFeatures.map(f =>
           (prisma as any).featureFlag.upsert({
