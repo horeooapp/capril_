@@ -281,6 +281,7 @@ export default function AgencyScreen({ onBack }: { onBack?: () => void }) {
         activeTab={tab}
         onChange={changeTab}
         accentColor={Theme.colors.teal}
+        actionTabs={onBack ? [{ id: "quitter", icon: "🚪", label: "Quitter", onPress: onBack }] : []}
       />
     </View>
   );

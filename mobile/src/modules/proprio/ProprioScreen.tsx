@@ -530,6 +530,7 @@ export default function ProprioScreen({ onBack }: { onBack?: () => void }) {
         activeTab={tab}
         onChange={changeTab}
         accentColor={Theme.colors.navy}
+        actionTabs={onBack ? [{ id: "quitter", icon: "🚪", label: "Quitter", onPress: onBack }] : []}
       />
     </View>
   );

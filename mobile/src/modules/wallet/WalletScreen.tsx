@@ -453,7 +453,8 @@ export default function WalletScreen({ onBack }: { onBack?: () => void }) {
         ]}
         activeTab={tab}
         onChange={changeTab}
-        accentColor={Theme.colors.teal}
+        accentColor={Theme.colors.green}
+        actionTabs={onBack ? [{ id: "quitter", icon: "🚪", label: "Quitter", onPress: onBack }] : []}
       />
     </View>
   );

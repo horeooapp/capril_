@@ -10,14 +10,22 @@ interface TabItem {
   label: string;
 }
 
+interface ActionTab {
+  id: string;
+  icon: string;
+  label: string;
+  onPress: () => void;
+}
+
 interface BottomNavProps {
   tabs: TabItem[];
   activeTab: string;
   onChange: (tabId: string) => void;
+  actionTabs?: ActionTab[];
   accentColor?: string; // e.g. Navy, Teal
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ tabs, activeTab, onChange, accentColor = Theme.colors.navy }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ tabs, activeTab, onChange, actionTabs = [], accentColor = Theme.colors.navy }) => {
   return (
     <View style={styles.container}>
       {tabs.map(t => {
@@ -42,6 +50,24 @@ export const BottomNav: React.FC<BottomNavProps> = ({ tabs, activeTab, onChange,
           </TouchableOpacity>
         );
       })}
+      {actionTabs.map(t => (
+        <TouchableOpacity 
+          key={t.id} 
+          onPress={t.onPress} 
+          style={styles.navItem}
+          activeOpacity={0.7}
+        >
+          <View style={styles.iconContainer}>
+            <Text style={[styles.navIcon, { opacity: 0.8, color: Theme.colors.red }]}>{t.icon}</Text>
+          </View>
+          <Text style={[
+            styles.navLabel, 
+            { color: Theme.colors.red, fontWeight: '800' }
+          ]}>
+            {t.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };

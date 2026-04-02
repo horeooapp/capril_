@@ -57,3 +57,56 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * POST /api/v1/proprietaires/patrimoine
+ * Creates a new property for the authenticated landlord.
+ */
+export async function POST(req: Request) {
+  try {
+    const user = await getAuthUser(req);
+    // Ensure the user has the right to create properties
+    if (!user || !['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'].includes(user.role as string)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { name, type, commune, address } = body;
+
+    // Basic validation
+    if (!name) {
+       return NextResponse.json({ error: 'Le nom de la propriété est requis' }, { status: 400 });
+    }
+
+    // Generate a unique code (e.g. PROP-XXXX)
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
+    const propertyCode = `PROP-${randomHex}`;
+
+    const newProperty = await prisma.property.create({
+      data: {
+        ownerUserId: user.id,
+        propertyCode,
+        name,
+        propertyType: type || 'RESIDENTIAL',
+        commune: commune || '',
+        address: address || '',
+        status: 'active'
+      }
+    });
+
+    return NextResponse.json({
+       success: true,
+       property: {
+         id: newProperty.id,
+         code: newProperty.propertyCode,
+         nom: newProperty.name,
+         type: newProperty.propertyType,
+         commune: newProperty.commune
+       }
+    }, { status: 201 });
+
+  } catch (error: any) {
+    console.error('[API PATRIMOINE POST] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

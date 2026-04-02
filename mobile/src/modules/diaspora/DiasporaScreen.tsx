@@ -234,6 +234,7 @@ export default function DiasporaScreen({ onBack }: { onBack?: () => void }) {
         activeTab={tab}
         onChange={setTab}
         accentColor={Theme.colors.navy}
+        actionTabs={onBack ? [{ id: "quitter", icon: "🚪", label: "Quitter", onPress: onBack }] : []}
       />
     </View>
   );

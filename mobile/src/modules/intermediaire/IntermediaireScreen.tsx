@@ -271,6 +271,7 @@ export default function IntermediaireScreen({ onBack }: { onBack?: () => void })
         activeTab={tab}
         onChange={changeTab}
         accentColor={Theme.colors.orange}
+        actionTabs={onBack ? [{ id: "quitter", icon: "🚪", label: "Quitter", onPress: onBack }] : []}
       />
     </View>
   );
