@@ -23,28 +23,16 @@ interface RechargeDrawerProps {
 
 const operators = [
   { id: 'WAVE', name: 'Wave CI', color: 'bg-white', border: 'border-blue-100', method: 'DEEP_LINK', 
-    renderLogo: () => <div className="text-[#1c1df5] font-black tracking-tighter text-3xl italic" style={{fontFamily:'Impact, Arial Black, sans-serif'}}>wave</div> 
+    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wave_logo.svg/512px-Wave_logo.svg.png" alt="Wave" className="w-full h-full object-contain" /> 
   },
   { id: 'ORANGE', name: 'Orange Money', color: 'bg-white', border: 'border-orange-100', method: 'DEEP_LINK',
     renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" className="w-full h-full object-contain" />
   },
   { id: 'MTN', name: 'MTN MoMo', color: 'bg-white', border: 'border-yellow-200', method: 'DEEP_LINK',
-    renderLogo: () => (
-      <svg viewBox="0 0 100 60" className="w-full h-full">
-        <ellipse cx="50" cy="30" rx="45" ry="25" fill="#FFCC00" />
-        <text x="50" y="38" fontSize="24" fontFamily="Arial Black, Impact, sans-serif" fontWeight="900" fill="#003366" textAnchor="middle">MoMo</text>
-      </svg>
-    )
+    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" alt="MTN" className="w-full h-full object-contain" />
   },
   { id: 'MOOV', name: 'Moov Money', color: 'bg-white', border: 'border-blue-200', method: 'DEEP_LINK',
-    renderLogo: () => (
-      <svg viewBox="0 0 100 40" className="w-full h-full">
-        <text x="50" y="28" fontSize="22" fontFamily="Arial Black, sans-serif" fontWeight="900" textAnchor="middle">
-          <tspan fill="#0055A5">moov</tspan>
-          <tspan fill="#F5A800">money</tspan>
-        </text>
-      </svg>
-    )
+    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Moov_Africa_logo.png" alt="Moov Africa" className="w-full h-full object-contain p-1" />
   },
   { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', method: 'CINETPAY',
     renderLogo: () => (

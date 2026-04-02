@@ -266,13 +266,21 @@ export default function WalletPage() {
                     <button
                       key={op}
                       onClick={() => setPrefs({...prefs, operateur: op})}
-                      className={`px-4 py-3 rounded-xl text-[11px] font-black transition-all border ${
+                      className={`relative flex items-center justify-center p-3 rounded-xl transition-all border-2 overflow-hidden ${
                         prefs.operateur === op 
-                        ? 'bg-[#1F4E79] text-white border-[#1F4E79] shadow-lg shadow-[#1F4E79]/20' 
-                        : 'bg-gray-50 text-gray-500 border-gray-100 hover:bg-white hover:border-gray-300'
+                        ? 'bg-white border-[#1F4E79] shadow-lg shadow-[#1F4E79]/10' 
+                        : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200'
                       }`}
                     >
-                      {op}
+                      {prefs.operateur === op && (
+                         <div className="absolute top-1 right-1 bg-[#1F4E79] rounded-full p-0.5">
+                            <CheckCircle2 size={10} className="text-white" />
+                         </div>
+                      )}
+                      {op === 'WAVE' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wave_logo.svg/512px-Wave_logo.svg.png" alt="Wave" className="h-8 object-contain" />}
+                      {op === 'ORANGE' && <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" className="h-8 object-contain" />}
+                      {op === 'MTN' && <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" alt="MTN" className="h-8 w-auto object-contain" />}
+                      {op === 'MOOV' && <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Moov_Africa_logo.png" alt="Moov" className="h-8 w-auto object-contain" />}
                     </button>
                   ))}
                 </div>

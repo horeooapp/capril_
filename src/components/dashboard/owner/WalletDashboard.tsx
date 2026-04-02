@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Smartphone
 } from 'lucide-react';
+import Link from 'next/link';
 import { useWalletData } from '@/hooks/qapril-web-hooks';
 import RechargeDrawer from './RechargeDrawer';
 
@@ -91,9 +92,9 @@ export default function WalletDashboard() {
                  <Zap size={20} />
                  Recharger
                </button>
-               <button className="w-full py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] font-black text-[12px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+               <Link href="/dashboard/wallet" className="w-full py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] font-black text-[12px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
                  Configuration
-               </button>
+               </Link>
             </div>
           </div>
         </motion.div>
