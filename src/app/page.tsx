@@ -79,25 +79,25 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
 
     // Show Premium Lock Portal (Black) ONLY if the mode is restricted AND the user is not authenticated.
     if (!isLandingPageEnabled && !session?.user) {
-        // Show Premium Lock Portal (Black)
+        // Show restricted Luminous Portal (previously Black Portal)
         return (
-            <div className="relative min-h-screen bg-black overflow-hidden flex flex-col font-sans">
+            <div className="relative min-h-screen bg-[#F5F7FA] overflow-hidden flex flex-col font-sans">
                 {ticker}
-                <div className="absolute inset-0 z-0 text-white">
+                <div className="absolute inset-0 z-0">
                     <img 
-                        src="/images/premium_portal_bg.png" 
-                        alt="Premium Architecture" 
-                        className="w-full h-full object-cover opacity-60 scale-105"
+                        src="/images/abidjan_plateau_bg.png" 
+                        alt="Plateau Abidjan" 
+                        className="w-full h-full object-cover opacity-80 scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/50 to-white/95 backdrop-blur-[2px]"></div>
                 </div>
 
                 <header className="relative z-20 w-full px-8 py-10">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                         <Link href="/" className="flex items-center space-x-6 group">
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700" />
+                            <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700 shadow-xl shadow-black/5 bg-white/50 backdrop-blur-md p-1" />
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-[0.6em] text-ivoire-orange mt-2 ml-1">Infrastructure Nationale</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.6em] text-[#0B4619] mt-2 ml-1">Infrastructure Nationale</span>
                             </div>
                         </Link>
                     </div>
@@ -105,43 +105,43 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
 
                 <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 pb-20 text-center">
                     <div className="max-w-5xl w-full">
-                        <h1 className="text-6xl md:text-[8rem] font-black text-white leading-[0.8] tracking-tighter mb-12 uppercase italic">
+                        <h1 className="text-6xl md:text-[8rem] font-black text-[#0B4619] leading-[0.8] tracking-tighter mb-12 uppercase italic drop-shadow-sm">
                             Registre <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ivoire-orange via-orange-400 to-white">National.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] via-[#E85D04] to-[#0B4619]">National.</span>
                         </h1>
                         {session?.user ? (
-                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:scale-[1.03] text-center">
-                                <h2 className="text-xl font-black text-white mb-2 uppercase tracking-widest leading-relaxed">
+                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 bg-white/70 backdrop-blur-3xl border border-white/40 shadow-2xl shadow-black/5 rounded-[2.5rem] transition-all hover:-translate-y-2 text-center">
+                                <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-widest leading-relaxed">
                                     {session.user.fullName || session.user.email}
                                 </h2>
-                                <p className="text-[#C55A11] mb-8 uppercase tracking-[0.3em] text-[10px] font-bold">
+                                <p className="text-[#0B4619] mb-8 uppercase tracking-[0.3em] text-[10px] font-bold">
                                     {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? "GOUVERNANCE" : session.user.role}
                                 </p>
                                 <Link 
                                     href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")}
-                                    className="inline-flex items-center justify-center w-full gap-3 py-5 bg-gradient-to-r from-[#C55A11] to-[#E87B2E] text-white rounded-2xl shadow-xl shadow-[#C55A11]/20 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
+                                    className="inline-flex items-center justify-center w-full gap-3 py-5 bg-gradient-to-r from-[#0B4619] to-[#063010] border border-[#0B4619]/20 text-white rounded-2xl shadow-xl shadow-[#0B4619]/30 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
                                 >
                                     Retourner à mon Espace
                                 </Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group glass-card-premium px-10 py-10 bg-white rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
-                                    <button type="submit" className="w-full">
-                                        <span className="font-black uppercase tracking-[0.3em] text-black text-xs block mb-2">Accès Gouvernance</span>
-                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Contrôle DGI & Audit</span>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-8">
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group px-10 py-10 bg-white/80 backdrop-blur-2xl border border-white border-b-4 border-b-[#0B4619] rounded-[2.5rem] shadow-xl shadow-black/5 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
+                                    <button type="submit" className="w-full outline-none">
+                                        <span className="font-black uppercase tracking-[0.3em] text-[#0B4619] text-xs block mb-2">Accès Gouvernance</span>
+                                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Contrôle DGI & Audit</span>
                                     </button>
                                 </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group glass-card-premium px-10 py-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
-                                    <button type="submit" className="w-full">
-                                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Espace Bailleur</span>
-                                        <span className="text-[9px] font-black text-white/30 uppercase tracking-widest block">Gestion de Patrimoine</span>
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group px-10 py-10 bg-white/80 backdrop-blur-2xl border border-white border-b-4 border-b-[#F77F00] rounded-[2.5rem] shadow-xl shadow-black/5 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
+                                    <button type="submit" className="w-full outline-none">
+                                        <span className="font-black uppercase tracking-[0.3em] text-gray-900 text-xs block mb-2">Espace Bailleur</span>
+                                        <span className="text-[9px] font-black text-[#F77F00] uppercase tracking-widest block">Gestion de Patrimoine</span>
                                     </button>
                                 </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group glass-card-premium px-10 py-10 bg-primary/90 backdrop-blur-xl rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center border border-white/20 shadow-2xl shadow-primary/20 cursor-pointer">
-                                    <button type="submit" className="w-full">
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group px-10 py-10 bg-gradient-to-br from-[#0B4619] to-[#063010] border border-[#0B4619]/20 rounded-[2.5rem] shadow-xl shadow-[#0B4619]/30 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
+                                    <button type="submit" className="w-full outline-none">
                                         <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Portail Locataire</span>
-                                        <span className="text-[9px] font-black text-white/60 uppercase tracking-widest block">Consultation de Bail</span>
+                                        <span className="text-[9px] font-black text-white/70 uppercase tracking-widest block">Consultation & Reçus</span>
                                     </button>
                                 </form>
                             </div>
