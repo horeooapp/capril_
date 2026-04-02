@@ -56,6 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const user = await prisma.user.findFirst({
                         where: { email },
                         include: {
+                            capacites: { where: { actif: true } },
                             _count: {
                                 select: {
                                     propertiesOwned: true,
@@ -142,6 +143,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             fullName: user.fullName,
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
+                            capaciteActive: (user as any).capaciteActive,
+                            capacites: (user as any).capacites.map((c: any) => c.capacite),
                             eligibleRoles: eligibleRoles,
                             chosenRole: finalChosenRole,
                             requiresRoleSelection: requiresSelection
@@ -149,12 +152,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     }
 
                     if (!user) {
+                        const { cookies } = await import("next/headers");
+                        const cookieStore = await cookies();
+                        const typeChoisi = cookieStore.get("qapril_type")?.value ?? "TENANT";
+                        const roleBase = typeChoisi === "ADMIN" ? "ADMIN" : typeChoisi === "LOCATAIRE" ? "TENANT" : "LANDLORD";
+
                         const newUser = await prisma.user.create({
                             data: {
                                 email,
-                                role: requestedRole as any,
+                                role: roleBase,
                                 status: 'PENDING_PROFILE',
-                                phone: `PENDING_${Date.now()}` // Bypass NOT NULL constraint in production DB
+                                phone: `PENDING_${Date.now()}`,
+                                onboardingComplete: typeChoisi === "LOCATAIRE",
+                                capaciteActive: typeChoisi === "LOCATAIRE" ? null : "PROPRIETAIRE"
                             }
                         });
                         
@@ -165,8 +175,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             role: newUser.role,
                             status: newUser.status,
                             fullName: newUser.fullName,
-                            onboardingComplete: false,
-                            eligibleRoles: [requestedRole],
+                            onboardingComplete: newUser.onboardingComplete,
+                            capaciteActive: (newUser as any).capaciteActive,
+                            capacites: [],
+                            eligibleRoles: [roleBase],
                             requiresRoleSelection: false
                         } as any;
                     }

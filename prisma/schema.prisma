@@ -538,6 +538,12 @@ model User {
   isCertified Boolean @default(false) @map("is_certified")
   onboardingComplete Boolean @default(false) @map("onboarding_complete")
 
+  // Capacite active en cours de session (C-AUTH-01)
+  capaciteActive    String?  @default("PROPRIETAIRE") @map("capacite_active")
+
+  // Relation vers les capacites
+  capacites         UserCapacite[]
+
   legalEntityId String?      @map("legal_entity_id")
   legalEntity   LegalEntity? @relation(fields: [legalEntityId], references: [id])
 
@@ -3405,4 +3411,22 @@ model Lead {
   @@index([statut, createdAt])
   @@index([profilDeclare])
   @@map("leads")
+}
+
+// CORRECTIF C-AUTH-01 - Table des capacites utilisateur
+model UserCapacite {
+  id          String   @id @default(uuid()) @map("cap_id")
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  capacite    String   @map("capacite")
+  // PROPRIETAIRE | AGENCE_AGREE | AGENCE_NON_AGREE | INTERMEDIAIRE
+
+  actif       Boolean  @default(true)
+  activeeAt   DateTime @default(now()) @map("activee_at")
+  desactiveeAt DateTime? @map("desactivee_at")
+
+  @@unique([userId, capacite])
+  @@index([userId, actif])
+  @@map("user_capacites")
 }

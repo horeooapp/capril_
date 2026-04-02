@@ -15,6 +15,11 @@ declare module "next-auth" {
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
+            capaciteActive?: string | null
+            capacites?: string[]
+            eligibleRoles?: string[]
+            chosenRole?: string | null
+            requiresRoleSelection?: boolean
         } & DefaultSession["user"]
     }
 
@@ -29,6 +34,11 @@ declare module "next-auth" {
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
+        capaciteActive?: string | null
+        capacites?: string[]
+        eligibleRoles?: string[]
+        chosenRole?: string | null
+        requiresRoleSelection?: boolean
     }
 }
 
@@ -45,10 +55,15 @@ declare module "next-auth/jwt" {
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
+        capaciteActive?: string | null
+        capacites?: string[]
+        eligibleRoles?: string[]
+        chosenRole?: string | null
+        requiresRoleSelection?: boolean
     }
 }
 
-// Augment @auth/core/types (very important for NextAuth v5)
+// Augment @auth/core/types
 declare module "@auth/core/types" {
     interface Session {
         user: {
@@ -62,6 +77,11 @@ declare module "@auth/core/types" {
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
+            capaciteActive?: string | null
+            capacites?: string[]
+            eligibleRoles?: string[]
+            chosenRole?: string | null
+            requiresRoleSelection?: boolean
         } & DefaultSession["user"]
     }
 
@@ -76,10 +96,15 @@ declare module "@auth/core/types" {
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
+        capaciteActive?: string | null
+        capacites?: string[]
+        eligibleRoles?: string[]
+        chosenRole?: string | null
+        requiresRoleSelection?: boolean
     }
 }
 
-// Augment @auth/core (sometimes used directly in config)
+// Augment @auth/core
 declare module "@auth/core" {
     interface Session {
         user: {
@@ -93,6 +118,11 @@ declare module "@auth/core" {
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
+            capaciteActive?: string | null
+            capacites?: string[]
+            eligibleRoles?: string[]
+            chosenRole?: string | null
+            requiresRoleSelection?: boolean
         } & DefaultSession["user"]
     }
 }
@@ -109,5 +139,10 @@ declare module "@auth/core/adapters" {
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
+        capaciteActive?: string | null
+        capacites?: string[]
+        eligibleRoles?: string[]
+        chosenRole?: string | null
+        requiresRoleSelection?: boolean
     }
 }
