@@ -36,6 +36,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const otp = credentials.otp as string;
                 const requestedRole = (credentials.role as string) || 'TENANT';
 
+                // ─── CORRECTIF AUTH-BUG-01 ────────────────────────────
+                const ROLE_MAP: Record<string, string> = {
+                  BAILLEUR:  "LANDLORD",
+                  LOCATAIRE: "TENANT",
+                  ADMIN:     "ADMIN",
+                  PROPRIETAIRE: "LANDLORD",
+                  GESTIONNAIRE: "LANDLORD",
+                };
+
+                const requestedRoleNormalise = ROLE_MAP[requestedRole.toUpperCase()] ?? requestedRole.toUpperCase();
+                // ────────────────────────────────────────────────────────
+
                 // 1. Verify OTP in Redis
                 let storedOtp: string | null = null;
                 if (redis) {
@@ -84,7 +96,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         if (isDiaspora) eligibleRolesSet.add('DIASPORA');
                         if (isAdmin) eligibleRolesSet.add('ADMIN');
 
-                        const reqRole = (requestedRole || '').toUpperCase();
+                        const reqRole = requestedRoleNormalise;
 
                         // Gestion stricte des privilèges d'administration
                         if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
@@ -162,7 +174,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 email,
                                 role: roleBase,
                                 status: 'PENDING_PROFILE',
-                                phone: `PENDING_${Date.now()}`,
+                                phone: `PENDING_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                                 onboardingComplete: typeChoisi === "LOCATAIRE",
                                 capaciteActive: typeChoisi === "LOCATAIRE" ? null : "PROPRIETAIRE"
                             }
