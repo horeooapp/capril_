@@ -75,9 +75,10 @@ export const authConfig = {
             if (isPublic) {
                 if (isLoggedIn && pathname.includes("/login")) {
                     const onboardingFait = (auth?.user as any)?.onboardingComplete;
+                    const chosenRole = (auth?.user as any)?.chosenRole || role;
                     
-                    if (role === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
-                    if (role === 'ADMIN' || role === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
+                    if (chosenRole === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
+                    if (chosenRole === 'ADMIN' || chosenRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
                     
                     // LANDLORD
                     if (!onboardingFait) {
@@ -97,25 +98,32 @@ export const authConfig = {
 
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
             const onboardingFait = (auth?.user as any)?.onboardingComplete;
+            const eligibleRoles = (auth?.user as any)?.eligibleRoles || [role];
 
-            if (role === 'TENANT' && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
-                return Response.redirect(new URL("/locataire", nextUrl));
-            }
-            
-            if ((role === 'ADMIN' || role === 'SUPER_ADMIN') && !pathname.startsWith("/admin")) {
-                if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
-                     return Response.redirect(new URL("/admin", nextUrl));
+            // Access to Dashboard (Bailleurs, Agencies, Diaspora)
+            if (pathname.startsWith("/dashboard")) {
+                const hasDashAccess = eligibleRoles.some((r: string) => ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'].includes(r));
+                if (!hasDashAccess) {
+                    return Response.redirect(new URL("/locataire", nextUrl));
                 }
-            }
-            
-            if ((role === 'LANDLORD' || role === 'LANDLORD_PRO' || role === 'AGENCY')) {
-                // Onboarding Enforcement
                 if (!onboardingFait && !pathname.startsWith("/onboarding")) {
                      return Response.redirect(new URL("/onboarding", nextUrl));
                 }
-
-                if (pathname.startsWith("/locataire") || pathname.startsWith("/admin")) {
+            }
+            
+            // Access to Locataire
+            if (pathname.startsWith("/locataire")) {
+                if (!eligibleRoles.includes('TENANT')) {
                     return Response.redirect(new URL("/dashboard", nextUrl));
+                }
+            }
+
+            // Access to Admin
+            if (pathname.startsWith("/admin")) {
+                if (!eligibleRoles.includes('ADMIN') && !eligibleRoles.includes('SUPER_ADMIN')) {
+                    if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
+                         return Response.redirect(new URL("/dashboard", nextUrl));
+                    }
                 }
             }
 
