@@ -55,6 +55,7 @@ export default function LocataireLayoutClient({
                             { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
                             { href: "/locataire/profile", label: "Profil", icon: <User size={24} /> },
                             { href: "/locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
+                            { label: "Quitter", icon: <LogOut size={24} />, onClick: () => onLogout() },
                         ]} />
                     )}
                 </main>

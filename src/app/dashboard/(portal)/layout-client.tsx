@@ -193,7 +193,10 @@ export default function DashboardLayoutClient({
                 </motion.div>
                 
                 {session?.user && (
-                    <BottomNav items={navLinks} />
+                    <BottomNav items={[
+                        ...navLinks, 
+                        { label: "Quitter", icon: <LogOut size={24} />, onClick: () => handleLogout() }
+                    ]} />
                 )}
             </main>
 
