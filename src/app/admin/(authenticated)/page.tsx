@@ -25,6 +25,7 @@ import {
     ExternalLink
 } from "lucide-react"
 import Link from "next/link"
+import LandingToggle from "@/components/admin/LandingToggle"
 import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
 import LiveActivityStream from "@/components/admin/LiveActivityStream"
@@ -96,7 +97,8 @@ export default async function AdminDashboardOverview() {
         activeWalletConfigs,
         totalReclamations,
         totalLitiges,
-        activePromos
+        activePromos,
+        landingFlag
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -147,6 +149,7 @@ export default async function AdminDashboardOverview() {
         (prisma as any).reclamationLocataire.count().catch(() => 0),
         (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
         (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
+        prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
     ]);
     
     // Check for missing tables
@@ -161,6 +164,7 @@ export default async function AdminDashboardOverview() {
     
     // Formatting data
     const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
+    const isLandingEnabled = landingFlag ? (landingFlag as any).enabled : true;
 
     const safeData = {
         totalDgi: Number(totalDgiRes?._sum?.totalDgi || 0),
@@ -245,6 +249,7 @@ export default async function AdminDashboardOverview() {
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
+                        <LandingToggle initialEnabled={isLandingEnabled} />
                         <div className="flex flex-col items-end">
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
                             <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
