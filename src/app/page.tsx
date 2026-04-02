@@ -19,7 +19,9 @@ import RentRanking from "@/components/RentRanking";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const searchParams = await props.searchParams;
+  const isPreview = searchParams?.preview === "true";
   let session = null;
   let dbNews: any[] = [];
   let isLandingPageEnabled = false;
@@ -74,7 +76,7 @@ export default async function Home() {
   const ticker = <NewsTicker items={newsItems} />;
 
     // --- 2. ACCESS CONTROL & REDIRECTION ---
-    if (session?.user) {
+    if (session?.user && !isPreview) {
         if (isAdmin) redirect("/admin");
         if (session.user.role === 'TENANT') redirect("/locataire");
         redirect("/dashboard");

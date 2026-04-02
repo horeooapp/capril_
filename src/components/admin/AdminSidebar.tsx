@@ -80,7 +80,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
                 <nav className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar mt-4">
                     {/* Public Home Link */}
                     <Link 
-                        href="/"
+                        href="/?preview=true"
                         className="relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/5 border border-dashed border-gray-100 hover:border-ivoire-orange/30 mb-4"
                     >
                         <span className="relative z-10 transition-transform group-hover:scale-110">

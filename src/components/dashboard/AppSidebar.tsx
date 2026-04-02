@@ -115,7 +115,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5 no-scrollbar">
                     {/* Public Home Link */}
                     <Link 
-                        href="/"
+                        href="/?preview=true"
                         className="relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all text-qtext-light hover:text-qorange hover:bg-qorange-pale border border-dashed border-qgrey-2 hover:border-qorange/30 mb-6"
                     >
                         <span className="relative z-10 transition-transform group-hover:scale-110">

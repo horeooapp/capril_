@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
-import { AppFeature } from "@/lib/features"
+import { AppFeature, invalidateFeaturesCache } from "@/lib/features"
 
 /**
  * Toggles a system feature (M17, M16, etc.)
@@ -45,7 +45,19 @@ export async function toggleFeature(feature: AppFeature, status: boolean) {
             newValues: { status }
         })
 
+        if ((prisma as any).featureFlag) {
+            await (prisma as any).featureFlag.upsert({
+                where: { id: feature },
+                update: { enabled: status },
+                create: { id: feature, name: feature, description: "", enabled: status }
+            })
+        }
+
+        invalidateFeaturesCache()
+        
         revalidatePath("/admin/system")
+        revalidatePath("/admin")
+        revalidatePath("/")
         return { success: true }
     } catch (error) {
         console.error("[SYSTEM] Toggle feature error:", error)
