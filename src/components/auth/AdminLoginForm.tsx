@@ -24,12 +24,18 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
         e.preventDefault()
         setError(null)
         startTransition(async () => {
-            const result = await loginWithAdminCredentials(email, password)
-            if (result.success) {
-                router.push(redirectPath)
-                router.refresh()
-            } else {
-                setError(result.error || "Identifiants incorrects.")
+            try {
+                const result = await loginWithAdminCredentials(email, password)
+                // If result is undefined, Next.js intercepted a redirect (successful login)
+                if (!result || result.success) {
+                    // Auth.js / Next.js will navigate automatically, but we force refresh just in case
+                    router.push(redirectPath)
+                    router.refresh()
+                } else {
+                    setError(result.error || "Identifiants incorrects.")
+                }
+            } catch (err) {
+                 console.error(err)
             }
         })
     }

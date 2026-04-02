@@ -39,14 +39,18 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
         e.preventDefault()
         setError(null)
         startTransition(async () => {
-            const result = await loginWithOTP(email, otp, role)
-            if (result?.success) {
-                // Determine redirection based on onboarding status
-                const finalPath = result.onboardingComplete ? redirectPath : "/onboarding"
-                router.push(finalPath)
-                router.refresh()
-            } else {
-                setError(result?.error || "Code incorrect ou expiré.")
+            try {
+                const result = await loginWithOTP(email, otp, role)
+                if (!result || result.success) {
+                    // Determine redirection based on onboarding status (default to redirectPath if unknown)
+                    const finalPath = result?.onboardingComplete === false ? "/onboarding" : redirectPath
+                    router.push(finalPath)
+                    router.refresh()
+                } else {
+                    setError(result.error || "Code incorrect ou expiré.")
+                }
+            } catch (err) {
+                console.error(err)
             }
         })
     }
