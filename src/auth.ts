@@ -106,25 +106,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             eligibleRolesSet.add(reqRole);
                         }
 
+                        // ASSOUPLISSEMENT DES RÈGLES : Un utilisateur peut cumuler Locataire et Propriétaire
+                        const isDashboardRequest = ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole);
+                        
+                        if (isDashboardRequest) {
+                            const hasAnyDashboardRole = Array.from(eligibleRolesSet).some(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
+                            if (!hasAnyDashboardRole) {
+                                // On lui octroie dynamiquement le rôle demandé (ex: LANDLORD) pour qu'il puisse y accéder
+                                eligibleRolesSet.add(reqRole);
+                            }
+                        } else if (reqRole === 'TENANT') {
+                            if (!eligibleRolesSet.has('TENANT')) {
+                                // Octroi dynamique de l'accès locataire
+                                eligibleRolesSet.add('TENANT');
+                            }
+                        }
+
                         const eligibleRoles = Array.from(eligibleRolesSet);
 
                         if (eligibleRoles.length === 0) {
                              throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
-                        }
-
-                        // VÉRIFICATION STRICTE DE COMPARTIMENTALISATION
-                        const isDashboardRequest = ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole);
-                        
-                        if (isDashboardRequest) {
-                            // Le portail de gestion exige au moins un de ces rôles
-                            const hasAnyDashboardRole = eligibleRoles.some(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
-                            if (!hasAnyDashboardRole) {
-                                throw new CustomAuthError("Accès refusé : Ce compte n'a pas accès au portail de gestion.");
-                            }
-                        } else if (reqRole === 'TENANT') {
-                            if (!eligibleRoles.includes('TENANT')) {
-                                throw new CustomAuthError("Accès refusé : Cet espace est réservé aux locataires.");
-                            }
                         }
 
                         let finalChosenRole: string | null = null;
