@@ -9,7 +9,7 @@ import { getAuthUser } from '@/lib/jwt';
 export async function POST(req: Request) {
   try {
     const user = await getAuthUser(req);
-    if (!user || (user.role !== 'LANDLORD' && (user as any).profileType !== 'DIASPORA')) {
+    if (!user || (!['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string) && (user as any).profileType !== 'DIASPORA')) {
       return NextResponse.json({ error: 'Réservé aux propriétaires' }, { status: 401 });
     }
 

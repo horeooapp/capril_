@@ -10,7 +10,7 @@ import { writeAuditLog } from '@/lib/audit';
 export async function PATCH(req: Request) {
   try {
     const user = await getAuthUser(req);
-    if (!user || user.role !== 'LANDLORD') {
+    if (!user || !['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string)) {
       return NextResponse.json({ error: 'Non autorisé ou rôle incorrect' }, { status: 401 });
     }
 

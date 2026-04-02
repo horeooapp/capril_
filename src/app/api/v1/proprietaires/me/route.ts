@@ -9,7 +9,7 @@ import { getAuthUser } from '@/lib/jwt';
 export async function GET(req: Request) {
   try {
     const user = await getAuthUser(req);
-    if (!user || user.role !== 'LANDLORD') {
+    if (!user || !['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string)) {
       return NextResponse.json({ error: 'Unauthorized or role mismatch' }, { status: 401 });
     }
 

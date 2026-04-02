@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const user = await getAuthUser(req);
     // Allowing INTERMEDIAIRE (ACT-05) to generate quittance if they have rights?
     // Let's keep it open to landlords, diaspora, and agents.
-    if (!user || (user.role !== 'LANDLORD' && (user as any).profileType !== 'DIASPORA' && user.role !== 'NON_CERTIFIED_AGENT')) {
+    if (!user || (!['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string) && (user as any).profileType !== 'DIASPORA' && user.role !== 'NON_CERTIFIED_AGENT')) {
       return NextResponse.json({ error: 'Unauthorized to emit quittances.' }, { status: 401 });
     }
 

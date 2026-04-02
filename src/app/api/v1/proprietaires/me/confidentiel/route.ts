@@ -10,7 +10,7 @@ export async function PATCH(req: Request) {
   try {
     const user = await getAuthUser(req);
     // Allow landlords and diaspora to manage confidentiality
-    if (!user || (user.role !== 'LANDLORD' && (user as any).profileType !== 'DIASPORA')) {
+    if (!user || (!['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string) && (user as any).profileType !== 'DIASPORA')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

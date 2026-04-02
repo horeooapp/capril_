@@ -12,7 +12,7 @@ export async function POST(
 ) {
   try {
     const user = await getAuthUser(req);
-    if (!user || user.role !== 'LANDLORD') {
+    if (!user || !['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'TENANT'].includes(user.role as string)) {
       return NextResponse.json({ error: 'Accès refusé' }, { status: 401 });
     }
 
