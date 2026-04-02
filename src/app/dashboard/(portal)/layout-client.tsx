@@ -105,6 +105,7 @@ export default function DashboardLayoutClient({
                     userName={session.user.fullName || session.user.name}
                     diasporaAbonnement={session.user.diasporaAbonnement}
                     agencyConfig={agencyConfig}
+                    eligibleRoles={session.user.eligibleRoles}
                 />
             )}
 
@@ -195,6 +196,9 @@ export default function DashboardLayoutClient({
                 {session?.user && (
                     <BottomNav items={[
                         ...navLinks, 
+                        ...(session.user.eligibleRoles?.length > 1 
+                            ? [{ href: "/auth/choose-role", label: "Profils", icon: <User size={24} /> }] 
+                            : []),
                         { label: "Quitter", icon: <LogOut size={24} />, onClick: () => handleLogout() }
                     ]} />
                 )}

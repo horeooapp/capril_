@@ -30,6 +30,7 @@ export default function LocataireLayoutClient({
                     role="TENANT" 
                     onLogout={onLogout}
                     userName={session.user.email}
+                    eligibleRoles={session.user.eligibleRoles}
                 />
             )}
 
@@ -55,6 +56,9 @@ export default function LocataireLayoutClient({
                             { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
                             { href: "/locataire/profile", label: "Profil", icon: <User size={24} /> },
                             { href: "/locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
+                            ...(session.user.eligibleRoles?.length > 1 
+                                ? [{ href: "/auth/choose-role", label: "Profils", icon: <User size={24} /> }] 
+                                : []),
                             { label: "Quitter", icon: <LogOut size={24} />, onClick: () => onLogout() },
                         ]} />
                     )}

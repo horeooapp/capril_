@@ -1,10 +1,10 @@
 export const Colors = {
-  navy: "#0D2B6E",
-  navyDark: "#071A45",
+  navy: "#1F4E79",
+  navyDark: "#0D2B6E",
   navyPale: "#EEF2FA",
-  green: "#1A7A3C",
+  green: "#10B981",
   greenPale: "#E8F5EE",
-  orange: "#C05B00",
+  orange: "#C55A11",
   orangePale: "#FFF3E0",
   red: "#A00000",
   redPale: "#FEECEC",
@@ -15,7 +15,7 @@ export const Colors = {
   purple: "#5B21B6",
   purplePale: "#EDE9FE",
   white: "#FFFFFF",
-  bg: "#F2F5FA",
+  bg: "#F8FAFC",
   grey1: "#EEF2F7",
   grey2: "#D6DCE8",
   grey3: "#8FA0BC",
@@ -24,6 +24,7 @@ export const Colors = {
   textMid: "#2D3F5E",
   textLight: "#6A7D9E",
   diaspora: "#0E3A8C",
+  institutionalSlate: "#F1F5F9",
 };
 
 export const Theme = {
@@ -44,13 +45,14 @@ export const Theme = {
     xl: 24,
   },
   shadows: {
-    sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 2 },
-    md: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 5 },
-    lg: { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 },
+    sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 3, elevation: 1 },
+    md: { shadowColor: '#1F4E79', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 15, elevation: 4 },
+    lg: { shadowColor: '#1F4E79', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.08, shadowRadius: 30, elevation: 8 },
   },
   gradients: {
+    institutional: ["#FFFFFF", Colors.institutionalSlate] as const,
     premium: [Colors.navy, Colors.navyDark] as const,
-    accent: [Colors.gold, "#B8860B"] as const,
-    success: [Colors.green, "#15803D"] as const,
+    accent: [Colors.orange, "#E87B2E"] as const,
+    success: [Colors.green, "#059669"] as const,
   }
 };

@@ -131,20 +131,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         let finalChosenRole: string | null = null;
                         let requiresSelection = false;
 
-                        if (reqRole === 'TENANT') {
-                            finalChosenRole = 'TENANT';
-                        } else if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
-                            finalChosenRole = reqRole;
+                        // Si l'utilisateur possède plusieurs rôles, forcer la sélection de la "casquette"
+                        if (eligibleRoles.length > 1) {
+                            requiresSelection = true;
+                            finalChosenRole = null;
                         } else {
-                            // Côté Bailleur/Dashboard, un utilisateur peut avoir plusieurs casquettes.
-                            const dashboardRoles = eligibleRoles.filter(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
-                            
-                            if (dashboardRoles.length > 1) {
-                                requiresSelection = true;
-                                finalChosenRole = null; // Va forcer l'affichage de /auth/choose-role
-                            } else {
-                                finalChosenRole = dashboardRoles[0] || reqRole;
-                            }
+                            // S'il n'a qu'un seul rôle, on l'utilise
+                            finalChosenRole = eligibleRoles[0];
                         }
 
                         return {

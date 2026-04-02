@@ -76,7 +76,7 @@ export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
     <>
       <StatusBar barStyle="light-content" />
       <LinearGradient 
-        colors={[Theme.colors.navyDark, Theme.colors.navy]} 
+        colors={Theme.gradients.institutional} 
         style={styles.container}
       >
         <SafeAreaView style={styles.safeArea}>
@@ -146,7 +146,7 @@ export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
                         
                         <TouchableOpacity onPress={handleRequestOTP} disabled={loading} style={styles.btnShadow}>
                           <LinearGradient
-                            colors={[Theme.colors.teal, Theme.colors.navy]}
+                            colors={Theme.gradients.premium}
                             style={styles.mainBtn}
                           >
                             {loading ? <ActivityIndicator color={Theme.colors.white} /> : <Text style={styles.btnText}>Recevoir le code</Text>}
@@ -182,7 +182,7 @@ export default function AuthScreen({ onLogin, onCancel }: AuthScreenProps) {
                         
                         <TouchableOpacity onPress={handleVerifyOTP} disabled={loading} style={styles.btnShadow}>
                           <LinearGradient
-                            colors={[Theme.colors.teal, Theme.colors.navy]}
+                            colors={Theme.gradients.premium}
                             style={styles.mainBtn}
                           >
                             {loading ? <ActivityIndicator color={Theme.colors.white} /> : <Text style={styles.btnText}>S'authentifier</Text>}
@@ -232,13 +232,13 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   innerContent: { flex: 1, justifyContent: 'space-between' },
   brandingSection: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 30, marginTop: 20 },
-  logoCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#FFFFFF', padding: 10, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 10, alignItems: 'center', justifyContent: 'center' },
+  logoCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#FFFFFF', padding: 10, marginBottom: 20, ...Theme.shadows.lg, alignItems: 'center', justifyContent: 'center' },
   logoImage: { width: '85%', height: '85%' },
-  brandTitle: { fontSize: 32, fontWeight: '900', color: Theme.colors.white, letterSpacing: 2, marginBottom: 8 },
-  brandSubtitle: { fontSize: 13, fontWeight: '500', color: Theme.colors.tealPale, textAlign: 'center', lineHeight: 20, opacity: 0.9, marginBottom: 20 },
-  trustBadge: { backgroundColor: 'rgba(255,255,255,0.12)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
-  trustText: { color: '#E0F4F9', fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
-  bottomSheet: { backgroundColor: Theme.colors.white, borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingHorizontal: 30, paddingTop: 15, paddingBottom: 20, minHeight: height * 0.45, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 15, elevation: 20 },
+  brandTitle: { fontSize: 32, fontWeight: '900', color: Theme.colors.navyDark, letterSpacing: 2, marginBottom: 8 },
+  brandSubtitle: { fontSize: 13, fontWeight: '500', color: Theme.colors.textLight, textAlign: 'center', lineHeight: 20, opacity: 0.9, marginBottom: 20 },
+  trustBadge: { backgroundColor: '#FFFFFF', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: Theme.colors.grey1, ...Theme.shadows.sm },
+  trustText: { color: Theme.colors.green, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
+  bottomSheet: { backgroundColor: Theme.colors.white, borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingHorizontal: 30, paddingTop: 15, paddingBottom: 20, minHeight: height * 0.45, ...Theme.shadows.lg },
   sheetIndicator: { width: 40, height: 5, backgroundColor: '#E2E8F0', borderRadius: 3, alignSelf: 'center', marginBottom: 25 },
   sheetTitle: { fontSize: 24, fontWeight: '900', color: Theme.colors.navy, marginBottom: 8 },
   sheetDesc: { fontSize: 13, color: Theme.colors.textLight, lineHeight: 18, marginBottom: 25 },

@@ -61,13 +61,13 @@ export default function App() {
   // 1. Loading State
   if (isLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: Theme.colors.navyDark, justifyContent: 'center', alignItems: 'center' }]}>
-        <StatusBar barStyle="light-content" />
+      <View style={[styles.container, { backgroundColor: Theme.colors.bg, justifyContent: 'center', alignItems: 'center' }]}>
+        <StatusBar barStyle="dark-content" />
         <View style={styles.splashLogoBox}>
            <Image source={require('./assets/icon.png')} style={styles.splashLogo} resizeMode="contain" />
         </View>
         <Text style={styles.splashBrand}>QAPRIL</Text>
-        <ActivityIndicator size="small" color={Theme.colors.tealPale} style={{ marginTop: 30 }} />
+        <ActivityIndicator size="small" color={Theme.colors.navyDark} style={{ marginTop: 30 }} />
       </View>
     );
   }
@@ -88,25 +88,25 @@ export default function App() {
   // 4. No portal chosen -> Show Menu
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <LinearGradient colors={[Theme.colors.navyDark, Theme.colors.navy]} style={styles.gradBg}>
+      <StatusBar barStyle="dark-content" />
+      <LinearGradient colors={Theme.gradients.institutional} style={styles.gradBg}>
         <SafeAreaView style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.scroll}>
             <View style={styles.header}>
               <View style={styles.logoBox}>
                 <Image source={require('./assets/icon.png')} style={styles.logo} resizeMode="contain" />
               </View>
-              <Text style={styles.welcome}>Bienvenue sur</Text>
+              <Text style={styles.welcome}>Portail Officiel</Text>
               <Text style={styles.userName}>QAPRIL</Text>
-              <Text style={styles.instruction}>Veuillez sélectionner votre portail d'accès</Text>
+              <Text style={styles.instruction}>Veuillez sélectionner votre session certifiée</Text>
             </View>
 
             <View style={styles.menu}>
               {[
-                { id: 'TENANT', name: 'PORTAIL LOCATAIRE', Icon: Key, desc: 'Loyers, quittances & score ICL', color: Theme.colors.teal, bg: 'rgba(20, 184, 166, 0.15)', iconColor: Theme.colors.teal },
-                { id: 'LANDLORD', name: 'PORTAIL PROPRIÉTAIRE', Icon: Home, desc: 'Gestion du patrimoine & wallet', color: '#FFF', bg: 'rgba(255, 255, 255, 0.1)', iconColor: '#FFF' },
-                { id: 'DIASPORA', name: 'PORTAIL DIASPORA', Icon: Globe, desc: 'Suivi RCI & virements SEPA', color: '#93C5FD', bg: 'rgba(147, 197, 253, 0.15)', iconColor: '#93C5FD' },
-                { id: 'INTERMEDIAIRE', name: 'PORTAIL INTERMÉDIAIRE', Icon: Handshake, desc: 'Mandats, M-EDL & Médiation', color: Theme.colors.orange, bg: 'rgba(249, 115, 22, 0.15)', iconColor: Theme.colors.orange },
+                { id: 'TENANT', name: 'PORTAIL LOCATAIRE', Icon: Key, desc: 'Loyers, quittances & score ICL', color: Theme.colors.navyDark, bg: Theme.colors.greenPale, iconColor: Theme.colors.green },
+                { id: 'LANDLORD', name: 'PORTAIL PROPRIÉTAIRE', Icon: Home, desc: 'Gestion du patrimoine & wallet', color: Theme.colors.navyDark, bg: Theme.colors.navyPale, iconColor: Theme.colors.navyDark },
+                { id: 'DIASPORA', name: 'PORTAIL DIASPORA', Icon: Globe, desc: 'Suivi RCI & virements SEPA', color: Theme.colors.navyDark, bg: Theme.colors.grey1, iconColor: Theme.colors.diaspora },
+                { id: 'INTERMEDIAIRE', name: 'PORTAIL INTERMÉDIAIRE', Icon: Handshake, desc: 'Mandats, M-EDL & Médiation', color: Theme.colors.navyDark, bg: Theme.colors.orangePale, iconColor: Theme.colors.orange },
               ].map(p => (
                 <TouchableOpacity 
                   key={p.id}
@@ -122,7 +122,7 @@ export default function App() {
                     <Text style={styles.cardDesc}>{p.desc}</Text>
                   </View>
                   <View style={styles.arrowBox}>
-                    <ChevronRight size={20} color="rgba(255,255,255,0.3)" strokeWidth={3} />
+                    <ChevronRight size={20} color={Theme.colors.navy} strokeWidth={3} />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -143,23 +143,23 @@ export default function App() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   gradBg: { flex: 1 },
-  splashLogoBox: { width: 120, height: 120, backgroundColor: '#FFF', borderRadius: 30, padding: 15, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 20, elevation: 15 },
+  splashLogoBox: { width: 120, height: 120, backgroundColor: '#FFF', borderRadius: 30, padding: 15, marginBottom: 20, ...Theme.shadows.lg },
   splashLogo: { width: '100%', height: '100%' },
-  splashBrand: { fontSize: 28, fontWeight: '900', color: '#FFF', letterSpacing: 1.5 },
+  splashBrand: { fontSize: 28, fontWeight: '900', color: Theme.colors.navyDark, letterSpacing: 1.5 },
   scroll: { padding: 30, paddingBottom: 50 },
   header: { marginTop: 20, marginBottom: 40 },
-  logoBox: { width: 70, height: 70, backgroundColor: '#FFF', borderRadius: 20, padding: 10, marginBottom: 25, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 10 },
+  logoBox: { width: 70, height: 70, backgroundColor: '#FFF', borderRadius: 20, padding: 10, marginBottom: 25, ...Theme.shadows.md },
   logo: { width: '100%', height: '100%' },
-  welcome: { fontSize: 18, color: 'rgba(255,255,255,0.7)', fontWeight: '700' },
-  userName: { fontSize: 32, fontWeight: '900', color: '#FFF', marginTop: 5 },
-  instruction: { fontSize: 13, color: Theme.colors.tealPale, marginTop: 10, fontWeight: '600', opacity: 0.8 },
+  welcome: { fontSize: 13, color: Theme.colors.orange, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' },
+  userName: { fontSize: 40, fontWeight: '900', color: Theme.colors.navyDark, marginTop: 5, letterSpacing: -1 },
+  instruction: { fontSize: 12, color: Theme.colors.textLight, marginTop: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
   menu: { gap: 15 },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 25, padding: 18, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15, elevation: 5 },
-  iconBox: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 24, padding: 18, borderWidth: 1, borderColor: Theme.colors.grey1, ...Theme.shadows.md },
+  iconBox: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   cardBody: { flex: 1, paddingLeft: 16 },
   cardTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 0.5 },
-  cardDesc: { fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 4, fontWeight: '600' },
+  cardDesc: { fontSize: 11, color: Theme.colors.textLight, marginTop: 4, fontWeight: '600' },
   arrowBox: { paddingLeft: 10 },
-  logoutBtn: { marginTop: 40, alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', paddingTop: 30 },
-  logoutText: { color: 'rgba(255,255,255,0.5)', fontWeight: '900', fontSize: 12, letterSpacing: 2 },
+  logoutBtn: { marginTop: 40, alignItems: 'center', borderTopWidth: 1, borderTopColor: Theme.colors.grey1, paddingTop: 30 },
+  logoutText: { color: Theme.colors.textLight, fontWeight: '900', fontSize: 10, letterSpacing: 2 },
 });

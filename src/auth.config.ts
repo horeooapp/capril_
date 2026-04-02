@@ -75,10 +75,17 @@ export const authConfig = {
             if (isPublic) {
                 if (isLoggedIn && pathname.includes("/login")) {
                     const onboardingFait = (auth?.user as any)?.onboardingComplete;
-                    const chosenRole = (auth?.user as any)?.chosenRole || role;
+                    const chosenRole = (auth?.user as any)?.chosenRole;
+                    const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
                     
-                    if (chosenRole === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
-                    if (chosenRole === 'ADMIN' || chosenRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
+                    if (requiresRoleSelection && !chosenRole) {
+                        return Response.redirect(new URL("/auth/choose-role", nextUrl));
+                    }
+                    
+                    const effectiveRole = chosenRole || role;
+
+                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
+                    if (effectiveRole === 'ADMIN' || effectiveRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
                     
                     // LANDLORD
                     if (!onboardingFait) {
@@ -99,6 +106,13 @@ export const authConfig = {
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
             const onboardingFait = (auth?.user as any)?.onboardingComplete;
             const eligibleRoles = (auth?.user as any)?.eligibleRoles || [role];
+            const chosenRole = (auth?.user as any)?.chosenRole;
+            const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
+
+            // Enforce role selection if needed
+            if (requiresRoleSelection && !chosenRole && !pathname.startsWith("/auth/choose-role") && !pathname.startsWith("/api/auth")) {
+                return Response.redirect(new URL("/auth/choose-role", nextUrl));
+            }
 
             // Access to Dashboard (Bailleurs, Agencies, Diaspora)
             if (pathname.startsWith("/dashboard")) {

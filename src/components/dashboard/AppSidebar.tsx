@@ -35,9 +35,10 @@ interface AppSidebarProps {
     userName?: string | null
     diasporaAbonnement?: boolean
     agencyConfig?: { isManager?: boolean, permissions?: string[] } | null
+    eligibleRoles?: string[]
 }
 
-export default function AppSidebar({ role, onLogout, userName, diasporaAbonnement, agencyConfig }: AppSidebarProps) {
+export default function AppSidebar({ role, onLogout, userName, diasporaAbonnement, agencyConfig, eligibleRoles }: AppSidebarProps) {
     const pathname = usePathname()
 
     const getNavLinks = () => {
@@ -167,6 +168,15 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
 
                 {/* Footer Section */}
                 <div className="p-6 mt-auto border-t border-qgrey-1 bg-qgrey-1/30">
+                    {eligibleRoles && eligibleRoles.length > 1 && (
+                        <Link 
+                            href="/auth/choose-role"
+                            className="w-full h-10 mb-2 bg-white text-qnavy border border-qgrey-2 rounded-xl flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-widest hover:bg-qnavy-pale transition-all active:scale-95 group shadow-sm"
+                        >
+                            <User size={14} className="group-hover:scale-110 transition-transform" />
+                            Changer de Profil
+                        </Link>
+                    )}
                     <button 
                         onClick={onLogout}
                         className="w-full h-12 bg-qred-pale text-qred rounded-xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-qred hover:text-white transition-all active:scale-95 group shadow-sm"
