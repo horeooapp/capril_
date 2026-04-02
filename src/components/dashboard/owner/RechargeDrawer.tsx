@@ -22,29 +22,71 @@ interface RechargeDrawerProps {
 }
 
 const operators = [
-  { id: 'WAVE', name: 'Wave CI', color: 'bg-white', border: 'border-blue-100', method: 'DEEP_LINK', 
-    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wave_logo.svg/512px-Wave_logo.svg.png" alt="Wave" className="w-full h-full object-contain" /> 
+  { id: 'WAVE', name: 'Wave Cote d\'Ivoire', color: 'bg-[#18A9DB]', border: 'border-transparent', method: 'DEEP_LINK', 
+    renderLogo: () => (
+      <div className="flex flex-col items-center justify-center w-full h-full text-white bg-[#18A9DB] rounded-lg">
+        <div className="flex items-center gap-0.5 mt-1">
+          <span className="text-xl -mt-1">🐧</span>
+          <span className="text-xl font-extrabold tracking-tighter leading-none">wave</span>
+        </div>
+        <span className="text-[5px] font-black opacity-90 tracking-widest mt-1 leading-none uppercase">Ton djê est calé</span>
+      </div>
+    ) 
   },
-  { id: 'ORANGE', name: 'Orange Money', color: 'bg-white', border: 'border-orange-100', method: 'DEEP_LINK',
-    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" className="w-full h-full object-contain" />
+  { id: 'ORANGE', name: 'Orange Money', color: 'bg-[#000000]', border: 'border-transparent', method: 'DEEP_LINK',
+    renderLogo: () => (
+      <div className="flex flex-col items-center justify-center w-full h-full text-white bg-[#000000] rounded-lg">
+        <div className="bg-[#FF6600] w-10 h-6 flex items-end px-1 pb-0.5 mt-0.5 rounded-sm">
+            <span className="text-[10px] font-black tracking-tight leading-none text-white">orange</span>
+        </div>
+        <span className="text-[5px] font-black text-white mt-1 tracking-[0.2em] uppercase">Money</span>
+      </div>
+    )
   },
-  { id: 'MTN', name: 'MTN MoMo', color: 'bg-white', border: 'border-yellow-200', method: 'DEEP_LINK',
-    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" alt="MTN" className="w-full h-full object-contain" />
+  { id: 'MTN', name: 'MTN MoMo', color: 'bg-[#FFCC00]', border: 'border-[#FFCC00]', method: 'DEEP_LINK',
+    renderLogo: () => (
+      <div className="flex flex-col items-center justify-center w-full h-full text-[#004b73] bg-[#FFCC00] rounded-lg border-2 border-[#FFCC00]">
+        <div className="w-4 h-4 bg-[#004b73] rounded shadow-sm relative overflow-hidden flex items-center justify-center mt-0.5">
+          <svg viewBox="0 0 100 100" className="w-3 h-3 fill-[#FFCC00]">
+             <path d="M20 80 Q 50 20 80 80 Z" />
+             <circle cx="50" cy="65" r="12" fill="#004b73" />
+          </svg>
+        </div>
+        <span className="text-[10px] font-black tracking-tighter leading-none mt-0.5">MoMo</span>
+        <span className="text-[4px] font-extrabold uppercase mt-[1px] tracking-wide">from MTN</span>
+      </div>
+    )
   },
-  { id: 'MOOV', name: 'Moov Money', color: 'bg-white', border: 'border-blue-200', method: 'DEEP_LINK',
-    renderLogo: () => <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Moov_Africa_logo.png" alt="Moov Africa" className="w-full h-full object-contain p-1" />
+  { id: 'MOOV', name: 'Moov Money', color: 'bg-[#005CA8]', border: 'border-transparent', method: 'DEEP_LINK',
+    renderLogo: () => (
+      <div className="flex items-center justify-center w-full h-full bg-[#005CA8] rounded-lg overflow-hidden relative">
+        <div className="absolute w-9 h-9 bg-[#F06222] rounded-sm transform rotate-45"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center -mt-0.5">
+           <span className="text-[6px] font-black text-[#005CA8] uppercase tracking-tighter leading-none mt-0.5">MOOV</span>
+           <span className="text-[7px] font-extrabold text-white italic tracking-tight leading-none drop-shadow-sm -mt-0.5 flex items-center gap-0.5">
+             Money
+             <svg viewBox="0 0 24 24" className="w-[6px] h-[6px] fill-white" opacity="0.9">
+               <path d="M4 6h16v12H4z" />
+             </svg>
+           </span>
+        </div>
+      </div>
+    )
   },
   { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', method: 'CINETPAY',
     renderLogo: () => (
-      <div className="flex gap-1 items-center justify-center w-full h-full px-1">
-        <svg viewBox="0 0 300 100" className="w-1/2 h-full" fill="#1434CB">
-          <path d="M127.3 22l-17.5 54h-28l17.5-54h28zm64.4 0c-7.6 0-28 3.5-28 23.3 0 11.6 15.7 18.6 23.3 23.9 8.2 4.6 11.6 8.2 11.6 12.8 0 7-9.3 10.5-17.5 10.5-10 0-16.3-1.2-23.3-4.6l-3.5 16.3c5.8 2.9 17.5 5.8 29.1 5.8 26.2 0 43.1-12.8 43.1-32.6 0-19.2-26.8-21-26.8-29.7 0-3.5 4.6-8.7 14.6-9.9 5.8-.6 14.6 0 21.6 3.5l3.5-16.3c-4.7-1.7-13.4-2.9-24.5-2.9zm75.8 0l-15.1 61.2-1.7-9.3c-3.5-8.7-14.6-19.2-27.4-23.3l7.6 59.4h28.5l43.1-88h-35zM62.9 22h-22.1c-5.8 0-10 1.7-11.6 7L.2 88h29.1l5.8-16.9h35.5L78 88h27.4L62.9 22zm-12.8 40.8l10-27.4 5.8 27.4H50.1z"/>
-        </svg>
-        <svg viewBox="0 0 300 180" className="w-1/2 h-full">
-          <circle cx="100" cy="90" r="70" fill="#EB001B"/>
-          <circle cx="200" cy="90" r="70" fill="#F79E1B"/>
-          <path d="M150 49.5c18 10 30 29 30 50.5s-12 40.5-30 50.5c-18-10-30-29-30-50.5s12-40.5 30-50.5z" fill="#FF5F00"/>
-        </svg>
+      <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded-lg gap-0.5 border border-gray-100">
+        {/* VISA */}
+        <div className="relative flex items-center">
+          <span className="text-[14px] font-black italic tracking-tighter text-[#1A1F71] leading-none drop-shadow-sm">VISA</span>
+          <div className="absolute top-0 left-0 w-2 h-1.5 bg-[#F7B600] rounded-tl-sm" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
+        </div>
+        {/* MASTERCARD */}
+        <div className="relative flex items-center justify-center w-12 h-5 -mt-1">
+           <div className="w-5 h-5 bg-[#EB001B] rounded-full absolute left-2 opacity-95"></div>
+           <div className="w-5 h-5 bg-[#F79E1B] rounded-full absolute right-2 opacity-95 mix-blend-multiply"></div>
+           <span className="relative z-10 text-[4px] font-extrabold text-white italic tracking-tighter drop-shadow-md mt-0.5">MasterCard</span>
+        </div>
       </div>
     )
   },
