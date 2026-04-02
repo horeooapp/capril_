@@ -33,11 +33,11 @@ export default function LandingToggle({ initialEnabled }: LandingToggleProps) {
                 <span className={`text-[10px] font-black uppercase tracking-tight flex items-center gap-1 mt-0.5 ${isEnabled ? 'text-primary' : 'text-gray-500'}`}>
                     {isEnabled ? (
                         <>
-                            <Globe size={12} /> Landing Ouverte
+                            <GlobeLock size={12} /> Landing Page (Restreint)
                         </>
                     ) : (
                         <>
-                            <GlobeLock size={12} /> Mode Restreint
+                            <Globe size={12} /> Page d'Accueil Libre
                         </>
                     )}
                 </span>
@@ -60,9 +60,9 @@ export default function LandingToggle({ initialEnabled }: LandingToggleProps) {
                     {isPending ? (
                         <Loader2 className="animate-spin" size={12} />
                     ) : isEnabled ? (
-                        <Globe size={12} className="text-primary" />
+                        <GlobeLock size={12} className="text-primary" />
                     ) : (
-                        <GlobeLock size={12} className="text-gray-400" />
+                        <Globe size={12} className="text-gray-400" />
                     )}
                 </motion.div>
             </button>

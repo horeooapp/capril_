@@ -77,9 +77,10 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
     // If the user is connected, we ALWAYS bypass the restricted "Black Portal" (which the user calls "landing page").
     // We let them see the full, unrestricted White Portal (which the user calls "page d'accueil").
 
-    // Show Premium Lock Portal (Black) ONLY if the mode is restricted AND the user is not authenticated.
-    if (!isLandingPageEnabled && !session?.user) {
-        // Show restricted Luminous Portal (previously Black Portal)
+    // Show restricted Luminous Portal (which the user calls "Landing Page") 
+    // ONLY if the mode is activated AND the user is not authenticated.
+    if (isLandingPageEnabled && !session?.user) {
+        // Show restricted Luminous Portal
         return (
             <div className="relative min-h-screen bg-[#F5F7FA] overflow-hidden flex flex-col font-sans">
                 {ticker}
