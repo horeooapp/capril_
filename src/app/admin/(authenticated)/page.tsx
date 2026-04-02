@@ -84,9 +84,6 @@ export default async function AdminDashboardOverview() {
         activeInvitations,
         totalConsultations,
         matchRate,
-        totalChampions,
-        activeChampions,
-        pendingCommissionsRes,
         totalEdls,
         certifiedEdls,
         totalMonthlyReports,
@@ -134,9 +131,6 @@ export default async function AdminDashboardOverview() {
         (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
         (prisma as any).consultationProfil.count().catch(() => 0),
         (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
-        (prisma as any).championProfile.count().catch(() => 0),
-        (prisma as any).championProfile.count({ where: { statut: "ACTIF" } }).catch(() => 0),
-        (prisma as any).championCommission.aggregate({ _sum: { montantFcfa: true }, where: { statut: "EN_ATTENTE" } }).catch(() => null),
         prisma.inspection.count().catch(() => 0),
         prisma.inspection.count({ where: { status: "TERMINEE" } }).catch(() => 0),
         prisma.rapportMensuel.count().catch(() => 0),
@@ -203,9 +197,6 @@ export default async function AdminDashboardOverview() {
         activeInvitations,
         totalConsultations,
         matchRate,
-        totalChampions,
-        activeChampions,
-        pendingCommissions: Number(pendingCommissionsRes?._sum?.montantFcfa || 0),
         newProspects: totalUsers > 0 ? await prisma.user.count({ where: { createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) } } }) : 0,
         mandateSuccessRate: totalMandates > 0 ? Math.round((totalMandates / (totalMandates + (totalMandatesDraft || 0))) * 100) : 0,
         totalEdls,
@@ -471,47 +462,6 @@ export default async function AdminDashboardOverview() {
                             icon={<RefreshCw size={28} />} 
                             color="indigo"
                             trend="Rappels Auto."
-                            delay={0.4}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-15 : Réseau Champions */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-indigo-600 px-2">Supervision ADD-15 : Réseau Champions</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="Total Champions" 
-                            value={safeData.totalChampions.toLocaleString()} 
-                            icon={<Trophy size={28} />} 
-                            color="indigo"
-                            trend={`${safeData.activeChampions} Actifs`}
-                            delay={0.1}
-                            href="/admin/champions"
-                        />
-                        <StatCard 
-                            title="Commissions à Valider" 
-                            value={`${safeData.pendingCommissions.toLocaleString()} FCFA`} 
-                            icon={<CreditCard size={28} />} 
-                            color="orange"
-                            trend="En attente"
-                            delay={0.2}
-                            href="/admin/champions"
-                        />
-                        <StatCard 
-                            title="Mandats Validés" 
-                            value={`${safeData.mandateSuccessRate}%`} 
-                            icon={<Zap size={28} />} 
-                            color="emerald"
-                            trend="Taux de conversion"
-                            delay={0.3}
-                        />
-                        <StatCard 
-                            title="Nouveaux Prospects" 
-                            value={`+${safeData.newProspects}`} 
-                            icon={<Users size={28} />} 
-                            color="blue"
-                            trend="Derniers 30j"
                             delay={0.4}
                         />
                     </div>
