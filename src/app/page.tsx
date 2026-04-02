@@ -113,26 +113,43 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                             Registre <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-ivoire-orange via-orange-400 to-white">National.</span>
                         </h1>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                            <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group glass-card-premium px-10 py-10 bg-white rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
-                                <button type="submit" className="w-full">
-                                    <span className="font-black uppercase tracking-[0.3em] text-black text-xs block mb-2">Accès Gouvernance</span>
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Contrôle DGI & Audit</span>
-                                </button>
-                            </form>
-                            <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group glass-card-premium px-10 py-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
-                                <button type="submit" className="w-full">
-                                    <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Espace Bailleur</span>
-                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-widest block">Gestion de Patrimoine</span>
-                                </button>
-                            </form>
-                            <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group glass-card-premium px-10 py-10 bg-primary/90 backdrop-blur-xl rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center border border-white/20 shadow-2xl shadow-primary/20 cursor-pointer">
-                                <button type="submit" className="w-full">
-                                    <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Portail Locataire</span>
-                                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest block">Consultation de Bail</span>
-                                </button>
-                            </form>
-                        </div>
+                        {session?.user ? (
+                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:scale-[1.03] text-center">
+                                <h2 className="text-xl font-black text-white mb-2 uppercase tracking-widest leading-relaxed">
+                                    {session.user.fullName || session.user.email}
+                                </h2>
+                                <p className="text-[#C55A11] mb-8 uppercase tracking-[0.3em] text-[10px] font-bold">
+                                    {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? "GOUVERNANCE" : session.user.role}
+                                </p>
+                                <Link 
+                                    href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")}
+                                    className="inline-flex items-center justify-center w-full gap-3 py-5 bg-gradient-to-r from-[#C55A11] to-[#E87B2E] text-white rounded-2xl shadow-xl shadow-[#C55A11]/20 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
+                                >
+                                    Retourner à mon Espace
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group glass-card-premium px-10 py-10 bg-white rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
+                                    <button type="submit" className="w-full">
+                                        <span className="font-black uppercase tracking-[0.3em] text-black text-xs block mb-2">Accès Gouvernance</span>
+                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Contrôle DGI & Audit</span>
+                                    </button>
+                                </form>
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group glass-card-premium px-10 py-10 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center cursor-pointer">
+                                    <button type="submit" className="w-full">
+                                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Espace Bailleur</span>
+                                        <span className="text-[9px] font-black text-white/30 uppercase tracking-widest block">Gestion de Patrimoine</span>
+                                    </button>
+                                </form>
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group glass-card-premium px-10 py-10 bg-primary/90 backdrop-blur-xl rounded-[2.5rem] transition-all hover:scale-[1.03] active:scale-95 text-center border border-white/20 shadow-2xl shadow-primary/20 cursor-pointer">
+                                    <button type="submit" className="w-full">
+                                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Portail Locataire</span>
+                                        <span className="text-[9px] font-black text-white/60 uppercase tracking-widest block">Consultation de Bail</span>
+                                    </button>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </main>
                 <Footer />
@@ -169,14 +186,22 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                             ))}
                         </nav>
                         
-                        <div className="flex gap-4">
-                             <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }}>
-                                <button type="submit" className="px-6 py-2 h-full bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Propriétaire</button>
-                             </form>
-                             <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }}>
-                                <button type="submit" className="px-6 py-2 h-full bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Locataire</button>
-                             </form>
-                        </div>
+                        {session?.user ? (
+                            <div className="flex gap-4">
+                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")} className="px-6 py-2 bg-[#C55A11] text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all outline-none flex items-center justify-center shadow-lg shadow-[#C55A11]/20">
+                                    Retour au Tableau de Bord
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="flex gap-4">
+                                 <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }}>
+                                    <button type="submit" className="px-6 py-2 h-full bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Propriétaire</button>
+                                 </form>
+                                 <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }}>
+                                    <button type="submit" className="px-6 py-2 h-full bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Locataire</button>
+                                 </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </header>
@@ -190,7 +215,11 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                                 Le Registre <span className="text-primary italic">Locatif</span> National.
                             </h1>
                             <p className="text-xl text-gray-600 mb-12">Normalisation et sécurisation du marché immobilier ivoirien.</p>
-                            <Link href="/locataire/login" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block">Démarrer l'Expérience</Link>
+                            {session?.user ? (
+                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")} className="px-10 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block shadow-xl shadow-[#C55A11]/20">Retour au Tableau de Bord</Link>
+                            ) : (
+                                <Link href="/locataire/login" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block">Démarrer l'Expérience</Link>
+                            )}
                         </div>
                     </div>
                 </section>
