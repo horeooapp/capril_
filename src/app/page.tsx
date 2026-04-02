@@ -20,8 +20,6 @@ import RentRanking from "@/components/RentRanking";
 export const dynamic = "force-dynamic";
 
 export default async function Home(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const searchParams = await props.searchParams;
-  const isPreview = searchParams?.preview === "true";
   let session = null;
   let dbNews: any[] = [];
   let isLandingPageEnabled = false;
@@ -76,10 +74,15 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
   const ticker = <NewsTicker items={newsItems} />;
 
     // --- 2. ACCESS CONTROL & REDIRECTION ---
-    if (session?.user && !isPreview) {
-        if (isAdmin) redirect("/admin");
-        if (session.user.role === 'TENANT') redirect("/locataire");
-        redirect("/dashboard");
+    if (session?.user) {
+        if (isAdmin) {
+            // Admins are allowed to stay on the home page, but they should never see the marketing landing page.
+            // They must see the premium black portal dashboard.
+            isLandingPageEnabled = false;
+        } else {
+            if (session.user.role === 'TENANT') redirect("/locataire");
+            redirect("/dashboard");
+        }
     }
 
     if (!isLandingPageEnabled) {
