@@ -33,14 +33,12 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Mesh Background (Admin Style) */}
-      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+    <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
+      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
       <div className="px-4">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 institutional-header p-6 rounded-[2rem]">
           <div className="space-y-3">
             <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
             <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
@@ -59,7 +57,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
 
       {/* Internal Navigation Tabs */}
       <div className="px-4">
-        <div className="flex gap-2 bg-white/50 backdrop-blur-md p-2 rounded-[2rem] w-fit border border-white/50 shadow-xl shadow-blue-900/5">
+        <div className="flex gap-2 institutional-header p-2 rounded-[2rem] w-fit shadow-sm">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -99,9 +97,9 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
               <div className="space-y-12">
                 {/* Active Alerts - MM-07 Protocol */}
                 <div className="px-4">
-                  <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-red-500 blur-[120px] opacity-10 -mr-40 -mt-40 group-hover:opacity-20 transition-opacity"></div>
-                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 relative z-10">
+                  <div className="premium-stat-card p-10 relative overflow-hidden group border-red-100/50">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-red-500 blur-[120px] opacity-5 -mr-40 -mt-40 group-hover:opacity-10 transition-opacity"></div>
+                    <h3 className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 relative z-10">
                        <ShieldCheck size={16} className="text-red-500" />
                        Interventions Prioritaires • Protocole MM-07
                     </h3>

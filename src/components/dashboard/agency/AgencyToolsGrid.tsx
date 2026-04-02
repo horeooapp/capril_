@@ -20,7 +20,7 @@ export const AgencyToolsGrid: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
-              className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:border-slate-200 transition-all cursor-pointer group flex flex-col justify-between h-full"
+              className="p-6 premium-stat-card cursor-pointer group flex flex-col justify-between h-full"
             >
               <div className="flex justify-between items-start mb-6">
                 <div 
@@ -82,7 +82,7 @@ export const AgencyToolsGrid: React.FC = () => {
         })}
       </div>
 
-      <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6">
+      <div className="institutional-header rounded-3xl p-6 mt-8">
         <div className="flex justify-between items-center mb-4">
            <h3 className="text-sm font-black text-slate-800 tracking-widest uppercase italic">Lock-in Cumulative</h3>
            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">87 / 100</span>

@@ -34,11 +34,10 @@ function PropSectionHeader({ label, right }: any) {
 
 const StatCard = ({ label, value, icon, color, bg, href }: any) => {
   const inner = (
-    <div className={`rounded-2xl p-4 border flex flex-col gap-1 h-full ${href ? "hover:shadow-md transition-shadow cursor-pointer" : ""}`}
-      style={{ background: bg || T.grey1, borderColor: (color || T.grey2) + "40" }}>
-      <div className="text-2xl">{icon}</div>
-      <div className="text-xl font-black" style={{ color: color || T.navy }}>{value}</div>
-      <div className="text-[10px] font-bold text-[#6A7D9E] uppercase tracking-wider">{label}</div>
+    <div className={`premium-stat-card p-6 flex flex-col gap-2 h-full ${href ? "cursor-pointer" : ""}`}>
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm border" style={{ backgroundColor: bg || '#F9FAFB', borderColor: (color || '#E5E7EB') + "40", color: color || '#111827' }}>{icon}</div>
+      <div className="text-2xl font-black mt-2" style={{ color: '#111827' }}>{value}</div>
+      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{label}</div>
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : <div>{inner}</div>;
@@ -147,10 +146,8 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
   const tauxEncaissement = stats.totalLoyers > 0 ? Math.round((stats.encaisse / stats.totalLoyers) * 100) : 0;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Mesh Background (Admin Style) */}
-      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+    <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
+      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
 
@@ -212,7 +209,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
               { href: "/dashboard/manual",     icon: <BookOpen strokeWidth={2.5} size={28} />, label: "Manuel",       color: "#5B21B6" },
             ].map((m, i) => (
               <Link key={i} href={m.href}
-                className="relative overflow-hidden bg-white/60 backdrop-blur-2xl border border-white p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col items-center justify-center gap-3 hover:-translate-y-1"
+                className="relative overflow-hidden glass-card-premium p-5 rounded-3xl group flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02]"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-transparent pointer-events-none"></div>
                 <div 
@@ -232,24 +229,24 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
 
         {/* TAUX D'ENCAISSEMENT PROMINENT */}
         <section className="max-w-4xl mx-auto w-full">
-          <Link href="/dashboard/wallet" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary blur-[100px] opacity-10 -mr-32 -mt-32 group-hover:opacity-20 transition-opacity"></div>
+          <Link href="/dashboard/wallet" className="premium-stat-card p-10 block group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary blur-[100px] opacity-5 -mr-32 -mt-32 group-hover:opacity-10 transition-opacity"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-end mb-8">
                 <div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Indice de Collection Mensuel</p>
-                  <p className="text-5xl font-black text-gray-900 tracking-tighter leading-none italic">{tauxEncaissement}<span className="text-xl text-gray-400 font-bold not-italic ml-1">%</span></p>
+                  <p className="text-5xl font-black text-gray-900 tracking-tighter leading-none">{tauxEncaissement}<span className="text-xl text-gray-400 font-bold ml-1">%</span></p>
                 </div>
                 <Badge
                   label={tauxEncaissement === 100 ? "PARFAIT ✓" : tauxEncaissement >= 80 ? "CONFORME" : "VIGILANCE"}
                   color="white"
                   bg={tauxEncaissement === 100 ? T.green : tauxEncaissement >= 80 ? T.teal : T.orange} />
               </div>
-              <div className="h-4 bg-gray-50 rounded-full overflow-hidden border border-gray-100">
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
                 <div className="h-full rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${tauxEncaissement}%`, background: tauxEncaissement === 100 ? T.green : tauxEncaissement >= 80 ? T.teal : T.orange }} />
               </div>
-              <p className="text-[11px] font-bold text-gray-400 mt-6 uppercase tracking-widest">{fmt(stats.encaisse)} FCFA encaissés • Objectif {fmt(stats.totalLoyers)} FCFA</p>
+              <p className="text-[10px] font-bold text-gray-500 mt-6 uppercase tracking-widest">{fmt(stats.encaisse)} FCFA encaissés • Objectif {fmt(stats.totalLoyers)} FCFA</p>
             </div>
           </Link>
         </section>
@@ -274,8 +271,8 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
               const s = entiteStats(e);
               return (
                 <div key={e.id}
-                  className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl cursor-pointer hover:shadow-2xl transition-all group"
-                  style={{ borderLeftWidth: 8, borderLeftColor: s.impayes > 0 ? T.red : T.green }}
+                  className="premium-stat-card p-8 cursor-pointer group"
+                  style={{ borderLeftWidth: 6, borderLeftColor: s.impayes > 0 ? T.red : T.green }}
                   onClick={() => setSelectedEntite(selectedEntite?.id === e.id ? null : e)}>
                   <div className="flex items-center gap-6">
                     <div className="w-16 h-16 rounded-[1.5rem] bg-gray-50 border border-gray-100 flex items-center justify-center text-3xl flex-shrink-0 group-hover:bg-white transition-colors">{entiteIcon(e.type)}</div>

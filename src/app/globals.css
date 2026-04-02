@@ -192,3 +192,30 @@ input:not([type="checkbox"]):not([type="radio"]) {
 .animate-ticker-hover:hover {
   animation-play-state: paused;
 }
+
+/* Institutional Custom Classes */
+.institutional-gradient-bg {
+  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+}
+
+.institutional-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.premium-stat-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 10px 40px -10px rgba(13, 43, 110, 0.05);
+  border-radius: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.premium-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(13, 43, 110, 0.08);
+  border-color: rgba(13, 43, 110, 0.1);
+}
+

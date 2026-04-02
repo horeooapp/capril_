@@ -86,7 +86,7 @@ const SecTitle = ({ label, right }: { label: string, right?: React.ReactNode }) 
 );
 
 const Card = ({ children, className = "" }: any) => (
-  <div className={`glass-card-premium p-8 rounded-[2.5rem] border border-gray-100 ${className}`}>
+  <div className={`premium-stat-card p-8 ${className}`}>
     {children}
   </div>
 );
@@ -203,7 +203,7 @@ const Sidebar = ({bp, sideOpen, tab, goTab, data}: any)=>(
 );
 
 const Topbar = ({selBien, setSelBien, bp, setSideOpen, tab, user, data, devise, setDevise, op, impayesN, alertesSLA}: any)=>(
-  <div className="h-24 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-100 shadow-sm">
+  <div className="h-24 institutional-header border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-[100]">
     <div className="flex items-center gap-8">
       {selBien ? (
         <button onClick={()=>setSelBien(null)} className="h-12 px-6 bg-gray-50 border border-gray-100 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest text-[#0D2B6E] flex items-center gap-3 hover:bg-white transition-all">
@@ -559,10 +559,8 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
 
   return (
     <>
-      <div className="flex min-h-screen relative overflow-hidden font-sans text-gray-900">
-      {/* Mesh Background (Admin Style) */}
-      <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-      <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+      <div className="flex min-h-screen relative overflow-hidden font-sans text-gray-900 institutional-gradient-bg">
+      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
 
       <Sidebar bp={bp} sideOpen={sideOpen} tab={tab} goTab={goTab} data={data} />
 

@@ -63,7 +63,7 @@ const TabBtn = ({ id, active, icon: Icon, label, onClick }: any) => (
 )
 
 const KpiCard = ({ label, value, unit, icon: Icon, color, bg, sub }: any) => (
-  <div className="p-4 rounded-[28px] border border-slate-100 shadow-sm flex flex-col justify-between min-h-[130px]" style={{ background: bg }}>
+  <div className="premium-stat-card p-4 flex flex-col justify-between min-h-[130px]">
     <div className="flex justify-between items-start">
       <div className="p-2 rounded-xl bg-white/80 shadow-sm">
         <Icon size={16} style={{ color }} />
@@ -127,10 +127,8 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
     const impayes = properties.filter((p: any) => p.leases?.some((l: any) => l.receipts?.length === 0 || l.receipts[0]?.status !== 'paid'))
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
-            {/* Mesh Background (Admin Style) */}
-            <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse-slow"></div>
+        <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
+            <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
                 
@@ -179,7 +177,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                               <p className="relative z-10 text-[10px] font-black uppercase tracking-widest mt-1" style={{ color: m.color }}>{m.label}</p>
                             </>
                           );
-                          const className = `relative overflow-hidden bg-white/60 backdrop-blur-2xl border p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col items-center justify-center gap-3 w-full ${m.active ? 'border-white hover:-translate-y-1' : 'border-white/50 hover:-translate-y-1 block'}`;
+                          const className = `relative overflow-hidden glass-card-premium p-5 group flex flex-col items-center justify-center gap-3 w-full ${m.active ? 'border-white scale-105' : 'hover:scale-[1.02] block'}`;
                           
                           if (m.href) {
                             return <a key={i} href={m.href} className={className}>{inner}</a>;
