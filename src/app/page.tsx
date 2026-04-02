@@ -74,18 +74,11 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
   const ticker = <NewsTicker items={newsItems} />;
 
     // --- 2. ACCESS CONTROL & REDIRECTION ---
-    if (session?.user) {
-        if (isAdmin) {
-            // Admins are allowed to stay on the home page, but they should never see the marketing landing page.
-            // They must see the premium black portal dashboard.
-            isLandingPageEnabled = false;
-        } else {
-            if (session.user.role === 'TENANT') redirect("/locataire");
-            redirect("/dashboard");
-        }
-    }
+    // If the user is connected, we ALWAYS bypass the restricted "Black Portal" (which the user calls "landing page").
+    // We let them see the full, unrestricted White Portal (which the user calls "page d'accueil").
 
-    if (!isLandingPageEnabled) {
+    // Show Premium Lock Portal (Black) ONLY if the mode is restricted AND the user is not authenticated.
+    if (!isLandingPageEnabled && !session?.user) {
         // Show Premium Lock Portal (Black)
         return (
             <div className="relative min-h-screen bg-black overflow-hidden flex flex-col font-sans">
