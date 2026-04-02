@@ -76,7 +76,9 @@ export default function DashboardOverviewClient({
     agencyData?: any,
     tenantData?: { bail: any, receipts: any[] }
 }) {
-    if (user?.role === 'TENANT') {
+    const activeRole = user?.chosenRole || user?.role;
+
+    if (activeRole === 'TENANT') {
         const bailInfo = tenantData?.bail;
         // Logic for bailleur masking MM-04b
         const bailleurInfo = bailInfo ? (() => {
@@ -126,11 +128,11 @@ export default function DashboardOverviewClient({
         return <IntermediairePortalDashboard data={intermData} session={{ user }} />;
     }
 
-    if (user?.role === 'AGENCY') {
+    if (activeRole === 'AGENCY') {
         return <AgencyPortalWrapper />;
     }
 
-    if (user?.role === 'LANDLORD' || user?.role === 'LANDLORD_PRO') {
+    if (activeRole === 'LANDLORD' || activeRole === 'LANDLORD_PRO') {
         if (diasporaData) {
             return <DiasporaPortalWrapper />;
         }
