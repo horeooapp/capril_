@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -518,31 +518,29 @@ enum ProfileType {
 }
 
 model User {
-  id          String  @id @default(uuid()) @map("user_id")
-  phone       String? @unique
-  fullName    String? @map("full_name")
-  name        String?
-  firstName   String? @map("first_name")
-  lastName    String? @map("last_name")
-  birthDate   DateTime? @map("birth_date")
-  birthPlace  String? @map("birth_place")
-  neighborhood String? @map("neighborhood")
-  avatarUrl   String? @map("avatar_url")
-  email       String? @unique
-  role Role @default(TENANT)
-  profileType ProfileType? @map("profile_type")
-  kycLevel    Int     @default(0) @map("kyc_level") // 0-4
-  kycStatus   String  @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
-  status      String  @default("active") // active|suspended|inactive
-  password    String?
-  isCertified Boolean @default(false) @map("is_certified")
-  onboardingComplete Boolean @default(false) @map("onboarding_complete")
+  id                 String       @id @default(uuid()) @map("user_id")
+  phone              String?      @unique
+  firstName          String?      @map("first_name")
+  lastName           String?      @map("last_name")
+  birthDate          DateTime?    @map("birth_date")
+  birthPlace         String?      @map("birth_place")
+  neighborhood       String?      @map("neighborhood")
+  avatarUrl          String?      @map("avatar_url")
+  email              String?      @unique
+  role               Role         @default(TENANT)
+  profileType        ProfileType? @map("profile_type")
+  kycLevel           Int          @default(0) @map("kyc_level") // 0-4
+  kycStatus          String       @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
+  status             String       @default("active") // active|suspended|inactive
+  password           String?
+  isCertified        Boolean      @default(false) @map("is_certified")
+  onboardingComplete Boolean      @default(false) @map("onboarding_complete")
 
   // Capacite active en cours de session (C-AUTH-01)
-  capaciteActive    String?  @default("PROPRIETAIRE") @map("capacite_active")
+  capaciteActive String? @default("PROPRIETAIRE") @map("capacite_active")
 
   // Relation vers les capacites
-  capacites         UserCapacite[]
+  capacites UserCapacite[]
 
   legalEntityId String?      @map("legal_entity_id")
   legalEntity   LegalEntity? @relation(fields: [legalEntityId], references: [id])
@@ -582,18 +580,6 @@ model User {
   reversalTransactions       ReversalTransaction[]
 
   // ADD-19 QAPRIL Diaspora Package
-  diasporaAbonnement     Boolean   @default(false) @map("diaspora_abonnement")
-  diasporaAbonnementSince DateTime?  @map("diaspora_abonnement_since")
-  diasporaDevise         String    @default("FCFA") @map("diaspora_devise")
-  diasporaStripeId       String?   @map("diaspora_stripe_id")
-  diasporaWhatsapp       String?   @map("diaspora_whatsapp")
-  paysResidence          String?   @map("pays_residence")
-  fuseauHoraire          String    @default("Africa/Abidjan") @map("fuseau_horaire")
-  emailRapportMensuel    String?   @map("email_rapport_mensuel")
-  deviceFingerprint      String?   @map("device_fingerprint")
-  fraudScore             Int       @default(0) @map("fraud_score")
-  fraudFlags             Json?     @map("fraud_flags")
-
   // ADD-05 B2B & White Label
   whiteLabelConfig Json?   @map("white_label_config")
   companyRegNumber String? @map("company_reg_number")
@@ -606,31 +592,24 @@ model User {
   blacklistAuthored   FraudBlacklist[]       @relation("BlacklistAuthor")
 
   // ADD-XX Agence Profile
-  agenceProfile       AgenceProfile?         @relation("AgenceProfileUser")
+  agenceProfile AgenceProfile? @relation("AgenceProfileUser")
 
   // ADD-05 Freemium
-  activePlanTier     String            @default("LOCATAIRE") @map("active_plan_tier")
+  activePlanTier     String              @default("LOCATAIRE") @map("active_plan_tier")
   planExpiresAt      DateTime?           @map("plan_expires_at")
   subscriptionAudits SubscriptionAudit[]
 
   // ADD-09 Paywall (QAPRIL Wallet)
-  walletBalance     Int @default(0) @map("wallet_balance")
-  landlordCode      String? @unique @map("landlord_code") // Opaque BAI-XXX code
-  isConfidential    Boolean @default(false) @map("is_confidential") // Active le masque BAI-NNN
-
   // ADD-07 v3 Rechargement Automatique
-  walletSeuilAlerte   Float? @default(500) @map("wallet_seuil_alerte")
-  walletRappelActif   Boolean  @default(false) @map("wallet_rappel_actif")
-  walletRappelJour    Int      @default(1) @map("wallet_rappel_jour")
-  walletRappelMontant Float? @map("wallet_rappel_montant")
-  walletOperateurPrefere String @default("WAVE") @map("wallet_operateur_prefere")
-  walletCanalAlertePref String @default("WHATSAPP") @map("wallet_canal_alerte_pref")
-
   walletRechargeLinks  WalletRechargeLink[]
   walletRechargeConfig WalletRechargeConfig?
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  walletConfig    UserWalletConfig?
+  diasporaProfile UserDiasporaProfile?
+  fraudProfile    UserFraudProfile?
+  deletedAt       DateTime?            @map("deleted_at")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
 
   bailsDeclaratifsAsBailleur  BailDeclaratif[] @relation("BdqBailleur")
   bailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")
@@ -656,16 +635,16 @@ model User {
   notificationLogs       NotificationLog[]
 
   // ADD-11
-  propertyRoles      PropertyAccess[] @relation("UserRoles")
-  invitedRoles       PropertyAccess[] @relation("InvitedRoles")
-  smsDeclarations    SmsDeclaration[] @relation("TenantDeclarations")
-  smsConfirmations   SmsDeclaration[] @relation("ManagerConfirmations")
+  propertyRoles    PropertyAccess[] @relation("UserRoles")
+  invitedRoles     PropertyAccess[] @relation("InvitedRoles")
+  smsDeclarations  SmsDeclaration[] @relation("TenantDeclarations")
+  smsConfirmations SmsDeclaration[] @relation("ManagerConfirmations")
 
-  mandatsDonnes      MandatGestion[]  @relation("MandatsDonnes")
-  mandatsRecus       MandatGestion[]  @relation("MandatsRecus")
+  mandatsDonnes      MandatGestion[]        @relation("MandatsDonnes")
+  mandatsRecus       MandatGestion[]        @relation("MandatsRecus")
   regularisation     AgencesRegularisation?
-  gardeFousLogs      GardeFousLog[]   @relation("UserGardeFous")
-  adminGardeFousLogs GardeFousLog[]   @relation("AdminGardeFous")
+  gardeFousLogs      GardeFousLog[]         @relation("UserGardeFous")
+  adminGardeFousLogs GardeFousLog[]         @relation("AdminGardeFous")
 
   // ADD-12 Tarifs
   configTarifsModifies ConfigTarif[]       @relation("ConfigTarifModifier")
@@ -676,30 +655,30 @@ model User {
   configTarifsAudits   ConfigTarifsAudit[] @relation("ConfigTarifAuditAuthor")
 
   // ADD-13 Espace Locataire
-  locataireProfile       LocataireProfile?
-  signalements           SignalementLocataire[] @relation("UserSignalements")
-  preavis                PreavisBail[]          @relation("UserPreavis")
-  passeports             PasseportLocatif[]     @relation("UserPasseports")
-  alertesLoyer           AlerteLoyer[]          @relation("UserAlertesLoyer")
+  locataireProfile LocataireProfile?
+  signalements     SignalementLocataire[] @relation("UserSignalements")
+  preavis          PreavisBail[]          @relation("UserPreavis")
+  passeports       PasseportLocatif[]     @relation("UserPasseports")
+  alertesLoyer     AlerteLoyer[]          @relation("UserAlertesLoyer")
 
   // ADD-14
-  profilPublic           LocataireProfilPublic?
-  invitationsEnvoyees    InvitationBail[]       @relation("InvitantBail")
-  invitationsRecues      InvitationBail[]       @relation("LocataireInvite")
+  profilPublic            LocataireProfilPublic?
+  invitationsEnvoyees     InvitationBail[]       @relation("InvitantBail")
+  invitationsRecues       InvitationBail[]       @relation("LocataireInvite")
   consultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")
 
   // ADD-16 Succession
-  successionsOwned       SuccessionProprio[]
-  successionsAsTenant    SuccessionLocataire[] @relation("SuccessionAsTenant")
-  reclamations           ReclamationLocataire[] @relation("TenantReclamations")
-  iclEvents              IclEvent[]
-  
+  successionsOwned    SuccessionProprio[]
+  successionsAsTenant SuccessionLocataire[]  @relation("SuccessionAsTenant")
+  reclamations        ReclamationLocataire[] @relation("TenantReclamations")
+  iclEvents           IclEvent[]
+
   // ADD-15 Rapports & Champions
-  redactedEdls         EtatsDesLieux[]    @relation("RedacteurEdl")
-  rapportsMensuels     RapportMensuel[]
-  championProfile      ChampionProfile?
-  supervisedChampions  ChampionProfile[]  @relation("SuperviseurChampions")
-  prospectsConvertis   ChampionProspect[] @relation("ProspectConverti")
+  redactedEdls        EtatsDesLieux[]    @relation("RedacteurEdl")
+  rapportsMensuels    RapportMensuel[]
+  championProfile     ChampionProfile?
+  supervisedChampions ChampionProfile[]  @relation("SuperviseurChampions")
+  prospectsConvertis  ChampionProspect[] @relation("ProspectConverti")
 
   // ADD-16 Succession Locataire
   // beneficiaireNom      String? @map("beneficiaire_nom")
@@ -792,42 +771,39 @@ enum TypePropriete {
 }
 
 model Property {
-  groupeId      String?         @map("groupeId")
-  typePropriete TypePropriete?  @map("typePropriete")
-  nomBien       String?         @map("nomBien")
-  nomComplet    String?         @map("nomComplet")
-  niveau        String?
+  // groupeId supprimé
+  typePropriete  TypePropriete? @map("typePropriete")
+  nomBien        String?        @map("nomBien")
+  nomComplet     String?        @map("nomComplet")
+  niveau         String?
   estCourEntiere Boolean        @default(false) @map("estCourEntiere")
 
-  groupe        Property?       @relation("PropertyGroupe", fields: [groupeId], references: [id])
-  biens         Property[]      @relation("PropertyGroupe")
-
-  id                   String   @id @default(uuid()) @map("property_id")
-  propertyCode         String   @unique @map("property_code") // HAB-ABJ-YOP-00001
-  ownerUserId          String   @map("owner_id")
-  owner                User     @relation("PropertyOwner", fields: [ownerUserId], references: [id])
-  propertyType         String   @map("property_type") // apartment|house|studio|villa|room|commercial
-  leaseType            String   @default("residential") @map("lease_type") // residential|commercial
-  commune              String
-  address              String
-  areaSqm              Float? @map("area_sqm")
-  rooms                Int?
-  bedrooms             Int?
-  name                 String?  @map("name")
+  id           String  @id @default(uuid()) @map("property_id")
+  propertyCode String  @unique @map("property_code") // HAB-ABJ-YOP-00001
+  ownerUserId  String  @map("owner_id")
+  owner        User    @relation("PropertyOwner", fields: [ownerUserId], references: [id])
+  propertyType String  @map("property_type") // apartment|house|studio|villa|room|commercial
+  leaseType    String  @default("residential") @map("lease_type") // residential|commercial
+  commune      String
+  address      String
+  areaSqm      Float?  @map("area_sqm")
+  rooms        Int?
+  bedrooms     Int?
+  name         String? @map("name")
 
   // CORRECTIF C-01 - Hierarchie bien
-  unitLabel         String?  @map("unit_label")
-  typeStructure     String   @default("INDEPENDANT") @map("type_structure")
-  parentPropertyId  String?  @map("parent_property_id")
-  parentProperty    Property? @relation("PropertyUnits", fields: [parentPropertyId], references: [id])
-  units             Property[] @relation("PropertyUnits")
+  unitLabel        String?    @map("unit_label")
+  typeStructure    String     @default("INDEPENDANT") @map("type_structure")
+  parentPropertyId String?    @map("parent_property_id")
+  parentProperty   Property?  @relation("PropertyUnits", fields: [parentPropertyId], references: [id])
+  units            Property[] @relation("PropertyUnits")
 
   city                 String?  @map("city")
-  declaredRentFcfa     Float? @map("declared_rent_fcfa")
+  declaredRentFcfa     Float?   @map("declared_rent_fcfa")
   digitalPostalAddress String?  @map("digital_postal_address")
-  gpsLatitude          Float? @map("gps_latitude")
-  gpsLongitude         Float? @map("gps_longitude")
-  amenities String @default("[]")
+  gpsLatitude          Float?   @map("gps_latitude")
+  gpsLongitude         Float?   @map("gps_longitude")
+  amenities            String[]
   status               String   @default("draft") // draft|pending_verification|active|rented|suspended|rejected|archived
   documents            Json?
 
@@ -837,10 +813,10 @@ model Property {
   managedByUserId String? @map("managed_by")
   manager         User?   @relation("AgentProperties", fields: [managedByUserId], references: [id])
 
-  managementMode    String @default("DIRECT") @map("management_mode")
-  superficieM2      Float?       @map("superficie_m2")
-  usageTerrain      String?  @map("usage_terrain")
-  referenceCadastre String?        @map("reference_cadastre")
+  managementMode    String  @default("DIRECT") @map("management_mode")
+  superficieM2      Float?  @map("superficie_m2")
+  usageTerrain      String? @map("usage_terrain")
+  referenceCadastre String? @map("reference_cadastre")
 
   leases           Lease[]
   bailsDeclaratifs BailDeclaratif[]
@@ -850,11 +826,12 @@ model Property {
   invitations      InvitationBail[]
 
   // ADD-05 Horeoo
-  isHoreoo       Boolean  @default(false) @map("is_horeoo")
-  horeooDiscount Float? @map("horeoo_discount")
+  isHoreoo       Boolean @default(false) @map("is_horeoo")
+  horeooDiscount Float?  @map("horeoo_discount")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   // Relations ADD-03
   ticketsMaintenance TicketMaintenance[]
@@ -876,21 +853,22 @@ model Property {
   // ADD-17 & 18
   annoncesVoisinage AnnonceVoisinage[]
 
-  @@index([ownerUserId])
-  @@index([commune])
-  @@index([status])
-  @@index([parentPropertyId])
-
   // CONTRAINTE C-06 : unicite unitLabel insensible casse dans un parent
   // Gere par : index SQL raw idx_property_unit_unique_ci (C-06A)
   //            + validation dans creerBien() (C-06C)
   // Prisma ne supporte pas LOWER() dans @@unique sur SQLite
   // La contrainte est active en base via le CREATE UNIQUE INDEX
 
+  @@index([ownerUserId])
+  @@index([commune])
+  @@index([status])
+  @@index([parentPropertyId])
   @@map("properties")
 }
 
 model PropertyImage {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id         String   @id @default(uuid())
   propertyId String   @map("property_id")
   property   Property @relation(fields: [propertyId], references: [id])
@@ -904,30 +882,31 @@ model PropertyImage {
 // LEASES (Part 7 & 8)
 // ═══════════════════════════════════════════════════════
 model Lease {
+
   // ── CDC Formulaires : Intégrité & QR Code
-  sha256Hash        String?   @map("sha256Hash")
-  sha256CalculeLe   DateTime? @map("sha256CalculeLe")
-  qrCodeUrl         String?   @map("qrCodeUrl")
+  sha256Hash      String?   @map("sha256Hash")
+  sha256CalculeLe DateTime? @map("sha256CalculeLe")
+  qrCodeUrl       String?   @map("qrCodeUrl")
 
   // ── CDC Formulaires : Cycle de vie draft
-  statutDraft       String    @default("ACTIF") @map("statutDraft")
-  versionDraft      Int       @default(1)       @map("versionDraft")
-  draftData         Json?     @map("draftData")
+  statutDraft  String @default("ACTIF") @map("statutDraft")
+  versionDraft Int    @default(1) @map("versionDraft")
+  draftData    Json?  @map("draftData")
 
   // ── CDC Formulaires : Légal & Fiscal
-  loiApplicable     String    @default("Loi N°2018-575 du 13 juin 2018") @map("loiApplicable")
-  droitsDgiCalcules Float?    @map("droitsDgiCalcules")
-  fraisQapril       Float?    @map("fraisQapril")
+  loiApplicable     String @default("Loi N°2018-575 du 13 juin 2018") @map("loiApplicable")
+  droitsDgiCalcules Float? @map("droitsDgiCalcules")
+  fraisQapril       Float? @map("fraisQapril")
 
   // ── CDC Formulaires : Alertes expiration
-  alerte90j         Boolean   @default(true) @map("alerte90j")
-  alerte60j         Boolean   @default(true) @map("alerte60j")
-  alerte30j         Boolean   @default(true) @map("alerte30j")
+  alerte90j Boolean @default(true) @map("alerte90j")
+  alerte60j Boolean @default(true) @map("alerte60j")
+  alerte30j Boolean @default(true) @map("alerte30j")
 
   // ── CDC Formulaires : Seuils impayé
-  seuilJ3           Boolean   @default(true) @map("seuilJ3")
-  seuilJ7           Boolean   @default(true) @map("seuilJ7")
-  seuilJ15          Boolean   @default(true) @map("seuilJ15")
+  seuilJ3  Boolean @default(true) @map("seuilJ3")
+  seuilJ7  Boolean @default(true) @map("seuilJ7")
+  seuilJ15 Boolean @default(true) @map("seuilJ15")
 
   id               String       @id @default(uuid()) @map("lease_id")
   leaseReference   String       @unique @map("lease_reference") // BAIL-2026-00123
@@ -954,19 +933,18 @@ model Lease {
   chargesAmount  Int       @default(0) @map("charges_amount")
   paymentDay     Int       @default(5) @map("payment_day")
   depositAmount  Int       @default(0) @map("deposit_amount")
-  
+
   // NOUVEAUX CHAMPS — Pratique locative CI (DLP-001)
-  dateLimitePaiement Int     @default(5) @map("date_limite_paiement") // Jour du mois avant lequel le loyer est dû (ex: 5, 10, personalized)
-  paiementAvance     Boolean @default(true) @map("paiement_avance")    // TRUE = payé d'avance (standard CI)
+  paiementAvance Boolean @default(true) @map("paiement_avance") // TRUE = payé d'avance (standard CI)
 
   typeGestion    String? @default("directe") @map("type_gestion")
   bailleurMasque Boolean @default(false) @map("bailleur_masque")
 
-  status     String @default("DRAFT")
+  status     LeaseStatus @default(DRAFT)
   importMode Boolean     @default(false) @map("import_mode")
 
   // ADD-05 BDQ
-  typeBail                 String  @default("ECRIT") @map("type_bail")
+  typeBail                 TypeBail  @default(ECRIT) @map("type_bail")
   confirmationLocataireSms Boolean   @default(false) @map("confirmation_locataire_sms")
   confirmationLocataireAt  DateTime? @map("confirmation_locataire_at")
   preavisRequisMois        Int?      @default(1) @map("preavis_requis_mois")
@@ -1017,14 +995,15 @@ model Lease {
   reminders ReminderLog[]
 
   // ADD-18 Utilities
-  modeUtilities     String @default("NON_APPLICABLE") @map("mode_utilities")
-  identifiantCie    String?     @map("identifiant_cie")
-  identifiantSodeci String?     @map("identifiant_sodeci")
-  modeleRepartition String @default("PRORATA_CHAMBRE") @map("modele_repartition")
-  forfaitUtilitiesMensuel Float? @map("forfait_utilities_mensuel")
+  modeUtilities           String  @default("NON_APPLICABLE") @map("mode_utilities")
+  identifiantCie          String? @map("identifiant_cie")
+  identifiantSodeci       String? @map("identifiant_sodeci")
+  modeleRepartition       String  @default("PRORATA_CHAMBRE") @map("modele_repartition")
+  forfaitUtilitiesMensuel Float?  @map("forfait_utilities_mensuel")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   sourceMigrationId String?           @map("source_migration_id")
   sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
@@ -1033,36 +1012,35 @@ model Lease {
   smsDeclarations SmsDeclaration[] @relation("LeaseDeclarations")
 
   // ADD-13 Espace Locataire
-  signalements           SignalementLocataire[]
-  caution                CautionBail?
-  preavis                PreavisBail[]
-  alertesLoyer           AlerteLoyer[]
-  scoreConsent           Boolean @default(false) @map("score_consent")
-  
+  signalements SignalementLocataire[]
+  caution      CautionBail?
+  preavis      PreavisBail[]
+  alertesLoyer AlerteLoyer[]
+  scoreConsent Boolean                @default(false) @map("score_consent")
+
   // ADD-16 Succession & Litige
-  successions            SuccessionLocataire[]
-  reclamations           ReclamationLocataire[]
-  dossiersLitige         DossierLitigeCertifie[]
-  propositionsLoyer      PropositionLoyer[]
+  successions       SuccessionLocataire[]
+  reclamations      ReclamationLocataire[]
+  dossiersLitige    DossierLitigeCertifie[]
+  propositionsLoyer PropositionLoyer[]
 
   // ADD-17 & 18 Relations
-  messagesBail            MessagerieBail[]
-  facturesUtilities       FactureUtility[]
-  repartitionsUtilities   RepartitionUtility[]
+  messagesBail          MessagerieBail[]
+  facturesUtilities     FactureUtility[]
+  repartitionsUtilities RepartitionUtility[]
 
   // ADD-01 v2 M-FISCAL
-  nbPagesBail            Int?      @map("nb_pages_bail")
-  dureeMoisBail          Int?      @map("duree_mois_bail")
-  loyerTotalFcfa         Float?  @map("loyer_total_fcfa")
-  droitsEnregistrement   Float?  @map("droits_enregistrement")
-  fraisTimbre            Float?  @map("frais_timbre")
-  totalFiscalBail        Float?  @map("total_fiscal_bail")
-  statutFiscal           String    @default("NON_CALCULÉ") @map("statut_fiscal")
-  recuFiscalUrl          String?   @map("recu_fiscal_url")
-  recuFiscalHash         String?   @map("recu_fiscal_hash")
-  deadlineEnregistrement DateTime? @map("deadline_enregistrement")
-  certEnregistrementDgiUrl String? @map("cert_enregistrement_dgi_url")
+  nbPagesBail              Int?      @map("nb_pages_bail")
+  droitsEnregistrement     Float?    @map("droits_enregistrement")
+  fraisTimbre              Float?    @map("frais_timbre")
+  totalFiscalBail          Float?    @map("total_fiscal_bail")
+  statutFiscal             String    @default("NON_CALCULÉ") @map("statut_fiscal")
+  recuFiscalUrl            String?   @map("recu_fiscal_url")
+  recuFiscalHash           String?   @map("recu_fiscal_hash")
+  deadlineEnregistrement   DateTime? @map("deadline_enregistrement")
+  certEnregistrementDgiUrl String?   @map("cert_enregistrement_dgi_url")
 
+  @@index([status, createdAt])
   @@index([propertyId])
   @@index([tenantId])
   @@index([status])
@@ -1091,25 +1069,27 @@ model PaymentIntent {
 }
 
 model Receipt {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   // ── CDC Formulaires : SHA-256 & QR Code
-  sha256Hash          String?   @map("sha256Hash")
-  sha256CalculeLe     DateTime? @map("sha256CalculeLe")
-  qrCodeUrl           String?   @map("qrCodeUrl")
+  sha256Hash      String?   @map("sha256Hash")
+  sha256CalculeLe DateTime? @map("sha256CalculeLe")
+  qrCodeUrl       String?   @map("qrCodeUrl")
 
   // ── CDC Formulaires : Mois quittancé
-  moisConcerne        String?   @map("moisConcerne")
-  dateEncaissement    DateTime? @map("dateEncaissement")
+  moisConcerne     String?   @map("moisConcerne")
+  dateEncaissement DateTime? @map("dateEncaissement")
 
   // ── CDC Formulaires : Traçabilité webhook
-  flagWebhookNonRecu  Boolean   @default(false) @map("flagWebhookNonRecu")
-  preuveUrl           String?   @map("preuveUrl")
+  flagWebhookNonRecu Boolean @default(false) @map("flagWebhookNonRecu")
+  preuveUrl          String? @map("preuveUrl")
 
   // ── CDC Formulaires : Certification ARC
-  arcDemande          Boolean   @default(false) @map("arcDemande")
-  arcCertificationId  String?   @map("arcCertificationId")
-  arcHorodatage       DateTime? @map("arcHorodatage")
+  arcDemande         Boolean   @default(false) @map("arcDemande")
+  arcCertificationId String?   @map("arcCertificationId")
+  arcHorodatage      DateTime? @map("arcHorodatage")
 
-  commentaireInterne  String?   @map("commentaireInterne")
+  commentaireInterne String? @map("commentaireInterne")
 
   id            String       @id @default(uuid()) @map("receipt_id")
   receiptRef    String       @unique @map("receipt_ref") // REC-2026-04-00123AB (or QR- format)
@@ -1132,7 +1112,8 @@ model Receipt {
   digitalDeliveryId String?          @map("digital_delivery_id")
   delivery          DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  ColocPayment ColocPayment[]
 
   @@index([leaseId])
   @@index([periodMonth])
@@ -1174,16 +1155,16 @@ model ProcedurePhase {
 // CDC DEPOSIT (Part 10)
 // ═══════════════════════════════════════════════════════
 model CDCDeposit {
-  id           String              @id @default(uuid())
-  leaseId      String              @unique @map("lease_id")
-  lease        Lease               @relation(fields: [leaseId], references: [id])
+  id           String           @id @default(uuid())
+  leaseId      String           @unique @map("lease_id")
+  lease        Lease            @relation(fields: [leaseId], references: [id])
   amount       Int
-  initiator    String @default("OWNER")
-  cdcReference String?             @map("cdc_reference")
-  status       String    @default("AWAITING_PAYMENT")
-  proofHash    String?             @map("proof_hash")
-  consignedAt  DateTime?           @map("consigned_at")
-  returnedAt   DateTime?           @map("returned_at")
+  initiator    String           @default("OWNER")
+  cdcReference String?          @map("cdc_reference")
+  status       CDCDepositStatus @default(PENDING)
+  proofHash    String?          @map("proof_hash")
+  consignedAt  DateTime?        @map("consigned_at")
+  returnedAt   DateTime?        @map("returned_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1201,13 +1182,13 @@ model Mandate {
   property        Property      @relation(fields: [propertyId], references: [id])
   agentUserId     String?       @map("agent_id")
   agent           User?         @relation("AgentMandates", fields: [agentUserId], references: [id])
-  mandateType     String
-  commissionPct   Float?      @map("commission_pct")
+  mandateType     MandateType
+  commissionPct   Float?        @map("commission_pct")
   commissionFixed Int?          @map("commission_fixed")
   startDate       DateTime      @map("start_date")
   endDate         DateTime?     @map("end_date")
-  status          String @default("DRAFT")
-  scope String @default("[]") // List of units or total
+  status          MandateStatus @default(DRAFT)
+  scope           String[] // List of units or total
 
   signedAt          DateTime? @map("signed_at")
   cancelledAt       DateTime? @map("cancelled_at")
@@ -1227,16 +1208,16 @@ model Mandate {
 }
 
 model MandateHistory {
-  id               String      @id @default(uuid())
-  propertyId       String      @map("property_id")
-  mandateId        String      @map("mandate_id")
-  mandate          Mandate     @relation(fields: [mandateId], references: [id])
-  agentUserId      String?     @map("agent_id")
-  agent            User?       @relation("MandateHistoryAgent", fields: [agentUserId], references: [id])
-  mandateType      String @map("type_mandat")
-  startDate        DateTime    @map("periode_debut")
-  endDate          DateTime?   @map("periode_fin")
-  bailsTransferred Int?        @map("baux_actifs_transferes")
+  id               String    @id @default(uuid())
+  propertyId       String    @map("property_id")
+  mandateId        String    @map("mandate_id")
+  mandate          Mandate   @relation(fields: [mandateId], references: [id])
+  agentUserId      String?   @map("agent_id")
+  agent            User?     @relation("MandateHistoryAgent", fields: [agentUserId], references: [id])
+  mandateType      String    @map("type_mandat")
+  startDate        DateTime  @map("periode_debut")
+  endDate          DateTime? @map("periode_fin")
+  bailsTransferred Int?      @map("baux_actifs_transferes")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1249,10 +1230,10 @@ model Colocataire {
   lease        Lease     @relation(fields: [leaseId], references: [id])
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
-  role ColocRole @default(SECONDAIRE)
+  role         ColocRole @default(SECONDAIRE)
   partLoyer    Int?      @map("part_loyer")
-  pctLoyer     Float?  @map("pct_loyer")
-  modePaiement String @default("INDIVIDUEL") @map("mode_paiement")
+  pctLoyer     Float?    @map("pct_loyer")
+  modePaiement String    @default("INDIVIDUEL") @map("mode_paiement")
   dateEntree   DateTime  @map("date_entree")
   dateSortie   DateTime? @map("date_sortie")
   status       String    @default("ACTIF") // ACTIF | SORTI | EXCLU
@@ -1276,6 +1257,7 @@ model ColocPayment {
   status        String      @default("CONFIRMED")
   operatorRef   String?     @map("reference_mobile")
   receiptId     String?     @map("quittance_ind_id")
+  receipt       Receipt?    @relation(fields: [receiptId], references: [id])
 
   paidAt DateTime @default(now()) @map("paid_at")
 
@@ -1284,32 +1266,32 @@ model ColocPayment {
 }
 
 model MonthlyRentSynthesis {
-  id              String      @id @default(uuid()) @map("synthese_id")
-  leaseId         String      @map("bail_id")
-  lease           Lease       @relation(fields: [leaseId], references: [id])
-  month           String      @map("mois_concerne") // YYYY-MM
-  totalExpected   Int         @map("loyer_total_du")
-  amountCollected Int         @default(0) @map("montant_collecte")
-  status          String @default("EN_ATTENTE") @map("statut_mois")
-  globalReceiptId String?     @map("quittance_glob_id")
-  completedAt     DateTime?   @map("completed_at")
+  id              String    @id @default(uuid()) @map("synthese_id")
+  leaseId         String    @map("bail_id")
+  lease           Lease     @relation(fields: [leaseId], references: [id])
+  month           String    @map("mois_concerne") // YYYY-MM
+  totalExpected   Int       @map("loyer_total_du")
+  amountCollected Int       @default(0) @map("montant_collecte")
+  status          String    @default("EN_ATTENTE") @map("statut_mois")
+  globalReceiptId String?   @map("quittance_glob_id")
+  completedAt     DateTime? @map("completed_at")
 
   @@unique([leaseId, month])
   @@map("monthly_rent_synthesis")
 }
 
 model LandLeaseInfo {
-  id                String       @id @default(uuid())
-  leaseId           String       @unique @map("bail_id")
-  lease             Lease        @relation(fields: [leaseId], references: [id])
-  superficieLouee   Float      @map("superficie_louee_m2")
-  usage             String @map("usage_declare")
-  periodicity       String  @default("MENSUEL") @map("periodicite_loyer")
-  eventEndDate      DateTime?    @map("date_evenement_fin")
-  annualIndexation  Float?     @default(0) @map("indexation_annuelle")
-  conditions        String?      @map("conditions_usage")
-  hasEntryInventory Boolean      @default(false) @map("etat_des_lieux_entree")
-  hasExitInventory  Boolean      @default(false) @map("etat_des_lieux_sortie")
+  id                String    @id @default(uuid())
+  leaseId           String    @unique @map("bail_id")
+  lease             Lease     @relation(fields: [leaseId], references: [id])
+  superficieLouee   Float     @map("superficie_louee_m2")
+  usage             String    @map("usage_declare")
+  periodicity       String    @default("MENSUEL") @map("periodicite_loyer")
+  eventEndDate      DateTime? @map("date_evenement_fin")
+  annualIndexation  Float?    @default(0) @map("indexation_annuelle")
+  conditions        String?   @map("conditions_usage")
+  hasEntryInventory Boolean   @default(false) @map("etat_des_lieux_entree")
+  hasExitInventory  Boolean   @default(false) @map("etat_des_lieux_sortie")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1320,6 +1302,8 @@ model LandLeaseInfo {
 // SCORING & CERTIFICATES (Part 13 & 14)
 // ═══════════════════════════════════════════════════════
 model ReliabilityScore {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id        String @id @default(uuid())
   userId    String @map("user_id")
   user      User   @relation(fields: [userId], references: [id])
@@ -1333,6 +1317,8 @@ model ReliabilityScore {
 }
 
 model IclEvent {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id          String   @id @default(uuid()) @map("event_id")
   userId      String   @map("user_id")
   user        User     @relation(fields: [userId], references: [id])
@@ -1345,23 +1331,25 @@ model IclEvent {
 }
 
 model AgenceProfile {
-  id                String   @id @default(uuid())
-  userId            String   @unique @map("user_id")
-  user              User     @relation("AgenceProfileUser", fields: [userId], references: [id], onDelete: Cascade)
-  
-  nomAgence         String   @map("nom_agence")
-  rccm              String   @map("rccm")
-  dfe               String   @map("dfe")
-  numEnregistrement String?  @map("num_enregistrement")
-  adresseLocal      String?  @map("adresse_local")
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id     String @id @default(uuid())
+  userId String @unique @map("user_id")
+  user   User   @relation("AgenceProfileUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  nomAgence         String  @map("nom_agence")
+  rccm              String  @map("rccm")
+  dfe               String  @map("dfe")
+  numEnregistrement String? @map("num_enregistrement")
+  adresseLocal      String? @map("adresse_local")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("agence_profiles")
 }
 
 model Certificate {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id        String   @id @default(uuid()) @map("cert_id")
   userId    String   @map("user_id")
   user      User     @relation(fields: [userId], references: [id])
@@ -1390,13 +1378,13 @@ model Passport {
 // DISPUTES & MEDIATION (Part 16)
 // ═══════════════════════════════════════════════════════
 model Dispute {
-  id              String        @id @default(uuid())
-  leaseId         String        @map("lease_id")
-  lease           Lease         @relation(fields: [leaseId], references: [id])
+  id              String  @id @default(uuid())
+  leaseId         String  @map("lease_id")
+  lease           Lease   @relation(fields: [leaseId], references: [id])
   title           String
   description     String
-  amountInDispute Int?          @map("amount_in_dispute")
-  status          String @default("OPEN")
+  amountInDispute Int?    @map("amount_in_dispute")
+  status          String  @default("OPEN")
   resolution      String?
 
   messages DisputeMessage[]
@@ -1414,7 +1402,7 @@ model DisputeMessage {
   senderId    String   @map("sender_id")
   sender      User     @relation("DisputeSender", fields: [senderId], references: [id])
   content     String
-  attachments String @default("[]")
+  attachments String[]
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1459,16 +1447,16 @@ model Notification {
 }
 
 model ObservatorySnapshot {
-  id           String  @id @default(uuid())
+  id           String @id @default(uuid())
   commune      String
-  propertyType String  @map("property_type")
+  propertyType String @map("property_type")
   period       String // YYYY-QX
-  avgRent      Int     @map("avg_rent")
-  medianRent   Int     @map("median_rent")
-  minRent      Int     @map("min_rent")
-  maxRent      Int     @map("max_rent")
-  sampleCount  Int     @map("sample_count")
-  trendPct     Float @map("trend_pct")
+  avgRent      Int    @map("avg_rent")
+  medianRent   Int    @map("median_rent")
+  minRent      Int    @map("min_rent")
+  maxRent      Int    @map("max_rent")
+  sampleCount  Int    @map("sample_count")
+  trendPct     Float  @map("trend_pct")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1477,6 +1465,8 @@ model ObservatorySnapshot {
 }
 
 model MarketData {
+  createdAt DateTime @default(now()) @map("created_at")
+
   id           String @id @default(uuid())
   city         String
   commune      String
@@ -1495,17 +1485,17 @@ model MarketData {
 // ═══════════════════════════════════════════════════════
 
 model SuccessionProprio {
-  id              String   @id @default(uuid()) @map("succession_id")
-  landlordId      String   @map("landlord_id")
-  landlord        User     @relation(fields: [landlordId], references: [id])
-  declarantNom    String   @map("declarant_nom")
-  declarantLien   String   @map("declarant_lien") // heritier | notaire | locataire | autre
-  declarantPhone  String   @map("declarant_phone")
-  dateDeclaration DateTime @default(now()) @map("date_declaration")
-  statut          String   @default("EN_COURS") // EN_COURS | VERIFIE | TRANSFERE | ARCHIVE | REJETE
-  dateDeces       DateTime @map("date_deces")
-  acteDecesUrl    String?  @map("acte_deces_url")
-  heritierId      String?  @map("heritier_id")
+  id              String    @id @default(uuid()) @map("succession_id")
+  landlordId      String    @map("landlord_id")
+  landlord        User      @relation(fields: [landlordId], references: [id])
+  declarantNom    String    @map("declarant_nom")
+  declarantLien   String    @map("declarant_lien") // heritier | notaire | locataire | autre
+  declarantPhone  String    @map("declarant_phone")
+  dateDeclaration DateTime  @default(now()) @map("date_declaration")
+  statut          String    @default("EN_COURS") // EN_COURS | VERIFIE | TRANSFERE | ARCHIVE | REJETE
+  dateDeces       DateTime  @map("date_deces")
+  acteDecesUrl    String?   @map("acte_deces_url")
+  heritierId      String?   @map("heritier_id")
   dateTransfert   DateTime? @map("date_transfert")
   notes           String?
 
@@ -1516,27 +1506,27 @@ model SuccessionProprio {
 }
 
 model SuccessionLocataire {
-  id              String   @id @default(uuid()) @map("succession_id")
-  leaseId         String   @map("lease_id")
-  lease           Lease    @relation(fields: [leaseId], references: [id])
-  tenantId        String   @map("tenant_id")
-  tenant          User     @relation("SuccessionAsTenant", fields: [tenantId], references: [id])
-  dateDeces       DateTime @map("date_deces")
-  declarantType   String?  @map("declarant_type") // proprio | famille | beneficiaire | autre
-  declarantPhone  String?  @map("declarant_phone")
-  
-  beneficiaireId  String?  @map("beneficiaire_id") // Link to internal User if exists
+  id             String   @id @default(uuid()) @map("succession_id")
+  leaseId        String   @map("lease_id")
+  lease          Lease    @relation(fields: [leaseId], references: [id])
+  tenantId       String   @map("tenant_id")
+  tenant         User     @relation("SuccessionAsTenant", fields: [tenantId], references: [id])
+  dateDeces      DateTime @map("date_deces")
+  declarantType  String?  @map("declarant_type") // proprio | famille | beneficiaire | autre
+  declarantPhone String?  @map("declarant_phone")
+
+  beneficiaireId       String? @map("beneficiaire_id") // Link to internal User if exists
   beneficiaireExtNom   String? @map("beneficiaire_ext_nom")
   beneficiaireExtPhone String? @map("beneficiaire_ext_phone")
-  
-  loyerProrata    Float? @map("loyer_prorata")
-  cautionMontant  Float? @map("caution_montant")
-  cautionRestituee Boolean @default(false) @map("caution_restituee")
-  dateRestitution DateTime? @map("date_restitution")
-  
-  statut          String   @default("TRANSITION") // TRANSITION | CAUTION_TRAITEE | ARCHIVE | LITIGE
+
+  loyerProrata     Float?    @map("loyer_prorata")
+  cautionMontant   Float?    @map("caution_montant")
+  cautionRestituee Boolean   @default(false) @map("caution_restituee")
+  dateRestitution  DateTime? @map("date_restitution")
+
+  statut            String   @default("TRANSITION") // TRANSITION | CAUTION_TRAITEE | ARCHIVE | LITIGE
   dateFinTransition DateTime @map("date_fin_transition") // J+30 manual handle or auto
-  notes           String?
+  notes             String?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1555,8 +1545,8 @@ model ReclamationLocataire {
   preuveUrl       String?  @map("preuve_url")
   statut          String   @default("OUVERT") // OUVERT | EN_COURS | RESOLU | ESCALADE_CACI | REJETE
   dateEcheance    DateTime @map("date_echeance")
-  
-  dossierLitigeId String?  @map("dossier_litige_id")
+
+  dossierLitigeId String?                @map("dossier_litige_id")
   dossierLitige   DossierLitigeCertifie? @relation(fields: [dossierLitigeId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -1566,34 +1556,34 @@ model ReclamationLocataire {
 }
 
 model DossierLitigeCertifie {
-  id              String   @id @default(uuid()) @map("dlc_id")
-  leaseId         String   @map("lease_id")
-  lease           Lease    @relation(fields: [leaseId], references: [id])
-  uuid            String   @unique @default(uuid()) @map("dlc_uuid")
-  hashSha256      String   @map("dlc_hash_sha256")
-  statut          String   @default("GENERE") // GENERE | TRANSMIS_CACI | MEDIATION_EN_COURS | CLOTURE
-  refCaci         String?  @map("ref_caci")
-  issue           String?  // ACCORD_AMIABLE | SENTENCE_ARBITRALE | ABANDONNE
-  dateCloture     DateTime? @map("date_cloture")
-  notes           String?
+  id          String    @id @default(uuid()) @map("dlc_id")
+  leaseId     String    @map("lease_id")
+  lease       Lease     @relation(fields: [leaseId], references: [id])
+  uuid        String    @unique @default(uuid()) @map("dlc_uuid")
+  hashSha256  String    @map("dlc_hash_sha256")
+  statut      String    @default("GENERE") // GENERE | TRANSMIS_CACI | MEDIATION_EN_COURS | CLOTURE
+  refCaci     String?   @map("ref_caci")
+  issue       String? // ACCORD_AMIABLE | SENTENCE_ARBITRALE | ABANDONNE
+  dateCloture DateTime? @map("date_cloture")
+  notes       String?
 
-  reclamations    ReclamationLocataire[]
-  createdAt       DateTime @default(now()) @map("created_at")
+  reclamations ReclamationLocataire[]
+  createdAt    DateTime               @default(now()) @map("created_at")
 
   @@map("dossiers_litige_certifies")
 }
 
 model PropositionLoyer {
-  id              String   @id @default(uuid()) @map("prop_id")
-  leaseId         String   @map("lease_id")
-  lease           Lease    @relation(fields: [leaseId], references: [id])
-  montantActuel   Int      @map("montant_actuel")
-  nouveauMontant  Int      @map("nouveau_montant")
-  dateEffet       DateTime @map("date_effet")
-  raison          String?
-  statut          String   @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | EXPIRE
-  
-  consentement    ConsentementLoyer?
+  id             String   @id @default(uuid()) @map("prop_id")
+  leaseId        String   @map("lease_id")
+  lease          Lease    @relation(fields: [leaseId], references: [id])
+  montantActuel  Int      @map("montant_actuel")
+  nouveauMontant Int      @map("nouveau_montant")
+  dateEffet      DateTime @map("date_effet")
+  raison         String?
+  statut         String   @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | EXPIRE
+
+  consentement ConsentementLoyer?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1602,15 +1592,15 @@ model PropositionLoyer {
 }
 
 model ConsentementLoyer {
-  id              String   @id @default(uuid()) @map("consent_id")
-  propositionId   String   @unique @map("prop_id")
-  proposition     PropositionLoyer @relation(fields: [propositionId], references: [id])
-  reponse         Boolean // true = OUI, false = NON
-  commentaire     String?
-  ipAddress       String?  @map("ip_address")
-  userAgent       String?  @map("user_agent")
-  
-  createdAt       DateTime @default(now()) @map("created_at")
+  id            String           @id @default(uuid()) @map("consent_id")
+  propositionId String           @unique @map("prop_id")
+  proposition   PropositionLoyer @relation(fields: [propositionId], references: [id])
+  reponse       Boolean // true = OUI, false = NON
+  commentaire   String?
+  ipAddress     String?          @map("ip_address")
+  userAgent     String?          @map("user_agent")
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("consentements_loyer")
 }
@@ -1674,7 +1664,7 @@ model Insurance {
   lease    Lease           @relation(fields: [leaseId], references: [id])
   provider String
   policyNo String          @unique @map("policy_no")
-  status   String @default("ACTIVE")
+  status   InsuranceStatus @default(ACTIVE)
 
   claims InsuranceClaim[]
 
@@ -1685,12 +1675,12 @@ model Insurance {
 }
 
 model InsuranceClaim {
-  id          String               @id @default(uuid())
-  insuranceId String               @map("insurance_id")
-  insurance   Insurance            @relation(fields: [insuranceId], references: [id])
+  id          String    @id @default(uuid())
+  insuranceId String    @map("insurance_id")
+  insurance   Insurance @relation(fields: [insuranceId], references: [id])
   amount      Int
   reason      String
-  status      String @default("OPEN")
+  status      String    @default("OPEN")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1699,12 +1689,12 @@ model InsuranceClaim {
 }
 
 model RepaymentPlan {
-  id              String     @id @default(uuid())
-  leaseId         String     @map("lease_id")
-  lease           Lease      @relation(fields: [leaseId], references: [id])
+  id              String  @id @default(uuid())
+  leaseId         String  @map("lease_id")
+  lease           Lease   @relation(fields: [leaseId], references: [id])
   details         String
-  status          String @default("PROPOSED")
-  tenantSignature String?    @map("tenant_signature")
+  status          String  @default("PROPOSED")
+  tenantSignature String? @map("tenant_signature")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1715,11 +1705,11 @@ model RepaymentPlan {
 model Mediation {
   id      String          @id @default(uuid())
   leaseId String?         @unique @map("lease_id")
-  lease   Lease?           @relation(fields: [leaseId], references: [id])
+  lease   Lease?          @relation(fields: [leaseId], references: [id])
   bdqId   String?         @unique @map("bdq_id")
   bdq     BailDeclaratif? @relation(fields: [bdqId], references: [id])
   subject String
-  status  String @default("OPEN")
+  status  String          @default("OPEN")
 
   messages MediationMessage[]
 
@@ -1765,7 +1755,7 @@ model FiscalDossier {
   dureeBailMois        Int     @map("duree_bail_mois")
   dureeRetenueMois     Int     @map("duree_retenue_mois")
   baseCalcul           Int     @map("base_calcul")
-  tauxApplique         Float @default(0.0250) @map("taux_applique")
+  tauxApplique         Float   @default(0.0250) @map("taux_applique")
   droitsEnregistrement Int     @map("droits_enregistrement")
   fraisTimbre          Int     @default(1000) @map("frais_timbre")
   fraisQapril          Int     @map("frais_qapril")
@@ -1774,8 +1764,8 @@ model FiscalDossier {
   penaltyAmount        Int     @default(0) @map("penalty_amount")
   exonere              Boolean @default(false)
 
-  statut           String @default("EN_ATTENTE_DECLARATION")
-  dateLimiteLegale DateTime     @map("date_limite_legale")
+  statut           String   @default("EN_ATTENTE_DECLARATION")
+  dateLimiteLegale DateTime @map("date_limite_legale")
 
   cinetpayTransId    String?   @map("cinetpay_transaction_id")
   cinetpayPaymentUrl String?   @map("cinetpay_payment_url")
@@ -1816,10 +1806,10 @@ model PrepaymentRequest {
   landlordId String @map("landlord_id")
   landlord   User   @relation("LandlordValidations", fields: [landlordId], references: [id])
 
-  monthsCount Int                     @map("months_count")
-  totalAmount Int                     @map("total_amount")
+  monthsCount Int     @map("months_count")
+  totalAmount Int     @map("total_amount")
   reason      String?
-  status      String @default("PENDING")
+  status      String  @default("PENDING")
 
   rejectionReason String?   @map("rejection_reason")
   approvedAt      DateTime? @map("approved_at")
@@ -1840,6 +1830,7 @@ model PrepaymentRequest {
 // ═══════════════════════════════════════════════════════
 
 model PaymentPgw {
+
   id           String   @id @default(uuid()) @map("payment_id")
   leaseId      String   @map("lease_id")
   lease        Lease    @relation(fields: [leaseId], references: [id])
@@ -1851,7 +1842,7 @@ model PaymentPgw {
   beneficiaireId String @map("beneficiaire_id")
   beneficiaire   User   @relation("BeneficiaryTransactions", fields: [beneficiaireId], references: [id])
 
-  canal PaymentCanal
+  canal              PaymentCanal
   msisdnPayeur       String?      @map("msisdn_payeur")
   msisdnBeneficiaire String?      @map("msisdn_beneficiaire")
 
@@ -1879,43 +1870,36 @@ model PaymentPgw {
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
   // M-PAY-AUTO
-  reversalStatus   String        @default("PENDING") @map("reversal_status")
-  honorairesAgence Float?              @map("honoraires_agence")
+  reversalStatus   String                @default("PENDING") @map("reversal_status")
+  honorairesAgence Float?                @map("honoraires_agence")
   reversals        ReversalTransaction[]
 
+  @@index([beneficiaireId])
   @@index([leaseId, moisConcerne])
   @@index([statut, expiresAt])
   @@index([refInterne])
   @@map("payments_pgw")
 }
 
-
-
 model ReversalTransaction {
-  id           String       @id @default(uuid()) @map("reversal_id")
-  paymentId    String       @map("payment_id")
-  payment      PaymentPgw   @relation(fields: [paymentId], references: [id])
-  recipientId  String       @map("recipient_id")
-  recipient    User         @relation(fields: [recipientId], references: [id])
+  id           String     @id @default(uuid()) @map("reversal_id")
+  paymentId    String     @map("payment_id")
+  payment      PaymentPgw @relation(fields: [paymentId], references: [id])
+  recipientId  String     @map("recipient_id")
+  recipient    User       @relation(fields: [recipientId], references: [id])
   type         String
   amount       Float
-  status       String       @default("SUCCESS") // SUCCESS, FAILED
-  referencePgw String?      @map("reference_pgw")
+  status       String     @default("SUCCESS") // SUCCESS, FAILED
+  referencePgw String?    @map("reference_pgw")
 
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("reversal_transactions")
 }
 
-
-
-
-
-
-
 model PgwWebhook {
   id              String       @id @default(uuid()) @map("webhook_id")
-  canal PaymentCanal
+  canal           PaymentCanal
   refOperateur    String?      @map("ref_operateur")
   payload         Json
   signatureValide Boolean      @map("signature_valid")
@@ -1940,11 +1924,11 @@ model PgwMsisdnLookup {
 model PgwReconciliation {
   id                      String       @id @default(uuid()) @map("recon_id")
   dateRecon               DateTime     @map("date_recon")
-  canal PaymentCanal
+  canal                   PaymentCanal
   nbTransactionsQapril    Int          @map("nb_transactions_qapril")
   nbTransactionsOperateur Int?         @map("nb_transactions_operateur")
-  montantTotalQapril      Float      @map("montant_total_qapril")
-  montantTotalOperateur   Float?     @map("montant_total_operateur")
+  montantTotalQapril      Float        @map("montant_total_qapril")
+  montantTotalOperateur   Float?       @map("montant_total_operateur")
   nbEcarts                Int          @default(0) @map("nb_ecarts")
   ecartsDetail            Json?        @map("ecarts_detail")
   statut                  String       @default("EN_COURS")
@@ -1969,59 +1953,57 @@ model FeatureFlag {
 
 // M-EDL — États des Lieux
 model EtatsDesLieux {
-  id               String      @id @default(uuid()) @map("edl_id")
-  leaseId          String      @map("lease_id")
-  lease            Lease       @relation(fields: [leaseId], references: [id])
-  typeEdl          String     @map("type_edl") // ENTREE | SORTIE
-  statut EdlStatut @default(EN_COURS)
-  
-  redigeParId      String      @map("redige_par")
-  redigePar        User        @relation("RedacteurEdl", fields: [redigeParId], references: [id])
-  
-  agentId          String?     @map("agent_id")
-  agent            User?       @relation("AgentEdls", fields: [agentId], references: [id])
-  locataireId      String?     @map("locataire_id")
-  locataire        User?       @relation("LocataireEdls", fields: [locataireId], references: [id])
-  
-  dateEdl          DateTime    @default(now()) @map("date_edl")
-  sections         Json? // Sections/photos/etats
-  
-  indexEau         Float?    @map("index_eau")
-  indexElec        Float?    @map("index_elec")
-  
-  clesRemises      Int         @default(0) @map("cles_remises")
-  clesDetail       String?     @map("cles_detail")
-  
-  reservesLocataire String?    @map("reserves_locataire")
-  
-  confirmeProprio    Boolean   @default(false) @map("confirme_proprio")
-  confirmeLocataire  Boolean   @default(false) @map("confirme_locataire")
-  confirmeProprioAt  DateTime? @map("confirme_proprio_at")
-  confirmeLocataireAt DateTime? @map("confirme_locataire_at")
+  id      String    @id @default(uuid()) @map("edl_id")
+  leaseId String    @map("lease_id")
+  lease   Lease     @relation(fields: [leaseId], references: [id])
+  typeEdl String    @map("type_edl") // ENTREE | SORTIE
+  statut  EdlStatut @default(EN_COURS)
+
+  redigeParId String @map("redige_par")
+  redigePar   User   @relation("RedacteurEdl", fields: [redigeParId], references: [id])
+
+  agentId     String? @map("agent_id")
+  agent       User?   @relation("AgentEdls", fields: [agentId], references: [id])
+  locataireId String? @map("locataire_id")
+  locataire   User?   @relation("LocataireEdls", fields: [locataireId], references: [id])
+
+  dateEdl  DateTime @default(now()) @map("date_edl")
+  sections Json? // Sections/photos/etats
+
+  indexEau  Float? @map("index_eau")
+  indexElec Float? @map("index_elec")
+
+  clesRemises Int     @default(0) @map("cles_remises")
+  clesDetail  String? @map("cles_detail")
+
+  reservesLocataire String? @map("reserves_locataire")
+
+  confirmeProprio      Boolean   @default(false) @map("confirme_proprio")
+  confirmeLocataire    Boolean   @default(false) @map("confirme_locataire")
+  confirmeProprioAt    DateTime? @map("confirme_proprio_at")
+  confirmeLocataireAt  DateTime? @map("confirme_locataire_at")
   expireConfirmationAt DateTime? @map("expire_confirmation_at")
-  
-  refEdl           String?     @unique @map("ref_edl")
-  hashSha256       String?     @map("hash_sha256")
-  pdfUrl           String?     @map("pdf_url")
-  
-  edlEntreeId      String?     @map("edl_entree_id")
-  edlEntree        EtatsDesLieux? @relation("EdlEntreeSortie", fields: [edlEntreeId], references: [id])
-  edlSorties       EtatsDesLieux[] @relation("EdlEntreeSortie")
-  
-  createdAt        DateTime    @default(now()) @map("created_at")
+
+  refEdl     String? @unique @map("ref_edl")
+  hashSha256 String? @map("hash_sha256")
+  pdfUrl     String? @map("pdf_url")
+
+  edlEntreeId String?         @map("edl_entree_id")
+  edlEntree   EtatsDesLieux?  @relation("EdlEntreeSortie", fields: [edlEntreeId], references: [id])
+  edlSorties  EtatsDesLieux[] @relation("EdlEntreeSortie")
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("etats_des_lieux")
 }
 
-
-
 // M-SIGN — Signatures Électroniques
 model SignatureElectronique {
-  id           String    @id @default(uuid()) @map("sig_id")
-  documentType String    @map("document_type")
-  documentId   String    @map("document_id")
-  signataireId String    @map("signataire_id")
-  signataire   User      @relation(fields: [signataireId], references: [id])
+  id           String @id @default(uuid()) @map("sig_id")
+  documentType String @map("document_type")
+  documentId   String @map("document_id")
+  signataireId String @map("signataire_id")
+  signataire   User   @relation(fields: [signataireId], references: [id])
   statut       String @default("EN_ATTENTE")
 
   methode      String? // OTP_SMS | DESSIN | BIOMETRIQUE
@@ -2031,9 +2013,9 @@ model SignatureElectronique {
   hashDocument String? @map("hash_document")
 
   // CORRECTIF C-02 - Certification PSCE
-  psceCertifId  String?  @map("psce_certif_id")
-  psceCertifAt  DateTime? @map("psce_certif_at")
-  psceProvider  String?  @map("psce_provider")
+  psceCertifId String?   @map("psce_certif_id")
+  psceCertifAt DateTime? @map("psce_certif_at")
+  psceProvider String?   @map("psce_provider")
 
   signedAt  DateTime? @map("signed_at")
   expiresAt DateTime? @map("expires_at")
@@ -2042,58 +2024,54 @@ model SignatureElectronique {
   @@map("signatures_electroniques")
 }
 
-
-
-
-
 // M-MAINT — Maintenance & Travaux (ADD-17)
 model TicketMaintenance {
-  id                 String              @id @default(uuid()) @map("ticket_id")
-  ticketRef          String              @unique @map("ticket_ref") // MAI-0001
-  
-  logementId         String?             @map("unite_id")
-  logement           Property?           @relation(fields: [logementId], references: [id])
-  
-  leaseId            String              @map("lease_id")
-  lease              Lease               @relation(fields: [leaseId], references: [id])
-  
-  locataireId        String              @map("locataire_id")
-  locataire          User                @relation("MaintenanceDeclarant", fields: [locataireId], references: [id])
-  
-  categorie          String @map("categorie_v2")
-  description        String
-  
+  id        String @id @default(uuid()) @map("ticket_id")
+  ticketRef String @unique @map("ticket_ref") // MAI-0001
+
+  logementId String?   @map("unite_id")
+  logement   Property? @relation(fields: [logementId], references: [id])
+
+  leaseId String @map("lease_id")
+  lease   Lease  @relation(fields: [leaseId], references: [id])
+
+  locataireId String @map("locataire_id")
+  locataire   User   @relation("MaintenanceDeclarant", fields: [locataireId], references: [id])
+
+  categorie   String @map("categorie_v2")
+  description String
+
   // V1 Compatibility
-  photosUrls String @default("[]") @map("photos_urls")
-  urgence            String              @default("NORMALE") // URGENTE|NORMALE|BASSE
-  
+  photosUrls String[] @map("photos_urls")
+  urgence    String   @default("NORMALE") // URGENTE|NORMALE|BASSE
+
   // V2 requirements
-  photoUrl           String?             @map("photo_url")
-  photoHashSha256    String?             @map("photo_hash_sha256")
-  statut             String   @default("EN_ATTENTE")
-  
-  dateSignalement    DateTime            @default(now()) @map("date_signalement")
-  datePriseEnCharge  DateTime?           @map("date_prise_en_charge")
-  dateResolution     DateTime?           @map("date_resolution")
-  proprioVuAt        DateTime?           @map("proprio_vu_at")
-  nbReouvertures     Int                 @default(0) @map("nb_reouvertures")
-  commentaireProprio String?             @map("commentaire_proprio")
-  confirmationLoc    Boolean?            @map("confirmation_locataire")
-  dateConfirmation   DateTime?           @map("date_confirmation")
+  photoUrl        String? @map("photo_url")
+  photoHashSha256 String? @map("photo_hash_sha256")
+  statut          String  @default("EN_ATTENTE")
 
-  prestataireId      String?             @map("prestataire_id")
-  prestataire        Prestataire?        @relation(fields: [prestataireId], references: [id])
+  dateSignalement    DateTime  @default(now()) @map("date_signalement")
+  datePriseEnCharge  DateTime? @map("date_prise_en_charge")
+  dateResolution     DateTime? @map("date_resolution")
+  proprioVuAt        DateTime? @map("proprio_vu_at")
+  nbReouvertures     Int       @default(0) @map("nb_reouvertures")
+  commentaireProprio String?   @map("commentaire_proprio")
+  confirmationLoc    Boolean?  @map("confirmation_locataire")
+  dateConfirmation   DateTime? @map("date_confirmation")
 
-  devisMontant       Float?            @map("devis_montant")
-  coutFinal          Float?            @map("cout_final")
-  dateIntervention   DateTime?           @map("date_intervention")
+  prestataireId String?      @map("prestataire_id")
+  prestataire   Prestataire? @relation(fields: [prestataireId], references: [id])
 
-  noteLocataire      Int?                @map("note_locataire")
-  notePrestataire    Int?                @map("note_prestataire")
+  devisMontant     Float?    @map("devis_montant")
+  coutFinal        Float?    @map("cout_final")
+  dateIntervention DateTime? @map("date_intervention")
 
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  closedAt           DateTime?           @map("closed_at")
+  noteLocataire   Int? @map("note_locataire")
+  notePrestataire Int? @map("note_prestataire")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  closedAt  DateTime? @map("closed_at")
 
   @@index([leaseId])
   @@index([statut])
@@ -2101,13 +2079,13 @@ model TicketMaintenance {
 }
 
 model Prestataire {
-  id          String   @id @default(uuid()) @map("prestataire_id")
+  id          String  @id @default(uuid()) @map("prestataire_id")
   nom         String
   specialite  String
   telephone   String
   email       String?
   adresse     String?
-  noteMoyenne Float? @map("note_moyenne")
+  noteMoyenne Float?  @map("note_moyenne")
 
   tickets TicketMaintenance[]
 
@@ -2115,8 +2093,6 @@ model Prestataire {
 
   @@map("prestataires")
 }
-
-
 
 // M-CAND — Candidatures
 model Candidature {
@@ -2129,33 +2105,31 @@ model Candidature {
   nom           String
   prenom        String
   telephone     String
-  revenuMensuel Float? @map("revenu_mensuel")
+  revenuMensuel Float?  @map("revenu_mensuel")
   employeur     String?
-  scoreQapril   Int?     @map("score_qapril")
-  tauxEffort    Float? @map("taux_effort")
-  docsJsonb     Json?    @map("docs_jsonb")
+  scoreQapril   Int?    @map("score_qapril")
+  tauxEffort    Float?  @map("taux_effort")
+  docsJsonb     Json?   @map("docs_jsonb")
 
-  statut     String @default("SOUMISE")
-  noteAgence String?    @map("note_agence")
+  statut     String  @default("SOUMISE")
+  noteAgence String? @map("note_agence")
 
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("candidatures")
 }
 
-
-
 // M-CHARGES — Charges Locatives
 model ChargeParametrage {
-  id             String     @id @default(uuid()) @map("charge_id")
-  logementId     String     @map("logement_id")
-  logement       Property   @relation(fields: [logementId], references: [id])
-  typeCharge     String @map("type_charge")
-  mode           String     @default("FORFAIT") // FORFAIT | PROVISION_REELLE
+  id             String   @id @default(uuid()) @map("charge_id")
+  logementId     String   @map("logement_id")
+  logement       Property @relation(fields: [logementId], references: [id])
+  typeCharge     String   @map("type_charge")
+  mode           String   @default("FORFAIT") // FORFAIT | PROVISION_REELLE
   montantMensuel Float    @map("montant_mensuel")
   cleRepartition Float?   @map("cle_repartition")
-  actif          Boolean    @default(true)
-  createdAt      DateTime   @default(now()) @map("created_at")
+  actif          Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("charges_parametrage")
 }
@@ -2165,8 +2139,8 @@ model RegularisationCharges {
   leaseId              String    @map("bail_id")
   lease                Lease     @relation(fields: [leaseId], references: [id])
   annee                Int
-  provisionsCollectees Float   @map("provisions_collectees")
-  chargesReelles       Float   @map("charges_reelles")
+  provisionsCollectees Float     @map("provisions_collectees")
+  chargesReelles       Float     @map("charges_reelles")
   solde                Float
   statut               String    @default("CALCULE")
   notifieAt            DateTime? @map("notifie_at")
@@ -2175,10 +2149,9 @@ model RegularisationCharges {
   @@map("regularisations_charges")
 }
 
-
-
 // M-ANNONCES — Vacance Locative
 model Annonce {
+
   id         String   @id @default(uuid()) @map("annonce_id")
   logementId String   @map("logement_id")
   logement   Property @relation(fields: [logementId], references: [id])
@@ -2187,21 +2160,22 @@ model Annonce {
 
   titre        String
   description  String
-  loyerDemande Float @map("loyer_demande")
-  charges      Float @default(0)
-  photosUrls String @default("[]") @map("photos_urls")
+  loyerDemande Float    @map("loyer_demande")
+  charges      Float    @default(0)
+  photosUrls   String[] @map("photos_urls")
   criteres     Json?
 
-  statut         String   @default("ACTIVE") // ACTIVE|SUSPENDUE|ARCHIVEE
+  statut         String @default("ACTIVE") // ACTIVE|SUSPENDUE|ARCHIVEE
   diffusions     Json? // {jumia: true, whatsapp: true, expat: false}
-  nbContacts     Int      @default(0) @map("nb_contacts")
-  nbVisites      Int      @default(0) @map("nb_visites")
-  nbCandidatures Int      @default(0) @map("nb_candidatures")
+  nbContacts     Int    @default(0) @map("nb_contacts")
+  nbVisites      Int    @default(0) @map("nb_visites")
+  nbCandidatures Int    @default(0) @map("nb_candidatures")
   coutVacance    Float? @map("cout_vacance")
 
   publieeAt  DateTime? @map("publiee_at")
   archiveeAt DateTime? @map("archivee_at")
 
+  @@index([logementId])
   @@map("annonces")
 }
 
@@ -2214,11 +2188,11 @@ model CrgMensuel {
   agence         User   @relation("AgenceCrgs", fields: [agenceId], references: [id])
 
   mois             DateTime
-  loyersEncaisses  Float  @default(0) @map("loyers_encaisses")
-  chargesDeduites  Float  @default(0) @map("charges_deduites")
-  travauxDeduits   Float  @default(0) @map("travaux_deduits")
-  honorairesAgence Float  @default(0) @map("honoraires_agence")
-  reversementNet   Float  @map("reversement_net")
+  loyersEncaisses  Float    @default(0) @map("loyers_encaisses")
+  chargesDeduites  Float    @default(0) @map("charges_deduites")
+  travauxDeduits   Float    @default(0) @map("travaux_deduits")
+  honorairesAgence Float    @default(0) @map("honoraires_agence")
+  reversementNet   Float    @map("reversement_net")
 
   reversementEffectueAt DateTime? @map("reversement_effectue_at")
   pdfUrl                String?   @map("pdf_url")
@@ -2237,7 +2211,7 @@ model AgendaEvenement {
   agentId  String? @map("agent_id")
   agent    User?   @relation("AgentEvents", fields: [agentId], references: [id])
 
-  typeEvent   String @map("type_event")
+  typeEvent   String  @map("type_event")
   titre       String
   description String?
 
@@ -2258,8 +2232,6 @@ model AgendaEvenement {
   @@map("agenda_evenements")
 }
 
-
-
 // ═══════════════════════════════════════════════════════
 // ADD-05 NEW MODELS
 // ═══════════════════════════════════════════════════════
@@ -2269,10 +2241,10 @@ model TvaTransaction {
   paymentId      String     @map("payment_id")
   payment        PaymentPgw @relation(fields: [paymentId], references: [id])
   serviceType    String     @map("service_type")
-  montantHt      Float    @map("montant_ht")
-  tauxTva        Float    @default(18.00) @map("taux_tva")
-  montantTva     Float    @map("montant_tva")
-  montantTtc     Float    @map("montant_ttc")
+  montantHt      Float      @map("montant_ht")
+  tauxTva        Float      @default(18.00) @map("taux_tva")
+  montantTva     Float      @map("montant_tva")
+  montantTtc     Float      @map("montant_ttc")
   periodeFiscale DateTime   @map("periode_fiscale")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -2311,13 +2283,13 @@ model FraudBlacklist {
 }
 
 model SubscriptionAudit {
-  id           String   @id @default(uuid()) @map("sub_audit_id")
-  userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id])
-  oldTier      String @map("old_tier")
-  newTier      String @map("new_tier")
+  id           String  @id @default(uuid()) @map("sub_audit_id")
+  userId       String  @map("user_id")
+  user         User    @relation(fields: [userId], references: [id])
+  oldTier      String  @map("old_tier")
+  newTier      String  @map("new_tier")
   reason       String?
-  executedById String?  @map("executed_by")
+  executedById String? @map("executed_by")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -2338,14 +2310,12 @@ model LegalProcedure {
   @@map("legal_procedures")
 }
 
-
-
 model CoopGroup {
-  id          String  @id @default(uuid()) @map("coop_id")
-  leaseId     String  @unique @map("lease_id")
-  lease       Lease   @relation(fields: [leaseId], references: [id])
+  id          String @id @default(uuid()) @map("coop_id")
+  leaseId     String @unique @map("lease_id")
+  lease       Lease  @relation(fields: [leaseId], references: [id])
   name        String
-  totalTarget Float @map("total_target")
+  totalTarget Float  @map("total_target")
 
   members User[] @relation("CoopMembers")
 
@@ -2355,13 +2325,13 @@ model CoopGroup {
 }
 
 model MigrationSession {
-  id             String          @id @default(uuid()) @map("session_id")
-  agenceId       String          @map("agence_id")
-  agence         User            @relation(fields: [agenceId], references: [id])
-  fichierNom     String          @map("fichier_nom")
-  fichierFormat  String          @map("fichier_format") // EXCEL|CSV|PDF|MANUAL
-  sourceLogiciel String?         @map("source_logiciel")
-  statut         String @default("UPLOADE")
+  id             String  @id @default(uuid()) @map("session_id")
+  agenceId       String  @map("agence_id")
+  agence         User    @relation(fields: [agenceId], references: [id])
+  fichierNom     String  @map("fichier_nom")
+  fichierFormat  String  @map("fichier_format") // EXCEL|CSV|PDF|MANUAL
+  sourceLogiciel String? @map("source_logiciel")
+  statut         String  @default("UPLOADE")
 
   nbLogements  Int @default(0) @map("nb_logements")
   nbLocataires Int @default(0) @map("nb_locataires")
@@ -2388,6 +2358,8 @@ model MigrationSession {
 }
 
 model MigrationStaging {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id         String           @id @default(uuid()) @map("staging_id")
   sessionId  String           @map("session_id")
   session    MigrationSession @relation(fields: [sessionId], references: [id])
@@ -2407,20 +2379,18 @@ model MigrationStaging {
   @@map("migration_staging")
 }
 
-
-
 // ═══════════════════════════════════════════════════════
 // FINAL SPRINT MODELS (EDL, SIG, RECOUVREMENT)
 // ═══════════════════════════════════════════════════════
 
 model Inspection {
-  id           String         @id @default(uuid()) @map("insp_id")
-  leaseId      String         @map("lease_id")
-  lease        Lease          @relation(fields: [leaseId], references: [id])
+  id           String   @id @default(uuid()) @map("insp_id")
+  leaseId      String   @map("lease_id")
+  lease        Lease    @relation(fields: [leaseId], references: [id])
   type         String
-  status       String         @default("PLANIFIEE") // PLANIFIEE|EN_COURS|TERMINEE
+  status       String   @default("PLANIFIEE") // PLANIFIEE|EN_COURS|TERMINEE
   date         DateTime
-  generalScore Int?           @map("general_score") // 0-100
+  generalScore Int?     @map("general_score") // 0-100
   comments     String?
 
   rooms InspectionRoom[]
@@ -2431,22 +2401,18 @@ model Inspection {
   @@map("inspections")
 }
 
-
-
 model InspectionRoom {
   id           String     @id @default(uuid()) @map("room_id")
   inspectionId String     @map("inspection_id")
   inspection   Inspection @relation(fields: [inspectionId], references: [id])
   name         String // Salon, Chambre 1, etc.
-  status       String @default("GOOD")
+  status       String     @default("GOOD")
   comments     String?
 
   photos InspectionPhoto[]
 
   @@map("inspection_rooms")
 }
-
-
 
 model InspectionPhoto {
   id               String         @id @default(uuid()) @map("photo_id")
@@ -2461,27 +2427,22 @@ model InspectionPhoto {
 }
 
 model ReminderLog {
-  id      String       @id @default(uuid()) @map("log_id")
-  leaseId String       @map("lease_id")
-  lease   Lease        @relation(fields: [leaseId], references: [id])
+  id      String   @id @default(uuid()) @map("log_id")
+  leaseId String   @map("lease_id")
+  lease   Lease    @relation(fields: [leaseId], references: [id])
   type    String
-  sentAt  DateTime     @default(now()) @map("sent_at")
-  status  String       @default("SENT")
+  sentAt  DateTime @default(now()) @map("sent_at")
+  status  String   @default("SENT")
 
   @@map("reminder_logs")
 }
-
-
-
-
-
-
 
 // ═══════════════════════════════════════════════════════
 // BAILS DÉCLARATIFS (ADD-06 M-BAIL-VERBAL)
 // ═══════════════════════════════════════════════════════
 
 model BailDeclaratif {
+
   id          String    @id @default(uuid()) @map("bdq_id")
   bailleurId  String    @map("bailleur_id")
   bailleur    User      @relation("BdqBailleur", fields: [bailleurId], references: [id])
@@ -2495,16 +2456,16 @@ model BailDeclaratif {
   telephoneLocataire     String    @map("telephone_locataire")
   descriptionLogement    String    @map("description_logement")
   adresseLibre           String?   @map("adresse_libre")
-  loyerDeclareMensuel    Float   @map("loyer_declare_mensuel")
+  loyerDeclareMensuel    Float     @map("loyer_declare_mensuel")
   dateEntreeEstimee      DateTime? @map("date_entree_estimee")
   precisionDateEntree    String    @default("EXACTE") @map("precision_date_entree")
   identiteIncomplete     Boolean   @default(false) @map("identite_incomplete")
   sourceCreation         String    @default("FORM") @map("source_creation")
 
-  statut BdqStatut @default(PENDING_LOCATAIRE)
+  statut                 BdqStatut @default(PENDING_LOCATAIRE)
   confirmationLocataire  Boolean?  @map("confirmation_locataire")
   confirmationAt         DateTime? @map("confirmation_at")
-  contrePropositionLoyer Float?  @map("contre_proposition_loyer")
+  contrePropositionLoyer Float?    @map("contre_proposition_loyer")
   motifRefus             String?   @map("motif_refus")
 
   agentConfirmantId     String?   @map("agent_confirmant_id")
@@ -2525,15 +2486,20 @@ model BailDeclaratif {
   bdqConversationState BdqConversationState? @relation("BdqConv")
   mediation            Mediation?
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
+  @@index([locataireId])
+  @@index([propertyId])
   @@index([bailleurId])
   @@index([telephoneLocataire])
   @@map("bails_declaratifs")
 }
 
 model BdqSmsLog {
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   id           String         @id @default(uuid()) @map("sms_id")
   bdqId        String         @map("bdq_id")
   bdq          BailDeclaratif @relation(fields: [bdqId], references: [id])
@@ -2552,8 +2518,8 @@ model BdqHistoriqueLoyer {
   id                    String         @id @default(uuid()) @map("hist_id")
   bdqId                 String         @map("bdq_id")
   bdq                   BailDeclaratif @relation(fields: [bdqId], references: [id])
-  ancienLoyer           Float        @map("ancien_loyer")
-  nouveauLoyer          Float        @map("nouveau_loyer")
+  ancienLoyer           Float          @map("ancien_loyer")
+  nouveauLoyer          Float          @map("nouveau_loyer")
   motif                 String?
   confirmationLocataire Boolean?       @map("confirmation_locataire")
   modifieParId          String?        @map("modifie_par")
@@ -2565,37 +2531,37 @@ model BdqHistoriqueLoyer {
 }
 
 model BdqConversationState {
-  id            String        @id @default(uuid())
-  bailleurId    String        @map("bailleur_id")
-  bailleur      User          @relation("BdqConvBailleur", fields: [bailleurId], references: [id])
-  legalEntityId String?       @map("legal_entity_id")
-  legalEntity   LegalEntity?  @relation("BdqConvLegalEntity", fields: [legalEntityId], references: [id])
-  canal PaymentCanal // WHATSAPP | APP_CHAT
-  canalRef      String?       @unique @map("canal_ref")
-  statut        String @default("EN_COURS")
+  id            String       @id @default(uuid())
+  bailleurId    String       @map("bailleur_id")
+  bailleur      User         @relation("BdqConvBailleur", fields: [bailleurId], references: [id])
+  legalEntityId String?      @map("legal_entity_id")
+  legalEntity   LegalEntity? @relation("BdqConvLegalEntity", fields: [legalEntityId], references: [id])
+  canal         NotifCanal // WHATSAPP | APP_CHAT
+  canalRef      String?      @unique @map("canal_ref")
+  statut        String       @default("EN_COURS")
 
   // Extracted fields
   nomLocataireExtrait        String?   @map("nom_locataire_extrait")
   telephoneExtrait           String?   @map("telephone_extrait")
   descriptionLogementExtrait String?   @map("description_logement_extrait")
-  loyerExtrait               Float?  @map("loyer_extrait")
+  loyerExtrait               Float?    @map("loyer_extrait")
   dateEntreeExtraite         DateTime? @map("date_entree_extraite")
   precisionDate              String    @default("APPROXIMATIVE") @map("precision_date")
   telephoneManquant          Boolean   @default(false) @map("telephone_manquant")
   identiteIncomplete         Boolean   @default(false) @map("identite_incomplete")
 
   // History
-  messagesHistory String @default("[]") @map("messages_history")
-  nbEchanges      Int     @default(0) @map("nb_echanges")
-  champEnAttente  String? @map("champ_en_attente")
-  pauseReason     String? @map("pause_reason")
+  messagesHistory String[] @map("messages_history")
+  nbEchanges      Int      @default(0) @map("nb_echanges")
+  champEnAttente  String?  @map("champ_en_attente")
+  pauseReason     String?  @map("pause_reason")
 
   bdqCreeId String?         @unique @map("bdq_cree_id")
   bdqCree   BailDeclaratif? @relation("BdqConv", fields: [bdqCreeId], references: [id])
 
   // Costs
-  tokensEntreeTotal Int     @default(0) @map("tokens_entree_total")
-  tokensSortieTotal Int     @default(0) @map("tokens_sortie_total")
+  tokensEntreeTotal Int   @default(0) @map("tokens_entree_total")
+  tokensSortieTotal Int   @default(0) @map("tokens_sortie_total")
   coutEstimeFcfa    Float @default(0) @map("cout_estime_fcfa")
 
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -2619,7 +2585,7 @@ model PropertyMaintenance {
   cost        Float?
   date        DateTime @default(now())
   provider    String? // Name of the company/craftsman
-  attachments String @default("[]") // Links to invoices/photos
+  attachments String[] // Links to invoices/photos
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2644,9 +2610,6 @@ model PropertyDocument {
 // ═══════════════════════════════════════════════════════
 // NOTIFICATIONS (Part 17 / ADD-09)
 // ═══════════════════════════════════════════════════════
-
-
-
 
 model NotificationPreference {
   id     String @id @default(uuid()) @map("pref_id")
@@ -2680,17 +2643,17 @@ model NotificationPreference {
 }
 
 model NotificationLog {
-  id             String      @id @default(uuid()) @map("notif_id")
-  userId         String      @map("user_id")
-  user           User        @relation(fields: [userId], references: [id])
-  canal PaymentCanal
-  typeEvenement  String      @map("type_evenement")
-  referenceId    String?     @map("reference_id")
-  templateId     String?     @map("template_id")
-  contenuPreview String?     @map("contenu_preview")
-  statut         String @default("EN_ATTENTE")
-  nbTentatives   Int         @default(0) @map("nb_tentatives")
-  erreurDetail   String?     @map("erreur_detail")
+  id             String     @id @default(uuid()) @map("notif_id")
+  userId         String     @map("user_id")
+  user           User       @relation(fields: [userId], references: [id])
+  canal          NotifCanal
+  typeEvenement  String     @map("type_evenement")
+  referenceId    String?    @map("reference_id")
+  templateId     String?    @map("template_id")
+  contenuPreview String?    @map("contenu_preview")
+  statut         String     @default("EN_ATTENTE")
+  nbTentatives   Int        @default(0) @map("nb_tentatives")
+  erreurDetail   String?    @map("erreur_detail")
 
   envoyeAt  DateTime? @map("envoye_at")
   livreAt   DateTime? @map("livre_at")
@@ -2706,91 +2669,84 @@ model NotificationLog {
 // ADD-11 : Rôles & Réclamations
 // ═══════════════════════════════════════════════════════
 
-
-
-
-
-
-
-
 model PropertyAccess {
-  id                  String        @id @default(uuid()) @map("acces_id")
-  propertyId          String        @map("bien_id")
-  userId              String        @map("user_id")
-  role Role
-  profil              String? @map("profil_intermediaire")
-  statut              String        @default("EN_ATTENTE") // EN_ATTENTE | ACTIF | SUSPENDU | REVOQUE | EXPIRE
-  
-  justificatifType    String?       @map("justificatif_type")
-  justificatifNumero  String?       @map("justificatif_numero")
-  justificatifValide  Boolean       @default(false) @map("justificatif_valide")
-  justificatifVerifieAt DateTime?   @map("justificatif_verifie_at")
-  
-  invitedById         String?       @map("invite_par")
-  invitedAt           DateTime?     @default(now()) @map("invite_at")
-  acceptedAt          DateTime?     @map("accepte_at")
-  revokedAt           DateTime?     @map("revoque_at")
-  mandatId            String?       @map("mandat_id")
-  
-  dateDebut           DateTime?     @default(now()) @map("date_debut")
-  dateFin             DateTime?     @map("date_fin")
-  note                String?
+  id         String  @id @default(uuid()) @map("acces_id")
+  propertyId String  @map("bien_id")
+  userId     String  @map("user_id")
+  role       Role
+  profil     String? @map("profil_intermediaire")
+  statut     String  @default("EN_ATTENTE") // EN_ATTENTE | ACTIF | SUSPENDU | REVOQUE | EXPIRE
 
-  property            Property      @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
-  user                User          @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
-  invitedBy           User?         @relation("InvitedRoles", fields: [invitedById], references: [id], onDelete: SetNull)
-  mandat              MandatGestion? @relation(fields: [mandatId], references: [id])
+  justificatifType      String?   @map("justificatif_type")
+  justificatifNumero    String?   @map("justificatif_numero")
+  justificatifValide    Boolean   @default(false) @map("justificatif_valide")
+  justificatifVerifieAt DateTime? @map("justificatif_verifie_at")
+
+  invitedById String?   @map("invite_par")
+  invitedAt   DateTime? @default(now()) @map("invite_at")
+  acceptedAt  DateTime? @map("accepte_at")
+  revokedAt   DateTime? @map("revoque_at")
+  mandatId    String?   @map("mandat_id")
+
+  dateDebut DateTime? @default(now()) @map("date_debut")
+  dateFin   DateTime? @map("date_fin")
+  note      String?
+
+  property  Property       @relation("PropertyRoles", fields: [propertyId], references: [id], onDelete: Cascade)
+  user      User           @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User?          @relation("InvitedRoles", fields: [invitedById], references: [id], onDelete: SetNull)
+  mandat    MandatGestion? @relation(fields: [mandatId], references: [id])
 
   @@unique([propertyId, userId])
   @@map("bien_acces")
 }
 
 model MandatGestion {
-  id                String       @id @default(uuid()) @map("mandat_id")
-  proprietaireId    String       @map("proprietaire_id")
-  intermediaireId   String       @map("intermediaire_id")
-  profil            String
-  biensConcernes String @default("[]") @map("biens_concernes") // IDs des biens
-  dateDebut         DateTime     @default(now()) @map("date_debut")
-  dateFin           DateTime?    @map("date_fin")
-  remuneration      String?      @default("GRATUIT")
-  permissions       Json         @map("permissions")
-  statut            String       @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | REVOQUE | EXPIRE
-  signatureProprio  DateTime?    @map("signature_proprio")
-  signatureInterm   DateTime?    @map("signature_interm")
-  hashSha256        String?      @map("hash_sha256")
-  createdAt         DateTime     @default(now()) @map("created_at")
+  id               String    @id @default(uuid()) @map("mandat_id")
+  proprietaireId   String    @map("proprietaire_id")
+  intermediaireId  String    @map("intermediaire_id")
+  profil           String
+  biensConcernes   String[]  @map("biens_concernes") // IDs des biens
+  dateDebut        DateTime  @default(now()) @map("date_debut")
+  dateFin          DateTime? @map("date_fin")
+  remuneration     String?   @default("GRATUIT")
+  permissions      Json      @map("permissions")
+  statut           String    @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | REVOQUE | EXPIRE
+  signatureProprio DateTime? @map("signature_proprio")
+  signatureInterm  DateTime? @map("signature_interm")
+  hashSha256       String?   @map("hash_sha256")
+  createdAt        DateTime  @default(now()) @map("created_at")
 
-  proprietaire      User         @relation("MandatsDonnes", fields: [proprietaireId], references: [id])
-  intermediaire     User         @relation("MandatsRecus", fields: [intermediaireId], references: [id])
-  propertyAccesses  PropertyAccess[]
+  proprietaire     User             @relation("MandatsDonnes", fields: [proprietaireId], references: [id])
+  intermediaire    User             @relation("MandatsRecus", fields: [intermediaireId], references: [id])
+  propertyAccesses PropertyAccess[]
 
   @@map("mandats_gestion")
 }
 
 model AgencesRegularisation {
-  id                  String      @id @default(uuid()) @map("reg_id")
-  userId              String      @unique @map("user_id")
-  statut              String   @default("EN_COURS")
-  dateInscription     DateTime    @default(now()) @map("date_inscription")
-  dateLimiteInitiale  DateTime    @map("date_limite_initiale")
-  dateLimiteActuelle  DateTime    @map("date_limite_actuelle")
-  nbBiensBascule      Int?        @map("nb_biens_bascule")
-  nbPropriosBascule   Int?        @map("nb_proprietaires_bascule")
-  recepisseCdaim      String?     @map("recepissse_cdaim") // URL/Path
-  recepisseDate       DateTime?   @map("recepissse_date")
-  
-  rappel_j30_at       DateTime?   @map("rappel_j30_at")
-  rappel_j90_at       DateTime?   @map("rappel_j90_at")
-  rappel_j180_at      DateTime?   @map("rappel_j180_at")
-  rappel_j240_at      DateTime?   @map("rappel_j240_at")
-  rappel_j270_at      DateTime?   @map("rappel_j270_at")
-  
-  basculeAt           DateTime?   @map("bascule_at")
-  regulariseAt        DateTime?   @map("regularise_at")
-  notesAdmin          String?     @map("notes_admin")
+  id                 String    @id @default(uuid()) @map("reg_id")
+  userId             String    @unique @map("user_id")
+  statut             String    @default("EN_COURS")
+  dateInscription    DateTime  @default(now()) @map("date_inscription")
+  dateLimiteInitiale DateTime  @map("date_limite_initiale")
+  dateLimiteActuelle DateTime  @map("date_limite_actuelle")
+  nbBiensBascule     Int?      @map("nb_biens_bascule")
+  nbPropriosBascule  Int?      @map("nb_proprietaires_bascule")
+  recepisseCdaim     String?   @map("recepissse_cdaim") // URL/Path
+  recepisseDate      DateTime? @map("recepissse_date")
 
-  user                User        @relation(fields: [userId], references: [id])
+  rappel_j30_at  DateTime? @map("rappel_j30_at")
+  rappel_j90_at  DateTime? @map("rappel_j90_at")
+  rappel_j180_at DateTime? @map("rappel_j180_at")
+  rappel_j240_at DateTime? @map("rappel_j240_at")
+  rappel_j270_at DateTime? @map("rappel_j270_at")
+
+  basculeAt    DateTime? @map("bascule_at")
+  regulariseAt DateTime? @map("regularise_at")
+  notesAdmin   String?   @map("notes_admin")
+
+  user User @relation(fields: [userId], references: [id])
 
   @@map("agences_regularisation")
 }
@@ -2805,136 +2761,134 @@ model GardeFousLog {
   traiteParId String?  @map("traite_par")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  user        User     @relation("UserGardeFous", fields: [userId], references: [id])
-  traitePar   User?    @relation("AdminGardeFous", fields: [traiteParId], references: [id])
+  user      User  @relation("UserGardeFous", fields: [userId], references: [id])
+  traitePar User? @relation("AdminGardeFous", fields: [traiteParId], references: [id])
 
   @@map("garde_fous_logs")
 }
 
 model SmsDeclaration {
-  id              String      @id @default(uuid()) @map("decl_id")
-  leaseId         String      @map("bail_id")
-  tenantId        String      @map("locataire_id")
-  montantDeclare  Float     @map("montant_declare")
-  canal PaymentCanal @default(SMS_DECLARATIF) // SMS | WHATSAPP | APP
-  statut          String  @default("EN_ATTENTE")
-  confirmeParId   String?     @map("confirme_par")
-  confirmeAt      DateTime?   @map("confirme_at")
-  receiptId       String?     @map("quittance_id")
-  rappel1At       DateTime?   @map("rappel_1_at")
-  alerteProprioAt DateTime?   @map("alerte_proprio_at")
-  smsBrut         String?     @map("sms_brut")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  expireAt        DateTime?   @map("expire_at")
+  id              String       @id @default(uuid()) @map("decl_id")
+  leaseId         String       @map("bail_id")
+  tenantId        String       @map("locataire_id")
+  montantDeclare  Float        @map("montant_declare")
+  canal           PaymentCanal @default(SMS_DECLARATIF) // SMS | WHATSAPP | APP
+  statut          String       @default("EN_ATTENTE")
+  confirmeParId   String?      @map("confirme_par")
+  confirmeAt      DateTime?    @map("confirme_at")
+  receiptId       String?      @map("quittance_id")
+  rappel1At       DateTime?    @map("rappel_1_at")
+  alerteProprioAt DateTime?    @map("alerte_proprio_at")
+  smsBrut         String?      @map("sms_brut")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  expireAt        DateTime?    @map("expire_at")
 
-  lease       Lease   @relation("LeaseDeclarations", fields: [leaseId], references: [id], onDelete: Cascade)
-  tenant      User    @relation("TenantDeclarations", fields: [tenantId], references: [id], onDelete: Cascade)
-  confirmePar User?   @relation("ManagerConfirmations", fields: [confirmeParId], references: [id], onDelete: SetNull)
+  lease       Lease @relation("LeaseDeclarations", fields: [leaseId], references: [id], onDelete: Cascade)
+  tenant      User  @relation("TenantDeclarations", fields: [tenantId], references: [id], onDelete: Cascade)
+  confirmePar User? @relation("ManagerConfirmations", fields: [confirmeParId], references: [id], onDelete: SetNull)
 
   @@index([statut, createdAt])
   @@map("sms_declarations")
 }
+
 // ═══════════════════════════════════════════════════════
 // ADD-12 : Configuration Tarifaire Admin
 // ═══════════════════════════════════════════════════════
 
-
-
-
 model ConfigTarif {
-  id               String       @id @default(uuid()) @map("tarif_id")
-  cle              String       @unique
+  id               String    @id @default(uuid()) @map("tarif_id")
+  cle              String    @unique
   valeur           Float
   description      String
-  modifiable       Boolean      @default(true)
-  dateEffet        DateTime     @default(now()) @map("date_effet")
-  modifieParId     String?      @map("modifie_par")
-  modifieAt        DateTime?    @default(now()) @map("modifie_at")
-  valeurPrecedente Float?     @map("valeur_precedente")
-  noteModification String?      @map("note_modification")
-  metadata         String?      @map("metadata")
+  modifiable       Boolean   @default(true)
+  dateEffet        DateTime  @default(now()) @map("date_effet")
+  modifieParId     String?   @map("modifie_par")
+  modifieAt        DateTime? @default(now()) @map("modifie_at")
+  valeurPrecedente Float?    @map("valeur_precedente")
+  noteModification String?   @map("note_modification")
+  metadata         String?   @map("metadata")
 
-  modifiePar       User?        @relation("ConfigTarifModifier", fields: [modifieParId], references: [id])
+  modifiePar User? @relation("ConfigTarifModifier", fields: [modifieParId], references: [id])
 
   @@map("config_tarifs")
 }
 
 model OffreAbonnement {
-  id                String       @id @default(uuid()) @map("offre_id")
-  code              String       @unique
-  nomAffichage      String       @map("nom_affichage")
-  description       String?
-  prixBaseTtc       Float      @map("prix_base_ttc")
-  quittancesInclus  Int          @default(0) @map("quittances_inclus") // 0 = illimité
-  prixUniteTtc      Float?     @default(0) @map("prix_unite_ttc")
-  modules           Json?
-  actif             Boolean      @default(true)
-  visibleSignup     Boolean      @default(true) @map("visible_signup")
-  ordreAffichage    Int          @default(0) @map("ordre_affichage")
-  createdAt         DateTime     @default(now()) @map("created_at")
-  modifieParId      String?      @map("modifie_par")
-  modifieAt         DateTime?    @map("modifie_at")
+  id               String    @id @default(uuid()) @map("offre_id")
+  code             String    @unique
+  nomAffichage     String    @map("nom_affichage")
+  description      String?
+  prixBaseTtc      Float     @map("prix_base_ttc")
+  quittancesInclus Int       @default(0) @map("quittances_inclus") // 0 = illimité
+  prixUniteTtc     Float?    @default(0) @map("prix_unite_ttc")
+  modules          Json?
+  actif            Boolean   @default(true)
+  visibleSignup    Boolean   @default(true) @map("visible_signup")
+  ordreAffichage   Int       @default(0) @map("ordre_affichage")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  modifieParId     String?   @map("modifie_par")
+  modifieAt        DateTime? @map("modifie_at")
 
-  modifiePar        User?        @relation("OffreModifier", fields: [modifieParId], references: [id])
-  codesPromo        CodePromo[]
-  tarifsNegocies    TarifNegocie[]
+  modifiePar     User?          @relation("OffreModifier", fields: [modifieParId], references: [id])
+  codesPromo     CodePromo[]
+  tarifsNegocies TarifNegocie[]
 
   @@map("offres_abonnements")
 }
 
 model CodePromo {
-  id               String          @id @default(uuid()) @map("promo_id")
-  code             String          @unique
-  typeRemise       String       @map("type_remise")
-  valeurRemise     Float         @map("valeur_remise")
-  offreCibleId     String?         @map("offre_cible")
-  cibleProfil      String          @default("TOUS") @map("cible_profil") // TOUS, AGENCE, PARTICULIER
-  dateDebut        DateTime        @default(now()) @map("date_debut")
-  dateFin          DateTime?       @map("date_fin")
-  maxUtilisations  Int?            @map("max_utilisations")
-  nbUtilisations   Int             @default(0) @map("nb_utilisations")
-  actif            Boolean         @default(true)
-  createdParId     String?         @map("created_par")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  note             String?
+  id              String    @id @default(uuid()) @map("promo_id")
+  code            String    @unique
+  typeRemise      String    @map("type_remise")
+  valeurRemise    Float     @map("valeur_remise")
+  offreCibleId    String?   @map("offre_cible")
+  cibleProfil     String    @default("TOUS") @map("cible_profil") // TOUS, AGENCE, PARTICULIER
+  dateDebut       DateTime  @default(now()) @map("date_debut")
+  dateFin         DateTime? @map("date_fin")
+  maxUtilisations Int?      @map("max_utilisations")
+  nbUtilisations  Int       @default(0) @map("nb_utilisations")
+  actif           Boolean   @default(true)
+  createdParId    String?   @map("created_par")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  note            String?
 
-  offreCible       OffreAbonnement? @relation(fields: [offreCibleId], references: [id])
-  createdPar       User?            @relation("PromoCreator", fields: [createdParId], references: [id])
+  offreCible OffreAbonnement? @relation(fields: [offreCibleId], references: [id])
+  createdPar User?            @relation("PromoCreator", fields: [createdParId], references: [id])
 
   @@map("codes_promo")
 }
 
 model TarifNegocie {
-  id               String          @id @default(uuid()) @map("neg_id")
-  userId           String          @map("user_id")
-  type             String
-  offreId          String?         @map("offre_id")
-  prixNegocieTtc   Float         @map("prix_negocie_ttc")
-  dateDebut        DateTime        @default(now()) @map("date_debut")
-  dateFin          DateTime?       @map("date_fin")
-  autoRenouveler   Boolean         @default(false) @map("auto_renouveler")
-  createdParId     String?         @map("created_par")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  note             String
+  id             String    @id @default(uuid()) @map("neg_id")
+  userId         String    @map("user_id")
+  type           String
+  offreId        String?   @map("offre_id")
+  prixNegocieTtc Float     @map("prix_negocie_ttc")
+  dateDebut      DateTime  @default(now()) @map("date_debut")
+  dateFin        DateTime? @map("date_fin")
+  autoRenouveler Boolean   @default(false) @map("auto_renouveler")
+  createdParId   String?   @map("created_par")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  note           String
 
-  user             User            @relation("UserTarifNegocie", fields: [userId], references: [id])
-  offre            OffreAbonnement? @relation(fields: [offreId], references: [id])
-  createdPar       User?            @relation("TarifNegocieCreator", fields: [createdParId], references: [id])
+  user       User             @relation("UserTarifNegocie", fields: [userId], references: [id])
+  offre      OffreAbonnement? @relation(fields: [offreId], references: [id])
+  createdPar User?            @relation("TarifNegocieCreator", fields: [createdParId], references: [id])
 
   @@map("tarifs_negocie")
 }
 
 model ConfigTarifsAudit {
-  id               String          @id @default(uuid()) @map("audit_id")
-  tableCible       String          @map("table_cible")
-  enregistrementId String          @map("enregistrement_id")
+  id               String   @id @default(uuid()) @map("audit_id")
+  tableCible       String   @map("table_cible")
+  enregistrementId String   @map("enregistrement_id")
   action           String // INSERT, UPDATE, DELETE
   avant            Json?
   apres            Json?
-  modifieParId     String?         @map("modifie_par")
-  createdAt        DateTime        @default(now()) @map("created_at")
+  modifieParId     String?  @map("modifie_par")
+  createdAt        DateTime @default(now()) @map("created_at")
 
-  modifiePar       User?           @relation("ConfigTarifAuditAuthor", fields: [modifieParId], references: [id])
+  modifiePar User? @relation("ConfigTarifAuditAuthor", fields: [modifieParId], references: [id])
 
   @@map("config_tarifs_audit")
 }
@@ -2944,135 +2898,127 @@ model ConfigTarifsAudit {
 // ═══════════════════════════════════════════════════════
 
 model LocataireProfile {
-  id                String       @id @default(uuid()) @map("profil_id")
-  userId            String       @unique @map("user_id")
-  scoreActuel       Int          @default(0) @map("score_actuel")
-  scoreBadge        String       @default("D") @map("score_badge")
-  scoreCalculeAt    DateTime?    @map("score_calcule_at")
-  tauxPaiement12m   Float      @default(0) @map("taux_paiement_12m")
-  nbBailsActifs     Int          @default(0) @map("nb_bails_actifs")
-  nbBailsClos       Int          @default(0) @map("nb_bails_clos")
-  alerteJ3Active    Boolean      @default(true) @map("alerte_j3_active")
-  alerteJ1Active    Boolean      @default(true) @map("alerte_j1_active")
-  canalAlertePref   String       @default("SMS") @map("canal_alerte_pref") // SMS | WHATSAPP | PUSH | TOUS
-  passeportGenereAt DateTime?    @map("passeport_genere_at")
-  createdAt         DateTime     @default(now()) @map("created_at")
+  id                String    @id @default(uuid()) @map("profil_id")
+  userId            String    @unique @map("user_id")
+  scoreActuel       Int       @default(0) @map("score_actuel")
+  scoreBadge        String    @default("D") @map("score_badge")
+  scoreCalculeAt    DateTime? @map("score_calcule_at")
+  tauxPaiement12m   Float     @default(0) @map("taux_paiement_12m")
+  nbBailsActifs     Int       @default(0) @map("nb_bails_actifs")
+  nbBailsClos       Int       @default(0) @map("nb_bails_clos")
+  alerteJ3Active    Boolean   @default(true) @map("alerte_j3_active")
+  alerteJ1Active    Boolean   @default(true) @map("alerte_j1_active")
+  canalAlertePref   String    @default("SMS") @map("canal_alerte_pref") // SMS | WHATSAPP | PUSH | TOUS
+  passeportGenereAt DateTime? @map("passeport_genere_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
 
-  user              User         @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("locataire_profiles")
 }
 
-
-
-
-
 model SignalementLocataire {
-  id              String           @id @default(uuid()) @map("signal_id")
-  bailId          String           @map("bail_id")
-  locataireId     String           @map("locataire_id")
-  categorie       String
-  description     String
-  urgence         String           @default("NORMAL") // NORMAL | URGENT | TRES_URGENT
-  photos String @default("[]")
-  statut          String @default("ENVOYE")
-  proprioVuAt     DateTime?        @map("proprio_vu_at")
-  resoluAt        DateTime?        @map("resolu_at")
-  resoluPar       String? @map("resolu_par")
-  noteResolution  String? @map("note_resolution")
-  createdAt       DateTime         @default(now()) @map("created_at")
+  id             String    @id @default(uuid()) @map("signal_id")
+  bailId         String    @map("bail_id")
+  locataireId    String    @map("locataire_id")
+  categorie      String
+  description    String
+  urgence        String    @default("NORMAL") // NORMAL | URGENT | TRES_URGENT
+  photos         String[]
+  statut         String    @default("ENVOYE")
+  proprioVuAt    DateTime? @map("proprio_vu_at")
+  resoluAt       DateTime? @map("resolu_at")
+  resoluPar      String?   @map("resolu_par")
+  noteResolution String?   @map("note_resolution")
+  createdAt      DateTime  @default(now()) @map("created_at")
 
-  bail            Lease            @relation(fields: [bailId], references: [id])
-  locataire       User             @relation("UserSignalements", fields: [locataireId], references: [id])
+  bail      Lease @relation(fields: [bailId], references: [id])
+  locataire User  @relation("UserSignalements", fields: [locataireId], references: [id])
 
   @@map("signalements_locataire")
 }
 
-
-
 model CautionBail {
-  id                String           @id @default(uuid()) @map("caution_id")
-  bailId            String           @unique @map("bail_id")
-  montantFcfa       Float          @map("montant_fcfa")
-  dateVersement     DateTime         @map("date_versement")
-  modeVersement     String?          @map("mode_versement") // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
-  destination       String  @default("PROPRIETAIRE")
-  recepisseCdcCi    String?          @map("recepissse_cdc_ci")
-  conditionsRestit  String?          @map("conditions_restit")
-  confirmeLocataire Boolean          @default(false) @map("confirme_locataire")
-  confirmeAt        DateTime?        @map("confirme_at")
-  certificatRef     String?          @unique @map("certificat_ref")
-  hashSha256        String?          @map("hash_sha256")
-  
-  // Restitution
-  restituee         Boolean          @default(false)
-  montantRestitue   Float?         @map("montant_restitue")
-  dateRestitution   DateTime?        @map("date_restitution")
-  motifRetenue      String?          @map("motif_retenue")
-  createdAt         DateTime         @default(now()) @map("created_at")
+  id                String    @id @default(uuid()) @map("caution_id")
+  bailId            String    @unique @map("bail_id")
+  montantFcfa       Float     @map("montant_fcfa")
+  dateVersement     DateTime  @map("date_versement")
+  modeVersement     String?   @map("mode_versement") // ESPECES | WAVE | ORANGE_MONEY | VIREMENT
+  destination       String    @default("PROPRIETAIRE")
+  recepisseCdcCi    String?   @map("recepissse_cdc_ci")
+  conditionsRestit  String?   @map("conditions_restit")
+  confirmeLocataire Boolean   @default(false) @map("confirme_locataire")
+  confirmeAt        DateTime? @map("confirme_at")
+  certificatRef     String?   @unique @map("certificat_ref")
+  hashSha256        String?   @map("hash_sha256")
 
-  bail              Lease            @relation(fields: [bailId], references: [id])
+  // Restitution
+  restituee       Boolean   @default(false)
+  montantRestitue Float?    @map("montant_restitue")
+  dateRestitution DateTime? @map("date_restitution")
+  motifRetenue    String?   @map("motif_retenue")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  bail Lease @relation(fields: [bailId], references: [id])
 
   @@map("cautions_bail")
 }
 
-
-
 model PreavisBail {
-  id                  String             @id @default(uuid()) @map("preavis_id")
-  bailId              String             @map("bail_id")
-  locataireId         String             @map("locataire_id")
-  dateDeclaration     DateTime           @default(now()) @map("date_declaration")
-  dateDepartPrevue    DateTime           @map("date_depart_prevue")
-  dateDepartEffective DateTime?          @map("date_depart_effective")
+  id                  String    @id @default(uuid()) @map("preavis_id")
+  bailId              String    @map("bail_id")
+  locataireId         String    @map("locataire_id")
+  dateDeclaration     DateTime  @default(now()) @map("date_declaration")
+  dateDepartPrevue    DateTime  @map("date_depart_prevue")
+  dateDepartEffective DateTime? @map("date_depart_effective")
   motif               String?
-  statut              String  @default("EMIS")
-  proprioAccuseAt     DateTime?          @map("proprio_accuse_at")
-  etatLieuxPrevu      DateTime?          @map("etat_lieux_prevu")
-  refPreavis          String?            @unique @map("ref_preavis")
-  hashSha256          String?            @map("hash_sha256")
-  createdAt           DateTime           @default(now()) @map("created_at")
+  statut              String    @default("EMIS")
+  proprioAccuseAt     DateTime? @map("proprio_accuse_at")
+  etatLieuxPrevu      DateTime? @map("etat_lieux_prevu")
+  refPreavis          String?   @unique @map("ref_preavis")
+  hashSha256          String?   @map("hash_sha256")
+  createdAt           DateTime  @default(now()) @map("created_at")
 
-  bail                Lease              @relation(fields: [bailId], references: [id])
-  locataire           User               @relation("UserPreavis", fields: [locataireId], references: [id])
+  bail      Lease @relation(fields: [bailId], references: [id])
+  locataire User  @relation("UserPreavis", fields: [locataireId], references: [id])
 
   @@map("preavis_bails")
 }
 
 model PasseportLocatif {
-  id                   String       @id @default(uuid()) @map("passeport_id")
-  locataireId          String       @map("locataire_id")
-  refPasseport         String?      @unique @map("ref_passeport")
-  scoreGlobal          Int @map("score_global")
-  tauxPaiementGlobal   Float @map("taux_paiement_global")
-  nbBailsInclus        Int @map("nb_bails_inclus")
-  periodeCouverteDebut DateTime     @map("periode_couverte_debut")
-  periodeCouverteFin   DateTime     @map("periode_couverte_fin")
-  snapshotBails        Json         @map("snapshot_bails")
-  hashSha256           String?      @map("hash_sha256")
-  pdfUrl               String?      @map("pdf_url")
-  nbConsultations      Int          @default(0) @map("nb_consultations")
-  createdAt            DateTime     @default(now()) @map("created_at")
-  expireAt             DateTime?    @map("expire_at")
+  id                   String    @id @default(uuid()) @map("passeport_id")
+  locataireId          String    @map("locataire_id")
+  refPasseport         String?   @unique @map("ref_passeport")
+  scoreGlobal          Int       @map("score_global")
+  tauxPaiementGlobal   Float     @map("taux_paiement_global")
+  nbBailsInclus        Int       @map("nb_bails_inclus")
+  periodeCouverteDebut DateTime  @map("periode_couverte_debut")
+  periodeCouverteFin   DateTime  @map("periode_couverte_fin")
+  snapshotBails        Json      @map("snapshot_bails")
+  hashSha256           String?   @map("hash_sha256")
+  pdfUrl               String?   @map("pdf_url")
+  nbConsultations      Int       @default(0) @map("nb_consultations")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  expireAt             DateTime? @map("expire_at")
 
-  locataire            User         @relation("UserPasseports", fields: [locataireId], references: [id])
+  locataire User @relation("UserPasseports", fields: [locataireId], references: [id])
 
   @@map("passeports_locatifs")
 }
 
 model AlerteLoyer {
-  id              String       @id @default(uuid()) @map("alerte_id")
-  bailId          String       @map("bail_id")
-  locataireId     String       @map("locataire_id")
-  typeAlerte      String       @map("type_alerte") // J_MOINS_3 | J_MOINS_1 | J_PLUS_1
-  datePrevue      DateTime     @map("date_prevue")
-  envoyee         Boolean      @default(false)
-  envoyeeAt       DateTime?    @map("envoyee_at")
-  canal PaymentCanal? // SMS | WHATSAPP | PUSH
-  createdAt       DateTime     @default(now()) @map("created_at")
+  id          String        @id @default(uuid()) @map("alerte_id")
+  bailId      String        @map("bail_id")
+  locataireId String        @map("locataire_id")
+  typeAlerte  String        @map("type_alerte") // J_MOINS_3 | J_MOINS_1 | J_PLUS_1
+  datePrevue  DateTime      @map("date_prevue")
+  envoyee     Boolean       @default(false)
+  envoyeeAt   DateTime?     @map("envoyee_at")
+  canal       PaymentCanal? // SMS | WHATSAPP | PUSH
+  createdAt   DateTime      @default(now()) @map("created_at")
 
-  bail            Lease        @relation(fields: [bailId], references: [id])
-  locataire       User         @relation("UserAlertesLoyer", fields: [locataireId], references: [id])
+  bail      Lease @relation(fields: [bailId], references: [id])
+  locataire User  @relation("UserAlertesLoyer", fields: [locataireId], references: [id])
 
   @@map("alertes_loyer")
 }
@@ -3082,31 +3028,31 @@ model AlerteLoyer {
 // ═══════════════════════════════════════════════════════
 
 model LocataireProfilPublic {
-  id               String      @id @default(uuid()) @map("profil_id")
-  userId           String      @unique @map("user_id")
-  user             User        @relation(fields: [userId], references: [id])
-  
-  visibilite       String   @default("INVISIBLE")
-  statutRecherche  String      @default("EN_RECHERCHE") @map("statut_recherche")
-  
-  statutPro        String?     @map("statut_pro") // SALARIE | INDEPENDANT | INFORMEL | SANS_EMPLOI
-  revenuFourchette String?     @map("revenu_fourchette")
-  employeurType    String?     @map("employeur_type")
-  
-  city               String?     @map("city")
-  communesSouhaitees String @default("[]") @map("communes_souhaitees")
-  budgetMaxFcfa      Int?      @map("budget_max_fcfa")
-  typeLogement String @default("[]") @map("type_logement")
-  disponibleAPartir  DateTime? @map("disponible_a_partir")
-  
-  kycNiveau          Int       @default(0) @map("kyc_niveau")
-  
-  nbInvitationsRecues  Int     @default(0) @map("nb_invitations_recues")
-  nbInvitationsRefusees Int     @default(0) @map("nb_invitations_refusees")
-  nbConsultationsProfil Int    @default(0) @map("nb_consultations_profil")
+  id     String @id @default(uuid()) @map("profil_id")
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
 
-  consultations        ConsultationProfil[]
-  
+  visibilite      String @default("INVISIBLE")
+  statutRecherche String @default("EN_RECHERCHE") @map("statut_recherche")
+
+  statutPro        String? @map("statut_pro") // SALARIE | INDEPENDANT | INFORMEL | SANS_EMPLOI
+  revenuFourchette String? @map("revenu_fourchette")
+  employeurType    String? @map("employeur_type")
+
+  city               String?   @map("city")
+  communesSouhaitees String[]  @map("communes_souhaitees")
+  budgetMaxFcfa      Int?      @map("budget_max_fcfa")
+  typeLogement       String[]  @map("type_logement")
+  disponibleAPartir  DateTime? @map("disponible_a_partir")
+
+  kycNiveau Int @default(0) @map("kyc_niveau")
+
+  nbInvitationsRecues   Int @default(0) @map("nb_invitations_recues")
+  nbInvitationsRefusees Int @default(0) @map("nb_invitations_refusees")
+  nbConsultationsProfil Int @default(0) @map("nb_consultations_profil")
+
+  consultations ConsultationProfil[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -3114,181 +3060,174 @@ model LocataireProfilPublic {
 }
 
 model InvitationBail {
-  id                String          @id @default(uuid()) @map("invitation_id")
-  propertyId        String?         @map("bien_id")
-  property          Property?       @relation(fields: [propertyId], references: [id])
-  
-  invitantId        String          @map("invitant_id")
-  invitant          User            @relation("InvitantBail", fields: [invitantId], references: [id])
-  invitantType      String          @map("invitant_type") // PROPRIETAIRE | AGENCE
-  
-  locataireId       String          @map("locataire_id")
-  locataire         User            @relation("LocataireInvite", fields: [locataireId], references: [id])
-  
-  methodeDecouverte String?         @map("methode_decouverte") // NUMERO | QR_CODE | LIEN | RECHERCHE_AGENCE
-  loyerPropose      Float?        @map("loyer_propose")
-  dateDebutProposee DateTime?       @map("date_debut_proposee")
-  messageInvitant   String?         @map("message_invitant")
-  
-  statut            String @default("ENVOYEE")
-  
-  vueAt             DateTime?       @map("vue_at")
-  reponduAt         DateTime?       @map("repondu_at")
-  leaseId           String?         @map("bail_id")
-  
-  expireAt          DateTime        @default(now()) @map("expire_at")
-  createdAt         DateTime        @default(now()) @map("created_at")
+  id         String    @id @default(uuid()) @map("invitation_id")
+  propertyId String?   @map("bien_id")
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  invitantId   String @map("invitant_id")
+  invitant     User   @relation("InvitantBail", fields: [invitantId], references: [id])
+  invitantType String @map("invitant_type") // PROPRIETAIRE | AGENCE
+
+  locataireId String @map("locataire_id")
+  locataire   User   @relation("LocataireInvite", fields: [locataireId], references: [id])
+
+  methodeDecouverte String?   @map("methode_decouverte") // NUMERO | QR_CODE | LIEN | RECHERCHE_AGENCE
+  loyerPropose      Float?    @map("loyer_propose")
+  dateDebutProposee DateTime? @map("date_debut_proposee")
+  messageInvitant   String?   @map("message_invitant")
+
+  statut String @default("ENVOYEE")
+
+  vueAt     DateTime? @map("vue_at")
+  reponduAt DateTime? @map("repondu_at")
+  leaseId   String?   @map("bail_id")
+
+  expireAt  DateTime @default(now()) @map("expire_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("invitations_bail")
 }
 
 model ConsultationProfil {
-  id                String               @id @default(uuid()) @map("consult_id")
-  locataireId       String               @map("locataire_id")
-  locataire         LocataireProfilPublic @relation(fields: [locataireId], references: [id])
-  
-  consultantId      String               @map("consultant_id")
-  consultant        User                 @relation("ConsultantProfil", fields: [consultantId], references: [id])
-  consultantType    String               @map("consultant_type") // PROPRIETAIRE | AGENCE
-  consultantNomAffiche String?           @map("consultant_nom_affiche")
-  
-  createdAt         DateTime             @default(now()) @map("created_at")
+  id          String                @id @default(uuid()) @map("consult_id")
+  locataireId String                @map("locataire_id")
+  locataire   LocataireProfilPublic @relation(fields: [locataireId], references: [id])
+
+  consultantId         String  @map("consultant_id")
+  consultant           User    @relation("ConsultantProfil", fields: [consultantId], references: [id])
+  consultantType       String  @map("consultant_type") // PROPRIETAIRE | AGENCE
+  consultantNomAffiche String? @map("consultant_nom_affiche")
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("consultations_profil")
 }
-
 
 // ═══════════════════════════════════════════════════════
 // ADD-15 : Modules Critiques (EDL, RPT, CHP)
 // ═══════════════════════════════════════════════════════
 
-
-
-
-
-
-
 model RapportMensuel {
-  id              String   @id @default(uuid()) @map("rapport_id")
-  userId          String   @map("user_id")
-  user            User     @relation(fields: [userId], references: [id])
-  periodeMois     Int      @map("periode_mois")
-  periodeAnnee    Int      @map("periode_annee")
-  typeRapport     String   @default("MENSUEL") @map("type_rapport") // MENSUEL | HEBDOMADAIRE | ANNUEL
-  dataRapport     Json     @map("data_rapport")
-  pdfUrl          String?  @map("pdf_url")
-  envoyeWhatsapp  Boolean  @default(false) @map("envoye_whatsapp")
-  envoyeEmail     Boolean  @default(false) @map("envoye_email")
-  envoyeAt        DateTime? @map("envoye_at")
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             String    @id @default(uuid()) @map("rapport_id")
+  userId         String    @map("user_id")
+  user           User      @relation(fields: [userId], references: [id])
+  periodeMois    Int       @map("periode_mois")
+  periodeAnnee   Int       @map("periode_annee")
+  typeRapport    String    @default("MENSUEL") @map("type_rapport") // MENSUEL | HEBDOMADAIRE | ANNUEL
+  dataRapport    Json      @map("data_rapport")
+  pdfUrl         String?   @map("pdf_url")
+  envoyeWhatsapp Boolean   @default(false) @map("envoye_whatsapp")
+  envoyeEmail    Boolean   @default(false) @map("envoye_email")
+  envoyeAt       DateTime? @map("envoye_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
 
   @@unique([userId, periodeMois, periodeAnnee, typeRapport])
   @@map("rapports_mensuels")
 }
 
 model ChampionProfile {
-  id                     String    @id @default(uuid()) @map("champion_id")
-  userId                 String    @unique @map("user_id")
-  user                   User      @relation(fields: [userId], references: [id])
-  zonePrincipale         String    @map("zone_principale")
-  zonesSecondaires String @default("[]") @map("zones_secondaires")
-  superviseurId          String?   @map("superviseur_id")
-  superviseur            User?     @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
-  statut                 String    @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
-  dateDebut              DateTime  @default(now()) @map("date_debut")
-  objectifMensuel        Int       @default(30) @map("objectif_mensuel")
-  totalInscriptions      Int       @default(0) @map("total_inscriptions")
-  totalCommissionsFcfa   Float   @default(0) @map("total_commissions_fcfa")
-  
-  prospects              ChampionProspect[]
-  commissions            ChampionCommission[]
-  
-  createdAt              DateTime  @default(now()) @map("created_at")
+  id                   String   @id @default(uuid()) @map("champion_id")
+  userId               String   @unique @map("user_id")
+  user                 User     @relation(fields: [userId], references: [id])
+  zonePrincipale       String   @map("zone_principale")
+  zonesSecondaires     String[] @map("zones_secondaires")
+  superviseurId        String?  @map("superviseur_id")
+  superviseur          User?    @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
+  statut               String   @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
+  dateDebut            DateTime @default(now()) @map("date_debut")
+  objectifMensuel      Int      @default(30) @map("objectif_mensuel")
+  totalInscriptions    Int      @default(0) @map("total_inscriptions")
+  totalCommissionsFcfa Float    @default(0) @map("total_commissions_fcfa")
+
+  prospects   ChampionProspect[]
+  commissions ChampionCommission[]
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("champions_profiles")
 }
 
 model ChampionProspect {
-  id                 String         @id @default(uuid()) @map("prospect_id")
-  championId         String         @map("champion_id")
+  id                 String          @id @default(uuid()) @map("prospect_id")
+  championId         String          @map("champion_id")
   champion           ChampionProfile @relation(fields: [championId], references: [id])
   nom                String
   telephone          String?
   quartier           String?
-  nbLogementsEstime  String?        @map("nb_logements_estime")
-  argumentCle        String?        @map("argument_cle")
-  statut             String @default("A_RAPPELER")
-  dateDernierContact DateTime?      @map("date_dernier_contact")
-  dateRappelPrevu    DateTime?      @map("date_rappel_prevu")
+  nbLogementsEstime  String?         @map("nb_logements_estime")
+  argumentCle        String?         @map("argument_cle")
+  statut             String          @default("A_RAPPELER")
+  dateDernierContact DateTime?       @map("date_dernier_contact")
+  dateRappelPrevu    DateTime?       @map("date_rappel_prevu")
   note               String?
-  userIdInscrit      String?        @map("user_id_inscrit")
-  userInscrit        User?          @relation("ProspectConverti", fields: [userIdInscrit], references: [id])
-  
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
+  userIdInscrit      String?         @map("user_id_inscrit")
+  userInscrit        User?           @relation("ProspectConverti", fields: [userIdInscrit], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("champions_prospects")
 }
 
 model ChampionCommission {
-  id             String          @id @default(uuid()) @map("commission_id")
-  championId     String          @map("champion_id")
-  champion       ChampionProfile @relation(fields: [championId], references: [id])
-  typeAction     String        @map("type_action")
-  referenceId    String?         @map("reference_id")
-  montantFcfa    Float         @map("montant_fcfa")
-  statut         String          @default("EN_ATTENTE") // EN_ATTENTE | VALIDE | PAYE | ANNULE
-  valideAt       DateTime?       @map("valide_at")
-  payeAt         DateTime?       @map("paye_at")
-  modePaiement   String?         @map("mode_paiement")
-  createdAt      DateTime        @default(now()) @map("created_at")
+  id           String          @id @default(uuid()) @map("commission_id")
+  championId   String          @map("champion_id")
+  champion     ChampionProfile @relation(fields: [championId], references: [id])
+  typeAction   String          @map("type_action")
+  referenceId  String?         @map("reference_id")
+  montantFcfa  Float           @map("montant_fcfa")
+  statut       String          @default("EN_ATTENTE") // EN_ATTENTE | VALIDE | PAYE | ANNULE
+  valideAt     DateTime?       @map("valide_at")
+  payeAt       DateTime?       @map("paye_at")
+  modePaiement String?         @map("mode_paiement")
+  createdAt    DateTime        @default(now()) @map("created_at")
 
   @@map("champions_commissions")
 }
 
 model WalletRechargeLink {
-  id              String          @id @default(uuid()) @map("link_id")
-  userId          String          @map("user_id")
-  user            User            @relation(fields: [userId], references: [id])
-  declencheur     String
-  operateur PaymentCanal          // WAVE | ORANGE | MTN | MOOV
-  montantSuggere  Float         @map("montant_suggere")
-  soldeAuMoment   Float         @map("solde_au_moment")
-  nbBailsActifs   Int             @map("nb_bails_actifs")
-  urlGeneree      String          @map("url_generee")
-  canalEnvoi      String          @map("canal_envoi") // WHATSAPP | SMS | PUSH
-  messageEnvoye   String?         @map("message_envoye")
-  
-    clique          Boolean         @default(false)
-  cliqueAt        DateTime?       @map("clique_at")
-  clicsCompteur   Int             @default(0) @map("clics_compteur")
-  rechargeEffectuee Boolean       @default(false) @map("recharge_effectuee")
-  rechargeAt      DateTime?       @map("recharge_at")
-  montantRecharge Float?        @map("montant_recharge")
-  webhookRef      String?         @map("webhook_ref")
-  
-  createdAt       DateTime        @default(now()) @map("created_at")
-  expireAt        DateTime        @map("expire_at")
+  id             String       @id @default(uuid()) @map("link_id")
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id])
+  declencheur    String
+  operateur      PaymentCanal // WAVE | ORANGE | MTN | MOOV
+  montantSuggere Float        @map("montant_suggere")
+  soldeAuMoment  Float        @map("solde_au_moment")
+  nbBailsActifs  Int          @map("nb_bails_actifs")
+  urlGeneree     String       @map("url_generee")
+  canalEnvoi     String       @map("canal_envoi") // WHATSAPP | SMS | PUSH
+  messageEnvoye  String?      @map("message_envoye")
+
+  clique            Boolean   @default(false)
+  cliqueAt          DateTime? @map("clique_at")
+  clicsCompteur     Int       @default(0) @map("clics_compteur")
+  rechargeEffectuee Boolean   @default(false) @map("recharge_effectuee")
+  rechargeAt        DateTime? @map("recharge_at")
+  montantRecharge   Float?    @map("montant_recharge")
+  webhookRef        String?   @map("webhook_ref")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  expireAt  DateTime @map("expire_at")
 
   @@index([userId, createdAt])
   @@map("wallet_recharge_links")
 }
 
 model WalletRechargeConfig {
-  id                String   @id @default(uuid()) @map("config_id")
-  userId            String   @unique @map("user_id")
-  user              User     @relation(fields: [userId], references: [id])
-  rappelActif       Boolean  @default(false) @map("rappel_actif")
-  jourDuMois        Int      @default(1) @map("jour_du_mois")
-  montantFixe       Float? @map("montant_fixe")
-  operateurPrefere  String   @default("WAVE") @map("operateur_prefere")
-  canalPrefere      String   @default("WHATSAPP") @map("canal_prefere")
-  dernierRappelAt   DateTime? @map("dernier_rappel_at")
-  nbRappelsEnvoyes  Int      @default(0) @map("nb_rappels_envoyes")
-  nbRechargements   Int      @default(0) @map("nb_rechargements")
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  id               String    @id @default(uuid()) @map("config_id")
+  userId           String    @unique @map("user_id")
+  user             User      @relation(fields: [userId], references: [id])
+  rappelActif      Boolean   @default(false) @map("rappel_actif")
+  jourDuMois       Int       @default(1) @map("jour_du_mois")
+  montantFixe      Float?    @map("montant_fixe")
+  operateurPrefere String    @default("WAVE") @map("operateur_prefere")
+  canalPrefere     String    @default("WHATSAPP") @map("canal_prefere")
+  dernierRappelAt  DateTime? @map("dernier_rappel_at")
+  nbRappelsEnvoyes Int       @default(0) @map("nb_rappels_envoyes")
+  nbRechargements  Int       @default(0) @map("nb_rechargements")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("wallet_recharge_configs")
 }
@@ -3298,39 +3237,39 @@ model WalletRechargeConfig {
 // ═══════════════════════════════════════════════════════
 
 model MessagerieBail {
-  id              String   @id @default(uuid()) @map("msg_id")
-  leaseId         String   @map("lease_id")
-  lease           Lease    @relation(fields: [leaseId], references: [id])
-  expediteurId    String   @map("expediteur_id")
-  expediteur      User     @relation(fields: [expediteurId], references: [id])
-  roleExpediteur  String   @map("role_expediteur") // PROPRIO | LOCATAIRE | SYSTEME
-  contenu         String
-  pjUrl           String?  @map("pj_url")
-  pjHashSha256    String?  @map("pj_hash_sha256")
-  statut          String   @default("ENVOYÉ") // ENVOYÉ | REÇU | LU
-  dateEnvoi       DateTime @default(now()) @map("date_envoi")
-  dateReception   DateTime? @map("date_reception")
-  dateLecture     DateTime? @map("date_lecture")
+  id             String    @id @default(uuid()) @map("msg_id")
+  leaseId        String    @map("lease_id")
+  lease          Lease     @relation(fields: [leaseId], references: [id])
+  expediteurId   String    @map("expediteur_id")
+  expediteur     User      @relation(fields: [expediteurId], references: [id])
+  roleExpediteur String    @map("role_expediteur") // PROPRIO | LOCATAIRE | SYSTEME
+  contenu        String
+  pjUrl          String?   @map("pj_url")
+  pjHashSha256   String?   @map("pj_hash_sha256")
+  statut         String    @default("ENVOYÉ") // ENVOYÉ | REÇU | LU
+  dateEnvoi      DateTime  @default(now()) @map("date_envoi")
+  dateReception  DateTime? @map("date_reception")
+  dateLecture    DateTime? @map("date_lecture")
 
   @@index([leaseId])
   @@map("messagerie_bail")
 }
 
 model AnnonceVoisinage {
-  id              String   @id @default(uuid()) @map("annonce_id")
-  proprioId       String   @map("proprio_id")
-  proprio         User     @relation(fields: [proprioId], references: [id])
-  propertyId      String   @map("property_id") // Used as building/courtyard reference
-  property        Property @relation(fields: [propertyId], references: [id])
-  typeAnnonce     String   @map("type_annonce") // ANNONCE | PLANNING | ALERTE_COUPURE | REGLEMENT | ECHANGE_TOUR
+  id              String    @id @default(uuid()) @map("annonce_id")
+  proprioId       String    @map("proprio_id")
+  proprio         User      @relation(fields: [proprioId], references: [id])
+  propertyId      String    @map("property_id") // Used as building/courtyard reference
+  property        Property  @relation(fields: [propertyId], references: [id])
+  typeAnnonce     String    @map("type_annonce") // ANNONCE | PLANNING | ALERTE_COUPURE | REGLEMENT | ECHANGE_TOUR
   titre           String
   contenu         String
-  datePublication DateTime @default(now()) @map("date_publication")
+  datePublication DateTime  @default(now()) @map("date_publication")
   dateExpiration  DateTime? @map("date_expiration")
-  epingle         Boolean  @default(false)
-  destinataires   String   @default("TOUS") // TOUS | id locataire spécifique
-  photoUrl        String?  @map("photo_url")
-  photoHashSha256 String?  @map("photo_hash_sha256")
+  epingle         Boolean   @default(false)
+  destinataires   String    @default("TOUS") // TOUS | id locataire spécifique
+  photoUrl        String?   @map("photo_url")
+  photoHashSha256 String?   @map("photo_hash_sha256")
 
   @@index([propertyId])
   @@map("annonces_voisinage")
@@ -3347,19 +3286,19 @@ model FactureUtility {
   acteurId            String        @map("acteur_id")
   acteur              User          @relation(fields: [acteurId], references: [id])
   roleActeur          String        @map("role_acteur") // PROPRIO | LOCATAIRE
-  typeUtility         String   @map("type_utility")
+  typeUtility         String        @map("type_utility")
   identifiantCompteur String        @map("identifiant_compteur")
   moisFacture         DateTime      @map("mois_facture")
-  montantTotal        Float       @map("montant_total")
+  montantTotal        Float         @map("montant_total")
   dateLimitePaiement  DateTime?     @map("date_limite_paiement")
-  statut UtilityStatus @default(EN_COURS)
+  statut              UtilityStatus @default(EN_COURS)
   source              String        @default("SAISIE_MANUELLE") // API_ORANGE | API_MTN | OCR_QAPRIL
   invoiceUrl          String?       @map("invoice_url")
-  modeUtilities       String   @map("mode_utilities")
+  modeUtilities       String        @map("mode_utilities")
   datePaiement        DateTime?     @map("date_paiement")
   createdAt           DateTime      @default(now()) @map("created_at")
 
-  repartitions        RepartitionUtility[]
+  repartitions RepartitionUtility[]
 
   @@unique([leaseId, moisFacture, typeUtility])
   @@index([leaseId])
@@ -3369,21 +3308,21 @@ model FactureUtility {
 }
 
 model RepartitionUtility {
-  id                String        @id @default(uuid()) @map("repart_id")
-  factureId         String        @map("facture_id")
-  facture           FactureUtility @relation(fields: [factureId], references: [id])
-  leaseLocataireId  String        @map("lease_locataire_id")
-  leaseLocataire    Lease         @relation(fields: [leaseLocataireId], references: [id])
-  locataireId       String        @map("locataire_id")
-  locataire         User          @relation(fields: [locataireId], references: [id])
-  montantQuotePart  Float       @map("montant_quote_part")
-  modeleApplique    String @map("modele_applique")
-  statutPaiement    String @default("EN_ATTENTE") @map("statut_paiement")
-  dateNotification  DateTime?     @map("date_notification")
-  datePaiement      DateTime?     @map("date_paiement")
-  modePaiement      String?       @map("mode_paiement") // MOBILE_MONEY | CASH | WALLET_QAPRIL
-  nbRelances        Int           @default(0) @map("nb_relances")
-  createdAt         DateTime      @default(now()) @map("created_at")
+  id               String         @id @default(uuid()) @map("repart_id")
+  factureId        String         @map("facture_id")
+  facture          FactureUtility @relation(fields: [factureId], references: [id])
+  leaseLocataireId String         @map("lease_locataire_id")
+  leaseLocataire   Lease          @relation(fields: [leaseLocataireId], references: [id])
+  locataireId      String         @map("locataire_id")
+  locataire        User           @relation(fields: [locataireId], references: [id])
+  montantQuotePart Float          @map("montant_quote_part")
+  modeleApplique   String         @map("modele_applique")
+  statutPaiement   String         @default("EN_ATTENTE") @map("statut_paiement")
+  dateNotification DateTime?      @map("date_notification")
+  datePaiement     DateTime?      @map("date_paiement")
+  modePaiement     String?        @map("mode_paiement") // MOBILE_MONEY | CASH | WALLET_QAPRIL
+  nbRelances       Int            @default(0) @map("nb_relances")
+  createdAt        DateTime       @default(now()) @map("created_at")
 
   @@index([factureId])
   @@index([locataireId])
@@ -3392,21 +3331,21 @@ model RepartitionUtility {
 
 // CORRECTIF C-03 - Nouveau modele Lead
 model Lead {
-  id              String    @id @default(uuid()) @map("lead_id")
+  id String @id @default(uuid()) @map("lead_id")
 
-  telephone       String
-  profilDeclare   String    @map("profil_declare")
-  
-  sourceDocument  String?   @map("source_document")
-  sourceToken     String?   @map("source_token")
+  telephone     String
+  profilDeclare String @map("profil_declare")
 
-  statut          String    @default("NOUVEAU")
+  sourceDocument String? @map("source_document")
+  sourceToken    String? @map("source_token")
 
-  noteCommerciale String?   @map("note_commerciale")
-  convertedUserId String?   @map("converted_user_id")
+  statut String @default("NOUVEAU")
 
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  noteCommerciale String? @map("note_commerciale")
+  convertedUserId String? @map("converted_user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([statut, createdAt])
   @@index([profilDeclare])
@@ -3415,18 +3354,81 @@ model Lead {
 
 // CORRECTIF C-AUTH-01 - Table des capacites utilisateur
 model UserCapacite {
-  id          String   @id @default(uuid()) @map("cap_id")
-  userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid()) @map("cap_id")
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  capacite    String   @map("capacite")
+  capacite String @map("capacite")
   // PROPRIETAIRE | AGENCE_AGREE | AGENCE_NON_AGREE | INTERMEDIAIRE
 
-  actif       Boolean  @default(true)
-  activeeAt   DateTime @default(now()) @map("activee_at")
+  actif        Boolean   @default(true)
+  activeeAt    DateTime  @default(now()) @map("activee_at")
   desactiveeAt DateTime? @map("desactivee_at")
 
   @@unique([userId, capacite])
   @@index([userId, actif])
   @@map("user_capacites")
+}
+
+model UserWalletConfig {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique @map("user_id")
+  user                   User     @relation(fields: [userId], references: [id])
+  walletBalance          Int      @default(0) @map("wallet_balance")
+  landlordCode           String?  @unique @map("landlord_code")
+  isConfidential         Boolean  @default(false) @map("is_confidential")
+  walletSeuilAlerte      Float?   @default(500) @map("wallet_seuil_alerte")
+  walletRappelActif      Boolean  @default(false) @map("wallet_rappel_actif")
+  walletRappelJour       Int      @default(1) @map("wallet_rappel_jour")
+  walletRappelMontant    Float?   @map("wallet_rappel_montant")
+  walletOperateurPrefere String   @default("WAVE") @map("wallet_operateur_prefere")
+  walletCanalAlertePref  String   @default("WHATSAPP") @map("wallet_canal_alerte_pref")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@map("user_wallet_configs")
+}
+
+model UserDiasporaProfile {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique @map("user_id")
+  user                    User      @relation(fields: [userId], references: [id])
+  diasporaAbonnement      Boolean   @default(false) @map("diaspora_abonnement")
+  diasporaAbonnementSince DateTime? @map("diaspora_abonnement_since")
+  diasporaDevise          String    @default("FCFA") @map("diaspora_devise")
+  diasporaStripeId        String?   @map("diaspora_stripe_id")
+  diasporaWhatsapp        String?   @map("diaspora_whatsapp")
+  paysResidence           String?   @map("pays_residence")
+  fuseauHoraire           String    @default("Africa/Abidjan") @map("fuseau_horaire")
+  emailRapportMensuel     String?   @map("email_rapport_mensuel")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  @@map("user_diaspora_profiles")
+}
+
+model UserFraudProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  user              User     @relation(fields: [userId], references: [id])
+  deviceFingerprint String?  @map("device_fingerprint")
+  fraudScore        Int      @default(0) @map("fraud_score")
+  fraudFlags        Json?    @map("fraud_flags")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("user_fraud_profiles")
+}
+
+model WalletTransaction {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   @map("type") // Ex: CREDIT, DEBIT
+  amount    Int      @map("amount")
+  status    String   @default("COMPLETED") @map("status")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("wallet_transactions")
 }
