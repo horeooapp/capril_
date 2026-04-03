@@ -51,3 +51,6 @@ test-smtp.js
 *.db-journal
 *.db-wal
 *.db-shm
+
+# mobile apps
+**/node_modules/

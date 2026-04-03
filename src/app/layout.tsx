@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google"; // Removed due to DNS issue during production builds
 import "./globals.css";
-
+import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.qapril.ci"),
   title: {
@@ -70,6 +70,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="antialiased font-sans flex flex-col min-h-screen">
+        <MobileRuntimeDirector />
         {children}
         <script
           type="application/ld+json"

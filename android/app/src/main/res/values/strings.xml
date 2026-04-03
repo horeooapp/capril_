@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">QAPRIL</string>
-    <string name="title_activity_main">QAPRIL</string>
-    <string name="package_name">ci.qapril.locataire</string>
-    <string name="custom_url_scheme">ci.qapril.locataire</string>
-</resources>
