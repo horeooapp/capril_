@@ -181,19 +181,30 @@ jobs:
           
           # 2. Secure Deployment Execution
           # We use su - github -c to ensure all commands run in a clean environment as the github user.
-          # We use -H 0.0.0.0 to listen on all interfaces, allowing external access.
           sudo su - github -c "
-            mkdir -p /home/github/capril_data/uploads && \
-            cd $DEPLOY_DEST && \
-            export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
-            npm ci && \
-            npx prisma@6.4.1 db push --accept-data-loss && \
-            npx prisma@6.4.1 db seed && \
-            npx prisma@6.4.1 generate && \
-            rm -rf public/uploads || true && \
-            ln -s /home/github/capril_data/uploads public/uploads && \
-            (pm2 delete capril || true) && \
-            pm2 start npm --name capril --cwd $DEPLOY_DEST --env production -- run start && \
+            set -e
+            mkdir -p /home/github/capril_data/uploads
+            cd \$DEPLOY_DEST
+            export DATABASE_URL='${{ secrets.DATABASE_URL }}'
+            
+            npm ci --omit=dev || true
+            npx prisma@6.4.1 db push --accept-data-loss
+            npx prisma@6.4.1 db seed || true
+            npx prisma@6.4.1 generate
+            
+            rm -rf public/uploads || true
+            ln -s /home/github/capril_data/uploads public/uploads || true
+            
+            pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: No existing process capril to delete'
+            
+            if [ -f server.js ]; then
+              echo 'Found server.js, starting Next.js standalone server...'
+              pm2 start server.js --name capril --env production
+            else
+              echo 'No server.js found, falling back to npm run start...'
+              pm2 start npm --name capril --cwd \$DEPLOY_DEST --env production -- run start
+            fi
+            
             pm2 save
           "
 
@@ -205,9 +216,7 @@ jobs:
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "❌ Health check failed! Showing PM2 logs:"
-            sudo su - github -c "pm2 logs capril --lines 60 --nostream" || true
-            echo "Triggering PM2 rollback..."
-            sudo su - github -c "pm2 restart capril" || true
+            sudo su - github -c "pm2 logs capril --lines 60 --nostream || true"
             exit 1
           fi
           echo "✅ Application is healthy!"
