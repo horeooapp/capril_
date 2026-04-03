@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cmd /c \"type nul > out\\.nojekyll\"",
+    "build": "next build && node -e \"require('fs').mkdirSync('out', { recursive: true }); require('fs').writeFileSync('out/.nojekyll', '')\"",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
