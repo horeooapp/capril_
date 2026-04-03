@@ -131,7 +131,7 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
-          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+          echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
           echo "AUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "NEXTAUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "AUTH_URL=\"${{ secrets.AUTH_URL }}\"" >> .env
@@ -193,21 +193,21 @@ jobs:
             rm -rf public/uploads || true && \
             ln -s /home/github/capril_data/uploads public/uploads && \
             (pm2 delete capril || true) && \
-            pm2 start \"npm run start\" --name capril --cwd $DEPLOY_DEST --env production && \
+            pm2 start npm --name capril --cwd $DEPLOY_DEST --env production -- run start && \
             pm2 save
           "
 
       - name: 🩺 Health Check
         run: |
           echo "Waiting for app to start..."
-          sleep 10
+          sleep 20
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/health" || echo "000")
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "❌ Health check failed! Showing PM2 logs:"
-            pm2 logs capril --lines 60 --nostream
+            sudo su - github -c "pm2 logs capril --lines 60 --nostream" || true
             echo "Triggering PM2 rollback..."
-            pm2 restart capril
+            sudo su - github -c "pm2 restart capril" || true
             exit 1
           fi
           echo "✅ Application is healthy!"
