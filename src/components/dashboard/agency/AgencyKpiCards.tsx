@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { T, biens } from '@/constants/agency-data';
 import { TrendingUp, ShieldAlert, Home, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -34,6 +35,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
       sub: "Avril 2026",
       color: T.navy,
       bg: T.navyPale,
+      href: "/dashboard/wallet"
     },
     {
       icon: "✅",
@@ -42,6 +44,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
       sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du portefeuille` : "0% du portefeuille",
       color: T.green,
       bg: T.greenPale,
+      href: "/dashboard/receipts"
     },
     {
       icon: "⚠️",
@@ -50,6 +53,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
       sub: "Procédure M07 active",
       color: T.red,
       bg: T.redPale,
+      href: "/dashboard/rcl-monitor"
     },
     {
       icon: "🏠",
@@ -58,44 +62,46 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
       sub: `${vacants} vacant${vacants > 1 ? "s" : ""}`,
       color: T.teal,
       bg: T.tealPale,
+      href: "/dashboard/properties"
     },
   ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
       {stats.map((k, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-          className="glass-card-premium p-8 group overflow-hidden border-t-4"
-          style={{ borderTopColor: k.color }}
-        >
-          <div className="flex justify-between items-start mb-10">
-            <div className="text-3xl group-hover:scale-110 transition-transform duration-500">{k.icon}</div>
-            <div 
-              className="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border"
-              style={{ backgroundColor: `${k.color}10`, color: k.color, borderColor: `${k.color}20` }}
-            >
-              {k.sub}
+        <Link key={i} href={k.href}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="glass-card-premium p-8 group overflow-hidden border-t-4 h-full cursor-pointer hover:shadow-xl transition-shadow"
+            style={{ borderTopColor: k.color }}
+          >
+            <div className="flex justify-between items-start mb-10">
+              <div className="text-3xl group-hover:scale-110 transition-transform duration-500">{k.icon}</div>
+              <div 
+                className="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border"
+                style={{ backgroundColor: `${k.color}10`, color: k.color, borderColor: `${k.color}20` }}
+              >
+                {k.sub}
+              </div>
             </div>
-          </div>
-          <div>
-            <div 
-              className="text-3xl font-black mb-2 tracking-tighter leading-none"
-              style={{ color: k.color }}
-            >
-              {k.value}
+            <div>
+              <div 
+                className="text-3xl font-black mb-2 tracking-tighter leading-none"
+                style={{ color: k.color }}
+              >
+                {k.value}
+              </div>
+              <div 
+                className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70"
+                style={{ color: k.color }}
+              >
+                {k.label}
+              </div>
             </div>
-            <div 
-              className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70"
-              style={{ color: k.color }}
-            >
-              {k.label}
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </Link>
       ))}
     </div>
   );

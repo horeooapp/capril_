@@ -404,9 +404,9 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           <div className="space-y-4">
             <PropSectionHeader label="Actions disponibles" />
             <div className="grid grid-cols-2 gap-3">
-              <button className="bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50">Émettre Quittance</button>
-              <button className="bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50">Renouveler Bail</button>
-              <button className="bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50">Modifier Loyer</button>
+              <Link href={`/dashboard/receipts?propertyId=${selectedUnite?.id}`} className="flex items-center justify-center bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50 text-center">Émettre Quittance</Link>
+              <Link href={`/dashboard/leases?propertyId=${selectedUnite?.id}`} className="flex items-center justify-center bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50 text-center">Renouveler Bail</Link>
+              <Link href={`/dashboard/properties?propertyId=${selectedUnite?.id}`} className="flex items-center justify-center bg-white border border-gray-100 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight text-navy hover:bg-gray-50 text-center">Modifier Loyer</Link>
               <button 
                 onClick={() => op("removeUnite")}
                 className="bg-red-50 text-red-600 p-4 rounded-xl text-[10px] font-black uppercase tracking-tight hover:bg-red-100">Retirer Unité</button>

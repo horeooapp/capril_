@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
@@ -107,9 +108,10 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
                        {properties.flatMap(p => p.leases || [])
                         .filter(l => l.status === 'OVERDUE')
                         .map((lease, idx) => (
-                          <div 
-                            key={idx} 
-                            className="bg-red-50 border border-red-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-red-100/50 transition-all"
+                          <Link 
+                            key={idx}
+                            href={`/dashboard/rcl-monitor?leaseId=${lease.id}`}
+                            className="bg-red-50 border border-red-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-red-100/50 transition-all block"
                           >
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm text-red-600">
@@ -128,7 +130,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
                                <div className="text-lg font-black text-red-600 font-mono">-{lease.rentAmount?.toLocaleString()} FCFA</div>
                                <div className="text-[8px] font-black text-red-400 uppercase tracking-widest mt-1">Dossier #PR-0{idx+1}</div>
                             </div>
-                          </div>
+                          </Link>
                         ))}
                     </div>
                   </div>
