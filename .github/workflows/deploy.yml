@@ -202,6 +202,7 @@ jobs:
               # Copy static assets to standalone
               cp -r public .next/standalone/public || true
               cp -r .next/static .next/standalone/.next/static || true
+              cp .env .next/standalone/.env || true
               
               PORT=3000 HOST=127.0.0.1 pm2 start .next/standalone/server.js --name capril --env production
             else
