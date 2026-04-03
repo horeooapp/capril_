@@ -103,7 +103,7 @@ export class ReminderService {
       amount: lease.rentAmount,
       timing,
       smsText: `QAPRIL: Rappel paiement loyer ${lease.property.propertyCode} (${timing}). Montant: ${lease.rentAmount} FCFA.`,
-      parameters: [lease.tenant?.fullName || 'Client', lease.property.propertyCode, String(lease.rentAmount)]
+      parameters: [(lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || 'Client', lease.property.propertyCode, String(lease.rentAmount)]
     };
 
     await NotificationService.envoyerNotification(lease.tenantId, event, {
@@ -119,7 +119,7 @@ export class ReminderService {
       leaseReference: lease.leaseReference,
       timing,
       smsText: `QAPRIL: Rappel Enregistrement DGI pour le bail ${lease.leaseReference} (${timing}). Évitez les pénalités de retard !`,
-      parameters: [lease.landlord?.fullName || 'Bailleur', lease.leaseReference, timing]
+      parameters: [(lease.landlord?.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord?.lastName || "") || 'Bailleur', lease.leaseReference, timing]
     };
 
     // Note: Le rappel fiscal est pour le BAILLEUR (landlord)

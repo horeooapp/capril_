@@ -104,7 +104,7 @@ export default async function EdlAdminPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="text-xs font-medium text-gray-500 italic">via {edl.redigePar?.fullName || "Système"}</span>
+                                            <span className="text-xs font-medium text-gray-500 italic">via {(edl.redigePar?.firstName ? edl.redigePar.firstName + " " : "") + (edl.redigePar?.lastName || "") || "Système"}</span>
                                         </td>
                                         <td className="px-8 py-6">
                                             {edl.statut === "CERTIFIE" ? (

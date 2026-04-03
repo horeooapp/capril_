@@ -16,6 +16,7 @@ export async function GET(req: Request) {
     const fullUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
+        walletConfig: true,
         propertiesOwned: {
           include: {
             leases: {
@@ -39,16 +40,16 @@ export async function GET(req: Request) {
     // Role-specific mapping 4.1
     const mapping = {
       id: fullUser.id,
-      nom: fullUser.fullName,
+      nom: (fullUser.firstName ? fullUser.firstName + " " : "") + (fullUser.lastName || ""),
       email: fullUser.email,
       telephone: fullUser.phone,
-      code: fullUser.landlordCode || 'BAI-XXX',
+      code: fullUser?.walletConfig?.landlordCode || 'BAI-XXX',
       abonnement: fullUser.activePlanTier || 'ESSENTIEL',
       wallet: {
-        solde: fullUser.walletBalance || 0,
+        solde: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
         decouvert: -1500, // Fixed rule ADD-07 v3
         devise: 'FCFA',
-        statut: (fullUser.walletBalance || 0) < 0 ? 'Débiteur' : 'Actif'
+        statut: (((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) < 0 ? 'Débiteur' : 'Actif'
       },
       stats: {
          entites: nbBiens,

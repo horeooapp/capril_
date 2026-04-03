@@ -146,7 +146,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             phone: user.phone,
                             role: user.role,
                             status: user.status,
-                            fullName: user.fullName,
+                            fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
                             capaciteActive: (user as any).capaciteActive,
@@ -180,7 +180,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             phone: newUser.phone,
                             role: newUser.role,
                             status: newUser.status,
-                            fullName: newUser.fullName,
+                            fullName: (newUser.firstName ? newUser.firstName + " " : "") + (newUser.lastName || ""),
                             onboardingComplete: newUser.onboardingComplete,
                             capaciteActive: (newUser as any).capaciteActive,
                             capacites: [],
@@ -268,7 +268,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         phone: user.phone,
                         role: role,
                         status: user.status,
-                        fullName: user.fullName,
+                        fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
                         onboardingComplete: (user as any).onboardingComplete,
                         diasporaAbonnement: (user as any).diasporaAbonnement
                     } as any;

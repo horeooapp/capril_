@@ -14,7 +14,7 @@ export async function GET() {
         const logs = await prisma.auditLog.findMany({
             take: 20,
             orderBy: { createdAt: 'desc' },
-            include: { user: { select: { fullName: true } } }
+            include: { user: { select: { firstName: true, lastName: true } } }
         });
 
         return NextResponse.json(logs);

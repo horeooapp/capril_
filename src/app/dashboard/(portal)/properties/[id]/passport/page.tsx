@@ -100,7 +100,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                                     <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                                         <div>
                                                             <p className="text-sm text-gray-500">
-                                                                Occupé par <span className="font-bold text-gray-900">{lease.tenant.name || lease.tenant.email}</span>
+                                                                Occupé par <span className="font-bold text-gray-900">{(lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || lease.tenant.email}</span>
                                                             </p>
                                                             <p className="text-xs text-gray-400 mt-1">
                                                                 Loyer : <span className="font-bold text-primary">{lease.rentAmount.toLocaleString()} FCFA</span>

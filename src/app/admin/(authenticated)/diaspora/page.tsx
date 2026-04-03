@@ -80,7 +80,7 @@ export default async function AdminDiasporaPage() {
                                     <tr key={u.id} className="hover:bg-indigo-50/10 transition-colors group">
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-black text-gray-900">{u.fullName}</span>
+                                                <span className="text-sm font-black text-gray-900">{(u.firstName ? u.firstName + " " : "") + (u.lastName || "")}</span>
                                                 <span className="text-[10px] text-gray-400 font-medium">{u.email}</span>
                                             </div>
                                         </td>

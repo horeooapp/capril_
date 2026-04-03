@@ -11,12 +11,16 @@ export async function GET() {
     select: {
       id: true,
       email: true,
-      fullName: true,
-      paysResidence: true,
-      diasporaDevise: true,
-      diasporaWhatsapp: true,
-      diasporaAbonnement: true,
-      diasporaAbonnementSince: true,
+      firstName: true, lastName: true,
+      diasporaProfile: {
+        select: {
+          paysResidence: true,
+          diasporaDevise: true,
+          diasporaWhatsapp: true,
+          diasporaAbonnement: true,
+          diasporaAbonnementSince: true,
+        }
+      }
     }
   });
 
@@ -32,9 +36,13 @@ export async function POST(req: Request) {
   const updated = await prisma.user.update({
     where: { id: session.user.id },
     data: {
-      paysResidence: data.paysResidence,
-      diasporaDevise: data.devise,
-      diasporaWhatsapp: data.whatsapp,
+      diasporaProfile: {
+        update: {
+          paysResidence: data.diasporaProfile?.paysResidence,
+          diasporaDevise: data.devise,
+          diasporaWhatsapp: data.whatsapp,
+        }
+      }
     }
   });
 

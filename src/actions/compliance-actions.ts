@@ -15,20 +15,22 @@ export async function getComplianceDashboard() {
         const totalBlacklisted = await prisma.fraudBlacklist.count();
         const pendingVerification = await prisma.identityDocument.count({ where: { status: "pending" } });
         
-        const avgFraudScore = await prisma.user.aggregate({
+        const avgFraudScore = await prisma.userFraudProfile.aggregate({
             _avg: { fraudScore: true }
         });
 
         // 2. Profils Suspects (Top 5 par fraudScore)
-        const suspiciousProfiles = await prisma.user.findMany({
+        const suspiciousProfiles = await prisma.userFraudProfile.findMany({
             where: { fraudScore: { gt: 0 } },
             orderBy: { fraudScore: 'desc' },
             take: 5,
-            select: {
-                id: true,
-                fullName: true,
-                fraudScore: true,
-                fraudFlags: true
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true, lastName: true
+                    }
+                }
             }
         });
 
@@ -39,7 +41,7 @@ export async function getComplianceDashboard() {
             },
             orderBy: { createdAt: 'desc' },
             take: 5,
-            include: { user: { select: { fullName: true } } }
+            include: { user: { select: { firstName: true, lastName: true } } }
         });
 
         return {
@@ -50,10 +52,10 @@ export async function getComplianceDashboard() {
                 blacklisted: totalBlacklisted,
                 alerts: pendingVerification,
             },
-            suspiciousProfiles: (suspiciousProfiles || []).map((u) => ({
-                name: u.fullName || "Utilisateur Inconnu",
-                score: u.fraudScore,
-                reason: (u.fraudFlags as any)?.reason || "Score de risque élevé"
+            suspiciousProfiles: (suspiciousProfiles || []).map((fp) => ({
+                name: (fp.user.firstName ? fp.user.firstName + " " : "") + (fp.user.lastName || "") || "Utilisateur Inconnu",
+                score: (fp.fraudScore || 0),
+                reason: (fp.fraudFlags as any)?.reason || "Score de risque élevé"
             })),
             logs: (surveillanceLogs || []).map((l) => ({
                 time: new Date(l.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),

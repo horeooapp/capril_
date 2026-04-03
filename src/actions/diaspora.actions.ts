@@ -17,14 +17,30 @@ export async function activerDiaspora(userId: string, data: {
   return prisma.user.update({
     where: { id: userId },
     data: {
-      diasporaAbonnement:      true,
-      diasporaAbonnementSince: new Date(),
-      diasporaDevise:          "EUR",
-      diasporaStripeId:        data.diasporaStripeId,
-      diasporaWhatsapp:        data.diasporaWhatsapp,
-      paysResidence:           data.paysResidence,
-      fuseauHoraire:           data.fuseauHoraire ?? "Europe/Paris",
-      emailRapportMensuel:     data.emailRapport,
+      diasporaProfile: {
+        upsert: {
+          create: {
+            diasporaAbonnement:      true,
+            diasporaAbonnementSince: new Date(),
+            diasporaDevise:          "EUR",
+            diasporaStripeId:        data.diasporaStripeId,
+            diasporaWhatsapp:        data.diasporaWhatsapp,
+            paysResidence:           data.paysResidence,
+            fuseauHoraire:           (data.fuseauHoraire || "Africa/Abidjan") ?? "Europe/Paris",
+            emailRapportMensuel:     data.emailRapport,
+          },
+          update: {
+            diasporaAbonnement:      true,
+            diasporaAbonnementSince: new Date(),
+            diasporaDevise:          "EUR",
+            diasporaStripeId:        data.diasporaStripeId,
+            diasporaWhatsapp:        data.diasporaWhatsapp,
+            paysResidence:           data.paysResidence,
+            fuseauHoraire:           (data.fuseauHoraire || "Africa/Abidjan") ?? "Europe/Paris",
+            emailRapportMensuel:     data.emailRapport,
+          }
+        }
+      }
     }
   });
 }
@@ -72,8 +88,7 @@ export async function genererRapportMensuel(userId: string, mois: number, annee:
 export async function getStatutDiaspora(userId: string) {
   const user = await prisma.user.findUnique({
     where:  { id: userId },
-    select: { diasporaAbonnement: true, diasporaAbonnementSince: true,
-              diasporaDevise: true, paysResidence: true, fuseauHoraire: true }
+    select: { diasporaProfile: true }
   });
-  return user;
+  return user?.diasporaProfile;
 }

@@ -16,7 +16,7 @@ async function checkMandatAccess(intermediaireId: string, propertyId: string) {
         where: {
             intermediaireId,
             statut: 'ACCEPTE',
-            biensConcernes: { contains: propertyId }
+            biensConcernes: { has: propertyId }
         }
     });
     if (!mandate) {
@@ -45,7 +45,7 @@ export async function getIntermediaireDashboardData() {
             },
             include: {
                 proprietaire: {
-                    select: { fullName: true, id: true }
+                    select: { firstName: true, lastName: true, id: true }
                 }
             }
         })
@@ -55,13 +55,7 @@ export async function getIntermediaireDashboardData() {
         }
 
         // 2. Extract property IDs from JSON string in MandatGestion
-        const allPropertyIds = mandates.flatMap(m => {
-            try {
-                return JSON.parse(m.biensConcernes || "[]")
-            } catch (e) {
-                return []
-            }
-        }) as string[]
+        const allPropertyIds = mandates.flatMap(m => m.biensConcernes || [])
 
         const uniquePropertyIds = Array.from(new Set(allPropertyIds))
 
@@ -75,7 +69,7 @@ export async function getIntermediaireDashboardData() {
                     where: { status: "ACTIVE" },
                     include: {
                         tenant: {
-                            select: { fullName: true, phone: true }
+                            select: { firstName: true, lastName: true, phone: true }
                         },
                         receipts: {
                             orderBy: { periodMonth: 'desc' },
@@ -120,7 +114,7 @@ export async function getIntermediaireDashboardData() {
                 : 0.05 // 5% default for Intermédiaire
             
             // Calc commissions on properties within this specific mandate
-            const mPropIds = JSON.parse(m.biensConcernes || "[]") as string[]
+            const mPropIds = m.biensConcernes || []
             const mProps = properties.filter(p => mPropIds.includes(p.id))
             mProps.forEach(p => {
                 p.leases.forEach(l => {
@@ -192,7 +186,7 @@ export async function emettreQuittanceIntermediaire(data: {
         // 3. Create receipt with SHA-256 (Rule N°3)
         const manager = await prisma.user.findUnique({
             where: { id: userId },
-            select: { fullName: true }
+            select: { firstName: true, lastName: true }
         })
 
         // SHA256(ref|mois|montant|bienId|intermediataireId|timestamp)
@@ -208,7 +202,7 @@ export async function emettreQuittanceIntermediaire(data: {
             paymentChannel: data.paymentChannel,
             paymentReference: data.paymentReference,
             receiptType: "LOYER",
-            creatorName: manager?.fullName || "Mandataire QAPRIL"
+            creatorName: (manager?.firstName ? manager.firstName + " " : "") + (manager?.lastName || "") || "Mandataire QAPRIL"
         })
 
         revalidatePath("/dashboard")

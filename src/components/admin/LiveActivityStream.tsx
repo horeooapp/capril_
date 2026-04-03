@@ -72,7 +72,7 @@ export default function LiveActivityStream({ logs: initialLogs = [] }: LiveActiv
                                 {(log.action || "").replace(/_/g, " ")}
                             </span>
                             <span className="text-gray-600 italic truncate">
-                                by {log.user?.fullName || "System"}
+                                by {(log.user?.firstName ? log.user.firstName + " " : "") + (log.user?.lastName || "") || "System"}
                             </span>
                         </motion.div>
                     ))}

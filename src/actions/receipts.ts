@@ -31,7 +31,7 @@ export async function createReceipt(data: {
         const [creator, config] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: userId },
-                select: { id: true, activePlanTier: true, walletBalance: true, fullName: true, role: true }
+                select: { id: true, activePlanTier: true, walletConfig: { select: { walletBalance: true } }, firstName: true, lastName: true, role: true }
             }),
             prisma.configTarif.findUnique({
                 where: { cle: "quittance_ttc" }
@@ -56,7 +56,7 @@ export async function createReceipt(data: {
         }
 
         if (shouldDeduct) {
-            const currentBalance = creator.walletBalance || 0;
+            const currentBalance = ((creator?.walletConfig?.walletBalance || 0) || 0) || 0;
             const nextBalance = currentBalance - RECEIPT_COST;
 
             // Bloquer seulement si on dépasse la limite critique de crédit (-1500 FCFA)
@@ -68,8 +68,8 @@ export async function createReceipt(data: {
             }
 
             // Déduction effective (Peut devenir négatif)
-            await prisma.user.update({
-                where: { id: userId },
+            await prisma.userWalletConfig.update({
+                where: { userId: userId },
                 data: { walletBalance: { decrement: RECEIPT_COST } }
             });
 
@@ -83,7 +83,7 @@ export async function createReceipt(data: {
         // 2. Delegate to shared library logic
         const receipt = await createAndNotifyReceipt({
             ...data,
-            creatorName: creator.fullName || undefined
+            creatorName: (creator.firstName ? creator.firstName + " " : "") + (creator.lastName || "") || undefined
         });
 
         revalidatePath(`/dashboard/leases/${data.leaseId}`)
@@ -116,8 +116,8 @@ export async function getReceiptById(id: string) {
             lease: {
                 include: {
                     property: true,
-                    landlord: { select: { fullName: true, phone: true } },
-                    tenant: { select: { fullName: true, phone: true } }
+                    landlord: { select: { firstName: true, lastName: true, phone: true } },
+                    tenant: { select: { firstName: true, lastName: true, phone: true } }
                 }
             }
         }

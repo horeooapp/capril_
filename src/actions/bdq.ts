@@ -166,7 +166,7 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         let tenant = await prisma.user.findUnique({ where: { phone: bdq.telephoneLocataire } })
         if (!tenant) {
             tenant = await prisma.user.create({
-                data: { phone: bdq.telephoneLocataire, fullName: bdq.nomLocataireDeclare, role: Role.TENANT, status: 'pending' }
+                data: { phone: bdq.telephoneLocataire, firstName: bdq.nomLocataireDeclare, role: Role.TENANT, status: 'pending' }
             })
         }
 
@@ -363,7 +363,7 @@ export async function getBDQByToken(token: string) {
             confirmationAt: true,
             hashBdqFinal: true,
             hashDeclaration: true,
-            bailleur: { select: { fullName: true } }
+            bailleur: { select: { firstName: true, lastName: true } }
         }
     })
 }

@@ -80,7 +80,7 @@ export function InvitationsLocataireClient({ initialInvitations }: InvitationsLo
                                     {inv.invitantType === 'PROPRIETAIRE' ? <User size={24} /> : <Building2 size={24} />}
                                 </div>
                                 <div>
-                                    <p className="font-black text-[#1F4E79] text-lg leading-tight">{inv.invitant?.fullName || "Bailleur QAPRIL"}</p>
+                                    <p className="font-black text-[#1F4E79] text-lg leading-tight">{(inv.invitant?.firstName ? inv.invitant.firstName + " " : "") + (inv.invitant?.lastName || "") || "Bailleur QAPRIL"}</p>
                                     <p className="text-[11px] text-gray-400 uppercase font-black tracking-widest">Souhaite vous inviter</p>
                                 </div>
                             </div>

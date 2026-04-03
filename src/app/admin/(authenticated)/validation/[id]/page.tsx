@@ -78,7 +78,7 @@ export default async function DocumentValidationPage({ params }: { params: Promi
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nom Complet (Déclaré)</label>
-                                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight">{doc.user?.fullName || "Utilisateur Inconnu"}</div>
+                                    <div className="text-lg font-bold text-gray-900 uppercase tracking-tight">{(doc.user?.firstName ? doc.user.firstName + " " : "") + (doc.user?.lastName || "") || "Utilisateur Inconnu"}</div>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@ export default async function DocumentValidationPage({ params }: { params: Promi
                                 <User size={32} />
                             </div>
                             <div>
-                                <h4 className="font-black text-gray-900 uppercase tracking-tighter">{doc.user?.fullName}</h4>
+                                <h4 className="font-black text-gray-900 uppercase tracking-tighter">{(doc.user?.firstName ? doc.user.firstName + " " : "") + (doc.user?.lastName || "")}</h4>
                                 <p className="text-xs font-bold text-gray-400">{doc.user?.phone}</p>
                             </div>
                         </div>

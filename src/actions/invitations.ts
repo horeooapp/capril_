@@ -41,12 +41,12 @@ export async function sendInvitation(data: {
 
         // Déclencher SMS/WhatsApp via service tiers
         const { NotificationService } = await import("@/lib/notification-service")
-        const invitant = await prisma.user.findUnique({ where: { id: data.invitantId }, select: { fullName: true } })
+        const invitant = await prisma.user.findUnique({ where: { id: data.invitantId }, select: { firstName: true, lastName: true } })
         
         await NotificationService.envoyerNotification(data.locataireId, "INVITATION_BAIL_RECUE", {
             payload: {
-                smsText: `[QAPRIL] ${invitant?.fullName || 'Un bailleur'} vous invite pour un bien. Répondez sur : https://qapril.ci/locataire/invitations`,
-                parameters: [invitant?.fullName || 'Un bailleur']
+                smsText: `[QAPRIL] ${(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur'} vous invite pour un bien. Répondez sur : https://qapril.ci/locataire/invitations`,
+                parameters: [(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur']
             }
         })
 
@@ -116,7 +116,7 @@ export async function getLocataireInvitations(userId: string) {
             include: {
                 property: true,
                 invitant: {
-                    select: { fullName: true }
+                    select: { firstName: true, lastName: true }
                 }
             },
             orderBy: { createdAt: 'desc' }

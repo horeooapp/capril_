@@ -38,7 +38,7 @@ export default function ManagersList({ accesses }: { accesses: any[] }) {
                         <div>
                             <div className="flex items-center gap-2">
                                 <h4 className="font-black text-[#1F4E79] italic uppercase tracking-tighter">
-                                    {access.user.fullName || access.user.phone}
+                                    {(access.user.firstName ? access.user.firstName + " " : "") + (access.user.lastName || "") || access.user.phone}
                                 </h4>
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px] font-black uppercase tracking-widest">
                                     {access.role}

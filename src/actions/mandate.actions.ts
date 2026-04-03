@@ -68,7 +68,7 @@ export async function revokeMandate(mandateId: string, revokedByUserId: string, 
 export async function getMandatesForProperty(propertyId: string) {
   return prisma.mandate.findMany({
     where:   { propertyId, status: { in: ["ACTIVE","DRAFT"] } },
-    include: { agent: { select: { fullName: true, phone: true, agenceProfile: true } } },
+    include: { agent: { select: { firstName: true, lastName: true, phone: true, agenceProfile: true } } },
     orderBy: { startDate: "desc" }
   });
 }

@@ -82,10 +82,10 @@ export default async function ChampionsAdminPage() {
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 font-black text-xs">
-                                                    {champion.user?.fullName?.charAt(0) || "C"}
+                                                    {(champion.user?.firstName ? champion.user.firstName + " " : "") + (champion.user?.lastName || "")?.charAt(0) || "C"}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-black text-gray-900 leading-none mb-1">{champion.user?.fullName}</span>
+                                                    <span className="text-sm font-black text-gray-900 leading-none mb-1">{(champion.user?.firstName ? champion.user.firstName + " " : "") + (champion.user?.lastName || "")}</span>
                                                     <span className="text-[10px] text-gray-500 font-medium">{champion.user?.phone}</span>
                                                 </div>
                                             </div>

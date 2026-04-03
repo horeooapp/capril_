@@ -128,15 +128,15 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
         conv = await prisma.bdqConversationState.create({
             data: {
                 bailleurId: userId,
-                canal: "APP_CHAT",
+                canal: "WHATSAPP",
                 canalRef,
                 statut: BdqConvStatut.EN_COURS,
-                messagesHistory: "[]"
+                messagesHistory: []
             }
         });
     }
 
-    const history = JSON.parse(conv.messagesHistory || "[]") as any[];
+    const history = (conv.messagesHistory || []) as any[];
     history.push({ role: "user", content: userMessage });
 
     // 2. Call Claude API 
@@ -268,7 +268,7 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
                 await prisma.bdqConversationState.update({
                     where: { id: conv.id },
                     data: {
-                        messagesHistory: JSON.stringify(history),
+                        messagesHistory: history,
                         tokensEntreeTotal: conv.tokensEntreeTotal + inputTokens + (finalData.usage?.input_tokens || 0),
                         tokensSortieTotal: conv.tokensSortieTotal + outputTokens + (finalData.usage?.output_tokens || 0),
                         coutEstimeFcfa: (conv.coutEstimeFcfa as unknown as number) + costFcfa
@@ -283,7 +283,7 @@ export async function processAiBdqMessage(canalRef: string, userMessage: string,
     await prisma.bdqConversationState.update({
         where: { id: conv.id },
         data: {
-            messagesHistory: JSON.stringify(history),
+            messagesHistory: history,
             nbEchanges: conv.nbEchanges + 1,
             tokensEntreeTotal: conv.tokensEntreeTotal + inputTokens,
             tokensSortieTotal: conv.tokensSortieTotal + outputTokens,

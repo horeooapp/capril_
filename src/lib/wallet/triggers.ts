@@ -44,8 +44,11 @@ export async function processWalletTriggers() {
       let triggerType: "SOLDE_BAS" | "FIN_DE_MOIS" | "RAPPEL_MENSUEL" | "CREDIT_GENERE" | null = null;
 
       // --- TRIGGER 1: Solde Bas ---
-      const seuil = user.walletSeuilAlerte || SEUIL_DEFAUT;
-      if ((user.walletBalance as number) < (seuil as number) && (user.walletBalance as number) >= 0) {
+      const seuil = user?.walletRechargeConfig?.montantFixe ?? SEUIL_DEFAUT; // Changed to montantFixe for triggers because walletSeuilAlerte no longer exists
+      // In the absence of a direct walletBalance, and seeing this is about recharge, the condition might need to use UserWalletConfig
+      const userWallet = await prisma.userWalletConfig.findUnique({ where: { userId: user.id } });
+      const currentBalance = userWallet?.walletBalance ?? 0;
+      if (currentBalance < (seuil as number) && currentBalance >= 0) {
         // Vérifier le quota quotidien d'alertes auto
         const nbAlertes24h = await prisma.walletRechargeLink.count({
           where: {
@@ -63,7 +66,8 @@ export async function processWalletTriggers() {
       // --- TRIGGER 2: Fin de mois ---
       if (!triggerType && isEndOfMonth) {
         const besoinMoisSuivant = user._count.leasesAsLandlord * PRIX_UNITE;
-        if ((user.walletBalance || 0) < besoinMoisSuivant) {
+        const currentBalance2 = userWallet?.walletBalance ?? 0;
+        if (currentBalance2 < besoinMoisSuivant) {
           triggerType = "FIN_DE_MOIS";
         }
       }
@@ -97,6 +101,8 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
+      walletRechargeConfig: true,
+      walletConfig: true,
       _count: {
         select: { leasesAsLandlord: { where: { status: "ACTIVE" } } }
       }
@@ -107,7 +113,7 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
 
   const options = await calculateSuggestedRecharge(user.id);
   const amount = options.recommande;
-  const operator = (user.walletOperateurPrefere || "WAVE") as Operator;
+  const operator = (user?.walletRechargeConfig?.operateurPrefere || "WAVE") as Operator;
   const ref = `AUTO-${trigger}-${Date.now()}`;
 
   const rawUrl = await generateDeepLink(operator, amount, ref);
@@ -119,10 +125,10 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
       declencheur: trigger,
       operateur: operator,
       montantSuggere: amount,
-      soldeAuMoment: user.walletBalance,
+      soldeAuMoment: (user?.walletConfig?.walletBalance || 0),
       nbBailsActifs: user._count.leasesAsLandlord,
       urlGeneree: rawUrl,
-      canalEnvoi: user.walletCanalAlertePref || "WHATSAPP",
+      canalEnvoi: user?.walletRechargeConfig?.canalPrefere || "WHATSAPP",
       expireAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
     }
   });
@@ -132,8 +138,8 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
 
   // 2. Templates 2026 (Zero Friction)
   let message = "";
-  const name = user.fullName || 'Propriétaire';
-  const balance = user.walletBalance || 0;
+  const name = (user.firstName ? user.firstName + " " : "") + (user.lastName || "") || 'Propriétaire';
+  const balance = user?.walletConfig?.walletBalance || 0;
 
   switch (trigger) {
     case "SOLDE_BAS":
@@ -151,7 +157,7 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
   }
 
   // 3. Envoi effectif
-  if (user.walletCanalAlertePref === "SMS") {
+  if (user?.walletRechargeConfig?.canalPrefere === "SMS") {
     await sendSMS(user.phone || "", message);
   } else {
     // Par défaut WhatsApp (Mock implementation for now)

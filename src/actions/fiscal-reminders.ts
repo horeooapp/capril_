@@ -29,7 +29,7 @@ export async function triggerFiscalReminders() {
                         leaseReference: true,
                         landlordId: true,
                         landlord: {
-                            select: { fullName: true }
+                            select: { firstName: true, lastName: true }
                         }
                     }
                 }

@@ -44,7 +44,7 @@ export class MessagingService {
         "NOUVEAU_MESSAGE_BAIL",
         {
           payload: {
-            titre: `Nouveau message de ${message.expediteur.fullName}`,
+            titre: `Nouveau message de ${(message.expediteur.firstName ? message.expediteur.firstName + " " : "") + (message.expediteur.lastName || "")}`,
             message: data.contenu.substring(0, 50) + (data.contenu.length > 50 ? "..." : ""),
             leaseId: data.leaseId,
             msgId: message.id
@@ -79,7 +79,7 @@ export class MessagingService {
       include: {
         expediteur: {
           select: {
-            fullName: true,
+            firstName: true, lastName: true,
             role: true,
           },
         },

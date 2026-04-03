@@ -48,7 +48,7 @@ export default function AuditPage() {
             const searchLower = filter.search.toLowerCase()
             return (
                 (log.action || "").toLowerCase().includes(searchLower) ||
-                (log.user?.fullName || "").toLowerCase().includes(searchLower) ||
+                ((log.user?.firstName ? log.user.firstName + " " : "") + (log.user?.lastName || "") || "").toLowerCase().includes(searchLower) ||
                 (log.entityId || "").toLowerCase().includes(searchLower)
             )
         }
@@ -199,7 +199,7 @@ export default function AuditPage() {
                                                 <UserIcon size={18} />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-[14px] font-black text-gray-800 tracking-tight">{log.user?.fullName || "Système Externe"}</span>
+                                                <span className="text-[14px] font-black text-gray-800 tracking-tight">{(log.user?.firstName ? log.user.firstName + " " : "") + (log.user?.lastName || "") || "Système Externe"}</span>
                                                 <span className="text-[11px] font-black text-ivoire-dark/60 uppercase tracking-widest">{log.user?.role || "AUTONOME"}</span>
                                             </div>
                                         </div>
@@ -300,7 +300,7 @@ export default function AuditPage() {
                                 <div className="grid grid-cols-2 gap-8">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</p>
-                                        <p className="text-[15px] font-black text-gray-900">{selectedLog.user?.fullName || "Système"}</p>
+                                        <p className="text-[15px] font-black text-gray-900">{(selectedLog.user?.firstName ? selectedLog.user.firstName + " " : "") + (selectedLog.user?.lastName || "") || "Système"}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">IP Client</p>

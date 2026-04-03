@@ -20,7 +20,7 @@ export async function GET() {
 
     const tariffs = await prisma.configTarif.findMany({
       orderBy: { cle: "asc" },
-      include: { modifiePar: { select: { fullName: true } } },
+      include: { modifiePar: { select: { firstName: true, lastName: true } } },
     });
 
     return NextResponse.json(tariffs);

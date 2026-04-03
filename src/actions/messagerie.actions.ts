@@ -21,7 +21,7 @@ export async function envoyerMessage(data: {
 export async function getMessagesBail(leaseId: string) {
   return prisma.messagerieBail.findMany({
     where:   { leaseId },
-    include: { expediteur: { select: { fullName: true, role: true } } },
+    include: { expediteur: { select: { firstName: true, lastName: true, role: true } } },
     orderBy: { dateEnvoi: "asc" }
   });
 }

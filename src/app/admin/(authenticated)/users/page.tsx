@@ -54,10 +54,10 @@ export default async function AdminUsersPage() {
                                             user.role === Role.SUPER_ADMIN ? 'bg-indigo-600' : 
                                             user.role === Role.ADMIN ? 'bg-purple-600' : 'bg-gray-400'
                                         }`}>
-                                            {user.fullName?.charAt(0) || user.email?.charAt(0) || "?"}
+                                            {((user as any).firstName?.charAt(0) || user.email?.charAt(0) || "?")}
                                         </div>
                                         <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">{user.fullName || "Utilisateur sans nom"}</div>
+                                            <div className="text-sm font-medium text-gray-900">{((user as any).firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}` : "Utilisateur sans nom")}</div>
                                             <div className="text-sm text-gray-500">{user.email || user.phone}</div>
                                         </div>
                                     </div>
@@ -86,7 +86,7 @@ export default async function AdminUsersPage() {
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <UserActions 
                                         userId={user.id} 
-                                        userName={user.fullName || user.email || user.phone || ""}
+                                        userName={((user as any).firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}` : user.email || user.phone || "")}
                                         currentRole={user.role} 
                                         isSuperAdmin={isSuperAdmin} 
                                         currentUserId={session?.user?.id || ""}

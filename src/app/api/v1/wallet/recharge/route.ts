@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       amount,
       currency: "XOF",
       description: `Rechargement Wallet QAPRIL - ${user.email}`,
-      customer_name: user.fullName || "Client",
+      customer_name: (user.firstName ? user.firstName + " " : "") + (user.lastName || "") || "Client",
       customer_surname: "QAPRIL",
       customer_email: user.email || "",
       customer_phone_number: (user as any).phone || "00000000",

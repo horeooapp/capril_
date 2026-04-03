@@ -56,7 +56,7 @@ export async function processPendingDeclarations() {
                 const managers = dec.lease.property.accessRoles
                 const recipients = managers.length > 0 ? managers.map((m: any) => m.user) : [dec.lease.property.owner]
                 
-                const tenantName = dec.tenant.fullName || dec.tenant.phone
+                const tenantName = (dec.tenant.firstName ? dec.tenant.firstName + " " : "") + (dec.tenant.lastName || "") || dec.tenant.phone
                 const reminderMsg = `QAPRIL (RAPPEL) : ${tenantName} attend la confirmation de son paiement (${Number(dec.montantDeclare).toLocaleString()} FCFA). Répondez OUI ou NON.`
 
                 for (const recipient of recipients) {

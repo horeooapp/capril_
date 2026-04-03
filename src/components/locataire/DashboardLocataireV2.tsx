@@ -160,7 +160,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
                 <span className="font-black text-gray-900 uppercase tracking-tighter">
                   {mainBail?.typeGestion === "agreee"
                     ? `Masqué (Agence agréée)`
-                    : (mainBail?.bailleurMasque ? "Identité masquée" : mainBail?.landlord?.fullName || "—")}
+                    : (mainBail?.bailleurMasque ? "Identité masquée" : ((mainBail?.landlord?.firstName || '') + " " + (mainBail?.landlord?.lastName || '')).trim() || "—")}
                 </span>
               </div>
               {mainBail?.sha && (

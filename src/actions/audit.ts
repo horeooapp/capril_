@@ -41,7 +41,7 @@ export async function getAuditLogs(filters?: {
         include: {
             user: {
                 select: {
-                    fullName: true,
+                    firstName: true, lastName: true,
                     role: true
                 }
             }

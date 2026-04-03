@@ -15,8 +15,8 @@ export async function generateScoreCertificate(userId: string) {
             where: { id: userId },
             select: {
                 id: true,
-                fullName: true,
-                fraudScore: true,
+                firstName: true, lastName: true,
+                fraudProfile: { select: { fraudScore: true } },
                 activePlanTier: true
             }
         })
@@ -24,7 +24,7 @@ export async function generateScoreCertificate(userId: string) {
         if (!user) return { success: false, error: "Utilisateur non trouvé." }
 
         // Uniquement pour les scores < 20 (Excellent payeur)
-        if (user.fraudScore >= 20) {
+        if ((user.fraudProfile?.fraudScore || 0) >= 20) {
             return { success: false, error: "Score insuffisant pour une certification." }
         }
 
@@ -34,7 +34,7 @@ export async function generateScoreCertificate(userId: string) {
 
         // On pourrait stocker cela dans une table `Certificate` dédiée
         // Pour l'instant on logue l'action
-        console.log(`CERTIFICATE_GENERATED: ${certId} for ${user.fullName}`)
+        console.log(`CERTIFICATE_GENERATED: ${certId} for ${(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}`)
 
         return { 
             success: true, 

@@ -13,7 +13,7 @@ export default function DashboardBailleur({ data }: Props) {
   const [bienOuvert,    setBienOuvert]    = useState<string | null>(null);
   const [opWallet,      setOpWallet]      = useState<keyof typeof OP_COLORS>("WAVE");
 
-  const seuil = data.walletSeuilAlerte ?? 1000;
+  const seuil = data?.walletSeuilAlerte ?? 1000;
   const pct   = Math.min(100, (data.walletBalance / 5000) * 100);
 
   return (

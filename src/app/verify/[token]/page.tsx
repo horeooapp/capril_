@@ -13,7 +13,7 @@ export default async function VerifyCertificatePage({ params }: { params: Promis
                     lease: {
                         include: {
                             property: true,
-                            landlord: { select: { fullName: true } }
+                            landlord: { select: { firstName: true, lastName: true } }
                         }
                     }
                 }
@@ -80,7 +80,7 @@ export default async function VerifyCertificatePage({ params }: { params: Promis
                                 </div>
                                 <div>
                                     <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Bailleur</span>
-                                    <span className="text-sm font-black text-slate-900 truncate w-full inline-block">{lease.landlord.fullName || "Confidentiel"}</span>
+                                    <span className="text-sm font-black text-slate-900 truncate w-full inline-block">{(lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || "Confidentiel"}</span>
                                 </div>
                             </div>
                         </div>

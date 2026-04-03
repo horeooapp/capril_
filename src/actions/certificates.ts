@@ -65,7 +65,7 @@ export async function generateRentalCertificate(leaseId: string): Promise<Rental
         certificateId: `CERT-${lease.id.substring(0, 8).toUpperCase()}`,
         issueDate: new Date(),
         tenant: {
-            name: lease.tenant?.fullName || null,
+            name: (lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || null,
             email: lease.tenant?.email || null
         },
         property: {

@@ -25,7 +25,7 @@ export async function getTenantDashboard() {
         const activeLease = await prisma.lease.findFirst({
             where: {
                 tenantId: userId,
-                status: { in: ["ACTIVE", "EN_RETARD", "PENDING_SIGNATURE", "EXPIRING"] }
+                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE"] }
             },
             include: {
                 property: true,
@@ -46,9 +46,9 @@ export async function getTenantDashboard() {
 
         // 3. Calculer les statistiques du loyer
         const totalArrears = activeLease.arrears.reduce((sum, arr) => sum + arr.amount, 0)
-        let leaseStatus = activeLease.status
+        let leaseStatus: any = activeLease.status
         if (totalArrears > 0) {
-            leaseStatus = "EN_RETARD"
+            leaseStatus = "LOYER_IMPAYE"
         }
 
         // 4. Utilitaires (Factures OCR CIE/SODECI)

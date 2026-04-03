@@ -135,14 +135,14 @@ export async function getBiensPortefeuille(ownerUserId: string) {
         include: {
           leases: {
             where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
-            include: { tenant: { select: { fullName: true } } },
+            include: { tenant: { select: { firstName: true, lastName: true } } },
             take: 1
           }
         }
       },
       leases: {
         where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
-        include: { tenant: { select: { fullName: true } } },
+        include: { tenant: { select: { firstName: true, lastName: true } } },
         take: 1
       }
     },
@@ -188,11 +188,11 @@ export async function retirerProperty(propertyId: string) {
                 include: {
                     leases: {
                         where: { status: 'ACTIVE' },
-                        select: { tenantId: true, tenant: { select: { phone: true, fullName: true } } }
+                        select: { tenantId: true, tenant: { select: { phone: true, firstName: true, lastName: true } } }
                     },
                     mandates: {
                         where: { status: 'ACTIVE' },
-                        select: { agentUserId: true, agent: { select: { phone: true, name: true } } }
+                        select: { agentUserId: true, agent: { select: { phone: true, firstName: true, lastName: true } } }
                     }
                 }
             })

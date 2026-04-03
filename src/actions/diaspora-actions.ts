@@ -20,9 +20,13 @@ export async function subscribeToDiaspora(userId: string) {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        diasporaAbonnement: true,
-        diasporaAbonnementSince: new Date(),
-        activePlanTier: 'PREMIUM' // Diaspora est un add-on mais élève souvent au rang Premium
+        activePlanTier: 'PREMIUM', // Diaspora est un add-on mais élève souvent au rang Premium
+        diasporaProfile: {
+          upsert: {
+            create: { diasporaAbonnement: true, diasporaAbonnementSince: new Date() },
+            update: { diasporaAbonnement: true, diasporaAbonnementSince: new Date() }
+          }
+        }
       }
     });
 
@@ -49,10 +53,22 @@ export async function updateDiasporaSettings(data: {
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        paysResidence: data.paysResidence,
-        diasporaDevise: data.devise,
-        diasporaWhatsapp: data.whatsapp,
-        emailRapportMensuel: data.emailRapport
+        diasporaProfile: {
+          upsert: {
+            create: {
+              paysResidence: data.paysResidence,
+              diasporaDevise: data.devise,
+              diasporaWhatsapp: data.whatsapp,
+              emailRapportMensuel: data.emailRapport
+            },
+            update: {
+              paysResidence: data.paysResidence,
+              diasporaDevise: data.devise,
+              diasporaWhatsapp: data.whatsapp,
+              emailRapportMensuel: data.emailRapport
+            }
+          }
+        }
       }
     });
 
@@ -90,7 +106,7 @@ export async function designateMandatLocal(input: {
         proprietaireId: session.user.id,
         intermediaireId: mandataire.id,
         profil: input.profil,
-        biensConcernes: JSON.stringify(input.biensIds),
+        biensConcernes: input.biensIds || [],
         permissions: input.permissions,
         statut: "EN_ATTENTE"
       }

@@ -32,8 +32,8 @@ export const AgencyPropertyList: React.FC<{ properties: any[], user?: any }> = (
           
           // Rule 5.2 - Anonymity Logic
           const displayBailleur = isCollaborator || p.bailleurMasque 
-            ? (p.landlord?.landlordCode || "BAI-XXXX") 
-            : (p.landlord?.fullName || "Bailleur");
+            ? (p.landlord?.walletConfig?.landlordCode || "BAI-XXXX") 
+            : ((p.landlord?.firstName ? p.landlord.firstName + " " : "") + (p.landlord?.lastName || "") || "Bailleur");
             
           const displayLocataire = isCollaborator 
             ? "Locataire Masqué" 

@@ -13,10 +13,10 @@ export async function generateLandlordCode(): Promise<string> {
     while (exists) {
         const num = Math.floor(Math.random() * (max - min + 1)) + min;
         code = `BAI-${num}`;
-        const user = await prisma.user.findUnique({
+        const config = await prisma.userWalletConfig.findUnique({
             where: { landlordCode: code },
         });
-        if (!user) exists = false;
+        if (!config) exists = false;
     }
 
     return code;
@@ -30,7 +30,10 @@ export async function populateLandlordCodes() {
     const users = await prisma.user.findMany({
         where: { 
             role: { in: ["LANDLORD", "LANDLORD_PRO", "AGENCY"] },
-            landlordCode: null 
+            OR: [
+                { walletConfig: { is: null } },
+                { walletConfig: { landlordCode: null } }
+            ] 
         },
     });
 
@@ -40,7 +43,14 @@ export async function populateLandlordCodes() {
         const code = await generateLandlordCode();
         await prisma.user.update({
             where: { id: user.id },
-            data: { landlordCode: code },
+            data: { 
+                walletConfig: {
+                    upsert: {
+                        create: { landlordCode: code },
+                        update: { landlordCode: code }
+                    }
+                } 
+            },
         });
         console.log(`[MM-04b] Assigned ${code} to User ${user.id}`);
     }

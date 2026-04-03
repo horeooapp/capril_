@@ -143,7 +143,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                 
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center gap-3">
-                                        <h3 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase">{searchResult.fullName}</h3>
+                                        <h3 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase">{(searchResult.firstName ? searchResult.firstName + " " : "") + (searchResult.lastName || "")}</h3>
                                         <div className="px-3 py-1 bg-emerald-50 text-emerald-500 rounded-full border border-emerald-100 flex items-center gap-1.5">
                                             <ShieldCheck size={12} />
                                             <span className="text-[10px] font-black uppercase tracking-widest">Identité Vérifiée</span>
@@ -203,7 +203,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h3 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter">Proposition de Bail</h3>
-                                    <p className="text-gray-400 font-medium">À l'attention de <span className="text-gray-900 font-bold">{invitationModal.locataire?.fullName}</span></p>
+                                    <p className="text-gray-400 font-medium">À l'attention de <span className="text-gray-900 font-bold">{(invitationModal.locataire?.firstName ? invitationModal.locataire.firstName + " " : "") + (invitationModal.locataire?.lastName || "")}</span></p>
                                 </div>
                                 <button onClick={() => setInvitationModal({ open: false, locataire: null })} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                                     <X size={24} className="text-gray-400" />

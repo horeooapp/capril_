@@ -134,7 +134,7 @@ export async function getPrepaymentRequests() {
             lease: {
                 include: { property: true }
             },
-            tenant: { select: { fullName: true, phone: true } }
+            tenant: { select: { firstName: true, lastName: true, phone: true } }
         },
         orderBy: { createdAt: 'desc' }
     });

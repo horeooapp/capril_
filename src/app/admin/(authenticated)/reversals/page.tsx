@@ -39,7 +39,7 @@ export default async function ReversalsAdminPage() {
                             <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors group">
                                 <td className="p-5">
                                     <div className="font-bold text-gray-900">{payment.refInterne}</div>
-                                    <div className="text-[10px] text-gray-500 font-mono">{payment.lease?.landlord?.fullName}</div>
+                                    <div className="text-[10px] text-gray-500 font-mono">{((payment.lease?.landlord?.firstName || '') + " " + (payment.lease?.landlord?.lastName || '')).trim()}</div>
                                 </td>
                                 <td className="p-5">
                                     <span className="text-lg font-black text-slate-900">

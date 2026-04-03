@@ -9,8 +9,8 @@ export default async function AdminSignaturesPage() {
         take: 20,
         orderBy: { updatedAt: 'desc' },
         include: {
-            locataire: { select: { fullName: true } },
-            owner: { select: { fullName: true } }
+            locataire: { select: { firstName: true, lastName: true } },
+            owner: { select: { firstName: true, lastName: true } }
         }
     }).catch(() => [])
 
@@ -92,12 +92,12 @@ export default async function AdminSignaturesPage() {
                                             <div className="flex items-center gap-4">
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] text-gray-400 uppercase font-black">Bailleur</span>
-                                                    <span className="text-sm font-bold text-gray-700">{s.owner?.fullName}</span>
+                                                    <span className="text-sm font-bold text-gray-700">{(s.owner?.firstName ? s.owner.firstName + " " : "") + (s.owner?.lastName || "")}</span>
                                                 </div>
                                                 <div className="w-1 h-8 bg-gray-100 rounded-full" />
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] text-gray-400 uppercase font-black">Preneur</span>
-                                                    <span className="text-sm font-bold text-gray-700">{s.locataire?.fullName}</span>
+                                                    <span className="text-sm font-bold text-gray-700">{(s.locataire?.firstName ? s.locataire.firstName + " " : "") + (s.locataire?.lastName || "")}</span>
                                                 </div>
                                             </div>
                                         </td>

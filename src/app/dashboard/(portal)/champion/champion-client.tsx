@@ -59,7 +59,7 @@ export default function ChampionDashboardClient({
           </div>
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Champion QAPRIL</p>
-            <h1 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase">{user.name}</h1>
+            <h1 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase">{(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">

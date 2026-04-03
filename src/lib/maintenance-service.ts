@@ -49,7 +49,7 @@ export class MaintenanceService {
       {
         payload: {
           titre: "Nouveau ticket de maintenance",
-          message: `Un nouveau ticket (${ticket.ticketRef}) a été créé pour le logement ${ticket.lease.property.propertyCode} par ${ticket.locataire.fullName}.`,
+          message: `Un nouveau ticket (${ticket.ticketRef}) a été créé pour le logement ${ticket.lease.property.propertyCode} par ${(ticket.locataire.firstName ? ticket.locataire.firstName + " " : "") + (ticket.locataire.lastName || "")}.`,
           ticketId: ticket.id,
           ticketRef: ticket.ticketRef
         }

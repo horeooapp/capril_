@@ -25,7 +25,7 @@ export async function getProperties() {
             include: {
                 leases: {
                     include: {
-                        tenant: { select: { fullName: true, phone: true } },
+                        tenant: { select: { firstName: true, lastName: true, phone: true } },
                         receipts: {
                             orderBy: { paidAt: 'desc' },
                             take: 10
@@ -106,7 +106,7 @@ export async function getPropertyById(id: string) {
                 leases: {
                     include: {
                         tenant: {
-                            select: { fullName: true, phone: true }
+                            select: { firstName: true, lastName: true, phone: true }
                         }
                     }
                 }
@@ -135,7 +135,7 @@ export async function getPropertyPassport(id: string) {
                 leases: {
                     include: {
                         tenant: {
-                            select: { fullName: true, email: true }
+                            select: { firstName: true, lastName: true, email: true }
                         },
                         incidentLogs: true
                     },
@@ -161,7 +161,7 @@ export async function getPropertyPassport(id: string) {
             leases: (property.leases || []).map((lease: any) => ({
                 ...serializeLease(lease),
                 tenant: lease.tenant ? {
-                    name: lease.tenant.fullName || lease.tenant.email || "Inconnu",
+                    name: (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || lease.tenant.email || "Inconnu",
                     email: lease.tenant.email
                 } : { name: "Inconnu", email: null },
                 incidents: (lease.incidentLogs || []).map((inc: any) => ({

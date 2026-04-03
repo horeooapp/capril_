@@ -71,7 +71,7 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                             <p className="text-xl font-black text-gray-900 leading-tight">
                                 {viewerRole === 'TENANT' && (lease.bailleurMasque || lease.typeGestion === 'AGREE')
                                     ? "Bailleur QAPRIL"
-                                    : (landlord.fullName || "Identification en cours")
+                                    : ((landlord.firstName ? landlord.firstName + " " : "") + (landlord.lastName || "") || "Identification en cours")
                                 }
                             </p>
                             <p className="text-sm font-bold text-[#FF8200]">
@@ -87,7 +87,7 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                     <div className="text-right">
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Locataire / Tenant</h3>
                         <div className="space-y-1">
-                            <p className="text-xl font-black text-gray-900 leading-tight">{tenant.fullName || "Saisi par le bailleur"}</p>
+                            <p className="text-xl font-black text-gray-900 leading-tight">{(tenant.firstName ? tenant.firstName + " " : "") + (tenant.lastName || "") || "Saisi par le bailleur"}</p>
                             <p className="text-sm font-bold text-blue-600">{tenant.phone}</p>
                             <p className="text-xs text-gray-400 font-medium tracking-tighter uppercase">Statut: En règle</p>
                         </div>

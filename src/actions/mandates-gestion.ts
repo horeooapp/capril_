@@ -27,7 +27,7 @@ export async function createMandatGestion(data: {
             proprietaireId: data.proprietaireId,
             intermediaireId: data.intermediaireId,
             profil: data.profil,
-            biensConcernes: JSON.stringify(data.biensConcernes),
+            biensConcernes: data.biensConcernes || [],
             dateFin: data.dateFin,
             permissions: data.permissions || defaultPermissions,
             statut: "EN_ATTENTE"
@@ -81,7 +81,7 @@ export async function acceptMandatGestion(mandatId: string) {
     })
 
     // Define accesses
-    const biensIds = JSON.parse(mandat.biensConcernes || "[]") as string[]
+    const biensIds = mandat.biensConcernes || []
     for (const bienId of biensIds) {
         await (prisma as any).propertyAccess.updateMany({
             where: { propertyId: bienId, userId: session.user.id, mandatId: mandat.id },

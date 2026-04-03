@@ -44,9 +44,20 @@ export async function updateUserResidence(userId: string, data: {
         await prisma.user.update({
             where: { id: userId },
             data: {
-                paysResidence: data.paysResidence,
-                fuseauHoraire: data.fuseauHoraire,
-                emailRapportMensuel: data.emailRapportMensuel
+                diasporaProfile: {
+                    upsert: {
+                        create: {
+                            paysResidence: data.paysResidence,
+                            fuseauHoraire: data.fuseauHoraire || "Africa/Abidjan",
+                            emailRapportMensuel: data.emailRapportMensuel
+                        },
+                        update: {
+                            paysResidence: data.paysResidence,
+                            fuseauHoraire: data.fuseauHoraire || "Africa/Abidjan",
+                            emailRapportMensuel: data.emailRapportMensuel
+                        }
+                    }
+                }
             }
         })
 

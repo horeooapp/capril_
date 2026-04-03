@@ -135,8 +135,8 @@ export async function getLeaseById(id: string) {
         where: { id },
         include: {
             property: true,
-            landlord: { select: { fullName: true, phone: true, email: true, landlordCode: true } },
-            tenant: { select: { id: true, fullName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
+            landlord: { select: { firstName: true, lastName: true, phone: true, email: true, walletConfig: { select: { landlordCode: true } } } },
+            tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
             procedurePhases: true,
             repaymentPlans: {
                 orderBy: { createdAt: 'desc' },
@@ -175,7 +175,7 @@ export async function getTenantLeases() {
             where: { tenantId: session.user.id },
             include: {
                 property: true,
-                landlord: { select: { fullName: true, landlordCode: true } },
+                landlord: { select: { firstName: true, lastName: true, walletConfig: { select: { landlordCode: true } } } },
                 receipts: {
                     where: { status: 'paid' },
                     orderBy: { periodMonth: 'desc' },

@@ -18,13 +18,13 @@ export async function getDashboardAgence(agenceUserId: string) {
       include: {
         property: { select: { commune: true, address: true, propertyCode: true } },
         leases:   { where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
-                    include: { tenant: { select: { fullName: true } } } }
+                    include: { tenant: { select: { firstName: true, lastName: true } } } }
       }
     }),
     // CRG du mois
     prisma.crgMensuel.findMany({
       where: { agenceId: agenceUserId, mois: { gte: debutMois } },
-      include: { proprietaire: { select: { fullName: true, landlordCode: true } } },
+      include: { proprietaire: { select: { firstName: true, lastName: true, walletConfig: { select: { landlordCode: true } } } } },
       orderBy: { mois: "desc" },
       take: 12
     }),
@@ -33,7 +33,7 @@ export async function getDashboardAgence(agenceUserId: string) {
       where: { agenceId: agenceUserId, debutAt: { gte: debutMois } },
       include: {
         logement: { select: { commune: true, address: true } },
-        contact:  { select: { fullName: true, phone: true } }
+        contact:  { select: { firstName: true, lastName: true, phone: true } }
       },
       orderBy: { debutAt: "asc" },
       take: 20

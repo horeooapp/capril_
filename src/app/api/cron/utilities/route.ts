@@ -80,7 +80,7 @@ export async function GET(req: Request) {
                 notificationsSent.push({
                     leaseId: facture.leaseId,
                     typeUtility: facture.typeUtility,
-                    tenant: facture.lease.tenant.fullName,
+                    tenant: (facture.lease.tenant.firstName ? facture.lease.tenant.firstName + " " : "") + (facture.lease.tenant.lastName || ""),
                     diffDays,
                     urgency
                 });

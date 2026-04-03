@@ -44,15 +44,15 @@ export const serializeLease = (lease: any) => {
                        (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
 
     const landlordData = lease.landlord ? {
-        fullName: shouldMask ? (lease.landlord.landlordCode || "BAI-CODE-PENDING") : (lease.landlord.fullName || lease.landlord.name || "N/A"),
+        fullName: shouldMask ? (lease.landlord.walletConfig?.walletConfig?.landlordCode || "BAI-CODE-PENDING") : ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || (lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || "N/A"),
         phone: shouldMask ? null : (lease.landlord.phone || null),
         email: shouldMask ? null : (lease.landlord.email || null),
-        landlordCode: lease.landlord.landlordCode || null
+        landlordCode: lease.landlord.walletConfig?.walletConfig?.landlordCode || null
     } : null;
 
     const tenantData = lease.tenant ? {
         id: lease.tenant.id || null,
-        fullName: lease.tenant.fullName || lease.tenant.name || null,
+        fullName: (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || null,
         phone: lease.tenant.phone || null,
         // ICL-CONSENT-01: Score transparency requires explicit consent in the lease
         reliabilityScore: lease.scoreConsent ? (lease.tenant.reliabilityScores?.[0]?.score || 750) : null
@@ -106,7 +106,7 @@ export const serializeUser = (user: any) => {
     return {
         id: user.id,
         phone: user.phone,
-        fullName: user.fullName,
+        fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
         email: user.email,
         role: user.role,
         kycLevel: user.kycLevel ? Number(user.kycLevel) : 0,
@@ -114,8 +114,8 @@ export const serializeUser = (user: any) => {
         status: user.status,
         isCertified: user.isCertified,
         onboardingComplete: user.onboardingComplete,
-        walletBalance: user.walletBalance,
-        fraudScore: user.fraudScore,
+        walletBalance: ((user.walletConfig?.walletConfig?.walletBalance || 0) || 0),
+        fraudScore: (user.fraudProfile?.fraudScore || 0),
         diasporaAbonnement: user.diasporaAbonnement,
         notificationPrefs: user.notificationPrefs
     }

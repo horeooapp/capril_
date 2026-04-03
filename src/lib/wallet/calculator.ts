@@ -16,7 +16,7 @@ export async function calculateSuggestedRecharge(userId: string): Promise<Rechar
       prisma.user.findUnique({
         where: { id: userId },
         select: {
-          walletBalance: true,
+          walletConfig: { select: { walletBalance: true } },
           _count: {
             select: {
               leasesAsLandlord: {
@@ -35,7 +35,7 @@ export async function calculateSuggestedRecharge(userId: string): Promise<Rechar
 
     if (!user) throw new Error("Utilisateur non trouvé");
 
-    const soldeActuel = user.walletBalance || 0;
+    const soldeActuel = ((user?.walletConfig?.walletBalance || 0) || 0) || 0;
     const nbBails = user._count.leasesAsLandlord || 0;
     
     // Constantes depuis ConfigTarif (ADD-07 v3) avec fallbacks sécurisés

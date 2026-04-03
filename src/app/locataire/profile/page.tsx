@@ -62,7 +62,7 @@ export default async function TenantProfilePage() {
                 
                 <div className="text-center md:text-left relative z-10 flex-1">
                     <h2 className="text-3xl font-black text-qnavy-dark uppercase leading-none mb-2">
-                        {user?.fullName || "Locataire Non Défini"}
+                        {(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Locataire Non Défini"}
                     </h2>
                     <p className="text-sm font-bold text-qtext-mid tracking-widest uppercase mb-4">{user?.email}</p>
                     

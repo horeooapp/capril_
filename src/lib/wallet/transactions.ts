@@ -13,10 +13,14 @@ export class WalletService {
   static async credit(userId: string, amount: number, reference: string, provider: string = "CINETPAY", metadata: any = {}) {
     return prisma.$transaction(async (tx) => {
       // 1. Mettre à jour le solde utilisateur
-      const user = await tx.user.update({
-        where: { id: userId },
-        data: {
-          walletBalance: { increment: Math.floor(amount) }
+      const userWallet = await tx.userWalletConfig.upsert({
+        where: { userId: userId },
+        create: {
+            userId: userId,
+            walletBalance: Math.floor(amount)
+        },
+        update: {
+            walletBalance: { increment: Math.floor(amount) }
         }
       });
 
@@ -31,13 +35,13 @@ export class WalletService {
             amount,
             type: "RECHARGE",
             provider,
-            newBalance: user.walletBalance,
+            newBalance: userWallet.walletBalance,
             ...metadata
           }
         }
       });
 
-      return user;
+      return userWallet;
     });
   }
 
@@ -46,18 +50,18 @@ export class WalletService {
    */
   static async debit(userId: string, amount: number, action: string, entityId: string, metadata: any = {}) {
     return prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId }, select: { walletBalance: true } });
-      if (!user) throw new Error("User not found");
+      const userWallet = await tx.userWalletConfig.findUnique({ where: { userId: userId } });
+      if (!userWallet) throw new Error("User not found");
 
       const OVERDRAFT_LIMIT = -1500;
-      if (user.walletBalance - amount < OVERDRAFT_LIMIT) {
+      if (userWallet.walletBalance - amount < OVERDRAFT_LIMIT) {
         throw new Error("INSUFFICIENT_FUNDS");
       }
 
-      const updatedUser = await tx.user.update({
-        where: { id: userId },
+      const updatedUserWallet = await tx.userWalletConfig.update({
+        where: { userId: userId },
         data: {
-          walletBalance: { decrement: Math.floor(amount) }
+            walletBalance: { decrement: Math.floor(amount) }
         }
       });
 
@@ -70,13 +74,13 @@ export class WalletService {
           newValues: {
             amount,
             action,
-            newBalance: updatedUser.walletBalance,
+            newBalance: updatedUserWallet.walletBalance,
             ...metadata
           }
         }
       });
 
-      return updatedUser;
+      return updatedUserWallet;
     });
   }
 

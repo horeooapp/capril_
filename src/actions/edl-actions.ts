@@ -157,11 +157,11 @@ export async function getAllEdls() {
       include: {
         lease: {
           include: {
-            tenants: { select: { fullName: true } },
+            tenants: { select: { firstName: true, lastName: true } },
             property: { select: { address: true } }
           }
         },
-        redigePar: { select: { fullName: true } }
+        redigePar: { select: { firstName: true, lastName: true } }
       },
       orderBy: { createdAt: "desc" }
     });

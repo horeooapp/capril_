@@ -41,7 +41,7 @@ export default async function OwnerProfilePage() {
                     </div>
                     <div className="text-center md:text-left">
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
-                            {user?.fullName || "Utilisateur QAPRIL"}
+                            {(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL"}
                         </h1>
                         <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{user?.email}</p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">

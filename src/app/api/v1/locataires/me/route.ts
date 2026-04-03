@@ -18,6 +18,7 @@ export async function GET(req: Request) {
       where: { id: user.id },
       include: {
         locataireProfile: true,
+        walletConfig: true,
         reliabilityScores: {
           orderBy: { createdAt: 'desc' },
           take: 1
@@ -31,14 +32,14 @@ export async function GET(req: Request) {
 
     const mapping = {
       id: fullUser.id,
-      nom: fullUser.fullName || 'Locataire QAPRIL',
+      nom: (fullUser.firstName ? fullUser.firstName + " " : "") + (fullUser.lastName || "") || 'Locataire QAPRIL',
       telephone: fullUser.phone,
       email: fullUser.email,
       depuis: fullUser.createdAt.toISOString(),
       kyc: fullUser.kycStatus === 'verified' ? 'Validé' : 'En attente',
       score: fullUser.locataireProfile?.scoreActuel || fullUser.reliabilityScores?.[0]?.score || 750,
       scoreBadge: fullUser.locataireProfile?.scoreBadge || 'D',
-      walletBalance: fullUser.walletBalance || 0,
+      walletBalance: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
       kycComplet: fullUser.kycLevel >= 4,
       kycEtapes: [
         { label: 'Identité', pts: 50, ok: fullUser.kycLevel >= 1, icon: 'id-card' },

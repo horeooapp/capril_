@@ -88,7 +88,7 @@ export async function confirmerEdl(edlId: string, par: "PROPRIO" | "LOCATAIRE") 
 export async function getEdlForLease(leaseId: string) {
   return prisma.etatsDesLieux.findMany({
     where:   { leaseId },
-    include: { redigePar:{select:{fullName:true}}, locataire:{select:{fullName:true}} },
+    include: { redigePar:{select:{firstName: true, lastName: true}}, locataire:{select:{firstName: true, lastName: true}} },
     orderBy: { dateEdl: "desc" }
   });
 }

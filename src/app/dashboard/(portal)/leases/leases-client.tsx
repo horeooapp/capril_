@@ -133,9 +133,7 @@ export default function LeasesClient({ leases }: { leases: Lease[] }) {
                                             <div className="w-8 h-8 bg-qnavy-pale rounded-lg flex items-center justify-center text-qnavy border border-white shadow-sm">
                                                 <User size={14} />
                                             </div>
-                                            <span className="text-[12px] font-black text-qnavy-dark uppercase tracking-tight">
                                                 {lease.tenant?.fullName || lease.tenant?.phone || "En attente"}
-                                            </span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${

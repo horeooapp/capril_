@@ -52,14 +52,15 @@ export async function createReceipt(data: {
   // Débiter wallet bailleur — 90 FCFA · mode crédit si solde < 0
   const bailleur = await prisma.user.findUnique({
     where: { id: lease!.landlordId },
-    select: { walletBalance: true }
+    select: { walletConfig: { select: { walletBalance: true } } }
   });
-  const creditAllowed = (bailleur?.walletBalance ?? 0) >= -1500;
+  const creditAllowed = ((bailleur?.walletConfig?.walletBalance || 0) ?? 0) >= -1500;
   if (!creditAllowed) throw new Error("Wallet: crédit maximum (-1 500 FCFA) atteint");
 
-  await prisma.user.update({
-    where: { id: lease!.landlordId },
-    data:  { walletBalance: { decrement: PRIX_QUITTANCE } }
+  await prisma.userWalletConfig.upsert({
+    where: { userId: lease!.landlordId },
+    create: { userId: lease!.landlordId, walletBalance: -PRIX_QUITTANCE },
+    update: { walletBalance: { decrement: PRIX_QUITTANCE } }
   });
 
   const receipt = await prisma.receipt.create({

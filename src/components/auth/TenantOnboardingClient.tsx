@@ -39,7 +39,7 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
     
     // Form State
     const [formData, setFormData] = useState({
-        fullName: session.user.fullName || "",
+        fullName: (session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || "",
         email: session.user.email || "",
         city: "",
         statutPro: "SALARIE",
@@ -204,7 +204,7 @@ function IdentityStep({ data, update }: any) {
                     <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Nom Complet</label>
                     <input 
                         type="text" 
-                        value={data.fullName}
+                        value={(data.firstName ? data.firstName + " " : "") + (data.lastName || "")}
                         onChange={(e) => update({...data, fullName: e.target.value})}
                         className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
                         placeholder="Ex: Jean Kouassi"

@@ -21,7 +21,7 @@ export async function GET(req: Request) {
            include: {
               tenant: {
                  select: {
-                    fullName: true,
+                    firstName: true, lastName: true,
                     phone: true,
                     email: true
                  }
@@ -45,7 +45,7 @@ export async function GET(req: Request) {
           reference: l.leaseReference,
           status: l.status,
           rentAmount: l.rentAmount,
-          tenantName: l.tenant?.fullName,
+          tenantName: (l.tenant?.firstName ? l.tenant.firstName + " " : "") + (l.tenant?.lastName || ""),
           startDate: l.startDate,
           endDate: l.endDate
        }))

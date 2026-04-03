@@ -220,7 +220,7 @@ const Topbar = ({selBien, setSelBien, bp, setSideOpen, tab, user, data, devise, 
           {selBien && <span className="text-primary font-black text-sm uppercase tracking-widest leading-none border-l-2 border-primary pl-4">{selBien.name}</span>}
         </div>
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">
-          {user.fullName || user.name} • Diaspora Premium • {data.settings?.pays || "France"}
+          {(user.firstName ? user.firstName + " " : "") + (user.lastName || "") || (user.firstName ? user.firstName + " " : "") + (user.lastName || "")} • Diaspora Premium • {data.settings?.pays || "France"}
         </p>
       </div>
     </div>
@@ -513,7 +513,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   const [tab,setTab]           = useState("dashboard");
   const [selBien,setSelBien]   = useState<any>(null);
   const [sideOpen,setSideOpen] = useState(false);
-  const [devise, setDevise]    = useState(user.diasporaDevise || "FCFA");
+  const [devise, setDevise]    = useState((user.diasporaProfile?.diasporaDevise || "FCFA") || "FCFA");
   const [O,setO] = useState({
     notifs:false,inviter:false,sla:false,virement:false,
     addBien:false,deleguer:false,selBienId:null as string | null,

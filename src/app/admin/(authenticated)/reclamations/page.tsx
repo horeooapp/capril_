@@ -8,7 +8,7 @@ export default async function AdminReclamationsPage() {
         orderBy: { createdAt: 'desc' },
         include: {
             logement: { select: { propertyCode: true } },
-            locataire: { select: { fullName: true } }
+            locataire: { select: { firstName: true, lastName: true } }
         }
     }).catch(() => [])
 
@@ -102,7 +102,7 @@ export default async function AdminReclamationsPage() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-gray-700">{r.locataire?.fullName}</span>
+                                                <span className="text-sm font-bold text-gray-700">{(r.locataire?.firstName ? r.locataire.firstName + " " : "") + (r.locataire?.lastName || "")}</span>
                                                 <span className="text-[10px] text-primary font-black uppercase tracking-widest">{r.logement?.propertyCode}</span>
                                             </div>
                                         </td>

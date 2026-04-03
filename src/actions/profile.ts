@@ -72,7 +72,6 @@ export async function updateUserProfile(data: {
                 data: {
                     firstName: finalFirstName,
                     lastName: finalLastName,
-                    fullName: fullName,
                     birthDate: finalBirthDate,
                     birthPlace: finalBirthPlace,
                     neighborhood: data.neighborhood, // Allowed

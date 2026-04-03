@@ -62,7 +62,7 @@ export async function createProperty(input: CreatePropertyInput) {
         const property = await prisma.property.create({
             data: {
                 ...propertyData,
-                amenities: JSON.stringify(amenities || []),
+                amenities: amenities || [],
                 propertyCode,
                 ownerUserId: session.user.id,
                 status: 'pending_verification',
@@ -162,11 +162,11 @@ export async function retirerProperty(propertyId: string) {
                 include: {
                     leases: {
                         where: { status: 'ACTIVE' },
-                        select: { tenantId: true, tenant: { select: { phone: true, fullName: true } } }
+                        select: { tenantId: true, tenant: { select: { phone: true, firstName: true, lastName: true } } }
                     },
                     mandates: {
                         where: { status: 'ACTIVE' },
-                        select: { agentUserId: true, agent: { select: { phone: true, name: true } } }
+                        select: { agentUserId: true, agent: { select: { phone: true, firstName: true, lastName: true } } }
                     }
                 }
             })

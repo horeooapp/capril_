@@ -103,14 +103,14 @@ export async function getLeaderboard(zone?: string) {
       take: 10,
       include: {
         user: {
-          select: { name: true, fullName: true }
+          select: { firstName: true, lastName: true }
         }
       }
     });
 
     return leaders.map((l: any, idx: number) => ({
       rank: idx + 1,
-      name: l.user.fullName || l.user.name || "Champion Anonyme",
+      name: (l.user.firstName ? l.user.firstName + " " : "") + (l.user.lastName || "") || (l.user.firstName ? l.user.firstName + " " : "") + (l.user.lastName || "") || "Champion Anonyme",
       points: Number(l.totalCommissionsFcfa),
       zone: l.zonePrincipale
     }));
@@ -150,7 +150,7 @@ export async function getAllChampions() {
     const champions = await (prisma as any).championProfile.findMany({
       include: {
         user: {
-          select: { fullName: true, phone: true, email: true }
+          select: { firstName: true, lastName: true, phone: true, email: true }
         },
         _count: {
           select: { prospects: true, commissions: true }

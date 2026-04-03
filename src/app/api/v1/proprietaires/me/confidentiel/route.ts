@@ -21,15 +21,11 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'La propriété isConfidential est requise (true/false).' }, { status: 400 });
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
+    const userWallet = await prisma.userWalletConfig.findUnique({
+      where: { userId: user.id }
     });
 
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    let nextLandlordCode = dbUser.landlordCode;
+    let nextLandlordCode = userWallet?.landlordCode;
     
     // Auto-generate if it doesn't exist
     if (isConfidential && (!nextLandlordCode || nextLandlordCode === 'BAI-XXX')) {
@@ -37,9 +33,14 @@ export async function PATCH(req: Request) {
       nextLandlordCode = `BAI-${randomInt}`;
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
+    const updatedUserWallet = await prisma.userWalletConfig.upsert({
+      where: { userId: user.id },
+      create: {
+        userId: user.id,
+        isConfidential,
+        landlordCode: nextLandlordCode
+      },
+      update: {
         isConfidential,
         landlordCode: nextLandlordCode
       }
@@ -47,10 +48,10 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ 
         success: true, 
-        isConfidential: updatedUser.isConfidential,
-        landlordCode: updatedUser.landlordCode,
+        isConfidential: updatedUserWallet.isConfidential,
+        landlordCode: updatedUserWallet?.landlordCode,
         message: isConfidential 
-          ? `Mode confidentiel activé. Votre alias est ${updatedUser.landlordCode}.` 
+          ? `Mode confidentiel activé. Votre alias est ${updatedUserWallet?.landlordCode}.` 
           : "Le mode confidentiel est désactivé. Vos gestionnaires verront votre véritable identité."
     });
 

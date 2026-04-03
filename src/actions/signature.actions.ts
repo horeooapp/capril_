@@ -63,7 +63,7 @@ export async function getSignaturesDocument(
 ) {
   return prisma.signatureElectronique.findMany({
     where:   { documentType, documentId },
-    include: { signataire: { select: { fullName: true, phone: true } } },
+    include: { signataire: { select: { firstName: true, lastName: true, phone: true } } },
     orderBy: { createdAt: "asc" }
   });
 }

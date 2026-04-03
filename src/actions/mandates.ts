@@ -36,11 +36,11 @@ export async function createMandate(data: {
                 status: MandateStatus.ACTIVE,
                 mandateType: MandateType.EXCLUSIVE
             },
-            include: { agent: { select: { fullName: true } } }
+            include: { agent: { select: { firstName: true, lastName: true } } }
         })
 
         if (existingExclusive) {
-            throw new Error(`Ce bien a déjà un mandat exclusif actif avec ${existingExclusive.agent?.fullName || 'une autre agence'}.`)
+            throw new Error(`Ce bien a déjà un mandat exclusif actif avec ${(existingExclusive.agent?.firstName ? existingExclusive.agent.firstName + " " : "") + (existingExclusive.agent?.lastName || "") || 'une autre agence'}.`)
         }
     }
 
@@ -183,7 +183,7 @@ export async function getMandatesByProperty(propertyId: string) {
         where: { propertyId },
         include: {
             agent: {
-                select: { fullName: true, email: true, role: true }
+                select: { firstName: true, lastName: true, email: true, role: true }
             }
         },
         orderBy: { createdAt: 'desc' }
@@ -216,7 +216,7 @@ export async function getLandlordMandates() {
         include: {
             property: true,
             agent: {
-                select: { fullName: true, email: true, role: true }
+                select: { firstName: true, lastName: true, email: true, role: true }
             },
             leases: {
                 include: {

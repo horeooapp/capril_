@@ -135,7 +135,7 @@ export function TenantPortalDashboard({
                 <div style={{background:T.teal,borderRadius:7,padding:"2px 9px",fontSize:9,fontWeight:900,color:T.white,letterSpacing:1.5,textTransform:"uppercase"}}>LOCATAIRE</div>
                 <div style={{width:6,height:6,borderRadius:"50%",background:"#5EE7B7"}}/>
               </div>
-              <div style={{fontSize:16,fontWeight:800,color:T.white}}>{(user?.fullName || user?.name || "Locataire").toUpperCase()}</div>
+              <div style={{fontSize:16,fontWeight:800,color:T.white}}>{((user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || user?.name || "Locataire").toUpperCase()}</div>
               <div style={{fontSize:11,color:T.white,opacity:.6,marginTop:2}}>Appt {bail?.logementRef || bail?.ref} · CID: {user?.id?.slice(-4)}</div>
             </div>
             <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5}}>

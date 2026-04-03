@@ -110,7 +110,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         statut: p.status === "active" ? "occupé" : "vacant",
         paiement: p.leases?.[0]?.statutFiscal === "A_JOUR" ? "À jour" : p.leases?.[0]?.statutFiscal === "EN_RETARD" ? "Impayé" : "—",
         loyer: p.leases?.[0]?.rentAmount || p.declaredRentFcfa || 0,
-        locataire: p.leases?.[0]?.tenant?.fullName || p.leases?.[0]?.tenant?.name
+        tenantName: (((p.leases?.[0]?.tenant?.firstName || '') + " " + (p.leases?.[0]?.tenant?.lastName || '')).trim() || "Anonyme")
       });
       return acc;
     }, {});
@@ -156,7 +156,7 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
           <div>
             <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">Espace Propriétaire • Supervision</p>
             <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
-              Bonjour, {user?.fullName?.split(" ")[0] || "Propriétaire"}.
+              Bonjour, {((user?.firstName || '') + ' ' + (user?.lastName || '')).trim() || "Propriétaire"}.
             </h1>
             
             {/* TAB SELECTOR */}

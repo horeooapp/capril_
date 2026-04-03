@@ -5,7 +5,7 @@ export default async function AdminDeclarationsPage() {
     const declarations = await (prisma as any).smsDeclaration.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
-            tenant: { select: { fullName: true, phone: true } },
+            tenant: { select: { firstName: true, lastName: true, phone: true } },
             lease: { 
                 include: { 
                     property: { select: { address: true, propertyCode: true } }
@@ -82,7 +82,7 @@ export default async function AdminDeclarationsPage() {
                                     <tr key={dec.id} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="p-6 first:pl-10">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-gray-900 uppercase italic tracking-tighter">{dec.tenant.fullName}</span>
+                                                <span className="font-black text-gray-900 uppercase italic tracking-tighter">{(dec.tenant.firstName ? dec.tenant.firstName + " " : "") + (dec.tenant.lastName || "")}</span>
                                                 <span className="text-[10px] font-bold text-gray-400 tracking-widest">{dec.tenant.phone}</span>
                                             </div>
                                         </td>

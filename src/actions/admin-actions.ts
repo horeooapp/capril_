@@ -43,7 +43,7 @@ export async function getAllUsers() {
             orderBy: { createdAt: 'desc' },
             select: {
                 id: true,
-                fullName: true,
+                firstName: true, lastName: true,
                 email: true,
                 role: true,
                 kycLevel: true,
@@ -54,11 +54,10 @@ export async function getAllUsers() {
             }
         })
 
-        // Ensure serialization and data safety
         return users.map(user => ({
             ...user,
             createdAt: user.createdAt.toISOString()
-        }))
+        })) as any[]
     } catch (error) {
         console.error("[getAllUsers] Critical Error:", error)
         return [] // Return empty list to prevent page crash
@@ -87,7 +86,7 @@ export async function getPendingValidations() {
             orderBy: { createdAt: 'desc' },
             select: {
                 id: true,
-                fullName: true,
+                firstName: true, lastName: true,
                 email: true,
                 role: true,
                 legalEntity: {
@@ -103,7 +102,7 @@ export async function getPendingValidations() {
         return users.map(user => ({
             ...user,
             createdAt: user.createdAt.toISOString()
-        }))
+        })) as any[]
     } catch (error) {
         console.error("[getPendingValidations] Critical Error:", error)
         return []
@@ -233,7 +232,7 @@ export async function getGlobalAuditLogs() {
             take: 100,
             include: {
                 user: {
-                    select: { fullName: true, email: true }
+                    select: { firstName: true, lastName: true, email: true }
                 }
             }
         })).map(log => ({

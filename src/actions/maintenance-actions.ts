@@ -57,7 +57,7 @@ export async function getPropertyTickets(propertyId: string | "all") {
   const tickets = await (prisma as any).ticketMaintenance.findMany({
     where,
     include: {
-      locataire: { select: { fullName: true } },
+      locataire: { select: { firstName: true, lastName: true } },
       logement: { select: { address: true } },
     },
     orderBy: { createdAt: "desc" }
@@ -69,7 +69,7 @@ export async function getPropertyTickets(propertyId: string | "all") {
     description: t.description,
     statut: mapStatusToLegacy(t.statut),
     createdAt: t.createdAt,
-    declarant: { fullName: t.locataire?.fullName || "Anonyme" },
+    declarant: { fullName: (t.locataire?.firstName ? t.locataire.firstName + " " : "") + (t.locataire?.lastName || "") || "Anonyme" },
     logement: { address: t.logement?.address || "N/A" }
   }));
 }

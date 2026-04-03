@@ -29,7 +29,7 @@ export async function dispatchMiseEnDemeure(leaseId: string, phaseId: string) {
 
         const delivery = await createMaPosteDispatch({
             recipientData: {
-                name: lease.tenant.fullName || "Locataire",
+                name: (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || "Locataire",
                 phone: lease.tenant.phone,
                 leaseRef: lease.leaseReference,
                 phaseId

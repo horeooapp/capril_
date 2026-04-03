@@ -74,8 +74,8 @@ export async function getLandLeaseDetails(leaseId: string) {
             lease: { 
                 include: { 
                     property: true,
-                    landlord: { select: { fullName: true } },
-                    tenant: { select: { fullName: true } }
+                    landlord: { select: { firstName: true, lastName: true } },
+                    tenant: { select: { firstName: true, lastName: true } }
                 } 
             } 
         }

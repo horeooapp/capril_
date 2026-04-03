@@ -101,13 +101,14 @@ export class DiasporaService {
           include: {
             intermediaire: true
           }
-        }
+        },
+        diasporaProfile: true
       }
     });
 
     if (!user) throw new Error("Utilisateur non trouvé");
 
-    const currency = user.diasporaDevise || "FCFA";
+    const currency = (user.diasporaProfile?.diasporaDevise || "FCFA") || "FCFA";
     const rate = await this.getExchangeRate(currency);
 
     let totalRentFcfa = 0;
@@ -160,8 +161,8 @@ export class DiasporaService {
       }),
       mandats: user.mandatsDonnes.map(m => ({
         id: m.id,
-        agence: m.intermediaire.fullName || m.intermediaire.name,
-        nom: m.intermediaire.fullName || m.intermediaire.name,
+        agence: ((m.intermediaire.firstName || '') + ' ' + (m.intermediaire.lastName || '')).trim() || "Agence",
+        nom: ((m.intermediaire.firstName || '') + ' ' + (m.intermediaire.lastName || '')).trim() || "Agent",
         phone: m.intermediaire.phone || "",
         statut: m.statut,
         status: m.statut === "ACTIF" ? "Actif" : "En attente",
@@ -191,10 +192,10 @@ export class DiasporaService {
         { date: new Date().toLocaleString('fr-FR'), op: "Orange Money", emetteur: "+225 07 11 22 33", montant: 320000, bien: "Villa 7", statut: "Quittance émise", ref: "QIT-2026-0341" }
       ],
       settings: {
-        iban: user.diasporaStripeId || "FR76 3000 4000 0300 0000 0000 147",
+        iban: user.diasporaProfile?.diasporaStripeId || "FR76 3000 4000 0300 0000 0000 147",
         banque: "Société Générale",
-        pays: user.paysResidence || "France",
-        fuseau: user.fuseauHoraire || "Europe/Paris",
+        pays: user.diasporaProfile?.paysResidence || "France",
+        fuseau: (user.diasporaProfile?.fuseauHoraire || "Africa/Abidjan") || "Europe/Paris",
         devise: currency,
         notifications: ["WhatsApp", "Email"]
       }

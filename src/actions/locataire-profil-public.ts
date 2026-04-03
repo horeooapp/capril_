@@ -15,7 +15,7 @@ export async function getPublicProfile(userId: string) {
             include: {
                 user: {
                     select: {
-                        fullName: true,
+                        firstName: true, lastName: true,
                         phone: true,
                         kycLevel: true
                     }
@@ -150,7 +150,8 @@ export async function completeOnboarding(userId: string, data: any) {
 
         // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
         const updateData: any = { onboardingComplete: true }
-        if (data.fullName) updateData.fullName = data.fullName
+        if (data.firstName) updateData.firstName = data.firstName;
+        if (data.lastName) updateData.lastName = data.lastName;
         if (data.email) updateData.email = data.email
         
         console.log(`[ONBOARDING] Updating user...`);

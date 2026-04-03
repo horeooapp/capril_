@@ -118,7 +118,7 @@ export async function recordColocPayment(data: {
 export async function getLeaseColocataires(leaseId: string) {
     return await prisma.colocataire.findMany({
         where: { leaseId, status: "ACTIF" },
-        include: { user: { select: { fullName: true, phone: true } } }
+        include: { user: { select: { firstName: true, lastName: true, phone: true } } }
     })
 }
 
@@ -131,7 +131,7 @@ export async function getMonthlySynthesis(leaseId: string, month: string) {
                     colocataires: { 
                         where: { status: "ACTIF" },
                         include: { 
-                            user: { select: { fullName: true } },
+                            user: { select: { firstName: true, lastName: true } },
                             payments: { where: { month } }
                         } 
                     } 

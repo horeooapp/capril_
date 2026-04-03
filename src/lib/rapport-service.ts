@@ -81,7 +81,7 @@ export class RapportService {
     const tauxRecouvrement = totalPotentiel > 0 ? Math.round((totalEncaisse / totalPotentiel) * 100) : 100;
 
     return {
-      ownerName: owner.fullName || owner.phone,
+      ownerName: (owner.firstName ? owner.firstName + " " : "") + (owner.lastName || "") || owner.phone,
       period,
       metrics: {
         totalPotentiel,

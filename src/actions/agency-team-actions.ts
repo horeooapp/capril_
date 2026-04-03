@@ -51,7 +51,7 @@ export async function listAgencyCollaborators() {
             return {
                 id: c.id,
                 email: c.email,
-                fullName: c.fullName || c.lastName || "Collaborateur",
+                fullName: (c.firstName ? c.firstName + " " : "") + (c.lastName || "") || c.lastName || "Collaborateur",
                 joinedAt: c.createdAt,
                 poste: conf?.poste || "COLLABORATEUR",
                 status: conf?.status || "INVITED",

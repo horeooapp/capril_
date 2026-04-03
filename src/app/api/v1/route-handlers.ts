@@ -192,7 +192,7 @@ export async function GET_Properties(req: NextRequest) {
         ...(groupeId  ? { groupeId }  : {}),
       },
       include: {
-        groupe: { select: { id: true, name: true, nomComplet: true, typePropriete: true } },
+        groupe: { select: { id: true, firstName: true, lastName: true, nomComplet: true, typePropriete: true } },
         biens:  { select: { id: true, nomBien: true, nomComplet: true, niveau: true, status: true } },
       },
       orderBy: { createdAt: 'desc' },

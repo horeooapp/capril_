@@ -103,7 +103,7 @@ export async function PATCH(req: Request) {
       message: 'Profil mis à jour avec succès',
       kycLevel: newKycLevel,
       user: {
-        fullName: updated.fullName,
+        fullName: (updated.firstName ? updated.firstName + " " : "") + (updated.lastName || ""),
         phone: updated.phone
       }
     });

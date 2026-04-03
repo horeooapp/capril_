@@ -48,9 +48,9 @@ export async function GET(req: Request) {
         statut: serialized.status === 'ACTIVE' ? 'À jour' : 'En cours',
         retard: serialized.status === 'LOYER_IMPAYE' ? 1 : 0,
         typeGestion: serialized.typeGestion || 'directe',
-        agence: serialized.agent?.fullName || null,
-        bailleurNom: serialized.landlord?.fullName,
-        bailleurCode: serialized.landlord?.landlordCode,
+        agence: (serialized.agent?.firstName ? serialized.agent.firstName + " " : "") + (serialized.agent?.lastName || "") || null,
+        bailleurNom: (serialized.landlord?.firstName ? serialized.landlord.firstName + " " : "") + (serialized.landlord?.lastName || ""),
+        bailleurCode: serialized.landlord?.walletConfig?.landlordCode,
         bailleurMasque: !!serialized.bailleurMasque
       });
     }
@@ -89,7 +89,7 @@ export async function GET(req: Request) {
         retard: 0,
         isDeclarative: true,
         bdqStatus: bdq.statut,
-        bailleurNom: bdq.bailleur?.fullName || bdq.bailleur?.name || 'Bailleur Inconnu'
+        bailleurNom: (bdq.bailleur?.firstName ? bdq.bailleur.firstName + " " : "") + (bdq.bailleur?.lastName || "") || 'Bailleur Inconnu'
       });
     }
 

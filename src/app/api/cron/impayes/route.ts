@@ -75,7 +75,7 @@ export async function GET(request: Request) {
                payload: {
                    smsText: `QAPRIL: Votre loyer de la période ${periodMonth} est en retard. Merci de régulariser la situation dès que possible.`,
                    html: `<p>Alerte de retard de Paiement QAPRIL.</p><p>Nous vous informons que nous n'avons pas constaté de règlement de votre loyer pour la période <strong>${periodMonth}</strong> de la propriété <strong>${lease.property?.address}</strong>.</p>`,
-                   parameters: [lease.tenant?.fullName || "Locataire", periodMonth, String(lease.rentAmount + lease.chargesAmount)]
+                   parameters: [(lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || "Locataire", periodMonth, String(lease.rentAmount + lease.chargesAmount)]
                }
             }
         ).catch(err => console.error("[CRON_IMPAYE] Notif Failed:", err));

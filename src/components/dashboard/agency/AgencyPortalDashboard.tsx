@@ -45,7 +45,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
               Console Agence.
             </h1>
             <p className="text-sm font-medium text-gray-500 mt-2 border-l-2 border-[#1F4E79] pl-4 uppercase tracking-widest flex items-center gap-2">
-              <span className="text-[#1F4E79] font-black">{user?.fullName || user?.name || "Agence Sans Nom"}</span>
+              <span className="text-[#1F4E79] font-black">{(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || user?.name || "Agence Sans Nom"}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
               <span className="text-[10px] font-black text-[#C55A11]">
                 {user?.isCertified ? "Agréée QAPRIL" : "Certification en cours"}

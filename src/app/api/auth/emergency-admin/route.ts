@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
             data: {
                 email,
                 phone: `+225_TMP_${Date.now().toString().slice(-8)}`, // Unique temporary phone
-                fullName: "Administrateur de Secours",
+                firstName: "Administrateur de Secours",
                 password: hashedPassword,
                 role: "SUPER_ADMIN",
                 status: "active"

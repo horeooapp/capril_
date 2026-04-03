@@ -29,7 +29,7 @@ export async function triggerOverdueReminders() {
                     tenant: {
                         select: {
                             id: true,
-                            fullName: true
+                            firstName: true, lastName: true
                         }
                     }
                 }
@@ -62,7 +62,7 @@ export async function triggerOverdueReminders() {
                 module: 'PAYMENT',
                 entityId: record.id,
                 newValues: {
-                    tenantName: record.lease.tenant?.fullName,
+                    tenantName: (record.lease.tenant?.firstName ? record.lease.tenant.firstName + " " : "") + (record.lease.tenant?.lastName || ""),
                     amount: record.totalExpected,
                     month: record.month
                 }

@@ -241,10 +241,10 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                 <div className="space-y-1">
                                     <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
                                         {data.bails[0].typeGestion === 'agreee' 
-                                            ? `Bailleur Masqué (${data.bails[0].landlord?.landlordCode || "AGREEE"})` 
+                                            ? `Bailleur Masqué (${data.bails[0].landlord?.walletConfig?.landlordCode || "AGREEE"})` 
                                             : (data.bails[0].bailleurMasque 
-                                                ? `Bailleur Masqué (${data.bails[0].landlord?.landlordCode || "PRIVE"})` 
-                                                : (data.bails[0].landlord?.fullName || "Non renseigné"))}
+                                                ? `Bailleur Masqué (${data.bails[0].landlord?.walletConfig?.landlordCode || "PRIVE"})` 
+                                                : (((data.bails[0].landlord?.firstName || '') + " " + (data.bails[0].landlord?.lastName || '')).trim() || "Non renseigné"))}
                                     </p>
                                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
                                         {data.bails[0].typeGestion === 'agreee' 

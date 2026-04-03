@@ -882,7 +882,6 @@ model PropertyImage {
 // LEASES (Part 7 & 8)
 // ═══════════════════════════════════════════════════════
 model Lease {
-
   // ── CDC Formulaires : Intégrité & QR Code
   sha256Hash      String?   @map("sha256Hash")
   sha256CalculeLe DateTime? @map("sha256CalculeLe")
@@ -1830,7 +1829,6 @@ model PrepaymentRequest {
 // ═══════════════════════════════════════════════════════
 
 model PaymentPgw {
-
   id           String   @id @default(uuid()) @map("payment_id")
   leaseId      String   @map("lease_id")
   lease        Lease    @relation(fields: [leaseId], references: [id])
@@ -2151,7 +2149,6 @@ model RegularisationCharges {
 
 // M-ANNONCES — Vacance Locative
 model Annonce {
-
   id         String   @id @default(uuid()) @map("annonce_id")
   logementId String   @map("logement_id")
   logement   Property @relation(fields: [logementId], references: [id])
@@ -2442,7 +2439,6 @@ model ReminderLog {
 // ═══════════════════════════════════════════════════════
 
 model BailDeclaratif {
-
   id          String    @id @default(uuid()) @map("bdq_id")
   bailleurId  String    @map("bailleur_id")
   bailleur    User      @relation("BdqBailleur", fields: [bailleurId], references: [id])

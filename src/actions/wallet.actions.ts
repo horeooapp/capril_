@@ -24,12 +24,12 @@ export async function calculerMontantRecharge(
 ) {
   const user = await prisma.user.findUnique({
     where:  { id: userId },
-    select: { walletBalance: true }
+    select: { walletConfig: { select: { walletBalance: true } } }
   });
   const nbBails = await prisma.lease.count({
     where: { landlordId: userId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } }
   });
-  const solde    = user?.walletBalance ?? 0;
+  const solde    = (user?.walletConfig?.walletBalance || 0) ?? 0;
   const besoin   = (nbBails * PRIX_Q * MOIS_COUV) - solde;
   const minimum  = Math.max(500, Math.ceil(besoin / 500) * 500);
   if (option === "MINIMUM")    return minimum;
@@ -55,29 +55,28 @@ export async function genererDeepLink(
 export async function checkAndAlertSoldeBas(userId: string) {
   const user = await prisma.user.findUnique({
     where:  { id: userId },
-    select: { walletBalance: true, walletSeuilAlerte: true,
-              walletOperateurPrefere: true, walletCanalAlertePref: true }
+    select: { walletConfig: { select: { walletBalance: true, walletSeuilAlerte: true, walletOperateurPrefere: true, walletCanalAlertePref: true } } }
   });
   if (!user) return;
-  const seuil = user.walletSeuilAlerte ?? SEUIL_DEFAUT;
-  if (user.walletBalance < seuil) {
+  const seuil = user?.walletConfig?.walletSeuilAlerte ?? SEUIL_DEFAUT;
+  if (((user?.walletConfig?.walletBalance || 0) || 0) < seuil) {
     const montant = await calculerMontantRecharge(userId, "RECOMMANDE");
     const { url, ref } = await genererDeepLink(
       userId,
-      (user.walletOperateurPrefere as any) ?? "WAVE",
+      (user?.walletConfig?.walletOperateurPrefere as any) ?? "WAVE",
       montant
     );
     // Logger le lien dans wallet_recharge_links
     await prisma.walletRechargeLink.create({
       data: {
         userId, declencheur: "SOLDE_BAS",
-        operateur: (user.walletOperateurPrefere as any) ?? "WAVE",
+        operateur: (user?.walletConfig?.walletOperateurPrefere as any) ?? "WAVE",
         montantSuggere: montant,
-        soldeAuMoment: user.walletBalance,
+        soldeAuMoment: ((user?.walletConfig?.walletBalance || 0) || 0),
         nbBailsActifs: await prisma.lease.count({
           where: { landlordId: userId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } }
         }),
-        urlGeneree: url, canalEnvoi: user.walletCanalAlertePref ?? "WHATSAPP",
+        urlGeneree: url, canalEnvoi: user?.walletConfig?.walletCanalAlertePref ?? "WHATSAPP",
         expireAt: new Date(Date.now() + 48 * 3600 * 1000)
       }
     });

@@ -10,7 +10,7 @@ export async function getRecentPayments() {
       include: {
         lease: {
           include: {
-            landlord: { select: { fullName: true } }
+            landlord: { select: { firstName: true, lastName: true } }
           }
         },
         reversals: true

@@ -23,7 +23,7 @@ export async function creerAnnonce(data: {
       description:  data.description,
       loyerDemande: data.loyerDemande,
       charges:      data.charges ?? 0,
-      photosUrls:   JSON.stringify(data.photosUrls ?? []),
+      photosUrls:   data.photosUrls ?? [],
       diffusions:   data.diffusions ?? {},
       statut:       "ACTIVE",
       publieeAt:    new Date(),

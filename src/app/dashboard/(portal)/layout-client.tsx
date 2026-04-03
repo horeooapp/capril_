@@ -102,7 +102,7 @@ export default function DashboardLayoutClient({
                 <AppSidebar 
                     role={session.user.chosenRole || session.user.role} 
                     onLogout={() => signOut()} 
-                    userName={session.user.fullName || session.user.name}
+                    userName={(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || (session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "")}
                     diasporaAbonnement={session.user.diasporaAbonnement}
                     agencyConfig={agencyConfig}
                     eligibleRoles={session.user.eligibleRoles}
@@ -154,7 +154,7 @@ export default function DashboardLayoutClient({
                                             </div>
                                             <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                                         </div>
-                                        <span className="text-[16px] font-black tracking-tight text-white uppercase drop-shadow-sm">{session.user.name || session.user.email?.split('@')[0]}</span>
+                                        <span className="text-[16px] font-black tracking-tight text-white uppercase drop-shadow-sm">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</span>
                                     </div>
                                     <div className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 text-white flex items-center justify-center shadow-lg group hover:bg-white/20 transition-all cursor-pointer">
                                         <User size={20} />

@@ -14,6 +14,7 @@ export async function calculateFraudScore(userId: string) {
             where: { id: userId },
             include: {
                 identityDocuments: true,
+                fraudProfile: true,
                 leasesAsTenant: {
                     include: { arrears: true }
                 }
@@ -40,17 +41,15 @@ export async function calculateFraudScore(userId: string) {
         }
 
         // 3. Multi-comptes / Fingerprint (Placeholder)
-        if (user.deviceFingerprint && user.deviceFingerprint === "KNOWN_FRAUD_DEVICE") {
+        if (user.fraudProfile?.deviceFingerprint && user.fraudProfile?.deviceFingerprint === "KNOWN_FRAUD_DEVICE") {
             score += 100
             flags.push("FRAUD_DEVICE_DETECTED")
         }
 
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                fraudScore: Math.min(score, 100), // Capé à 100
-                fraudFlags: flags
-            }
+        await prisma.userFraudProfile.upsert({
+            where: { userId: userId },
+            create: { userId: userId, fraudScore: Math.min(score, 100), fraudFlags: flags },
+            update: { fraudScore: Math.min(score, 100), fraudFlags: flags }
         })
 
         return { success: true, score, flags }
@@ -78,14 +77,21 @@ export async function addToBlacklist(data: {
 
         // En cas de doc hash, on peut invalider l'utilisateur
         if (data.documentHash) {
-            await prisma.user.updateMany({
-                where: { 
-                    identityDocuments: {
-                        some: { docNumberHash: data.documentHash }
-                    }
-                },
-                data: { status: "suspended", fraudScore: 100 }
+            const usersToSuspend = await prisma.user.findMany({
+                where: { identityDocuments: { some: { docNumberHash: data.documentHash } } },
+                select: { id: true }
             })
+            for (const u of usersToSuspend) {
+                await prisma.user.update({
+                    where: { id: u.id },
+                    data: { status: "suspended" }
+                })
+                await prisma.userFraudProfile.upsert({
+                    where: { userId: u.id },
+                    create: { userId: u.id, fraudScore: 100 },
+                    update: { fraudScore: 100 }
+                })
+            }
         }
 
         revalidatePath("/admin/security")

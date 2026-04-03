@@ -18,28 +18,25 @@ export async function POST(req: Request) {
 
     const cout = isCourEntiere ? 10000 : 3000;
 
-    const landlord = await prisma.user.findUnique({
-      where: { id: user.id },
+    const landlordConfig = await prisma.userWalletConfig.findUnique({
+      where: { userId: user.id },
       select: { walletBalance: true }
     });
 
-    if (!landlord) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!landlordConfig) {
+      return NextResponse.json({ error: 'User wallet not found' }, { status: 404 });
     }
 
-    if ((landlord.walletBalance || 0) < cout) {
+    if ((landlordConfig.walletBalance || 0) < cout) {
       return NextResponse.json({ 
-          error: `Solde insuffisant. Le bail nécessite ${cout} FCFA, mais votre solde est de ${landlord.walletBalance || 0} FCFA.` 
+          error: `Solde insuffisant. Le bail nécessite ${cout} FCFA, mais votre solde est de ${landlordConfig.walletBalance || 0} FCFA.` 
       }, { status: 402 });
     }
 
-    // Deduct from wallet
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.userWalletConfig.update({
+      where: { userId: user.id },
       data: {
-        walletBalance: {
-          decrement: cout
-        }
+        walletBalance: { decrement: cout }
       }
     });
 

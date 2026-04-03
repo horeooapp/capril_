@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
         const managers = (lease as any).property.accessRoles
         const recipients = managers.length > 0 ? managers.map((m: any) => m.user) : [(lease as any).property.owner]
 
-        const tenantName = tenant.fullName || tenant.phone
+        const tenantName = (tenant.firstName ? tenant.firstName + " " : "") + (tenant.lastName || "") || tenant.phone
         const alertMsg = `QAPRIL : ${tenantName} déclare avoir payé ${amount.toLocaleString()} FCFA. Répondez OUI pour confirmer et générer la quittance, ou NON pour contester.`
 
         for (const recipient of recipients) {

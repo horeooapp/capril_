@@ -24,7 +24,7 @@ export async function findLocataireByPhone(phone: string) {
         const profil = (user as any).profilPublic
         return {
             id: user.id,
-            fullName: user.fullName || "Utilisateur QAPRIL",
+            fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || "") || "Utilisateur QAPRIL",
             kycLevel: user.kycLevel,
             kycStatus: user.kycStatus,
             visibilite: profil.visibilite,
@@ -82,7 +82,7 @@ export async function searchLocataires(filters: {
             include: {
                 user: {
                     select: {
-                        fullName: true,
+                        firstName: true, lastName: true,
                         kycLevel: true
                     }
                 }
@@ -92,10 +92,10 @@ export async function searchLocataires(filters: {
 
         // Anonymisation partielle pour l'agence (Ibrahim K. au lieu de Ibrahim Koné)
         return results.map((profil: any) => {
-            const nameParts = profil.user.fullName?.split(' ') || []
+            const nameParts = (profil.user.firstName ? profil.user.firstName + " " : "") + (profil.user.lastName || "")?.split(' ') || []
             const anonymizedName = nameParts.length > 1 
                 ? `${nameParts[0]} ${nameParts[1].charAt(0)}.` 
-                : profil.user.fullName || "Locataire"
+                : (profil.user.firstName ? profil.user.firstName + " " : "") + (profil.user.lastName || "") || "Locataire"
                 
             return {
                 id: profil.userId,

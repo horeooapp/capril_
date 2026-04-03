@@ -92,7 +92,7 @@ export async function getAuthUser(req: Request) {
           email: true,
           phone: true,
           role: true,
-          fullName: true,
+          firstName: true, lastName: true,
           status: true,
           onboardingComplete: true
         }
@@ -110,7 +110,7 @@ export async function getAuthUser(req: Request) {
         email: true,
         phone: true,
         role: true,
-        fullName: true,
+        firstName: true, lastName: true,
         status: true,
         onboardingComplete: true
       }

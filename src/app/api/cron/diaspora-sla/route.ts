@@ -34,8 +34,8 @@ export async function GET(request: Request) {
           include: {
             property: {
               include: { 
-                owner: { select: { id: true, fullName: true, diasporaDevise: true } },
-                manager: { select: { id: true, fullName: true, phone: true } }
+                owner: { select: { id: true, firstName: true, lastName: true, diasporaDevise: true } },
+                manager: { select: { id: true, firstName: true, lastName: true, phone: true } }
               }
             }
           }
@@ -60,8 +60,8 @@ export async function GET(request: Request) {
         if (landlord) {
             await NotificationService.envoyerNotification(landlord.id, "DIASPORA_SLA_ALARM", {
                 payload: {
-                    smsText: `QAPRIL ALERTE : Votre mandataire (${manager?.fullName || "Non assigné"}) n'a pas réagi au signalement #${sig.id.slice(0,6)} dans le délai SLA de ${threshold}h.`,
-                    parameters: [manager?.fullName || "Mandataire", sig.id.slice(0,6), String(Math.floor(hoursSinceCreation))]
+                    smsText: `QAPRIL ALERTE : Votre mandataire (${(manager?.firstName ? manager.firstName + " " : "") + (manager?.lastName || "") || "Non assigné"}) n'a pas réagi au signalement #${sig.id.slice(0,6)} dans le délai SLA de ${threshold}h.`,
+                    parameters: [(manager?.firstName ? manager.firstName + " " : "") + (manager?.lastName || "") || "Mandataire", sig.id.slice(0,6), String(Math.floor(hoursSinceCreation))]
                 }
             }).catch(console.error);
         }
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
                     hoursSinceCreation, 
                     threshold, 
                     managerId: manager?.id,
-                    managerName: manager?.fullName 
+                    managerName: (manager?.firstName ? manager.firstName + " " : "") + (manager?.lastName || "") 
                 }
             }
         });

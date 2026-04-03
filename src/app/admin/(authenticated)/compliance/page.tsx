@@ -80,10 +80,10 @@ export default async function CompliancePage() {
                             <div key={i} className="flex items-center justify-between p-5 rounded-3xl bg-white/60 border border-white/50 hover:bg-white transition-all group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 font-bold">
-                                        {user.name?.charAt(0) || "?"}
+                                        {(user.firstName ? user.firstName + " " : "") + (user.lastName || "")?.charAt(0) || "?"}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-gray-800">{user.name}</div>
+                                        <div className="font-bold text-gray-800">{(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}</div>
                                         <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">{user.reason}</div>
                                     </div>
                                 </div>

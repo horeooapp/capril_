@@ -210,7 +210,7 @@ export default function ChampionRecoveryDashboard() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">{item.lease.tenant.fullName}</h4>
+                      <h4 className="text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">{(item.lease.tenant.firstName ? item.lease.tenant.firstName + " " : "") + (item.lease.tenant.lastName || "")}</h4>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
                         <Smartphone size={12} className="text-blue-500" /> {item.lease.tenant.phone}
                         <span className="w-1.5 h-1.5 bg-gray-200 rounded-full"></span>
@@ -220,7 +220,7 @@ export default function ChampionRecoveryDashboard() {
                          <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-red-100/50">
                            Retard {Math.floor((new Date().getTime() - new Date(item.dueDate).getTime()) / (1000 * 3600 * 24))} Jours
                          </span>
-                         <span className="text-xs font-bold text-gray-400 italic">Bailleur: {item.lease.landlord.fullName}</span>
+                         <span className="text-xs font-bold text-gray-400 italic">Bailleur: {(item.lease.landlord.firstName ? item.lease.landlord.firstName + " " : "") + (item.lease.landlord.lastName || "")}</span>
                       </div>
                     </div>
                  </div>

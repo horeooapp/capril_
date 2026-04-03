@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
                 documentType: docType, 
                 documentNumber: docNumber || uuidv4(), 
                 issuer: 'USER', 
-                fullName: session.user.name || undefined, 
+                fullName: session.user.fullName || undefined, 
                 birthDate: '', 
                 nationality: '', 
                 expiryDate: '' 
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
         data: { 
             kycStatus: 'under_review', 
             kycLevel: nextLevel,
-            fullName: mrz.fullName && isIdentityDoc ? mrz.fullName : undefined
+            firstName: mrz.fullName && isIdentityDoc ? mrz.fullName : undefined
         } 
     });
 

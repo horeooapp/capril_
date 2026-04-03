@@ -27,7 +27,7 @@ export default async function AiMonitoringPage() {
             take: 10,
             orderBy: { updatedAt: 'desc' },
             include: { 
-                bailleur: { select: { fullName: true, phone: true } },
+                bailleur: { select: { firstName: true, lastName: true, phone: true } },
                 bdqCree: { select: { id: true } }
             }
         }).catch(() => [])
@@ -114,7 +114,7 @@ export default async function AiMonitoringPage() {
                                     <tr key={conv.id} className="hover:bg-indigo-50/30 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-gray-900">{conv.bailleur?.fullName || "Utilisateur Inconnu"}</span>
+                                                <span className="text-xs font-bold text-gray-900">{(conv.bailleur?.firstName ? conv.bailleur.firstName + " " : "") + (conv.bailleur?.lastName || "") || "Utilisateur Inconnu"}</span>
                                                 <span className="text-[10px] text-gray-400 font-medium">{conv.bailleur?.phone}</span>
                                             </div>
                                         </td>

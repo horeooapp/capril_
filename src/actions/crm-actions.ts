@@ -17,7 +17,7 @@ export async function getCrmContacts(agenceId: string, role?: string) {
       },
       select: {
         id: true,
-        fullName: true,
+        firstName: true, lastName: true,
         phone: true,
         email: true,
         role: true,

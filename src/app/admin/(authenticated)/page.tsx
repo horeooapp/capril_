@@ -114,13 +114,13 @@ export default async function AdminDashboardOverview() {
         prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
         prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "paid" } }).catch(() => null),
         (prisma as any).reversalTransaction.count().catch(() => 0),
-        prisma.user.count({ where: { fraudScore: { gt: 50 } } }).catch(() => 0),
+        prisma.user.count({ where: { fraudProfile: { fraudScore: { gt: 50 } } } }).catch(() => 0),
         (prisma as any).bailDeclaratif.count().catch(() => 0),
         (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
         (prisma as any).bdqConversationState.count().catch(() => 0),
         (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null),
-        prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' }, include: { user: { select: { fullName: true } } } }).catch(() => []),
-        prisma.identityDocument.findMany({ where: { status: "pending" }, take: 5, include: { user: { select: { fullName: true } } } }).catch(() => []),
+        prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' }, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
+        prisma.identityDocument.findMany({ where: { status: "pending" }, take: 5, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
         prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
         prisma.featureFlag.count().catch(() => 0),
         (prisma as any).smsDeclaration.count().catch(() => 0),
@@ -693,7 +693,7 @@ export default async function AdminDashboardOverview() {
                                     safeData.documentsUnderReview.map((doc: any) => (
                                         <div key={doc.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:bg-orange-50 transition-colors">
                                             <div className="flex justify-between items-start mb-2">
-                                                <span className="text-[10px] font-black text-gray-900 truncate max-w-[120px]">{doc.user?.fullName}</span>
+                                                <span className="text-[10px] font-black text-gray-900 truncate max-w-[120px]">{(doc.user?.firstName ? doc.user.firstName + " " : "") + (doc.user?.lastName || "")}</span>
                                                 <span className="text-[8px] font-bold text-gray-400 uppercase">{new Date(doc.createdAt).toLocaleDateString()}</span>
                                             </div>
                                             <div className="flex items-center justify-between">

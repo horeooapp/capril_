@@ -15,8 +15,8 @@ export async function verifyQRToken(token: string) {
                 lease: {
                     include: {
                         property: true,
-                        tenant: { select: { fullName: true } },
-                        landlord: { select: { fullName: true } }
+                        tenant: { select: { firstName: true, lastName: true } },
+                        landlord: { select: { firstName: true, lastName: true } }
                     }
                 }
             }
@@ -30,8 +30,8 @@ export async function verifyQRToken(token: string) {
                     lease: {
                         include: {
                             property: true,
-                            tenant: { select: { fullName: true } },
-                            landlord: { select: { fullName: true } }
+                            tenant: { select: { firstName: true, lastName: true } },
+                            landlord: { select: { firstName: true, lastName: true } }
                         }
                     }
                 }
@@ -46,8 +46,8 @@ export async function verifyQRToken(token: string) {
                     reference: receipt.receiptRef,
                     amount: receipt.totalAmount,
                     period: receipt.periodMonth,
-                    tenant: receipt.lease.tenant?.fullName,
-                    landlord: receipt.lease.landlord.fullName,
+                    tenant: (receipt.lease.tenant?.firstName ? receipt.lease.tenant.firstName + " " : "") + (receipt.lease.tenant?.lastName || ""),
+                    landlord: (receipt.lease.landlord.firstName ? receipt.lease.landlord.firstName + " " : "") + (receipt.lease.landlord.lastName || ""),
                     date: receipt.paidAt,
                     property: receipt.lease.property.address
                 }
@@ -58,7 +58,7 @@ export async function verifyQRToken(token: string) {
         const certificate = await prisma.certificate.findUnique({
             where: { qrToken: token },
             include: {
-                user: { select: { fullName: true } }
+                user: { select: { firstName: true, lastName: true } }
             }
         });
 
@@ -69,7 +69,7 @@ export async function verifyQRToken(token: string) {
                 entity: {
                     reference: certificate.id.slice(0, 8).toUpperCase(),
                     type: certificate.certType,
-                    holder: certificate.user.fullName,
+                    holder: (certificate.user.firstName ? certificate.user.firstName + " " : "") + (certificate.user.lastName || ""),
                     issuedAt: certificate.issuedAt,
                     expiresAt: certificate.expiresAt
                 }

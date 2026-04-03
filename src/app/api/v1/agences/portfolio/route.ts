@@ -20,7 +20,7 @@ export async function GET(req: Request) {
            include: {
               tenant: {
                  select: {
-                    fullName: true,
+                    firstName: true, lastName: true,
                     phone: true,
                     email: true
                  }
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
         },
         owner: {
            select: {
-              fullName: true,
+              firstName: true, lastName: true,
               phone: true,
               email: true
            }
@@ -46,13 +46,13 @@ export async function GET(req: Request) {
        commune: p.commune,
        type: p.propertyType,
        status: p.status,
-       ownerName: p.owner?.fullName,
+       ownerName: (p.owner?.firstName ? p.owner.firstName + " " : "") + (p.owner?.lastName || ""),
        leases: p.leases.map(l => ({
           id: l.id,
           reference: l.leaseReference,
           status: l.status,
           rentAmount: l.rentAmount,
-          tenantName: l.tenant?.fullName,
+          tenantName: (l.tenant?.firstName ? l.tenant.firstName + " " : "") + (l.tenant?.lastName || ""),
           startDate: l.startDate,
           endDate: l.endDate
        }))

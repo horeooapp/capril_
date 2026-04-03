@@ -83,11 +83,11 @@ export async function getAgencyDashboardData() {
             include: {
                 property: {
                     include: {
-                        owner: { select: { fullName: true, id: true } },
+                        owner: { select: { firstName: true, lastName: true, id: true } },
                         leases: {
                             where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },
                             include: {
-                                tenant: { select: { fullName: true, id: true } }
+                                tenant: { select: { firstName: true, lastName: true, id: true } }
                             }
                         }
                     }
@@ -109,11 +109,11 @@ export async function getAgencyDashboardData() {
                 ...p,
                 landlord: {
                     ...p.owner,
-                    fullName: isMasked ? (p.owner.fullName.substring(0, 3) + "***") : p.owner.fullName
+                    fullName: isMasked ? ((p.owner.firstName ? p.owner.firstName + " " : "") + (p.owner.lastName || "").substring(0, 3) + "***") : (p.owner.firstName ? p.owner.firstName + " " : "") + (p.owner.lastName || "")
                 },
                 leases: p.leases.map((l: any) => ({
                     ...l,
-                    tenantName: isMasked ? "Locataire Masqué" : (l.tenant?.fullName || "Anonyme")
+                    tenantName: isMasked ? "Locataire Masqué" : ((l.tenant?.firstName ? l.tenant.firstName + " " : "") + (l.tenant?.lastName || "") || "Anonyme")
                 }))
             };
         });

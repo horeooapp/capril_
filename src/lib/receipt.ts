@@ -110,9 +110,9 @@ export async function createAndNotifyReceipt(data: {
                 totalAmount: data.rentAmount + data.chargesAmount,
                 paymentMethod: data.paymentChannel,
                 paidAt: new Date(),
-                tenantName: lease.tenant?.fullName || 'Locataire',
+                tenantName: (lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || 'Locataire',
                 propertyAddress: lease.property.address,
-                landlordName: data.creatorName || lease.landlord.fullName || 'Propriétaire QAPRIL',
+                landlordName: data.creatorName || (lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || 'Propriétaire QAPRIL',
                 receiptHash: documentHash,
                 qrToken: qrToken,
                 declarative: data.receiptType === 'DECLARATIVE'
@@ -126,7 +126,7 @@ export async function createAndNotifyReceipt(data: {
                     referenceId: receiptRef,
                     receiptBuffer: pdfBuffer,
                     payload: {
-                        parameters: [lease.tenant?.fullName || "Locataire", lease.property.address || "Propriété"],
+                        parameters: [(lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || "Locataire", lease.property.address || "Propriété"],
                         smsText: `[QAPRIL] Votre quittance Certifiée SHA-256 pour ${data.periodMonth} est disponible. Réf: ${receiptRef}.`,
                         html: `<p>Votre quittance certifiée pour le mois de ${data.periodMonth} a été générée.</p>`
                     }

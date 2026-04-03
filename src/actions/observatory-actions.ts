@@ -71,12 +71,12 @@ export async function getLiveEventStream() {
         const logs = await prisma.auditLog.findMany({
             orderBy: { createdAt: 'desc' },
             take: 10,
-            include: { user: { select: { fullName: true } } }
+            include: { user: { select: { firstName: true, lastName: true } } }
         });
         return logs.map(l => ({
             id: l.id,
             action: l.action,
-            user: l.user?.fullName || "Système",
+            user: (l.user?.firstName ? l.user.firstName + " " : "") + (l.user?.lastName || "") || "Système",
             createdAt: l.createdAt
         }));
     } catch (error) {

@@ -114,7 +114,7 @@ export async function triggerAssistedKYC(documentId: string) {
                     userId: "ADMIN_ID_PLACEHOLDER", // Should be fetched or broadcast
                     channel: "PUSH",
                     title: "Vérification Manuelle Requise",
-                    content: `Anomalie détectée sur le document de ${doc.user.fullName || doc.userId}. Motifs: ${analysis.flags.join(", ")}`,
+                    content: `Anomalie détectée sur le document de ${(doc.user.firstName ? doc.user.firstName + " " : "") + (doc.user.lastName || "") || doc.userId}. Motifs: ${analysis.flags.join(", ")}`,
                     type: "WARNING"
                 }
             })

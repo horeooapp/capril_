@@ -10,13 +10,13 @@ export async function getDashboardBailleur(landlordId: string) {
   const [user, leases, recentReceipts] = await Promise.all([
     prisma.user.findUnique({
       where:  { id: landlordId },
-      select: { walletBalance: true, walletSeuilAlerte: true, fullName: true }
+      include: { walletConfig: true }
     }),
     prisma.lease.findMany({
       where:   { landlordId, status: { not: "ARCHIVED" } },
       include: {
         property: { select: { commune: true, address: true, propertyCode: true } },
-        tenant:   { select: { fullName: true, phone: true } },
+        tenant:   { select: { firstName: true, lastName: true, phone: true } },
         mandate:  { select: { mandateRef: true, mandateType: true, status: true } },
         receipts: { orderBy: { periodMonth: "desc" }, take: 1 }
       }
@@ -39,14 +39,14 @@ export async function getDashboardBailleur(landlordId: string) {
 
   // Alertes
   const alertes = [];
-  const seuil   = user?.walletSeuilAlerte ?? SEUIL_WALLET;
-  if ((user?.walletBalance ?? 0) < seuil) {
+  const seuil   = user?.walletConfig?.walletSeuilAlerte ?? SEUIL_WALLET;
+  if (((user?.walletConfig?.walletBalance || 0) ?? 0) < seuil) {
     alertes.push({ type: "WALLET", message: `Wallet sous seuil ${seuil} FCFA`,
-      details: { solde: user?.walletBalance, seuil } });
+      details: { solde: (user?.walletConfig?.walletBalance || 0), seuil } });
   }
 
   return {
-    walletBalance:      user?.walletBalance ?? 0,
+    walletBalance:      (user?.walletConfig?.walletBalance || 0) ?? 0,
     walletSeuilAlerte:  seuil,
     biensActifs:        actifs.length,
     biensVacants:       vacants,

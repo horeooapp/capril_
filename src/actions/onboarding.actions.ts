@@ -38,8 +38,12 @@ export async function finaliserOnboarding(data: {
       data: {
         onboardingComplete:  true,
         capaciteActive:      data.capaciteActive,
-        diasporaAbonnement:  data.activerDiaspora,
-        diasporaAbonnementSince: data.activerDiaspora ? new Date() : null,
+        diasporaProfile: {
+          upsert: {
+            create: { diasporaAbonnement: data.activerDiaspora, diasporaAbonnementSince: data.activerDiaspora ? new Date() : null },
+            update: { diasporaAbonnement: data.activerDiaspora, diasporaAbonnementSince: data.activerDiaspora ? new Date() : null }
+          }
+        }
       }
     })
   ]);

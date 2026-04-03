@@ -16,6 +16,7 @@ export async function GET(req: Request) {
     const fullUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
+        walletConfig: true,
         propertiesManaged: {
           include: {
             leases: {
@@ -39,10 +40,10 @@ export async function GET(req: Request) {
     // Role-specific mapping 6.1
     const mapping = {
       id: fullUser.id,
-      nom: fullUser.fullName,
+      nom: (fullUser.firstName ? fullUser.firstName + " " : "") + (fullUser.lastName || ""),
       email: fullUser.email,
       telephone: fullUser.phone,
-      code: fullUser.landlordCode || `AG-${fullUser.id.substring(0, 5)}`,
+      code: fullUser?.walletConfig?.landlordCode || `AG-${fullUser.id.substring(0, 5)}`,
       commune: fullUser.propertiesManaged[0]?.commune || 'Abidjan',
       agreement: 'CIMA/QAP-2026',
       stats: {

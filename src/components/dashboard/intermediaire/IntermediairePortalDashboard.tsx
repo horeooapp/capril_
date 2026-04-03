@@ -291,7 +291,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                             <div className="grid grid-cols-2 gap-3 mb-5">
                                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                                     <div className="text-[8px] font-black text-slate-400 uppercase mb-1">Dû par</div>
-                                                    <div className="text-[11px] font-black text-slate-800 line-clamp-1">{p.leases?.[0]?.tenant?.fullName || "Inconnu"}</div>
+                                                    <div className="text-[11px] font-black text-slate-800 line-clamp-1">{((p.leases?.[0]?.tenant?.firstName || '') + ' ' + (p.leases?.[0]?.tenant?.lastName || '')).trim() || "Inconnu"}</div>
                                                 </div>
                                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                                     <div className="text-[8px] font-black text-slate-400 uppercase mb-1">Montant</div>
@@ -343,7 +343,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                                     <span className="text-[8px] font-black px-2 py-1 bg-[#0D2B6E] text-white rounded-md uppercase tracking-widest">{m.id.slice(0, 5)}</span>
                                                     <span className="text-[8px] font-black px-2 py-1 bg-green-100 text-green-700 rounded-md uppercase tracking-widest">{m.statut}</span>
                                                 </div>
-                                                <h4 className="text-[14px] font-black text-[#0D2B6E] uppercase italic">Propriétaire {m.proprietaire?.fullName || "Individuel"}</h4>
+                                                <h4 className="text-[14px] font-black text-[#0D2B6E] uppercase italic">Propriétaire {(m.proprietaire?.firstName ? m.proprietaire.firstName + " " : "") + (m.proprietaire?.lastName || "") || "Individuel"}</h4>
                                                 <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Type: Gestion Totale</div>
                                             </div>
                                             <div className="text-right">

@@ -77,10 +77,10 @@ export default async function AgencyTeamPage() {
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-qnavy-pale flex items-center justify-center text-qnavy font-black text-sm uppercase">
-                                                        {member.fullName?.substring(0, 2)}
+                                                        {(member.firstName ? member.firstName + " " : "") + (member.lastName || "")?.substring(0, 2)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-qtext">{member.fullName}</p>
+                                                        <p className="font-bold text-qtext">{(member.firstName ? member.firstName + " " : "") + (member.lastName || "")}</p>
                                                         <p className="text-sm font-medium text-qgrey-400">{member.email}</p>
                                                     </div>
                                                 </div>

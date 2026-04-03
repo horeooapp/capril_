@@ -97,7 +97,7 @@ export default async function VerifyBDQPage({ params }: { params: Promise<{ toke
                                 </div>
                                 <div className="min-w-0">
                                     <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Bailleur</span>
-                                    <span className="text-sm font-black text-slate-900 truncate block">{bdq.bailleur.fullName || "Confidentiel"}</span>
+                                    <span className="text-sm font-black text-slate-900 truncate block">{(bdq.bailleur.firstName ? bdq.bailleur.firstName + " " : "") + (bdq.bailleur.lastName || "") || "Confidentiel"}</span>
                                 </div>
                             </div>
                         </div>

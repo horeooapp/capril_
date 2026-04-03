@@ -85,7 +85,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                                 </div>
                                 <div>
                                     <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 border-b pb-1">Bailleur</h3>
-                                    <p className="font-black text-gray-900 text-lg uppercase">{lease.property.owner.name}</p>
+                                    <p className="font-black text-gray-900 text-lg uppercase">{(lease.property.owner.firstName ? lease.property.owner.firstName + " " : "") + (lease.property.owner.lastName || "")}</p>
                                     <p className="text-sm text-gray-500">{lease.property.owner.email}</p>
                                 </div>
                             </div>

@@ -16,7 +16,7 @@ export async function getOwnerConsolidatedDashboard() {
         include: {
             mandates: {
                 where: { status: "ACTIVE" },
-                include: { agent: { select: { fullName: true } } }
+                include: { agent: { select: { firstName: true, lastName: true } } }
             },
             leases: {
                 where: { status: "ACTIVE" },

@@ -18,6 +18,7 @@ export async function getWalletProfile() {
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
             include: {
+                walletConfig: true,
                 walletRechargeConfig: true,
                 walletRechargeLinks: {
                     orderBy: { createdAt: 'desc' },
@@ -35,10 +36,10 @@ export async function getWalletProfile() {
         const suggestions = await calculateSuggestedRecharge(user.id);
 
         return {
-            balance: user.walletBalance,
-            operateur: user.walletOperateurPrefere || "WAVE",
-            canal: user.walletCanalAlertePref || "WHATSAPP",
-            seuil: user.walletSeuilAlerte || 500,
+            balance: user?.walletConfig?.walletBalance || 0,
+            operateur: user?.walletRechargeConfig?.operateurPrefere || "WAVE",
+            canal: user?.walletRechargeConfig?.canalPrefere || "WHATSAPP",
+            seuil: user?.walletRechargeConfig?.montantFixe || 500,
             rappel: user.walletRechargeConfig,
             recentLinks: user.walletRechargeLinks,
             suggestions,
@@ -64,24 +65,21 @@ export async function updateWalletPreferences(data: {
     if (!session || !session.user || !session.user.id) return { error: "Non autorisé" };
 
     try {
-        await prisma.user.update({
-            where: { id: session.user.id },
-            data: {
-                walletOperateurPrefere: data.operateur,
-                walletCanalAlertePref: data.canal,
-                walletSeuilAlerte: data.seuil
-            }
-        });
-
-        if (data.rappelActif !== undefined || data.rappelJour !== undefined) {
+        if (data.operateur !== undefined || data.canal !== undefined || data.seuil !== undefined || data.rappelActif !== undefined || data.rappelJour !== undefined) {
             await prisma.walletRechargeConfig.upsert({
                 where: { userId: session.user.id },
                 update: {
+                    operateurPrefere: data.operateur,
+                    canalPrefere: data.canal,
+                    montantFixe: data.seuil,
                     rappelActif: data.rappelActif,
                     jourDuMois: data.rappelJour
                 },
                 create: {
                     userId: session.user.id,
+                    operateurPrefere: data.operateur || "WAVE",
+                    canalPrefere: data.canal || "WHATSAPP",
+                    montantFixe: data.seuil,
                     rappelActif: data.rappelActif || false,
                     jourDuMois: data.rappelJour || 1
                 }

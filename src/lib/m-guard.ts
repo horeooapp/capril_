@@ -58,7 +58,7 @@ export async function evaluateTransactionRisk(context: RiskContext): Promise<Ris
         select: { fraudScore: true }
     });
 
-    if (isBlacklisted && isBlacklisted.fraudScore > 80) {
+    if (isBlacklisted && (isBlacklisted.fraudProfile?.fraudScore || 0) > 80) {
         riskScore = 100;
         flags.push("USER_ALREADY_SUSPECT");
     }

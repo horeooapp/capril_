@@ -21,28 +21,26 @@ export async function POST(req: Request) {
 
     // The landlord's wallet is deducted even if the agent is the one clicking emitting.
     // In our simplified mock, we assume the connected user is paying (the landlord or agent).
-    const payer = await prisma.user.findUnique({
-      where: { id: user.id },
+    const payerConfig = await prisma.userWalletConfig.findUnique({
+      where: { userId: user.id },
       select: { walletBalance: true }
     });
 
-    if (!payer) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!payerConfig) {
+      return NextResponse.json({ error: 'User wallet not found' }, { status: 404 });
     }
 
-    if ((payer.walletBalance || 0) < cout) {
+    if ((payerConfig.walletBalance || 0) < cout) {
       return NextResponse.json({ 
           error: `Solde Wallet insuffisant. Émettre une quittance coûte ${cout} FCFA.` 
       }, { status: 402 });
     }
 
     // Deduct from wallet
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.userWalletConfig.update({
+      where: { userId: user.id },
       data: {
-        walletBalance: {
-          decrement: cout
-        }
+        walletBalance: { decrement: cout }
       }
     });
 

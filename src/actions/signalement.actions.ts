@@ -57,7 +57,7 @@ export async function getSignalementsForProperty(logementId: string) {
   return prisma.ticketMaintenance.findMany({
     where:   { logementId },
     include: {
-      locataire:   { select: { fullName: true, phone: true } },
+      locataire:   { select: { firstName: true, lastName: true, phone: true } },
       prestataire: { select: { nom: true, telephone: true, specialite: true } }
     },
     orderBy: { dateSignalement: "desc" }

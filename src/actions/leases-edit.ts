@@ -90,7 +90,7 @@ export async function updateLeaseDraft(leaseId: string, data: {
                 commercialData: data.commercialData 
                     ? (data.commercialData as Prisma.InputJsonValue) 
                     : (lease.commercialData ? (lease.commercialData as Prisma.InputJsonValue) : Prisma.JsonNull),
-                dateLimitePaiement: data.dateLimitePaiement ?? lease.dateLimitePaiement,
+                paymentDay: data.dateLimitePaiement ?? lease.paymentDay,
                 paiementAvance: data.paiementAvance ?? lease.paiementAvance
             }
         })

@@ -84,7 +84,7 @@ export async function sendMediationMessage(disputeId: string, content: string, a
                 disputeId,
                 senderId: session.user.id,
                 content,
-                attachments: JSON.stringify(attachments)
+                attachments: attachments || []
             }
         });
 
@@ -144,8 +144,8 @@ export async function getDisputeDetails(disputeId: string) {
                 select: { 
                     leaseReference: true, 
                     leaseType: true,
-                    landlord: { select: { fullName: true } },
-                    tenant: { select: { fullName: true } }
+                    landlord: { select: { firstName: true, lastName: true } },
+                    tenant: { select: { firstName: true, lastName: true } }
                 }
             },
             messages: {
@@ -164,7 +164,7 @@ export async function getDisputeTimeline(disputeId: string) {
         where: { id: disputeId },
         include: {
             messages: {
-                include: { sender: { select: { fullName: true, role: true } } },
+                include: { sender: { select: { firstName: true, lastName: true, role: true } } },
                 orderBy: { createdAt: 'asc' }
             },
             lease: {
@@ -202,9 +202,9 @@ export async function getDisputeTimeline(disputeId: string) {
         timeline.push({
             type: 'MESSAGE',
             date: msg.createdAt,
-            title: `Message de ${msg.sender.fullName}`,
+            title: `Message de ${(msg.sender.firstName ? msg.sender.firstName + " " : "") + (msg.sender.lastName || "")}`,
             content: msg.content,
-            sender: msg.sender.fullName,
+            sender: (msg.sender.firstName ? msg.sender.firstName + " " : "") + (msg.sender.lastName || ""),
             meta: { role: msg.sender.role, attachments: msg.attachments }
         });
     });
@@ -250,8 +250,8 @@ export async function getDisputes() {
                 select: { 
                     leaseReference: true, 
                     property: { select: { commune: true } },
-                    landlord: { select: { fullName: true } },
-                    tenant: { select: { fullName: true } }
+                    landlord: { select: { firstName: true, lastName: true } },
+                    tenant: { select: { firstName: true, lastName: true } }
                 }
             }
         },

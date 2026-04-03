@@ -52,7 +52,7 @@ export default async function AdminLayout({
                             id: session.user.id,
                             email: session.user.email,
                             role: session.user.role,
-                            fullName: session.user.fullName
+                            fullName: ((session.user as any).firstName ? (session.user as any).firstName + " " : "") + ((session.user as any).lastName || "")
                         }
                     } : null} 
                     onLogout={logout} 

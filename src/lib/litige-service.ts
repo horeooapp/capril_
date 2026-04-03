@@ -28,7 +28,7 @@ export class LitigeService {
     // 2. Create the data payload to hash (deterministic)
     const payload = JSON.stringify({
       lease_id: lease.id,
-      tenant_name: lease.tenant?.fullName || "N/A",
+      tenant_name: (lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || "N/A",
       property_ref: lease.property.propertyCode,
       reclamations: (lease.reclamations as any[]).map((r: any) => ({
         id: r.id,

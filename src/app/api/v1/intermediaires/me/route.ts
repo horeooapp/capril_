@@ -11,7 +11,7 @@ export async function GET() {
     select: {
       id: true,
       email: true,
-      fullName: true,
+      firstName: true, lastName: true,
       role: true,
       isCertified: true,
       kycLevel: true,

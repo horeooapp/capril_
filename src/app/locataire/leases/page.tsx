@@ -78,10 +78,10 @@ export default async function TenantLeasesPage() {
                                             <div className="text-right">
                                                 <span className="block font-extrabold text-[#1F4E79] uppercase">
                                                     {lease.typeGestion === 'agreee' 
-                                                        ? `Bailleur Masqué (${lease.landlord?.landlordCode || "AGREEE"})` 
+                                                        ? `Bailleur Masqué (${lease.landlord?.walletConfig?.landlordCode || "AGREEE"})` 
                                                         : (lease.bailleurMasque 
-                                                            ? `Bailleur Masqué (${lease.landlord?.landlordCode || "PRIVE"})` 
-                                                            : (lease.landlord?.fullName || "Non renseigné"))}
+                                                            ? `Bailleur Masqué (${lease.landlord?.walletConfig?.landlordCode || "PRIVE"})` 
+                                                            : ((lease.landlord?.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord?.lastName || "") || "Non renseigné"))}
                                                 </span>
                                                 <span className="block text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-0.5">
                                                     {lease.typeGestion === 'agreee' 

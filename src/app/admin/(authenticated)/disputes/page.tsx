@@ -54,11 +54,11 @@ export default async function DisputesAdminPage() {
                                     </p>
                                     <div className="flex items-center gap-3 pt-1">
                                         <span className="text-[10px] font-bold text-gray-500 italic">
-                                            Bailleur: {dispute.lease.landlord.fullName}
+                                            Bailleur: {(dispute.lease.landlord.firstName ? dispute.lease.landlord.firstName + " " : "") + (dispute.lease.landlord.lastName || "")}
                                         </span>
                                         <span className="text-[10px] text-gray-300">|</span>
                                         <span className="text-[10px] font-bold text-gray-500 italic">
-                                            Locataire: {dispute.lease.tenant?.fullName || 'N/A'}
+                                            Locataire: {(dispute.lease.tenant?.firstName ? dispute.lease.tenant.firstName + " " : "") + (dispute.lease.tenant?.lastName || "") || 'N/A'}
                                         </span>
                                     </div>
                                 </div>

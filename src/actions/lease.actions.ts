@@ -33,8 +33,8 @@ export async function createLease(data: {
   const sha256 = createHash("sha256").update(payload).digest("hex");
 
   // Facturation 2 000 FCFA — débiter wallet bailleur
-  await prisma.user.update({
-    where: { id: data.landlordId },
+  await (prisma as any).userWalletConfig.update({
+    where: { userId: data.landlordId },
     data:  { walletBalance: { decrement: 2000 } }
   });
 
@@ -53,7 +53,7 @@ export async function createLease(data: {
       chargesAmount:  data.chargesAmount ?? 0,
       paymentDay:     data.paymentDay    ?? 5,
       depositAmount:  data.depositAmount ?? 0,
-      typeBail:       data.typeBail      ?? "ECRIT",
+      typeBail:       data.typeBail      ?? ("ECRIT" as any),
       status:         "DRAFT",
     }
   });
@@ -68,7 +68,7 @@ export async function getLeasesForLandlord(landlordId: string) {
     where: { landlordId, status: { not: "ARCHIVED" } },
     include: {
       property: { select: { commune: true, address: true, propertyCode: true } },
-      tenant:   { select: { fullName: true, phone: true } },
+      tenant:   { select: { firstName: true, lastName: true, phone: true } },
       receipts: { orderBy: { createdAt: "desc" }, take: 1 }
     },
     orderBy: { createdAt: "desc" }
@@ -81,8 +81,8 @@ export async function getLeaseById(leaseId: string) {
     where:   { id: leaseId },
     include: {
       property: true,
-      landlord: { select: { fullName: true, phone: true, landlordCode: true } },
-      tenant:   { select: { fullName: true, phone: true } },
+      landlord: { select: { firstName: true, lastName: true, phone: true, walletConfig: { select: { landlordCode: true } } } },
+      tenant:   { select: { firstName: true, lastName: true, phone: true } },
       mandate:  true,
       receipts: { orderBy: { createdAt: "desc" } }
     }

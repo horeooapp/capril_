@@ -17,8 +17,7 @@ export async function GET(req: Request) {
     const fullUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: { 
-        walletBalance: true,
-        walletSeuilAlerte: true,
+        walletConfig: { select: { walletBalance: true, walletSeuilAlerte: true } },
         activePlanTier: true,
         _count: {
            select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
@@ -37,15 +36,15 @@ export async function GET(req: Request) {
     const consoMensuelle = nbBails * 75;
 
     return NextResponse.json({
-      solde: fullUser.walletBalance || 0,
+      solde: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
       devise: 'FCFA',
-      seuilAlerte: fullUser.walletSeuilAlerte || 500,
+      seuilAlerte: fullUser?.walletConfig?.walletSeuilAlerte || 500,
       decouvertMax: -1500,
       historique: history,
       stats: {
          nbBails,
          consoMensuelle,
-         autonomieMois: (fullUser.walletBalance || 0) > 0 ? Math.floor((fullUser.walletBalance || 0) / (consoMensuelle || 1)) : 0
+         autonomieMois: (((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) > 0 ? Math.floor((((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) / (consoMensuelle || 1)) : 0
       }
     });
 

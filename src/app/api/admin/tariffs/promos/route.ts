@@ -16,7 +16,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       include: { 
         offreCible: { select: { nomAffichage: true, code: true } },
-        createdPar: { select: { fullName: true } }
+        createdPar: { select: { firstName: true, lastName: true } }
       },
     });
 

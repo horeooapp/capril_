@@ -131,9 +131,9 @@ export class ChampionService {
       include: {
         lease: {
           include: {
-             tenant: { select: { fullName: true, phone: true } },
+             tenant: { select: { firstName: true, lastName: true, phone: true } },
              property: { select: { address: true, propertyCode: true } },
-             landlord: { select: { fullName: true } }
+             landlord: { select: { firstName: true, lastName: true } }
           }
         }
       },
@@ -215,14 +215,14 @@ export class ChampionService {
 
     const event = "CHAMPION_RELANCE" as any;
     const amount = arrear.amount;
-    const tenantName = arrear.lease.tenant?.fullName || "Client";
+    const tenantName = (arrear.lease.tenant?.firstName ? arrear.lease.tenant.firstName + " " : "") + (arrear.lease.tenant?.lastName || "") || "Client";
     
     // Generate a payment link (mock for now, but following the pattern)
     const paymentUrl = `https://qapril.ci/pay/${arrear.id}`;
 
     const payload = {
-      smsText: `QAPRIL: Bonjour ${tenantName}, je suis ${champion.fullName || 'votre agent'}, votre Champion QAPRIL. Votre loyer de ${amount.toLocaleString()} FCFA est en attente. Réglez-le ici : ${paymentUrl}. Merci !`,
-      parameters: [tenantName, champion.fullName || "Champion", String(amount), paymentUrl]
+      smsText: `QAPRIL: Bonjour ${tenantName}, je suis ${(champion.firstName ? champion.firstName + " " : "") + (champion.lastName || "") || 'votre agent'}, votre Champion QAPRIL. Votre loyer de ${amount.toLocaleString()} FCFA est en attente. Réglez-le ici : ${paymentUrl}. Merci !`,
+      parameters: [tenantName, (champion.firstName ? champion.firstName + " " : "") + (champion.lastName || "") || "Champion", String(amount), paymentUrl]
     };
 
     const { NotificationService } = await import("./notification-service");

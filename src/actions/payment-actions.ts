@@ -82,7 +82,7 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
             amount: input.amount,
             currency: "XOF",
             description: `Règlement Loyer - Contrat ${input.leaseId} (${input.monthsCount} mois)`,
-            customer_name: session.user.name || session.user.fullName || "Locataire",
+            customer_name: session.user.fullName || session.user.fullName || "Locataire",
             customer_surname: "QAPRIL",
             customer_email: session.user.email || "client@qapril.ci",
             customer_phone_number: input.payerPhone,
