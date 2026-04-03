@@ -125,6 +125,9 @@ export async function loginWithAdminCredentials(email: string, password: string)
         }
 
         // 2. User & Role Check (using JS validation to bypass Prisma Enum errors)
+        console.log(`[DEBUG] auth.ts - process.env.DATABASE_URL starts with: '${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 10) : "UNDEFINED"}'`);
+        console.log(`[DEBUG] auth.ts admin - process.env.DATABASE_URL starts with: '${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 15) : "UNDEFINED"}'`);
+        
         const user = await prisma.user.findFirst({
             where: { email: normalizedEmail }
         });
