@@ -131,7 +131,7 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
-          echo "DATABASE_URL='${{ secrets.DATABASE_URL }}'" > .env
+          echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
           echo "AUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "NEXTAUTH_SECRET=\"${{ secrets.AUTH_SECRET }}\"" >> .env
           echo "AUTH_URL=\"${{ secrets.AUTH_URL }}\"" >> .env
