@@ -42,7 +42,7 @@ export async function POST(req: Request) {
             }
 
             // Récupérer l'utilisateur pour vérifier son rôle
-            let user = await prisma.user.findFirst({ where: { email: normalizedEmail } });
+            const user = await prisma.user.findFirst({ where: { email: normalizedEmail } });
             
             // Si l'utilisateur n'existe pas, ou vérifier qu'il a le bon rôle selon l'app ciblée...
             // Pour l'instant, validation simple:
