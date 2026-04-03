@@ -187,16 +187,11 @@ jobs:
             cd $DEPLOY_DEST && \
             export DATABASE_URL='${{ secrets.DATABASE_URL }}' && \
             npm ci && \
-            # FIX: Automated cleanup of invalid JSONB defaults in migration files
-            # We use a standalone script to avoid shell quoting issues and find {} substitution errors
-            # Synchronisation directe du schéma pour forcer la création des colonnes manquantes (ex: landlord_code)
             npx prisma@6.4.1 db push --accept-data-loss && \
             npx prisma@6.4.1 db seed && \
             npx prisma@6.4.1 generate && \
-            # Link persistent uploads to the public folder
             rm -rf public/uploads || true && \
             ln -s /home/github/capril_data/uploads public/uploads && \
-            # Start/Restart using npm start to ensure static assets are served by Next.js
             (pm2 delete capril || true) && \
             pm2 start \"npm run start\" --name capril --cwd $DEPLOY_DEST --env production && \
             pm2 save
