@@ -36,8 +36,12 @@ jobs:
 
       - name: 🔨 Build application
         run: |
-          # Clean secret in case of acccidental prefix
-          export CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          # Clean secret robustly, ignoring any newlines, carriage returns, or spaces before DATABASE_URL=
+          RAW_URL='${{ secrets.DATABASE_URL }}'
+          export CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
+          
+          # Trim leading/trailing whitespace and quotes just in case
+          export CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
           export DATABASE_URL="$CLEAN_DB_URL"
           npm run build
         env:
@@ -134,8 +138,10 @@ jobs:
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
           
-          # Sanitize GitHub Secret in case the user accidentally pasted "DATABASE_URL=postgres..." into the value
-          CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          # Sanitize GitHub Secret: robustly strip any accidental prefix, spaces, carriage returns, or quotes
+          RAW_URL='${{ secrets.DATABASE_URL }}'
+          CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
           
           echo "DATABASE_URL=$CLEAN_DB_URL" > .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
@@ -187,7 +193,9 @@ jobs:
           
           # 2. Secure Deployment Execution
           # We use su - github -c to ensure all commands run in a clean environment as the github user.
-          CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          RAW_URL='${{ secrets.DATABASE_URL }}'
+          CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
           
           sudo su - github -c "
             set -e
