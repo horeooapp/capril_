@@ -261,29 +261,36 @@ jobs:
 
       - name: 🩺 Health Check
         run: |
-          echo "Waiting for app to start..."
-          sleep 20
+          DEPLOY_DEST="/home/github/capril_app"
+          echo "🩺 Checking application health at http://127.0.0.1:3000/api/health"
           
-          # Check PM2 overall status
-          echo "📊 PM2 Status:"
-          sudo su - github -c "pm2 status capril"
+          # Tentative de Health Check
+          MAX_RETRIES=5
+          COUNT=0
+          while [ $COUNT -lt $MAX_RETRIES ]; do
+            if curl -s -f http://127.0.0.1:3000/api/health | grep -q "OK"; then
+              echo "✅ Application is healthy!"
+              exit 0
+            fi
+            echo "⏳ Waiting for application to boot... ($((COUNT+1))/$MAX_RETRIES)"
+            sleep 5
+            COUNT=$((COUNT+1))
+          done
           
-          # Check if port 3000 is listening
-          echo "🔌 Port 3000 check:"
-          ss -lntu | grep :3000 || echo "⚠️ Port 3000 NOT listening!"
-          
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/health" || echo "000")
-          echo "Health check status: $STATUS"
-          
-          if [ "$STATUS" != "200" ]; then
-            echo "❌ Health check failed! (Expected 200, got $STATUS)"
-            echo "📋 DUMPING PM2 LOGS:"
-            sudo su - github -c "pm2 logs capril --lines 100 --nostream || true"
-            echo "📋 DUMPING PM2 DESCRIPTION:"
-            sudo su - github -c "pm2 describe capril || true"
-            exit 1
-          fi
-          echo "✅ Application is healthy!"
+          echo "❌ Health check failed. Dumping diagnostics..."
+          sudo -u github bash << 'EOF_DIAG'
+            echo "--- PM2 Status ---"
+            pm2 list
+            echo "--- PM2 Logs (Last 50 lines) ---"
+            pm2 logs capril --lines 50 --no-daemon & sleep 5 && kill $!
+            
+            echo "--- System DB Status ---"
+            sudo systemctl status postgresql --no-pager || echo "PostgreSQL service not found."
+            
+            echo "--- Listening Ports ---"
+            sudo ss -tulpn | grep 5432 || echo "No process listening on 5432"
+          EOF_DIAG
+          exit 1
 
       - name: 📣 Notify on Success
         if: success()
