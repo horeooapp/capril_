@@ -183,7 +183,7 @@ jobs:
           sudo su - github -c "
             set -e
             mkdir -p /home/github/capril_data/uploads
-            cd \$DEPLOY_DEST
+            cd $DEPLOY_DEST
             export DATABASE_URL='${{ secrets.DATABASE_URL }}'
             
             npm ci --omit=dev || true
