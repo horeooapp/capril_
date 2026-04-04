@@ -71,10 +71,9 @@ jobs:
           cp package-lock.json dist_package/
 
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: build-output
-          include-hidden-files: true
           path: dist_package/
           retention-days: 1
 
@@ -99,8 +98,7 @@ jobs:
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
-        uses: actions/download-artifact@v4
-        continue-on-error: true
+        uses: actions/download-artifact@v3
         with:
           name: build-output
 
