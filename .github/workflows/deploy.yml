@@ -36,12 +36,24 @@ jobs:
 
       - name: 🔨 Build application
         run: |
-          # Clean secret robustly, ignoring any newlines, carriage returns, or spaces before DATABASE_URL=
+          # Robustly extract DATABASE_URL from secret (handles multiline or accidental labels)
           RAW_URL='${{ secrets.DATABASE_URL }}'
-          export CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
+          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
+          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
           
-          # Trim leading/trailing whitespace and quotes just in case
-          export CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
+          # Trim whitespace and quotes
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
+          
+          # 🚨 CRITICAL PROTOCOL VALIDATION
+          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
+            echo "❌ ERROR: DATABASE_URL must start with postgresql:// or postgres://"
+            echo "Detected protocol: ${CLEAN_DB_URL%%://*}"
+            if [[ "$CLEAN_DB_URL" =~ ^file: ]]; then
+              echo "⚠️  SQLite detected (file:) which is NOT supported in production."
+            fi
+            exit 1
+          fi
+          
           export DATABASE_URL="$CLEAN_DB_URL"
           npm run build
         env:
@@ -136,11 +148,18 @@ jobs:
           sudo su - github -c "pm2 stop capril || true"
           
           # Sync production files. Using standalone reduces sync size by ~80%.
+          # Part 1: Main synchronization (excluding static assets from deletion to prevent 'chunk failed' errors)
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='*.db*' \
             --exclude='node_modules' \
+            --exclude='.next/static' \
             ./ $DEPLOY_DEST/
+
+          # Part 2: Accumulative sync of static assets (never delete old chunks to support active sessions)
+          mkdir -p $DEPLOY_DEST/.next/static
+          rsync -rlptvz --no-owner --no-group --no-perms \
+            ./.next/static/ $DEPLOY_DEST/.next/static/
 
       # Handled inside the restart block for better permission consistency
 
@@ -150,10 +169,16 @@ jobs:
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
           
-          # Sanitize GitHub Secret: robustly strip any accidental prefix, spaces, carriage returns, or quotes
+          # Robustly extract DATABASE_URL from secret
           RAW_URL='${{ secrets.DATABASE_URL }}'
-          CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
+          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
+          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
           CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
+          
+          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
+            echo "❌ ERROR: Invalid DATABASE_URL protocol on production host."
+            exit 1
+          fi
           
           echo "DATABASE_URL=$CLEAN_DB_URL" > .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
@@ -205,9 +230,11 @@ jobs:
             cd $DEPLOY_DEST
             
             # Setup environment for database operations
+            # Robustly extract DATABASE_URL from secret
             RAW_URL='${{ secrets.DATABASE_URL }}'
-            CLEAN_DB_URL=\"\${RAW_URL#*DATABASE_URL=}\"
-            CLEAN_DB_URL=\$(echo \"\$CLEAN_DB_URL\" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*\$//' -e 's/^\"//' -e 's/\"\$//')
+            CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
+            [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
+            CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
             export DATABASE_URL=\"\$CLEAN_DB_URL\"
             
             # Application of migrations (Standalone has no prisma generate needed as client is built-in)
