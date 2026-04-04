@@ -25,31 +25,49 @@ export default async function FeaturesPage() {
         orderBy: { id: "asc" }
       });
 
-      // Auto-seed si table vide en production
-      if (features.length === 0) {
-        const defaultFeatures = [
-          { id: "M01-M03", name: "Vérification KYC", description: "Gestion des documents d'identité et niveaux de certification", enabled: true },
-          { id: "M04", name: "Gestion des Baux", description: "Émission et suivi des contrats de location certifiés", enabled: true },
-          { id: "M05", name: "Mandats de Gestion", description: "Gestion des délégations entre propriétaires et agences", enabled: true },
-          { id: "M06-M09", name: "Maintenance & Incidents", description: "Suivi des interventions techniques et signalements locataires", enabled: true },
-          { id: "M10-M11", name: "Médiation & Contentieux", description: "Centre de résolution amiable et procédures CACI", enabled: true },
-          { id: "M16", name: "Fiscalité Immobilière", description: "Calcul automatique des taxes et aide à la déclaration", enabled: true },
-          { id: "M-PGW", name: "Passerelle de Paiement", description: "Intégration Mobile Money (Orange, Wave, MTN) et SEPA", enabled: true },
-          { id: "DIASPORA_PACKAGE", name: "Pack Diaspora", description: "Fonctionnalités premium pour les propriétaires résidant à l'étranger", enabled: true },
-          { id: "M-EDL", name: "États des Lieux", description: "EDL numériques avec photos et signature certifiée", enabled: true },
-          { id: "M-SIGN", name: "Signature Électronique", description: "Service de signature légale pour tous les documents", enabled: true },
-          { id: "NEWS_TICKER", name: "News Ticker", description: "Informations défilantes sur la page d'accueil", enabled: true },
-          { id: "SMS_NOTIFICATIONS", name: "Notifications SMS", description: "Alertes automatiques par SMS et WhatsApp", enabled: true },
-          { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Active ou désactive la Landing Page marketing", enabled: true },
-        ];
-        await Promise.all(defaultFeatures.map(f =>
-          (prisma as any).featureFlag.upsert({
-            where: { id: f.id },
-            update: {},
-            create: f,
-          })
-        ));
-        features = await (prisma as any).featureFlag.findMany({ orderBy: { id: "asc" } });
+      // Validation d'auto-seed intelligente
+      const defaultFeatures = [
+        { id: "M01-M03", name: "Vérification KYC", description: "Gestion des documents d'identité et niveaux de certification", enabled: true },
+        { id: "M04", name: "Gestion des Baux", description: "Émission et suivi des contrats de location certifiés", enabled: true },
+        { id: "M05", name: "Mandats de Gestion", description: "Gestion des délégations entre propriétaires et agences", enabled: true },
+        { id: "M06-M09", name: "Maintenance & Incidents", description: "Suivi des interventions techniques et signalements locataires", enabled: true },
+        { id: "M10-M11", name: "Médiation & Contentieux", description: "Centre de résolution amiable et procédures contentieuses", enabled: true },
+        { id: "M16", name: "Fiscalité Immobilière", description: "Calcul automatique des taxes et aide à la déclaration", enabled: true },
+        { id: "M-PGW", name: "Passerelle de Paiement", description: "Intégration Mobile Money (Orange, Wave, MTN) et Cartes Bancaires", enabled: true },
+        { id: "DIASPORA_PACKAGE", name: "Pack Diaspora", description: "Fonctionnalités premium pour les propriétaires résidant à l'étranger", enabled: true },
+        { id: "M-EDL", name: "États des Lieux", description: "EDL numériques avec photos et signature certifiée", enabled: true },
+        { id: "M-SIGN", name: "Signature Électronique", description: "Service de signature légale pour tous les documents", enabled: true },
+        { id: "NEWS_TICKER", name: "News Ticker", description: "Informations défilantes sur le tableau de bord", enabled: true },
+        { id: "SMS_NOTIFICATIONS", name: "Notifications SMS", description: "Alertes automatiques par SMS et WhatsApp", enabled: true },
+        { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Vitrine publique d'agence immobilière personnalisée", enabled: true },
+        { id: "CDC_CONSIGNATION", name: "Consignation CDC", description: "Dépôts des cautions et garanties légales (Caisse des Dépôts)", enabled: true },
+        { id: "ASSURANCE_LOYER", name: "Assurance Loyers Impayés", description: "Souscription directe et vérification d'éligibilité locataire", enabled: true },
+        { id: "M16_ANAH", name: "Aides à la Rénovation", description: "Dossiers de demande de subventions et primes de rénovation", enabled: true },
+        { id: "USSD_PORTAL", name: "Portail USSD", description: "Accès hors-ligne via syntaxe USSD pour locataires", enabled: true },
+        { id: "M_COLOC", name: "Gestion Colocation", description: "Gestion des baux multiples solidaire et quittances divisées", enabled: true },
+        { id: "M_TERRAIN", name: "Terrains Nus & Foncier", description: "Baux fonciers, emphytéotiques et gestion des parcelles", enabled: true },
+        { id: "M-CAND", name: "Dossiers Candidats", description: "Pipeline d'acquisition, scoring et choix du locataire", enabled: true },
+        { id: "M-CHARGES", name: "Régularisation des Charges", description: "Calcul annuel, indexation et récupération au tantième", enabled: true },
+        { id: "M-ANNONCES", name: "Diffusion Multi-Portail", description: "Interface avec les plateformes de petites annonces", enabled: true },
+        { id: "M-COMPTA", name: "Comptabilité Syndic/Gérant", description: "Journaux comptables, rapprochement bancaire et bilans", enabled: true },
+        { id: "M-AGENDA", name: "Agenda & Visites", description: "Planification des visites agences et interventions techniques", enabled: true }
+      ];
+
+      // S'il manque des features, on les ajoute
+      if (features.length < defaultFeatures.length) {
+        const featureIds = new Set(features.map((f: any) => f.id));
+        const missingFeatures = defaultFeatures.filter((f: any) => !featureIds.has(f.id));
+        
+        if (missingFeatures.length > 0) {
+          await Promise.all(missingFeatures.map((f: any) =>
+            (prisma as any).featureFlag.upsert({
+              where: { id: f.id },
+              update: {},
+              create: f,
+            })
+          ));
+          features = await (prisma as any).featureFlag.findMany({ orderBy: { id: "asc" } });
+        }
       }
     }
   } catch (e) {
