@@ -267,6 +267,14 @@ jobs:
             # Massive ownership transfer via a single-line SQL command to avoid Heredoc indentation issues
             sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;"
 
+            echo "🛠️ Ensuring Schema Integrity (Forcing PostgreSQL)..."
+            # Force 'postgresql' provider in both the main prisma folder and the standalone bundle
+            find . -name "schema.prisma" -exec sed -i 's/provider = "sqlite"/provider = "postgresql"/g' {} +
+            
+            # Verify the provider in the logs for the main schema
+            echo "--- Server-side schema.prisma snippet ---"
+            grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
+
             echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
