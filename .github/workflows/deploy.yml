@@ -19,22 +19,29 @@ jobs:
       - name: 🚚 Checkout repository
         uses: actions/checkout@v6
 
+      - name: 🛠️ Ensuring Schema Integrity (Forcing PostgreSQL - PRE-INSTALL)
+        run: |
+          echo "🛠️ Overwriting SQLite provider with PostgreSQL in schema..."
+          sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
+          echo "--- Pre-install schema.prisma snippet ---"
+          grep -C 2 "provider =" prisma/schema.prisma
+
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: 'npm'
 
-      - name: 📦 Install dependencies
+      - name: 📦 Install dependencies (Triggers postinstall)
         run: npm ci
 
-      - name: 🏗️ Generate Prisma Client
+      - name: 🏗️ Verify Prisma Client
         run: |
-          echo "🛠️ Ensuring Schema Integrity (Forcing PostgreSQL)..."
-          sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
-          echo "--- Build-side schema.prisma snippet ---"
+          echo "--- Final Build-side schema.prisma snippet ---"
           grep -C 2 "provider =" prisma/schema.prisma
-          npx prisma generate
+          echo "🔍 Verifying generated client integrity..."
+          grep -q "provider = \"postgresql\"" node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: Generated client is still SQLite!" && exit 1)
+          echo "✅ Generated client is PostgreSQL-compatible."
 
       - name: 🔍 TypeScript type check
         run: npx tsc --noEmit
