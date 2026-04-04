@@ -71,9 +71,10 @@ jobs:
           cp package-lock.json dist_package/
 
       - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output
+          include-hidden-files: true
           path: dist_package/
           retention-days: 1
 
@@ -90,15 +91,15 @@ jobs:
       - name: 🧹 Critical Runner Cleanup
         run: |
           # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
-          sudo rm -rf /home/github/actions-runner/_diag/pages || true
-          mkdir -p /home/github/actions-runner/_diag/pages || true
+          # Delete file contents rather than the directory to avoid runner lock conflicts
+          sudo rm -f /home/github/actions-runner/_diag/pages/* || true
           
           # Standard workspace cleanup
           find . -maxdepth 1 -mindepth 1 -not -path '*/.*' -exec rm -rf {} + || true
           rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
 
       - name: 📥 Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-output
 
