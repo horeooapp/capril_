@@ -12,8 +12,9 @@ try {
 
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || 3000;
+process.env.HOSTNAME = '127.0.0.1'; // Force IPv4 for Apache reverse proxy compatibility
 
-console.log(`[QAPRIL] Booting production server...`);
+console.log(`[QAPRIL] Booting production server on ${process.env.HOSTNAME}:${process.env.PORT}...`);
 
 // Path candidates for the internal Next.js server
 const paths = [

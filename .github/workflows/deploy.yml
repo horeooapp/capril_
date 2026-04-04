@@ -235,9 +235,20 @@ jobs:
             CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
             [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
             CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-            export DATABASE_URL=\"\$CLEAN_DB_URL\"
             
-            # Application of migrations (Standalone has no prisma generate needed as client is built-in)
+            # Validation at start
+            if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
+                echo "❌ CRITICAL: Invalid DATABASE_URL detected on production server."
+                exit 1
+            fi
+            
+            export DATABASE_URL="\$CLEAN_DB_URL"
+            
+            # 🧪 TEST DB CONNECTION BEFORE MIGRATIONS
+            echo "🧪 Starting standalone database connectivity test..."
+            node scripts/test-db-connection.js || { echo "❌ DB Connectivity Test Failed!"; exit 1; }
+            
+            # Application of migrations
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
             
@@ -255,11 +266,24 @@ jobs:
         run: |
           echo "Waiting for app to start..."
           sleep 20
+          
+          # Check PM2 overall status
+          echo "📊 PM2 Status:"
+          sudo su - github -c "pm2 status capril"
+          
+          # Check if port 3000 is listening
+          echo "🔌 Port 3000 check:"
+          ss -lntu | grep :3000 || echo "⚠️ Port 3000 NOT listening!"
+          
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/health" || echo "000")
           echo "Health check status: $STATUS"
+          
           if [ "$STATUS" != "200" ]; then
-            echo "❌ Health check failed! Showing PM2 logs:"
-            sudo su - github -c "pm2 logs capril --lines 60 --nostream || true"
+            echo "❌ Health check failed! (Expected 200, got $STATUS)"
+            echo "📋 DUMPING PM2 LOGS:"
+            sudo su - github -c "pm2 logs capril --lines 100 --nostream || true"
+            echo "📋 DUMPING PM2 DESCRIPTION:"
+            sudo su - github -c "pm2 describe capril || true"
             exit 1
           fi
           echo "✅ Application is healthy!"
