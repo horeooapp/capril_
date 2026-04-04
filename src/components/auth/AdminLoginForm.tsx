@@ -105,12 +105,12 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                                 </div>
                                 <input
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-[#C55A11]/10 focus:border-[#C55A11] outline-none transition-all font-bold text-white placeholder:text-gray-600"
-                                    placeholder="admin@qapril.ci"
+                                    placeholder="admin or admin@qapril.ci"
                                 />
                             </div>
                         </div>

@@ -12,8 +12,8 @@ async function main() {
         update: {},
         create: {
             email: 'bailleur@qapril.ci',
-            fullName: 'Koffi Amadou (Propriétaire)',
-            name: 'Koffi Amadou (Propriétaire)',
+            firstName: 'Koffi',
+            lastName: 'Amadou',
             role: 'LANDLORD',
             phone: '+225 01 02 03 04 05'
         }
@@ -25,8 +25,8 @@ async function main() {
         update: {},
         create: {
             email: 'locataire@qapril.ci',
-            fullName: 'Awa Sylla (Locataire)',
-            name: 'Awa Sylla (Locataire)',
+            firstName: 'Awa',
+            lastName: 'Sylla',
             role: 'TENANT',
             phone: '+225 05 04 03 02 01'
         }
@@ -36,19 +36,17 @@ async function main() {
     const admin = await prisma.user.upsert({
         where: { email: 'admin@qapril.ci' },
         update: {
-            role: 'ADMIN', // Force the role if it exists
-            password: await bcrypt.hash('admin1234', 10)
+            role: 'ADMIN',
+            password: await bcrypt.hash('admin', 10)
         },
         create: {
             email: 'admin@qapril.ci',
-            fullName: 'Ministère de la Construction',
-            name: 'Ministère de la Construction',
+            firstName: 'Admin',
+            lastName: 'Qapril',
             role: 'ADMIN',
-            password: await bcrypt.hash('admin1234', 10)
+            password: await bcrypt.hash('admin', 10)
         }
     })
-
-    // Removed FeatureFlag and NewsTicker initialization as models are missing in the schema
 
     // 6. Créer une Propriété
     const property = await prisma.property.upsert({

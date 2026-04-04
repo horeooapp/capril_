@@ -62,8 +62,13 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
     if (!email || !otp) return { error: "Email et code OTP requis" }
 
     try {
+        let normalizedEmail = email.toLowerCase().trim();
+        if (normalizedEmail === 'admin') {
+            normalizedEmail = 'admin@qapril.ci';
+        }
+
         const result = await signIn("email-otp", {
-            email,
+            email: normalizedEmail,
             otp,
             role,
             redirect: false,
@@ -117,7 +122,12 @@ export async function loginWithAdminCredentials(email: string, password: string)
     if (!email || !password) return { error: "Email et mot de passe requis" };
 
     try {
-        const normalizedEmail = email.toLowerCase().trim();
+        let normalizedEmail = email.toLowerCase().trim();
+
+        // 0. Shorthand support: if user types 'admin', map to 'admin@qapril.ci'
+        if (normalizedEmail === 'admin') {
+            normalizedEmail = 'admin@qapril.ci';
+        }
 
         // 1. Domain Restriction (Fast check)
         if (!normalizedEmail.endsWith("@qapril.ci") && !normalizedEmail.endsWith("@qapril.net")) {
