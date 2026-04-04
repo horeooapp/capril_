@@ -1,0 +1,24 @@
+﻿src/actions/locataire-profil-public.ts(153,170): error TS1005: ';' expected.
+src/app/admin/(authenticated)/reversals/page.tsx(42,106): error TS1109: Expression expected.
+src/app/admin/(authenticated)/reversals/page.tsx(42,129): error TS1109: Expression expected.
+src/app/admin/(authenticated)/reversals/page.tsx(42,164): error TS1109: Expression expected.
+src/app/admin/(authenticated)/reversals/page.tsx(42,190): error TS1005: ':' expected.
+src/auth.config.ts(24,89): error TS1005: ';' expected.
+src/auth.config.ts(49,110): error TS1005: ';' expected.
+src/components/dashboard/intermediaire/IntermediairePortalDashboard.tsx(294,137): error TS1109: Expression expected.
+src/components/dashboard/intermediaire/IntermediairePortalDashboard.tsx(294,158): error TS1109: Expression expected.
+src/components/dashboard/intermediaire/IntermediairePortalDashboard.tsx(294,191): error TS1109: Expression expected.
+src/components/dashboard/intermediaire/IntermediairePortalDashboard.tsx(294,228): error TS1005: ':' expected.
+src/components/dashboard/owner/OwnerPortalDashboard.tsx(113,35): error TS1109: Expression expected.
+src/components/dashboard/owner/OwnerPortalDashboard.tsx(113,56): error TS1109: Expression expected.
+src/components/dashboard/owner/OwnerPortalDashboard.tsx(113,89): error TS1109: Expression expected.
+src/components/dashboard/owner/OwnerPortalDashboard.tsx(114,7): error TS1005: ':' expected.
+src/components/locataire/DashboardLocataireClient.tsx(247,66): error TS1135: Argument expression expected.
+src/components/locataire/DashboardLocataireClient.tsx(247,89): error TS1109: Expression expected.
+src/components/locataire/DashboardLocataireClient.tsx(247,124): error TS1109: Expression expected.
+src/components/locataire/DashboardLocataireClient.tsx(247,170): error TS1005: '}' expected.
+src/components/locataire/DashboardLocataireClient.tsx(247,171): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/components/locataire/DashboardLocataireV2.tsx(163,82): error TS1109: Expression expected.
+src/components/locataire/DashboardLocataireV2.tsx(163,105): error TS1109: Expression expected.
+src/components/locataire/DashboardLocataireV2.tsx(163,140): error TS1109: Expression expected.
+src/components/locataire/DashboardLocataireV2.tsx(163,173): error TS1005: ':' expected.

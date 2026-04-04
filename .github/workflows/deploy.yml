@@ -69,13 +69,15 @@ jobs:
       - name: 📦 Create Deployment Package
         run: |
           mkdir -p dist_package
-          cp -r .next dist_package/
-          rm -rf dist_package/.next/cache
-          cp -r public dist_package/ || true
-          cp -r prisma dist_package/ || true
-          cp -r scripts dist_package/ || true
-          cp package.json dist_package/
-          cp package-lock.json dist_package/
+          # Next.js Standalone mode essentials
+          mkdir -p dist_package/.next
+          cp -r .next/standalone dist_package/.next/
+          cp -r .next/static dist_package/.next/
+          cp -r public dist_package/
+          cp -r prisma dist_package/
+          cp -r scripts dist_package/
+          cp server.js dist_package/
+          # No need for root node_modules or package.json as they are in standalone
 
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
@@ -122,8 +124,10 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # Sync all production files (full build) to the destination
-          # Using --delete ensures we remove old chunks and stray files
+          # 🛑 STOP APP BEFORE SYNC to release file locks and avoid "Directory not empty" errors
+          sudo su - github -c "pm2 stop capril || true"
+          
+          # Sync production files. Using standalone reduces sync size by ~80%.
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='*.db*' \
@@ -179,43 +183,35 @@ jobs:
           sudo systemctl enable redis-server || true
           sudo systemctl start redis-server || true
 
-      - name: 🚀 Restart Application (PM2)
+      - name: 🚀 Start Application (PM2)
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           
-          # 0. Fix permissions for npm and pm2 (Critical for self-hosted runners)
-          sudo chown -R $USER:$USER ~/.npm || true
+          # Fix permissions for execution
           sudo chown -R $USER:$USER ~/.pm2 || true
 
-          # 1. Cleanup root instances if any (Part 3.1)
-          sudo HOME=/root pm2 kill || true
-          
-          # 2. Secure Deployment Execution
-          # We use su - github -c to ensure all commands run in a clean environment as the github user.
-          RAW_URL='${{ secrets.DATABASE_URL }}'
-          CLEAN_DB_URL="${RAW_URL#*DATABASE_URL=}"
-          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-          
           sudo su - github -c "
             set -e
             mkdir -p /home/github/capril_data/uploads
             cd $DEPLOY_DEST
             
-            # Use the sanitized database URL we generated above
-            export DATABASE_URL='$CLEAN_DB_URL'
+            # Setup environment for database operations
+            RAW_URL='${{ secrets.DATABASE_URL }}'
+            CLEAN_DB_URL=\"\${RAW_URL#*DATABASE_URL=}\"
+            CLEAN_DB_URL=\$(echo \"\$CLEAN_DB_URL\" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*\$//' -e 's/^\"//' -e 's/\"\$//')
+            export DATABASE_URL=\"\$CLEAN_DB_URL\"
             
-            npm ci --omit=dev || true
+            # Application of migrations (Standalone has no prisma generate needed as client is built-in)
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
-            npx prisma@6.4.1 generate
             
             rm -rf public/uploads || true
             ln -s /home/github/capril_data/uploads public/uploads || true
             
+            # Start via root server.js wrapper (which boots the internal standalone server)
             pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: No existing process capril to delete'
-            
-            pm2 start npm --name capril --cwd $DEPLOY_DEST --env production -- run start
+            pm2 start server.js --name capril --cwd $DEPLOY_DEST --env production
             
             pm2 save
           "
