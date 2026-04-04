@@ -19,29 +19,25 @@ jobs:
       - name: 🚚 Checkout repository
         uses: actions/checkout@v6
 
-      - name: 🛠️ Ensuring Schema Integrity (Forcing PostgreSQL - PRE-INSTALL)
-        run: |
-          echo "🛠️ Overwriting SQLite provider with PostgreSQL in schema..."
-          sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
-          echo "--- Pre-install schema.prisma snippet ---"
-          grep -C 2 "provider =" prisma/schema.prisma
-
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js (Cache Disabled for Clean Reset)
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'npm'
+          # Cache disabled to prevent SQLite-contaminated binaries from being restored
+          cache-dependency-path: package-lock.json
 
-      - name: 📦 Install dependencies (Triggers postinstall)
-        run: npm ci
-
-      - name: 🏗️ Verify Prisma Client
+      - name: 📦 Install dependencies (Fresh Slate)
         run: |
-          echo "--- Final Build-side schema.prisma snippet ---"
-          grep -C 2 "provider =" prisma/schema.prisma
-          echo "🔍 Verifying generated client integrity..."
-          grep -q "provider = \"postgresql\"" node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: Generated client is still SQLite!" && exit 1)
-          echo "✅ Generated client is PostgreSQL-compatible."
+          rm -rf node_modules package-lock.json || true
+          npm install
+
+      - name: 🏗️ Verify Prisma Client (PostgreSQL Only)
+        run: |
+          echo "🔍 Verifying Schema Integrity..."
+          grep "provider = \"postgresql\"" prisma/schema.prisma
+          echo "🔍 Checking Generated Client..."
+          grep -q "provider = \"postgresql\"" node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination detected in generated client!" && exit 1)
+          echo "✅ Client is 100% PostgreSQL-native."
 
       - name: 🔍 TypeScript type check
         run: npx tsc --noEmit
