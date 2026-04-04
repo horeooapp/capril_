@@ -17,6 +17,11 @@ async function testConnection() {
     const url = new URL(process.env.DATABASE_URL.replace('postgresql://', 'http://').replace('postgres://', 'http://'));
     console.log(`📡 Host: ${url.hostname}`);
     console.log(`👤 User: ${url.username}`);
+    console.log(`🔑 Pass length: ${url.password.length}`);
+    
+    if (url.password.includes('@') || url.password.includes(':')) {
+      console.log('⚠️  WARNING: Your password contains @ or : characters. These MUST be URL-encoded (e.g. @ -> %40) or the connection will fail.');
+    }
   } catch (e) {
     console.log('⚠️  Could not parse DATABASE_URL components.');
   }
