@@ -247,11 +247,8 @@ jobs:
             echo "🧪 Starting standalone database connectivity test..."
             if ! node scripts/test-db-connection.js; then
               echo "⚠️  Connection failed. Attempting to sync qapril_user password with secret..."
-              # Extraction et décodage du password via Node pour gérer les caractères spéciaux (%40, etc.)
               ENCODED_PASS=$(echo "$CLEAN_DB_URL" | sed -e 's|^.*://[^:]*:\([^@]*\)@.*$|\1|')
               DECODED_PASS=$(node -e "console.log(decodeURIComponent(process.argv[1]))" "$ENCODED_PASS")
-              
-              # Échappement des quotes uniques pour SQL
               ESCAPED_PASS=$(echo "$DECODED_PASS" | sed "s/'/''/g")
               
               sudo -u postgres psql -c "ALTER USER qapril_user WITH PASSWORD '$ESCAPED_PASS';" || echo "❌ Failed to reset password."
@@ -259,24 +256,24 @@ jobs:
               echo "🔄 Retrying connection test..."
               if ! node scripts/test-db-connection.js; then
                 echo "❌ DB Connectivity Test Failed again! Dumping System Diagnostics..."
-                echo "--- PostgreSQL Service Status ---"
-                sudo systemctl status postgresql --no-pager || echo "PostgreSQL service not found."
-                echo "--- Database Users List ---"
-                sudo -u postgres psql -c "\du"
+                sudo systemctl status postgresql --no-pager || true
                 exit 1
               fi
               echo "✅ Password sync successful!"
             fi
             
+            echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
             
+            echo "📁 Setting up persistent storage..."
             rm -rf public/uploads || true
             mkdir -p /home/github/capril_data/uploads
-            ln -s /home/github/capril_data/uploads public/uploads || true
+            [ -L "public/uploads" ] || ln -s /home/github/capril_data/uploads public/uploads || true
             
+            echo "🚀 Starting application (PM2)..."
             pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: New process'
-            pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production
+            PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
             pm2 save
           EOF_DEPLOY
 
