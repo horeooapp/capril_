@@ -35,9 +35,12 @@ jobs:
         run: npx tsc --noEmit
 
       - name: 🔨 Build application
-        run: npm run build
+        run: |
+          # Clean secret in case of acccidental prefix
+          export CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          export DATABASE_URL="$CLEAN_DB_URL"
+          npm run build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
