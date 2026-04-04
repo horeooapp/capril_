@@ -197,18 +197,7 @@ jobs:
             
             pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: No existing process capril to delete'
             
-            if [ -f .next/standalone/server.js ]; then
-              echo 'Found standalone server.js, starting...'
-              # Copy static assets to standalone
-              cp -r public .next/standalone/public || true
-              cp -r .next/static .next/standalone/.next/static || true
-              cp .env .next/standalone/.env || true
-              
-              PORT=3000 HOST=127.0.0.1 pm2 start .next/standalone/server.js --name capril --env production
-            else
-              echo 'No standalone server.js found, falling back to npm run start...'
-              pm2 start npm --name capril --cwd \$DEPLOY_DEST --env production -- run start
-            fi
+            pm2 start npm --name capril --cwd $DEPLOY_DEST --env production -- run start
             
             pm2 save
           "
