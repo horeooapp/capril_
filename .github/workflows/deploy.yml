@@ -130,7 +130,11 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           cd $DEPLOY_DEST
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+          
+          # Sanitize GitHub Secret in case the user accidentally pasted "DATABASE_URL=postgres..." into the value
+          CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          
+          echo "DATABASE_URL=$CLEAN_DB_URL" > .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
           echo "NEXTAUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
           echo "AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
@@ -180,11 +184,15 @@ jobs:
           
           # 2. Secure Deployment Execution
           # We use su - github -c to ensure all commands run in a clean environment as the github user.
+          CLEAN_DB_URL=$(echo "${{ secrets.DATABASE_URL }}" | sed 's/^DATABASE_URL=//')
+          
           sudo su - github -c "
             set -e
             mkdir -p /home/github/capril_data/uploads
             cd $DEPLOY_DEST
-            export DATABASE_URL='${{ secrets.DATABASE_URL }}'
+            
+            # Use the sanitized database URL we generated above
+            export DATABASE_URL='$CLEAN_DB_URL'
             
             npm ci --omit=dev || true
             npx prisma@6.4.1 db push --accept-data-loss
