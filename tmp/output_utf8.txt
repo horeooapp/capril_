@@ -1,0 +1,2 @@
+﻿[dotenv@17.3.1] injecting env (21) from .env -- tip: ­ƒñû agentic secret storage: https://dotenvx.com/as2
+DATABASE_URL starts with: postgresql://postgre
