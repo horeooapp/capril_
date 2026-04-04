@@ -97,15 +97,23 @@ jobs:
     environment: production
 
     steps:
-      - name: 🧹 Critical Runner Cleanup
+      - name: 🧹 Safe Runner Cleanup
         run: |
           # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
           # Delete file contents rather than the directory to avoid runner lock conflicts
-          sudo rm -f /home/github/actions-runner/_diag/pages/* || true
+          # Use sudo only if the file exists to avoid unnecessary permission noise
+          [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
           
-          # Standard workspace cleanup
-          find . -maxdepth 1 -mindepth 1 -not -path '*/.*' -exec rm -rf {} + || true
-          rm -rf .next public prisma scripts package.json package-lock.json dist_package || true
+          # Targeted cleanup of build artifacts only. 
+          # We avoid 'find .' which can inadvertently target sensitive runner-internal directories (like _temp) 
+          # if they are present in the search path or symlinked.
+          rm -rf .next public prisma scripts dist_package package.json package-lock.json || true
+          
+          # Workspace Debugging (helps diagnose if the environment is corrupted)
+          echo "--- Runner Environment Context ---"
+          echo "PWD: $(pwd)"
+          echo "Workspace: $GITHUB_WORKSPACE"
+          ls -F
 
       - name: 📥 Download build artifact
         uses: actions/download-artifact@v4
