@@ -83,8 +83,20 @@ jobs:
           SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
           # USSD
           USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
-          # App
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+
+      - name: 🧹 Nuclear Runner Cleanup (Purge Stale Modules)
+        run: |
+          echo "☢️ Nuking stale runner workspace..."
+          rm -rf node_modules .next dist out package-lock.json || true
+          
+      - name: 🛡️ Prisma Guard (Verify Schema Integrity)
+        run: |
+          echo "🔍 Verifying Schema Content:"
+          cat prisma/schema.prisma || echo "❌ Schema NOT found!"
+          if grep -q 'provider = "sqlite"' prisma/schema.prisma; then
+            echo "🚨 FATAL ERROR: SQLite found in schema!"
+            exit 1
+          fi
 
       - name: 📦 Create Deployment Package
         run: |
