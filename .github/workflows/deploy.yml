@@ -84,32 +84,65 @@ jobs:
           # USSD
           USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
 
-      - name: 🧹 Nuclear Runner Cleanup (Purge Stale Modules)
+      - name: ☢️ Nuclear Runner Cleanup (Purge Stale Modules)
         run: |
-          echo "☢️ Nuking stale runner workspace..."
-          rm -rf node_modules .next dist out package-lock.json || true
+          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
+          rm -rf node_modules .next dist out dist_package package-lock.json || true
+
+      - name: 🛡️ Prisma Guard (Pre-check Schema)
+        run: |
+          echo "🔍 Verifying Schema Content BEFORE Build..."
+          grep "provider = \"postgresql\"" prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
+
+      - name: 📦 Install dependencies
+        run: |
+          npm install
+
+      - name: 🧪 Client Guard (Verify Generated Client)
+        run: |
+          echo "🔍 Checking Generated Client..."
+          grep -q 'provider = "postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
+          echo "✅ Client is 100% PostgreSQL-native."
+
+      - name: 🏗️ Build App
+        run: |
+          # Robustly extract DATABASE_URL from secret
+          RAW_URL='${{ secrets.DATABASE_URL }}'
+          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
+          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
           
-      - name: 🛡️ Prisma Guard (Verify Schema Integrity)
-        run: |
-          echo "🔍 Verifying Schema Content:"
-          cat prisma/schema.prisma || echo "❌ Schema NOT found!"
-          if grep -q 'provider = "sqlite"' prisma/schema.prisma; then
-            echo "🚨 FATAL ERROR: SQLite found in schema!"
+          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
+            echo "❌ ERROR: Invalid DATABASE_URL for production."
             exit 1
           fi
+          
+          export DATABASE_URL="$CLEAN_DB_URL"
+          npm run build
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
+          EMAIL_SERVER: ${{ secrets.EMAIL_SERVER }}
+          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
+          USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
 
       - name: 📦 Create Deployment Package
         run: |
           mkdir -p dist_package
-          # Next.js Standalone mode essentials
-          mkdir -p dist_package/.next
-          cp -r .next/standalone dist_package/.next/
-          cp -r .next/static dist_package/.next/
+          
+          # 1. Standalone bundle (Server logic + its own node_modules)
+          cp -r .next/standalone/* dist_package/
+          
+          # 2. Static assets (Must be separate in Next.js Standalone)
+          mkdir -p dist_package/.next/static
+          cp -r .next/static/* dist_package/.next/static/
+          
+          # 3. Public assets (Images, etc.)
           cp -r public dist_package/
+          
+          # 4. Prisma & Scripts (Migrations & Diagnostics)
           cp -r prisma dist_package/
           cp -r scripts dist_package/
-          cp server.js dist_package/
-          # No need for root node_modules or package.json as they are in standalone
 
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
