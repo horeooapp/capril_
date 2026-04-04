@@ -155,7 +155,6 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           sudo mkdir -p $DEPLOY_DEST
-          sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
           # 🛑 STOP APP & NUKE ALL STALE ARTIFACTS
           sudo su - github -c "pm2 stop capril || true"
@@ -171,6 +170,9 @@ jobs:
             --exclude='.env*' \
             --exclude='public/uploads/' \
             ./ $DEPLOY_DEST/
+
+          # 🔑 ENSURE OWNERSHIP (Critical for PM2 and Exorcism)
+          sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
 
           # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
@@ -299,11 +301,6 @@ jobs:
             # Massive ownership transfer via a single-line SQL command to avoid Heredoc indentation issues
             sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;"
 
-            echo "🛠️ Ensuring Schema & Client Integrity (Nuclear Exorcism)..."
-            # Force 'postgresql' provider using the Nuclear Regex across ALL files on the VPS
-            EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-            find . -type f -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
-            
             # Verify the provider in the logs for the main schema
             echo "--- Server-side schema.prisma snippet ---"
             grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
