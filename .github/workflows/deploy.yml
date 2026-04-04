@@ -246,16 +246,22 @@ jobs:
             
             echo "🧪 Starting standalone database connectivity test..."
             if ! node scripts/test-db-connection.js; then
-              echo "❌ DB Connectivity Test Failed! Dumping System Diagnostics..."
-              echo "--- PostgreSQL Service Status ---"
-              sudo systemctl status postgresql --no-pager || echo "PostgreSQL service not found."
-              echo "--- Listening Ports ---"
-              sudo ss -tulpn | grep 5432 || echo "Nothing listening on 5432"
-              echo "--- Database Users List ---"
-              sudo -u postgres psql -c "\du" || echo "Could not list users."
-              echo "--- Databases List ---"
-              sudo -u postgres psql -c "\l" || echo "Could not list databases."
-              exit 1
+              echo "⚠️  Connection failed. Attempting to sync qapril_user password with secret..."
+              # Extraction robuste du password (gère les caractères spéciaux)
+              DB_PASS=$(echo "$CLEAN_DB_URL" | sed -e 's|^.*://[^:]*:\([^@]*\)@.*$|\1|')
+              
+              sudo -u postgres psql -c "ALTER USER qapril_user WITH PASSWORD '$DB_PASS';" || echo "❌ Failed to reset password."
+              
+              echo "🔄 Retrying connection test..."
+              if ! node scripts/test-db-connection.js; then
+                echo "❌ DB Connectivity Test Failed again! Dumping System Diagnostics..."
+                echo "--- PostgreSQL Service Status ---"
+                sudo systemctl status postgresql --no-pager || echo "PostgreSQL service not found."
+                echo "--- Database Users List ---"
+                sudo -u postgres psql -c "\du"
+                exit 1
+              fi
+              echo "✅ Password sync successful!"
             fi
             
             npx prisma@6.4.1 db push --accept-data-loss
