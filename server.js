@@ -18,8 +18,9 @@ console.log(`[QAPRIL] Booting production server on ${process.env.HOSTNAME}:${pro
 
 // Path candidates for the internal Next.js server
 const paths = [
+    path.join(__dirname, 'next-server.js'), // New renamed location for standalone
     path.join(__dirname, '.next', 'standalone', 'server.js'),
-    path.join(__dirname, 'standalone', 'server.js'), // If only .next was moved
+    path.join(__dirname, 'standalone', 'server.js'),
 ];
 
 let found = false;

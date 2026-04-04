@@ -94,7 +94,13 @@ jobs:
           cp -a prisma dist_package/
           cp -a scripts dist_package/
 
-          # 5. Root server.js (Loader) - CRITICAL for .env loading and binding
+          # 5. Rename Internal Next.js Server to avoid conflict with our loader
+          # Standalone generates its own server.js, we rename it to next-server.js
+          if [ -f "dist_package/server.js" ]; then
+            mv dist_package/server.js dist_package/next-server.js
+          fi
+
+          # 6. Global server.js (Our custom loader)
           cp -a server.js dist_package/
 
       - name: 🔱 Post-Build Exorcism (Nuclear Search & Destroy SQLite)
@@ -157,23 +163,23 @@ jobs:
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           sudo mkdir -p $DEPLOY_DEST
           
-          # 🛑 STOP APP & NUKE ALL STALE ARTIFACTS
+          # 停止 APP 
           sudo su - github -c "pm2 stop capril || true"
-          
+          sudo su - github -c "pm2 delete capril || true"
+
           echo "🧹 Nuking STALE artifacts on VPS (Pre-deployment)..."
-          # We keep .env (config) and public/uploads (user data)
-          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules || true
-          sudo find $DEPLOY_DEST -maxdepth 1 -not -name "." -not -name ".env*" -not -name "public" -exec rm -rf {} + || true
+          # Only keep persistent directories and critical config
+          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package.json $DEPLOY_DEST/package-lock.json || true
           
-          # Sync EVERYTHING EXCEPT config and user uploads
-          echo "🚀 Syncing 100% FRESH build..."
+          # Sync everything from dist_package (which was downloaded to current dir)
+          echo "🚀 Syncing 100% FRESH standalone build..."
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
-            --exclude='.env*' \
-            --exclude='public/uploads/' \
+            --exclude=".env*" \
+            --exclude="public/uploads/" \
             ./ $DEPLOY_DEST/
 
-          # 🔑 ENSURE OWNERSHIP (Critical for PM2 and Exorcism)
-          sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
+          # Force restore ownership to github user
+          sudo chown -R github:github $DEPLOY_DEST || true
 
           # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
