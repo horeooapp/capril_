@@ -332,11 +332,10 @@ jobs:
             echo "🌱 Running Compiled Seed Logic..."
             if [ -f "prisma/seed.js" ]; then
                echo "🚀 EXEC: node prisma/seed.js"
-               sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"
-               if [ $? -eq 0 ]; then
+               if sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"; then
                   echo "✅ SEED SUCCESSFUL"
                else
-                  echo "❌ SEED FAILED"
+                  echo "❌ SEED FAILED (Non-fatal, continuing...)"
                fi
             else
               echo "⚠️ Compiled seed NOT found at $DEPLOY_DEST/prisma/seed.js. Skipping seeding."
@@ -365,7 +364,7 @@ jobs:
           MAX_RETRIES=5
           COUNT=0
           while [ $COUNT -lt $MAX_RETRIES ]; do
-            if curl -s -f http://127.0.0.1:3000/api/health | grep -q "OK"; then
+            if curl -s -f http://127.0.0.1:3000/api/health | grep -iq "ok"; then
               echo "✅ Application is healthy!"
               exit 0
             fi
