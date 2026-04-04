@@ -32,21 +32,35 @@ async function main() {
         }
     })
 
-    // 3. Créer un Utilisateur Administrateur (Admin)
+    const adminEmail = 'admin@qapril.ci';
+    const adminPassword = 'Home@set2026';
+    const hashed = await bcrypt.hash(adminPassword, 10);
+
+    console.log(`🌱 Upserting admin account for: ${adminEmail}`);
+
     const admin = await prisma.user.upsert({
-        where: { email: 'admin@qapril.ci' },
+        where: { email: adminEmail },
         update: {
             role: 'ADMIN',
-            password: await bcrypt.hash('Home@set2026', 10)
+            password: hashed,
+            firstName: 'Super',
+            lastName: 'Admin'
         },
         create: {
-            email: 'admin@qapril.ci',
-            firstName: 'Admin',
-            lastName: 'Qapril',
+            email: adminEmail,
             role: 'ADMIN',
-            password: await bcrypt.hash('Home@set2026', 10)
+            password: hashed,
+            firstName: 'Super',
+            lastName: 'Admin'
         }
-    })
+    });
+
+    console.log('✅ Admin user sync complete:', {
+        id: admin.id,
+        email: admin.email,
+        role: admin.role,
+        hasPassword: !!admin.password
+    });
 
     // 6. Créer une Propriété
     const property = await prisma.property.upsert({

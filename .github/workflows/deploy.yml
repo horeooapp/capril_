@@ -327,12 +327,19 @@ jobs:
 
             echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss --skip-generate
-            # Use native node to run the pre-compiled seed
+            
+            # 🔥 RESTART PM2 & SEED
+            echo "🌱 Running Compiled Seed Logic..."
             if [ -f "prisma/seed.js" ]; then
-              echo "🌱 Running Compiled Seed..."
-              node prisma/seed.js
+               echo "🚀 EXEC: node prisma/seed.js"
+               sudo su - github -c "cd $DEPLOY_DEST && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"
+               if [ $? -eq 0 ]; then
+                  echo "✅ SEED SUCCESSFUL"
+               else
+                  echo "❌ SEED FAILED"
+               fi
             else
-              echo "⚠️ Compiled seed not found, skipping seeding."
+              echo "⚠️ Compiled seed NOT found at $DEPLOY_DEST/prisma/seed.js. Skipping seeding."
             fi
             
             echo "📁 Setting up persistent storage..."
