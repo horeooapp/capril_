@@ -67,10 +67,15 @@ export async function createReceipt(data: {
                 };
             }
 
-            // Déduction effective (Peut devenir négatif)
-            await prisma.userWalletConfig.update({
+            // Déduction effective (Peut devenir négatif). Utilisation de upsert pour éviter RecordNotFound.
+            await prisma.userWalletConfig.upsert({
                 where: { userId: userId },
-                data: { walletBalance: { decrement: RECEIPT_COST } }
+                update: { walletBalance: { decrement: RECEIPT_COST } },
+                create: {
+                    userId: userId,
+                    walletBalance: -RECEIPT_COST,
+                    landlordCode: Math.random().toString(36).substring(2, 8).toUpperCase()
+                }
             });
 
             // TRIGGER IMMEDIAT: Si le solde devient négatif, on active le mode crédit (ADD-07 v3)
