@@ -122,12 +122,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
     if (!email || !password) return { error: "Email et mot de passe requis" };
 
     try {
-        let normalizedEmail = email.toLowerCase().trim();
-
-        // 0. Shorthand support: if user types 'admin', map to 'admin@qapril.ci'
-        if (normalizedEmail === 'admin') {
-            normalizedEmail = 'admin@qapril.ci';
-        }
+        const normalizedEmail = email.toLowerCase().trim();
 
         // 1. Domain Restriction (Fast check)
         if (!normalizedEmail.endsWith("@qapril.ci") && !normalizedEmail.endsWith("@qapril.net")) {
