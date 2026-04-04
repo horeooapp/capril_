@@ -13,6 +13,14 @@ async function testConnection() {
     process.exit(1);
   }
 
+  try {
+    const url = new URL(process.env.DATABASE_URL.replace('postgresql://', 'http://').replace('postgres://', 'http://'));
+    console.log(`📡 Host: ${url.hostname}`);
+    console.log(`👤 User: ${url.username}`);
+  } catch (e) {
+    console.log('⚠️  Could not parse DATABASE_URL components.');
+  }
+
   const prisma = new PrismaClient({
     datasources: {
       db: {
