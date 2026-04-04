@@ -69,7 +69,7 @@ function LeaseRegistrationForm() {
         setError(null)
 
         // v2.0 Financial Ceilings (Part 7.1)
-        if (depositAmount > rentAmount * 2) return setError("La caution ne peut excéder 2 mois de loyer.")
+        if (depositAmount > 2) return setError("La caution ne peut excéder 2 mois de loyer.")
         if (advanceMonths > 2) return setError("L'avance ne peut excéder 2 mois.")
         if (agencyFees > rentAmount) return setError("Les frais d'agence ne peuvent excéder 1 mois.")
 
@@ -82,7 +82,8 @@ function LeaseRegistrationForm() {
             rentAmount,
             durationMonths: 12,
             chargesAmount,
-            depositAmount
+            depositAmount: depositAmount * rentAmount,
+            // Advance logic: standard practice maps exactly to the initial setup. 
         }
 
         startTransition(async () => {
@@ -220,12 +221,14 @@ function LeaseRegistrationForm() {
                                         <input type="number" value={chargesAmount || ''} onChange={(e) => setChargesAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-gray-600">Caution (FCFA)</label>
-                                        <input type="number" value={depositAmount || ''} onChange={(e) => setDepositAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <label className="text-xs font-bold text-gray-600">Caution (Mois)</label>
+                                        <input required type="number" min={0} max={2} value={depositAmount || ''} onChange={(e) => setDepositAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(depositAmount * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Avance (Mois)</label>
-                                        <input type="number" value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <input required type="number" min={0} max={2} value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Frais d&apos;agence (6% du Loyer)</label>

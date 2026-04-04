@@ -28,7 +28,9 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
     const [tenantName, setTenantName] = useState((initialLease.tenant?.firstName ? initialLease.tenant.firstName + " " : "") + (initialLease.tenant?.lastName || "") || "")
     const [rentAmount, setRentAmount] = useState<number>(initialLease.rentAmount || 0)
     const [chargesAmount, setChargesAmount] = useState<number>(initialLease.chargesAmount || 0)
-    const [depositAmount, setDepositAmount] = useState<number>(initialLease.depositAmount || 0)
+    const [depositMonths, setDepositMonths] = useState<number>(
+        initialLease.depositAmount && initialLease.rentAmount ? Math.round(initialLease.depositAmount / initialLease.rentAmount) : 0
+    )
     const [advanceMonths, setAdvanceMonths] = useState<number>(0)
     const [agencyFees, setAgencyFees] = useState<number>(0)
     const [isPending, startTransition] = useTransition()
@@ -58,7 +60,7 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
             return setError("Veuillez remplir tous les champs de cette étape.")
         }
         if (step === 2) {
-            if (depositAmount > rentAmount * 2) {
+            if (depositMonths > 2) {
                 return setError("Oups ! La loi limite la caution à 2 mois de loyer maximum.")
             }
             if (advanceMonths > 2) {
@@ -93,7 +95,7 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
         setError(null)
 
         // v2.0 Financial Ceilings (Part 7.1)
-        if (depositAmount > rentAmount * 2) return setError("La caution ne peut excéder 2 mois de loyer.")
+        if (depositMonths > 2) return setError("La caution ne peut excéder 2 mois de loyer.")
         if (advanceMonths > 2) return setError("L'avance ne peut excéder 2 mois.")
         if (agencyFees > rentAmount) return setError("Les frais d'agence ne peuvent excéder 1 mois.")
 
@@ -106,7 +108,7 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
             rentAmount,
             durationMonths: initialLease.durationMonths || 12,
             chargesAmount,
-            depositAmount,
+            depositAmount: depositMonths * rentAmount,
             commercialData: {
                 ...parsedData,
                 clauses
@@ -238,12 +240,14 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
                                         <input type="number" value={chargesAmount || ''} onChange={(e) => setChargesAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-white border border-qgrey-2 rounded-2xl font-bold text-qnavy focus:ring-2 focus:ring-qnavy outline-none" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-qtext-mid uppercase tracking-widest">Caution Fixée (FCFA)</label>
-                                        <input type="number" value={depositAmount || ''} onChange={(e) => setDepositAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-white border border-qgrey-2 rounded-2xl font-bold text-qnavy focus:ring-2 focus:ring-qnavy outline-none" placeholder="Max 2 mois" />
+                                        <label className="text-xs font-black text-qtext-mid uppercase tracking-widest">Caution Fixée (Mois)</label>
+                                        <input required type="number" min={0} max={2} value={depositMonths || ''} onChange={(e) => setDepositMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-white border border-qgrey-2 rounded-2xl font-bold text-qnavy focus:ring-2 focus:ring-qnavy outline-none" placeholder="Max 2 mois" />
+                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(depositMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-qtext-mid uppercase tracking-widest">Avance (Mois)</label>
-                                        <input type="number" value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-white border border-qgrey-2 rounded-2xl font-bold text-qnavy focus:ring-2 focus:ring-qnavy outline-none" placeholder="Max 2 mois" />
+                                        <input required type="number" min={0} max={2} value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-white border border-qgrey-2 rounded-2xl font-bold text-qnavy focus:ring-2 focus:ring-qnavy outline-none" placeholder="Max 2 mois" />
+                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-black text-qtext-light uppercase tracking-widest">Frais d'agence estimés</label>
