@@ -332,7 +332,7 @@ jobs:
             echo "🌱 Running Compiled Seed Logic..."
             if [ -f "prisma/seed.js" ]; then
                echo "🚀 EXEC: node prisma/seed.js"
-               sudo su - github -c "cd $DEPLOY_DEST && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"
+               sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"
                if [ $? -eq 0 ]; then
                   echo "✅ SEED SUCCESSFUL"
                else
