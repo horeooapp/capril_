@@ -306,7 +306,7 @@ jobs:
             grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
 
             echo "📦 Running Prisma Migrations..."
-            npx prisma@6.4.1 db push --accept-data-loss
+            npx prisma@6.4.1 db push --accept-data-loss --skip-generate
             npx prisma@6.4.1 db seed || true
             
             echo "📁 Setting up persistent storage..."
