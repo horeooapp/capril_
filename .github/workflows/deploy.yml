@@ -130,19 +130,21 @@ jobs:
         run: |
           mkdir -p dist_package
           
-          # 1. Standalone bundle (Server logic + its own node_modules)
-          cp -r .next/standalone/* dist_package/
+          # 1. Standalone bundle (Server logic + its own production node_modules)
+          # Use '.' to include hidden files like .next/
+          cp -a .next/standalone/. dist_package/
           
           # 2. Static assets (Must be separate in Next.js Standalone)
           mkdir -p dist_package/.next/static
-          cp -r .next/static/* dist_package/.next/static/
+          cp -a .next/static/. dist_package/.next/static/
           
-          # 3. Public assets (Images, etc.)
-          cp -r public dist_package/
+          # 3. Public assets (Images, etc. - excluding local uploads if any)
+          mkdir -p dist_package/public
+          cp -a public/. dist_package/public/
           
           # 4. Prisma & Scripts (Migrations & Diagnostics)
-          cp -r prisma dist_package/
-          cp -r scripts dist_package/
+          cp -a prisma dist_package/
+          cp -a scripts dist_package/
 
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
@@ -189,20 +191,23 @@ jobs:
           sudo su - github -c "pm2 stop capril || true"
           
           echo "🧹 Nuking STALE artifacts on VPS (Pre-deployment)..."
-          # We nuke .next and node_modules entirely to ensure no poisoned survivors
-          # We keep only .env (config) and public/uploads (user data)
-          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package-lock.json || true
+          # We keep .env (config) and public/uploads (user data)
+          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules || true
           sudo find $DEPLOY_DEST -maxdepth 1 -not -name "." -not -name ".env*" -not -name "public" -exec rm -rf {} + || true
           
-          # Sync everything EXCEPT .env and node_modules (handled by standalone bundle)
+          # Sync EVERYTHING EXCEPT config and user uploads
           echo "🚀 Syncing 100% FRESH build..."
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
-            --exclude='node_modules' \
+            --exclude='public/uploads/' \
             ./ $DEPLOY_DEST/
 
           # 🧪 FINAL INTEGRITY CHECK (Searching for SQLite survivors in deployed code)
           echo "🧪 Final Pre-Restart Integrity Check..."
+          if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
+            echo "🚨 FATAL ERROR: Server directory missing! Deployment incomplete."
+            exit 1
+          fi
           if grep -r 'provider = "sqlite"' $DEPLOY_DEST/.next/server/ | head -n 1; then
             echo "🚨 FATAL ERROR: SQLite ghost detected in final deployment!"
             exit 1
