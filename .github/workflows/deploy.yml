@@ -94,6 +94,10 @@ jobs:
           cp -a prisma dist_package/
           cp -a scripts dist_package/
 
+          # 🔥 COMPILE SEED (To avoid ts-node on VPS)
+          # We use npx tsc to transpile the seed.ts into seed.js
+          npx tsc prisma/seed.ts --esModuleInterop --module commonjs --target es2020 --outDir dist_package/prisma
+
           # 5. Rename Internal Next.js Server to avoid conflict with our loader
           # Standalone generates its own server.js, we rename it to next-server.js
           if [ -f "dist_package/server.js" ]; then
@@ -314,7 +318,13 @@ jobs:
 
             echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss --skip-generate
-            npx prisma@6.4.1 db seed || true
+            # Use native node to run the pre-compiled seed
+            if [ -f "prisma/seed.js" ]; then
+              echo "🌱 Running Compiled Seed..."
+              node prisma/seed.js
+            else
+              echo "⚠️ Compiled seed not found, skipping seeding."
+            fi
             
             echo "📁 Setting up persistent storage..."
             rm -rf public/uploads || true
