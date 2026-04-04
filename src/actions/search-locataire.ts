@@ -9,29 +9,62 @@ import { prisma } from "@/lib/prisma"
 // INV-01 : Recherche par numéro (Propriétaire)
 export async function findLocataireByPhone(phone: string) {
     try {
-        const user = await (prisma.user as any).findUnique({
-            where: { phone },
+        const cleanPhone = phone.trim();
+        const rawDigits = phone.replace(/\D/g, '');
+        
+        const variations = [cleanPhone];
+        
+        if (rawDigits.length === 10) {
+            variations.push(`+225 ${rawDigits.slice(0,2)} ${rawDigits.slice(2,4)} ${rawDigits.slice(4,6)} ${rawDigits.slice(6,8)} ${rawDigits.slice(8,10)}`);
+            variations.push(`+225${rawDigits}`);
+            variations.push(rawDigits);
+        } else if (rawDigits.length === 13 && rawDigits.startsWith('225')) {
+            const num = rawDigits.slice(3);
+            variations.push(`+225 ${num.slice(0,2)} ${num.slice(2,4)} ${num.slice(4,6)} ${num.slice(6,8)} ${num.slice(8,10)}`);
+            variations.push(`+225${num}`);
+            variations.push(num);
+            variations.push(`0${num}`); // often domestic representation
+        }
+
+        const user = await (prisma.user as any).findFirst({
+            where: {
+                role: 'TENANT',
+                phone: {
+                    in: variations
+                }
+            },
             include: {
                 profilPublic: true
             }
         })
 
-        if (!user || !(user as any).profilPublic || (user as any).profilPublic.visibilite === 'INVISIBLE') {
+        if (!user) {
+            return null
+        }
+
+        // Si le profil public n'existe pas encore, on crée un profil vide fictif par défaut pour permettre l'invitation
+        const profil = (user as any).profilPublic || {
+            visibilite: 'TOUS',
+            statutPro: 'NON_REIGNE',
+            revenuFourchette: 0,
+            communesSouhaitees: []
+        };
+
+        if (profil.visibilite === 'INVISIBLE') {
             return null
         }
 
         // Retourner uniquement les données autorisées
-        const profil = (user as any).profilPublic
         return {
             id: user.id,
-            fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || "") || "Utilisateur QAPRIL",
-            kycLevel: user.kycLevel,
-            kycStatus: user.kycStatus,
+            fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || "") || "Locataire QAPRIL",
+            kycLevel: user.kycLevel || 0,
+            kycStatus: user.kycStatus || 'UNVERIFIED',
             visibilite: profil.visibilite,
             statutPro: profil.statutPro,
             revenuFourchette: profil.revenuFourchette,
             communesSouhaitees: (profil.communesSouhaitees as string[]) || [],
-            scoreBadge: 'A' // TODO: Récupérer via calculateScore
+            scoreBadge: 'B' // Par défaut si aucun calcul
         }
     } catch (error) {
         console.error("Error finding locataire by phone:", error)
