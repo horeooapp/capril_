@@ -224,42 +224,40 @@ jobs:
           # Fix permissions for execution
           sudo chown -R $USER:$USER ~/.pm2 || true
 
-          sudo su - github -c "
+          # 1. Extraction en dehors du bloc sudo (formatage robuste)
+          RAW_URL="${{ secrets.DATABASE_URL }}"
+          # Si c'est au format 'DATABASE_URL=xxx', on extrait xxx. Sinon on garde tout.
+          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\([^[:space:]]*\).*/\1/p')
+          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
+          # Trim spaces and quotes
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]"'\'']*//' -e 's/[[:space:]"'\'']*$//')
+
+          # 2. Validation
+          case "$CLEAN_DB_URL" in
+            postgres://*|postgresql://*) ;;
+            *) echo "❌ CRITICAL: Invalid DATABASE_URL protocol. Received: ${CLEAN_DB_URL:0:10}..."; exit 1 ;;
+          esac
+
+          # 3. Exécution avec Heredoc (format YAML-safe)
+          sudo -u github CLEAN_DB_URL="$CLEAN_DB_URL" DEPLOY_DEST="$DEPLOY_DEST" bash << 'EOF_DEPLOY'
             set -e
-            mkdir -p /home/github/capril_data/uploads
-            cd $DEPLOY_DEST
+            export DATABASE_URL="$CLEAN_DB_URL"
+            cd "$DEPLOY_DEST"
             
-            # Setup environment for database operations
-            # Robustly extract DATABASE_URL from secret
-            RAW_URL='${{ secrets.DATABASE_URL }}'
-            CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
-            [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
-            CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-            
-            # Validation at start
-            case \"\$CLEAN_DB_URL\" in
-              postgres://*|postgresql://*) ;;
-              *) echo \"❌ CRITICAL: Invalid DATABASE_URL protocol detected on production host.\"; exit 1 ;;
-            esac
-            
-            export DATABASE_URL=\"\$CLEAN_DB_URL\"
-            
-            # 🧪 TEST DB CONNECTION BEFORE MIGRATIONS
+            echo "🧪 Starting standalone database connectivity test..."
             node scripts/test-db-connection.js || { echo "❌ DB Connectivity Test Failed!"; exit 1; }
             
-            # Application of migrations
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
             
             rm -rf public/uploads || true
+            mkdir -p /home/github/capril_data/uploads
             ln -s /home/github/capril_data/uploads public/uploads || true
             
-            # Start via root server.js wrapper (which boots the internal standalone server)
-            pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: No existing process capril to delete'
-            pm2 start server.js --name capril --cwd $DEPLOY_DEST --env production
-            
+            pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: New process'
+            pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production
             pm2 save
-          "
+          EOF_DEPLOY
 
       - name: 🩺 Health Check
         run: |
