@@ -29,7 +29,12 @@ jobs:
         run: npm ci
 
       - name: 🏗️ Generate Prisma Client
-        run: npx prisma generate
+        run: |
+          echo "🛠️ Ensuring Schema Integrity (Forcing PostgreSQL)..."
+          sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
+          echo "--- Build-side schema.prisma snippet ---"
+          grep -C 2 "provider =" prisma/schema.prisma
+          npx prisma generate
 
       - name: 🔍 TypeScript type check
         run: npx tsc --noEmit
@@ -112,20 +117,8 @@ jobs:
       - name: 🧹 Safe Runner Cleanup
         run: |
           # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
-          # Delete file contents rather than the directory to avoid runner lock conflicts
-          # Use sudo only if the file exists to avoid unnecessary permission noise
           [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
-          
-          # Targeted cleanup of build artifacts only. 
-          # We avoid 'find .' which can inadvertently target sensitive runner-internal directories (like _temp) 
-          # if they are present in the search path or symlinked.
           rm -rf .next public prisma scripts dist_package package.json package-lock.json || true
-          
-          # Workspace Debugging (helps diagnose if the environment is corrupted)
-          echo "--- Runner Environment Context ---"
-          echo "PWD: $(pwd)"
-          echo "Workspace: $GITHUB_WORKSPACE"
-          ls -F
 
       - name: 📥 Download build artifact
         uses: actions/download-artifact@v4
@@ -144,22 +137,26 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # 🛑 STOP APP BEFORE SYNC to release file locks and avoid "Directory not empty" errors
+          # 🛑 STOP APP BEFORE SYNC
           sudo su - github -c "pm2 stop capril || true"
           
-          # Sync production files. Using standalone reduces sync size by ~80%.
-          # Part 1: Main synchronization (excluding static assets from deletion to prevent 'chunk failed' errors)
+          # Sync production files.
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
-            --exclude='*.db*' \
             --exclude='node_modules' \
             --exclude='.next/static' \
             ./ $DEPLOY_DEST/
 
-          # Part 2: Accumulative sync of static assets (never delete old chunks to support active sessions)
+          # Part 2: Accumulative sync of static assets
           mkdir -p $DEPLOY_DEST/.next/static
           rsync -rlptvz --no-owner --no-group --no-perms \
             ./.next/static/ $DEPLOY_DEST/.next/static/
+          
+          # 🧼 STALE ARTIFACT SCRUB (The "SQLite Banishment")
+          echo "🧼 Scrubbing stale database artifacts..."
+          find $DEPLOY_DEST -name "*.db*" -delete || true
+          find $DEPLOY_DEST -name "*.sqlite*" -delete || true
+          find $DEPLOY_DEST -name "dev.db" -delete || true
 
       # Handled inside the restart block for better permission consistency
 
