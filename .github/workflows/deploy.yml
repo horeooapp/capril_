@@ -262,6 +262,14 @@ jobs:
               echo "✅ Password sync successful!"
             fi
             
+            echo "🔧 Fixing PostgreSQL permissions for qapril_user..."
+            sudo -u postgres psql -d qapril -c "GRANT ALL ON SCHEMA public TO qapril_user;" || true
+            sudo -u postgres psql -d qapril -c "ALTER SCHEMA public OWNER TO qapril_user;" || true
+            # Reassign ownership of all ENUM types in the public schema to ensure Prisma can update them
+            sudo -u postgres psql -d qapril -t -c "SELECT 'ALTER TYPE \"' || n.nspname || '\".\"' || t.typname || '\" OWNER TO qapril_user;' FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'public' AND t.typtype = 'e';" | while read -r line; do
+              [ -n "$line" ] && sudo -u postgres psql -d qapril -c "$line" || true
+            done
+
             echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss
             npx prisma@6.4.1 db seed || true
