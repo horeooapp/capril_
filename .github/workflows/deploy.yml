@@ -140,9 +140,15 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # 🛑 STOP APP BEFORE SYNC
+          # 🛑 STOP APP & NUKE ZOMBIES
           sudo su - github -c "pm2 stop capril || true"
           
+          echo "🧹 Nuking Zombie artifacts on VPS..."
+          # Delete everything EXCEPT .env and public (where uploads live) to clear stale modules
+          sudo find $DEPLOY_DEST -maxdepth 1 -not -name "." -not -name ".env*" -not -name "public" -exec rm -rf {} + || true
+          # Keep public/uploads but clear other static assets to be replaced
+          sudo find $DEPLOY_DEST/public -maxdepth 1 -not -name "." -not -name "public" -not -name "uploads" -exec rm -rf {} + || true
+
           # Sync production files.
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
