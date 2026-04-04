@@ -37,14 +37,14 @@ async function main() {
         where: { email: 'admin@qapril.ci' },
         update: {
             role: 'ADMIN',
-            password: await bcrypt.hash('admin', 10)
+            password: await bcrypt.hash('Home@set2026', 10)
         },
         create: {
             email: 'admin@qapril.ci',
             firstName: 'Admin',
             lastName: 'Qapril',
             role: 'ADMIN',
-            password: await bcrypt.hash('admin', 10)
+            password: await bcrypt.hash('Home@set2026', 10)
         }
     })
 
