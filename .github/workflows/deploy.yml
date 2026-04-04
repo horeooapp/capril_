@@ -152,32 +152,29 @@ jobs:
           sudo mkdir -p $DEPLOY_DEST
           sudo chown -R github:github $DEPLOY_DEST || sudo chown -R $USER:$USER $DEPLOY_DEST
           
-          # 🛑 STOP APP & NUKE ZOMBIES
+          # 🛑 STOP APP & NUKE ALL STALE ARTIFACTS
           sudo su - github -c "pm2 stop capril || true"
           
-          echo "🧹 Nuking Zombie artifacts on VPS..."
-          # Delete everything EXCEPT .env and public (where uploads live) to clear stale modules
+          echo "🧹 Nuking STALE artifacts on VPS (Pre-deployment)..."
+          # We nuke .next and node_modules entirely to ensure no poisoned survivors
+          # We keep only .env (config) and public/uploads (user data)
+          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package-lock.json || true
           sudo find $DEPLOY_DEST -maxdepth 1 -not -name "." -not -name ".env*" -not -name "public" -exec rm -rf {} + || true
-          # Keep public/uploads but clear other static assets to be replaced
-          sudo find $DEPLOY_DEST/public -maxdepth 1 -not -name "." -not -name "public" -not -name "uploads" -exec rm -rf {} + || true
-
-          # Sync production files.
+          
+          # Sync everything EXCEPT .env and node_modules (handled by standalone bundle)
+          echo "🚀 Syncing 100% FRESH build..."
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude='.env*' \
             --exclude='node_modules' \
-            --exclude='.next/static' \
             ./ $DEPLOY_DEST/
 
-          # Part 2: Accumulative sync of static assets
-          mkdir -p $DEPLOY_DEST/.next/static
-          rsync -rlptvz --no-owner --no-group --no-perms \
-            ./.next/static/ $DEPLOY_DEST/.next/static/
-          
-          # 🧼 STALE ARTIFACT SCRUB (The "SQLite Banishment")
-          echo "🧼 Scrubbing stale database artifacts..."
-          find $DEPLOY_DEST -name "*.db*" -delete || true
-          find $DEPLOY_DEST -name "*.sqlite*" -delete || true
-          find $DEPLOY_DEST -name "dev.db" -delete || true
+          # 🧪 FINAL INTEGRITY CHECK (Searching for SQLite survivors in deployed code)
+          echo "🧪 Final Pre-Restart Integrity Check..."
+          if grep -r 'provider = "sqlite"' $DEPLOY_DEST/.next/server/ | head -n 1; then
+            echo "🚨 FATAL ERROR: SQLite ghost detected in final deployment!"
+            exit 1
+          fi
+          echo "✅ Integrity verified (PostgreSQL-native)."
 
       # Handled inside the restart block for better permission consistency
 
