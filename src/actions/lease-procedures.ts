@@ -262,3 +262,54 @@ export async function initiateTermination(leaseId: string) {
         return { success: false, error: message };
     }
 }
+
+/**
+ * Annulation d'un contrat non validé (DRAFT, PENDING_SIGNATURE, PENDING_CONFIRMATION)
+ */
+export async function cancelLease(leaseId: string) {
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            select: { landlordId: true, tenantId: true, status: true }
+        });
+
+        if (!lease) throw new Error("Bail introuvable.");
+
+        // Autoriser l'annulation si le statut est avant validation
+        if (lease.status !== LeaseStatus.DRAFT && lease.status !== LeaseStatus.PENDING_SIGNATURE && lease.status !== LeaseStatus.PENDING_CONFIRMATION) {
+            throw new Error("Ce bail ne peut plus être annulé à ce stade car il est déjà engagé.");
+        }
+
+        const updatedLease = await prisma.lease.update({
+            where: { id: leaseId },
+            data: { status: LeaseStatus.CANCELLED },
+        });
+
+        await prisma.procedurePhase.create({
+            data: {
+                leaseId,
+                phaseNumber: 0,
+                name: "Annulation du contrat",
+                description: "Le contrat a été annulé par les parties avant sa validation finale.",
+            },
+        });
+
+        await prisma.auditLog.create({
+            data: {
+                userId,
+                action: "CANCEL_LEASE",
+                module: "LEASE",
+                entityId: leaseId,
+            },
+        });
+
+        return { success: true, lease: updatedLease };
+    } catch (error: unknown) {
+        console.error("Error cancelling lease:", error);
+        const message = error instanceof Error ? error.message : "Erreur lors de l'annulation du bail.";
+        return { success: false, error: message };
+    }
+}
