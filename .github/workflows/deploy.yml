@@ -98,18 +98,19 @@ jobs:
 
       - name: 🔱 Post-Build Exorcism (Nuclear Search & Destroy SQLite)
         run: |
-          echo "🔱 Purging ALL 'sqlite' provider variants from compiled JS and schema files..."
-          # Broad find across all text-like files in the package
-          # Upgraded Regex: Catches 'provider = "sqlite"', 'provider: "sqlite"', '"provider": "sqlite"', etc.
+          echo "🔱 Purging ALL 'sqlite' provider variants from ALL build artifacts..."
+          # Nuclear Regex: Catches 'provider = "sqlite"', 'provider: "sqlite"', '"provider": "sqlite"', etc.
           EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
           
-          find dist_package -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
+          # Remove file extension filters to ensure we hit .rsc, .meta, and other Next.js internal files
+          find dist_package -type f -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
           
           echo "🧪 Verifying Nuclear Exorcism Results..."
           # Check for ANY case-insensitive variation of sqlite provider in the final artifacts
+          # We output the matched lines for easier debugging if it fails
           SURVIVORS=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' dist_package/ || true)
           if [ -n "$SURVIVORS" ]; then
-            echo "❌ ERROR: SQLite ghosts survived the exorcism!"
+            echo "❌ ERROR: SQLite ghosts survived the exorcism in these files:"
             echo "$SURVIVORS"
             exit 1
           fi
@@ -174,18 +175,20 @@ jobs:
           # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
           
-          # Force fix any survivors on the VPS filesystem using the Nuclear Regex
+          # Force fix any survivors on the VPS filesystem using the Nuclear Regex (ALL files)
           EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-          find $DEPLOY_DEST -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
+          find $DEPLOY_DEST -type f -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
 
           if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
             echo "🚨 FATAL ERROR: Server directory missing! Deployment incomplete."
             exit 1
           fi
           
-          # Case-insensitive verification
-          if grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' $DEPLOY_DEST/.next/server/ | head -n 1; then
-            echo "🚨 FATAL ERROR: SQLite ghost detected in final deployment!"
+          # Case-insensitive verification with verbose output
+          OFFENDING_FILES=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' $DEPLOY_DEST/.next/server/ || true)
+          if [ -n "$OFFENDING_FILES" ]; then
+            echo "🚨 FATAL ERROR: SQLite ghost detected in these final deployment files:"
+            echo "$OFFENDING_FILES"
             exit 1
           fi
           echo "✅ Integrity verified (PostgreSQL-native)."
@@ -297,9 +300,9 @@ jobs:
             sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;"
 
             echo "🛠️ Ensuring Schema & Client Integrity (Nuclear Exorcism)..."
-            # Force 'postgresql' provider using the Nuclear Regex across all relevant files on the VPS
+            # Force 'postgresql' provider using the Nuclear Regex across ALL files on the VPS
             EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-            find . -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
+            find . -type f -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
             
             # Verify the provider in the logs for the main schema
             echo "--- Server-side schema.prisma snippet ---"
