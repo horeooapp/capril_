@@ -33,22 +33,26 @@ export async function sendInvitation(data: {
             }
         })
 
-        // Incrémenter le compteur sur le profil public
-        await (prisma as any).locataireProfilPublic.update({
+        // Incrémenter le compteur sur le profil public (utilise updateMany pour éviter de crasher si le profil n'existe pas encore)
+        await (prisma as any).locataireProfilPublic.updateMany({
             where: { userId: data.locataireId },
             data: { nbInvitationsRecues: { increment: 1 } }
         })
 
-        // Déclencher SMS/WhatsApp via service tiers
-        const { NotificationService } = await import("@/lib/notification-service")
-        const invitant = await prisma.user.findUnique({ where: { id: data.invitantId }, select: { firstName: true, lastName: true } })
-        
-        await NotificationService.envoyerNotification(data.locataireId, "INVITATION_BAIL_RECUE", {
-            payload: {
-                smsText: `[QAPRIL] ${(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur'} vous invite pour un bien. Répondez sur : https://qapril.ci/locataire/invitations`,
-                parameters: [(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur']
-            }
-        })
+        // Déclencher SMS/WhatsApp via service tiers avec interception d'erreur
+        try {
+            const { NotificationService } = await import("@/lib/notification-service")
+            const invitant = await prisma.user.findUnique({ where: { id: data.invitantId }, select: { firstName: true, lastName: true } })
+            
+            await NotificationService.envoyerNotification(data.locataireId, "INVITATION_BAIL_RECUE", {
+                payload: {
+                    smsText: `[QAPRIL] ${(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur'} vous invite pour un bien. Répondez sur : https://qapril.ci/locataire/invitations`,
+                    parameters: [(invitant?.firstName ? invitant.firstName + " " : "") + (invitant?.lastName || "") || 'Un bailleur']
+                }
+            })
+        } catch (notifErr) {
+            console.error("Non-fatal: L'envoi de la notification SMS a échoué, mais l'invitation est enregistrée.", notifErr)
+        }
 
         return invitation
     } catch (error) {
