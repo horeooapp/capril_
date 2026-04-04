@@ -37,6 +37,7 @@ async function main() {
         where: { email: 'admin@qapril.ci' },
         update: {
             role: 'ADMIN', // Force the role if it exists
+            password: await bcrypt.hash('admin1234', 10)
         },
         create: {
             email: 'admin@qapril.ci',
