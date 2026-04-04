@@ -19,46 +19,39 @@ jobs:
       - name: 🚚 Checkout repository
         uses: actions/checkout@v6
 
-      - name: 🟢 Setup Node.js (Cache Disabled for Clean Reset)
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          # Cache disabled to prevent SQLite-contaminated binaries from being restored
-          cache-dependency-path: package-lock.json
+      - name: ☢️ Nuclear Runner Cleanup (Purge Stale Modules)
+        run: |
+          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
+          rm -rf node_modules .next dist out dist_package package-lock.json || true
+
+      - name: 🛡️ Prisma Guard (Pre-check Schema)
+        run: |
+          echo "🔍 Verifying Schema Content BEFORE Build..."
+          grep "provider = \"postgresql\"" prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
 
       - name: 📦 Install dependencies (Fresh Slate)
         run: |
-          rm -rf node_modules package-lock.json || true
           npm install
 
-      - name: 🏗️ Verify Prisma Client (PostgreSQL Only)
+      - name: 🧪 Client Guard (Verify Generated Client)
         run: |
-          echo "🔍 Verifying Schema Integrity..."
-          grep "provider = \"postgresql\"" prisma/schema.prisma
           echo "🔍 Checking Generated Client..."
-          grep -q "provider = \"postgresql\"" node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination detected in generated client!" && exit 1)
+          grep -q 'provider = "postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
           echo "✅ Client is 100% PostgreSQL-native."
 
       - name: 🔍 TypeScript type check
         run: npx tsc --noEmit
 
-      - name: 🔨 Build application
+      - name: 🏗️ Build App (PostgreSQL Native)
         run: |
-          # Robustly extract DATABASE_URL from secret (handles multiline or accidental labels)
+          # Robustly extract DATABASE_URL from secret
           RAW_URL='${{ secrets.DATABASE_URL }}'
           CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
           [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
-          
-          # Trim whitespace and quotes
           CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
           
-          # 🚨 CRITICAL PROTOCOL VALIDATION
           if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
-            echo "❌ ERROR: DATABASE_URL must start with postgresql:// or postgres://"
-            echo "Detected protocol: ${CLEAN_DB_URL%%://*}"
-            if [[ "$CLEAN_DB_URL" =~ ^file: ]]; then
-              echo "⚠️  SQLite detected (file:) which is NOT supported in production."
-            fi
+            echo "❌ ERROR: DATABASE_URL must start with postgresql://. Detected protocol: ${CLEAN_DB_URL%%://*}"
             exit 1
           fi
           
@@ -70,59 +63,13 @@ jobs:
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           EMAIL_FROM: ${{ vars.EMAIL_FROM }}
           EMAIL_SERVER: ${{ secrets.EMAIL_SERVER }}
-          # Mobile Money & Payments
           MOBILE_MONEY_WEBHOOK_SECRET: ${{ secrets.MOBILE_MONEY_WEBHOOK_SECRET }}
           ORANGE_MONEY_API_KEY: ${{ secrets.ORANGE_MONEY_API_KEY }}
           MTN_MOMO_API_KEY: ${{ secrets.MTN_MOMO_API_KEY }}
           MOOV_MONEY_API_KEY: ${{ secrets.MOOV_MONEY_API_KEY }}
-          # MaPoste
           MAPOSTE_WEBHOOK_SECRET: ${{ secrets.MAPOSTE_WEBHOOK_SECRET }}
           MAPOSTE_API_KEY: ${{ secrets.MAPOSTE_API_KEY }}
-          # SMS Gateway
           SMS_GATEWAY_PROVIDER: ${{ vars.SMS_GATEWAY_PROVIDER }}
-          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
-          # USSD
-          USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
-
-      - name: ☢️ Nuclear Runner Cleanup (Purge Stale Modules)
-        run: |
-          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
-          rm -rf node_modules .next dist out dist_package package-lock.json || true
-
-      - name: 🛡️ Prisma Guard (Pre-check Schema)
-        run: |
-          echo "🔍 Verifying Schema Content BEFORE Build..."
-          grep "provider = \"postgresql\"" prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
-
-      - name: 📦 Install dependencies
-        run: |
-          npm install
-
-      - name: 🧪 Client Guard (Verify Generated Client)
-        run: |
-          echo "🔍 Checking Generated Client..."
-          grep -q 'provider = "postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
-          echo "✅ Client is 100% PostgreSQL-native."
-
-      - name: 🏗️ Build App
-        run: |
-          # Robustly extract DATABASE_URL from secret
-          RAW_URL='${{ secrets.DATABASE_URL }}'
-          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
-          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
-          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-          
-          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
-            echo "❌ ERROR: Invalid DATABASE_URL for production."
-            exit 1
-          fi
-          
-          export DATABASE_URL="$CLEAN_DB_URL"
-          npm run build
-        env:
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
-          EMAIL_SERVER: ${{ secrets.EMAIL_SERVER }}
           SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
           USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
 
@@ -149,21 +96,24 @@ jobs:
           # 5. Root server.js (Loader) - CRITICAL for .env loading and binding
           cp -a server.js dist_package/
 
-      - name: 🔱 Post-Build Exorcism (Search & Destroy SQLite in Binary Artifacts)
+      - name: 🔱 Post-Build Exorcism (Nuclear Search & Destroy SQLite)
         run: |
-          echo "🔱 Purging all 'sqlite' provider mentions from compiled JS and schema files..."
+          echo "🔱 Purging ALL 'sqlite' provider variants from compiled JS and schema files..."
           # Broad find across all text-like files in the package
-          find dist_package -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i -E 's/provider[[:space:]]*=[[:space:]]*["'\'']sqlite["'\'']/provider = "postgresql"/g'
+          # Upgraded Regex: Catches 'provider = "sqlite"', 'provider: "sqlite"', '"provider": "sqlite"', etc.
+          EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
           
-          echo "🧪 Verifying Exorcism Results..."
-          # Check for ANY variation of sqlite provider in the final artifacts
-          SURVIVORS=$(grep -rE "provider[[:space:]]*=[[:space:]]*[\"']sqlite[\"']" dist_package/ || true)
+          find dist_package -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
+          
+          echo "🧪 Verifying Nuclear Exorcism Results..."
+          # Check for ANY case-insensitive variation of sqlite provider in the final artifacts
+          SURVIVORS=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' dist_package/ || true)
           if [ -n "$SURVIVORS" ]; then
-            echo "❌ ERROR: SQLite survivors found in build output!"
+            echo "❌ ERROR: SQLite ghosts survived the exorcism!"
             echo "$SURVIVORS"
             exit 1
           fi
-          echo "✅ Artifacts fully sanitized (PostgreSQL native)."
+          echo "✅ Package fully purged of SQLite artifacts."
 
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
@@ -224,15 +174,17 @@ jobs:
           # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
           
-          # Force fix any survivors on the VPS filesystem using robust regex
-          find $DEPLOY_DEST -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sudo sed -i -E 's/provider[[:space:]]*=[[:space:]]*["'\'']sqlite["'\'']/provider = "postgresql"/g' || true
+          # Force fix any survivors on the VPS filesystem using the Nuclear Regex
+          EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
+          find $DEPLOY_DEST -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
 
           if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
             echo "🚨 FATAL ERROR: Server directory missing! Deployment incomplete."
             exit 1
           fi
           
-          if grep -rE "provider[[:space:]]*=[[:space:]]*[\"']sqlite[\"']" $DEPLOY_DEST/.next/server/ | head -n 1; then
+          # Case-insensitive verification
+          if grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' $DEPLOY_DEST/.next/server/ | head -n 1; then
             echo "🚨 FATAL ERROR: SQLite ghost detected in final deployment!"
             exit 1
           fi
@@ -344,9 +296,10 @@ jobs:
             # Massive ownership transfer via a single-line SQL command to avoid Heredoc indentation issues
             sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;"
 
-            echo "🛠️ Ensuring Schema Integrity (Forcing PostgreSQL)..."
-            # Force 'postgresql' provider in both the main prisma folder and the standalone bundle
-            find . -name "schema.prisma" -exec sed -i 's/provider = "sqlite"/provider = "postgresql"/g' {} +
+            echo "🛠️ Ensuring Schema & Client Integrity (Nuclear Exorcism)..."
+            # Force 'postgresql' provider using the Nuclear Regex across all relevant files on the VPS
+            EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
+            find . -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
             
             # Verify the provider in the logs for the main schema
             echo "--- Server-side schema.prisma snippet ---"
