@@ -91,14 +91,23 @@ jobs:
           cp -a public/. dist_package/public/
           
           # 4. Prisma & Scripts (Migrations & Diagnostics)
-          cp -a prisma dist_package/
+          mkdir -p dist_package/prisma
+          cp -a prisma/schema.prisma dist_package/prisma/
           cp -a scripts dist_package/
 
           # 🔥 COMPILE SEED (To avoid ts-node on VPS)
-          # We use npx tsc to transpile the seed.ts into seed.js
+          # We run tsc from inside the prisma dir to avoid nested output folders
+          echo "🌱 Compiling Prisma Seed..."
           npx tsc prisma/seed.ts --esModuleInterop --module commonjs --target es2020 --outDir dist_package/prisma
+          
+          # Fix tsc nesting if it happened
+          if [ -d "dist_package/prisma/prisma" ]; then
+             mv dist_package/prisma/prisma/* dist_package/prisma/
+             rm -rf dist_package/prisma/prisma
+          fi
 
-          # 5. Rename Internal Next.js Server to avoid conflict with our loader
+          echo "🔍 Verifying Deployment Package Structure:"
+          ls -R dist_package/prisma
           # Standalone generates its own server.js, we rename it to next-server.js
           if [ -f "dist_package/server.js" ]; then
             mv dist_package/server.js dist_package/next-server.js
