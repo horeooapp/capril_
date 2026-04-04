@@ -146,6 +146,22 @@ jobs:
           cp -a prisma dist_package/
           cp -a scripts dist_package/
 
+          # 5. Root server.js (Loader) - CRITICAL for .env loading and binding
+          cp -a server.js dist_package/
+
+      - name: 🔱 Post-Build Exorcism (Search & Destroy SQLite in Binary Artifacts)
+        run: |
+          echo "🔱 Purging all 'sqlite' provider mentions from compiled JS and schema files..."
+          # Target .js, .prisma, and .json files in dist_package
+          find dist_package -type f \( -name "*.js" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sed -i 's/provider = "sqlite"/provider = "postgresql"/g'
+          
+          echo "🧪 Verifying Exorcism Results..."
+          if grep -r "provider = \"sqlite\"" dist_package/.next/server/ | head -n 1; then
+            echo "❌ ERROR: SQLite survivors found in build output!"
+            exit 1
+          fi
+          echo "✅ Artifacts fully sanitized."
+
       - name: 💾 Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -202,12 +218,17 @@ jobs:
             --exclude='public/uploads/' \
             ./ $DEPLOY_DEST/
 
-          # 🧪 FINAL INTEGRITY CHECK (Searching for SQLite survivors in deployed code)
-          echo "🧪 Final Pre-Restart Integrity Check..."
+          # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
+          echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
+          
+          # Force fix any survivors on the VPS filesystem
+          find $DEPLOY_DEST -type f \( -name "*.js" -o -name "*.prisma" -o -name "*.json" \) -print0 | xargs -0 sudo sed -i 's/provider = "sqlite"/provider = "postgresql"/g' || true
+
           if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
             echo "🚨 FATAL ERROR: Server directory missing! Deployment incomplete."
             exit 1
           fi
+          
           if grep -r 'provider = "sqlite"' $DEPLOY_DEST/.next/server/ | head -n 1; then
             echo "🚨 FATAL ERROR: SQLite ghost detected in final deployment!"
             exit 1
@@ -339,6 +360,9 @@ jobs:
             
             echo "🚀 Starting application (PM2)..."
             pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: New process'
+            
+            # Use the ROOT server.js (loader) instead of internal Next.js server.js
+            # This ensures .env is loaded and we bind to 127.0.0.1
             PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
             pm2 save
           EOF_DEPLOY
