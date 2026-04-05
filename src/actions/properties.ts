@@ -309,14 +309,14 @@ export async function creerBien(data: {
   return { success: true, bien, propertyCode: propertyCode };
 }
 
-export function formaterAdresseBien(bien: {
+export async function formaterAdresseBien(bien: {
   unitLabel?:      string | null;
   name?:           string | null;
   address:         string;
   commune:         string;
   propertyCode:    string;
   parentProperty?: { name?: string | null; address: string } | null;
-}): string {
+}): Promise<string> {
   const parts: string[] = [];
   if (bien.parentProperty?.name) parts.push(bien.parentProperty.name);
   if (bien.unitLabel) parts.push(bien.unitLabel);
