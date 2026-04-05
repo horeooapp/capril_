@@ -68,7 +68,7 @@ export default function LandlordLoginPage() {
                         <div className="h-1 w-24 bg-gradient-to-r from-[#C55A11] to-transparent mb-12"></div>
 
                         <p className="text-2xl text-slate-300 font-light leading-relaxed mb-16">
-                            Accédez en temps réel à vos rapports financiers, vos baux certifiés et la gestion simplifiée de vos locataires sur l'infrastructure d'État.
+                            Accédez en temps réel à vos rapports financiers, vos baux certifiés et la gestion simplifiée de vos locataires sur la plateforme certifiée QAPRIL.
                         </p>
                         
                         <div className="flex gap-12">
@@ -79,7 +79,7 @@ export default function LandlordLoginPage() {
                             <div className="w-px h-12 bg-white/10 mt-2"></div>
                             <div>
                                 <div className="text-4xl font-black text-white mb-2 font-serif">100%</div>
-                                <div className="text-[10px] uppercase tracking-[0.2em] text-[#C55A11] font-black opacity-80">Conformité DGI</div>
+                                <div className="text-[10px] uppercase tracking-[0.2em] text-[#C55A11] font-black opacity-80">Conformité en cours d'accréditation ARTCI</div>
                             </div>
                         </div>
                     </motion.div>

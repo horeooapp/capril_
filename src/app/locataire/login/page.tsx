@@ -70,7 +70,7 @@ export default function TenantLoginPage() {
                             confiance.
                         </h2>
                         <p className="text-2xl text-white/80 font-medium leading-relaxed mb-16">
-                            Simplifiez votre vie de locataire avec des outils numériques certifiés par l'État. Baux, quittances et maintenance en un clic.
+                            Simplifiez votre vie de locataire avec la plateforme certifiée QAPRIL. Baux, quittances et maintenance en un clic.
                         </p>
                         
                         <div className="inline-flex items-center gap-3 p-5 bg-white/5 backdrop-blur-xl rounded-[28px] border border-white/10">
