@@ -155,7 +155,7 @@ export default function AgentBailDeclaratif({
   // ── Création en base du bail déclaratif
   async function confirmerCreation(data: any) {
     // BUG-03 : vérification explicite de la session au lieu du ! non-null assertion
-    const userId = session?.user?.userId
+    const userId = session?.user?.id || (session?.user as any)?.userId
     if (!userId) {
       setMessages(prev => [...prev, {
         role    : "assistant",

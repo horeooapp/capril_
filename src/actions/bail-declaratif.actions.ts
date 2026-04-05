@@ -126,5 +126,5 @@ export async function creerBailDeclaratif(
   console.log(`[BDQ] Bail cree ${leaseReference} - Inviter ${phoneNorm}`)
 
   revalidatePath("/dashboard/leases")
-  return { success: true, bail, tenant }
+  return { success: true, bail, bdq, tenant }
 }
