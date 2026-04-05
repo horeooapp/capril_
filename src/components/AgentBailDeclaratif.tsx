@@ -168,6 +168,10 @@ export default function AgentBailDeclaratif({
     try {
       const res = await creerBailDeclaratif(userId, { ...data, propertyId })
 
+      if (res.error) {
+        throw new Error(res.error);
+      }
+
       setEtape("done")
       setMessages(prev => [...prev, {
         role    : "assistant",

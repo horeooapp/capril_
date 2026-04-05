@@ -37,11 +37,12 @@ export async function creerBailDeclaratif(
   ownerUserId: string,
   data: BailDeclaratifData
 ) {
-  if (!data.tenantFullName?.trim()) throw new Error("Nom du locataire requis")
-  if (!data.commune?.trim())        throw new Error("Commune requise")
-  if (!data.address?.trim())        throw new Error("Adresse requise")
-  if (!data.rentAmount || data.rentAmount <= 0) throw new Error("Montant loyer invalide")
-  if (!data.startDate)              throw new Error("Date de début requise")
+  try {
+  if (!data.tenantFullName?.trim()) return { error: "Nom du locataire requis" }
+  if (!data.commune?.trim())        return { error: "Commune requise" }
+  if (!data.address?.trim())        return { error: "Adresse requise" }
+  if (!data.rentAmount || data.rentAmount <= 0) return { error: "Montant loyer invalide" }
+  if (!data.startDate)              return { error: "Date de début requise" }
 
   const phoneNorm = normaliserTelephone(data.tenantPhone)
 
@@ -95,10 +96,10 @@ export async function creerBailDeclaratif(
       landlordId:     ownerUserId, // Prerequisite for LeaseUncheckedCreateInput
       propertyId:     propertyId,
       typeBail:       "DECLARATIF_BDQ",
-      rentAmount:     data.rentAmount,
+      rentAmount:     Number(data.rentAmount) || 0,
       durationMonths: 0,          // Option A: 0 = durée libre
       chargesAmount:  0,
-      paymentDay:     data.paymentDay,
+      paymentDay:     Number(data.paymentDay) || 5,
       startDate:      new Date(data.startDate),
       status:         "ACTIVE_DECLARATIF",
       modeCreation:   "DECLARATIF",
@@ -112,7 +113,7 @@ export async function creerBailDeclaratif(
       propertyId:          propertyId,
       telephoneLocataire:  phoneNorm,
       nomLocataireDeclare: data.tenantFullName,
-      loyerDeclareMensuel: data.rentAmount,
+      loyerDeclareMensuel: Number(data.rentAmount) || 0,
       dateEntreeEstimee:   new Date(data.startDate),
       statut:              "PENDING_LOCATAIRE",
       sourceCreation:      "IA_CHAT",
@@ -127,4 +128,8 @@ export async function creerBailDeclaratif(
 
   revalidatePath("/dashboard/leases")
   return { success: true, bail, bdq, tenant }
+  } catch (err: any) {
+    console.error("[BDQ_CREATE_ERROR]", err);
+    return { error: err.message || "Erreur interne lors de la création du bail" };
+  }
 }

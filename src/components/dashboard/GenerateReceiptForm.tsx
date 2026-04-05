@@ -38,8 +38,9 @@ export default function GenerateReceiptForm({
                 periodMonth: periodStr,
                 rentAmount: amountFcfa,
                 chargesAmount: 0,
-                paymentMethod: paymentChannel,
-                paymentRef: paymentReference
+                paymentChannel: paymentChannel,
+                paymentReference: paymentReference,
+                receiptType: receiptType
             })
 
             if (result.error) {
