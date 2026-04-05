@@ -48,7 +48,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages } = await req.json()
+    let { messages } = await req.json()
+
+    // L'API Anthropic exige un tableau non vide commençant par un message utilisateur.
+    if (!messages || messages.length === 0) {
+      messages = [{ role: "user", content: "Bonjour, je souhaite enregistrer un nouveau bail déclaratif en répondant à tes questions." }]
+    } else if (messages[0].role !== "user") {
+      messages = [{ role: "user", content: "Bonjour, je souhaite enregistrer un nouveau bail déclaratif en répondant à tes questions." }, ...messages]
+    }
 
     const response = await client.messages.create({
       model:      "claude-3-5-sonnet-20241022", // Model updated to standard
