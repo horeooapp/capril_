@@ -156,8 +156,8 @@ export async function getLeaseById(id: string) {
         where: { id },
         include: {
             property: true,
-            landlord: { select: { firstName: true, lastName: true, phone: true, email: true, walletConfig: { select: { landlordCode: true } } } },
-            tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
+            landlord: { select: { firstName: true, lastName: true, phone: true, email: true, neighborhood: true, taxId: true, companyRegNumber: true, walletConfig: { select: { landlordCode: true } } } },
+            tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true, neighborhood: true, taxId: true, companyRegNumber: true, reliabilityScores: { take: 1, orderBy: { createdAt: 'desc' } } } },
             procedurePhases: true,
             repaymentPlans: {
                 orderBy: { createdAt: 'desc' },

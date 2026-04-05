@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { requestSignatureOTP, signLease } from '@/actions/leases'
-import { ShieldCheck, Send, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, Send, CheckCircle2, Printer } from 'lucide-react'
+import PrintableLeaseContract from './PrintableLeaseContract'
 
 import React from 'react'
 
@@ -41,7 +42,7 @@ const CardFooter = ({ children, className }: BaseProps) => (
     <div className={`p-6 border-t ${className}`}>{children}</div>
 )
 
-export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: string, leaseRef: string }) {
+export default function LeaseSignatureUI({ leaseId, leaseRef, fullLease }: { leaseId: string, leaseRef: string, fullLease?: any }) {
     const [step, setStep] = useState<'initial' | 'otp' | 'success'>('initial')
     const [otp, setOtp] = useState('')
     const [loading, setLoading] = useState(false)
@@ -102,7 +103,27 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
     }
 
     return (
-        <Card className="max-w-md mx-auto shadow-xl border-t-4 border-t-primary overflow-hidden">
+        <div className="space-y-8">
+        
+        {/* CONTRAT COMPLET VIEW */}
+        {fullLease && (
+            <div className="bg-slate-50 border rounded-2xl overflow-hidden shadow-inner relative">
+                <div className="bg-slate-200 p-3 flex justify-between items-center border-b">
+                    <span className="font-bold text-sm text-slate-700">Contrat Officiel (Loi 2019-576)</span>
+                    <Button 
+                        className="bg-white text-slate-700 border hover:bg-slate-50 flex items-center gap-2 text-xs py-1"
+                        onClick={() => window.print()}
+                    >
+                        <Printer size={14} /> Imprimer / PDF
+                    </Button>
+                </div>
+                <div className="max-h-[60vh] overflow-y-auto print:max-h-none print:overflow-visible relative">
+                    <PrintableLeaseContract lease={fullLease} />
+                </div>
+            </div>
+        )}
+
+        <Card className="max-w-md mx-auto shadow-xl border-t-4 border-t-primary overflow-hidden print:hidden">
             <CardHeader className="bg-slate-50 border-b">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-full">
@@ -171,5 +192,6 @@ export default function LeaseSignatureUI({ leaseId, leaseRef }: { leaseId: strin
                 </p>
             </CardFooter>
         </Card>
+        </div>
     )
 }
