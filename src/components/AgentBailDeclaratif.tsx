@@ -175,11 +175,11 @@ export default function AgentBailDeclaratif({
       setEtape("done")
       setMessages(prev => [...prev, {
         role    : "assistant",
-        content : `Bail déclaratif créé avec succès !\nRéférence : ${res.bail.leaseReference}\n\nUn SMS d'invitation va être envoyé au locataire.`,
+        content : `Bail déclaratif créé avec succès !\nRéférence : ${(res as any).bail.leaseReference}\n\nUn SMS d'invitation va être envoyé au locataire.`,
       }])
 
       // BUG-05 : onSuccess reçoit maintenant bail + bdq + tenant
-      onSuccess?.({ bail: res.bail, bdq: res.bdq, tenant: res.tenant })
+      onSuccess?.({ bail: (res as any).bail, bdq: (res as any).bdq, tenant: (res as any).tenant })
 
     } catch (err: any) {
       // Si la création échoue, on repasse en recap pour que le bailleur puisse réessayer
