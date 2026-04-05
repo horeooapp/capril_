@@ -23,10 +23,26 @@ function normaliserTelephone(phone: string): string {
   return "+" + digits
 }
 
+function genRef(prefix: string, commune?: string): string {
+  const year   = new Date().getFullYear()
+  const random = Math.random().toString(36).slice(2, 7).toUpperCase()
+  if (commune) {
+    const cc = commune.slice(0, 3).toUpperCase()
+    return `${prefix}-${cc}-${year}-${random}`
+  }
+  return `${prefix}-${year}-${random}`
+}
+
 export async function creerBailDeclaratif(
   ownerUserId: string,
   data: BailDeclaratifData
 ) {
+  if (!data.tenantFullName?.trim()) throw new Error("Nom du locataire requis")
+  if (!data.commune?.trim())        throw new Error("Commune requise")
+  if (!data.address?.trim())        throw new Error("Adresse requise")
+  if (!data.rentAmount || data.rentAmount <= 0) throw new Error("Montant loyer invalide")
+  if (!data.startDate)              throw new Error("Date de début requise")
+
   const phoneNorm = normaliserTelephone(data.tenantPhone)
 
   // 1. Trouver ou creer le locataire
@@ -42,6 +58,7 @@ export async function creerBailDeclaratif(
         lastName: data.tenantFullName.split(' ').slice(1).join(' ') || '',
         role:     "TENANT",
         status:   "active",
+        onboardingComplete: false,
       }
     })
   }
@@ -51,11 +68,7 @@ export async function creerBailDeclaratif(
 
   if (!propertyId) {
     // Generer une reference declarative
-    const count = await prisma.property.count()
-    const seq = String(count + 1).padStart(5, "0")
-    const year = new Date().getFullYear()
-    const communeCode = data.commune.slice(0, 3).toUpperCase()
-    const propertyCode = `IND-${communeCode}-${year}-${seq}`
+    const propertyCode = genRef("IND", data.commune)
 
     const property = await prisma.property.create({
       data: {
@@ -72,25 +85,40 @@ export async function creerBailDeclaratif(
   }
 
   // 3. Generer la reference du bail
-  const count = await prisma.lease.count()
-  const seq = String(count + 1).padStart(5, "0")
-  const year = new Date().getFullYear()
-  const leaseReference = `BDQ-${year}-${seq}`
+  const leaseReference = genRef("BDQ")
 
-  // 4. Creer le bail declaratif
+  // 4. Creer le bail declaratif (Lease)
   const bail = await prisma.lease.create({
     data: {
       leaseReference,
       tenantId:       tenant.id,
       landlordId:     ownerUserId, // Prerequisite for LeaseUncheckedCreateInput
       propertyId:     propertyId,
+      typeBail:       "DECLARATIF_BDQ",
       rentAmount:     data.rentAmount,
-      durationMonths: 12,          // Prerequisite for LeaseUncheckedCreateInput
+      durationMonths: 0,          // Option A: 0 = durée libre
       chargesAmount:  0,
       paymentDay:     data.paymentDay,
       startDate:      new Date(data.startDate),
       status:         "ACTIVE_DECLARATIF",
       modeCreation:   "DECLARATIF",
+    }
+  })
+
+  // 4bis. Creer le BailDeclaratif et lier au Lease
+  const bdq = await prisma.bailDeclaratif.create({
+    data: {
+      bailleurId:          ownerUserId,
+      propertyId:          propertyId,
+      telephoneLocataire:  phoneNorm,
+      nomLocataireDeclare: data.tenantFullName,
+      loyerDeclareMensuel: data.rentAmount,
+      dateEntreeEstimee:   new Date(data.startDate),
+      statut:              "PENDING_LOCATAIRE",
+      sourceCreation:      "IA_CHAT",
+      descriptionLogement: data.address,
+      hashDeclaration:     "GENERATED_FROM_ACTION",
+      bailFormelId:        bail.id
     }
   })
 

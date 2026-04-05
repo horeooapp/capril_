@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { auth } from "@/auth"
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -21,7 +22,7 @@ INFORMATIONS A COLLECTER (dans cet ordre) :
 1. tenantFullName : Prenom et nom du locataire
 2. tenantPhone : Numero de telephone du locataire
 3. commune : Commune du bien (Cocody, Abobo, Yopougon, Marcory, Adjame, Treichville, Plateau, Koumassi)
-4. address : Adresse ou quartier du bien
+4. address : Quartier et description precise du bien (ex: "Riviera 3, derriere le supermarche")
 5. rentAmount : Montant du loyer en FCFA (nombre entier)
 6. paymentDay : Jour du mois ou le loyer est du (1, 5, 10, 15, 25, 30)
 7. startDate : Date de debut d'occupation (format YYYY-MM-DD)
@@ -38,6 +39,14 @@ Si le bailleur veut corriger : recommence la collecte pour le champ concerne.
 IMPORTANT : Ne jamais inventer de donnees. Toujours demander si tu n'es pas sur.`
 
 export async function POST(req: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Non autorise" },
+      { status: 401 }
+    )
+  }
+
   try {
     const { messages } = await req.json()
 

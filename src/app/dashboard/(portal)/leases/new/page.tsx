@@ -223,12 +223,20 @@ function LeaseRegistrationForm() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Caution (Mois)</label>
-                                        <input required type="number" min={0} max={2} value={depositAmount || ''} onChange={(e) => setDepositAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <select required value={depositAmount || ''} onChange={(e) => setDepositAmount(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#FF8200]">
+                                            <option value="" disabled>Sélectionnez...</option>
+                                            <option value={1}>1 mois</option>
+                                            <option value={2}>2 mois</option>
+                                        </select>
                                         <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(depositAmount * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Avance (Mois)</label>
-                                        <input required type="number" min={0} max={2} value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl" placeholder="Max 2 mois" />
+                                        <select required value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-[#FF8200]">
+                                            <option value="" disabled>Sélectionnez...</option>
+                                            <option value={1}>1 mois</option>
+                                            <option value={2}>2 mois</option>
+                                        </select>
                                         <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
