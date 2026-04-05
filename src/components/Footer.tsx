@@ -68,7 +68,7 @@ export default function Footer() {
                 {/* Copyright */}
                 <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-sm text-gray-400 mb-4 md:mb-0">
-                        &copy; {new Date().getFullYear()} QAPRIL - Registre Locatif. Tous droits réservés.
+                        &copy; {new Date().getFullYear()} QAPRIL - Portail National de Normalisation du Marché Locatif. Tous droits réservés.
                     </p>
                     <div className="flex space-x-6">
                         <span className="text-xs text-gray-500">Un service sécurisé pour la République de Côte d&apos;Ivoire</span>

@@ -5,7 +5,7 @@ import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.qapril.ci"),
   title: {
-    default: "QAPRIL - Registre Locatif Numérique National",
+    default: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
     template: "%s | QAPRIL"
   },
   description: "La plateforme nationale officielle pour la gestion et la certification des quittances de loyer en Côte d'Ivoire. Sécurisation des baux immobiliers et des cautions avec la CDC-CI.",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     locale: "fr_CI",
     url: "https://www.qapril.ci",
     siteName: "QAPRIL",
-    title: "QAPRIL - Registre Locatif Numérique National",
+    title: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
     description: "Normalisation et sécurisation du marché locatif en Côte d'Ivoire. Certifiez vos baux et quittances.",
     images: [
       {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "QAPRIL - Registre Locatif Numérique",
+    title: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
     description: "Sécurisation intégrale des transactions locatives en Côte d'Ivoire.",
     images: ["/images/og-main.png"],
     creator: "@qapril_ci",

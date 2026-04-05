@@ -38,7 +38,7 @@ export default function GeographicRentAnalysis() {
                         Analyse <span className="text-primary italic">Géographique</span>.
                     </h2>
                     <p className="mt-6 text-lg text-gray-500 font-medium max-w-2xl mx-auto">
-                        Comparez les niveaux de prix moyens pratiqués sur le territoire national, certifiés par les flux du Registre Locatif.
+                        Comparez les niveaux de prix moyens pratiqués sur le territoire national, certifiés par les flux du Portail National de Normalisation du Marché Locatif.
                     </p>
                 </div>
 

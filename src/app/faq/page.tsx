@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 
 const faqs = [
   {
-    q: "Qu'est-ce que le Registre Locatif National ?",
+    q: "Qu'est-ce que QAPRIL (Quittancement autonome plateforme de ressource immobilière locative) ?",
     a: "C'est la base de données centrale opérée par QAPRIL pour normaliser, enregistrer et certifier l'ensemble des baux immobiliers en Côte d'Ivoire."
   },
   {

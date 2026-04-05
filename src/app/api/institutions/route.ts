@@ -55,7 +55,7 @@ export async function GET(req: Request) {
         const responseData = {
             meta: {
                 timestamp: new Date().toISOString(),
-                source: "Registre Locatif QAPRIL CI",
+                source: "Portail National de Normalisation du Marché Locatif (QAPRIL)",
                 anonymized: true
             },
             data: {
