@@ -16,6 +16,8 @@ export async function updateUserProfile(data: {
     birthDate: Date | null;
     birthPlace: string;
     neighborhood: string;
+    profession?: string;
+    salary?: number | null;
     phone: string;
     avatarUrl?: string;
     docType?: string;
@@ -41,7 +43,7 @@ export async function updateUserProfile(data: {
         let newKycLevel = user.kycLevel || 0;
 
         // Automatically upgrade to Level 2 if basic info is provided
-        const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.phone && data.docType && data.docNumber;
+        const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.profession && data.phone && data.docType && data.docNumber;
         if (hasAllRequired && newKycLevel < 2) {
             newKycLevel = 2;
         }
@@ -75,6 +77,8 @@ export async function updateUserProfile(data: {
                     birthDate: finalBirthDate,
                     birthPlace: finalBirthPlace,
                     neighborhood: data.neighborhood, // Allowed
+                    profession: data.profession,     // Allowed
+                    salary: data.salary,             // Allowed
                     phone: data.phone,               // Allowed
                     ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Allowed
                     kycLevel: newKycLevel

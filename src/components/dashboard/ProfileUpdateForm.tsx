@@ -19,6 +19,8 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
         birthDate: initialData?.birthDate ? new Date(initialData.birthDate).toISOString().split('T')[0] : "",
         birthPlace: initialData?.birthPlace || "",
         neighborhood: initialData?.neighborhood || "",
+        profession: initialData?.profession || "",
+        salary: initialData?.salary || "",
         phone: initialData?.phone || "",
         avatarUrl: initialData?.avatarUrl || "",
         docType: initialData?.docType || "CNI_CI",
@@ -53,6 +55,8 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                 birthDate: formData.birthDate ? new Date(formData.birthDate) : null,
                 birthPlace: formData.birthPlace,
                 neighborhood: formData.neighborhood,
+                profession: formData.profession,
+                salary: formData.salary ? parseFloat(formData.salary.toString()) : null,
                 phone: formData.phone,
                 avatarUrl: formData.avatarUrl,
                 docType: formData.docType,
@@ -171,6 +175,31 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                         placeholder="Ex: Cocody Angré"
                     />
                 </div>
+                {!isAgency && (
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Profession</label>
+                        <input 
+                            required 
+                            readOnly={isIdentityLocked}
+                            value={formData.profession}
+                            onChange={(e) => setFormData({...formData, profession: e.target.value})}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
+                            placeholder="Ex: Comptable"
+                        />
+                    </div>
+                )}
+                {!isAgency && (
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Salaire / Revenu Mensuel (Optionnel)</label>
+                        <input 
+                            type="number"
+                            value={formData.salary}
+                            onChange={(e) => setFormData({...formData, salary: e.target.value})}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                            placeholder="Ex: 500000"
+                        />
+                    </div>
+                )}
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de téléphone</label>
                     <input 

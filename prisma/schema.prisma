@@ -525,6 +525,8 @@ model User {
   birthDate          DateTime?    @map("birth_date")
   birthPlace         String?      @map("birth_place")
   neighborhood       String?      @map("neighborhood")
+  profession         String?      @map("profession")
+  salary             Float?       @map("salary")
   avatarUrl          String?      @map("avatar_url")
   email              String?      @unique
   role               Role         @default(TENANT)
