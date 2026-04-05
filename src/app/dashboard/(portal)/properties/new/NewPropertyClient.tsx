@@ -67,7 +67,7 @@ export default function NewPropertyClient() {
         }
 
         startTransition(async () => {
-            const result = await creerBien(data as any)
+            const result: any = await creerBien(data as any)
             if (result?.error) {
                 setError(result.error)
             } else {

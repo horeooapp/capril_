@@ -82,8 +82,10 @@ export async function creerBailDeclaratif(
     data: {
       leaseReference,
       tenantId:       tenant.id,
+      landlordId:     ownerUserId, // Prerequisite for LeaseUncheckedCreateInput
       propertyId:     propertyId,
       rentAmount:     data.rentAmount,
+      durationMonths: 12,          // Prerequisite for LeaseUncheckedCreateInput
       chargesAmount:  0,
       paymentDay:     data.paymentDay,
       startDate:      new Date(data.startDate),
