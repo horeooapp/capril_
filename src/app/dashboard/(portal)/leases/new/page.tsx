@@ -304,9 +304,9 @@ function LeaseModeSelector() {
 
     if (mode === "agent") {
         return (
-            <div className="h-[calc(100vh-80px)] p-4 max-w-4xl mx-auto py-8">
+            <div className="h-[calc(100vh-140px)]">
                 <AgentBailDeclaratif
-                  onSuccess={(bail) => {
+                  onSuccess={({ bail }) => {
                     router.push(`/dashboard/leases`);
                     router.refresh();
                   }}
@@ -321,41 +321,45 @@ function LeaseModeSelector() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="text-center space-y-3 mb-10">
-                <h1 className="text-4xl font-black text-gray-900 tracking-tight">Nouveau bail</h1>
-                <p className="text-gray-500 text-lg">Choisissez comment enregistrer votre locataire</p>
+        <div className="p-4 max-w-4xl mx-auto py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="text-xl font-bold text-[#1B3A6B] mb-2 text-center md:text-left">
+                Nouveau bail déclaratif
+            </div>
+            <div className="text-sm text-[#4A6A8A] mb-6 text-center md:text-left">
+                Choisissez comment enregistrer votre locataire
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Mode IA */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* Mode IA — recommandé */}
                 <div
                     onClick={() => setMode("agent")}
-                    className="bg-[#1B3A6B] hover:bg-blue-900 transition-all rounded-3xl p-8 cursor-pointer shadow-xl transform hover:-translate-y-1"
+                    className="bg-[#1B3A6B] rounded-2xl p-5 cursor-pointer active:opacity-90 hover:bg-blue-900 transition-all shadow-xl transform hover:-translate-y-1"
                 >
-                    <div className="text-4xl mb-5">🤖</div>
-                    <div className="text-white font-black text-xl mb-2">
+                    <div className="text-2xl mb-3">🤖</div>
+                    <div className="text-white font-bold text-base mb-1">
                         Créer avec l'assistant IA
                     </div>
-                    <div className="text-white/70 text-sm leading-relaxed mb-6">
-                        L'assistant interactif de QAPRIL vous pose les questions une par une. Répondez naturellement et il s'occupe de la saisie.
+                    <div className="text-white/60 text-xs leading-relaxed">
+                        L'assistant vous pose les questions une par une.
+                        Répondez naturellement — il s'occupe du reste.
                     </div>
-                    <div className="bg-[#FF8200] text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl inline-block shadow-lg">
-                        Recommandé - Ultra rapide
+                    <div className="mt-3 bg-[#F5A800] text-[#1B2A3B] text-xs font-bold px-3 py-1.5 rounded-lg inline-block">
+                        Recommandé — 2 minutes
                     </div>
                 </div>
 
-                {/* Mode formulaire */}
+                {/* Mode formulaire classique */}
                 <div
                     onClick={() => setMode("formulaire")}
-                    className="bg-white border-2 border-gray-100 hover:border-gray-200 transition-all rounded-3xl p-8 cursor-pointer shadow-lg hover:shadow-xl transform hover:-translate-y-1 group"
+                    className="bg-white border border-[#D0DFF5] rounded-2xl p-5 cursor-pointer active:opacity-90 hover:border-gray-200 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                    <div className="text-4xl mb-5">📝</div>
-                    <div className="text-gray-900 font-black text-xl mb-2 group-hover:text-[#FF8200] transition-colors">
+                    <div className="text-4xl mb-3">📝</div>
+                    <div className="text-[#1B3A6B] font-bold text-base mb-1">
                         Formulaire classique
                     </div>
-                    <div className="text-gray-500 text-sm leading-relaxed">
-                        Remplissez manuellement le formulaire standard en 3 étapes. Idéal si vous avez toutes les données structurées.
+                    <div className="text-[#4A6A8A] text-xs leading-relaxed">
+                        Remplissez manuellement le formulaire standard en 3 étapes.
                     </div>
                 </div>
             </div>
