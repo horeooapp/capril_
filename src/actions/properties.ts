@@ -15,11 +15,12 @@ export async function getProperties() {
         const session = await ensureAuthenticated()
         const userId = session.user.id
 
-        const properties = await prisma.property.findMany({
+        const dbProperties = await prisma.property.findMany({
             where: {
                 OR: [
                     { ownerUserId: userId },
-                    { managedByUserId: userId }
+                    { managedByUserId: userId },
+                    { leases: { some: { landlordId: userId } } }
                 ]
             },
             include: {
@@ -42,6 +43,46 @@ export async function getProperties() {
             },
             orderBy: { createdAt: 'desc' }
         })
+
+        const properties = [...dbProperties] as any[];
+
+        const directLeases = await prisma.lease.findMany({
+            where: { landlordId: userId },
+            include: {
+                property: true,
+                tenant: { select: { firstName: true, lastName: true, phone: true } },
+                receipts: {
+                    orderBy: { paidAt: 'desc' },
+                    take: 10
+                },
+                cdcDeposits: true,
+                reclamations: {
+                    where: { statut: { in: ['OUVERT', 'EN_COURS'] } }
+                },
+                dossiersLitige: {
+                    where: { statut: { in: ['GENERE', 'TRANSMIS_CACI', 'MEDIATION_EN_COURS'] } }
+                }
+            }
+        });
+
+        const existingPropertyIds = new Set(properties.map(p => p.id));
+        for (const lease of directLeases) {
+            if (!existingPropertyIds.has(lease.propertyId)) {
+                const prop = {
+                    ...lease.property,
+                    leases: [lease]
+                };
+                properties.push(prop);
+                existingPropertyIds.add(lease.propertyId);
+            } else {
+                const prop = properties.find((p: any) => p.id === lease.propertyId);
+                if (prop && Array.isArray(prop.leases)) {
+                    if (!prop.leases.some((l: any) => l.id === lease.id)) {
+                        prop.leases.push(lease);
+                    }
+                }
+            }
+        }
 
         return properties.map(serializeProperty)
     } catch (error) {
