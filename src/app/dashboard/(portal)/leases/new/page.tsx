@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createLease } from "@/actions/leases"
 import { createBDQ } from "@/actions/bdq"
 import { getProperties } from "@/actions/properties"
+import AgentBailDeclaratif from "@/components/AgentBailDeclaratif"
 
 // Define TypeBail locally to avoid @prisma/client bundling issues in Client Components
 enum TypeBail {
@@ -284,7 +285,73 @@ function LeaseRegistrationForm() {
 export default function LeaseRegistrationPage() {
     return (
         <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F4E79]"></div></div>}>
-            <LeaseRegistrationForm />
+            <LeaseModeSelector />
         </Suspense>
     )
 }
+
+function LeaseModeSelector() {
+    const [mode, setMode] = useState<"choix" | "agent" | "formulaire">("choix");
+    const router = useRouter();
+
+    if (mode === "agent") {
+        return (
+            <div className="h-[calc(100vh-80px)] p-4 max-w-4xl mx-auto py-8">
+                <AgentBailDeclaratif
+                  onSuccess={(bail) => {
+                    router.push(`/dashboard/leases`);
+                    router.refresh();
+                  }}
+                  onCancel={() => setMode("choix")}
+                />
+            </div>
+        )
+    }
+
+    if (mode === "formulaire") {
+        return <LeaseRegistrationForm />
+    }
+
+    return (
+        <div className="max-w-3xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="text-center space-y-3 mb-10">
+                <h1 className="text-4xl font-black text-gray-900 tracking-tight">Nouveau bail</h1>
+                <p className="text-gray-500 text-lg">Choisissez comment enregistrer votre locataire</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Mode IA */}
+                <div
+                    onClick={() => setMode("agent")}
+                    className="bg-[#1B3A6B] hover:bg-blue-900 transition-all rounded-3xl p-8 cursor-pointer shadow-xl transform hover:-translate-y-1"
+                >
+                    <div className="text-4xl mb-5">🤖</div>
+                    <div className="text-white font-black text-xl mb-2">
+                        Créer avec l'assistant IA
+                    </div>
+                    <div className="text-white/70 text-sm leading-relaxed mb-6">
+                        L'assistant interactif de QAPRIL vous pose les questions une par une. Répondez naturellement et il s'occupe de la saisie.
+                    </div>
+                    <div className="bg-[#FF8200] text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl inline-block shadow-lg">
+                        Recommandé - Ultra rapide
+                    </div>
+                </div>
+
+                {/* Mode formulaire */}
+                <div
+                    onClick={() => setMode("formulaire")}
+                    className="bg-white border-2 border-gray-100 hover:border-gray-200 transition-all rounded-3xl p-8 cursor-pointer shadow-lg hover:shadow-xl transform hover:-translate-y-1 group"
+                >
+                    <div className="text-4xl mb-5">📝</div>
+                    <div className="text-gray-900 font-black text-xl mb-2 group-hover:text-[#FF8200] transition-colors">
+                        Formulaire classique
+                    </div>
+                    <div className="text-gray-500 text-sm leading-relaxed">
+                        Remplissez manuellement le formulaire standard en 3 étapes. Idéal si vous avez toutes les données structurées.
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+

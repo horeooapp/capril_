@@ -771,13 +771,6 @@ enum TypePropriete {
 }
 
 model Property {
-  // groupeId supprimé
-  typePropriete  TypePropriete? @map("typePropriete")
-  nomBien        String?        @map("nomBien")
-  nomComplet     String?        @map("nomComplet")
-  niveau         String?
-  estCourEntiere Boolean        @default(false) @map("estCourEntiere")
-
   id           String  @id @default(uuid()) @map("property_id")
   propertyCode String  @unique @map("property_code") // HAB-ABJ-YOP-00001
   ownerUserId  String  @map("owner_id")
@@ -799,7 +792,7 @@ model Property {
   units            Property[] @relation("PropertyUnits")
 
   city                 String?  @map("city")
-  declaredRentFcfa     Float?   @map("declared_rent_fcfa")
+  declaredRentFcfa     Int?     @map("declared_rent_fcfa")
   digitalPostalAddress String?  @map("digital_postal_address")
   gpsLatitude          Float?   @map("gps_latitude")
   gpsLongitude         Float?   @map("gps_longitude")
@@ -886,6 +879,8 @@ model Lease {
   sha256Hash      String?   @map("sha256Hash")
   sha256CalculeLe DateTime? @map("sha256CalculeLe")
   qrCodeUrl       String?   @map("qrCodeUrl")
+
+  modeCreation    String    @default("NUMERIQUE") @map("mode_creation")
 
   // ── CDC Formulaires : Cycle de vie draft
   statutDraft  String @default("ACTIF") @map("statutDraft")
