@@ -180,10 +180,9 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Profession</label>
                         <input 
                             required 
-                            readOnly={isIdentityLocked}
                             value={formData.profession}
                             onChange={(e) => setFormData({...formData, profession: e.target.value})}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
+                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
                             placeholder="Ex: Comptable"
                         />
                     </div>
