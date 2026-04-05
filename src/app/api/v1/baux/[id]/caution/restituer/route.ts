@@ -49,7 +49,9 @@ export async function POST(
       where: { id: lease.caution.id },
       data: {
         restituee: true,
-        dateRestitution: new Date(),
+        restitueAt: new Date(),
+        statutRestitution: finalMontantRestitue === lease.caution.montantFcfa ? "RESTITUE" : "RETENU_PARTIEL",
+        montantRetenu: montantRetenue || 0,
         motifRetenue,
         montantRestitue: finalMontantRestitue
       }

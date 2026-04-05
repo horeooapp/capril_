@@ -34,6 +34,8 @@ export async function createLease(data: {
     rentAmount: number,
     chargesAmount?: number,
     depositAmount?: number,
+    avanceLoyer?: number,
+    preavisRequisMois?: number,
     durationMonths: number,
     commercialData?: {
         indexationType: 'fixed' | 'ipc',
@@ -82,6 +84,23 @@ export async function createLease(data: {
         // 4. Create Lease (OHADA: 24 months min is a common best practice for stability)
         const finalDuration = data.leaseType === 'commercial' ? Math.max(data.durationMonths, 24) : data.durationMonths;
 
+        // Validation Loi n°2019-576 du 26 juin 2019 (Code de la Construction et de l'Habitat)
+        const preavis = data.preavisRequisMois ?? 3;
+        if (preavis < 3) {
+            throw new Error("Le préavis ne peut être inférieur à 3 mois (Arts. 440 et 442 CCH).");
+        }
+
+        const maxLoyerAvanceCaution = data.rentAmount * 2;
+        const avanceLoyer = data.avanceLoyer ?? 0;
+        const depositAmount = data.depositAmount ?? 0;
+
+        if (avanceLoyer > maxLoyerAvanceCaution) {
+            throw new Error(`Avances illégales : max ${maxLoyerAvanceCaution.toLocaleString()} FCFA (Art. 415 CCH — 2 mois de loyer)`);
+        }
+        if (depositAmount > maxLoyerAvanceCaution) {
+            throw new Error(`Dépôt de garantie illégal : max ${maxLoyerAvanceCaution.toLocaleString()} FCFA (Art. 416 CCH)`);
+        }
+
         // Determination of initial status based on TypeBail (ADD-05)
         let initialStatus: LeaseStatus = LeaseStatus.DRAFT;
         if (data.typeBail === TypeBail.DECLARATIF_BDQ) {
@@ -101,7 +120,9 @@ export async function createLease(data: {
                 durationMonths: finalDuration,
                 rentAmount: data.rentAmount,
                 chargesAmount: data.chargesAmount || 0,
-                depositAmount: data.depositAmount || 0,
+                depositAmount: depositAmount,
+                avanceLoyer: avanceLoyer,
+                preavisRequisMois: preavis,
                 commercialData: data.commercialData as Prisma.InputJsonValue,
                 status: initialStatus 
             }

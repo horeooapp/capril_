@@ -429,7 +429,7 @@ export default function ManualOfficielContent() {
                         </h2>
                         <div className="space-y-6 print:space-y-4">
                             {[
-                                { q: "Est-ce que QAPRIL est légal ?", a: "Oui. Conforme à la loi n°2018-575 du 13 juin 2018. Les quittances sont valables devant les tribunaux." },
+                                { q: "Est-ce que QAPRIL est légal ?", a: "Oui. Conforme à la loi n°2019-576 du 26 juin 2019. Les quittances sont valables devant les tribunaux." },
                                 { q: "Le locataire doit-il payer ?", a: "Non, réception, historique et score sont entièrement gratuits pour le locataire." },
                                 { q: "Si le locataire n'a pas de smartphone ?", a: "Il est alerté par SMS basique et peut utiliser l'USSD *144*PSDP#." },
                                 { q: "Que se passe-t-il si mon Wallet QAPRIL est vide ?", a: "QAPRIL émet vos quittances en mode crédit jusqu'à -1500 FCFA, puis suspend les émissions." },

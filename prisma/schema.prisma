@@ -822,6 +822,12 @@ model Property {
   isHoreoo       Boolean @default(false) @map("is_horeoo")
   horeooDiscount Float?  @map("horeoo_discount")
 
+  // Phase 3 — Préemption et Vente (Conformité Loi 2019-576)
+  enVente                    Boolean   @default(false) @map("en_vente")
+  prixVenteFcfa              Float?    @map("prix_vente_fcfa")
+  preemptionNotifieeAt       DateTime? @map("preemption_notifiee_at")
+  locataireRenoncePreemption Boolean   @default(false) @map("locataire_renonce_preemption")
+
   deletedAt DateTime? @map("deleted_at")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -888,7 +894,7 @@ model Lease {
   draftData    Json?  @map("draftData")
 
   // ── CDC Formulaires : Légal & Fiscal
-  loiApplicable     String @default("Loi N°2018-575 du 13 juin 2018") @map("loiApplicable")
+  loiApplicable     String @default("Loi n°2019-576 du 26 juin 2019") @map("loiApplicable")
   droitsDgiCalcules Float? @map("droitsDgiCalcules")
   fraisQapril       Float? @map("fraisQapril")
 
@@ -930,6 +936,8 @@ model Lease {
 
   // NOUVEAUX CHAMPS — Pratique locative CI (DLP-001)
   paiementAvance Boolean @default(true) @map("paiement_avance") // TRUE = payé d'avance (standard CI)
+  avanceLoyer    Int     @default(0) @map("avance_loyer")
+  avanceLoyerConformeAt DateTime? @map("avance_loyer_conforme_at")
 
   typeGestion    String? @default("directe") @map("type_gestion")
   bailleurMasque Boolean @default(false) @map("bailleur_masque")
@@ -941,7 +949,7 @@ model Lease {
   typeBail                 TypeBail  @default(ECRIT) @map("type_bail")
   confirmationLocataireSms Boolean   @default(false) @map("confirmation_locataire_sms")
   confirmationLocataireAt  DateTime? @map("confirmation_locataire_at")
-  preavisRequisMois        Int?      @default(1) @map("preavis_requis_mois")
+  preavisRequisMois        Int?      @default(3) @map("preavis_requis_mois")
 
   signedAt          DateTime? @map("signed_at")
   terminatedAt      DateTime? @map("terminated_at")
@@ -1033,6 +1041,7 @@ model Lease {
   recuFiscalHash           String?   @map("recu_fiscal_hash")
   deadlineEnregistrement   DateTime? @map("deadline_enregistrement")
   certEnregistrementDgiUrl String?   @map("cert_enregistrement_dgi_url")
+  acteEnregistrementRemisAt DateTime? @map("acte_enregistrement_remis_at")
 
   @@index([status, createdAt])
   @@index([propertyId])
@@ -1335,6 +1344,13 @@ model AgenceProfile {
   numEnregistrement String? @map("num_enregistrement")
   adresseLocal      String? @map("adresse_local")
 
+  // Phase 4 — Agrément et Garanties Financières (Art. 459-465 CCH)
+  numeroAgrement    String? @unique @map("numero_agrement")
+  agrementDate      DateTime? @map("agrement_date")
+  garantieFinanciere String? @map("garantie_financiere")
+  rcPro             String? @map("rc_pro")
+  statutLegal       String  @default("NON_AGREE") @map("statut_legal")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -1576,6 +1592,13 @@ model PropositionLoyer {
   dateEffet      DateTime @map("date_effet")
   raison         String?
   statut         String   @default("EN_ATTENTE") // EN_ATTENTE | ACCEPTE | REFUSE | EXPIRE
+
+  // NOUVEAU — Conformité Art. 423-424 CCH
+  dateNotification      DateTime? @map("date_notification")
+  dateEffetDemandee     DateTime? @map("date_effet_demandee")
+  estConformeDelaiAns   Boolean   @default(false) @map("est_conforme_delai_ans")
+  estConformePreavis    Boolean   @default(false) @map("est_conforme_preavis")
+  motifNullite          String?   @map("motif_nullite")
 
   consentement ConsentementLoyer?
 
@@ -2943,12 +2966,16 @@ model CautionBail {
   certificatRef     String?   @unique @map("certificat_ref")
   hashSha256        String?   @map("hash_sha256")
 
-  // Restitution
-  restituee       Boolean   @default(false)
-  montantRestitue Float?    @map("montant_restitue")
-  dateRestitution DateTime? @map("date_restitution")
-  motifRetenue    String?   @map("motif_retenue")
-  createdAt       DateTime  @default(now()) @map("created_at")
+  // Restitution (Conformité Loi 2019-576)
+  restituee           Boolean   @default(false)
+  clesRestitueeAt     DateTime? @map("cles_restituees_at")
+  deadlineRestitution DateTime? @map("deadline_restitution")
+  montantRestitue     Float?    @map("montant_restitue")
+  montantRetenu       Float?    @map("montant_retenu")
+  motifRetenue        String?   @map("motif_retenue")
+  restitueAt          DateTime? @map("restitue_at")
+  statutRestitution   String    @default("EN_ATTENTE") @map("statut_restitution")
+  createdAt           DateTime  @default(now()) @map("created_at")
 
   bail Lease @relation(fields: [bailId], references: [id])
 
@@ -2968,6 +2995,13 @@ model PreavisBail {
   etatLieuxPrevu      DateTime? @map("etat_lieux_prevu")
   refPreavis          String?   @unique @map("ref_preavis")
   hashSha256          String?   @map("hash_sha256")
+  
+  // Conformité Forclusion (Art. 444 CCH)
+  lettreResiliationEnvoyeeAt  DateTime? @map("lettre_resiliation_envoyee_at")
+  modeEnvoi                   String?   @map("mode_envoi")
+  deadlineContestation        DateTime? @map("deadline_contestation")
+  contesteAt                  DateTime? @map("conteste_at")
+  
   createdAt           DateTime  @default(now()) @map("created_at")
 
   bail      Lease @relation(fields: [bailId], references: [id])

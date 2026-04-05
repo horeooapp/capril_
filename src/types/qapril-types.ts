@@ -181,7 +181,7 @@ export interface CreateReceiptDTO {
 // ── Helpers & Calculs ─────────────────────────────────────────
 
 export const LOI_APPLICABLE =
-  "Loi N°2018-575 du 13 juin 2018 — Bail à usage d'habitation en Côte d'Ivoire";
+  "Loi n°2019-576 du 26 juin 2019 — Code de la Construction et de l'Habitat en Côte d'Ivoire";
 
 /** Droits DGI · Art. 550 CGI CI · RG-BAIL-05 */
 export function calculerDGI(loyer: number, dureeMois: number): number {

@@ -19,7 +19,9 @@ export async function createLease(data: {
   rentAmount:    number;   // Int FCFA
   chargesAmount?: number;  // Int FCFA
   paymentDay?:   number;   // défaut 5
-  depositAmount?: number;  // Int FCFA
+  depositAmount?: number,  // Int FCFA
+  avanceLoyer?: number,
+  preavisRequisMois?: number,
   typeBail?:     string;   // "ECRIT" | "DECLARATIF_BDQ"
 }) {
   const ref = `BAIL-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
@@ -38,6 +40,26 @@ export async function createLease(data: {
     data:  { walletBalance: { decrement: 2000 } }
   });
 
+  // Validation Loi n°2019-576 du 26 juin 2019 (Code de la Construction et de l'Habitat)
+  const preavis = data.preavisRequisMois ?? 3;
+  if (preavis < 3) {
+      throw new Error("Le préavis ne peut être inférieur à 3 mois (Arts. 440 et 442 CCH).");
+  }
+
+  const maxLoyerAvanceCaution = data.rentAmount * 2;
+  const avanceLoyer = data.avanceLoyer ?? 0;
+  const depositAmount = data.depositAmount ?? 0;
+
+  if (avanceLoyer > maxLoyerAvanceCaution) {
+      throw new Error(`Avances illégales : max ${maxLoyerAvanceCaution.toLocaleString()} FCFA (Art. 415 CCH — 2 mois de loyer)`);
+  }
+  if (depositAmount > maxLoyerAvanceCaution) {
+      throw new Error(`Dépôt de garantie illégal : max ${maxLoyerAvanceCaution.toLocaleString()} FCFA (Art. 416 CCH)`);
+  }
+
+  const deadlineDgi = new Date(data.startDate);
+  deadlineDgi.setDate(deadlineDgi.getDate() + 30);
+
   const lease = await prisma.lease.create({
     data: {
       leaseReference: ref,
@@ -52,8 +74,11 @@ export async function createLease(data: {
       rentAmount:     data.rentAmount,
       chargesAmount:  data.chargesAmount ?? 0,
       paymentDay:     data.paymentDay    ?? 5,
-      depositAmount:  data.depositAmount ?? 0,
+      depositAmount:  depositAmount,
+      avanceLoyer:    avanceLoyer,
+      preavisRequisMois: preavis,
       typeBail:       data.typeBail      ?? ("ECRIT" as any),
+      deadlineEnregistrement: deadlineDgi,
       status:         "DRAFT",
     }
   });
@@ -105,4 +130,76 @@ export async function countActiveLeasesForLandlord(landlordId: string) {
   return prisma.lease.count({
     where: { landlordId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } }
   });
+}
+
+// ── Phase 2: Restitution de Caution (Conformité Loi 2019-576) ──
+export async function enregistrerRestitutionCles(leaseId: string, dateRestitution: Date) {
+  const deadline = new Date(dateRestitution);
+  deadline.setDate(deadline.getDate() + 30);
+  
+  return prisma.cautionBail.update({
+    where: { bailId: leaseId },
+    data: {
+      clesRestitueeAt: dateRestitution,
+      deadlineRestitution: deadline,
+      statutRestitution: "EN_ATTENTE"
+    }
+  });
+}
+
+// ── Phase 2: Préavis (Conformité Forclusion Art. 444) ──
+export async function enregistrerEnvoiResiliation(preavisId: string, dateEnvoi: Date, modeEnvoi: string) {
+  const deadline = new Date(dateEnvoi);
+  deadline.setDate(deadline.getDate() + 30);
+  
+  return prisma.preavisBail.update({
+    where: { id: preavisId },
+    data: {
+      lettreResiliationEnvoyeeAt: dateEnvoi,
+      modeEnvoi,
+      deadlineContestation: deadline,
+      statut: "ENVOYE"
+    }
+  });
+}
+
+// ── Phase 2: Révision Loyer (Conformité Art. 423-424) ──
+export async function validerRevisionLoyer(leaseId: string, dateEffet: Date) {
+  const lease = await prisma.lease.findUnique({ where: { id: leaseId } });
+  if (!lease) throw new Error("Bail introuvable");
+  
+  const troisAnsAvant = new Date(dateEffet);
+  troisAnsAvant.setFullYear(troisAnsAvant.getFullYear() - 3);
+
+  if (lease.startDate > troisAnsAvant) {
+      throw new Error("Loi 2019-576 (Art. 423) : La révision du loyer ne peut intervenir qu'après 3 ans de bail.");
+  }
+
+  const troisMoisAvant = new Date(dateEffet);
+  troisMoisAvant.setMonth(troisMoisAvant.getMonth() - 3);
+  
+  const aujourdHui = new Date();
+  if (aujourdHui > troisMoisAvant) {
+      throw new Error("Loi 2019-576 (Art. 424) : Le préavis de révision doit être de 3 mois minimum avant la date d'effet.");
+  }
+  
+  return true;
+}
+
+// ── Phase 3: État des Lieux Obligatoire (Conformité Art. 411 CCH) ──
+export async function verifierEtatDesLieuxObligatoire(leaseId: string) {
+  const lease = await prisma.lease.findUnique({
+    where: { id: leaseId },
+    include: { inspections: true }
+  });
+
+  if (!lease) throw new Error("Bail introuvable");
+
+  const hasEntryEdl = lease.inspections.some(insp => insp.type === "ENTRY" && insp.status !== "ANNULEE");
+  
+  if (!hasEntryEdl) {
+    throw new Error("Loi 2019-576 (Art. 411) : Un état des lieux d'entrée est obligatoire pour formaliser ce bail.");
+  }
+
+  return true;
 }

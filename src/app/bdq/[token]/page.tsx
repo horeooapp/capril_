@@ -130,7 +130,7 @@ export default async function VerifyBDQPage({ params }: { params: Promise<{ toke
                         <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                         <p className="text-[10px] text-amber-700 font-bold leading-relaxed uppercase tracking-wider">
                             Avertissement Légal : Ce document constitue un commencement de preuve par écrit. 
-                            Il ne remplace pas un bail signé (Loi n°2018-575). 
+                            Il ne remplace pas un bail signé (Loi n°2019-576). 
                             Transition recommandée vers bail M-SIGN après 3 mois.
                         </p>
                     </div>

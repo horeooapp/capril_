@@ -84,7 +84,8 @@ function LeaseRegistrationForm() {
             durationMonths: 12,
             chargesAmount,
             depositAmount: depositAmount * rentAmount,
-            // Advance logic: standard practice maps exactly to the initial setup. 
+            avanceLoyer: advanceMonths * rentAmount,
+            preavisRequisMois: 3,
         }
 
         startTransition(async () => {

@@ -1,0 +1,1 @@
+src/app/api/v1/baux/[id]/caution/restituer/route.ts(52,9): error TS2561: Object literal may only specify known properties, but 'dateRestitution' does not exist in type '(Without<CautionBailUpdateInput, CautionBailUncheckedUpdateInput> & CautionBailUncheckedUpdateInput) | (Without<...> & CautionBailUpdateInput)'. Did you mean to write 'deadlineRestitution'?
