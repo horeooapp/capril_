@@ -33,14 +33,13 @@ export default function GenerateReceiptForm({
         setIsPending(true)
 
         try {
-            const result = await createReceipt({
+            const result = await (createReceipt as any)({
                 leaseId,
                 periodMonth: periodStr,
                 rentAmount: amountFcfa,
-                chargesAmount: 0, // Charges are usually included or added separately in v3.0 logic
-                paymentChannel,
-                paymentReference,
-                receiptType
+                chargesAmount: 0,
+                paymentMethod: paymentChannel,
+                paymentRef: paymentReference
             })
 
             if (result.error) {
