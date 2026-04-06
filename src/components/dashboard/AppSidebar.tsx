@@ -177,6 +177,15 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                             Changer de Profil
                         </Link>
                     )}
+                    {(role === 'LANDLORD' || role === 'AGENCY' || role === 'CHAMPION') && (
+                        <Link 
+                            href="/onboarding"
+                            className="w-full h-10 mb-2 bg-white text-[#C55A11] border border-[#C55A11]/20 rounded-xl flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-widest hover:bg-orange-50 transition-all active:scale-95 group shadow-sm"
+                        >
+                            <Building2 size={14} className="group-hover:scale-110 transition-transform" />
+                            Ajouter une Casquette
+                        </Link>
+                    )}
                     <button 
                         onClick={onLogout}
                         className="w-full h-12 bg-qred-pale text-qred rounded-xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-qred hover:text-white transition-all active:scale-95 group shadow-sm"

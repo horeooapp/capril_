@@ -1,7 +1,7 @@
 "use client";
 // src/app/onboarding/page.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { finaliserOnboarding, type Capacite } from "@/actions/onboarding.actions";
@@ -24,6 +24,20 @@ function OnboardingContent() {
   const [actif,  setActif]  = useState<Capacite>("PROPRIETAIRE");
   const [diaspo, setDiaspo] = useState(false);
   const [loading,setLoading]= useState(false);
+
+  const isAlreadyOnboarded = (session?.user as any)?.onboardingComplete;
+
+  useEffect(() => {
+     if (session?.user) {
+         const user = session.user as any;
+         if (user.capacites && user.capacites.length > 0) {
+             setSel(new Set(user.capacites));
+         }
+         if (user.capaciteActive) {
+             setActif(user.capaciteActive);
+         }
+     }
+  }, [session]);
 
   const toggle = (c: Capacite) => {
     const next = new Set(sel);
@@ -69,13 +83,13 @@ function OnboardingContent() {
       <div className="w-full max-w-md mx-auto">
         <div className="flex items-center justify-between bg-[#1B3A6B] text-white p-4 rounded-xl mb-4 shadow-sm">
           <div className="font-bold tracking-widest text-lg">QAPRIL</div>
-          <span className="text-xs text-white/60">Configuration du compte</span>
+          <span className="text-xs text-white/60">{isAlreadyOnboarded ? "Mise à jour des profils" : "Configuration du compte"}</span>
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-[#D0DFF5]">
           <div className="p-6 border-b border-[#EEF3FB] flex justify-between items-center">
             <div className="text-lg font-black text-[#1B3A6B]">Quelles sont vos capacités ?</div>
-            <span className="text-[10px] bg-[#1B3A6B] text-white px-2 py-1 rounded-md uppercase font-bold tracking-widest">1 seule fois</span>
+            <span className="text-[10px] bg-[#1B3A6B] text-white px-2 py-1 rounded-md uppercase font-bold tracking-widest">{isAlreadyOnboarded ? "Mise à jour" : "1 seule fois"}</span>
           </div>
           <div className="p-6">
             <p className="text-xs text-[#4A6A8A] mb-4">
@@ -140,7 +154,7 @@ function OnboardingContent() {
 
             <button onClick={handleSubmit} disabled={loading || sel.size===0}
               className="w-full bg-[#C55A11] hover:bg-[#A64B0E] disabled:opacity-50 text-white font-bold text-sm tracking-wide py-4 rounded-xl mt-6 transition-all active:scale-[0.98]">
-              {loading ? "Configuration..." : "Confirmer et accéder à mon espace →"}
+              {loading ? (isAlreadyOnboarded ? "Mise à jour..." : "Configuration...") : (isAlreadyOnboarded ? "Mettre à jour mes choix →" : "Confirmer et accéder à mon espace →")}
             </button>
           </div>
         </div>
