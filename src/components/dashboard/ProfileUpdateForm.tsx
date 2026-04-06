@@ -125,6 +125,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                         required 
                         readOnly={isIdentityLocked}
                         value={formData.lastName}
+                        autoComplete="family-name"
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                         className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                         placeholder={isAgency ? "Ex: QAPRIL IMMOBILIER" : "Ex: Koné"}
@@ -137,6 +138,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                             required 
                             readOnly={isIdentityLocked}
                             value={formData.firstName}
+                            autoComplete="given-name"
                             onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                             className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
                             placeholder="Ex: Adama"
@@ -203,6 +205,9 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de téléphone</label>
                     <input 
                         required 
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
@@ -308,9 +313,9 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
             <button 
                 type="submit" 
                 disabled={isPending}
-                className="w-full mt-6 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] shadow-xl shadow-blue-900/20 hover:bg-blue-900 transition-all disabled:opacity-50 flex justify-center items-center"
+                className="w-full mt-6 py-5 bg-[#1F4E79] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[13px] shadow-xl shadow-blue-900/20 hover:bg-blue-900 transition-all disabled:opacity-50 flex justify-center items-center active:scale-95 touch-manipulation"
             >
-                {isPending ? "Mise à jour..." : "Enregistrer et Valider (KYC)"}
+                {isPending ? "Mise à jour..." : "Enregistrer et Valider profil"}
             </button>
         </form>
     )

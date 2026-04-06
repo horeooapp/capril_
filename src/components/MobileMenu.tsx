@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { User } from 'lucide-react'
 
 interface NavLink {
     href: string
@@ -143,20 +144,36 @@ export default function MobileMenu({
                                         <div className="w-12 h-12 rounded-full bg-[#1F4E79]/10 flex items-center justify-center text-[#1F4E79] font-black text-sm border border-[#1F4E79]/20">
                                             {session.user.role?.charAt(0)}
                                         </div>
-                                        <div className="flex flex-col min-w-0">
+                                        <div className="flex flex-col min-w-0 flex-1">
                                             <p className="text-[14px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
-                                            <div className="flex items-center">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                                <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none">{session.user.role}</span>
+                                            <div className="flex items-center justify-between mt-1">
+                                                <div className="flex items-center">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                                                    <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none">{session.user.role}</span>
+                                                </div>
+                                                <Link 
+                                                    href={session.user.role === 'TENANT' ? "/locataire/profile" : "/dashboard/profile"}
+                                                    onClick={() => setIsOpen(false)}
+                                                    className="bg-qnavy/10 text-qnavy p-2 rounded-lg hover:bg-qnavy hover:text-white transition-all scale-90"
+                                                >
+                                                    <User size={14} />
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link 
+                                        href={session.user.role === 'TENANT' ? "/locataire/profile" : "/dashboard/profile"}
+                                        onClick={() => setIsOpen(false)}
+                                        className="flex items-center justify-center bg-qnavy text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-qnavy/20 col-span-2"
+                                    >
+                                        Gérer mon profil
+                                    </Link>
+                                    <Link 
                                         href={session.user.role === 'TENANT' ? "/locataire" : (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
                                         onClick={() => setIsOpen(false)}
-                                        className="flex items-center justify-center bg-gray-900 dark:bg-white dark:text-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-black/10"
+                                        className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
                                     >
                                         Espace
                                     </Link>

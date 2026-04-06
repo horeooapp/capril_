@@ -46,7 +46,7 @@ export default function DashboardLayoutClient({
     const pathname = usePathname()
 
     const activeRole = session?.user?.chosenRole || session?.user?.role;
-    const isAgency = activeRole === 'AGENCY' || activeRole === 'NON_CERTIFIED_AGENT';
+    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole);
     const isIntermediary = activeRole === 'INTERMEDIARY';
     const isManager = isAgency && (agencyConfig?.isManager !== false);
     const perms = agencyConfig?.permissions || [];
@@ -157,9 +157,12 @@ export default function DashboardLayoutClient({
                                         </div>
                                         <span className="text-[16px] font-black tracking-tight text-white uppercase drop-shadow-sm">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</span>
                                     </div>
-                                    <div className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 text-white flex items-center justify-center shadow-lg group hover:bg-white/20 transition-all cursor-pointer">
+                                    <Link 
+                                        href="/dashboard/profile"
+                                        className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 text-white flex items-center justify-center shadow-lg group hover:bg-white/20 transition-all cursor-pointer"
+                                    >
                                         <User size={20} />
-                                    </div>
+                                    </Link>
 
                                     {/* Quick Logout Button */}
                                     <button 

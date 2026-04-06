@@ -27,7 +27,7 @@ export default async function DashboardPage() {
         getMonthlyReports(user.id),
         (activeRole === "DIASPORA" || user.diasporaAbonnement) ? getDiasporaDashboard() : null,
         (activeRole === "INTERMEDIARY" || user.profileType === "INTERMEDIARY") ? getIntermediaireDashboardData() : null,
-        (activeRole === "AGENCY" || activeRole === "NON_CERTIFIED_AGENT" || user.role === "AGENCY") ? getAgencyDashboardData() : null,
+        (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole) || user.role === "AGENCY") ? getAgencyDashboardData() : null,
         activeRole === "TENANT" ? getProperties().then(props => props[0]?.leases?.[0]) : null, 
         [] // Always provide an array for receipts to avoid null mismatch
     ])

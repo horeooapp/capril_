@@ -26,7 +26,7 @@ export default function DashboardOverviewClient({
     agencyData?: any,
     tenantData?: any
 }) {
-    if (activeRole === 'AGENCY' || activeRole === 'NON_CERTIFIED_AGENT') {
+    if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole)) {
         return <AgencyPortalWrapper initialData={agencyData} />;
     }
 
