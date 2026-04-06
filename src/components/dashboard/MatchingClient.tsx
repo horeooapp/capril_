@@ -106,7 +106,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                 <div className="space-y-8">
                     <div className="glass-panel p-8 rounded-[2rem] bg-white border border-white/40 shadow-xl max-w-2xl">
                         <label className="text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] mb-4 block">Numéro de téléphone du locataire</label>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <div className="relative flex-1">
                                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input 
@@ -120,7 +120,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                             <button 
                                 onClick={handlePhoneSearch}
                                 disabled={loading}
-                                className="px-8 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                className="w-full md:w-auto px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                                 <Search size={20} />
                                 {loading ? "..." : "Trouver"}
