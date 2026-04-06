@@ -191,6 +191,25 @@ export default function ManualOfficielContent() {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="print:break-inside-avoid bg-ivoire-dark/5 p-8 rounded-3xl border border-ivoire-dark/10 mt-8">
+                                <h3 className="text-xl font-black text-ivoire-dark mb-4 uppercase tracking-tight flex items-center gap-2">
+                                    <ShieldCheck size={24} /> 1.3 Protections Locatives (Loi 2019)
+                                </h3>
+                                <p className="text-sm font-bold text-ivoire-dark/80 leading-relaxed mb-6">
+                                    QAPRIL est conçu pour faire respecter la loi n°2019-576 du 26 juin 2019 relative au bail à usage d&apos;habitation en Côte d&apos;Ivoire.
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-medium">
+                                    <div className="space-y-2">
+                                        <p className="text-gray-900 font-extrabold uppercase text-[11px] tracking-widest">Caution & Avance (Art. 12)</p>
+                                        <p className="text-sm text-gray-600">Le total de la caution et des loyers d&apos;avance ne peut excéder **3 mois**. Les quittances QAPRIL vous permettent de prouver ces versements.</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-gray-900 font-extrabold uppercase text-[11px] tracking-widest">Délai de Préavis (Art. 39)</p>
+                                        <p className="text-sm text-gray-600">Que ce soit pour le locataire ou le bailleur, le délai de préavis est de **1 mois** minimum. QAPRIL automatise l&apos;envoi de l&apos;Avis Électronique certifié.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

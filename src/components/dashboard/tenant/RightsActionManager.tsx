@@ -132,9 +132,9 @@ export const RightsActionManager = () => {
                                 </div>
 
                                 <div className="p-4 bg-orange-50 border border-orange-100 rounded-xl flex gap-3">
-                                    <Info size={16} className="text-[#C55A11] shrink-0 mt-0.5" />
+                                    <ShieldCheck size={16} className="text-[#C55A11] shrink-0 mt-0.5" />
                                     <p className="text-[10px] text-[#C55A11] font-bold uppercase tracking-widest leading-tight">
-                                        Avertissement : Cette action est officielle. Le propriétaire sera notifié et un délai sera imposé pour sa réponse.
+                                        Note Légale (Loi 2019) : Cette action est officielle. Le délai de préavis est de 1 mois minimum. Le propriétaire sera notifié par Avis Électronique certifié.
                                     </p>
                                 </div>
 

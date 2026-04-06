@@ -128,7 +128,7 @@ export default async function TenantLeasesPage() {
                                                                 <p className="text-[10px] text-gray-400">Payé le {new Date(receipt.paidAt).toLocaleDateString('fr-FR')}</p>
                                                             </div>
                                                         </div>
-                                                        <Link href={`/locataire/receipts/${receipt.id}`} className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">
+                                                        <Link href={`/receipts/${receipt.id}`} className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">
                                                             Voir
                                                         </Link>
                                                     </div>
