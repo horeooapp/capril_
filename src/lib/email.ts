@@ -121,35 +121,51 @@ export function wrapInPremiumTemplate(content: string, title?: string) {
     <html lang="fr">
     <head>
       <meta charset="UTF-8">
-      <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9fbfd; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(31, 78, 121, 0.08); border: 1px solid #eef2f7; }
-        .header { background: linear-gradient(135deg, #1F4E79 0%, #2c6ca7 100%); padding: 40px 40px; text-align: center; }
-        .logo { color: #ffffff; font-size: 28px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; margin: 0; }
-        .content { padding: 48px 40px; color: #344054; line-height: 1.6; }
-        .title { color: #1F4E79; font-size: 22px; font-weight: 800; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px; }
-        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; border-top: 1px solid #f2f4f7; }
-        .button-container { margin: 40px 0; text-align: center; }
-        .button { background-color: #C55A11; color: #ffffff !important; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(197, 90, 17, 0.2); }
-        .footer-text { font-size: 11px; color: #667085; margin: 8px 0; font-weight: 500; }
-        .footer-tag { font-size: 10px; color: #98a2b3; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-top: 16px; }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1 class="logo">QAPRIL</h1>
-        </div>
-        <div class="content">
-          ${title ? `<h2 class="title">${title}</h2>` : ""}
-          ${content}
-        </div>
-        <div class="footer">
-          <p class="footer-text">© 2024 QAPRIL • Excellence en Administration Centrale</p>
-          <p class="footer-text">Infrastructure Numérique Nationale de Confiance</p>
-          <div class="footer-tag">Certifié par l'État de Côte d'Ivoire</div>
-        </div>
-      </div>
+    <body style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #EEF3FB; margin: 0; padding: 40px 10px; -webkit-font-smoothing: antialiased;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(27, 58, 107, 0.1); border: 1px solid #D0DFF5;">
+          <!-- Header -->
+          <tr>
+              <td style="background-color: #1B3A6B; padding: 40px; text-align: center; border-bottom: 4px solid #FF8200;">
+                  <img src="${appUrl}/logo.png" alt="QAPRIL" style="height: 60px; width: auto; display: block; margin: 0 auto; margin-bottom: 20px;"/>
+                  <p style="color: #8AAABF; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin: 0;">Quittancement Autonome & Plateforme de Ressource Immobilière Locative</p>
+              </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+              <td style="padding: 40px 30px;">
+                  ${title ? `<h2 style="color: #1B3A6B; font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.5px; border-left: 4px solid #FF8200; padding-left: 12px;">${title}</h2>` : ""}
+                  <div style="color: #344054; font-size: 15px; line-height: 1.6;">
+                      ${content}
+                  </div>
+              </td>
+          </tr>
+          
+          <!-- Security Badges -->
+          <tr>
+              <td style="background-color: #F8FAFC; padding: 24px 30px; border-top: 1px solid #EEF3FB;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                          <td align="center">
+                              <p style="margin:0 0 8px 0; font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 1px;">✓ Conforme CDC-CI (Caisse des Dépôts et Consignations)</p>
+                              <p style="margin:0; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">🔒 Infrastructure Protégée AES-256</p>
+                          </td>
+                      </tr>
+                  </table>
+              </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+              <td style="background-color: #0F2342; padding: 30px 40px; text-align: center;">
+                  <p style="color: #94A3B8; font-size: 11px; margin: 0 0 8px 0;">Cet email est généré automatiquement par l'Infrastructure de Confiance QAPRIL.</p>
+                  <p style="color: #FF8200; font-size: 11px; margin: 0 0 16px 0; font-weight: bold;">Le personnel QAPRIL ne vous demandera jamais ce code par téléphone.</p>
+                  <p style="color: #4A90E2; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin: 0;">© ${new Date().getFullYear()} RÉPUBLIQUE DE CÔTE D'IVOIRE</p>
+              </td>
+          </tr>
+      </table>
     </body>
     </html>
   `;
@@ -159,39 +175,41 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci"}/auth/reset-password?token=${token}`;
   
   const content = `
-    <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte <strong>QAPRIL</strong>.</p>
-    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien est valable pendant <strong>1 heure</strong>.</p>
-    <div class="button-container">
-      <a href="${resetLink}" class="button">Réinitialiser le mot de passe</a>
+    <p style="margin: 0 0 20px 0;">Vous avez initié une demande de réinitialisation des accès pour votre compte certifié <strong>QAPRIL</strong>.</p>
+    <p style="margin: 0 0 20px 0;">Veuillez cliquer sur le bouton de sécurité ci-dessous pour configurer une nouvelle clé d'accès. Ce lien est chiffré et n'est valable que pendant <strong>1 heure</strong>.</p>
+    <div style="margin: 32px 0; text-align: center;">
+      <a href="${resetLink}" style="background-color: #1B3A6B; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; display: inline-block;">Réinitialiser l'accès</a>
     </div>
-    <p style="color: #667085; font-size: 13px; margin-top: 32px;">Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email en toute sécurité.</p>
+    <div style="background-color: #FFF4E5; border-left: 4px solid #FF8200; padding: 16px; margin-top: 32px; border-radius: 0 8px 8px 0;">
+      <p style="margin: 0; font-size: 13px; color: #5A3A00;"><strong>Alerte :</strong> Si vous n'avez pas demandé cette réinitialisation, votre compte pourrait être ciblé. Veuillez le signaler immédiatement à <em>fraude@qapril.ci</em>.</p>
+    </div>
   `;
 
   return sendEmail({
     to: email,
-    subject: "Réinitialisation de votre mot de passe - QAPRIL",
-    html: wrapInPremiumTemplate(content, "Sécurité de votre compte"),
+    subject: "Action Requise : Réinitialisation de vos accès - QAPRIL",
+    html: wrapInPremiumTemplate(content, "Sécurité de l'Authentification"),
   });
 }
 
 export async function sendOTPEmail(email: string, otp: string) {
   const content = `
-    <div style="text-align: center;">
-      <p style="font-size: 16px; color: #344054; margin-bottom: 32px;">Utilisez le code de validation ci-dessous pour sécuriser votre accès à la console <strong>QAPRIL</strong>.</p>
-      
-      <div style="background-color: #f9fafb; border: 2px dashed #eef2f7; border-radius: 16px; padding: 32px; margin: 24px 0;">
-        <span style="font-size: 42px; font-weight: 900; letter-spacing: 12px; color: #1F4E79; font-family: 'Courier New', Courier, monospace;">${otp}</span>
-      </div>
-      
-      <p style="font-size: 13px; color: #667085; margin-top: 32px;">Ce code est strictement personnel et expirera dans 10 minutes par mesure de sécurité.</p>
-      <p style="font-size: 11px; color: #98a2b3; font-style: italic;">Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+    <p style="margin: 0 0 16px 0;">Cher(e) utilisateur(trice),</p>
+    <p style="margin: 0 0 24px 0;">Suite à votre procédure d'authentification, veuillez utiliser le code de sécurité <strong>à usage unique (OTP)</strong> ci-dessous pour déverrouiller votre session et accéder à votre espace protégé.</p>
+    
+    <div style="background-color: #F8FAFC; border: 2px dashed #1B3A6B; border-radius: 16px; padding: 32px; text-align: center; margin: 32px 0;">
+      <span style="font-size: 44px; font-weight: 900; letter-spacing: 12px; color: #1B3A6B; font-family: 'Courier New', Courier, monospace; display: block; margin-left: 12px;">${otp}</span>
+    </div>
+    
+    <div style="background-color: #FFF4E5; border-left: 4px solid #FF8200; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0;">
+      <p style="margin: 0; font-size: 13px; color: #5A3A00; line-height: 1.5;"><strong>Consigne de sécurité :</strong> Ce code expirera automatiquement dans 10 minutes. Ne le partagez avec <strong>personne</strong>. Nos agents ne vous le réclameront jamais.</p>
     </div>
   `;
 
   return sendEmail({
     to: email,
-    subject: `${otp} est votre code de validation QAPRIL`,
-    html: wrapInPremiumTemplate(content, "Authentification Sécurisée"),
+    subject: `🔐 [${otp}] Code de validation QAPRIL`,
+    html: wrapInPremiumTemplate(content, "Validation d'Accès OTP"),
   });
 }
 
