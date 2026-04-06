@@ -45,9 +45,9 @@ export default function DashboardLayoutClient({
 }) {
     const pathname = usePathname()
 
-    const role = session?.user?.chosenRole || session?.user?.role;
-    const isAgency = role === 'AGENCY' || role === 'NON_CERTIFIED_AGENT';
-    const isIntermediary = role === 'INTERMEDIARY';
+    const activeRole = session?.user?.chosenRole || session?.user?.role;
+    const isAgency = activeRole === 'AGENCY' || activeRole === 'NON_CERTIFIED_AGENT';
+    const isIntermediary = activeRole === 'INTERMEDIARY';
     const isManager = isAgency && (agencyConfig?.isManager !== false);
     const perms = agencyConfig?.permissions || [];
 
@@ -72,17 +72,17 @@ export default function DashboardLayoutClient({
             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={18} /> },
             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={18} /> },
             { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
-            ...(role === 'TENANT' 
+            ...(activeRole === 'TENANT' 
                 ? [{ href: "/dashboard/certificates", label: "Passeport", icon: <FileCheck2 size={18} /> }]
                 : [{ href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> }]
             ),
             { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={18} /> },
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-            ...(role === 'CHAMPION' 
+            ...(activeRole === 'CHAMPION' 
                 ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }]
                 : []
             ),
-            ...(session?.user?.diasporaAbonnement 
+            ...(session?.user?.diasporaAbonnement || activeRole === 'DIASPORA'
                 ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }]
                 : []
             ),
@@ -101,10 +101,10 @@ export default function DashboardLayoutClient({
             {/* Vertical Sidebar - Only for Desktop */}
             {session?.user && (
                 <AppSidebar 
-                    role={session.user.chosenRole || session.user.role} 
+                    role={activeRole} 
                     onLogout={() => signOut()} 
-                    userName={(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || (session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "")}
-                    diasporaAbonnement={session.user.diasporaAbonnement}
+                    userName={(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}
+                    diasporaAbonnement={session.user.diasporaAbonnement || activeRole === 'DIASPORA'}
                     agencyConfig={agencyConfig}
                     eligibleRoles={session.user.eligibleRoles}
                 />

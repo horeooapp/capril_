@@ -30,7 +30,7 @@ import {
 import ProtectedLogo from "@/components/ProtectedLogo"
 
 interface AppSidebarProps {
-    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY'
+    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA'
     onLogout: () => void | Promise<void>
     userName?: string | null
     diasporaAbonnement?: boolean
@@ -54,7 +54,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             ]
         }
         
-        if (role === 'AGENCY') {
+        if (role === 'AGENCY' || role === 'NON_CERTIFIED_AGENT') {
             const isManager = agencyConfig?.isManager !== false // Default to manager if undefined to prevent locking out legacy users
             const perms = agencyConfig?.permissions || []
 
@@ -72,8 +72,8 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             return allLinks.filter(l => isManager || ["SETTINGS", "MANUAL"].includes(l.id) || perms.includes(l.id))
         }
         
-        // Owner / Default Links (5-tab focus + extras for desktop)
-        return [
+        // Default Links (5-tab focus + extras for desktop)
+        const commonLinks = [
             { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={20} /> },
             { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={20} /> },
             { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={20} /> },
@@ -85,9 +85,11 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={20} /> },
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={20} /> },
             ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={20} /> }] : []),
-            ...(diasporaAbonnement ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),
+            ...(diasporaAbonnement || role === 'DIASPORA' ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),
             { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
         ]
+
+        return commonLinks;
     }
 
     const navLinks = getNavLinks()
@@ -105,7 +107,12 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                         />
                         <div className="flex items-center gap-2 mt-1">
                             <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase">
-                                {role === 'TENANT' ? 'Locataire' : role === 'AGENCY' ? 'Agence' : 'PROPRIÉTAIRE'}
+                                {role === 'TENANT' ? 'Locataire' 
+                                 : role === 'AGENCY' ? 'Agence' 
+                                 : role === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire' 
+                                 : role === 'INTERMEDIARY' ? 'Intermédiaire'
+                                 : role === 'DIASPORA' ? 'Diaspora'
+                                 : 'PROPRIÉTAIRE'}
                             </div>
                             <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                         </div>
