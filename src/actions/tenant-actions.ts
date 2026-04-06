@@ -3,7 +3,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Role } from "@prisma/client"
-import { serializeLease } from "@/lib/serialize"
+import { serializeLease, serializeObject } from "@/lib/serialize"
 
 export async function getTenantDashboard() {
     const session = await auth()
@@ -42,7 +42,7 @@ export async function getTenantDashboard() {
         })
 
         if (!activeLease) {
-            return { success: true, hasLease: false, user }
+            return serializeObject({ success: true, hasLease: false, user })
         }
 
         // 3. Calculer les statistiques du loyer
@@ -63,7 +63,7 @@ export async function getTenantDashboard() {
             where: { userId }
         })
 
-        return {
+        return serializeObject({
             success: true,
             hasLease: true,
             user,
@@ -74,10 +74,10 @@ export async function getTenantDashboard() {
             },
             utilities,
             score: locataireProfile?.scoreActuel || 750
-        }
+        })
 
     } catch (error: any) {
         console.error("Tenant Dashboard Error:", error)
-        return { success: false, error: error.message }
+        return serializeObject({ success: false, error: error.message })
     }
 }

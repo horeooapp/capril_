@@ -7,6 +7,8 @@ import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
 import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen } from "lucide-react"
 
+import { SessionProvider } from "next-auth/react"
+
 interface LocataireLayoutClientProps {
     children: React.ReactNode
     session: any
@@ -19,7 +21,8 @@ export default function LocataireLayoutClient({
     onLogout
 }: LocataireLayoutClientProps) {
     return (
-        <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
+        <SessionProvider session={session}>
+            <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
             {/* Mesh Background */}
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
@@ -78,5 +81,6 @@ export default function LocataireLayoutClient({
                 )}
             </div>
         </div>
+    </SessionProvider>
     )
 }
