@@ -187,3 +187,68 @@ export async function updateUserProfile(data: {
         return { error: error.message || "Impossible de mettre à jour le profil." }
     }
 }
+
+/**
+ * Deletes a user account (Soft Delete).
+ * Safety checks:
+ * - Tenant: No active leases.
+ * - Landlord/Agency: No active properties with tenants or active mandates.
+ */
+export async function deleteUserAccount() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Authentification requise.");
+
+    const userId = session.user.id;
+
+    try {
+        // 1. Safety Check: Tenant with active leases
+        const activeLease = await prisma.lease.findFirst({
+            where: {
+                OR: [
+                    { tenantId: userId, status: { in: ['ACTIVE', 'MISE_EN_DEMEURE', 'CLEMENCE_EN_COURS'] } },
+                    { landlordId: userId, status: { in: ['ACTIVE', 'MISE_EN_DEMEURE', 'CLEMENCE_EN_COURS'] } }
+                ]
+            }
+        });
+
+        if (activeLease) {
+            throw new Error("Impossible de supprimer le compte : Un contrat de bail est actuellement en cours d'exécution.");
+        }
+
+        // 2. Safety Check: Agency with active mandates
+        const activeMandate = await prisma.mandate.findFirst({
+            where: { agent: { id: userId }, status: 'ACTIVE' }
+        });
+
+        const activeMandatGestion = await prisma.mandatGestion.findFirst({
+            where: { intermediaireId: userId, statut: 'ACTIF' }
+        });
+
+        if (activeMandate || activeMandatGestion) {
+            throw new Error("Impossible de supprimer le compte : Un mandat de gestion est encore actif.");
+        }
+
+        // 3. Mark as deleted (Soft Delete)
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                deletedAt: new Date(),
+                status: 'inactive'
+            }
+        });
+
+        // 4. Audit Log
+        await writeAuditLog({
+            userId: userId,
+            action: "ACCOUNT_DELETED",
+            module: "SECURITY",
+            entityId: userId,
+            newValues: { status: 'deleted', deletedAt: new Date().toISOString() }
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("[DELETE_ACCOUNT] Error:", error.message);
+        return { error: error.message || "Une erreur est survenue lors de la suppression." };
+    }
+}

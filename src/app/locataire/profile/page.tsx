@@ -4,7 +4,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
 import PreferencesLocataireClient from "@/components/locataire/PreferencesLocataireClient"
-import { User, Settings, ShieldCheck, ArrowLeft, Stamp, Bell } from "lucide-react"
+import { User, Settings, ShieldCheck, ArrowLeft, Stamp, Bell, Trash2 } from "lucide-react"
+import { DeleteAccountSection } from "@/components/dashboard/profile/DeleteAccountSection"
 
 export const dynamic = "force-dynamic"
 
@@ -151,6 +152,8 @@ export default async function TenantProfilePage() {
                  </div>
             </div>
             
+            {/* Zone de Danger: Suppression de Compte */}
+            <DeleteAccountSection />
         </div>
     )
 }

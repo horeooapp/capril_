@@ -42,6 +42,23 @@ export const authConfig = {
                     token.chosenRole = (user as any).chosenRole || null
                 }
             }
+
+            // [FIX DÉFINITIF] Sync dynamic role from Redis if not present or during refresh
+            if (token.id) {
+                try {
+                    const { redis } = await import("@/lib/redis");
+                    if (redis) {
+                        const globalActiveRole = await redis.get(`user:active_role:${token.id}`);
+                        if (globalActiveRole) {
+                            token.chosenRole = globalActiveRole;
+                        }
+                    }
+                } catch (e) {
+                    // Fail silent to avoid blocking auth if redis is down
+                    console.error("[AUTH_CONFIG] Redis Sync Error:", e);
+                }
+            }
+
             return token
         },
         async session({ session, token }) {

@@ -1,4 +1,5 @@
-import { User, Settings, ShieldCheck, CreditCard, Bell, LogOut, Star } from "lucide-react"
+import { User, Settings, ShieldCheck, CreditCard, Bell, LogOut, Star, Trash2 } from "lucide-react"
+import { DeleteAccountSection } from "@/components/dashboard/profile/DeleteAccountSection"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
@@ -135,6 +136,9 @@ export default async function OwnerProfilePage() {
                 {/* Wallet / Abonnement */}
                 <SubscriptionManager currentPlan="PREMIUM AGREE" />
             </div>
+
+            {/* Zone de Danger: Suppression de Compte */}
+            <DeleteAccountSection />
 
             {/* Disclaimer */}
             <div className="text-center px-8">
