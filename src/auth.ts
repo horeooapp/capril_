@@ -131,8 +131,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         let finalChosenRole: string | null = null;
                         let requiresSelection = false;
 
-                        // Si l'utilisateur possède plusieurs rôles, forcer la sélection de la "casquette"
-                        if (eligibleRoles.length > 1) {
+                        // Si l'utilisateur demande explicitement le portail locataire et y a droit
+                        if (reqRole === 'TENANT' && eligibleRoles.includes('TENANT')) {
+                            finalChosenRole = 'TENANT';
+                            requiresSelection = false;
+                        } 
+                        // S'il demande un espace propriétaire/agence/etc. et possède plusieurs rôles
+                        else if (eligibleRoles.length > 1) {
                             requiresSelection = true;
                             finalChosenRole = null;
                         } else {

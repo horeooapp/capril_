@@ -4,6 +4,7 @@ import { getTenantDashboard } from "@/actions/tenant-actions"
 import Link from "next/link"
 import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react"
 import PaymentClient from "./PaymentClient"
+import UploadPreuvePaiement from "@/components/tenant/UploadPreuvePaiement"
 
 export const dynamic = "force-dynamic"
 
@@ -85,6 +86,8 @@ export default async function TenantPaymentPage() {
                              Ce paiement génèrera automatiquement une quittance <strong className="text-qorange">SHA-256</strong> dans votre espace et enverra une notification SMS/WhatsApp à votre bailleur.
                          </p>
                     </div>
+
+                    <UploadPreuvePaiement leaseId={lease.id} />
                 </div>
             )}
         </div>

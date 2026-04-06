@@ -4,6 +4,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AuthScreen from '../screens/AuthScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 
+import PaymentScreen from '../screens/PaymentScreen';
+import MaintenanceScreen from '../screens/MaintenanceScreen';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -29,7 +32,16 @@ function MainTabNavigator() {
         component={DashboardScreen} 
         options={{ title: 'Accueil' }}
       />
-      {/* On peut ajouter 'Quittances', 'Paramètres' ici plus tard */}
+      <Tab.Screen 
+        name="Payment" 
+        component={PaymentScreen} 
+        options={{ title: 'Règlement' }}
+      />
+      <Tab.Screen 
+        name="Maintenance" 
+        component={MaintenanceScreen} 
+        options={{ title: 'Assistance' }}
+      />
     </Tab.Navigator>
   );
 }
