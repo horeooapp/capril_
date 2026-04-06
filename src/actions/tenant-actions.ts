@@ -6,31 +6,50 @@ import { Role } from "@prisma/client"
 import { serializeLease, serializeObject } from "@/lib/serialize"
 
 export async function getTenantDashboard() {
-    const session = await auth()
-    if (!session?.user?.id || session.user.role !== Role.TENANT) {
-        throw new Error("Accès refusé. Réservé aux locataires.")
-    }
-
-    const userId = session.user.id
-
     try {
-        // 1. Récupérer le Locataire
+        const session = await auth()
+        
+        // 1. Authentification & Autorisation fine-grained
+        if (!session?.user?.id) {
+            return serializeObject({ success: false, error: "Session expirée. Veuillez vous reconnecter." })
+        }
+
+        const userRoles = (session.user as any).eligibleRoles || [session.user.role];
+        const currentRole = (session.user as any).chosenRole || session.user.role;
+        const isTenant = currentRole === Role.TENANT || userRoles.includes(Role.TENANT);
+
+        if (!isTenant) {
+            return serializeObject({ success: false, error: "Accès refusé. Réservé aux locataires." })
+        }
+
+        const userId = session.user.id
+
+        // 2. Récupérer le Locataire
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { id: true, lastName: true, firstName: true, email: true, phone: true }
         })
 
-        if (!user) throw new Error("Utilisateur introuvable")
+        if (!user) {
+            return serializeObject({ success: false, error: "Profil utilisateur introuvable." })
+        }
 
-        // 2. Trouver le bail actif (Dédicacé au locataire)
+        // 3. Trouver le bail actif
         const activeLease = await prisma.lease.findFirst({
             where: {
                 tenantId: userId,
-                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE"] }
+                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF"] }
             },
             include: {
                 property: true,
-                landlord: { select: { lastName: true, firstName: true, phone: true } },
+                landlord: { 
+                    select: { 
+                        lastName: true, 
+                        firstName: true, 
+                        phone: true,
+                        walletConfig: { select: { landlordCode: true } }
+                    } 
+                },
                 receipts: {
                     orderBy: { createdAt: "desc" },
                     take: 5
@@ -45,20 +64,20 @@ export async function getTenantDashboard() {
             return serializeObject({ success: true, hasLease: false, user })
         }
 
-        // 3. Calculer les statistiques du loyer
-        const totalArrears = activeLease.arrears.reduce((sum, arr) => sum + arr.amount, 0)
+        // 4. Calculer les statistiques du loyer
+        const totalArrears = activeLease.arrears.reduce((sum, arr) => sum + Number(arr.amount || 0), 0)
         let leaseStatus: any = activeLease.status
         if (totalArrears > 0) {
             leaseStatus = "LOYER_IMPAYE"
         }
 
-        // 4. Utilitaires (Factures OCR CIE/SODECI)
+        // 5. Utilitaires (Factures OCR CIE/SODECI)
         const utilities = await prisma.factureUtility.findMany({
             where: { leaseId: activeLease.id, statut: { in: ["EN_COURS", "EN_RETARD"] } },
             orderBy: { dateLimitePaiement: "asc" }
         })
 
-        // 5. Score Locatif (Passeport)
+        // 6. Score Locatif (Passeport)
         const locataireProfile = await prisma.locataireProfile.findUnique({
             where: { userId }
         })
@@ -77,7 +96,10 @@ export async function getTenantDashboard() {
         })
 
     } catch (error: any) {
-        console.error("Tenant Dashboard Error:", error)
-        return serializeObject({ success: false, error: error.message })
+        console.error("[TENANT-ACTION] Critical failure:", error)
+        return serializeObject({ 
+            success: false, 
+            error: process.env.NODE_ENV === 'development' ? error.message : "Impossible de charger vos données. Veuillez réessayer plus tard." 
+        })
     }
 }

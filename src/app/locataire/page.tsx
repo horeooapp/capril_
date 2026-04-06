@@ -43,9 +43,14 @@ export default function LocataireDashboardPage() {
         async function loadData() {
             try {
                 const data = await getTenantDashboard()
-                setDashboardData(data)
-            } catch (err) {
-                console.error(err)
+                if (data) {
+                    setDashboardData(data)
+                } else {
+                    setDashboardData({ success: false, error: "Erreur de communication avec le serveur." })
+                }
+            } catch (err: any) {
+                console.error("Dashboard Load Error:", err)
+                setDashboardData({ success: false, error: err.message || "Une erreur inattendue est survenue." })
             } finally {
                 setLoading(false)
             }
