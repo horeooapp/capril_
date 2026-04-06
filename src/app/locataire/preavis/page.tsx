@@ -6,7 +6,8 @@ import PreavisLocataireClient from "@/components/locataire/PreavisLocataireClien
 
 export default async function PreavisPage() {
     const session = await auth()
-    if (!session?.user || session.user.role !== "TENANT") redirect("/locataire/login")
+    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
+    if (!session?.user || activeRole !== "TENANT") redirect("/locataire/login")
 
     const dashboardData = await getLocataireDashboardData(session.user.id)
     const activeBail = dashboardData.bails[0]

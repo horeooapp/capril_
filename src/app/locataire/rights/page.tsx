@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic"
 export default async function TenantRightsPage() {
     const session = await auth()
     
-    if (!session?.user || session.user.role !== "TENANT") {
+    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
+    
+    if (!session?.user || activeRole !== "TENANT") {
         redirect("/locataire/login")
     }
 
