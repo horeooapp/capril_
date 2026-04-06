@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { serializeObject } from "@/lib/serialize"
 
 export interface BailDeclaratifData {
   tenantFullName: string
@@ -127,7 +128,7 @@ export async function creerBailDeclaratif(
   console.log(`[BDQ] Bail cree ${leaseReference} - Inviter ${phoneNorm}`)
 
   revalidatePath("/dashboard/leases")
-  return { success: true, bail, bdq, tenant }
+  return serializeObject({ success: true, bail, bdq, tenant })
   } catch (err: any) {
     console.error("[BDQ_CREATE_ERROR]", err);
     return { error: err.message || "Erreur interne lors de la création du bail" };

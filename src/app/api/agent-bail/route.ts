@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { auth } from "@/auth"
 
 const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
+  apiKey: process.env.ANTHROPIC_API_KEY || "dummy_key_to_prevent_startup_crash"
 })
 
 // Systeme prompt de l'agent QAPRIL
