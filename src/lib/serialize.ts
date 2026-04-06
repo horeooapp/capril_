@@ -44,10 +44,10 @@ export const serializeLease = (lease: any) => {
                        (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
 
     const landlordData = lease.landlord ? {
-        fullName: shouldMask ? (lease.landlord.walletConfig?.walletConfig?.landlordCode || "BAI-CODE-PENDING") : ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || (lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || "N/A"),
+        fullName: shouldMask ? (lease.landlord.walletConfig?.landlordCode || "BAI-CODE-PENDING") : ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || "N/A"),
         phone: shouldMask ? null : (lease.landlord.phone || null),
         email: shouldMask ? null : (lease.landlord.email || null),
-        landlordCode: lease.landlord.walletConfig?.walletConfig?.landlordCode || null
+        landlordCode: lease.landlord.walletConfig?.landlordCode || null
     } : null;
 
     const tenantData = lease.tenant ? {

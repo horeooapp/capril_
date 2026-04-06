@@ -171,21 +171,26 @@ export async function getReceiptsForTenant() {
         return []
     }
 
-    const receipts = await prisma.receipt.findMany({
-        where: { lease: { tenantId: session.user.id } },
-        include: {
-            lease: {
-                include: {
-                    property: {
-                        include: { owner: true }
+    try {
+        const receipts = await prisma.receipt.findMany({
+            where: { lease: { tenantId: session.user.id } },
+            include: {
+                lease: {
+                    include: {
+                        property: {
+                            include: { owner: true }
+                        }
                     }
                 }
-            }
-        },
-        orderBy: { periodMonth: 'desc' }
-    })
+            },
+            orderBy: { periodMonth: 'desc' }
+        })
 
-    return receipts.map(serializeReceipt)
+        return receipts.map(serializeReceipt)
+    } catch (error: any) {
+        console.error("[GET_TENANT_RECEIPTS_ERROR]", error)
+        return []
+    }
 }
 
 /**

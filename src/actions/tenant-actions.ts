@@ -3,6 +3,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Role } from "@prisma/client"
+import { serializeLease } from "@/lib/serialize"
 
 export async function getTenantDashboard() {
     const session = await auth()
@@ -35,7 +36,7 @@ export async function getTenantDashboard() {
                     take: 5
                 },
                 arrears: {
-                    where: { status: "UNPAID" }
+                    where: { status: { in: ["unpaid", "UNPAID"] } }
                 }
             }
         })
@@ -67,7 +68,7 @@ export async function getTenantDashboard() {
             hasLease: true,
             user,
             lease: {
-                ...activeLease,
+                ...serializeLease(activeLease),
                 computedStatus: leaseStatus,
                 totalArrears
             },
