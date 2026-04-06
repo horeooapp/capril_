@@ -13,7 +13,11 @@ export const authConfig = {
         error: '/dashboard/login',
     },
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
+            if (trigger === "update" && session?.user) {
+                // Merge dynamically updated token fields (e.g. onboardingComplete)
+                Object.assign(token, session.user);
+            }
             if (user) {
                 token.id = user.id
                 token.email = user.email

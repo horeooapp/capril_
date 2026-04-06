@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession, SessionProvider } from "next-auth/react";
 import { finaliserOnboarding, type Capacite } from "@/actions/onboarding.actions";
 
 const CAPACITES = [
@@ -16,8 +17,9 @@ const CAPACITES = [
     sub: "J'aide un proche ou un client à gérer son bien" },
 ] as const;
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router   = useRouter();
+  const { data: session, update } = useSession();
   const [sel,    setSel]    = useState<Set<Capacite>>(new Set(["PROPRIETAIRE"]));
   const [actif,  setActif]  = useState<Capacite>("PROPRIETAIRE");
   const [diaspo, setDiaspo] = useState(false);
@@ -43,7 +45,18 @@ export default function OnboardingPage() {
         capaciteActive: actif,
         activerDiaspora: diaspo
       });
-      // Force un refresh complet pour NextAuth / Dashboard routing
+      // 1. Flush NextAuth Token state to respect Dashboard Middleware rules
+      if (session) {
+          await update({
+              ...session,
+              user: {
+                  ...session.user,
+                  onboardingComplete: true,
+                  capaciteActive: actif
+              }
+          });
+      }
+      // 2. Routing to Dashboard securely
       window.location.href = "/dashboard";
     } catch (e) {
       console.error(e);
@@ -133,5 +146,13 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <SessionProvider>
+      <OnboardingContent />
+    </SessionProvider>
   );
 }
