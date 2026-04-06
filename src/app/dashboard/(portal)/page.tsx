@@ -8,6 +8,7 @@ import { getDiasporaDashboard } from "@/actions/diaspora-actions"
 import { getIntermediaireDashboardData } from "@/actions/intermediaire-actions"
 import { getAgencyDashboardData } from "@/actions/agency-actions"
 import { DiasporaDashboardData } from "@/types/diaspora"
+import { redirect } from "next/navigation"
 
 export const dynamic = "force-dynamic"
 
@@ -15,8 +16,7 @@ export default async function DashboardPage() {
     const session = await auth();
     const user = await getCurrentUser();
     
-    if (!user || !session) {
-        const { redirect } = await import("next/navigation");
+    if (!user || !session?.user) {
         redirect("/dashboard/login");
     }
 
