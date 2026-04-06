@@ -2,7 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { getTenantDashboard } from "@/actions/tenant-actions"
 import Link from "next/link"
-import { ArrowLeft, Tool, AlertCircle } from "lucide-react"
+import { ArrowLeft, AlertCircle } from "lucide-react"
 import DeclareIncidentForm from "@/components/tenant/DeclareIncidentForm"
 
 export const dynamic = "force-dynamic"

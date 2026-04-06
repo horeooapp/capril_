@@ -98,9 +98,9 @@ export default function DeclareIncidentForm({ leaseId, propertyId }: { leaseId: 
                             Urgence
                         </label>
                         <div className="flex gap-3">
-                            <button type="button" onClick={() => setPriority("FAIBLE")} className={\`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all \${priority === 'FAIBLE' ? 'bg-qgrey-1 text-qtext-dark border-2 border-qgrey-2' : 'border border-qgrey-2 text-qtext-light'}\`}>Faible</button>
-                            <button type="button" onClick={() => setPriority("MOYENNE")} className={\`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all \${priority === 'MOYENNE' ? 'bg-qorange-pale text-qorange border-2 border-qorange/50' : 'border border-qgrey-2 text-qtext-light'}\`}>Moyenne</button>
-                            <button type="button" onClick={() => setPriority("CRITIQUE")} className={\`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all \${priority === 'CRITIQUE' ? 'bg-qred-pale text-qred border-2 border-qred/50' : 'border border-qgrey-2 text-qtext-light'}\`}>Critique</button>
+                            <button type="button" onClick={() => setPriority("FAIBLE")} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${priority === 'FAIBLE' ? 'bg-qgrey-1 text-qtext-dark border-2 border-qgrey-2' : 'border border-qgrey-2 text-qtext-light'}`}>Faible</button>
+                            <button type="button" onClick={() => setPriority("MOYENNE")} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${priority === 'MOYENNE' ? 'bg-qorange-pale text-qorange border-2 border-qorange/50' : 'border border-qgrey-2 text-qtext-light'}`}>Moyenne</button>
+                            <button type="button" onClick={() => setPriority("CRITIQUE")} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${priority === 'CRITIQUE' ? 'bg-qred-pale text-qred border-2 border-qred/50' : 'border border-qgrey-2 text-qtext-light'}`}>Critique</button>
                         </div>
                     </div>
 
