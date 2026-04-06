@@ -44,7 +44,7 @@ export default function GenerateReceiptForm({
             })
 
             if (result.error) {
-                setError(result.error)
+                setError(result.message || result.error)
                 setIsPending(false)
                 return
             }
@@ -52,9 +52,9 @@ export default function GenerateReceiptForm({
             setIsModalOpen(false)
             router.push(`/dashboard/receipts`)
             router.refresh()
-        } catch (err) {
+        } catch (err: any) {
             console.error("[RECEIPT_GEN_ERROR]", err)
-            setError("Une erreur est survenue lors de la génération.")
+            setError(err.message || "Une erreur inconnue est survenue au niveau du réseau ou du serveur.")
             setIsPending(false)
         }
     }
