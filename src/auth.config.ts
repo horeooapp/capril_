@@ -120,11 +120,17 @@ export const authConfig = {
                 return Response.redirect(new URL("/auth/choose-role", nextUrl));
             }
 
+            // 4. PATH-BASED ACCESS CONTROL
+            const isAdmin = eligibleRoles.includes('ADMIN') || eligibleRoles.includes('SUPER_ADMIN');
+            const isTenant = eligibleRoles.includes('TENANT');
+            const hasDashAccess = eligibleRoles.some((r: string) => ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'].includes(r));
+
             // Access to Dashboard (Bailleurs, Agencies, Diaspora)
             if (pathname.startsWith("/dashboard")) {
-                const hasDashAccess = eligibleRoles.some((r: string) => ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'].includes(r));
                 if (!hasDashAccess) {
-                    return Response.redirect(new URL("/locataire", nextUrl));
+                    if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
+                    if (isTenant) return Response.redirect(new URL("/locataire", nextUrl));
+                    return Response.redirect(new URL("/", nextUrl));
                 }
                 if (!onboardingFait && !pathname.startsWith("/onboarding")) {
                      return Response.redirect(new URL("/onboarding", nextUrl));
@@ -133,16 +139,20 @@ export const authConfig = {
             
             // Access to Locataire
             if (pathname.startsWith("/locataire")) {
-                if (!eligibleRoles.includes('TENANT')) {
-                    return Response.redirect(new URL("/dashboard", nextUrl));
+                if (!isTenant) {
+                    if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
+                    if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
+                    return Response.redirect(new URL("/", nextUrl));
                 }
             }
 
             // Access to Admin
             if (pathname.startsWith("/admin")) {
-                if (!eligibleRoles.includes('ADMIN') && !eligibleRoles.includes('SUPER_ADMIN')) {
+                if (!isAdmin) {
                     if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
-                         return Response.redirect(new URL("/dashboard", nextUrl));
+                         if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
+                         if (isTenant) return Response.redirect(new URL("/locataire", nextUrl));
+                         return Response.redirect(new URL("/", nextUrl));
                     }
                 }
             }
