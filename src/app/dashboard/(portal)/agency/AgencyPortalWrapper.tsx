@@ -5,8 +5,9 @@ import { useAgencyData } from '@/hooks/qapril-web-hooks';
 import { AgencyPortalDashboard } from '@/components/dashboard/agency/AgencyPortalDashboard';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-export default function AgencyPortalWrapper() {
-  const { data, loading, error } = useAgencyData();
+export default function AgencyPortalWrapper({ initialData }: { initialData?: any }) {
+  const { data: fetchedData, loading, error } = useAgencyData();
+  const data = initialData || fetchedData;
 
   if (loading) {
     return (

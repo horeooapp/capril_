@@ -1,7 +1,22 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Bell, AlertTriangle, ChevronRight, TrendingUp, CheckCircle, X, Building2, FileSignature, Receipt, Wallet, BookOpen } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { 
+  Bell, 
+  AlertTriangle, 
+  ChevronRight, 
+  TrendingUp, 
+  CheckCircle, 
+  X, 
+  Building2, 
+  FileSignature, 
+  Receipt, 
+  Wallet, 
+  BookOpen,
+  Globe,
+  Handshake
+} from "lucide-react"
 import Link from "next/link"
 import { retirerProperty } from "@/actions/property.actions"
 
@@ -61,7 +76,19 @@ const Sheet = ({ open, onClose, title, tc, children }: any) => {
 
 import WalletDashboard from "./WalletDashboard"
 
-export function OwnerPortalDashboard({ user, properties: initialProperties }: { user: any, properties: any[] }) {
+export function OwnerPortalDashboard({ 
+  user, 
+  properties: initialProperties,
+  diasporaData,
+  intermData,
+  activeRole
+}: { 
+  user: any, 
+  properties: any[],
+  diasporaData?: any,
+  intermData?: any,
+  activeRole?: string
+}) {
   const [activeTab, setActiveTab] = useState<"overview" | "wallet">("overview");
   const [sheets, setSheets] = useState<Record<string, boolean>>({});
   const [selectedEntite, setSelectedEntite] = useState<any>(null);
@@ -154,9 +181,29 @@ export function OwnerPortalDashboard({ user, properties: initialProperties }: { 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">Espace Propriétaire • Supervision</p>
-            <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
-              Bonjour, {((user?.firstName || '') + ' ' + (user?.lastName || '')).trim() || "Propriétaire"}.
+            {diasporaData && (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="inline-flex items-center gap-3 px-4 py-2 bg-[#0D2B6E] text-white rounded-full text-[9px] font-black uppercase tracking-[0.2em] mb-4 shadow-lg shadow-blue-900/20"
+              >
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <Globe size={12} className="text-blue-300" />
+                QAPRIL Diaspora • Connecté à l'International
+              </motion.div>
+            )}
+            
+            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">
+              {activeRole === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire Privé' : activeRole === 'INTERMEDIARY' ? 'Intermédiaire de Gestion' : 'Espace Propriétaire'} • Supervision
+            </p>
+            <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none flex items-center gap-4 flex-wrap">
+              Bonjour, {((user?.firstName || '') + ' ' + (user?.lastName || '')).trim() || "Utilisateur"}.
+              {intermData && (
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-100 rounded-lg text-[9px] font-black uppercase tracking-widest leading-none">
+                   <Handshake size={12} />
+                   Mandat Actif
+                </span>
+              )}
             </h1>
             
             {/* TAB SELECTOR */}

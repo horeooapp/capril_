@@ -5,8 +5,10 @@ import { useLandlordData } from '@/hooks/qapril-web-hooks';
 import { OwnerPortalDashboard } from '@/components/dashboard/owner/OwnerPortalDashboard';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-export default function OwnerPortalWrapper() {
-  const { data, loading, error } = useLandlordData();
+export default function OwnerPortalWrapper({ diasporaData, intermData, activeRole }: { diasporaData?: any, intermData?: any, activeRole?: string }) {
+  const { data: fetchedData, loading: dataLoading, error } = useLandlordData();
+  const data = fetchedData;
+  const loading = dataLoading && !data;
 
   if (loading) {
     return (
@@ -41,5 +43,13 @@ export default function OwnerPortalWrapper() {
 
   if (!data) return null;
 
-  return <OwnerPortalDashboard user={data.user} properties={data.properties} />;
+  return (
+    <OwnerPortalDashboard 
+      user={data.user} 
+      properties={data.properties} 
+      diasporaData={diasporaData}
+      intermData={intermData}
+      activeRole={activeRole}
+    />
+  );
 }

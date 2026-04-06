@@ -8,6 +8,7 @@ import {
     Home, 
     Building2, 
     Globe, 
+    Handshake,
     ShieldCheck, 
     ArrowRight,
     Loader2
@@ -41,6 +42,20 @@ const ROLE_METADATA: Record<string, {
         description: "Gestion multi-lots, mandats certifiés et tableaux de bord de performance.",
         icon: Building2,
         color: "#0F172A",
+        path: "/dashboard"
+    },
+    'NON_CERTIFIED_AGENT': {
+        title: "Gestionnaire Privé",
+        description: "Gérez plusieurs biens et locataires avec nos outils de gestion avancée.",
+        icon: Building2,
+        color: "#334155",
+        path: "/dashboard"
+    },
+    'INTERMEDIARY': {
+        title: "Intermédiaire de Gestion",
+        description: "Accès délégué pour la supervision et le suivi des dossiers de location.",
+        icon: Handshake,
+        color: "#64748b",
         path: "/dashboard"
     },
     'DIASPORA': {

@@ -85,14 +85,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         const isDiaspora = (user as any).diasporaAbonnement === true;
                         const isLandlord = userRole === 'LANDLORD' || userRole === 'LANDLORD_PRO' || user._count.propertiesOwned > 0;
                         const isTenant = userRole === 'TENANT' || user._count.leasesAsTenant > 0;
-                        const isAgency = userRole === 'AGENCY' || user._count.mandates > 0;
+                        const isAgency = userRole === 'AGENCY' || userRole === 'NON_CERTIFIED_AGENT' || user._count.mandates > 0;
+                        const isIntermediary = (user as any).profileType === 'INTERMEDIARY';
                         const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
 
                         // Compile eligible roles
                         const eligibleRolesSet = new Set<string>();
                         if (isLandlord) eligibleRolesSet.add('LANDLORD');
                         if (isTenant) eligibleRolesSet.add('TENANT');
-                        if (isAgency) eligibleRolesSet.add('AGENCY');
+                        if (isAgency) {
+                            eligibleRolesSet.add('AGENCY');
+                            if (userRole === 'NON_CERTIFIED_AGENT') eligibleRolesSet.add('NON_CERTIFIED_AGENT');
+                        }
+                        if (isIntermediary) eligibleRolesSet.add('INTERMEDIARY');
                         if (isDiaspora) eligibleRolesSet.add('DIASPORA');
                         if (isAdmin) eligibleRolesSet.add('ADMIN');
 
@@ -107,10 +112,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }
 
                         // ASSOUPLISSEMENT DES RÈGLES : Un utilisateur peut cumuler Locataire et Propriétaire
-                        const isDashboardRequest = ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(reqRole);
+                        const isDashboardRequest = ['LANDLORD', 'AGENCY', 'NON_CERTIFIED_AGENT', 'INTERMEDIARY', 'DIASPORA'].includes(reqRole);
                         
                         if (isDashboardRequest) {
-                            const hasAnyDashboardRole = Array.from(eligibleRolesSet).some(r => ['LANDLORD', 'AGENCY', 'DIASPORA'].includes(r));
+                            const hasAnyDashboardRole = Array.from(eligibleRolesSet).some(r => ['LANDLORD', 'AGENCY', 'NON_CERTIFIED_AGENT', 'INTERMEDIARY', 'DIASPORA'].includes(r));
                             if (!hasAnyDashboardRole) {
                                 // On lui octroie dynamiquement le rôle demandé (ex: LANDLORD) pour qu'il puisse y accéder
                                 eligibleRolesSet.add(reqRole);

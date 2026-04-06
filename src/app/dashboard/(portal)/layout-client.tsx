@@ -46,8 +46,9 @@ export default function DashboardLayoutClient({
     const pathname = usePathname()
 
     const role = session?.user?.chosenRole || session?.user?.role;
-    const isAgency = role === 'AGENCY';
-    const isManager = isAgency && agencyConfig?.isManager !== false;
+    const isAgency = role === 'AGENCY' || role === 'NON_CERTIFIED_AGENT';
+    const isIntermediary = role === 'INTERMEDIARY';
+    const isManager = isAgency && (agencyConfig?.isManager !== false);
     const perms = agencyConfig?.permissions || [];
 
     const getNavLinks = () => {
