@@ -28,10 +28,10 @@ export default function DashboardOverviewClient({
 }) {
     if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole)) {
         let payload = undefined;
-        if (agencyData?.success && agencyData.data) {
+        if (agencyData) {
             payload = {
-                ...agencyData.data,
-                candidates: agencyData.data.candidatures || []
+                ...agencyData,
+                candidates: agencyData.candidatures || []
             };
         }
         return <AgencyPortalWrapper initialData={payload} />;

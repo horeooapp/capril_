@@ -60,7 +60,7 @@ export function useAgencyData(initialData?: any) {
         ]);
         setData({ user, properties, candidates: candidates.candidates || [] });
       } catch (e: any) {
-        setError(e.message);
+        setError("Impossible de charger les données Agence via l'API client obsolète. Veuillez rafraîchir la page ou contacter l'admin.");
       } finally {
         setLoading(false);
       }
