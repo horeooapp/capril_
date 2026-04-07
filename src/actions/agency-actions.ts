@@ -77,9 +77,9 @@ export async function getAgencyDashboardData() {
     const userId = session.user.id;
 
     try {
-        // 1. Get Property Accesses
+        // 1. Get Property Accesses (Fixed schema mismatch: PropertyAccess does not have 'statut' or 'profil')
         const accesses = await (prisma as any).propertyAccess.findMany({
-            where: { userId, statut: "ACTIF" },
+            where: { userId, revokedAt: null },
             include: {
                 property: {
                     include: {
@@ -95,37 +95,56 @@ export async function getAgencyDashboardData() {
             }
         });
 
+        // Get properties directly managed by the agency (if they created them directly)
+        const directProperties = await (prisma as any).property.findMany({
+            where: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] },
+            include: {
+                owner: { select: { firstName: true, lastName: true, id: true } },
+                leases: {
+                    where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },
+                    include: {
+                        tenant: { select: { firstName: true, lastName: true, id: true } }
+                    }
+                }
+            }
+        });
+
+        // Merge properties avoiding duplicates
+        const allPropertiesMap = new Map();
+        directProperties.forEach((p: any) => allPropertiesMap.set(p.id, p));
+        accesses.forEach((a: any) => { if (a.property) allPropertiesMap.set(a.propertyId, a.property); });
+        
+        const mergedProperties = Array.from(allPropertiesMap.values());
+
         // 2. Determine Role (Chef vs Collaborateur)
-        // Rule MM-04: Collaborateurs have limited visibility
-        const isChef = session.user.role === "AGENCY" || accesses.some((a: any) => a.profil === "chef");
+        const isChef = ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE', 'AGENCE_NON_AGREE'].includes(session.user.role) || (session.user as any).capaciteActive?.includes('AGENCY');
         const agencyRole = isChef ? "chef" : "collaborateur";
 
         // 3. Process Properties with Masking (Rule MM-04)
-        const processedProperties = accesses.map((acc: any) => {
-            const p = acc.property;
+        const processedProperties = mergedProperties.map((p: any) => {
             const isMasked = !isChef; // Rule MM-04: Mask for collaborators
 
             return {
                 ...p,
                 landlord: {
                     ...p.owner,
-                    fullName: isMasked ? ((p.owner.firstName ? p.owner.firstName + " " : "") + (p.owner.lastName || "").substring(0, 3) + "***") : (p.owner.firstName ? p.owner.firstName + " " : "") + (p.owner.lastName || "")
+                    fullName: isMasked ? ((p.owner?.firstName ? p.owner.firstName + " " : "") + (p.owner?.lastName || "").substring(0, 3) + "***") : ((p.owner?.firstName ? p.owner.firstName + " " : "") + (p.owner?.lastName || ""))
                 },
-                leases: p.leases.map((l: any) => ({
+                leases: p.leases?.map((l: any) => ({
                     ...l,
                     tenantName: isMasked ? "Locataire Masqué" : ((l.tenant?.firstName ? l.tenant.firstName + " " : "") + (l.tenant?.lastName || "") || "Anonyme")
-                }))
+                })) || []
             };
         });
 
         // 4. Fetch Candidatures (M-CAND)
-        const propertyIds = accesses.map((a: any) => a.propertyId);
-        const candidatures = await (prisma as any).candidature.findMany({
+        const propertyIds = mergedProperties.map((p: any) => p.id);
+        const candidatures = propertyIds.length > 0 ? await (prisma as any).candidature.findMany({
             where: { logementId: { in: propertyIds } },
             orderBy: { createdAt: "desc" }
-        });
+        }) : [];
 
-        // 5. Apply KPI Logic (Reusing or extending getAgencyKpis logic)
+        // 5. Apply KPI Logic
         const kpis = await getAgencyKpis(userId);
 
         return {
