@@ -12,8 +12,13 @@ export default async function OwnerProfilePage() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { identityDocuments: { orderBy: { createdAt: "desc" } } }
+        include: { 
+            identityDocuments: { orderBy: { createdAt: "desc" } },
+            agenceProfile: true
+        }
     })
+
+    const agencyProfile = (user as any)?.agenceProfile;
 
     const primaryDoc = user?.identityDocuments?.find(d => !['DFE','RCCM','NIF','AGREMENT'].includes(d.docType)) || user?.identityDocuments?.[0];
     const dfeDoc = user?.identityDocuments?.find(d => d.docType === 'DFE');
@@ -42,9 +47,12 @@ export default async function OwnerProfilePage() {
                     </div>
                     <div className="text-center md:text-left">
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
-                            {(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL"}
+                            {activeRole === "AGENCY" && agencyProfile?.nomAgence 
+                                ? agencyProfile.nomAgence 
+                                : ((user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL")
+                            }
                         </h1>
-                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{user?.email}</p>
+                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{activeRole === "AGENCY" && agencyProfile?.adresseLocal ? agencyProfile.adresseLocal : user?.email}</p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
                             <span className="px-4 py-1.5 bg-white border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 shadow-sm">
                                 Niveau KYC : {user?.kycLevel || 1}
@@ -82,10 +90,15 @@ export default async function OwnerProfilePage() {
                             docType: primaryDoc?.docType,
                             docNumber: primaryDoc?.docNumber,
                             // Agency
-                            dfe: dfeDoc?.docNumber,
-                            rccm: rccmDoc?.docNumber,
-                            nif: nifDoc?.docNumber,
-                            agrement: agrementDoc?.docNumber
+                            dfe: agencyProfile?.dfe || dfeDoc?.docNumber,
+                            rccm: agencyProfile?.rccm || rccmDoc?.docNumber,
+                            nif: agencyProfile?.nif || nifDoc?.docNumber,
+                            agrement: agencyProfile?.numeroAgrement || agrementDoc?.docNumber,
+                            nomAgence: agencyProfile?.nomAgence || user?.lastName,
+                            adresseLocal: agencyProfile?.adresseLocal,
+                            garantieFinanciere: agencyProfile?.garantieFinanciere,
+                            rcPro: agencyProfile?.rcPro,
+                            numEnregistrement: agencyProfile?.numEnregistrement
                         }} 
                     />
                 </div>

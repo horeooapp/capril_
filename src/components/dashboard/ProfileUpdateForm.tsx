@@ -29,7 +29,12 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
         dfe: initialData?.dfe || "",
         rccm: initialData?.rccm || "",
         nif: initialData?.nif || "",
-        agrement: initialData?.agrement || ""
+        agrement: initialData?.agrement || "",
+        nomAgence: initialData?.nomAgence || initialData?.lastName || "",
+        adresseLocal: initialData?.adresseLocal || "",
+        garantieFinanciere: initialData?.garantieFinanciere || "",
+        rcPro: initialData?.rcPro || "",
+        numEnregistrement: initialData?.numEnregistrement || ""
     })
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +70,12 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                 dfe: formData.dfe,
                 rccm: formData.rccm,
                 nif: formData.nif,
-                agrement: formData.agrement
+                agrement: formData.agrement,
+                nomAgence: formData.nomAgence,
+                adresseLocal: formData.adresseLocal,
+                garantieFinanciere: formData.garantieFinanciere,
+                rcPro: formData.rcPro,
+                numEnregistrement: formData.numEnregistrement
             })
 
             if (result.error) {
@@ -119,7 +129,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
             <div className={`grid grid-cols-1 ${isAgency ? '' : 'md:grid-cols-2'} gap-6`}>
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79] pl-2">
-                        {isAgency ? "Raison Sociale (Nom de l'Agence)" : "Nom de Famille"}
+                        {isAgency ? "Nom de Famille (Représentant Légal)" : "Nom de Famille"}
                     </label>
                     <input 
                         required 
@@ -128,7 +138,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                         autoComplete="family-name"
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                         className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed" 
-                        placeholder={isAgency ? "Ex: QAPRIL IMMOBILIER" : "Ex: Koné"}
+                        placeholder={isAgency ? "Ex: Koné" : "Ex: Koné"}
                     />
                 </div>
                 {!isAgency && (
@@ -255,48 +265,90 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                 <div className="p-8 bg-[#1F4E79]/5 border border-[#1F4E79]/10 rounded-[2.5rem] space-y-6">
                     <h4 className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-3">
                         <ShieldCheck size={20} className="text-[#C55A11]" /> 
-                        Accréditations & Conformité Fiscale
+                        Identité Professionnelle & Conformité Fiscale
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">N° Agrément Ministériel</label>
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Nom de l'Agence / Raison Sociale</label>
                             <input 
                                 required 
-                                value={formData.agrement}
-                                onChange={(e) => setFormData({...formData, agrement: e.target.value})}
+                                value={formData.nomAgence}
+                                onChange={(e) => setFormData({...formData, nomAgence: e.target.value})}
                                 className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
-                                placeholder="Numéro d'agrément"
+                                placeholder="Ex: QAPRIL IMMOBILIER"
                             />
                         </div>
+
                         <div className="space-y-2">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Compte Contribuable (NIF)</label>
+                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Localisation Géographique / Siège Social</label>
                             <input 
                                 required 
-                                value={formData.nif}
-                                onChange={(e) => setFormData({...formData, nif: e.target.value})}
+                                value={formData.adresseLocal}
+                                onChange={(e) => setFormData({...formData, adresseLocal: e.target.value})}
                                 className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
-                                placeholder="N° Compte Contribuable"
+                                placeholder="Adresse complète de l'agence..."
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Numéro RCCM</label>
-                            <input 
-                                required 
-                                value={formData.rccm}
-                                onChange={(e) => setFormData({...formData, rccm: e.target.value})}
-                                className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
-                                placeholder="Registre de Commerce"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Numéro DFE</label>
-                            <input 
-                                required 
-                                value={formData.dfe}
-                                onChange={(e) => setFormData({...formData, dfe: e.target.value})}
-                                className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
-                                placeholder="Déclaration Fiscale d'Existence"
-                            />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#1F4E79]/10">
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">N° Agrément Ministériel</label>
+                                <input  
+                                    value={formData.agrement}
+                                    onChange={(e) => setFormData({...formData, agrement: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="Numéro d'agrément"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Compte Contribuable (NIF)</label>
+                                <input 
+                                    required 
+                                    value={formData.nif}
+                                    onChange={(e) => setFormData({...formData, nif: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="N° Compte Contribuable"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Numéro RCCM</label>
+                                <input 
+                                    required 
+                                    value={formData.rccm}
+                                    onChange={(e) => setFormData({...formData, rccm: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="Registre de Commerce"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">Numéro DFE</label>
+                                <input 
+                                    required 
+                                    value={formData.dfe}
+                                    onChange={(e) => setFormData({...formData, dfe: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="Déclaration Fiscale d'Existence"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">N° Assurance RC Pro</label>
+                                <input 
+                                    value={formData.rcPro}
+                                    onChange={(e) => setFormData({...formData, rcPro: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="Ex: Police N°..."
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">N° Garantie Financière</label>
+                                <input 
+                                    value={formData.garantieFinanciere}
+                                    onChange={(e) => setFormData({...formData, garantieFinanciere: e.target.value})}
+                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    placeholder="Attestation..."
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

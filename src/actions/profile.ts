@@ -27,6 +27,11 @@ export async function updateUserProfile(data: {
     rccm?: string;
     nif?: string;
     agrement?: string;
+    nomAgence?: string;
+    adresseLocal?: string;
+    garantieFinanciere?: string;
+    rcPro?: string;
+    numEnregistrement?: string;
 }) {
     const session = await auth()
     if (!session || !session.user || !session.user.id) {
@@ -129,19 +134,27 @@ export async function updateUserProfile(data: {
                     await tx.agenceProfile.upsert({
                         where: { userId: session.user.id },
                         update: {
-                            nomAgence: finalLastName,
+                            nomAgence: data.nomAgence || finalLastName,
                             rccm: data.rccm || "",
                             dfe: data.dfe || "",
                             nif: data.nif || null,
                             numeroAgrement: data.agrement || null,
+                            adresseLocal: data.adresseLocal || null,
+                            garantieFinanciere: data.garantieFinanciere || null,
+                            rcPro: data.rcPro || null,
+                            numEnregistrement: data.numEnregistrement || null,
                         },
                         create: {
                             userId: session.user.id,
-                            nomAgence: finalLastName,
+                            nomAgence: data.nomAgence || finalLastName,
                             rccm: data.rccm || "",
                             dfe: data.dfe || "",
                             nif: data.nif || null,
                             numeroAgrement: data.agrement || null,
+                            adresseLocal: data.adresseLocal || null,
+                            garantieFinanciere: data.garantieFinanciere || null,
+                            rcPro: data.rcPro || null,
+                            numEnregistrement: data.numEnregistrement || null,
                         }
                     });
 
