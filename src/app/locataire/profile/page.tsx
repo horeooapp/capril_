@@ -110,6 +110,8 @@ export default async function TenantProfilePage() {
                         phone: user?.phone,
                         avatarUrl: user?.avatarUrl,
                         email: user?.email,
+                        profession: user?.profession,
+                        salary: user?.salary,
                         docType: primaryDoc?.docType,
                         docNumber: primaryDoc?.docNumber
                     }} 
