@@ -11,7 +11,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
 
-    const isAgency = activeRole === "AGENCY";
+    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole || '');
 
     const [formData, setFormData] = useState({
         firstName: initialData?.firstName || "",

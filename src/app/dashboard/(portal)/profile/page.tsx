@@ -27,8 +27,10 @@ export default async function OwnerProfilePage() {
     const agrementDoc = user?.identityDocuments?.find(d => d.docType === 'AGREMENT');
     const activeRole = (session.user as any)?.chosenRole || session.user.role;
     
+    const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole);
+
     let displayRole = "PROPRIÉTAIRE";
-    if (activeRole === "AGENCY") displayRole = "AGENCE";
+    if (isAgencyRole) displayRole = "AGENCE";
     if (activeRole === "DIASPORA") displayRole = "DIASPORA";
     if (activeRole === "CHAMPION") displayRole = "CHAMPION";
 
@@ -47,12 +49,12 @@ export default async function OwnerProfilePage() {
                     </div>
                     <div className="text-center md:text-left">
                         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
-                            {activeRole === "AGENCY" && agencyProfile?.nomAgence 
+                            {isAgencyRole && agencyProfile?.nomAgence 
                                 ? agencyProfile.nomAgence 
                                 : ((user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL")
                             }
                         </h1>
-                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{activeRole === "AGENCY" && agencyProfile?.adresseLocal ? agencyProfile.adresseLocal : user?.email}</p>
+                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{isAgencyRole && agencyProfile?.adresseLocal ? agencyProfile.adresseLocal : user?.email}</p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
                             <span className="px-4 py-1.5 bg-white border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 shadow-sm">
                                 Niveau KYC : {user?.kycLevel || 1}
