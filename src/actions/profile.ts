@@ -124,6 +124,38 @@ export async function updateUserProfile(data: {
                             });
                         }
                     }
+
+                    // ADDED: Sync with AgenceProfile table
+                    await tx.agenceProfile.upsert({
+                        where: { userId: session.user.id },
+                        update: {
+                            nomAgence: finalLastName,
+                            rccm: data.rccm || "",
+                            dfe: data.dfe || "",
+                            nif: data.nif || null,
+                            numeroAgrement: data.agrement || null,
+                        },
+                        create: {
+                            userId: session.user.id,
+                            nomAgence: finalLastName,
+                            rccm: data.rccm || "",
+                            dfe: data.dfe || "",
+                            nif: data.nif || null,
+                            numeroAgrement: data.agrement || null,
+                        }
+                    });
+
+                    // ADDED: Sync with LegalEntity if linked
+                    if (user.legalEntityId) {
+                        await tx.legalEntity.update({
+                            where: { id: user.legalEntityId },
+                            data: {
+                                companyName: finalLastName,
+                                rccmNumber: data.rccm || "",
+                                nifNumber: data.nif || null
+                            }
+                        });
+                    }
                 } else if (data.docType && data.docNumber) {
                     const existingDoc = await tx.identityDocument.findFirst({
                         where: { 

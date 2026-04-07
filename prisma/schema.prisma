@@ -1343,6 +1343,8 @@ model AgenceProfile {
   nomAgence         String  @map("nom_agence")
   rccm              String  @map("rccm")
   dfe               String  @map("dfe")
+  nif               String? @map("nif")
+  nifDate           DateTime? @map("nif_date")
   numEnregistrement String? @map("num_enregistrement")
   adresseLocal      String? @map("adresse_local")
 

@@ -31,6 +31,9 @@ export async function upsertAgencyProfile(data: {
     nomAgence: string
     rccm: string
     dfe: string
+    nif?: string
+    nifDate?: Date | null
+    numeroAgrement?: string
     numEnregistrement?: string
     adresseLocal?: string
 }) {
@@ -51,6 +54,9 @@ export async function upsertAgencyProfile(data: {
                 nomAgence: data.nomAgence,
                 rccm: data.rccm,
                 dfe: data.dfe,
+                nif: data.nif || null,
+                nifDate: data.nifDate || null,
+                numeroAgrement: data.numeroAgrement || null,
                 numEnregistrement: data.numEnregistrement || null,
                 adresseLocal: data.adresseLocal || null,
             },
@@ -59,6 +65,9 @@ export async function upsertAgencyProfile(data: {
                 nomAgence: data.nomAgence,
                 rccm: data.rccm,
                 dfe: data.dfe,
+                nif: data.nif || null,
+                nifDate: data.nifDate || null,
+                numeroAgrement: data.numeroAgrement || null,
                 numEnregistrement: data.numEnregistrement || null,
                 adresseLocal: data.adresseLocal || null,
             }
