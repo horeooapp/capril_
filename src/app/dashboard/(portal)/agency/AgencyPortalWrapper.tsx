@@ -6,8 +6,7 @@ import { AgencyPortalDashboard } from '@/components/dashboard/agency/AgencyPorta
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function AgencyPortalWrapper({ initialData }: { initialData?: any }) {
-  const { data: fetchedData, loading, error } = useAgencyData();
-  const data = initialData || fetchedData;
+  const { data, loading, error } = useAgencyData(initialData);
 
   if (loading) {
     return (

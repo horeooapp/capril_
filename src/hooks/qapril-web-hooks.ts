@@ -43,12 +43,13 @@ export function useLandlordData() {
 /**
  * Hook for Agency (Agence)
  */
-export function useAgencyData() {
-  const [data, setData] = useState<{ user: any, properties: any[], candidates: any[] } | null>(null);
-  const [loading, setLoading] = useState(true);
+export function useAgencyData(initialData?: any) {
+  const [data, setData] = useState<{ user: any, properties: any[], candidates: any[] } | null>(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialData) return;
     async function load() {
       try {
         setLoading(true);
@@ -65,7 +66,7 @@ export function useAgencyData() {
       }
     }
     load();
-  }, []);
+  }, [initialData]);
 
   return { data, loading, error };
 }
