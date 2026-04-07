@@ -20,7 +20,8 @@ export default async function DashboardPage() {
         redirect("/dashboard/login");
     }
 
-    const activeRole = (session.user as any).chosenRole || user.role;
+    // [FIX DÉFINITIF] Prioritize chosenRole (from Redis) or Database preference (capaciteActive)
+    const activeRole = (session.user as any).chosenRole || (session.user as any).capaciteActive || user.role;
 
     const [properties, reports, diasporaData, intermData, agencyData, tenantBail, tenantReceipts] = await Promise.all([
         getProperties() as Promise<any[]>,

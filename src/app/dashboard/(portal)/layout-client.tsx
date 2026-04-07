@@ -202,7 +202,8 @@ export default function DashboardLayoutClient({
                 {session?.user && (
                     <BottomNav items={[
                         ...navLinks, 
-                        ...(session.user.eligibleRoles?.length > 1 
+                        // Show "Profils" if the user has multiple roles OR is a manager (to allow switching to other capacities)
+                        ...((session.user.eligibleRoles?.length > 1 || (session.user as any).capacites?.length > 1)
                             ? [{ href: "/auth/choose-role", label: "Profils", icon: <User size={24} /> }] 
                             : []),
                         { label: "Quitter", icon: <LogOut size={24} />, onClick: () => handleLogout() }

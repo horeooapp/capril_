@@ -34,16 +34,11 @@ export const authConfig = {
                 token.capaciteActive = (user as any).capaciteActive
                 token.capacites = (user as any).capacites
                 
-                // Only default to a role if there's only one choice.
-                // Otherwise, leave null to trigger the selection page.
-                if ((user as any).eligibleRoles?.length === 1) {
-                    token.chosenRole = (user as any).eligibleRoles[0]
-                } else {
-                    token.chosenRole = (user as any).chosenRole || null
-                }
+                // PRIORITY: If we have a choice from the DB, it's our chosenRole
+                token.chosenRole = (user as any).capaciteActive || (user as any).chosenRole || null
             }
 
-            // [FIX DÉFINITIF] Sync dynamic role from Redis if not present or during refresh
+            // Sync with Redis for immediate UI response (Lock)
             if (token.id) {
                 try {
                     const { redis } = await import("@/lib/redis");
@@ -51,11 +46,13 @@ export const authConfig = {
                         const globalActiveRole = await redis.get(`user:active_role:${token.id}`);
                         if (globalActiveRole) {
                             token.chosenRole = globalActiveRole;
+                        } else if (token.chosenRole) {
+                            // If Redis is empty but we have a choice in token, seed Redis
+                            await redis.set(`user:active_role:${token.id}`, token.chosenRole);
                         }
                     }
                 } catch (e) {
-                    // Fail silent to avoid blocking auth if redis is down
-                    console.error("[AUTH_CONFIG] Redis Sync Error:", e);
+                    console.error("[AUTH_CONFIG] Sync Error:", e);
                 }
             }
 
