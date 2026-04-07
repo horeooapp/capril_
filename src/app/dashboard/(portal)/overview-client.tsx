@@ -27,7 +27,10 @@ export default function DashboardOverviewClient({
     tenantData?: any
 }) {
     if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole)) {
-        return <AgencyPortalWrapper initialData={agencyData} />;
+        const payload = agencyData?.success ? agencyData.data : undefined;
+        // Also map candidatures to candidates to match the expected format from client fallback if needed
+        if (payload && payload.candidatures) { payload.candidates = payload.candidatures; }
+        return <AgencyPortalWrapper initialData={payload} />;
     }
 
     if (activeRole === 'INTERMEDIARY') {
