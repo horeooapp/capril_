@@ -114,7 +114,7 @@ export async function calculateUserScore(userId: string) {
     });
 
     if (quittances.length > 0) {
-        const payesATemps = quittances.filter(q => q.status === 'paid').length;
+        const payesATemps = quittances.filter(q => String(q.status).toLowerCase() === 'paid').length;
         punctuality = Math.round((payesATemps / quittances.length) * 600);
     } else {
         // Nouveau locataire : Base ponctualité neutre (Silver start candidate)
@@ -158,7 +158,7 @@ export async function calculateUserScore(userId: string) {
         badge: getScoreBadge(score),
         breakdown: { punctuality, stability, kyc },
         tauxPaiement12m: quittances.length > 0 
-            ? Math.round((quittances.filter(q => q.status === 'paid').length / quittances.length) * 100) 
+            ? Math.round((quittances.filter(q => String(q.status).toLowerCase() === 'paid').length / quittances.length) * 100) 
             : 100
     };
 }
