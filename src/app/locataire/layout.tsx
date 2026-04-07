@@ -17,23 +17,30 @@ export default async function LocataireLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
-    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    
+    let computedRole = (session?.user as any)?.chosenRole || session?.user?.role;
     if (session?.user) {
+        const dbUser = await prisma.user.findUnique({
+             where: { id: session.user.id },
+             select: { capaciteActive: true }
+        });
+        computedRole = (dbUser as any)?.capaciteActive || computedRole;
+
         // CRITICAL: Verify Global Role Concurrency Lock
-        const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
+        const isGloballyActive = await isRoleGloballyActive(session.user.id, computedRole);
         if (!isGloballyActive) {
-            // This browser has a stale role, force logout
-            redirect("/api/auth/signout")
+            // Just sync redis with DB to self-heal
+            const { redis } = await import("@/lib/redis");
+            if (redis) await redis.set(`user:active_role:${session.user.id}`, computedRole);
         }
 
-        if (activeRole !== "TENANT") {
+        if (computedRole !== "TENANT") {
             redirect("/dashboard")
         }
     }
 
+
     // 3. Security: Check onboarding but with extreme robustness
-    if (activeRole === "TENANT") {
+    if (computedRole === "TENANT") {
         try {
             if (!session?.user?.id) {
                 // Should not happen, but prevents Prisma crash

@@ -27,12 +27,13 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    // CRITICAL: Verify Global Role Concurrency Lock
-    const activeRole = (session.user as any).chosenRole || session.user.role;
+    // CRITICAL: Verify active role carefully. We prioritize DB state (capaciteActive) because cookie updates can lag behind UI.
+    const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
     const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
     if (!isGloballyActive) {
-        // This browser has a stale role, force logout
-        redirect("/api/auth/signout")
+        // Just sync redis with DB to self-heal
+        const { redis } = await import("@/lib/redis");
+        if (redis) await redis.set(`user:active_role:${session.user.id}`, activeRole);
     }
 
     // Role Enforcement based on activeRole, NOT hardcoded dbUser.role
@@ -46,7 +47,7 @@ export default async function DashboardLayout({
     }
 
     return (
-        <DashboardLayoutClient session={session} agencyConfig={(dbUser as any).agencyConfig}>
+        <DashboardLayoutClient session={session} dbActiveRole={activeRole} agencyConfig={(dbUser as any).agencyConfig}>
             {children}
         </DashboardLayoutClient>
     )
