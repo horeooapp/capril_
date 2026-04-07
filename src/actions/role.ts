@@ -19,10 +19,17 @@ export async function setChosenRole(role: string) {
         return { error: "Rôle non autorisé pour cet utilisateur" }
     }
 
-    // Set the global lock in Redis
+    // Set the global lock in Redis & Database
     if (redis) {
         await redis.set(`user:active_role:${session.user.id}`, role);
     }
+    
+    // Also persist in the DB for consistent sessions across devices
+    const { prisma } = await import("@/lib/prisma");
+    await prisma.user.update({
+        where: { id: session.user.id },
+        data: { capaciteActive: role }
+    });
     
     console.log(`[AUTH] User ${session.user.email} chose role: ${role}`)
     

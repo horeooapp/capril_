@@ -30,7 +30,7 @@ import {
 import ProtectedLogo from "@/components/ProtectedLogo"
 
 interface AppSidebarProps {
-    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA'
+    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
     onLogout: () => void | Promise<void>
     userName?: string | null
     diasporaAbonnement?: boolean
@@ -54,7 +54,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             ]
         }
         
-        if (role === 'AGENCY' || role === 'NON_CERTIFIED_AGENT') {
+        if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(role)) {
             const isManager = agencyConfig?.isManager !== false // Default to manager if undefined to prevent locking out legacy users
             const perms = agencyConfig?.permissions || []
 
@@ -108,8 +108,8 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                         <div className="flex items-center gap-2 mt-1">
                             <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase">
                                 {role === 'TENANT' ? 'Locataire' 
-                                 : role === 'AGENCY' ? 'Agence' 
-                                 : role === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire' 
+                                 : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role) ? 'Agence' 
+                                 : ['NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role) ? 'Gestionnaire' 
                                  : role === 'INTERMEDIARY' ? 'Intermédiaire'
                                  : role === 'DIASPORA' ? 'Diaspora'
                                  : 'PROPRIÉTAIRE'}

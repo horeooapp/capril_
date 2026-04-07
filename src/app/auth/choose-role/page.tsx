@@ -54,6 +54,24 @@ const ROLE_METADATA: Record<string, {
         glow: "rgba(15, 23, 42, 0.15)",
         path: "/dashboard"
     },
+    'AGENCE_AGREE': {
+        title: "Agence Agréée",
+        subtitle: "EXPERTISE CERTIFIÉE",
+        description: "Accès complet aux outils métiers pour agences avec agrément d'état.",
+        icon: ShieldCheck,
+        color: "#0D2B6E",
+        glow: "rgba(13, 43, 110, 0.15)",
+        path: "/dashboard"
+    },
+    'AGENCE_NON_AGREE': {
+        title: "Gestionnaire",
+        subtitle: "GESTION IMMOBILIÈRE",
+        description: "Outils de gestion locative pour structures non agréées ou syndics.",
+        icon: Briefcase,
+        color: "#4A5B7A",
+        glow: "rgba(74, 91, 122, 0.15)",
+        path: "/dashboard"
+    },
     'NON_CERTIFIED_AGENT': {
         title: "Gestionnaire Privé",
         subtitle: "GESTION INDÉPENDANTE",

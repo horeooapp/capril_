@@ -36,13 +36,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const otp = credentials.otp as string;
                 const requestedRole = (credentials.role as string) || 'TENANT';
 
-                // ─── CORRECTIF AUTH-BUG-01 ────────────────────────────
                 const ROLE_MAP: Record<string, string> = {
-                  BAILLEUR:  "LANDLORD",
-                  LOCATAIRE: "TENANT",
-                  ADMIN:     "ADMIN",
+                  BAILLEUR:     "LANDLORD",
+                  LOCATAIRE:    "TENANT",
+                  ADMIN:        "ADMIN",
                   PROPRIETAIRE: "LANDLORD",
-                  GESTIONNAIRE: "LANDLORD",
+                  AGENCE:       "AGENCE_AGREE",
+                  GESTIONNAIRE: "AGENCE_NON_AGREE",
                 };
 
                 const requestedRoleNormalise = ROLE_MAP[requestedRole.toUpperCase()] ?? requestedRole.toUpperCase();
@@ -133,20 +133,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                              throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
                         }
 
-                        let finalChosenRole: string | null = null;
+                        // PRIORITY: Determine chosen role based on Database State (V4)
+                        let finalChosenRole = (user as any).capaciteActive || null;
                         let requiresSelection = false;
 
-                        // Si l'utilisateur demande explicitement le portail locataire et y a droit
+                        // If explicitly requested Tenant, respect it
                         if (reqRole === 'TENANT' && eligibleRoles.includes('TENANT')) {
                             finalChosenRole = 'TENANT';
                             requiresSelection = false;
                         } 
-                        // S'il demande un espace propriétaire/agence/etc. et possède plusieurs rôles
-                        else if (eligibleRoles.length > 1) {
+                        // If no DB choice but multiple options exist, force selection
+                        else if (!finalChosenRole && eligibleRoles.length > 1) {
                             requiresSelection = true;
-                            finalChosenRole = null;
-                        } else {
-                            // S'il n'a qu'un seul rôle, on l'utilise
+                        } 
+                        // If only one choice, use it
+                        else if (!finalChosenRole && eligibleRoles.length === 1) {
                             finalChosenRole = eligibleRoles[0];
                         }
 
@@ -180,7 +181,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 status: 'PENDING_PROFILE',
                                 phone: `PENDING_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                                 onboardingComplete: typeChoisi === "LOCATAIRE",
-                                capaciteActive: typeChoisi === "LOCATAIRE" ? null : "PROPRIETAIRE"
+                                capaciteActive: typeChoisi === "LOCATAIRE" ? null : roleBase === "LANDLORD" ? "PROPRIETAIRE" : roleBase
                             }
                         });
                         

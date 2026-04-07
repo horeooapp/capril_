@@ -151,7 +151,9 @@ export default function DashboardLayoutClient({
                                     <div className="hidden sm:flex flex-col items-end">
                                         <div className="flex items-center gap-2 mb-1">
                                             <div className="bg-qgreen rounded-md px-2 py-0.5 text-[8px] font-black text-white tracking-[0.2em] uppercase">
-                                                {session.user.role === 'CHAMPION' ? 'Champion' : 'Certifié'}
+                                                {activeRole === 'CHAMPION' ? 'Champion' 
+                                                 : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(activeRole) ? 'Agence Certifiée' 
+                                                 : 'Bailleur Certifié'}
                                             </div>
                                             <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                                         </div>
