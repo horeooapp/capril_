@@ -100,15 +100,21 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
             role: role
         });
         
-        let customMessage = "";
-        // Check if the error code itself is the custom message we passed
-        if (errorCode && errorCode !== 'CredentialsSignin' && !errorCode.includes('signin') && errorCode !== 'UNKNOWN_ERROR') {
-             customMessage = errorCode;
+        const lowerMsg = (error?.message || "").toLowerCase();
+        // Use errorCode from line 94
+
+        const OTP_ERROR_MESSAGES: Record<string, string> = {
+            invalid_otp: "Code OTP incorrect ou expiré.",
+            no_valid_role: "Compte sans rôle valide. Veuillez contacter le support.",
+            database_error: "Erreur technique lors de l'authentification."
+        };
+
+        if (OTP_ERROR_MESSAGES[errorCode]) {
+            return { error: OTP_ERROR_MESSAGES[errorCode] };
         }
 
-        const lowerMsg = (error?.message || "").toLowerCase();
         if (lowerMsg.includes('credentialssignin') || error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin') {
-            return { error: customMessage || "Code OTP incorrect, expiré ou compte non autorisé." };
+            return { error: "Code OTP incorrect, expiré ou compte non autorisé." };
         }
 
         return { error: `Échec de l'authentification: ${error?.message || "Erreur interne"}` };
@@ -175,16 +181,24 @@ export async function loginWithAdminCredentials(email: string, password: string)
         }
         
         const errorString = String(error);
-        const errorStack = error?.stack || "";
+        const errorCode = error?.code || error?.type || "";
         
-        // Try to extract our CustomAuthError message from raw stack or code
-        let customMessage = "";
-        if (error?.type === 'CredentialsSignin') {
-             customMessage = error?.message || "Identifiants refusés";
-             if (customMessage.includes("CredentialsSignin")) {
-                 customMessage = "Mot de passe incorrect ou compte non trouvé.";
-             }
-             return { error: customMessage };
+        const ADMIN_ERROR_MESSAGES: Record<string, string> = {
+            domain_restricted: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)",
+            account_not_found: "Compte administrateur non trouvé.",
+            insufficient_role: "Rôle insuffisant pour accéder à la console.",
+            password_not_configured: "Mot de passe non configuré pour ce compte.",
+            invalid_password: "Mot de passe incorrect.",
+            database_error: "Erreur de base de données. Veuillez réessayer.",
+            admin_access_denied: "Accès refusé : Privilèges administrateur requis."
+        };
+
+        if (ADMIN_ERROR_MESSAGES[errorCode]) {
+            return { error: ADMIN_ERROR_MESSAGES[errorCode] };
+        }
+        
+        if (error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin') {
+             return { error: "Identifiants incorrects ou accès non autorisé." };
         }
         
         if (
@@ -192,13 +206,14 @@ export async function loginWithAdminCredentials(email: string, password: string)
             error?.name === 'CallbackRouteError' || 
             errorString.includes('CallbackRouteError')
         ) {
-             return { error: "Mot de passe incorrect." };
+             return { error: "L'authentification a échoué (erreur de routage)." };
         }
         
         console.error("[SERVER ACTION] loginWithAdminCredentials detail:", {
             name: error?.name,
             message: error?.message,
             type: error?.type,
+            code: error?.code,
             stack: error?.stack
         });
         

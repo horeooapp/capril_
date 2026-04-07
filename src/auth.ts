@@ -57,7 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const isValid = storedOtp === otp;
 
                 if (!isValid) {
-                    throw new CustomAuthError("Code OTP incorrect ou expiré.");
+                    throw new CustomAuthError("invalid_otp");
                 }
 
                 try {
@@ -106,7 +106,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         // Gestion stricte des privilèges d'administration
                         if (reqRole === 'ADMIN' || reqRole === 'SUPER_ADMIN') {
                             if (!isAdmin) {
-                                throw new CustomAuthError("Accès refusé : Privilèges administrateur requis.");
+                                throw new CustomAuthError("admin_access_denied");
                             }
                             eligibleRolesSet.add(reqRole);
                         }
@@ -130,7 +130,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         const eligibleRoles = Array.from(eligibleRolesSet);
 
                         if (eligibleRoles.length === 0) {
-                             throw new CustomAuthError("Compte sans rôle valide. Veuillez contacter le support.");
+                             throw new CustomAuthError("no_valid_role");
                         }
 
                         // PRIORITY: Determine chosen role based on Database State (V4)
@@ -204,7 +204,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         throw dbError;
                     }
                     console.error("[AUTH] Database Error in authorize:", dbError?.message || dbError);
-                    throw new CustomAuthError("Database error");
+                    throw new CustomAuthError("database_error");
                 }
             }
         }),
@@ -225,7 +225,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     // 1. Domain Restriction
                     if (!email.endsWith("@qapril.ci") && !email.endsWith("@qapril.net")) {
-                        throw new CustomAuthError("Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)");
+                        throw new CustomAuthError("domain_restricted");
                     }
 
                     const user = await prisma.user.findFirst({
@@ -233,15 +233,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (!user) {
-                        throw new CustomAuthError("Compte non trouvé.");
+                        throw new CustomAuthError("account_not_found");
                     }
 
                     if (!['ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
-                        throw new CustomAuthError("Rôle insuffisant pour accéder à la console");
+                        throw new CustomAuthError("insufficient_role");
                     }
 
                     if (!user.password) {
-                        throw new CustomAuthError("Mot de passe non configuré");
+                        throw new CustomAuthError("password_not_configured");
                     }
 
                     // 2. Verify password
@@ -249,7 +249,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const isValidPassword = await compare(password, user.password);
 
                     if (!isValidPassword) {
-                        throw new CustomAuthError("Mot de passe incorrect");
+                        throw new CustomAuthError("invalid_password");
                     }
 
                     // 3. SuperAdmin Logic
