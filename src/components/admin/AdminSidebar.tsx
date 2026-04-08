@@ -51,7 +51,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
         { href: "/admin/compliance", label: "Conformité KYC", icon: <ShieldAlert size={20} /> },
         { href: "/admin/disputes", label: "Médiation & Litiges", icon: <Scale size={20} /> },
         { href: "/admin/system/ai-monitoring", label: "Supervision IA", icon: <Bot size={20} /> },
-        { href: "/admin/settings/features", label: "Modules Core", icon: <Settings2 size={20} /> },
+        { href: "/admin/system", label: "Configuration Système", icon: <Settings2 size={20} /> },
         { href: "/admin/users", label: "Utilisateurs", icon: <Users size={20} /> },
         { href: "/admin/edl", label: "États des Lieux", icon: <ClipboardCheck size={20} /> },
         { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },
