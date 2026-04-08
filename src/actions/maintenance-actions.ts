@@ -50,28 +50,33 @@ export async function createMaintenanceTicket(data: {
  * Récupérer tous les tickets (compatibilité admin)
  */
 export async function getPropertyTickets(propertyId: string | "all") {
-  await ensureAuthenticated();
-  
-  const where = propertyId === "all" ? {} : { logementId: propertyId };
-  
-  const tickets = await (prisma as any).ticketMaintenance.findMany({
-    where,
-    include: {
-      locataire: { select: { firstName: true, lastName: true } },
-      logement: { select: { address: true } },
-    },
-    orderBy: { createdAt: "desc" }
-  });
+  try {
+    await ensureAuthenticated();
+    
+    const where = propertyId === "all" ? {} : { logementId: propertyId };
+    
+    const tickets = await (prisma as any).ticketMaintenance.findMany({
+      where,
+      include: {
+        locataire: { select: { firstName: true, lastName: true } },
+        logement: { select: { address: true } },
+      },
+      orderBy: { createdAt: "desc" }
+    });
 
-  return tickets.map((t: any) => ({
-    id: t.id,
-    titre: t.description.substring(0, 30) + "...",
-    description: t.description,
-    statut: mapStatusToLegacy(t.statut),
-    createdAt: t.createdAt,
-    declarant: { fullName: (t.locataire?.firstName ? t.locataire.firstName + " " : "") + (t.locataire?.lastName || "") || "Anonyme" },
-    logement: { address: t.logement?.address || "N/A" }
-  }));
+    return tickets.map((t: any) => ({
+      id: t.id,
+      titre: t.description.substring(0, 30) + "...",
+      description: t.description,
+      statut: mapStatusToLegacy(t.statut),
+      createdAt: t.createdAt,
+      declarant: { fullName: (t.locataire?.firstName ? t.locataire.firstName + " " : "") + (t.locataire?.lastName || "") || "Anonyme" },
+      logement: { address: t.logement?.address || "N/A" }
+    }));
+  } catch (error) {
+    console.error("[Maintenance] getPropertyTickets Error:", error);
+    return [];
+  }
 }
 
 function mapStatusToLegacy(status: string): string {
