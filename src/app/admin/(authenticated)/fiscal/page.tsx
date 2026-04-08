@@ -4,7 +4,7 @@ import FiscalReminderButton from "@/components/admin/FiscalReminderButton"
 
 export default async function DGIDashboardPage() {
     const res = await getFiscalStats()
-    if (!res.success) return <div>Erreur de chargement</div>
+    if (!res.success) return <div className="p-8 text-red-500 font-bold">Erreur de chargement: {String(res.error)}</div>
 
     const { stats, recentRegistrations } = res
 

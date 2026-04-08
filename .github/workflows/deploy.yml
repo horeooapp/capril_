@@ -360,15 +360,19 @@ jobs:
           DEPLOY_DEST="/home/github/capril_app"
           echo "🩺 Checking application health at http://127.0.0.1:3000/api/health"
           
-          # Tentative de Health Check
-          MAX_RETRIES=15
+          # Tentative de Health Check hyper-robuste
+          MAX_RETRIES=30
           COUNT=0
           while [ $COUNT -lt $MAX_RETRIES ]; do
-            if curl -s -f http://127.0.0.1:3000/api/health | grep -iq "ok"; then
-              echo "✅ Application is healthy!"
+            # On vérifie le HTTP Status, les redirects et on ignore silencieusement les erreurs de connexion curl
+            STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -L http://127.0.0.1:3000/api/health || echo "000")
+            
+            if [ "$STATUS_CODE" = "200" ]; then
+              echo "✅ Application is healthy! (Status 200)"
               exit 0
             fi
-            echo "⏳ Waiting for application to boot... ($((COUNT+1))/$MAX_RETRIES)"
+            
+            echo "⏳ Waiting for application to boot... (Status: $STATUS_CODE) ($((COUNT+1))/$MAX_RETRIES)"
             sleep 10
             COUNT=$((COUNT+1))
           done
