@@ -12,12 +12,23 @@ function generateRandomPassword() {
 
 export async function authorizeAgencyManager() {
     const session = await auth()
-    if (!session?.user?.id || session.user.role !== "AGENCY") {
+    const u = session?.user as any;
+    
+    if (!u?.id) {
+        throw new Error("Accès refusé. Non connecté.")
+    }
+
+    const isAgency = 
+        ["AGENCY", "AGENCE_AGREE", "NON_CERTIFIED_AGENT"].includes(u.role) ||
+        ["AGENCY", "AGENCE_AGREE", "NON_CERTIFIED_AGENT"].includes(u.chosenRole) ||
+        u.eligibleRoles?.some((r: string) => ["AGENCY", "AGENCE_AGREE", "NON_CERTIFIED_AGENT"].includes(r));
+
+    if (!isAgency) {
         throw new Error("Accès refusé. Seules les Agences autorisées peuvent utiliser ce module.")
     }
 
     const manager = await prisma.user.findUnique({
-        where: { id: session.user.id }
+        where: { id: u.id as string }
     })
 
     if (!manager) throw new Error("Gérant introuvable.")
