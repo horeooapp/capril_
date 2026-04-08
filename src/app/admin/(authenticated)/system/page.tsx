@@ -7,6 +7,16 @@ import { motion } from "framer-motion"
 
 const FEATURES: { key: AppFeature; label: string; description: string }[] = [
     { 
+        key: "PAYMENT_GATEWAY", 
+        label: "Moyens de Paiement", 
+        description: "Active ou désactive globalement tous les encaissements via Mobile Money et Cartes Bancaires." 
+    },
+    { 
+        key: "PAYMENT_TEST_MODE", 
+        label: "Mode Test (Paiements)", 
+        description: "Bascule l'ensemble du système de paiement en mode Sandbox (Test) ou Production." 
+    },
+    { 
         key: "M17_FISCAL", 
         label: "Enregistrement Fiscal (M17)", 
         description: "Active le calcul des droits DGI et la génération des certificats fiscaux." 
@@ -158,6 +168,7 @@ export default function SystemPage() {
                                 <div className="p-3 bg-gray-700/50 rounded-lg">
                                     <span className="text-2xl">
                                         {
+                                            feature.key.includes("PAYMENT") ? "💳" :
                                             feature.key.includes("FISCAL") ? "🏦" : 
                                             feature.key.includes("SMS") ? "📱" : 
                                             feature.key === "M_MANDAT" ? "📋" :

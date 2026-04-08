@@ -23,6 +23,7 @@ export const FEATURES = {
 
   // Nouveaux Modules & Mappage CDC v3.0
   PAYMENT_GATEWAY: "M-PGW",
+  PAYMENT_TEST_MODE: "PAYMENT_TEST_MODE",
   KYC: "M01-M03",
   LEASES: "M04",
   MANDATES: "M05",
