@@ -325,11 +325,11 @@ jobs:
             echo "--- Server-side schema.prisma snippet ---"
             grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
 
-            echo "📦 Running Prisma Migrations..."
-            npx prisma@6.4.1 db push --accept-data-loss
-            
             echo "🔧 Forcing PostgreSQL Enum coercions..."
             sudo -u postgres psql -d qapril -f scripts/fix-enums-pg.sql || echo "⚠️ Non-fatal enum coercion error."
+
+            echo "📦 Running Prisma Migrations..."
+            npx prisma@6.4.1 db push --accept-data-loss
             
             # 🔥 RESTART PM2 & SEED
             echo "🌱 Running Compiled Seed Logic..."
