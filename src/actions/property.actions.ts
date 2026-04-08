@@ -21,7 +21,7 @@ export async function creerBien(data: {
   address:          string;
   propertyType:     string;
   declaredRentFcfa?: number;
-  areaSqm?:         number;
+  superficieM2?:         number;
   name?:            string;
 }) {
   // Validation hierarchie
@@ -93,7 +93,7 @@ export async function creerBien(data: {
       typeStructure:    data.typeStructure,
       parentPropertyId: data.parentPropertyId,
       declaredRentFcfa: data.declaredRentFcfa,
-      areaSqm:          data.areaSqm,
+      superficieM2:          data.superficieM2,
       status:           "draft",
     }
   });

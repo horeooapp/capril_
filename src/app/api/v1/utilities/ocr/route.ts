@@ -47,14 +47,14 @@ export async function POST(req: Request) {
                     leaseId,
                     acteurId: session.user.id,
                     roleActeur: session.user.role === 'TENANT' ? 'LOCATAIRE' : 'PROPRIO',
-                    typeUtility,
+                    typeUtility: typeUtility as any,
                     identifiantCompteur: `COMPT-OCR-${Math.floor(Math.random() * 99999)}`,
-                    moisFacture: new Date(),
+                    moisFacture: new Date().toISOString().slice(0, 7),
                     montantTotal: extractedAmount,
                     dateLimitePaiement: dueDate,
                     statut: "EN_COURS",
                     source: "OCR_VISION",
-                    modeUtilities: "PARTAGÉ_PROPRIO",
+                    modeUtilities: "PARTAGE_PROPRIO" as any,
                     invoiceUrl: mockInvoiceUrl
                 }
             });

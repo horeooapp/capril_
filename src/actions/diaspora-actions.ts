@@ -106,7 +106,7 @@ export async function designateMandatLocal(input: {
         proprietaireId: session.user.id,
         intermediaireId: mandataire.id,
         profil: input.profil,
-        biensConcernes: input.biensIds || [],
+        biens: { create: input.biensIds?.map((id: string) => ({ propertyId: id })) || [] },
         permissions: input.permissions,
         statut: "EN_ATTENTE"
       }

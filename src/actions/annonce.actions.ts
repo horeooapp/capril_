@@ -38,7 +38,7 @@ export async function getAnnoncesActives(commune?: string) {
       statut: "ACTIVE",
       ...(commune ? { logement: { commune } } : {})
     },
-    include: { logement: { select: { commune: true, address: true, propertyType: true, areaSqm: true } } },
+    include: { logement: { select: { commune: true, address: true, propertyType: true, superficieM2: true } } },
     orderBy: { publieeAt: "desc" }
   });
 }

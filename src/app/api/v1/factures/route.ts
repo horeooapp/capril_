@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         ticketRef,
         leaseId: lease.id,
         locataireId: lease.tenantId || lease.landlordId, // Le locataire est le débiteur
-        categorie: "FACTURE_UTILITY",
+        categorie: "FACTURE_UTILITY" as any,
         description,
         statut: "EN_ATTENTE", // Devient "Cloturé" quand le locataire paie
         urgence: "URGENTE", // URGENT pour éviter les coupures

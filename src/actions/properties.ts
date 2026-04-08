@@ -101,7 +101,7 @@ export async function registerProperty(data: {
     declaredRentFcfa: number,
     propertyType: string,
     rooms?: number,
-    areaSqm?: number
+    superficieM2?: number
 }) {
     const session = await ensureAuthenticated()
     const userId = session.user.id
@@ -119,7 +119,7 @@ export async function registerProperty(data: {
                 declaredRentFcfa: data.declaredRentFcfa,
                 propertyType: data.propertyType,
                 rooms: data.rooms,
-                areaSqm: data.areaSqm,
+                superficieM2: data.superficieM2,
                 status: 'active'
             }
         })
@@ -198,7 +198,7 @@ export async function getPropertyPassport(id: string) {
         return {
             ...serialized,
             type: (property as any).propertyType,
-            surface: (property as any).areaSqm ? Number((property as any).areaSqm) : null,
+            surface: (property as any).superficieM2 ? Number((property as any).superficieM2) : null,
             leases: (property.leases || []).map((lease: any) => ({
                 ...serializeLease(lease),
                 tenant: lease.tenant ? {
@@ -282,7 +282,7 @@ export async function creerBien(data: {
   address:           string;
   propertyType:      string;
   declaredRentFcfa?: number;
-  areaSqm?:          number;
+  superficieM2?:          number;
 }) {
   const session = await ensureAuthenticated();
   const ownerUserId = data.ownerUserId || session.user.id;
@@ -340,7 +340,7 @@ export async function creerBien(data: {
       address:          data.address,
       propertyType:     data.propertyType,
       declaredRentFcfa: data.declaredRentFcfa,
-      areaSqm:          data.areaSqm,
+      superficieM2:          data.superficieM2,
       status:           "active"
     }
   });

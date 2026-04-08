@@ -12,7 +12,7 @@ export async function saveFactureOCR(data: {
   roleActeur:          "PROPRIO" | "LOCATAIRE";
   typeUtility:         "CIE" | "SODECI";
   identifiantCompteur: string;
-  moisFacture:         Date;
+  moisFacture:         string;
   montantTotal:        number;
   dateLimitePaiement?: Date;
   invoiceUrl?:         string;  // URL photo/scan
@@ -39,7 +39,7 @@ export async function saveFactureOCR(data: {
 export async function markFacturePaid(factureId: string, datePaiement?: Date) {
   return prisma.factureUtility.update({
     where: { id: factureId },
-    data: { statut: "PAYÉE", datePaiement: datePaiement ?? new Date() }
+    data: { statut: "PAYEE", datePaiement: datePaiement ?? new Date() }
   });
 }
 

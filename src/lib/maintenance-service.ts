@@ -98,7 +98,7 @@ export class MaintenanceService {
     const ticket = await prisma.ticketMaintenance.update({
       where: { id: ticketId },
       data: {
-        statut: "RÉSOLU",
+        statut: "RESOLU",
         dateResolution: new Date(),
         commentaireProprio: commentaire,
       },
@@ -131,7 +131,7 @@ export class MaintenanceService {
       data: {
         confirmationLoc: confirme,
         dateConfirmation: new Date(),
-        statut: confirme ? "CLÔTURÉ" : "CONTESTÉ",
+        statut: confirme ? "CLOTURE" : "CONTESTE",
         nbReouvertures: confirme ? undefined : { increment: 1 },
       },
       include: {

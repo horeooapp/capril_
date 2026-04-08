@@ -20,7 +20,7 @@ export async function createSignalement(data: {
   leaseId:      string;
   locataireId:  string;
   logementId?:  string;
-  categorie:    string;
+  categorie:    any;
   description:  string;
   urgence?:     "URGENTE" | "NORMALE" | "BASSE";
   photoUrl?:    string;
@@ -78,7 +78,7 @@ export async function marquerVuParBailleur(ticketId: string) {
 
 // Mettre a jour le statut (bailleur/agent)
 export async function updateSignalementStatut(ticketId: string, data: {
-  statut:              string;
+  statut:              any;
   commentaireProprio?: string;
   dateResolution?:     Date;
   prestataireId?:      string;

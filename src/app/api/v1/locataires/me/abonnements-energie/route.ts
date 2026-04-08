@@ -43,9 +43,9 @@ export async function GET(req: Request) {
       history: factures.map(f => ({
         id: f.id,
         type: f.typeUtility, // CIE | SODECI
-        mois: f.moisFacture.toISOString(),
+        mois: f.moisFacture,
         montant: f.montantTotal,
-        statut: f.statut === 'PAYÉE' ? 'Réglé' : 'À payer',
+        statut: f.statut === 'PAYEE' ? 'Réglé' : 'À payer',
         limite: f.dateLimitePaiement ? f.dateLimitePaiement.toISOString() : null
       }))
     };

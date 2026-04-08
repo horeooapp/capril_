@@ -158,7 +158,7 @@ export async function enregistrerEnvoiResiliation(preavisId: string, dateEnvoi: 
       lettreResiliationEnvoyeeAt: dateEnvoi,
       modeEnvoi,
       deadlineContestation: deadline,
-      statut: "ENVOYE"
+      statut: "ENVOYE" as any
     }
   });
 }

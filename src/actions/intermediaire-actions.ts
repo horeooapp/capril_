@@ -16,7 +16,7 @@ async function checkMandatAccess(intermediaireId: string, propertyId: string) {
         where: {
             intermediaireId,
             statut: 'ACCEPTE',
-            biensConcernes: { has: propertyId }
+            biens: { some: { propertyId } }
         }
     });
     if (!mandate) {
@@ -46,7 +46,8 @@ export async function getIntermediaireDashboardData() {
             include: {
                 proprietaire: {
                     select: { firstName: true, lastName: true, id: true }
-                }
+                },
+                biens: { select: { propertyId: true } }
             }
         })
 
@@ -55,7 +56,7 @@ export async function getIntermediaireDashboardData() {
         }
 
         // 2. Extract property IDs from JSON string in MandatGestion
-        const allPropertyIds = mandates.flatMap(m => m.biensConcernes || [])
+        const allPropertyIds = mandates.flatMap(m => (m as any).biens?.map((b: any) => b.propertyId) || [])
 
         const uniquePropertyIds = Array.from(new Set(allPropertyIds))
 
@@ -114,7 +115,7 @@ export async function getIntermediaireDashboardData() {
                 : 0.05 // 5% default for Intermédiaire
             
             // Calc commissions on properties within this specific mandate
-            const mPropIds = m.biensConcernes || []
+            const mPropIds = (m as any).biens?.map((b: any) => b.propertyId) || []
             const mProps = properties.filter(p => mPropIds.includes(p.id))
             mProps.forEach(p => {
                 p.leases.forEach(l => {

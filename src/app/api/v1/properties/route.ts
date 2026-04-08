@@ -13,7 +13,7 @@ interface Property {
     declaredRentFcfa: any; // Decimal from Prisma
     propertyType: string;
     rooms: number | null;
-    areaSqm: any; // Decimal from Prisma
+    superficieM2: any; // Decimal from Prisma
     status: string;
     createdAt: Date;
     updatedAt: Date;
@@ -25,7 +25,7 @@ interface Property {
 const serializeProperty = (p: Property) => ({
     ...p,
     declaredRentFcfa: p.declaredRentFcfa?.toString() || "0",
-    areaSqm: p.areaSqm ? Number(p.areaSqm.toString()) : null
+    superficieM2: p.superficieM2 ? Number(p.superficieM2.toString()) : null
 });
 
 /**
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
                 declaredRentFcfa: declaredRentFcfa,
                 propertyType: data.propertyType,
                 rooms: data.totalRooms ? parseInt(data.totalRooms) : null,
-                areaSqm: data.usefulAreaSqm ? parseFloat(data.usefulAreaSqm) : null,
+                superficieM2: data.usefulAreaSqm ? parseFloat(data.usefulAreaSqm) : null,
                 status: 'ACTIVE'
             }
         }) as unknown as Property;

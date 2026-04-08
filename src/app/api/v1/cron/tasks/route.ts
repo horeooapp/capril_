@@ -69,7 +69,7 @@ export async function GET(req: Request) {
       // Escalader le ticket pour éviter une double sanction demain
       await prisma.ticketMaintenance.update({
           where: { id: ticket.id },
-          data: { statut: 'ESCALADEE' }
+          data: { statut: 'ESCALADEE' as any }
       });
       ticketsPunished++;
     }

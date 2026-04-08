@@ -71,7 +71,7 @@ export async function GET(req: Request) {
                 await prisma.reminderLog.create({
                     data: {
                         leaseId: facture.leaseId,
-                        type: `RELANCE_${facture.typeUtility}_${urgency}`,
+                        type: `RELANCE_${facture.typeUtility}_${urgency}` as any,
                         sentAt: new Date(),
                         status: "SENT"
                     }
