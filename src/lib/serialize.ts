@@ -24,7 +24,7 @@ export const serializeProperty = (property: any) => {
     if (!property) return null
     return {
         ...property,
-        areaSqm: property.areaSqm ? Number(property.areaSqm) : null,
+        superficieM2: property.superficieM2 ? Number(property.superficieM2) : null,
         declaredRentFcfa: property.declaredRentFcfa ? Number(property.declaredRentFcfa) : 0,
         gpsLatitude: property.gpsLatitude ? Number(property.gpsLatitude) : null,
         gpsLongitude: property.gpsLongitude ? Number(property.gpsLongitude) : null,

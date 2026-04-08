@@ -63,7 +63,7 @@ export default function NewPropertyClient() {
             address: formData.get("addressLine1") as string,
             propertyType: formData.get("propertyType") as string,
             declaredRentFcfa: parseInt(formData.get("rent") as string) || undefined,
-            areaSqm: parseFloat(formData.get("area") as string) || undefined,
+            superficieM2: parseFloat(formData.get("area") as string) || undefined,
         }
 
         startTransition(async () => {

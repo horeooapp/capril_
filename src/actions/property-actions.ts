@@ -11,7 +11,7 @@ export type CreatePropertyInput = {
     leaseType: 'residential' | 'commercial'
     commune: string
     address: string
-    areaSqm?: number
+    superficieM2?: number
     rooms?: number
     bedrooms?: number
     amenities?: string[]

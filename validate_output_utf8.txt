@@ -1,0 +1,43 @@
+﻿Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+node.exe : 
+Au caractère Ligne:1 : 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (:  
+  String) [], RemoteExc   
+ eption
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Error: Prisma schema 
+validation - (validate 
+wasm)
+Error code: P1012
+[1;91merror[0m: 
+[1mField 
+"mandatsGestion" is 
+already defined on model 
+"Property".[0m
+  [1;94m-->[0m  [4mpris
+ma\schema.prisma:873[0m
+[1;94m   | [0m
+[1;94m872 | [0m  
+MandateHistory 
+MandateHistory[]
+[1;94m873 | [0m  
+[1;91mmandatsGestion[0m 
+MandatGestionBien[]
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 6.4.1

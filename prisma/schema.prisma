@@ -1661,6 +1661,9 @@ model AuditLog {
 
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([userId])
+  @@index([entityId])
+  @@index([createdAt])
   @@map("audit_log")
 }
 
@@ -1674,6 +1677,8 @@ model WebhookEvent {
 
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([operator, eventType])
+  @@index([createdAt])
   @@map("webhook_events")
 }
 
@@ -2773,8 +2778,8 @@ model AgencesRegularisation {
   dateLimiteActuelle DateTime  @map("date_limite_actuelle")
   nbBiensBascule     Int?      @map("nb_biens_bascule")
   nbPropriosBascule  Int?      @map("nb_proprietaires_bascule")
-  recepisseCdaim     String?   @map("recepissse_cdaim") // URL/Path
-  recepisseDate      DateTime? @map("recepissse_date")
+  recepisseCdaim     String?   @map("recepisse_cdaim") // URL/Path
+  recepisseDate      DateTime? @map("recepisse_date")
 
   rappel_j30_at  DateTime? @map("rappel_j30_at")
   rappel_j90_at  DateTime? @map("rappel_j90_at")
