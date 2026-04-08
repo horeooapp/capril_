@@ -328,6 +328,9 @@ jobs:
             echo "📦 Running Prisma Migrations..."
             npx prisma@6.4.1 db push --accept-data-loss
             
+            echo "🔧 Forcing PostgreSQL Enum coercions..."
+            sudo -u postgres psql -d qapril -f scripts/fix-enums-pg.sql || echo "⚠️ Non-fatal enum coercion error."
+            
             # 🔥 RESTART PM2 & SEED
             echo "🌱 Running Compiled Seed Logic..."
             if [ -f "prisma/seed.js" ]; then
