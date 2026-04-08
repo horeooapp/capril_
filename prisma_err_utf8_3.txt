@@ -1,0 +1,14 @@
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError parsing attribute "@default": The defined default value `PLANIFIEE` is not a valid value of the enum specified for the field.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:2415[0m
+[1;94m   | [0m
+[1;94m2414 | [0m  type         String
+[1;94m2415 | [0m  status       InspectionType   [1;91m@default(PLANIFIEE)[0m // PLANIFIEE|EN_COURS|TERMINEE
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 6.4.1

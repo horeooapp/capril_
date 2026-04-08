@@ -1,0 +1,820 @@
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:593[0m
+[1;94m   | [0m
+[1;94m592 | [0m
+[1;94m593 | [0m  [1;91mprocurationsDonnees ProcurationNumerique[] @relation("Mandant")[0m
+[1;94m594 | [0m  procurationsRecues  ProcurationNumerique[] @relation("Mandataire")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:594[0m
+[1;94m   | [0m
+[1;94m593 | [0m  procurationsDonnees ProcurationNumerique[] @relation("Mandant")
+[1;94m594 | [0m  [1;91mprocurationsRecues  ProcurationNumerique[] @relation("Mandataire")[0m
+[1;94m595 | [0m  fraudRecords        FraudBlacklist[]       @relation("UserFraud")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:595[0m
+[1;94m   | [0m
+[1;94m594 | [0m  procurationsRecues  ProcurationNumerique[] @relation("Mandataire")
+[1;94m595 | [0m  [1;91mfraudRecords        FraudBlacklist[]       @relation("UserFraud")[0m
+[1;94m596 | [0m  blacklistAuthored   FraudBlacklist[]       @relation("BlacklistAuthor")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:596[0m
+[1;94m   | [0m
+[1;94m595 | [0m  fraudRecords        FraudBlacklist[]       @relation("UserFraud")
+[1;94m596 | [0m  [1;91mblacklistAuthored   FraudBlacklist[]       @relation("BlacklistAuthor")[0m
+[1;94m597 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:599[0m
+[1;94m   | [0m
+[1;94m598 | [0m  // ADD-XX Agence Profile
+[1;94m599 | [0m  [1;91magenceProfile AgenceProfile? @relation("AgenceProfileUser")[0m
+[1;94m600 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:602[0m
+[1;94m   | [0m
+[1;94m601 | [0m  // ADD-05 Freemium
+[1;94m602 | [0m  [1;91mactivePlanTier     String              @default("LOCATAIRE") @map("active_plan_tier")[0m
+[1;94m603 | [0m  planExpiresAt      DateTime?           @map("plan_expires_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:603[0m
+[1;94m   | [0m
+[1;94m602 | [0m  activePlanTier     String              @default("LOCATAIRE") @map("active_plan_tier")
+[1;94m603 | [0m  [1;91mplanExpiresAt      DateTime?           @map("plan_expires_at")[0m
+[1;94m604 | [0m  subscriptionAudits SubscriptionAudit[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:604[0m
+[1;94m   | [0m
+[1;94m603 | [0m  planExpiresAt      DateTime?           @map("plan_expires_at")
+[1;94m604 | [0m  [1;91msubscriptionAudits SubscriptionAudit[][0m
+[1;94m605 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:608[0m
+[1;94m   | [0m
+[1;94m607 | [0m  // ADD-07 v3 Rechargement Automatique
+[1;94m608 | [0m  [1;91mwalletRechargeLinks  WalletRechargeLink[][0m
+[1;94m609 | [0m  walletRechargeConfig WalletRechargeConfig?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:609[0m
+[1;94m   | [0m
+[1;94m608 | [0m  walletRechargeLinks  WalletRechargeLink[]
+[1;94m609 | [0m  [1;91mwalletRechargeConfig WalletRechargeConfig?[0m
+[1;94m610 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:611[0m
+[1;94m   | [0m
+[1;94m610 | [0m
+[1;94m611 | [0m  [1;91mwalletConfig    UserWalletConfig?[0m
+[1;94m612 | [0m  diasporaProfile UserDiasporaProfile?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:612[0m
+[1;94m   | [0m
+[1;94m611 | [0m  walletConfig    UserWalletConfig?
+[1;94m612 | [0m  [1;91mdiasporaProfile UserDiasporaProfile?[0m
+[1;94m613 | [0m  fraudProfile    UserFraudProfile?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:613[0m
+[1;94m   | [0m
+[1;94m612 | [0m  diasporaProfile UserDiasporaProfile?
+[1;94m613 | [0m  [1;91mfraudProfile    UserFraudProfile?[0m
+[1;94m614 | [0m  deletedAt       DateTime?            @map("deleted_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:614[0m
+[1;94m   | [0m
+[1;94m613 | [0m  fraudProfile    UserFraudProfile?
+[1;94m614 | [0m  [1;91mdeletedAt       DateTime?            @map("deleted_at")[0m
+[1;94m615 | [0m  createdAt       DateTime             @default(now()) @map("created_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:615[0m
+[1;94m   | [0m
+[1;94m614 | [0m  deletedAt       DateTime?            @map("deleted_at")
+[1;94m615 | [0m  [1;91mcreatedAt       DateTime             @default(now()) @map("created_at")[0m
+[1;94m616 | [0m  updatedAt       DateTime             @updatedAt @map("updated_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:616[0m
+[1;94m   | [0m
+[1;94m615 | [0m  createdAt       DateTime             @default(now()) @map("created_at")
+[1;94m616 | [0m  [1;91mupdatedAt       DateTime             @updatedAt @map("updated_at")[0m
+[1;94m617 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:618[0m
+[1;94m   | [0m
+[1;94m617 | [0m
+[1;94m618 | [0m  [1;91mbailsDeclaratifsAsBailleur  BailDeclaratif[] @relation("BdqBailleur")[0m
+[1;94m619 | [0m  bailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:619[0m
+[1;94m   | [0m
+[1;94m618 | [0m  bailsDeclaratifsAsBailleur  BailDeclaratif[] @relation("BdqBailleur")
+[1;94m619 | [0m  [1;91mbailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")[0m
+[1;94m620 | [0m  bailsDeclaratifsAsAgent     BailDeclaratif[] @relation("BdqAgent")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:620[0m
+[1;94m   | [0m
+[1;94m619 | [0m  bailsDeclaratifsAsLocataire BailDeclaratif[] @relation("BdqLocataire")
+[1;94m620 | [0m  [1;91mbailsDeclaratifsAsAgent     BailDeclaratif[] @relation("BdqAgent")[0m
+[1;94m621 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:622[0m
+[1;94m   | [0m
+[1;94m621 | [0m
+[1;94m622 | [0m  [1;91mbdqConversations BdqConversationState[] @relation("BdqConvBailleur")[0m
+[1;94m623 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:625[0m
+[1;94m   | [0m
+[1;94m624 | [0m  // Relations ADD-03
+[1;94m625 | [0m  [1;91magentEdls            EtatsDesLieux[]         @relation("AgentEdls")[0m
+[1;94m626 | [0m  locataireEdls        EtatsDesLieux[]         @relation("LocataireEdls")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:626[0m
+[1;94m   | [0m
+[1;94m625 | [0m  agentEdls            EtatsDesLieux[]         @relation("AgentEdls")
+[1;94m626 | [0m  [1;91mlocataireEdls        EtatsDesLieux[]         @relation("LocataireEdls")[0m
+[1;94m627 | [0m  signatures           SignatureElectronique[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:627[0m
+[1;94m   | [0m
+[1;94m626 | [0m  locataireEdls        EtatsDesLieux[]         @relation("LocataireEdls")
+[1;94m627 | [0m  [1;91msignatures           SignatureElectronique[][0m
+[1;94m628 | [0m  maintenanceDeclarant TicketMaintenance[]     @relation("MaintenanceDeclarant")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:628[0m
+[1;94m   | [0m
+[1;94m627 | [0m  signatures           SignatureElectronique[]
+[1;94m628 | [0m  [1;91mmaintenanceDeclarant TicketMaintenance[]     @relation("MaintenanceDeclarant")[0m
+[1;94m629 | [0m  userCandidatures     Candidature[]           @relation("UserCandidatures")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:629[0m
+[1;94m   | [0m
+[1;94m628 | [0m  maintenanceDeclarant TicketMaintenance[]     @relation("MaintenanceDeclarant")
+[1;94m629 | [0m  [1;91muserCandidatures     Candidature[]           @relation("UserCandidatures")[0m
+[1;94m630 | [0m  agenceAnnonces       Annonce[]               @relation("AgenceAnnonces")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:630[0m
+[1;94m   | [0m
+[1;94m629 | [0m  userCandidatures     Candidature[]           @relation("UserCandidatures")
+[1;94m630 | [0m  [1;91magenceAnnonces       Annonce[]               @relation("AgenceAnnonces")[0m
+[1;94m631 | [0m  proprietaireCrgs     CrgMensuel[]            @relation("ProprietaireCrgs")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:631[0m
+[1;94m   | [0m
+[1;94m630 | [0m  agenceAnnonces       Annonce[]               @relation("AgenceAnnonces")
+[1;94m631 | [0m  [1;91mproprietaireCrgs     CrgMensuel[]            @relation("ProprietaireCrgs")[0m
+[1;94m632 | [0m  agenceCrgs           CrgMensuel[]            @relation("AgenceCrgs")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:632[0m
+[1;94m   | [0m
+[1;94m631 | [0m  proprietaireCrgs     CrgMensuel[]            @relation("ProprietaireCrgs")
+[1;94m632 | [0m  [1;91magenceCrgs           CrgMensuel[]            @relation("AgenceCrgs")[0m
+[1;94m633 | [0m  agenceEvents         AgendaEvenement[]       @relation("AgenceEvents")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:633[0m
+[1;94m   | [0m
+[1;94m632 | [0m  agenceCrgs           CrgMensuel[]            @relation("AgenceCrgs")
+[1;94m633 | [0m  [1;91magenceEvents         AgendaEvenement[]       @relation("AgenceEvents")[0m
+[1;94m634 | [0m  agentEvents          AgendaEvenement[]       @relation("AgentEvents")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:634[0m
+[1;94m   | [0m
+[1;94m633 | [0m  agenceEvents         AgendaEvenement[]       @relation("AgenceEvents")
+[1;94m634 | [0m  [1;91magentEvents          AgendaEvenement[]       @relation("AgentEvents")[0m
+[1;94m635 | [0m  eventContact         AgendaEvenement[]       @relation("EventContact")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:635[0m
+[1;94m   | [0m
+[1;94m634 | [0m  agentEvents          AgendaEvenement[]       @relation("AgentEvents")
+[1;94m635 | [0m  [1;91meventContact         AgendaEvenement[]       @relation("EventContact")[0m
+[1;94m636 | [0m  disputeMessages      DisputeMessage[]        @relation("DisputeSender")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:636[0m
+[1;94m   | [0m
+[1;94m635 | [0m  eventContact         AgendaEvenement[]       @relation("EventContact")
+[1;94m636 | [0m  [1;91mdisputeMessages      DisputeMessage[]        @relation("DisputeSender")[0m
+[1;94m637 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:638[0m
+[1;94m   | [0m
+[1;94m637 | [0m
+[1;94m638 | [0m  [1;91mnotificationPreference NotificationPreference?[0m
+[1;94m639 | [0m  notificationLogs       NotificationLog[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:639[0m
+[1;94m   | [0m
+[1;94m638 | [0m  notificationPreference NotificationPreference?
+[1;94m639 | [0m  [1;91mnotificationLogs       NotificationLog[][0m
+[1;94m640 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:642[0m
+[1;94m   | [0m
+[1;94m641 | [0m  // ADD-11
+[1;94m642 | [0m  [1;91mpropertyRoles    PropertyAccess[] @relation("UserRoles")[0m
+[1;94m643 | [0m  invitedRoles     PropertyAccess[] @relation("InvitedRoles")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:643[0m
+[1;94m   | [0m
+[1;94m642 | [0m  propertyRoles    PropertyAccess[] @relation("UserRoles")
+[1;94m643 | [0m  [1;91minvitedRoles     PropertyAccess[] @relation("InvitedRoles")[0m
+[1;94m644 | [0m  smsDeclarations  SmsDeclaration[] @relation("TenantDeclarations")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:644[0m
+[1;94m   | [0m
+[1;94m643 | [0m  invitedRoles     PropertyAccess[] @relation("InvitedRoles")
+[1;94m644 | [0m  [1;91msmsDeclarations  SmsDeclaration[] @relation("TenantDeclarations")[0m
+[1;94m645 | [0m  smsConfirmations SmsDeclaration[] @relation("ManagerConfirmations")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:645[0m
+[1;94m   | [0m
+[1;94m644 | [0m  smsDeclarations  SmsDeclaration[] @relation("TenantDeclarations")
+[1;94m645 | [0m  [1;91msmsConfirmations SmsDeclaration[] @relation("ManagerConfirmations")[0m
+[1;94m646 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:647[0m
+[1;94m   | [0m
+[1;94m646 | [0m
+[1;94m647 | [0m  [1;91mmandatsDonnes      MandatGestion[]        @relation("MandatsDonnes")[0m
+[1;94m648 | [0m  mandatsRecus       MandatGestion[]        @relation("MandatsRecus")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:648[0m
+[1;94m   | [0m
+[1;94m647 | [0m  mandatsDonnes      MandatGestion[]        @relation("MandatsDonnes")
+[1;94m648 | [0m  [1;91mmandatsRecus       MandatGestion[]        @relation("MandatsRecus")[0m
+[1;94m649 | [0m  regularisation     AgencesRegularisation?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:649[0m
+[1;94m   | [0m
+[1;94m648 | [0m  mandatsRecus       MandatGestion[]        @relation("MandatsRecus")
+[1;94m649 | [0m  [1;91mregularisation     AgencesRegularisation?[0m
+[1;94m650 | [0m  gardeFousLogs      GardeFousLog[]         @relation("UserGardeFous")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:650[0m
+[1;94m   | [0m
+[1;94m649 | [0m  regularisation     AgencesRegularisation?
+[1;94m650 | [0m  [1;91mgardeFousLogs      GardeFousLog[]         @relation("UserGardeFous")[0m
+[1;94m651 | [0m  adminGardeFousLogs GardeFousLog[]         @relation("AdminGardeFous")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:651[0m
+[1;94m   | [0m
+[1;94m650 | [0m  gardeFousLogs      GardeFousLog[]         @relation("UserGardeFous")
+[1;94m651 | [0m  [1;91madminGardeFousLogs GardeFousLog[]         @relation("AdminGardeFous")[0m
+[1;94m652 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:654[0m
+[1;94m   | [0m
+[1;94m653 | [0m  // ADD-12 Tarifs
+[1;94m654 | [0m  [1;91mconfigTarifsModifies ConfigTarif[]       @relation("ConfigTarifModifier")[0m
+[1;94m655 | [0m  offresModifiees      OffreAbonnement[]   @relation("OffreModifier")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:655[0m
+[1;94m   | [0m
+[1;94m654 | [0m  configTarifsModifies ConfigTarif[]       @relation("ConfigTarifModifier")
+[1;94m655 | [0m  [1;91moffresModifiees      OffreAbonnement[]   @relation("OffreModifier")[0m
+[1;94m656 | [0m  promosCrees          CodePromo[]         @relation("PromoCreator")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:656[0m
+[1;94m   | [0m
+[1;94m655 | [0m  offresModifiees      OffreAbonnement[]   @relation("OffreModifier")
+[1;94m656 | [0m  [1;91mpromosCrees          CodePromo[]         @relation("PromoCreator")[0m
+[1;94m657 | [0m  tarifsNegocies       TarifNegocie[]      @relation("UserTarifNegocie")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:657[0m
+[1;94m   | [0m
+[1;94m656 | [0m  promosCrees          CodePromo[]         @relation("PromoCreator")
+[1;94m657 | [0m  [1;91mtarifsNegocies       TarifNegocie[]      @relation("UserTarifNegocie")[0m
+[1;94m658 | [0m  tarifsNegociesCrees  TarifNegocie[]      @relation("TarifNegocieCreator")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:658[0m
+[1;94m   | [0m
+[1;94m657 | [0m  tarifsNegocies       TarifNegocie[]      @relation("UserTarifNegocie")
+[1;94m658 | [0m  [1;91mtarifsNegociesCrees  TarifNegocie[]      @relation("TarifNegocieCreator")[0m
+[1;94m659 | [0m  configTarifsAudits   ConfigTarifsAudit[] @relation("ConfigTarifAuditAuthor")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:659[0m
+[1;94m   | [0m
+[1;94m658 | [0m  tarifsNegociesCrees  TarifNegocie[]      @relation("TarifNegocieCreator")
+[1;94m659 | [0m  [1;91mconfigTarifsAudits   ConfigTarifsAudit[] @relation("ConfigTarifAuditAuthor")[0m
+[1;94m660 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:662[0m
+[1;94m   | [0m
+[1;94m661 | [0m  // ADD-13 Espace Locataire
+[1;94m662 | [0m  [1;91mlocataireProfile LocataireProfile?[0m
+[1;94m663 | [0m  signalements     SignalementLocataire[] @relation("UserSignalements")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:663[0m
+[1;94m   | [0m
+[1;94m662 | [0m  locataireProfile LocataireProfile?
+[1;94m663 | [0m  [1;91msignalements     SignalementLocataire[] @relation("UserSignalements")[0m
+[1;94m664 | [0m  preavis          PreavisBail[]          @relation("UserPreavis")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:664[0m
+[1;94m   | [0m
+[1;94m663 | [0m  signalements     SignalementLocataire[] @relation("UserSignalements")
+[1;94m664 | [0m  [1;91mpreavis          PreavisBail[]          @relation("UserPreavis")[0m
+[1;94m665 | [0m  passeports       PasseportLocatif[]     @relation("UserPasseports")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:665[0m
+[1;94m   | [0m
+[1;94m664 | [0m  preavis          PreavisBail[]          @relation("UserPreavis")
+[1;94m665 | [0m  [1;91mpasseports       PasseportLocatif[]     @relation("UserPasseports")[0m
+[1;94m666 | [0m  alertesLoyer     AlerteLoyer[]          @relation("UserAlertesLoyer")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:666[0m
+[1;94m   | [0m
+[1;94m665 | [0m  passeports       PasseportLocatif[]     @relation("UserPasseports")
+[1;94m666 | [0m  [1;91malertesLoyer     AlerteLoyer[]          @relation("UserAlertesLoyer")[0m
+[1;94m667 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:669[0m
+[1;94m   | [0m
+[1;94m668 | [0m  // ADD-14
+[1;94m669 | [0m  [1;91mprofilPublic            LocataireProfilPublic?[0m
+[1;94m670 | [0m  invitationsEnvoyees     InvitationBail[]       @relation("InvitantBail")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:670[0m
+[1;94m   | [0m
+[1;94m669 | [0m  profilPublic            LocataireProfilPublic?
+[1;94m670 | [0m  [1;91minvitationsEnvoyees     InvitationBail[]       @relation("InvitantBail")[0m
+[1;94m671 | [0m  invitationsRecues       InvitationBail[]       @relation("LocataireInvite")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:671[0m
+[1;94m   | [0m
+[1;94m670 | [0m  invitationsEnvoyees     InvitationBail[]       @relation("InvitantBail")
+[1;94m671 | [0m  [1;91minvitationsRecues       InvitationBail[]       @relation("LocataireInvite")[0m
+[1;94m672 | [0m  consultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:672[0m
+[1;94m   | [0m
+[1;94m671 | [0m  invitationsRecues       InvitationBail[]       @relation("LocataireInvite")
+[1;94m672 | [0m  [1;91mconsultationsEffectuees ConsultationProfil[]   @relation("ConsultantProfil")[0m
+[1;94m673 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:675[0m
+[1;94m   | [0m
+[1;94m674 | [0m  // ADD-16 Succession
+[1;94m675 | [0m  [1;91msuccessionsOwned    SuccessionProprio[][0m
+[1;94m676 | [0m  successionsAsTenant SuccessionLocataire[]  @relation("SuccessionAsTenant")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:676[0m
+[1;94m   | [0m
+[1;94m675 | [0m  successionsOwned    SuccessionProprio[]
+[1;94m676 | [0m  [1;91msuccessionsAsTenant SuccessionLocataire[]  @relation("SuccessionAsTenant")[0m
+[1;94m677 | [0m  reclamations        ReclamationLocataire[] @relation("TenantReclamations")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:677[0m
+[1;94m   | [0m
+[1;94m676 | [0m  successionsAsTenant SuccessionLocataire[]  @relation("SuccessionAsTenant")
+[1;94m677 | [0m  [1;91mreclamations        ReclamationLocataire[] @relation("TenantReclamations")[0m
+[1;94m678 | [0m  iclEvents           IclEvent[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:678[0m
+[1;94m   | [0m
+[1;94m677 | [0m  reclamations        ReclamationLocataire[] @relation("TenantReclamations")
+[1;94m678 | [0m  [1;91miclEvents           IclEvent[][0m
+[1;94m679 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:681[0m
+[1;94m   | [0m
+[1;94m680 | [0m  // ADD-15 Rapports & Champions
+[1;94m681 | [0m  [1;91mredactedEdls        EtatsDesLieux[]    @relation("RedacteurEdl")[0m
+[1;94m682 | [0m  rapportsMensuels    RapportMensuel[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:682[0m
+[1;94m   | [0m
+[1;94m681 | [0m  redactedEdls        EtatsDesLieux[]    @relation("RedacteurEdl")
+[1;94m682 | [0m  [1;91mrapportsMensuels    RapportMensuel[][0m
+[1;94m683 | [0m  championProfile     ChampionProfile?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:683[0m
+[1;94m   | [0m
+[1;94m682 | [0m  rapportsMensuels    RapportMensuel[]
+[1;94m683 | [0m  [1;91mchampionProfile     ChampionProfile?[0m
+[1;94m684 | [0m  supervisedChampions ChampionProfile[]  @relation("SuperviseurChampions")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:684[0m
+[1;94m   | [0m
+[1;94m683 | [0m  championProfile     ChampionProfile?
+[1;94m684 | [0m  [1;91msupervisedChampions ChampionProfile[]  @relation("SuperviseurChampions")[0m
+[1;94m685 | [0m  prospectsConvertis  ChampionProspect[] @relation("ProspectConverti")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:685[0m
+[1;94m   | [0m
+[1;94m684 | [0m  supervisedChampions ChampionProfile[]  @relation("SuperviseurChampions")
+[1;94m685 | [0m  [1;91mprospectsConvertis  ChampionProspect[] @relation("ProspectConverti")[0m
+[1;94m686 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:694[0m
+[1;94m   | [0m
+[1;94m693 | [0m  // ADD-17 & 18 Relations
+[1;94m694 | [0m  [1;91mmessagesBailEnvoyes   MessagerieBail[][0m
+[1;94m695 | [0m  annoncesVoisinage     AnnonceVoisinage[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:695[0m
+[1;94m   | [0m
+[1;94m694 | [0m  messagesBailEnvoyes   MessagerieBail[]
+[1;94m695 | [0m  [1;91mannoncesVoisinage     AnnonceVoisinage[][0m
+[1;94m696 | [0m  facturesUtilities     FactureUtility[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:696[0m
+[1;94m   | [0m
+[1;94m695 | [0m  annoncesVoisinage     AnnonceVoisinage[]
+[1;94m696 | [0m  [1;91mfacturesUtilities     FactureUtility[][0m
+[1;94m697 | [0m  repartitionsUtilities RepartitionUtility[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:697[0m
+[1;94m   | [0m
+[1;94m696 | [0m  facturesUtilities     FactureUtility[]
+[1;94m697 | [0m  [1;91mrepartitionsUtilities RepartitionUtility[][0m
+[1;94m698 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:699[0m
+[1;94m   | [0m
+[1;94m698 | [0m
+[1;94m699 | [0m  [1;91m@@index([phone])[0m
+[1;94m700 | [0m  @@index([role])
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:700[0m
+[1;94m   | [0m
+[1;94m699 | [0m  @@index([phone])
+[1;94m700 | [0m  [1;91m@@index([role])[0m
+[1;94m701 | [0m  @@map("users")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:701[0m
+[1;94m   | [0m
+[1;94m700 | [0m  @@index([role])
+[1;94m701 | [0m  [1;91m@@map("users")[0m
+[1;94m702 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:702[0m
+[1;94m   | [0m
+[1;94m701 | [0m  @@map("users")
+[1;94m702 | [0m[1;91m}[0m
+[1;94m703 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1000[0m
+[1;94m   | [0m
+[1;94m999 | [0m  // M-EDL
+[1;94m1000 | [0m  [1;91minspections Inspection[][0m
+[1;94m1001 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1003[0m
+[1;94m   | [0m
+[1;94m1002 | [0m  // M-RECOUVREMENT
+[1;94m1003 | [0m  [1;91mreminders ReminderLog[][0m
+[1;94m1004 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1006[0m
+[1;94m   | [0m
+[1;94m1005 | [0m  // ADD-18 Utilities
+[1;94m1006 | [0m  [1;91mmodeUtilities           String  @default("NON_APPLICABLE") @map("mode_utilities")[0m
+[1;94m1007 | [0m  identifiantCie          String? @map("identifiant_cie")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1007[0m
+[1;94m   | [0m
+[1;94m1006 | [0m  modeUtilities           String  @default("NON_APPLICABLE") @map("mode_utilities")
+[1;94m1007 | [0m  [1;91midentifiantCie          String? @map("identifiant_cie")[0m
+[1;94m1008 | [0m  identifiantSodeci       String? @map("identifiant_sodeci")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1008[0m
+[1;94m   | [0m
+[1;94m1007 | [0m  identifiantCie          String? @map("identifiant_cie")
+[1;94m1008 | [0m  [1;91midentifiantSodeci       String? @map("identifiant_sodeci")[0m
+[1;94m1009 | [0m  modeleRepartition       String  @default("PRORATA_CHAMBRE") @map("modele_repartition")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1009[0m
+[1;94m   | [0m
+[1;94m1008 | [0m  identifiantSodeci       String? @map("identifiant_sodeci")
+[1;94m1009 | [0m  [1;91mmodeleRepartition       String  @default("PRORATA_CHAMBRE") @map("modele_repartition")[0m
+[1;94m1010 | [0m  forfaitUtilitiesMensuel Float?  @map("forfait_utilities_mensuel")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1010[0m
+[1;94m   | [0m
+[1;94m1009 | [0m  modeleRepartition       String  @default("PRORATA_CHAMBRE") @map("modele_repartition")
+[1;94m1010 | [0m  [1;91mforfaitUtilitiesMensuel Float?  @map("forfait_utilities_mensuel")[0m
+[1;94m1011 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1012[0m
+[1;94m   | [0m
+[1;94m1011 | [0m
+[1;94m1012 | [0m  [1;91mdeletedAt DateTime? @map("deleted_at")[0m
+[1;94m1013 | [0m  createdAt DateTime  @default(now()) @map("created_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1013[0m
+[1;94m   | [0m
+[1;94m1012 | [0m  deletedAt DateTime? @map("deleted_at")
+[1;94m1013 | [0m  [1;91mcreatedAt DateTime  @default(now()) @map("created_at")[0m
+[1;94m1014 | [0m  updatedAt DateTime  @updatedAt @map("updated_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1014[0m
+[1;94m   | [0m
+[1;94m1013 | [0m  createdAt DateTime  @default(now()) @map("created_at")
+[1;94m1014 | [0m  [1;91mupdatedAt DateTime  @updatedAt @map("updated_at")[0m
+[1;94m1015 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1016[0m
+[1;94m   | [0m
+[1;94m1015 | [0m
+[1;94m1016 | [0m  [1;91msourceMigrationId String?           @map("source_migration_id")[0m
+[1;94m1017 | [0m  sourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1017[0m
+[1;94m   | [0m
+[1;94m1016 | [0m  sourceMigrationId String?           @map("source_migration_id")
+[1;94m1017 | [0m  [1;91msourceMigration   MigrationSession? @relation(fields: [sourceMigrationId], references: [id])[0m
+[1;94m1018 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1020[0m
+[1;94m   | [0m
+[1;94m1019 | [0m  // ADD-11
+[1;94m1020 | [0m  [1;91msmsDeclarations SmsDeclaration[] @relation("LeaseDeclarations")[0m
+[1;94m1021 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1023[0m
+[1;94m   | [0m
+[1;94m1022 | [0m  // ADD-13 Espace Locataire
+[1;94m1023 | [0m  [1;91msignalements SignalementLocataire[][0m
+[1;94m1024 | [0m  caution      CautionBail?
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1024[0m
+[1;94m   | [0m
+[1;94m1023 | [0m  signalements SignalementLocataire[]
+[1;94m1024 | [0m  [1;91mcaution      CautionBail?[0m
+[1;94m1025 | [0m  preavis      PreavisBail[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1025[0m
+[1;94m   | [0m
+[1;94m1024 | [0m  caution      CautionBail?
+[1;94m1025 | [0m  [1;91mpreavis      PreavisBail[][0m
+[1;94m1026 | [0m  alertesLoyer AlerteLoyer[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1026[0m
+[1;94m   | [0m
+[1;94m1025 | [0m  preavis      PreavisBail[]
+[1;94m1026 | [0m  [1;91malertesLoyer AlerteLoyer[][0m
+[1;94m1027 | [0m  scoreConsent Boolean                @default(false) @map("score_consent")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1027[0m
+[1;94m   | [0m
+[1;94m1026 | [0m  alertesLoyer AlerteLoyer[]
+[1;94m1027 | [0m  [1;91mscoreConsent Boolean                @default(false) @map("score_consent")[0m
+[1;94m1028 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1030[0m
+[1;94m   | [0m
+[1;94m1029 | [0m  // ADD-16 Succession & Litige
+[1;94m1030 | [0m  [1;91msuccessions       SuccessionLocataire[][0m
+[1;94m1031 | [0m  reclamations      ReclamationLocataire[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1031[0m
+[1;94m   | [0m
+[1;94m1030 | [0m  successions       SuccessionLocataire[]
+[1;94m1031 | [0m  [1;91mreclamations      ReclamationLocataire[][0m
+[1;94m1032 | [0m  dossiersLitige    DossierLitigeCertifie[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1032[0m
+[1;94m   | [0m
+[1;94m1031 | [0m  reclamations      ReclamationLocataire[]
+[1;94m1032 | [0m  [1;91mdossiersLitige    DossierLitigeCertifie[][0m
+[1;94m1033 | [0m  propositionsLoyer PropositionLoyer[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1033[0m
+[1;94m   | [0m
+[1;94m1032 | [0m  dossiersLitige    DossierLitigeCertifie[]
+[1;94m1033 | [0m  [1;91mpropositionsLoyer PropositionLoyer[][0m
+[1;94m1034 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1036[0m
+[1;94m   | [0m
+[1;94m1035 | [0m  // ADD-17 & 18 Relations
+[1;94m1036 | [0m  [1;91mmessagesBail          MessagerieBail[][0m
+[1;94m1037 | [0m  facturesUtilities     FactureUtility[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1037[0m
+[1;94m   | [0m
+[1;94m1036 | [0m  messagesBail          MessagerieBail[]
+[1;94m1037 | [0m  [1;91mfacturesUtilities     FactureUtility[][0m
+[1;94m1038 | [0m  repartitionsUtilities RepartitionUtility[]
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1038[0m
+[1;94m   | [0m
+[1;94m1037 | [0m  facturesUtilities     FactureUtility[]
+[1;94m1038 | [0m  [1;91mrepartitionsUtilities RepartitionUtility[][0m
+[1;94m1039 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1041[0m
+[1;94m   | [0m
+[1;94m1040 | [0m  // ADD-01 v2 M-FISCAL
+[1;94m1041 | [0m  [1;91mnbPagesBail              Int?      @map("nb_pages_bail")[0m
+[1;94m1042 | [0m  droitsEnregistrement     Float?    @map("droits_enregistrement")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1042[0m
+[1;94m   | [0m
+[1;94m1041 | [0m  nbPagesBail              Int?      @map("nb_pages_bail")
+[1;94m1042 | [0m  [1;91mdroitsEnregistrement     Float?    @map("droits_enregistrement")[0m
+[1;94m1043 | [0m  fraisTimbre              Float?    @map("frais_timbre")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1043[0m
+[1;94m   | [0m
+[1;94m1042 | [0m  droitsEnregistrement     Float?    @map("droits_enregistrement")
+[1;94m1043 | [0m  [1;91mfraisTimbre              Float?    @map("frais_timbre")[0m
+[1;94m1044 | [0m  totalFiscalBail          Float?    @map("total_fiscal_bail")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1044[0m
+[1;94m   | [0m
+[1;94m1043 | [0m  fraisTimbre              Float?    @map("frais_timbre")
+[1;94m1044 | [0m  [1;91mtotalFiscalBail          Float?    @map("total_fiscal_bail")[0m
+[1;94m1045 | [0m  statutFiscal             String    @default("NON_CALCULÉ") @map("statut_fiscal")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1045[0m
+[1;94m   | [0m
+[1;94m1044 | [0m  totalFiscalBail          Float?    @map("total_fiscal_bail")
+[1;94m1045 | [0m  [1;91mstatutFiscal             String    @default("NON_CALCULÉ") @map("statut_fiscal")[0m
+[1;94m1046 | [0m  recuFiscalUrl            String?   @map("recu_fiscal_url")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1046[0m
+[1;94m   | [0m
+[1;94m1045 | [0m  statutFiscal             String    @default("NON_CALCULÉ") @map("statut_fiscal")
+[1;94m1046 | [0m  [1;91mrecuFiscalUrl            String?   @map("recu_fiscal_url")[0m
+[1;94m1047 | [0m  recuFiscalHash           String?   @map("recu_fiscal_hash")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1047[0m
+[1;94m   | [0m
+[1;94m1046 | [0m  recuFiscalUrl            String?   @map("recu_fiscal_url")
+[1;94m1047 | [0m  [1;91mrecuFiscalHash           String?   @map("recu_fiscal_hash")[0m
+[1;94m1048 | [0m  deadlineEnregistrement   DateTime? @map("deadline_enregistrement")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1048[0m
+[1;94m   | [0m
+[1;94m1047 | [0m  recuFiscalHash           String?   @map("recu_fiscal_hash")
+[1;94m1048 | [0m  [1;91mdeadlineEnregistrement   DateTime? @map("deadline_enregistrement")[0m
+[1;94m1049 | [0m  certEnregistrementDgiUrl String?   @map("cert_enregistrement_dgi_url")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1049[0m
+[1;94m   | [0m
+[1;94m1048 | [0m  deadlineEnregistrement   DateTime? @map("deadline_enregistrement")
+[1;94m1049 | [0m  [1;91mcertEnregistrementDgiUrl String?   @map("cert_enregistrement_dgi_url")[0m
+[1;94m1050 | [0m  acteEnregistrementRemisAt DateTime? @map("acte_enregistrement_remis_at")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1050[0m
+[1;94m   | [0m
+[1;94m1049 | [0m  certEnregistrementDgiUrl String?   @map("cert_enregistrement_dgi_url")
+[1;94m1050 | [0m  [1;91macteEnregistrementRemisAt DateTime? @map("acte_enregistrement_remis_at")[0m
+[1;94m1051 | [0m
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1052[0m
+[1;94m   | [0m
+[1;94m1051 | [0m
+[1;94m1052 | [0m  [1;91m@@index([status, createdAt])[0m
+[1;94m1053 | [0m  @@index([propertyId])
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1053[0m
+[1;94m   | [0m
+[1;94m1052 | [0m  @@index([status, createdAt])
+[1;94m1053 | [0m  [1;91m@@index([propertyId])[0m
+[1;94m1054 | [0m  @@index([tenantId])
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1054[0m
+[1;94m   | [0m
+[1;94m1053 | [0m  @@index([propertyId])
+[1;94m1054 | [0m  [1;91m@@index([tenantId])[0m
+[1;94m1055 | [0m  @@index([status])
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1055[0m
+[1;94m   | [0m
+[1;94m1054 | [0m  @@index([tenantId])
+[1;94m1055 | [0m  [1;91m@@index([status])[0m
+[1;94m1056 | [0m  @@map("leases")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1056[0m
+[1;94m   | [0m
+[1;94m1055 | [0m  @@index([status])
+[1;94m1056 | [0m  [1;91m@@map("leases")[0m
+[1;94m1057 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1057[0m
+[1;94m   | [0m
+[1;94m1056 | [0m  @@map("leases")
+[1;94m1057 | [0m[1;91m}[0m
+[1;94m1058 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 116
+[Context: validate]
+
+Prisma CLI Version : 6.4.1

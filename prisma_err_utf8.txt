@@ -1,0 +1,29 @@
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating field `property` in model `MandateHistory`: The relation field `property` on model `MandateHistory` is missing an opposite relation field on the model `Property`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1219[0m
+[1;94m   | [0m
+[1;94m1218 | [0m  propertyId       String    @map("property_id")
+[1;94m1219 | [0m  [1;91mproperty         Property  @relation(fields: [propertyId], references: [id])[0m
+[1;94m1220 | [0m  mandateId        String    @map("mandate_id")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `lease` in model `ColocPayment`: The relation field `lease` on model `ColocPayment` is missing an opposite relation field on the model `Lease`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:1259[0m
+[1;94m   | [0m
+[1;94m1258 | [0m  leaseId       String      @map("bail_id")
+[1;94m1259 | [0m  [1;91mlease         Lease       @relation(fields: [leaseId], references: [id])[0m
+[1;94m1260 | [0m  colocataireId String      @map("coloc_id")
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `user` in model `WalletTransaction`: The relation field `user` on model `WalletTransaction` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:3458[0m
+[1;94m   | [0m
+[1;94m3457 | [0m  userId    String   @map("user_id")
+[1;94m3458 | [0m  [1;91muser      User     @relation(fields: [userId], references: [id])[0m
+[1;94m3459 | [0m  type      String   @map("type") // Ex: CREDIT, DEBIT
+[1;94m   | [0m
+
+Validation Error Count: 3
+[Context: validate]
+
+Prisma CLI Version : 6.4.1
