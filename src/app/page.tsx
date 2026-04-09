@@ -106,9 +106,9 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
 
                 <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 pb-20 text-center">
                     <div className="max-w-5xl w-full">
-                        <h1 className="text-6xl md:text-[8rem] font-black text-[#0B4619] leading-[0.8] tracking-tighter mb-12 uppercase italic drop-shadow-sm">
-                            Registre <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] via-[#E85D04] to-[#0B4619]">National.</span>
+                        <h1 className="text-4xl md:text-6xl font-black text-[#0B4619] leading-tight tracking-tighter mb-12 uppercase drop-shadow-sm">
+                            Quittancement Autonome<br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] via-[#E85D04] to-[#0B4619]">Plateforme de Ressources<br />Immobilières Locatives.</span>
                         </h1>
                         {session?.user ? (
                             <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 bg-white/70 backdrop-blur-3xl border border-white/40 shadow-2xl shadow-black/5 rounded-[2.5rem] transition-all hover:-translate-y-2 text-center">
@@ -208,8 +208,8 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                     <HeroSlider />
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="max-w-2xl text-center md:text-left">
-                            <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-none">
-                                Le Registre <span className="text-primary italic">Locatif</span> National.
+                            <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-8 leading-none">
+                                Quittancement Autonome <span className="text-primary italic">Plateforme</span> de Ressources Immobilières Locatives.
                             </h1>
                             <p className="text-xl text-gray-600 mb-12">Normalisation et sécurisation du marché immobilier ivoirien.</p>
                             {session?.user ? (
