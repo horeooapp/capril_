@@ -18,6 +18,36 @@ export async function sendInvitation(data: {
     messageInvitant?: string
 }) {
     try {
+        let actualLandlordId = data.invitantId;
+        
+        if (data.propertyId) {
+            const prop = await prisma.property.findUnique({
+                where: { id: data.propertyId },
+                select: { landlordId: true }
+            });
+            if (prop && prop.landlordId) {
+                actualLandlordId = prop.landlordId;
+            }
+        }
+
+        // 1. Créer le contrat (Lease) en attente de signature immédiatement
+        let newLease = null;
+        if (data.propertyId) {
+            newLease = await prisma.lease.create({
+                data: {
+                    leaseReference: `BAIL-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+                    propertyId: data.propertyId,
+                    landlordId: actualLandlordId,
+                    tenantId: data.locataireId,
+                    startDate: data.dateDebutProposee,
+                    durationMonths: 12, // Valeur par défaut
+                    rentAmount: Number(data.loyerPropose),
+                    paymentDay: 5,
+                    status: 'PENDING_SIGNATURE'
+                }
+            });
+        }
+
         const invitation = await (prisma as any).invitationBail.create({
             data: {
                 propertyId: data.propertyId,
@@ -29,6 +59,7 @@ export async function sendInvitation(data: {
                 dateDebutProposee: data.dateDebutProposee,
                 messageInvitant: data.messageInvitant,
                 statut: 'ENVOYEE',
+                leaseId: newLease ? newLease.id : null,
                 expireAt: new Date(Date.now() + 72 * 60 * 60 * 1000) // 72 heures
             }
         })
@@ -77,24 +108,32 @@ export async function respondToInvitation(invitationId: string, response: 'ACCEP
         }
 
         if (response === 'ACCEPTEE') {
-            // Créer le bail (Lease)
-            const newLease = await prisma.lease.create({
-                data: {
-                    leaseReference: `BAIL-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
-                    propertyId: invitation.propertyId!,
-                    landlordId: invitation.invitantId, // Si agence, le landlordId doit être géré différemment (PROPRIETAIRE du bien)
-                    tenantId: invitation.locataireId,
-                    startDate: invitation.dateDebutProposee!,
-                    durationMonths: 12,
-                    rentAmount: Number(invitation.loyerPropose),
-                    paymentDay: 5,
-                    status: 'PENDING_SIGNATURE'
+            if (!invitation.leaseId) {
+                // Créer le bail (Lease) si non pré-généré
+                let actualLandlordId = invitation.invitantId;
+                if (invitation.propertyId) {
+                    const prop = await prisma.property.findUnique({ where: { id: invitation.propertyId }, select: { landlordId: true }});
+                    if (prop?.landlordId) actualLandlordId = prop.landlordId;
                 }
-            })
-            updateData.leaseId = newLease.id
+
+                const newLease = await prisma.lease.create({
+                    data: {
+                        leaseReference: `BAIL-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+                        propertyId: invitation.propertyId!,
+                        landlordId: actualLandlordId,
+                        tenantId: invitation.locataireId,
+                        startDate: invitation.dateDebutProposee!,
+                        durationMonths: 12,
+                        rentAmount: Number(invitation.loyerPropose),
+                        paymentDay: 5,
+                        status: 'PENDING_SIGNATURE'
+                    }
+                })
+                updateData.leaseId = newLease.id
+            }
         } else {
             // Incrémenter les refus sur le profil public
-            await (prisma as any).locataireProfilPublic.update({
+            await (prisma as any).locataireProfilPublic.updateMany({
                 where: { userId: invitation.locataireId },
                 data: { nbInvitationsRefusees: { increment: 1 } }
             })
