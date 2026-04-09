@@ -61,7 +61,7 @@ export default function NewPropertyClient() {
             parentPropertyId: parentId,
             commune: formData.get("commune") as string,
             address: formData.get("addressLine1") as string,
-            propertyType: formData.get("propertyType") as string,
+            propertyType: (formData.get("propertyType") as string) || finalTypeStructure,
             declaredRentFcfa: parseInt(formData.get("rent") as string) || undefined,
             superficieM2: parseFloat(formData.get("area") as string) || undefined,
         }
