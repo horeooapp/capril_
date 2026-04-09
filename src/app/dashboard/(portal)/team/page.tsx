@@ -2,6 +2,7 @@ import React from "react"
 import { listAgencyCollaborators } from "@/actions/agency-team-actions"
 import { Users, Shield, Clock, Search, MoreVertical, Plus } from "lucide-react"
 import { CollaboratorInvitationModal } from "@/components/dashboard/agency/CollaboratorInvitationModal"
+import { CollaboratorActionsDropdown } from "@/components/dashboard/agency/CollaboratorActionsDropdown"
 
 export const metadata = {
     title: "Mon Équipe | M-AGENCE QAPRIL"
@@ -108,9 +109,11 @@ export default async function AgencyTeamPage() {
                                                 )}
                                             </td>
                                             <td className="py-4 px-6 text-right">
-                                                <button className="p-2 text-qgrey-400 hover:text-qnavy hover:bg-qnavy-pale rounded-lg transition-colors">
-                                                    <MoreVertical size={18} />
-                                                </button>
+                                                <CollaboratorActionsDropdown 
+                                                    collaboratorId={member.id} 
+                                                    status={member.status} 
+                                                    inviteToken={member.inviteToken} 
+                                                />
                                             </td>
                                         </tr>
                                     ))

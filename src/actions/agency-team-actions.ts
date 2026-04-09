@@ -66,7 +66,8 @@ export async function listAgencyCollaborators() {
                 joinedAt: c.createdAt,
                 poste: conf?.poste || "COLLABORATEUR",
                 status: conf?.status || "INVITED",
-                permissions: conf?.permissions || []
+                permissions: conf?.permissions || [],
+                inviteToken: conf?.inviteToken || null
             }
         }) };
     } catch (e: any) {
