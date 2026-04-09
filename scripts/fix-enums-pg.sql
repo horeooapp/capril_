@@ -582,4 +582,9 @@ BEGIN
     ALTER TABLE "payments_pgw" ALTER COLUMN "reversal_status" TYPE "ReversalStatus" USING "reversal_status"::text::"ReversalStatus";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
+  BEGIN
+    ALTER TABLE "factures_utilities" ALTER COLUMN "statut" DROP DEFAULT;
+    ALTER TABLE "factures_utilities" ALTER COLUMN "statut" TYPE "UtilityStatus" USING "statut"::text::"UtilityStatus";
+  EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
+
 END $$;
