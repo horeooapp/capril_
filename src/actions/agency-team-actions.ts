@@ -182,7 +182,7 @@ export async function validateInvitationToken(token: string) {
     return matchedUser
 }
 
-export async function acceptInvite(token: string, password: string, fullName: string) {
+export async function acceptInvite(token: string, fullName: string) {
     try {
         const matchedUser = await validateInvitationToken(token)
 
@@ -196,13 +196,9 @@ export async function acceptInvite(token: string, password: string, fullName: st
             inviteToken: null // Invalidates token
         }
 
-        const { hash } = await import("bcrypt-ts")
-        const hashedPassword = await hash(password, 10)
-
         await (prisma.user as any).update({
             where: { id: matchedUser.id },
             data: {
-                password: hashedPassword,
                 fullName: fullName,
                 lastName: fullName,
                 agencyConfig: newConfig,
@@ -210,7 +206,14 @@ export async function acceptInvite(token: string, password: string, fullName: st
             }
         })
 
-        return { success: true, message: "Bienvenue sur QAPRIL. Vous pouvez à présent vous connecter." }
+        // On génère un OTP pour l'auto-connexion immédiate
+        const autoLoginOtp = Math.random().toString().slice(2, 8)
+        const { redis } = await import("@/lib/redis")
+        if (redis) {
+            await redis.setex(`otp:${matchedUser.email}`, 300, autoLoginOtp)
+        }
+
+        return { success: true, message: "Bienvenue sur QAPRIL. Connexion en cours...", autoLoginOtp }
     } catch (e: any) {
         return { success: false, error: e.message }
     }

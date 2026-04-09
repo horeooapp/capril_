@@ -2,7 +2,8 @@
 
 import React, { useState, useTransition } from "react"
 import { acceptInvite } from "@/actions/agency-team-actions"
-import { Mail, Lock, User, CheckCircle2, ShieldAlert } from "lucide-react"
+import { Mail, User, CheckCircle2, ShieldAlert } from "lucide-react"
+import { signIn } from "next-auth/react"
 
 export function InviteAcceptClient({ token, email }: { token: string, email: string }) {
     const [isPending, startTransition] = useTransition()
@@ -10,24 +11,12 @@ export function InviteAcceptClient({ token, email }: { token: string, email: str
     const [success, setSuccess] = useState(false)
 
     const [formData, setFormData] = useState({
-        fullName: "",
-        password: "",
-        confirm: ""
+        fullName: ""
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
-
-        if (formData.password !== formData.confirm) {
-            setError("Les mots de passe ne correspondent pas.")
-            return
-        }
-
-        if (formData.password.length < 8) {
-            setError("Le mot de passe doit contenir au moins 8 caractères.")
-            return
-        }
 
         if (!formData.fullName.trim()) {
             setError("Votre nom et prénoms sont requis.")
@@ -35,11 +24,18 @@ export function InviteAcceptClient({ token, email }: { token: string, email: str
         }
 
         startTransition(async () => {
-            const res = await acceptInvite(token, formData.password, formData.fullName)
+            const res = await acceptInvite(token, formData.fullName)
             if (!res.success) {
                 setError(res.error || "Une erreur est survenue")
             } else {
                 setSuccess(true)
+                // Redirection automatique sans passer par la page de choix (/login)
+                await signIn("email-otp", {
+                    email,
+                    otp: res.autoLoginOtp,
+                    role: "AGENCY",
+                    callbackUrl: "/dashboard"
+                })
             }
         })
     }
@@ -50,16 +46,11 @@ export function InviteAcceptClient({ token, email }: { token: string, email: str
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                     <CheckCircle2 size={32} />
                 </div>
-                <h2 className="text-xl font-black text-green-800 uppercase tracking-wider">Compte Activé !</h2>
-                <p className="text-sm font-medium text-green-700">
-                    Votre accès collaborateur a été créé avec succès. Vous pouvez maintenant vous connecter à votre compte.
+                <h2 className="text-xl font-black text-green-800 uppercase tracking-wider text-center">Profil Activé !</h2>
+                <p className="text-sm font-medium text-green-700 text-center flex flex-col items-center gap-3">
+                    Redirection vers votre tableau de bord en cours...
+                    <span className="w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></span>
                 </p>
-                <a 
-                    href="/login" 
-                    className="block w-full text-center px-6 py-4 bg-qgreen hover:bg-qgreen-dark text-white rounded-xl text-sm font-black uppercase tracking-wider transition-all shadow-[0_8px_16px_rgba(29,190,115,0.2)]"
-                >
-                    Connexion
-                </a>
             </div>
         )
     }
@@ -94,36 +85,6 @@ export function InviteAcceptClient({ token, email }: { token: string, email: str
                         onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                         className="w-full bg-white border border-qgrey-2 rounded-2xl pl-12 pr-4 py-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none transition-all" 
                         placeholder="Ex: Jean Dupont"
-                    />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-qgrey-400 pl-2">Mot de Passe Sécurisé</label>
-                <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-qgrey-400" size={18} />
-                    <input 
-                        type="password"
-                        required 
-                        value={formData.password}
-                        onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        className="w-full bg-white border border-qgrey-2 rounded-2xl pl-12 pr-4 py-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none transition-all" 
-                        placeholder="Min 8 caractères"
-                    />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-qgrey-400 pl-2">Confirmer le Mot de Passe</label>
-                <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-qgrey-400" size={18} />
-                    <input 
-                        type="password"
-                        required 
-                        value={formData.confirm}
-                        onChange={(e) => setFormData({...formData, confirm: e.target.value})}
-                        className="w-full bg-white border border-qgrey-2 rounded-2xl pl-12 pr-4 py-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none transition-all" 
-                        placeholder="Répétez le mot de passe"
                     />
                 </div>
             </div>
