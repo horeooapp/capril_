@@ -23,10 +23,10 @@ export async function sendInvitation(data: {
         if (data.propertyId) {
             const prop = await prisma.property.findUnique({
                 where: { id: data.propertyId },
-                select: { landlordId: true }
+                select: { ownerUserId: true }
             });
-            if (prop && prop.landlordId) {
-                actualLandlordId = prop.landlordId;
+            if (prop && prop.ownerUserId) {
+                actualLandlordId = prop.ownerUserId;
             }
         }
 
@@ -112,8 +112,8 @@ export async function respondToInvitation(invitationId: string, response: 'ACCEP
                 // Créer le bail (Lease) si non pré-généré
                 let actualLandlordId = invitation.invitantId;
                 if (invitation.propertyId) {
-                    const prop = await prisma.property.findUnique({ where: { id: invitation.propertyId }, select: { landlordId: true }});
-                    if (prop?.landlordId) actualLandlordId = prop.landlordId;
+                    const prop = await prisma.property.findUnique({ where: { id: invitation.propertyId }, select: { ownerUserId: true }});
+                    if (prop?.ownerUserId) actualLandlordId = prop.ownerUserId;
                 }
 
                 const newLease = await prisma.lease.create({
