@@ -80,6 +80,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (user) {
+                        // AUTO-ACTIVATE AGENCY COLLABORATORS ON FIRST LOGIN
+                        const conf = (user as any).agencyConfig;
+                        if (conf && conf.status === "INVITED") {
+                            const newConfig = { ...conf, status: "ACTIVE", inviteToken: null };
+                            await (prisma.user as any).update({
+                                where: { id: user.id },
+                                data: { agencyConfig: newConfig, status: "active" }
+                            });
+                            (user as any).agencyConfig = newConfig;
+                            user.status = "active";
+                        }
+
                         // ROLE DETECTION & ENFORCEMENT
                         const userRole = (user.role || '').toUpperCase();
                         const isDiaspora = (user as any).diasporaAbonnement === true;
