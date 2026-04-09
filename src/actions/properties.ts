@@ -259,14 +259,34 @@ async function genererReference(type: TypeStructure, commune: string, unitLabel?
   const communeCode = COMMUNE_CODES[commune] ?? commune.slice(0,3).toUpperCase();
   const annee = new Date().getFullYear();
 
-  const count = await prisma.property.count();
-  const seq = String(count + 1).padStart(5, "0");
-
-  const refBase = `${prefix}-${communeCode}-${annee}-${seq}`;
-
+  // On vérifie d'abord les enfants car leur Ref est déduite du parent
   if (type !== "INDEPENDANT" && parentRef && unitLabel) {
     const suffixe = normaliserSuffixe(unitLabel);
     return `${parentRef}-${suffixe}`;
+  }
+
+  const count = await prisma.property.count();
+  let seqNumber = count + 1;
+  let refBase = "";
+  let isUnique = false;
+
+  // Boucle pour contourner les conflits de séquence (ex: suppression logique)
+  while (!isUnique) {
+    const seq = String(seqNumber).padStart(5, "0");
+    refBase = `${prefix}-${communeCode}-${annee}-${seq}`;
+    
+    // findFirst we can bypass global soft-delete scopes sometimes, 
+    // but better yet, findUnique on @unique field checks DB directly.
+    const existant = await prisma.property.findUnique({
+      where: { propertyCode: refBase },
+      select: { id: true }
+    });
+
+    if (!existant) {
+      isUnique = true;
+    } else {
+      seqNumber++;
+    }
   }
 
   return refBase;
@@ -284,70 +304,75 @@ export async function creerBien(data: {
   declaredRentFcfa?: number;
   superficieM2?:          number;
 }) {
-  const session = await ensureAuthenticated();
-  const ownerUserId = data.ownerUserId || session.user.id;
-  const { typeStructure, unitLabel, parentPropertyId } = data;
+  try {
+    const session = await ensureAuthenticated();
+    const ownerUserId = data.ownerUserId || session.user.id;
+    const { typeStructure, unitLabel, parentPropertyId } = data;
 
-  if (typeStructure !== "INDEPENDANT") {
-    if (!unitLabel?.trim()) {
-      throw new Error(`Nom de l'unite obligatoire pour un bien enfant`);
+    if (typeStructure !== "INDEPENDANT") {
+      if (!unitLabel?.trim() && parentPropertyId) {
+        throw new Error(`Nom de l'unité obligatoire pour un bien enfant`);
+      }
+      if (!parentPropertyId && typeStructure !== "COUR_COMMUNE" && typeStructure !== "IMMEUBLE" && typeStructure !== "RESIDENCE") {
+        throw new Error(`Structure parente obligatoire pour un bien enfant`);
+      }
     }
-    if (!parentPropertyId) {
-      throw new Error(`Structure parente obligatoire pour un bien enfant`);
-    }
-  }
 
-  if (typeStructure !== "INDEPENDANT" && !parentPropertyId) {
-    if (!data.name?.trim()) {
-      throw new Error(`Nom obligatoire pour ${typeStructure}`);
+    if (typeStructure !== "INDEPENDANT" && !parentPropertyId) {
+      if (!data.name?.trim()) {
+        throw new Error(`Nom obligatoire pour ${typeStructure}`);
+      }
     }
-  }
 
-  if (typeStructure !== "INDEPENDANT" && unitLabel && parentPropertyId) {
-    const unitesExistantes = await prisma.property.findMany({
-      where: { parentPropertyId, unitLabel: { not: null } },
-      select: { unitLabel: true }
+    if (typeStructure !== "INDEPENDANT" && unitLabel && parentPropertyId) {
+      const unitesExistantes = await prisma.property.findMany({
+        where: { parentPropertyId, unitLabel: { not: null } },
+        select: { unitLabel: true }
+      });
+      const labelNorm = unitLabel.trim().toLowerCase();
+      const doublon = unitesExistantes.find(u => u.unitLabel?.trim().toLowerCase() === labelNorm);
+      if (doublon) {
+        throw new Error(`L'unite "${doublon.unitLabel}" existe deja. Choisissez un nom different.`);
+      }
+    }
+
+    let parentRef: string | undefined;
+    if (parentPropertyId) {
+      const parent = await prisma.property.findUnique({
+        where: { id: parentPropertyId },
+        select: { propertyCode: true, name: true }
+      });
+      if (!parent) throw new Error("Structure parente introuvable");
+      parentRef = parent.propertyCode;
+    }
+
+    const unitLabelNorm = unitLabel ? normaliserLabel(unitLabel) : undefined;
+    const propertyCode = await genererReference(typeStructure, data.commune, unitLabelNorm, parentRef);
+
+    const bien = await prisma.property.create({
+      data: {
+        propertyCode,
+        ownerUserId,
+        typeStructure,
+        name:             data.name,
+        unitLabel:        unitLabelNorm,
+        parentPropertyId: data.parentPropertyId,
+        commune:          data.commune,
+        address:          data.address,
+        propertyType:     data.propertyType,
+        declaredRentFcfa: data.declaredRentFcfa,
+        superficieM2:          data.superficieM2,
+        status:           "active"
+      }
     });
-    const labelNorm = unitLabel.trim().toLowerCase();
-    const doublon = unitesExistantes.find(u => u.unitLabel?.trim().toLowerCase() === labelNorm);
-    if (doublon) {
-      throw new Error(`L'unite "${doublon.unitLabel}" existe deja. Choisissez un nom different.`);
-    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/properties");
+    return { success: true, bien, propertyCode: propertyCode };
+  } catch (error: any) {
+    console.error("[créerBien Error]:", error);
+    return { error: error.message || "Une erreur est survenue lors de la création du bien." };
   }
-
-  let parentRef: string | undefined;
-  if (parentPropertyId) {
-    const parent = await prisma.property.findUnique({
-      where: { id: parentPropertyId },
-      select: { propertyCode: true, name: true }
-    });
-    if (!parent) throw new Error("Structure parente introuvable");
-    parentRef = parent.propertyCode;
-  }
-
-  const unitLabelNorm = unitLabel ? normaliserLabel(unitLabel) : undefined;
-  const propertyCode = await genererReference(typeStructure, data.commune, unitLabelNorm, parentRef);
-
-  const bien = await prisma.property.create({
-    data: {
-      propertyCode,
-      ownerUserId,
-      typeStructure,
-      name:             data.name,
-      unitLabel:        unitLabelNorm,
-      parentPropertyId: data.parentPropertyId,
-      commune:          data.commune,
-      address:          data.address,
-      propertyType:     data.propertyType,
-      declaredRentFcfa: data.declaredRentFcfa,
-      superficieM2:          data.superficieM2,
-      status:           "active"
-    }
-  });
-
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/properties");
-  return { success: true, bien, propertyCode: propertyCode };
 }
 
 export async function formaterAdresseBien(bien: {
