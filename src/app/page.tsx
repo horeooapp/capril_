@@ -164,7 +164,7 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
     ];
 
     return (
-        <div className="bg-white min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
+        <div className="bg-gradient-to-b from-[#F5F7FA] via-[#FAFBFC] to-[#F5F7FA] min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
             <div className="sticky top-0 z-[60]">
                 {ticker}
             </div>
@@ -220,7 +220,7 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                         </div>
                     </div>
                 </section>
-                <section className="py-32 bg-white"><AppDepthCards /></section>
+                <section className="py-32 bg-transparent"><AppDepthCards /></section>
             </main>
             <Footer />
         </div>
