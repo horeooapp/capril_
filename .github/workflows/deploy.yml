@@ -179,6 +179,10 @@ jobs:
           # 停止 APP 
           sudo su - github -c "pm2 stop capril || true"
           sudo su - github -c "pm2 delete capril || true"
+          
+          echo "🧹 Purge des processus fantômes bloquant le port 3000..."
+          sudo fuser -k -9 3000/tcp || true
+          sudo pkill -f next-server || true
 
           echo "🧹 Nuking STALE artifacts on VPS (Pre-deployment)..."
           # Only keep persistent directories and critical config
@@ -319,7 +323,7 @@ jobs:
             sudo -u postgres psql -d qapril -c "ALTER SCHEMA public OWNER TO qapril_user;" || true
             
             # Massive ownership transfer via a single-line SQL command to avoid Heredoc indentation issues
-            sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;"
+            sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;" || true
 
             # Verify the provider in the logs for the main schema
             echo "--- Server-side schema.prisma snippet ---"
@@ -349,13 +353,16 @@ jobs:
             mkdir -p /home/github/capril_data/uploads
             [ -L "public/uploads" ] || ln -s /home/github/capril_data/uploads public/uploads || true
             
-            echo "🚀 Starting application (PM2)..."
+            echo "🚀 Starting application (PM2) and purging Zombies..."
+            sudo fuser -k -9 3000/tcp || true
+            sudo pkill -f next-server || true
+            
             pm2 describe capril > /dev/null 2>&1 && pm2 delete capril || echo 'PM2: New process'
             
             # Use the ROOT server.js (loader) instead of internal Next.js server.js
             # This ensures .env is loaded and we bind to 127.0.0.1
             PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
-            pm2 save
+            pm2 save --force
           EOF_DEPLOY
 
       - name: 🩺 Health Check
