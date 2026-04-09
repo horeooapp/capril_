@@ -522,13 +522,13 @@ BEGIN
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
-    ALTER TABLE "ticket_maintenance" ALTER COLUMN "statut" DROP DEFAULT;
-    ALTER TABLE "ticket_maintenance" ALTER COLUMN "statut" TYPE "MaintenanceStatus" USING "statut"::text::"MaintenanceStatus";
+    ALTER TABLE "tickets_maintenance" ALTER COLUMN "statut" DROP DEFAULT;
+    ALTER TABLE "tickets_maintenance" ALTER COLUMN "statut" TYPE "MaintenanceStatus" USING "statut"::text::"MaintenanceStatus";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
-    ALTER TABLE "ticket_maintenance" ALTER COLUMN "categorie" DROP DEFAULT;
-    ALTER TABLE "ticket_maintenance" ALTER COLUMN "categorie" TYPE "MaintenanceCategory" USING "categorie"::text::"MaintenanceCategory";
+    ALTER TABLE "tickets_maintenance" ALTER COLUMN "categorie" DROP DEFAULT;
+    ALTER TABLE "tickets_maintenance" ALTER COLUMN "categorie" TYPE "MaintenanceCategory" USING "categorie"::text::"MaintenanceCategory";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
@@ -542,8 +542,8 @@ BEGIN
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
-    ALTER TABLE "tarif_negocie" ALTER COLUMN "type" DROP DEFAULT;
-    ALTER TABLE "tarif_negocie" ALTER COLUMN "type" TYPE "NegocieType" USING "type"::text::"NegocieType";
+    ALTER TABLE "tarifs_negocie" ALTER COLUMN "type" DROP DEFAULT;
+    ALTER TABLE "tarifs_negocie" ALTER COLUMN "type" TYPE "NegocieType" USING "type"::text::"NegocieType";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
@@ -557,8 +557,8 @@ BEGIN
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
-    ALTER TABLE "preavis_bail" ALTER COLUMN "statut" DROP DEFAULT;
-    ALTER TABLE "preavis_bail" ALTER COLUMN "statut" TYPE "PreavisStatutEnum" USING "statut"::text::"PreavisStatutEnum";
+    ALTER TABLE "preavis_bails" ALTER COLUMN "statut" DROP DEFAULT;
+    ALTER TABLE "preavis_bails" ALTER COLUMN "statut" TYPE "PreavisStatutEnum" USING "statut"::text::"PreavisStatutEnum";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
@@ -567,8 +567,8 @@ BEGIN
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
 
   BEGIN
-    ALTER TABLE "champion_prospects" ALTER COLUMN "statut" DROP DEFAULT;
-    ALTER TABLE "champion_prospects" ALTER COLUMN "statut" TYPE "ProspectStatut" USING "statut"::text::"ProspectStatut";
+    ALTER TABLE "champions_prospects" ALTER COLUMN "statut" DROP DEFAULT;
+    ALTER TABLE "champions_prospects" ALTER COLUMN "statut" TYPE "ProspectStatut" USING "statut"::text::"ProspectStatut";
   EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'Failed: %', SQLERRM; END;
   
   -- Also fix reversals
