@@ -112,7 +112,7 @@ export async function createLease(data: {
         const property = await prisma.property.findUnique({ where: { id: data.propertyId } });
         if (!property) throw new Error("Bien introuvable.");
 
-        let realLandlordId = property.ownerUserId;
+        const realLandlordId = property.ownerUserId;
         let realAgentId: string | null = null;
         let resolvedMandatId: string | null = data.mandatGestionId || null;
 

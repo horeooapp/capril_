@@ -7,7 +7,7 @@ async function main() {
     console.log('Initiating database reset...');
 
     // 1. Fetch current admin@capril.ci to preserve it (if it exists)
-    let admin = await prisma.user.findFirst({ 
+    const admin = await prisma.user.findFirst({ 
         where: { email: 'admin@capril.ci' } 
     });
 

@@ -51,6 +51,7 @@ export default function AgentBailDeclaratif({
   // Démarrage automatique de la conversation
   useEffect(() => {
     demarrerConversation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Scroll automatique vers le dernier message
