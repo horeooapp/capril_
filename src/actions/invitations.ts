@@ -137,6 +137,14 @@ export async function respondToInvitation(invitationId: string, response: 'ACCEP
                 where: { userId: invitation.locataireId },
                 data: { nbInvitationsRefusees: { increment: 1 } }
             })
+
+            // IMPORTANT : Annuler le bail pré-généré pour éviter un contrat "fantôme" (Orphan Lease)
+            if (invitation.leaseId) {
+                await prisma.lease.update({
+                    where: { id: invitation.leaseId },
+                    data: { status: 'CANCELLED' }
+                })
+            }
         }
 
         const updated = await (prisma as any).invitationBail.update({

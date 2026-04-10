@@ -15,13 +15,24 @@ export async function getProperties() {
         const session = await ensureAuthenticated()
         const userId = session.user.id
 
+        const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
+        const managerId = (fullUser?.agencyConfig as any)?.managerId
+
+        const orConditions: any[] = [
+            { ownerUserId: userId },
+            { managedByUserId: userId },
+            { leases: { some: { landlordId: userId } } },
+            { accessRoles: { some: { userId: userId, statut: "ACTIF" } } }
+        ]
+
+        if (managerId) {
+            orConditions.push({ managedByUserId: managerId })
+            orConditions.push({ leases: { some: { agentId: managerId } } })
+        }
+
         const dbProperties = await prisma.property.findMany({
             where: {
-                OR: [
-                    { ownerUserId: userId },
-                    { managedByUserId: userId },
-                    { leases: { some: { landlordId: userId } } }
-                ]
+                OR: orConditions
             },
             include: {
                 leases: {
@@ -46,8 +57,16 @@ export async function getProperties() {
 
         const properties = [...dbProperties] as any[];
 
+        const leaseOrConditions: any[] = [
+            { landlordId: userId },
+            { agentId: userId }
+        ]
+        if (managerId) {
+            leaseOrConditions.push({ agentId: managerId })
+        }
+
         const directLeases = await prisma.lease.findMany({
-            where: { landlordId: userId },
+            where: { OR: leaseOrConditions },
             include: {
                 property: true,
                 tenant: { select: { firstName: true, lastName: true, phone: true } },

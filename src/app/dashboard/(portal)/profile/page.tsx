@@ -18,6 +18,18 @@ export default async function OwnerProfilePage() {
         }
     })
 
+    if (!user) {
+        return (
+            <div className="flex h-[50vh] items-center justify-center animate-in fade-in zoom-in duration-500">
+                <div className="glass-panel p-8 text-center max-w-sm rounded-3xl border border-red-500/30 bg-red-50/50">
+                    <h2 className="text-xl font-bold text-red-600 mb-2">Profil introuvable</h2>
+                    <p className="text-sm text-gray-600 mb-6">Impossible de charger vos données. Votre compte a peut-être été supprimé.</p>
+                    <Link href="/login" className="px-6 py-2 bg-red-600 text-white rounded-xl text-sm font-bold uppercase tracking-wide cursor-pointer hover:bg-red-700">Se Reconnecter</Link>
+                </div>
+            </div>
+        )
+    }
+
     const agencyProfile = (user as any)?.agenceProfile;
 
     const primaryDoc = user?.identityDocuments?.find(d => !['DFE','RCCM','NIF','AGREMENT'].includes(d.docType)) || user?.identityDocuments?.[0];

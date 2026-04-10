@@ -12,35 +12,6 @@ async function apiFetch(path: string, opts: any = {}) {
 }
 
 /**
- * Hook for Landlord (Propriétaire)
- */
-export function useLandlordData() {
-  const [data, setData] = useState<{ user: any, properties: any[] } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const [user, properties] = await Promise.all([
-          apiFetch('/proprietaires/me'),
-          apiFetch('/proprietaires/patrimoine'),
-        ]);
-        setData({ user, properties });
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
-
-  return { data, loading, error };
-}
-
-/**
  * Hook for Agency (Agence)
  */
 export function useAgencyData(initialData?: any) {

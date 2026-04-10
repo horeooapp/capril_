@@ -53,8 +53,20 @@ export async function ensurePropertyAccess(propertyId: string) {
 
     if (!property) throw new Error("Propriété non trouvée.")
 
-    if (property.ownerUserId !== userId && property.managedByUserId !== userId) {
-        throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.")
+    const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
+    const managerId = (fullUser?.agencyConfig as any)?.managerId
+
+    const hasAccess = property.ownerUserId === userId || 
+                      property.managedByUserId === userId || 
+                      (managerId && property.managedByUserId === managerId);
+    
+    if (!hasAccess) {
+        const pAccess = await prisma.propertyAccess.findFirst({
+            where: { propertyId, userId, statut: "ACTIF" }
+        })
+        if (!pAccess) {
+            throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.")
+        }
     }
 }
 
@@ -74,18 +86,28 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
 
     const lease = await prisma.lease.findUnique({
         where: { id: leaseId },
-        select: { landlordId: true, tenantId: true, agentId: true }
+        select: { landlordId: true, tenantId: true, agentId: true, propertyId: true }
     })
 
     if (!lease) throw new Error("Bail non trouvé.")
 
+    const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
+    const managerId = (fullUser?.agencyConfig as any)?.managerId
+
     const isParticipant = 
         lease.landlordId === userId || 
         lease.tenantId === userId || 
-        lease.agentId === userId
+        lease.agentId === userId ||
+        (managerId && lease.agentId === managerId)
 
     if (!isParticipant) {
-        throw new Error("Accès refusé : Vous n'êtes pas partie prenante de ce bail.")
+        // Fallback to check if they have access to the property via PropertyAccess
+        const pAccess = await prisma.propertyAccess.findFirst({
+            where: { propertyId: lease.propertyId, userId, statut: "ACTIF" }
+        })
+        if (!pAccess) {
+            throw new Error("Accès refusé : Vous n'êtes pas partie prenante de ce bail.")
+        }
     }
     
     return lease

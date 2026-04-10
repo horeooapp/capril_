@@ -934,11 +934,11 @@ model Lease {
   tenant           User?        @relation("LeaseTenant", fields: [tenantId], references: [id])
   tenantEntityId   String?      @map("tenant_entity_id")
   tenantEntity     LegalEntity? @relation("LeaseTenantEntity", fields: [tenantEntityId], references: [id])
-  agentId          String?      @map("agent_id")
-  agent            User?        @relation("LeaseAgent", fields: [agentId], references: [id])
-  mandateId        String?      @map("mandate_id")
-  mandate          Mandate?     @relation(fields: [mandateId], references: [id])
-  leaseType        String       @default("residential") @map("lease_type") // residential|commercial
+  agentId          String?        @map("agent_id")
+  agent            User?          @relation("LeaseAgent", fields: [agentId], references: [id])
+  mandatGestionId  String?        @map("mandat_gestion_id")
+  mandatGestion    MandatGestion? @relation(fields: [mandatGestionId], references: [id])
+  leaseType        String         @default("residential") @map("lease_type") // residential|commercial
 
   startDate      DateTime  @map("start_date")
   endDate        DateTime? @map("end_date")
@@ -1216,8 +1216,6 @@ model Mandate {
 
   proofHash String? @map("proof_hash")
   pdfUrl    String? @map("pdf_url")
-
-  leases  Lease[]
   history MandateHistory[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -2765,6 +2763,7 @@ model MandatGestion {
   proprietaire     User             @relation("MandatsDonnes", fields: [proprietaireId], references: [id])
   intermediaire    User             @relation("MandatsRecus", fields: [intermediaireId], references: [id])
   propertyAccesses PropertyAccess[]
+  leases           Lease[]
 
   @@map("mandats_gestion")
 }

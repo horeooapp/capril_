@@ -211,7 +211,11 @@ export async function acceptInvite(token: string, fullName: string) {
         const autoLoginOtp = Math.random().toString().slice(2, 8)
         const { redis } = await import("@/lib/redis")
         if (redis) {
-            await redis.setex(`otp:${matchedUser.email}`, 300, autoLoginOtp)
+            if (typeof redis.setex === 'function') {
+                await redis.setex(`otp:${matchedUser.email}`, 300, autoLoginOtp)
+            } else {
+                await redis.set(`otp:${matchedUser.email}`, autoLoginOtp, 'EX', 300)
+            }
         }
 
         return { success: true, message: "Bienvenue sur QAPRIL. Connexion en cours...", autoLoginOtp }

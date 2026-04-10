@@ -17,7 +17,8 @@ export interface BailDeclaratifData {
 
 // Normaliser le numero de telephone CI
 function normaliserTelephone(phone: string): string {
-  const digits = phone.replace(/[^0-9]/g, "")
+  if (!phone) return "";
+  const digits = String(phone).replace(/[^0-9]/g, "")
   if (digits.startsWith("225")) return "+" + digits
   if (digits.length === 10) return "+225" + digits
   if (digits.length === 8) return "+225" + "0" + digits
@@ -40,12 +41,14 @@ export async function creerBailDeclaratif(
 ) {
   try {
   if (!data.tenantFullName?.trim()) return { error: "Nom du locataire requis" }
+  if (!data.tenantPhone)            return { error: "Numéro de téléphone requis" }
   if (!data.commune?.trim())        return { error: "Commune requise" }
   if (!data.address?.trim())        return { error: "Adresse requise" }
   if (!data.rentAmount || data.rentAmount <= 0) return { error: "Montant loyer invalide" }
   if (!data.startDate)              return { error: "Date de début requise" }
 
   const phoneNorm = normaliserTelephone(data.tenantPhone)
+  if (!phoneNorm)                   return { error: "Format du téléphone invalide" }
 
   // 1. Trouver ou creer le locataire
   let tenant = await prisma.user.findFirst({

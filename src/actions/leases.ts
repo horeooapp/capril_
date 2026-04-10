@@ -42,7 +42,8 @@ export async function createLease(data: {
         indexationPeriod: number, // months
         activityType: string,
         indexationPercentage?: number
-    }
+    },
+    mandatGestionId?: string
 }) {
     const session = await auth()
     if (!session || !session.user || !session.user.id) {
@@ -107,15 +108,39 @@ export async function createLease(data: {
             initialStatus = LeaseStatus.PENDING_CONFIRMATION;
         }
 
+        // 4. Resolve True Landlord and Mandate (Agent logic)
+        const property = await prisma.property.findUnique({ where: { id: data.propertyId } });
+        if (!property) throw new Error("Bien introuvable.");
+
+        let realLandlordId = property.ownerUserId;
+        let realAgentId: string | null = null;
+        let resolvedMandatId: string | null = data.mandatGestionId || null;
+
+        if (session.user.id !== realLandlordId) {
+            // The user creating the lease is an agent/intermediary
+            realAgentId = session.user.id;
+            
+            // Auto-detect Active Mandate if not passed explicitly
+            if (!resolvedMandatId) {
+                const activeAccess = await (prisma as any).propertyAccess.findFirst({
+                    where: { propertyId: data.propertyId, userId: realAgentId, statut: "ACTIF" }
+                });
+                if (!activeAccess) throw new Error("Vous n'avez pas de mandat actif pour gérer ce bien.");
+                resolvedMandatId = activeAccess.mandatId || null;
+            }
+        }
+
         const lease = await prisma.lease.create({
             data: {
                 leaseReference,
                 leaseType: data.leaseType,
                 typeBail: data.typeBail || TypeBail.ECRIT,
                 propertyId: data.propertyId,
-                landlordId: session.user.id,
+                landlordId: realLandlordId,
+                agentId: realAgentId,
                 tenantId,
                 tenantEntityId: data.tenantEntityId,
+                mandatGestionId: resolvedMandatId,
                 startDate: data.startDate,
                 durationMonths: finalDuration,
                 rentAmount: data.rentAmount,

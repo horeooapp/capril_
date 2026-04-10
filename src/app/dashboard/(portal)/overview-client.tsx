@@ -39,9 +39,9 @@ export default function DashboardOverviewClient({
 
     if (activeRole === 'INTERMEDIARY') {
         // En attendant un wrapper spécifique, un intermédiaire voit la vue propriétaire étendue
-        return <OwnerPortalWrapper intermData={intermData} activeRole={activeRole} />;
+        return <OwnerPortalWrapper user={user} properties={properties} intermData={intermData} activeRole={activeRole} />;
     }
 
     // Par défaut pour tout le monde (Propriétaire, Diaspora, etc.) => Dashboard Propriétaire Premium
-    return <OwnerPortalWrapper diasporaData={diasporaData} activeRole={activeRole} />;
+    return <OwnerPortalWrapper user={user} properties={properties} diasporaData={diasporaData} activeRole={activeRole} />;
 }

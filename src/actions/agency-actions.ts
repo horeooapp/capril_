@@ -75,9 +75,9 @@ export async function getAgencyDashboardData() {
     const userId = session.user.id;
 
     try {
-        // 1. Get Property Accesses (Fixed schema mismatch: PropertyAccess does not have 'statut' or 'profil')
+        // 1. Get Property Accesses
         const accesses = await (prisma as any).propertyAccess.findMany({
-            where: { userId, revokedAt: null },
+            where: { userId, revokedAt: null, statut: "ACTIF" },
             include: {
                 property: {
                     include: {
