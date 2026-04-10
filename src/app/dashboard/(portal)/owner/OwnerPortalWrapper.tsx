@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useLandlordData } from '@/hooks/qapril-web-hooks';
+
 import { OwnerPortalDashboard } from '@/components/dashboard/owner/OwnerPortalDashboard';
 import { Loader2, AlertCircle } from 'lucide-react';
 

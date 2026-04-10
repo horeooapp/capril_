@@ -13,7 +13,8 @@ export default function DashboardOverviewClient({
     session,
     agencyData,
     diasporaData,
-    intermData
+    intermData,
+    properties
 }: { 
     user: any,
     activeRole: string,

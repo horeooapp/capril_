@@ -89,8 +89,12 @@ export async function getAgencyRevenueForecast(agentId: string) {
     const mandates = await prisma.mandate.findMany({
         where: { agentUserId: agentId, status: MandateStatus.ACTIVE },
         include: {
-            leases: {
-                where: { status: 'ACTIVE' }
+            property: {
+                include: {
+                    leases: {
+                        where: { status: 'ACTIVE' }
+                    }
+                }
             }
         }
     });
@@ -98,7 +102,8 @@ export async function getAgencyRevenueForecast(agentId: string) {
     let totalProjected = 0;
 
     for (const mandate of mandates) {
-        for (const lease of mandate.leases) {
+        if (!mandate.property || !mandate.property.leases) continue;
+        for (const lease of mandate.property.leases) {
             // Projected monthly commission
             const monthlyComm = (lease.rentAmount * Number(mandate.commissionPct)) / 100;
             totalProjected += monthlyComm;
@@ -116,10 +121,14 @@ export async function getMandateAnalytics(mandateId: string) {
     const mandate = await prisma.mandate.findUnique({
         where: { id: mandateId },
         include: {
-            leases: {
+            property: {
                 include: {
-                    receipts: true,
-                    arrears: true
+                    leases: {
+                        include: {
+                            receipts: true,
+                            arrears: true
+                        }
+                    }
                 }
             }
         }
@@ -132,9 +141,9 @@ export async function getMandateAnalytics(mandateId: string) {
     let occupancyDays = 0;
     const now = new Date();
 
-    mandate.leases.forEach(lease => {
+    (mandate.property?.leases || []).forEach((lease: any) => {
         // Rent Collection
-        lease.receipts.forEach(r => {
+        lease.receipts.forEach((r: any) => {
             totalExpected += r.totalAmount;
             if (r.status === 'paid' || r.status === 'PAID') {
                 totalCollected += r.totalAmount;
@@ -157,7 +166,7 @@ export async function getMandateAnalytics(mandateId: string) {
         totalExpected,
         occupancyDays: Math.round(occupancyDays),
         efficiencyScore,
-        leaseCount: mandate.leases.length,
+        leaseCount: mandate.property?.leases?.length || 0,
         status: mandate.status
     };
 }

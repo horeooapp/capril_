@@ -17,7 +17,6 @@ export async function getDashboardBailleur(landlordId: string) {
       include: {
         property: { select: { commune: true, address: true, propertyCode: true } },
         tenant:   { select: { firstName: true, lastName: true, phone: true } },
-        mandate:  { select: { mandateRef: true, mandateType: true, status: true } },
         receipts: { orderBy: { periodMonth: "desc" }, take: 1 }
       }
     }),

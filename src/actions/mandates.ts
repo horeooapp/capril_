@@ -214,14 +214,17 @@ export async function getLandlordMandates() {
             }
         },
         include: {
-            property: true,
+            property: {
+                include: {
+                    leases: {
+                        include: {
+                            receipts: true
+                        }
+                    }
+                }
+            },
             agent: {
                 select: { firstName: true, lastName: true, email: true, role: true }
-            },
-            leases: {
-                include: {
-                    receipts: true
-                }
             }
         },
         orderBy: { createdAt: 'desc' }
@@ -232,8 +235,8 @@ export async function getLandlordMandates() {
         let totalExpected = 0;
         let totalCollected = 0;
         
-        mandate.leases.forEach(lease => {
-            lease.receipts.forEach(r => {
+        (mandate.property?.leases || []).forEach((lease: any) => {
+            lease.receipts.forEach((r: any) => {
                 totalExpected += r.totalAmount;
                 if (r.status === 'paid' || r.status === 'PAID') {
                     totalCollected += r.totalAmount;
@@ -247,7 +250,7 @@ export async function getLandlordMandates() {
             ...mandate,
             analytics: {
                 collectionRate,
-                totalLeases: mandate.leases.length
+                totalLeases: mandate.property?.leases?.length || 0
             }
         };
     });

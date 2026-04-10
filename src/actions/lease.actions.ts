@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 // ── Créer un bail ────────────────────────────────────────
 export async function createLease(data: {
   propertyId:    string;
+  leaseType?:    string;
   landlordId:    string;
   tenantId?:     string;
   agentId?:      string;
@@ -142,7 +143,6 @@ export async function getLeaseById(leaseId: string) {
       property: true,
       landlord: { select: { firstName: true, lastName: true, phone: true, walletConfig: { select: { landlordCode: true } } } },
       tenant:   { select: { firstName: true, lastName: true, phone: true } },
-      mandate:  true,
       receipts: { orderBy: { createdAt: "desc" } }
     }
   });

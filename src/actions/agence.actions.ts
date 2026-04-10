@@ -16,9 +16,14 @@ export async function getDashboardAgence(agenceUserId: string) {
     prisma.mandate.findMany({
       where: { agentUserId: agenceUserId, status: "ACTIVE" },
       include: {
-        property: { select: { commune: true, address: true, propertyCode: true } },
-        leases:   { where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
-                    include: { tenant: { select: { firstName: true, lastName: true } } } }
+        property: { 
+          include: {
+            leases: { 
+              where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+              include: { tenant: { select: { firstName: true, lastName: true } } } 
+            }
+          } 
+        }
       }
     }),
     // CRG du mois
@@ -50,7 +55,7 @@ export async function getDashboardAgence(agenceUserId: string) {
   const totalLoyers   = crg.reduce((s,c) => s + c.loyersEncaisses, 0);
   const totalHonoraires = crg.reduce((s,c) => s + c.honorairesAgence, 0);
   const biensMandat   = mandats.length;
-  const bauxActifs    = mandats.reduce((s,m) => s + m.leases.length, 0);
+  const bauxActifs    = mandats.reduce((s,m) => s + (m.property?.leases?.length || 0), 0);
 
   return { profil, mandats, crg, agenda, annonces,
     kpi: { totalLoyers, totalHonoraires, biensMandat, bauxActifs } };
