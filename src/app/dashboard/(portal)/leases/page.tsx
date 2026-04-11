@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { ClipboardList, Search, Plus, Filter, Key, CheckCircle2, Clock } from "lucide-react"
+import Link from "next/link"
 
 export default function LeasesDashboardPage() {
     const [leases] = useState<any[]>([
@@ -22,9 +23,9 @@ export default function LeasesDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2">
+                    <Link href="/dashboard/lease-wizard" className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Nouveau Contrat
-                    </button>
+                    </Link>
                 </div>
             </div>
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Building2, Search, Plus, MapPin, CheckCircle, Clock, Home, X, Filter, BarChart } from "lucide-react"
+import Link from "next/link"
 
 export default function PropertiesDashboardPage() {
     const [properties] = useState<any[]>([
@@ -25,9 +26,9 @@ export default function PropertiesDashboardPage() {
                     <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Filtres
                     </button>
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Nouveau Bien
-                    </button>
+                    </Link>
                 </div>
             </div>
 
