@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,11 +54,11 @@ export const EdlComparator: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all shadow-sm">
+          <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
             <Download size={16} />
             Export Certifié PDF
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-blue-900/20">
+          <button className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
             <ShieldCheck size={16} />
             Signer & Clôturer
           </button>
@@ -187,7 +188,7 @@ export const EdlComparator: React.FC = () => {
                 </div>
               ))}
 
-              <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-[#1F4E79] hover:text-[#1F4E79] transition-all group">
+              <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-[#1F4E79] hover:text-[#1F4E79] transition-all group" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                 <Plus size={18} className="group-hover:rotate-90 transition-transform" />
                 <span className="text-[11px] font-black uppercase tracking-widest">Ajouter une dégradation</span>
               </button>
@@ -212,7 +213,7 @@ export const EdlComparator: React.FC = () => {
                   Le locataire dispose de 72h pour contester.
                </p>
 
-               <button className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 mt-6">
+               <button className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 mt-6" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                   Valider le solde
                   <ArrowRight size={18} />
                </button>

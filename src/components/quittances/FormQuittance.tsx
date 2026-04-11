@@ -1,4 +1,5 @@
-"use client";
+"use client"
+import { toast } from "sonner";;
 // QAPRIL - FormQuittance - Visuel approuve 01/04/2026
 // 3 vues : Formulaire → Prévisualisation → Confirmation
 // NE PAS MODIFIER les classes Q.*
@@ -157,7 +158,7 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
               <span className="text-[9px] text-white/40 font-mono truncate">{result.sha256}</span>
             </div>
             <div className="flex gap-2 mt-3">
-              <button className={Q.btnPrimary + " flex-1"}>⬇ Télécharger PDF</button>
+              <button className={Q.btnPrimary + " flex-1"} onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>⬇ Télécharger PDF</button>
               <button onClick={() => { setVue("form"); setMois(""); }} className={Q.btnSecond + " flex-1"}>+ Nouvelle quittance</button>
             </div>
           </div>

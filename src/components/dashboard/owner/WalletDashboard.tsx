@@ -1,4 +1,5 @@
-'use client';
+'use client'
+import { toast } from "sonner";;
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -120,7 +121,7 @@ export default function WalletDashboard() {
                 <div className="mt-8 space-y-1">
                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Service Clients</p>
                    <p className="text-lg font-black italic uppercase tracking-tighter">Support Wallet Direct.</p>
-                   <button className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.2em] flex items-center gap-2 mt-2 group-hover:gap-4 transition-all">
+                   <button className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.2em] flex items-center gap-2 mt-2 group-hover:gap-4 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                       Contacter sur WhatsApp <ArrowRight size={14} />
                    </button>
                 </div>
@@ -139,7 +140,7 @@ export default function WalletDashboard() {
               <span className="h-[1px] w-8 bg-gray-200"></span>
             </div>
           </div>
-          <button className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-white text-[#1F4E79] rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all border border-transparent hover:border-gray-100 shadow-sm">
+          <button className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-white text-[#1F4E79] rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all border border-transparent hover:border-gray-100 shadow-sm" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
              Exporter Relevé
           </button>
         </div>

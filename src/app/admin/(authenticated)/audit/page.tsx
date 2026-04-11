@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState, useEffect } from "react"
 import { getAuditLogs } from "@/actions/audit"
@@ -103,7 +104,7 @@ export default function AuditPage() {
                         <RefreshCcw size={16} className={loading ? "animate-spin" : ""} />
                         Actualiser
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-gray-200 active:scale-95">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-gray-200 active:scale-95" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         <ExternalLink size={16} />
                         Exporter
                     </button>

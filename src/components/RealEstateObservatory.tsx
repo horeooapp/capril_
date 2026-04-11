@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { motion } from "framer-motion"
 import TrendChart from "./TrendChart"
@@ -118,7 +119,7 @@ export default function RealEstateObservatory() {
                             <h3 className="text-2xl font-black mb-4 uppercase tracking-tighter italic">Rapport d&apos;Analyse Trimestriel</h3>
                             <p className="text-gray-400 font-medium max-w-xl">Accédez à l&apos;étude complète des flux migratoires et des variations de prix sectorielles certifiée par le protocole QAPRIL.</p>
                         </div>
-                        <button className="px-10 py-5 bg-primary hover:bg-orange-600 transition-colors rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20 whitespace-nowrap">
+                        <button className="px-10 py-5 bg-primary hover:bg-orange-600 transition-colors rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20 whitespace-nowrap" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                             Descendre le Rapport PDF
                         </button>
                     </div>

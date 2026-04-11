@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { getTenantLeases } from "@/actions/leases"
 import Link from "next/link"
 
@@ -139,7 +140,7 @@ export default async function TenantLeasesPage() {
 
                                     {/* Actions */}
                                     <div className="pt-4 flex gap-3">
-                                        <button className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-black transition-colors shadow-lg shadow-gray-200 uppercase tracking-wider">
+                                        <button className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-black transition-colors shadow-lg shadow-gray-200 uppercase tracking-wider" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                             Télécharger le bail
                                         </button>
                                         <Link href={`/locataire/trust`} className="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 uppercase tracking-wider">

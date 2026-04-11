@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import React from "react"
 import { Users, Search, Filter, Download, ArrowUpRight } from "lucide-react"
 import { prisma } from "@/lib/prisma"
@@ -23,10 +24,10 @@ export default async function AdminCandidatesPage() {
                     <p className="text-[14px] text-gray-500 font-medium">Contrôle centralisé des dossiers M-CAND et scores ICL.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors">
+                    <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         <Download size={20} />
                     </button>
-                    <button className="px-6 py-3 bg-gray-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all">
+                    <button className="px-6 py-3 bg-gray-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         Exporter CSV
                     </button>
                 </div>
@@ -57,7 +58,7 @@ export default async function AdminCandidatesPage() {
                             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                         />
                     </div>
-                    <button className="flex items-center gap-2 px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors">
+                    <button className="flex items-center gap-2 px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         <Filter size={14} />
                         Filtres Avancés
                     </button>
@@ -110,7 +111,7 @@ export default async function AdminCandidatesPage() {
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white transition-all transform group-hover:scale-110">
+                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white transition-all transform group-hover:scale-110" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                                 <ArrowUpRight size={18} />
                                             </button>
                                         </td>

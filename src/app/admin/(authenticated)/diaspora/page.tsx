@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import React from "react"
 import { Globe, Search, Filter, ShieldCheck, Mail, ArrowUpRight } from "lucide-react"
 import { prisma } from "@/lib/prisma"
@@ -22,7 +23,7 @@ export default async function AdminDiasporaPage() {
                     <p className="text-[14px] text-gray-500 font-medium">Contrôle des services packagés pour les investisseurs de la Diaspora.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200">
+                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-200" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         <Mail size={14} />
                         Notifier Cohorte
                     </button>
@@ -100,7 +101,7 @@ export default async function AdminDiasporaPage() {
                                             Aujourd&apos;hui (10:45)
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all transform group-hover:scale-110 shadow-sm">
+                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all transform group-hover:scale-110 shadow-sm" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                                 <ArrowUpRight size={18} />
                                             </button>
                                         </td>

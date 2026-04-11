@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState } from "react"
 import { motion } from "framer-motion"
@@ -124,7 +125,7 @@ export default function ArrearsProceduralBox({ leaseId, proceduralState }: Arrea
                             Action validée et transmise
                         </div>
                     )}
-                    <button className="text-gray-500 hover:text-white text-sm transition-colors">
+                    <button className="text-gray-500 hover:text-white text-sm transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                         Ignorer (Clemence)
                     </button>
                 </div>

@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState, useMemo } from "react";
 import { useMobileMoneyLocataire } from "@/hooks/qapril-hooks";
@@ -221,7 +222,7 @@ export function TenantPortalDashboard({
                                 <div style={{fontSize:9,color:T.textLight}}>Accès : Quittances, Bail, RCL</div>
                             </div>
                         </div>
-                        <button style={{background:T.redPale,color:T.red,border:"none",borderRadius:6,padding:"4px 8px",fontSize:9,fontWeight:800}}>RÉVOQUER</button>
+                        <button style={{background:T.redPale,color:T.red,border:"none",borderRadius:6,padding:"4px 8px",fontSize:9,fontWeight:800}} onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>RÉVOQUER</button>
                     </div>
                     <div style={{marginTop:20,textAlign:"center"}}>
                         <button onClick={()=>cl("trust")} style={{background:T.grey1,color:T.textMid,borderRadius:8,padding:"10px 20px",fontSize:11,fontWeight:700,border:"none"}}>Fermer</button>

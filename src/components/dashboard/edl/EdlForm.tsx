@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -186,7 +187,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
                   <div className="space-y-4">
                      <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Preuves Photos (Horodatées)</label>
                      <div className="grid grid-cols-2 gap-4 h-48">
-                        <button className="rounded-2xl border-2 border-dashed border-gray-800 flex flex-col items-center justify-center text-gray-600 hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group overflow-hidden relative">
+                        <button className="rounded-2xl border-2 border-dashed border-gray-800 flex flex-col items-center justify-center text-gray-600 hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group overflow-hidden relative" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                            <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                            <Camera className="w-10 h-10 mb-2 group-hover:scale-110 transition-transform" />
                            <span className="text-[10px] font-black uppercase tracking-widest">Capture Photo</span>
@@ -241,7 +242,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
                           className="w-full bg-black/40 border-2 border-gray-800 rounded-2xl py-6 px-6 text-2xl font-black text-white focus:border-indigo-500 outline-none transition-all placeholder:text-gray-800"
                         />
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-2">
-                           <button className="p-3 bg-gray-800 rounded-xl text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all">
+                           <button className="p-3 bg-gray-800 rounded-xl text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                               <Camera className="w-5 h-5" />
                            </button>
                         </div>

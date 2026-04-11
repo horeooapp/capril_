@@ -140,7 +140,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                         </div>
 
                                         <div className="flex flex-col justify-center items-center md:items-end w-full md:w-auto pt-6 md:pt-0 border-t md:border-t-0 border-gray-100">
-                                            <button className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn">
+                                            <button className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                                 <Download size={20} className="group-hover/btn:translate-y-1 transition-transform" />
                                                 PDF Premium
                                             </button>

@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState, useEffect } from "react";
 import { 
@@ -90,7 +91,7 @@ export default function AgencyDashboardPage() {
           <div className="p-3 bg-indigo-500/10 rounded-xl">
             <span className="text-xs font-black text-indigo-500">4 Collaborateurs</span>
           </div>
-          <button className="p-3 bg-gray-800 hover:bg-gray-700 rounded-xl transition-all relative">
+          <button className="p-3 bg-gray-800 hover:bg-gray-700 rounded-xl transition-all relative" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
             <Bell className="w-5 h-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
           </button>

@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
@@ -204,7 +205,7 @@ export default function LocataireDashboardPage() {
                         <Link href="/locataire/receipts" className="flex-1 bg-white text-qnavy-dark hover:bg-qgrey-1 font-black rounded-2xl px-6 py-4 text-xs uppercase tracking-widest transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2">
                            Régler maintenant <ArrowUpRight size={18} />
                         </Link>
-                        <button className="h-14 w-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all">
+                        <button className="h-14 w-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                             <Download size={20} />
                         </button>
                     </div>

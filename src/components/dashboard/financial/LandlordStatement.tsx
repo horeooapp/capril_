@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { 
   FileText, Download, Share2, 
@@ -39,9 +40,9 @@ export default function LandlordStatement({ data }: { data: StatementData }) {
         </div>
         
         <div className="flex gap-3">
-          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all"><Printer className="w-5 h-5" /></button>
-          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all"><Share2 className="w-5 h-5" /></button>
-          <button className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-600/20 transition-all">
+          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}><Printer className="w-5 h-5" /></button>
+          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}><Share2 className="w-5 h-5" /></button>
+          <button className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-600/20 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
             Télécharger PDF <Download className="w-4 h-4" />
           </button>
         </div>

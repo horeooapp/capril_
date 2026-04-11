@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -59,7 +60,7 @@ export const RclMonitor: React.FC = () => {
         <div className="lg:col-span-8 space-y-6">
            <div className="flex items-center justify-between px-4">
               <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Procédures en cours</h3>
-              <button className="text-[10px] font-black text-[#1F4E79] uppercase hover:underline">Voir les archives</button>
+              <button className="text-[10px] font-black text-[#1F4E79] uppercase hover:underline" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Voir les archives</button>
            </div>
            
            <div className="space-y-4">

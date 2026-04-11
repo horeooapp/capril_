@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState } from "react";
 import { 
@@ -132,7 +133,7 @@ export default function MaintenanceAgencyDash({ initialTickets }: { initialTicke
                       Clôturer
                     </button>
                 )}
-                <button className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all">
+                <button className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>

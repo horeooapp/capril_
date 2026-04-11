@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -260,7 +261,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                                 <div className={`w-2 h-2 rounded-full ${p.leases?.[0]?.receipts?.[0]?.status === 'paid' ? 'bg-green-500' : 'bg-red-500'}`} />
                                                 <span className="text-[9px] font-black uppercase text-slate-500">{p.leases?.[0]?.receipts?.[0]?.status === 'paid' ? 'À JOUR' : 'IMPAYÉ'}</span>
                                             </div>
-                                            <button className="text-[9px] font-black uppercase text-[#0D2B6E] flex items-center gap-1 hover:underline">
+                                            <button className="text-[9px] font-black uppercase text-[#0D2B6E] flex items-center gap-1 hover:underline" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                                 Gérer <ChevronRight size={12} />
                                             </button>
                                         </div>
@@ -378,7 +379,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                             <div className="text-3xl font-black italic">{fmt(Math.round(stats.totalCommissions))} F</div>
                                         </div>
                                     </div>
-                                    <button className="w-full py-4 bg-white text-[#C9A84C] rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">Relais de virement →</button>
+                                    <button className="w-full py-4 bg-white text-[#C9A84C] rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Relais de virement →</button>
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pl-2 leading-none">Canaux Mobile Money</h3>
@@ -439,8 +440,8 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                              <div>
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 mb-2 block italic">Période du loyer</label>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button className="py-4 bg-[#0D2B6E] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 italic">Avril 2026</button>
-                                    <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl text-[12px] font-black uppercase tracking-widest italic opacity-50">Mai 2026</button>
+                                    <button className="py-4 bg-[#0D2B6E] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 italic" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Avril 2026</button>
+                                    <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl text-[12px] font-black uppercase tracking-widest italic opacity-50" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Mai 2026</button>
                                 </div>
                              </div>
 
@@ -453,7 +454,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                         { l: "MoMo", i: "🟡" },
                                         { l: "Transfert", i: "🏦" },
                                     ].map((m, i) => (
-                                        <button key={i} className="p-4 border border-slate-100 rounded-2xl flex flex-col items-center gap-2 hover:border-[#0D2B6E] transition-all group active:scale-95 shadow-sm">
+                                        <button key={i} className="p-4 border border-slate-100 rounded-2xl flex flex-col items-center gap-2 hover:border-[#0D2B6E] transition-all group active:scale-95 shadow-sm" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                             <span className="text-2xl">{m.i}</span>
                                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-[#0D2B6E]">{m.l}</span>
                                         </button>
@@ -500,7 +501,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                 { l: "SMS Premium", i: "📱", c: "#000000" },
                                 { l: "Appel Vocal", i: "📞", c: "#0D2B6E" }
                              ].map((c, i) => (
-                                <button key={i} className="w-full flex items-center justify-between p-5 border border-slate-100 rounded-3xl hover:border-slate-800 transition-all">
+                                <button key={i} className="w-full flex items-center justify-between p-5 border border-slate-100 rounded-3xl hover:border-slate-800 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                      <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ background: c.c }}>{c.i}</div>
                                         <div className="text-[12px] font-black uppercase italic" style={{ color: c.c }}>{c.l}</div>
@@ -530,7 +531,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option B: Délai étendu (15 jours)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Approbation mandataire nécessaire</p>
                             </button>
-                            <button className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all opacity-50">
+                            <button className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all opacity-50" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option C: Échéancier (CACI)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Plan de paiement en 3 fois</p>
                             </button>

@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -112,7 +113,7 @@ export default function FiscalRegistrationBox({ dossier, leaseReference }: Props
                             </svg>
                             <span className="font-black uppercase tracking-widest text-sm">Bail Enregistré Fiscalement</span>
                         </div>
-                        <button className="w-full py-5 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-green-700 transition-all shadow-xl shadow-green-100 active:scale-[0.98]">
+                        <button className="w-full py-5 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-green-700 transition-all shadow-xl shadow-green-100 active:scale-[0.98]" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                             Télécharger le Certificat DGI
                         </button>
                     </div>

@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState } from "react";
 import { 
@@ -91,7 +92,7 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
                   </div>
                   <span className="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">{contact.role}</span>
                 </div>
-                <button className="p-2 text-gray-500 hover:text-white transition-colors">
+                <button className="p-2 text-gray-500 hover:text-white transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                   <MoreHorizontal className="w-5 h-5" />
                 </button>
               </div>
@@ -112,10 +113,10 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
               </div>
 
               <div className="mt-auto flex gap-2">
-                <button className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2">
+                <button className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                   <MessageSquare className="w-4 h-4" /> Message
                 </button>
-                <button className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all">
+                <button className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

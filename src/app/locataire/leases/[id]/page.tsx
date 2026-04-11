@@ -1,3 +1,4 @@
+import { toast } from "sonner";
  
 import { auth } from "@/auth"
 import { getLeaseById } from "@/actions/leases"
@@ -161,7 +162,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                         <p className="text-xs text-gray-400 leading-relaxed font-medium">
                             Besoin d&apos;aide avec votre contrat ? Notre service de médiation est disponible 24/7 pour résoudre vos litiges à l&apos;amiable.
                         </p>
-                        <button className="mt-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-gray-700 rounded-lg hover:border-gray-500 transition-colors">
+                        <button className="mt-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-gray-700 rounded-lg hover:border-gray-500 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                             Contacter le Support
                         </button>
                     </div>

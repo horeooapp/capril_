@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import { useState } from "react";
 import { 
@@ -199,8 +200,8 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
                   </div>
                   
                   <div className="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 uppercase">Modifier</button>
-                    <button className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase">Annuler</button>
+                    <button className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 uppercase" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Modifier</button>
+                    <button className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Annuler</button>
                   </div>
                 </motion.div>
               ))

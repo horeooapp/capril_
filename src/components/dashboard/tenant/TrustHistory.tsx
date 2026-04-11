@@ -1,4 +1,5 @@
 "use client"
+import { toast } from "sonner";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,7 +53,7 @@ export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
               <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-6">
                  Présentez ce code aux agences pour un accès temporaire (24h) à votre score certifié.
               </p>
-              <button className="w-full py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20">
+              <button className="w-full py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                  Générer un jeton d'accès
               </button>
            </div>

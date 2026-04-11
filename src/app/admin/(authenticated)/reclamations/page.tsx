@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import React from "react"
 import { AlertCircle, Search, Filter, MessageSquare, Clock, ArrowUpRight } from "lucide-react"
 import { prisma } from "@/lib/prisma"
@@ -64,8 +65,8 @@ export default async function AdminReclamationsPage() {
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button className="px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors">Urgents Only</button>
-                        <button className="flex items-center gap-2 px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors">
+                        <button className="px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Urgents Only</button>
+                        <button className="flex items-center gap-2 px-6 py-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                             <Filter size={14} />
                             Filtres
                         </button>
@@ -130,7 +131,7 @@ export default async function AdminReclamationsPage() {
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white transition-all transform group-hover:scale-110">
+                                            <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-900 hover:text-white transition-all transform group-hover:scale-110" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                                                 <ArrowUpRight size={18} />
                                             </button>
                                         </td>

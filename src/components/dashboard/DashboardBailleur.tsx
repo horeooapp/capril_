@@ -1,4 +1,5 @@
-"use client";
+"use client"
+import { toast } from "sonner";;
 // QAPRIL - Dashboard Bailleur - Visuel approuve 01/04/2026
 // NE PAS MODIFIER les classes Q.* - elles encodent le design approuve
 
@@ -48,7 +49,7 @@ export default function DashboardBailleur({ data }: Props) {
                 </div>
               </div>
             </div>
-            <button className={Q.btnAmber + " !px-3 !py-2 text-xs"}>⚡ Recharger</button>
+            <button className={Q.btnAmber + " !px-3 !py-2 text-xs"} onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>⚡ Recharger</button>
           </div>
         )}
 
@@ -149,7 +150,7 @@ export default function DashboardBailleur({ data }: Props) {
                     <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger 2 000 FCFA</div>
                   </div>
                   <button className="border-none px-2.5 py-1.5 rounded-md text-xs font-bold cursor-pointer transition-all"
-                    style={{background:OP_COLORS[opWallet].bg, color:OP_COLORS[opWallet].text}}>
+                    style={{background:OP_COLORS[opWallet].bg, color:OP_COLORS[opWallet].text}} onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
                     Ouvrir →
                   </button>
                 </div>
