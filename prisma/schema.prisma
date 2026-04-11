@@ -704,6 +704,8 @@ model User {
   repartitionsUtilities RepartitionUtility[]
   walletTransactions    WalletTransaction[]
 
+  automationSettings    AutomationSettings?
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -1415,6 +1417,13 @@ model Dispute {
   amountInDispute Int?          @map("amount_in_dispute")
   status          DisputeStatus @default(OPEN)
   resolution      String?
+  
+  // Nouveaux champs pour le Triage Judiciaire (DLC) CACI
+  type            String        @default("AUTRE") // DEFAUT_PAIEMENT, DEGRADATION_LOURDE, SOUS_LOCATION_ILLICITE, TROUBLES_VOISINAGE
+  severity        String        @default("NORMALE") // NORMALE, HAUTE, CRITIQUE
+  hash            String?       @map("hash_caci") // Hash cryptographique CACI
+  monthsDefeated  Int           @default(0) @map("months_defeated")
+  isCryptoSealed  Boolean       @default(false) @map("is_crypto_sealed")
 
   messages DisputeMessage[]
 
@@ -3506,4 +3515,40 @@ model MandatGestionBien {
 
   @@unique([mandatId, propertyId])
   @@map("mandats_gestion_biens")
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTOMATIONS (Part 25)
+// ═══════════════════════════════════════════════════════
+model AutomationSettings {
+  id             String @id @default(uuid())
+  userId         String @unique @map("user_id")
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  autoRelance    Boolean @default(true) @map("auto_relance")
+  autoQuittance  Boolean @default(true) @map("auto_quittance")
+  autoAssurance  Boolean @default(false) @map("auto_assurance")
+  customScripts  Json?   @map("custom_scripts")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("automation_settings")
+}
+
+// ═══════════════════════════════════════════════════════
+// SUCCESSION (Part 26)
+// ═══════════════════════════════════════════════════════
+model Succession {
+  id           String @id @default(uuid())
+  deceasedName String @map("deceased_name")
+  claimantName String @map("claimant_name")
+  relation     String
+  propertyInfo String @map("property_info")
+  notaire      String?
+  status       String @default("EN_ATTENTE_ATTESTATION")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("successions")
 }
