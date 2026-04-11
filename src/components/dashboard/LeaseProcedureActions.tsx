@@ -3,7 +3,7 @@
 import { useState } from "react"
 // LeaseStatus is a plain string field in this schema (no Prisma enum generated)
 type LeaseStatus = string
-import { declareUnpaidRent, sendFormalNotice, initiateTermination, proposeClemency, cancelLease } from "@/actions/lease-procedures"
+import { declareUnpaidRent, sendFormalNotice, initiateTermination, proposeClemency, cancelLease, suspendPropertyAccess } from "@/actions/lease-procedures"
 import { useRouter } from "next/navigation"
 
 interface LeaseProcedureActionsProps {
@@ -110,6 +110,17 @@ export default function LeaseProcedureActions({ leaseId, currentStatus }: { leas
                         className="w-full flex items-center justify-between px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium group"
                     >
                         <span>⚖️ Demander Résiliation (Phase 7)</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                    </button>
+                )}
+
+                {(currentStatus === "MISE_EN_DEMEURE" || currentStatus === "REPRISE_PROCEDURE" || currentStatus === "DEMANDE_RESILIATION") && (
+                    <button
+                        onClick={() => handleAction(suspendPropertyAccess)}
+                        disabled={loading}
+                        className="w-full mt-4 flex items-center justify-between px-4 py-3 bg-transparent text-qred border-2 border-qred border-dashed rounded-xl hover:bg-qred hover:text-white transition-all font-black group shadow-[0_0_15px_rgba(255,0,0,0.1)] hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]"
+                    >
+                        <span className="flex items-center gap-2">🔐 COUPER ACCÈS BIOMÉTRIQUE (IOT)</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                     </button>
                 )}

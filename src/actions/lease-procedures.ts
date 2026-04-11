@@ -313,3 +313,95 @@ export async function cancelLease(leaseId: string) {
         return { success: false, error: message };
     }
 }
+
+/**
+ * Phase IOT: Suspension de l'accès physique à la propriété
+ */
+export async function suspendPropertyAccess(leaseId: string) {
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            select: { propertyId: true, tenantId: true }
+        });
+
+        if (!lease || !lease.propertyId || !lease.tenantId) {
+            throw new Error("Bail Invalide pour suspension.");
+        }
+
+        await prisma.propertyAccess.updateMany({
+            where: {
+                propertyId: lease.propertyId,
+                userId: lease.tenantId
+            },
+            data: {
+                statut: "SUSPENDU"
+            }
+        });
+
+        await prisma.procedurePhase.create({
+            data: {
+                leaseId,
+                phaseNumber: 99,
+                name: "Coupure Accès IOT",
+                description: "Le contrôleur d'accès physique au bâtiment a été suspendu pour ce locataire défaillant.",
+            },
+        });
+
+        await prisma.auditLog.create({
+            data: {
+                userId,
+                action: "SUSPEND_PHYSICAL_ACCESS",
+                module: "IOT",
+                entityId: lease.propertyId,
+            },
+        });
+
+        return { success: true };
+    } catch (error: unknown) {
+        console.error("Error suspending property access:", error);
+        const message = error instanceof Error ? error.message : "Erreur IOT.";
+        return { success: false, error: message };
+    }
+}
+
+/**
+ * Récupère tous les baux sous procédure judiciaire
+ */
+export async function getDisputedLeases() {
+    try {
+        const session = await ensureAuthenticated();
+        
+        let targetId = session.user.id;
+        const userAny = session.user as any;
+        if ((session.user.role === "NON_CERTIFIED_AGENT" || session.user.role === "AGENCY") && userAny.agencyId) {
+            targetId = userAny.agencyId;
+        }
+
+        const disputes = await prisma.lease.findMany({
+            where: {
+                landlordId: targetId,
+                status: {
+                    in: ["LOYER_IMPAYE", "MISE_EN_DEMEURE", "CLEMENCE_EN_COURS", "REPRISE_PROCEDURE", "DEMANDE_RESILIATION"]
+                }
+            },
+            include: {
+                tenant: { select: { firstName: true, lastName: true, phone: true } },
+                property: { select: { name: true, address: true } },
+                procedurePhases: {
+                    orderBy: { actionDate: 'desc' },
+                    take: 1
+                }
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            }
+        });
+
+        return { success: true, disputes };
+    } catch (error: unknown) {
+        return { success: false, error: "Impossible de charger les contentieux" };
+    }
+}
