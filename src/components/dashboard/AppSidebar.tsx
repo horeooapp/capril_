@@ -84,6 +84,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={20} />, id: "MANAGE_PROPERTIES" },
                 { href: "/dashboard/disputes", label: "Contentieux", icon: <Scale size={20} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/marketplace", label: "Marketplace", icon: <Store size={20} />, id: "READ_DASHBOARD" },
+                { href: "/dashboard/syndication", label: "Syndicateur Web", icon: <Megaphone size={20} />, id: "MANAGE_PROPERTIES" },
                 { href: "/dashboard/procurations", label: "Délégations", icon: <FileSignature size={20} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/billing", label: "Abonnements", icon: <CreditCard size={20} />, id: "SETTINGS" },
                 { href: "/dashboard/fiscal", label: "Fiscalité", icon: <Landmark size={20} />, id: "MANAGE_ACCOUNTING" },
