@@ -20,6 +20,8 @@ import {
 import { getWalletProfile, updateWalletPreferences, processRechargeLink } from "@/actions/wallet-actions"
 import { toast } from "sonner"
 import RechargeDrawer from "@/components/dashboard/owner/RechargeDrawer"
+import Link from "next/link"
+import { Landmark } from "lucide-react"
 
 export default function WalletPage() {
   const [profile, setProfile] = useState<any>(null)
@@ -128,6 +130,25 @@ export default function WalletPage() {
             <Wallet size={200} />
           </div>
         </div>
+      </div>
+
+      {/* Raccourci vers le registre C.D.C */}
+      <div className="p-4 bg-white border border-qgrey-2 rounded-[1.5rem] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-blue-50 rounded-xl">
+             <Landmark className="text-[#1F4E79]" size={20} />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-wider">Caisse des Dépôts (CDC)</h3>
+            <p className="text-[10px] font-bold text-gray-500">Registre Global de vos cautions sécurisées.</p>
+          </div>
+        </div>
+        <Link 
+          href="/dashboard/wallet/cdc"
+          className="px-6 py-3 bg-[#1F4E79] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all flex items-center gap-2 shadow-md shrink-0 w-full sm:w-auto justify-center"
+        >
+          Voir le Registre <ChevronRight size={14} />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
