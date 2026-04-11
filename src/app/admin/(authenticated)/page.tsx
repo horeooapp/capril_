@@ -230,8 +230,11 @@ export default async function AdminDashboardOverview() {
                     </div>
                 )}
 
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                     <div>
+                        <div className="mb-3 bg-gradient-to-r from-orange-400 to-qnavy text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full inline-block animate-pulse shadow-md">
+                            Mise à jour v4.0 (Grand Éveil) : 100% Modules Actifs
+                        </div>
                         <h1 className="text-4xl md:text-6xl font-black text-[#1F4E79] tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
                             Supervision.
                         </h1>

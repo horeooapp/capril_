@@ -14,6 +14,7 @@ import {
     MessageSquare,
     AlertTriangle,
     ChevronRight,
+    Trophy,
     LucideIcon
 } from "lucide-react"
 import Link from "next/link"
@@ -140,6 +141,38 @@ const modules = [
         icon: Scale, 
         status: "active", 
         href: "/admin/disputes" 
+    },
+    { 
+        id: "M-OBSERV", 
+        name: "Observatoire IA", 
+        description: "Analyse géographique des loyers et indicateurs du marché.", 
+        icon: Globe, 
+        status: "active", 
+        href: "/admin/observatory" 
+    },
+    { 
+        id: "M-CHAMPION", 
+        name: "Gamification", 
+        description: "Leaderboard B2B des agents selon le recouvrement effectif.", 
+        icon: Trophy, 
+        status: "active", 
+        href: "/admin/champions" 
+    },
+    { 
+        id: "M-REPORTS", 
+        name: "Rapports Consol.", 
+        description: "Console centrale des exports financiers et tableaux de bord.", 
+        icon: FileText, 
+        status: "active", 
+        href: "/admin/reports" 
+    },
+    { 
+        id: "M-NEWS", 
+        name: "News Ticker", 
+        description: "Centre de communication mass-marketing et push SMS réseau.", 
+        icon: MessageSquare, 
+        status: "active", 
+        href: "/admin/news" 
     }
 ]
 
