@@ -126,3 +126,41 @@ export async function resolveMaintenanceTicket(ticketId: string, commentaire?: s
 export async function confirmMaintenanceResolution(ticketId: string, confirme: boolean) {
     return updateTicketStatus(ticketId, confirme ? "CLÔTURÉ" : "CONTESTÉ");
 }
+
+export async function getUnassignedTickets() {
+    try {
+        await ensureAuthenticated();
+        const tickets = await prisma.ticketMaintenance.findMany({
+            where: {
+                prestataireId: null,
+                statut: "EN_ATTENTE"
+            },
+            include: {
+                logement: { select: { address: true, name: true } },
+                locataire: { select: { firstName: true, lastName: true } }
+            },
+            orderBy: { dateSignalement: 'desc' }
+        });
+        return { success: true, tickets };
+    } catch (error: any) {
+        return { success: false, error: "Impossible de récupérer les tickets." };
+    }
+}
+
+export async function assignTicketToProvider(ticketId: string, prestataireId: string) {
+    try {
+        await ensureAuthenticated();
+        await prisma.ticketMaintenance.update({
+            where: { id: ticketId },
+            data: { 
+                prestataireId,
+                statut: "PRIS_EN_CHARGE",
+                datePriseEnCharge: new Date()
+            }
+        });
+        revalidatePath("/dashboard/providers");
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: "Erreur lors de l'assignation." };
+    }
+}
