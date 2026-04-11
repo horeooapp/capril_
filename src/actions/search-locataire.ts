@@ -1,6 +1,7 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/auth"
 
 /**
  * M-CAND-AGENCE & INV-01 : Moteur de matching et recherche
@@ -81,7 +82,11 @@ export async function searchLocataires(filters: {
     kycNiveauMin?: number
 }) {
     try {
-        // TODO: Vérifier le rôle de l'utilisateur appelant (doit être AGENCY + PlanTier PRO/PREMIUM)
+        const session = await auth();
+        if (!session?.user?.id) throw new Error("Unauthorized");
+        if (!['AGENCY', 'AGENCE_AGREE', 'ADMIN', 'SUPER_ADMIN'].includes(session.user.role as string)) {
+            throw new Error("⛔ Accès Refusé (Paywall) : Vous devez souscrire au Plan Premium (PRO) pour effectuer une recherche d'Acquisition Locataire IA.");
+        }
         
         const where: any = {
             visibilite: { in: ['TOUS', 'INVITATION_AGENCE'] },

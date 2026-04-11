@@ -80,6 +80,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (user) {
+                        // KICK-OUT IF SUSPENDED OR BANNED (God Mode Control)
+                        if (user.status === "BANNED" || user.status === "SUSPENDED") {
+                             throw new CustomAuthError("account_suspended");
+                        }
+
                         // AUTO-ACTIVATE AGENCY COLLABORATORS ON FIRST LOGIN
                         const conf = (user as any).agencyConfig;
                         if (conf && conf.status === "INVITED") {

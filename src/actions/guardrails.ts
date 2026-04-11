@@ -64,6 +64,12 @@ export async function checkGuardrails(intermediairePhone: string, profil: Profil
             }
         });
 
+        // FORCE SESSION KILL: Bloquer activement l'utilisateur en Base de Données
+        await (prisma as any).user.update({
+            where: { id: intermediaire.id },
+            data: { status: "BANNED" }
+        });
+
         return { 
             success: false, 
             error: `L'intermédiaire a atteint les limites de son statut (${maxProprios} propriétaires, ${maxBiens} biens). Il doit s'inscrire comme AGENCE pour gérer plus de biens.` 
