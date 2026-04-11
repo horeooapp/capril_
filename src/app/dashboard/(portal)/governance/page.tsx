@@ -1,67 +1,49 @@
-import ManagementReport from "@/components/reports/ManagementReport";
-import { getOwnerFinancialReport } from "@/actions/report-actions";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+"use client"
 
-export const dynamic = "force-dynamic";
+import React from "react"
+import { Users, Presentation, CheckSquare, Calendar, Globe } from "lucide-react"
 
-export default async function GovernancePage() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect("/dashboard/login");
-  }
-
-  const res = await getOwnerFinancialReport(session.user.id);
-  
-  if (!res.success || !res.data) {
+export default function GovernanceDashboardPage() {
     return (
-      <div className="p-20 text-center">
-        <h1 className="text-xl font-bold text-red-600">Erreur de chargement</h1>
-        <p className="text-gray-500">{res.error || "Impossible de récupérer vos données financières."}</p>
-      </div>
-    );
-  }
-
-  const { financials, performance } = res.data;
-
-  // Adapter les données pour le composant ManagementReport
-  const reportData = {
-    leaseRef: `GOV-${session.user.id.substring(0, 8).toUpperCase()}`,
-    landlordName: session.user.fullName || session.user.email?.split('@')[0] || "Propriétaire QAPRIL",
-    propertyAddress: "Ensemble de votre Patrimoine",
-    period: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
-    financials: {
-      rentReceived: financials.rentReceived,
-      agencyFees: financials.agencyFees,
-      qaprilFees: financials.qaprilFees,
-      tva: financials.tva,
-      netToLandlord: financials.netToLandlord
-    },
-    performance: performance
-  };
-
-  return (
-    <div className="min-h-screen bg-transparent py-12 px-4">
-        <div className="max-w-4xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#1F4E79] rounded-2xl flex items-center justify-center text-white shadow-xl rotate-3">
-                        <BarChart3 size={24} />
-                    </div>
-                    <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none italic">Gouvernance.</h1>
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
+                        <Presentation className="text-qblue" size={32} /> Gouvernance & AG
+                    </h1>
+                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                        Plateforme de rassemblement pour les Syndicats de Copropriétaires.
+                    </p>
                 </div>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest ml-1">Analyse consolidée de votre performance immobilière</p>
             </div>
-            <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] bg-white/50 backdrop-blur-md px-8 py-4 rounded-[1.5rem] border border-white/40 shadow-2xl shadow-gray-200/20">
-                Généré le {new Date().toLocaleDateString('fr-FR')}
-            </div>
-        </div>
-        
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out">
-            <ManagementReport data={reportData} />
-        </div>
-    </div>
-  );
-}
 
-import { BarChart3 } from "lucide-react";
+            <div className="bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm p-8">
+                <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] rounded-[2rem] p-8 md:p-12 text-white relative shadow-lg overflow-hidden flex flex-col items-center text-center">
+                    <Globe size={80} className="text-blue-500/20 absolute -top-10 -right-10" />
+                    <Calendar size={48} className="text-blue-400 mb-6" />
+                    <h2 className="text-2xl font-black mb-4">Assemblée Générale Annuelle</h2>
+                    <p className="text-gray-300 text-sm font-medium leading-relaxed max-w-2xl mb-8">
+                        Organisez vos AG Virtuellement. Convoquez les copropriétaires par email tracé, proposez des résolutions et menez des votes électroniques via QAPRIL avec génération immédiate de PV.
+                    </p>
+                    <button className="bg-white text-qnavy px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-white/10">
+                        Convoquer Nouvelle AG
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                     <div className="bg-qgrey-1/30 border border-qgrey-2 rounded-2xl p-6">
+                         <div className="flex items-center justify-between mb-4">
+                             <h4 className="font-black text-qnavy">Votes en Cours</h4>
+                             <span className="bg-qorange-pale text-qorange px-2 py-0.5 rounded text-[10px] font-black uppercase">Résolution #42</span>
+                         </div>
+                         <p className="text-xs font-bold text-qtext-mid mb-4">Refection de la toiture Bâtiment A.</p>
+                         <div className="w-full bg-qgrey-2 rounded-full h-2 mb-2">
+                             <div className="bg-qgreen h-2 rounded-full" style={{width: '65%'}}></div>
+                         </div>
+                         <p className="text-[10px] font-black uppercase tracking-widest text-qtext-light">65% Pour / Quorum Actif</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+    )
+}
