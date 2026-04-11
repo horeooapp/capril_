@@ -1,125 +1,158 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { getDisputedLeases } from "@/actions/lease-procedures"
-import { toast } from "sonner"
-import { AlertOctagon, ArrowRight, Gavel, Loader2, ShieldOff, Search } from "lucide-react"
-import Link from "next/link"
+import React, { useState } from "react"
+import { Scale, AlertTriangle, ShieldCheck, FileCheck, Search, FileSignature, UploadCloud, ChevronRight, Gavel, FileLock2, Info } from "lucide-react"
 
-export default function DisputesDashboardPage() {
-    const [disputes, setDisputes] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        loadData()
-    }, [])
-
-    const loadData = async () => {
-        setLoading(true)
-        try {
-            const res = await getDisputedLeases()
-            if (res.success) {
-                setDisputes(res.disputes || [])
-            } else {
-                toast.error(res.error)
-            }
-        } catch (error) {
-            toast.error("Erreur de chargement")
-        } finally {
-            setLoading(false)
+export default function CertifieDisputesPage() {
+    const [litiges] = useState([
+        {
+            id: "LIT-248-CI",
+            locataire: "SYLLA Ousmane",
+            bien: "Bureau 12 - Plateau",
+            type: "IMPAYE_GRAVE",
+            statut: "EN_ATTENTE_TRIBUNAL",
+            hashCaci: "a9x2...1b4",
+            dateEscalade: "12 Avril 2026",
+            gravite: "EVICTION_ORDER"
+        },
+        {
+            id: "LIT-235-CI",
+            locataire: "MOUKETO Christian",
+            bien: "Villa 32 - Angré 9ème",
+            type: "DEGRADATION_LOURDE",
+            statut: "DOSSIER_CONSTITUE",
+            hashCaci: "En préparation",
+            dateEscalade: "10 Avril 2026",
+            gravite: "DEMANDE_ARBITRAGE"
         }
-    }
-
-    if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-qred" size={40} /></div>
-
-    const getStatusConfig = (status: string) => {
-        switch (status) {
-            case 'LOYER_IMPAYE': return { color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200', label: 'Impayé Détecté' }
-            case 'MISE_EN_DEMEURE': return { color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-200', label: 'Mise en Demeure' }
-            case 'CLEMENCE_EN_COURS': return { color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', label: 'Clémence' }
-            case 'REPRISE_PROCEDURE': return { color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', label: 'Reprise Procédure' }
-            case 'DEMANDE_RESILIATION': return { color: 'text-qnavy', bg: 'bg-qnavy-pale', border: 'border-qnavy/20', label: 'Résiliation (Huissier)' }
-            default: return { color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200', label: status }
-        }
-    }
+    ])
 
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-700">
-            {/* Dark premium header */}
-            <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 flex items-center gap-4">
-                            <Gavel className="text-red-400" size={40} /> Contentieux
-                        </h1>
-                        <p className="text-sm font-medium text-gray-300 max-w-xl leading-relaxed">
-                            Supervisez les Mises en Demeure, Échéanciers de Clémence et Procédures Légales d'Expulsion. 
-                            Le verrouillage IOT est disponible pour les cas critiques.
-                        </p>
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div>
+                    <div className="mb-2 bg-gradient-to-r from-red-600 to-rose-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
+                        <Scale size={12} /> Procédures Judiciaires & CACI
                     </div>
-                    <div className="flex bg-black/30 border border-white/10 rounded-2xl p-6 text-center backdrop-blur-sm">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Dossiers Actifs</p>
-                            <p className="text-4xl font-black text-red-400">{disputes.length}</p>
-                        </div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3 mt-2">
+                        <Gavel className="text-red-600" size={32} /> Triage Judiciaire
+                    </h1>
+                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                        Génération des Dossiers Litiges Certifiés (DLC) opposables devant les tribunaux ivoiriens.
+                    </p>
+                </div>
+                <div className="flex gap-3">
+                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                        <Scale size={16} /> Médiations (Amiable)
+                    </button>
+                    <button className="bg-red-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-red-700 transition-all shadow-md flex items-center gap-2">
+                        <FileSignature size={16} /> Ouvrir un Dossier (DLC)
+                    </button>
+                </div>
+            </div>
+
+            {/* Warning Banner */}
+            <div className="bg-red-50 border border-red-100 p-5 rounded-2xl flex gap-4">
+                <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20} />
+                <div>
+                     <h3 className="font-bold text-sm text-red-800 uppercase tracking-widest">Avertissement Légal</h3>
+                     <p className="text-xs font-medium text-red-700 mt-1">
+                        La classification en "Litige Certifié" ancre la preuve de l'historique logiciel (retards de loyers tracés, edl signé, injonctions de payer sans réponse) dans un hash SHA-256 inaltérable. Toute réquisition de la force publique doit se baser sur l'UUID de ce dossier.
+                     </p>
+                </div>
+            </div>
+
+            {/* Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 <div className="bg-white p-6 rounded-[2rem] border border-qgrey-2 shadow-sm flex items-center gap-4">
+                    <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                        <Gavel className="text-red-600" size={24} />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1">Dossiers Certifiés</p>
+                        <p className="text-2xl font-black text-qnavy-dark">02 <span className="text-sm font-bold text-qtext-mid">dossiers</span></p>
+                    </div>
+                </div>
+                <div className="bg-[linear-gradient(135deg,#7F1D1D_0%,#450A0A_100%)] p-6 rounded-[2rem] shadow-lg flex items-center gap-4 relative overflow-hidden">
+                    <Scale className="absolute -right-4 -bottom-4 text-white opacity-5" size={100} />
+                    <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-sm relative z-10 border border-white/10">
+                        <FileLock2 className="text-white" size={24} />
+                    </div>
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-black text-red-200 uppercase tracking-widest mb-1 shadow-sm">Ordres d'Expulsion (CACI)</p>
+                        <p className="text-2xl font-black text-white">01 <span className="text-sm opacity-80">En Triage</span></p>
                     </div>
                 </div>
             </div>
 
-            {disputes.length === 0 ? (
-                <div className="bg-white rounded-[2rem] p-16 border border-gray-100 flex flex-col items-center text-center shadow-sm">
-                    <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
-                        <AlertOctagon size={40} className="text-green-500" />
+            {/* Table */}
+            <div className="bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm">
+                <div className="p-6 border-b border-qgrey-2 flex justify-between items-center bg-qgrey-1/30">
+                    <h2 className="text-sm font-black text-qnavy-dark flex items-center gap-2">
+                        <FileCheck size={18} className="text-red-600"/> Registre des Poursuites Actives
+                    </h2>
+                    <div className="relative w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                        <input type="text" placeholder="UUID, Nom..." className="w-full pl-9 pr-4 py-2 bg-white border border-qgrey-2 rounded-lg text-xs font-bold focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all" />
                     </div>
-                    <h2 className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-wide">Zéro Contentieux</h2>
-                    <p className="text-gray-500 font-medium">Tout votre parc immobilier est en règle ce mois-ci.</p>
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {disputes.map((lease) => {
-                        const config = getStatusConfig(lease.status)
-                        const lastPhaseDate = lease.procedurePhases?.[0]?.actionDate ? new Date(lease.procedurePhases[0].actionDate).toLocaleDateString() : 'Inconnue'
-                        
-                        return (
-                            <Link key={lease.id} href={`/dashboard/leases/${lease.id}`}>
-                                <motion.div 
-                                    initial={{opacity:0, y:10}} 
-                                    animate={{opacity:1, y:0}} 
-                                    className={`bg-white hover:bg-gray-50 border ${config.border} p-6 rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-6 cursor-pointer transition-all shadow-sm hover:shadow-md group relative overflow-hidden`}
-                                >
-                                    <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${config.bg.replace('bg-', 'bg-').replace('-50', '-500')}`}></div>
-                                    
-                                    <div className="flex-1 space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <h3 className="text-lg font-black text-gray-900 capitalize">{lease.tenant?.firstName} {lease.tenant?.lastName}</h3>
-                                            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-md ${config.bg} ${config.color} border ${config.border}`}>
-                                                {config.label}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm font-bold text-gray-500 flex items-center gap-2">
-                                            <span>{lease.property?.name || lease.property?.address}</span>
-                                        </p>
-                                        <p className="text-xs text-gray-400 italic">Phase enclenchée le {lastPhaseDate}</p>
-                                    </div>
-
-                                    <div className="flex items-center gap-6">
-                                        {lease.status === "DEMANDE_RESILIATION" && (
-                                            <div className="flex items-center gap-2 text-red-500 bg-red-50 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-red-100">
-                                                <ShieldOff size={14} /> IOT Suspendu
+                
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white border-b border-qgrey-2">
+                                <th className="p-5 font-black text-[9px] uppercase tracking-widest text-qtext-light">Référence (UUID)</th>
+                                <th className="p-5 font-black text-[9px] uppercase tracking-widest text-qtext-light">Contrevenant</th>
+                                <th className="p-5 font-black text-[9px] uppercase tracking-widest text-qtext-light">Motif Judiciaire</th>
+                                <th className="p-5 font-black text-[9px] uppercase tracking-widest text-qtext-light">Code Preuve (SHA)</th>
+                                <th className="p-5 font-black text-[9px] uppercase tracking-widest text-qtext-light text-right">Sanction Visée</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {litiges.map((l) => (
+                                <tr key={l.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/50 transition-colors">
+                                    <td className="p-5">
+                                        <p className="font-bold text-xs text-qnavy">{l.id}</p>
+                                        <p className="text-[9px] font-black uppercase text-qtext-mid mt-0.5">{l.dateEscalade}</p>
+                                    </td>
+                                    <td className="p-5">
+                                        <p className="font-bold text-sm text-qnavy-dark">{l.locataire}</p>
+                                        <p className="text-[10px] font-bold text-qtext-mid mt-0.5">{l.bien}</p>
+                                    </td>
+                                    <td className="p-5">
+                                        <span className="bg-red-50 text-red-700 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-red-100">
+                                            {l.type.replace('_', ' ')}
+                                        </span>
+                                    </td>
+                                    <td className="p-5">
+                                         {l.hashCaci.includes('préparation') ? (
+                                            <span className="text-xs font-medium text-qtext-light italic">{l.hashCaci}</span>
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <ShieldCheck size={14} className="text-red-600" />
+                                                <code className="bg-qgrey-1 px-2 py-1 rounded text-[10px] text-qnavy font-mono font-bold tracking-wider">{l.hashCaci}</code>
                                             </div>
                                         )}
-                                        <div className="w-12 h-12 bg-white border border-gray-200 group-hover:border-qnavy group-hover:bg-qnavy group-hover:text-white text-gray-400 rounded-2xl flex items-center justify-center transition-all">
-                                            <ArrowRight size={20} />
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </Link>
-                        )
-                    })}
+                                    </td>
+                                    <td className="p-5 text-right flex justify-end">
+                                        {l.gravite === 'EVICTION_ORDER' && (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+                                                Ordre d'Expulsion
+                                            </span>
+                                        )}
+                                        {l.gravite === 'DEMANDE_ARBITRAGE' && (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-qgrey-2 text-qnavy text-[9px] font-black uppercase tracking-widest rounded-lg">
+                                                Arbitrage CACI
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+            </div>
         </div>
     )
 }
