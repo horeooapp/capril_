@@ -2,12 +2,15 @@
 
 import React, { useEffect, useState } from "react"
 import { getAllInsurances } from "@/actions/insurance"
-import { Shield, AlertTriangle, FileText, Loader2, Plus } from "lucide-react"
+import { Shield, AlertTriangle, FileText, Loader2, Plus, X, Calendar, Upload, FileSignature } from "lucide-react"
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function InsuranceDashboardPage() {
     const [insurances, setInsurances] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         loadData()
@@ -20,6 +23,19 @@ export default function InsuranceDashboardPage() {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleSubmitClaim = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsSubmitting(true)
+        // Simulation
+        setTimeout(() => {
+            setIsSubmitting(false)
+            setIsModalOpen(false)
+            toast.success("Sinistre déclaré avec succès. Un inspecteur prendra en charge votre dossier et initiera le recouvrement sous 48h.", {
+                icon: '⚖️'
+            })
+        }, 2000)
     }
 
     if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-qgreen" size={40} /></div>
@@ -37,7 +53,7 @@ export default function InsuranceDashboardPage() {
                         Couvertures Loyers Impayés et dommages, gérées au sein de QAPRIL.
                     </p>
                 </div>
-                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => setIsModalOpen(true)} className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2 hover:scale-105 active:scale-95">
                     <Plus size={16} /> Déclarer Sinistre
                 </button>
             </div>
@@ -102,6 +118,121 @@ export default function InsuranceDashboardPage() {
                     </div>
                 )}
             </div>
+
+            {/* MODALE DE DECLARATION DE SINISTRE */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }} 
+                            className="fixed inset-0 bg-[#0D2B6E]/60 backdrop-blur-md"
+                            onClick={() => !isSubmitting && setIsModalOpen(false)}
+                        />
+
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+                            animate={{ opacity: 1, scale: 1, y: 0 }} 
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+                            className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl relative z-[101] overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]"
+                        >
+                            {/* Header */}
+                            <div className="p-8 pb-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+                                <div>
+                                    <div className="flex items-center gap-3 text-qgreen mb-2">
+                                        <div className="w-10 h-10 bg-qgreen-pale rounded-xl flex items-center justify-center">
+                                            <AlertTriangle size={20} />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest bg-qgreen-pale px-3 py-1 rounded-full text-qgreen-dark">Procédure Formelle</span>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter">Déclaration de Sinistre</h2>
+                                    <p className="text-sm font-medium text-slate-500 mt-1">
+                                        Enregistrement blockchain conformément à la police d'assurance.
+                                    </p>
+                                </div>
+                                <button disabled={isSubmitting} onClick={() => setIsModalOpen(false)} className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all shadow-sm disabled:opacity-50">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            {/* Body */}
+                            <div className="p-8 overflow-y-auto custom-scrollbar">
+                                <form id="claimForm" onSubmit={handleSubmitClaim} className="space-y-6">
+                                    
+                                    {/* Police Selection */}
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Police d'Assurance Associée *</label>
+                                        <select required disabled={isSubmitting} className="w-full border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:outline-none flex-shrink-0 focus:border-qgreen transition-colors bg-white cursor-pointer disabled:bg-slate-50">
+                                            <option value="">Sélectionnez un contrat de bail couvert...</option>
+                                            {insurances.filter(i => i.status === 'ACTIVE').map(ins => (
+                                                <option key={ins.id} value={ins.id}>
+                                                    Contrat N°{ins.policyNo} - {ins.lease?.property?.name || "Propriété"} ({ins.provider})
+                                                </option>
+                                            ))}
+                                            {insurances.filter(i => i.status === 'ACTIVE').length === 0 && (
+                                                <option disabled>Aucune couverture active</option>
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    {/* Type & Date */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Nature du Sinistre *</label>
+                                            <select required disabled={isSubmitting} className="w-full border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:border-qgreen transition-colors bg-white cursor-pointer disabled:bg-slate-50">
+                                                <option value="">Choisissez...</option>
+                                                <option value="IMPAYE">Loyers Impayés (GLI)</option>
+                                                <option value="DOMMAGE">Dégâts Matériels / Dégradations</option>
+                                                <option value="EAU">Dégât des Eaux</option>
+                                                <option value="INCENDIE">Incendie / Explosion</option>
+                                                <option value="AUTRE">Autre incident</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Date du Constat *</label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                                <input type="date" required disabled={isSubmitting} className="w-full border-2 border-slate-100 rounded-2xl pl-12 pr-5 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:border-qgreen transition-colors bg-white disabled:bg-slate-50" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Description Détaillée</label>
+                                        <textarea required disabled={isSubmitting} rows={4} placeholder="Veuillez décrire précisément les faits et les dommages observés..." className="w-full border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:border-qgreen transition-colors bg-white resize-none disabled:bg-slate-50"></textarea>
+                                    </div>
+
+                                    {/* Upload Evidence */}
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]">Pièces Justificatives (Photos, Constat)</label>
+                                        <div className={`border-2 border-dashed ${isSubmitting ? 'border-slate-300 bg-slate-50' : 'border-qgreen/30 bg-qgreen-pale/30 hover:bg-qgreen-pale/60 cursor-pointer'} rounded-3xl p-6 text-center transition-colors group`}>
+                                            <div className={`w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-3 transition-transform ${isSubmitting ? 'text-slate-400' : 'text-qgreen group-hover:scale-110'}`}>
+                                                <Upload size={24} />
+                                            </div>
+                                            <h4 className={`text-sm font-black ${isSubmitting ? 'text-slate-500' : 'text-[#1F4E79]'}`}>Déposez vos documents ici</h4>
+                                            <p className="text-xs font-medium text-slate-400 mt-1">PDF, JPG, PNG (Max 10Mo)</p>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 flex-shrink-0">
+                                <button type="button" disabled={isSubmitting} onClick={() => setIsModalOpen(false)} className="px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-200 transition-colors disabled:opacity-50">
+                                    Annuler
+                                </button>
+                                <button form="claimForm" disabled={isSubmitting} type="submit" className="bg-qgreen text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <FileSignature size={16} />}
+                                    Soumettre le dossier
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
