@@ -13,20 +13,29 @@ on:
 
 jobs:
   # ──────────────────────────────────────────────────────
-  # JOB 1: Quality Gate (Build + Type Check)
+  # JOB 1: unified (Build + Deploy)
   # ──────────────────────────────────────────────────────
-  build:
-    name: 🔨 Build & Type Check
-    runs-on: ubuntu-latest
+  deploy:
+    name: 🚀 Build & Deploy to Hostinger
+    runs-on: self-hosted
+    environment: production
 
     steps:
+      - name: 🧹 Safe Runner Cleanup
+        run: |
+          # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
+          [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
+          # Nuclear Cleanup to ensure zero contamination
+          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
+          rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
+
       - name: 🚚 Checkout repository
         uses: actions/checkout@v6
 
-      - name: ☢️ Nuclear Runner Cleanup (Purge Stale Modules)
-        run: |
-          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
-          rm -rf node_modules .next dist out dist_package package-lock.json || true
+      - name: 🟢 Setup Node.js (Runner Env)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
 
       - name: 🛡️ Prisma Guard (Pre-check Schema)
         run: |
@@ -139,41 +148,7 @@ jobs:
           fi
           echo "✅ Package fully purged of SQLite artifacts."
 
-      - name: 💾 Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output
-          include-hidden-files: true
-          path: dist_package/
-          retention-days: 1
-
-  # ──────────────────────────────────────────────────────
-  # JOB 2: Deploy to Hostinger
-  # ──────────────────────────────────────────────────────
-  deploy:
-    name: 🚀 Deploy to Hostinger
-    runs-on: self-hosted
-    needs: build
-    environment: production
-
-    steps:
-      - name: 🧹 Safe Runner Cleanup
-        run: |
-          # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
-          [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
-          rm -rf .next public prisma scripts dist_package package.json package-lock.json || true
-
-      - name: 📥 Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output
-
-      - name: 🟢 Setup Node.js (Runner Env)
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - name: 🚀 Transfer Files to VPS
+      - name: 🚀 Transfer Files to VPS Target Folder
         run: |
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
@@ -183,12 +158,12 @@ jobs:
           # We only delete the `.next` and specific files. We DO NOT stop PM2 here to avoid 503 downtime!
           sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package.json $DEPLOY_DEST/package-lock.json || true
           
-          # Sync everything from dist_package (which was downloaded to current dir)
-          echo "🚀 Syncing 100% FRESH standalone build..."
+          # Sync everything from dist_package
+          echo "🚀 Syncing 100% FRESH standalone build directly from local step..."
           rsync -rlptvz --delete --no-owner --no-group --no-perms \
             --exclude=".env*" \
             --exclude="public/uploads/" \
-            ./ $DEPLOY_DEST/
+            dist_package/ $DEPLOY_DEST/
 
           # Force restore ownership to github user
           sudo chown -R github:github $DEPLOY_DEST || true
@@ -213,8 +188,6 @@ jobs:
             exit 1
           fi
           echo "✅ Integrity verified (PostgreSQL-native)."
-
-      # Handled inside the restart block for better permission consistency
 
       - name: 🔐 Create Production .env
         run: |
@@ -265,7 +238,7 @@ jobs:
       - name: 📦 Install and Start Local Redis
         run: |
           sudo apt-get update || true
-          sudo apt-get install -y redis-server
+          sudo apt-get install -y redis-server || true
           sudo systemctl enable redis-server || true
           sudo systemctl start redis-server || true
 
