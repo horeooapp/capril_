@@ -1,15 +1,128 @@
-import { BarChartHorizontal } from "lucide-react"
+"use client"
 
-export default function CRMPage() {
+import React, { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import { getCrmContacts } from "@/actions/crm-actions"
+import { Users, Phone, Mail, Search, Loader2, ArrowRight, Activity, Filter, MessageCircle } from "lucide-react"
+
+export default function CRMDashboardPage() {
+    const [contacts, setContacts] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        loadData()
+    }, [])
+
+    const loadData = async () => {
+        try {
+            // Hardcoded "agency-id" context simulation for UI preview, in real app needs session ID context hook
+            const res = await getCrmContacts("fake-agency-id", undefined)
+            setContacts(res || [])
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <h1 className="text-3xl font-black text-qnavy-dark uppercase tracking-tighter">Acquisition & CRM</h1>
-            <div className="bg-white rounded-[2rem] p-8 border border-qnavy/10 shadow-[0_12px_40px_rgba(13,43,110,0.06)] flex flex-col items-center justify-center text-center py-20">
-                <div className="w-20 h-20 bg-qnavy-pale rounded-[2rem] border border-white shadow-inner flex items-center justify-center text-qnavy mb-6">
-                    <BarChartHorizontal size={40} />
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
+                        <Users className="text-purple-500" size={32} /> CRM & Leads
+                    </h1>
+                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                        Gérez vos prospects, locataires et propriétaires depuis un annuaire central.
+                    </p>
                 </div>
-                <h2 className="text-xl font-black text-qnavy-dark mb-2">Module en cours de déploiement</h2>
-                <p className="text-qgrey-dark max-w-md">L'outil de suivi des prospects (Leads) et des opportunités d'affaires immobilières est en cours d'intégration.</p>
+                <div className="flex gap-3">
+                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                        <Filter size={16} /> Segmenter
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-[linear-gradient(135deg,#6b21a8_0%,#3b0764_100%)] rounded-[2rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl flex items-center justify-between">
+                 <div className="relative z-10 max-w-2xl">
+                     <h2 className="text-3xl font-black tracking-tight mb-2">Engagez votre audience avec Q-Mail.</h2>
+                     <p className="text-purple-200 text-sm leading-relaxed mb-6">Concevez des campagnes d'emailings et SMS groupées vers vos Leads (Nouveaux programmes, Rappel de régularisations, Veux). Taux d'ouverture garanti par SendGrid.</p>
+                     <button className="bg-white text-purple-900 font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg">
+                        <MessageCircle size={16}/> Créer une Campagne
+                     </button>
+                 </div>
+                 <Activity size={180} className="absolute right-0 opacity-10 rotate-12 -translate-y-10" />
+            </div>
+
+            <div className="bg-white rounded-3xl border border-qgrey-2 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-qgrey-2 flex items-center gap-4 bg-qgrey-1/30">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input type="text" placeholder="Rechercher un prospect ou client..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qnavy focus:ring-1 focus:ring-qnavy transition-all" />
+                    </div>
+                </div>
+
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-white border-b border-qgrey-2">
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Contact</th>
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Type</th>
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Coordonnées</th>
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Niveau KYC</th>
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {contacts.map((c) => (
+                            <tr key={c.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group">
+                                <td className="p-5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-qnavy-pale text-qnavy flex items-center justify-center font-black text-sm">
+                                            {c.firstName?.[0]}{c.lastName?.[0]}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-qnavy-dark capitalize">{c.firstName} {c.lastName}</p>
+                                            <p className="text-[10px] text-qtext-light">ID: {c.id.substring(0,8)}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-5">
+                                    <span className="bg-purple-50 text-purple-600 border border-purple-100 px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest">
+                                        {c.role}
+                                    </span>
+                                </td>
+                                <td className="p-5 space-y-1">
+                                    {c.phone && <p className="text-xs font-bold text-qtext-mid flex items-center gap-2"><Phone size={12}/> {c.phone}</p>}
+                                    {c.email && <p className="text-xs font-bold text-qtext-mid flex items-center gap-2"><Mail size={12}/> {c.email}</p>}
+                                </td>
+                                <td className="p-5">
+                                    <div className="w-full bg-qgrey-2 rounded-full h-1.5 max-w-[80px]">
+                                        <div className="bg-qgreen h-1.5 rounded-full" style={{width: `${Math.min((c.kycLevel / 3) * 100, 100)}%`}}></div>
+                                    </div>
+                                    <p className="text-[9px] font-bold text-qtext-mid mt-1 uppercase">Level {c.kycLevel}</p>
+                                </td>
+                                <td className="p-5 text-right">
+                                    <button className="w-8 h-8 rounded-full bg-white border border-qgrey-2 flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
+                                        <ArrowRight size={14} />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        {contacts.length === 0 && !loading && (
+                            <tr>
+                                <td colSpan={5} className="p-10 text-center border-b border-qgrey-2">
+                                    <Users className="text-qgrey-2 mx-auto mb-3" size={32} />
+                                    <p className="text-sm font-bold text-qtext-light">Aucun prospect ou propriétaire en base. Votre CRM est vierge.</p>
+                                </td>
+                            </tr>
+                        )}
+                        {loading && (
+                           <tr>
+                                <td colSpan={5} className="p-10 text-center border-b border-qgrey-2">
+                                     <Loader2 className="animate-spin text-qnavy mx-auto" size={32} />
+                                </td>
+                           </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     )
