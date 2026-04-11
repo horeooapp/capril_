@@ -67,6 +67,9 @@ export default function ReceiptsClient({ receipts }: { receipts: ReceiptItem[] }
                     <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors shadow-sm active:scale-95">
                         <Search size={20} />
                     </button>
+                    <Link href="/dashboard/payments/advances" className="p-4 bg-qorange-pale border border-qorange/20 rounded-2xl text-qorange hover:bg-qorange hover:text-white transition-all shadow-sm active:scale-95 whitespace-nowrap text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                        Avances sur loyer <ChevronRight size={16} />
+                    </Link>
                     <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors shadow-sm active:scale-95">
                         <Filter size={20} />
                     </button>

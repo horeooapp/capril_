@@ -53,9 +53,16 @@ export default async function TenantPaymentPage() {
                     <p className="text-sm font-medium text-qtext-mid max-w-sm mx-auto mb-8">
                         Vous n'avez aucun arriéré détecté sur votre bail. Votre prochain loyer sera facturé à l'échéance convenue.
                     </p>
-                    <Link href="/locataire" className="bg-qgreen hover:bg-qgreen-dark text-white font-black px-8 py-4 rounded-xl uppercase text-xs tracking-widest transition-all shadow-md shadow-qgreen/30">
+                    <Link href="/locataire" className="bg-qgreen hover:bg-qgreen-dark text-white font-black px-8 py-4 rounded-xl uppercase text-xs tracking-widest transition-all shadow-md shadow-qgreen/30 inline-block mb-4">
                         Retour à l'accueil
                     </Link>
+                    
+                    <div className="mt-8 pt-8 border-t border-qgreen/20">
+                        <p className="text-xs text-qgreen-dark font-bold mb-4">Besoin de sécuriser votre location sur le long terme ?</p>
+                        <Link href="/locataire/advances" className="bg-white hover:bg-qgreen/10 text-qgreen font-black px-6 py-3 rounded-xl uppercase text-[10px] tracking-widest border border-qgreen/20 transition-all inline-block">
+                            Proposer une Avance sur Loyer (3 à 12 mois)
+                        </Link>
+                    </div>
                 </div>
             ) : (
                 <div className="space-y-6">
@@ -90,6 +97,12 @@ export default async function TenantPaymentPage() {
                     </div>
 
                     <UploadPreuvePaiement leaseId={lease.id} />
+
+                    <div className="text-center pt-4">
+                        <Link href="/locataire/advances" className="text-[10px] uppercase font-black tracking-widest text-qnavy hover:text-qorange transition-colors">
+                            Ou proposez de payer plusieurs mois d'avance
+                        </Link>
+                    </div>
                 </div>
             )}
         </div>
