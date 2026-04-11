@@ -25,7 +25,12 @@ import {
     Receipt,
     Wallet,
     BookOpen,
-    Users
+    Users,
+    Shield,
+    Scale,
+    Store,
+    FileSignature,
+    LineChart
 } from "lucide-react"
 import ProtectedLogo from "@/components/ProtectedLogo"
 
@@ -64,7 +69,15 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/dashboard/properties", label: "Patrimoine", icon: <Building2 size={20} />, id: "MANAGE_PROPERTIES" },
                 { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={20} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/receipts", label: "Comptabilité", icon: <FileText size={20} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/insurance", label: "Assurances", icon: <Shield size={20} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/succession", label: "Successions", icon: <Users size={20} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={20} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/disputes", label: "Contentieux", icon: <Scale size={20} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/marketplace", label: "Marketplace", icon: <Store size={20} />, id: "READ_DASHBOARD" },
+                { href: "/dashboard/procurations", label: "Délégations", icon: <FileSignature size={20} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={20} />, id: "SETTINGS" },
+                { href: "/dashboard/moderation", label: "Modération", icon: <ShieldAlert size={20} />, id: "SETTINGS" },
+                { href: "/dashboard/observatory", label: "Observatoire", icon: <LineChart size={20} />, id: "READ_DASHBOARD" },
                 { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={20} />, id: "MANUAL" },
                 ...(isManager ? [{ href: "/dashboard/team", label: "Mon Équipe", icon: <Users size={20} />, id: "TEAM" }] : [])
             ]
@@ -79,6 +92,12 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             { href: "/dashboard/properties", label: "Logements", icon: <Building2 size={20} /> },
             { href: "/dashboard/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
             { href: "/dashboard/receipts", label: "Quittances", icon: <FileText size={20} /> },
+            { href: "/dashboard/insurance", label: "Assurances", icon: <Shield size={20} /> },
+            { href: "/dashboard/succession", label: "Successions", icon: <Users size={20} /> },
+            { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={20} /> },
+            { href: "/dashboard/disputes", label: "Contentieux", icon: <Scale size={20} /> },
+            { href: "/dashboard/marketplace", label: "Marketplace", icon: <Store size={20} /> },
+            { href: "/dashboard/procurations", label: "Procurations", icon: <FileSignature size={20} /> },
             { href: "/dashboard/profile", label: "Profil", icon: <User size={20} /> },
             { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={20} /> },
             { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={20} /> },
