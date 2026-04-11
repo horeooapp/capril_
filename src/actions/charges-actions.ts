@@ -1,5 +1,6 @@
 "use server"
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -40,5 +41,34 @@ export async function recordExpense(data: {
     return { success: true };
   } catch (error) {
     return { success: false };
+  }
+}
+
+export async function getAllCharges() {
+  try {
+    const session = await auth()
+    if (!session?.user) throw new Error("Non authentifié")
+    
+    let targetId = session.user.id;
+    const userAny = session.user as any;
+    if ((session.user.role === "NON_CERTIFIED_AGENT" || session.user.role === "AGENCY") && userAny.agencyId) {
+        targetId = userAny.agencyId;
+    }
+
+    const charges = await prisma.chargeParametrage.findMany({
+      where: {
+        logement: {
+          ownerUserId: targetId
+        }
+      },
+      include: {
+        logement: { select: { name: true, address: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    return { success: true, charges };
+  } catch (error) {
+    return { success: false, error: "Impossible de charger les paramètres de charges" };
   }
 }

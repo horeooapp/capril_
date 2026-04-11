@@ -85,3 +85,34 @@ export async function getInsuranceByLease(leaseId: string) {
         include: { claims: true }
     })
 }
+
+export async function getAllInsurances() {
+    const session = await auth()
+    if (!session?.user) throw new Error("Non authentifié")
+    
+    let targetId = session.user.id;
+    const userAny = session.user as any;
+    if ((session.user.role === "NON_CERTIFIED_AGENT" || session.user.role === "AGENCY") && userAny.agencyId) {
+        targetId = userAny.agencyId;
+    }
+
+    const insurances = await prisma.insurance.findMany({
+        where: {
+            lease: {
+                landlordId: targetId
+            }
+        },
+        include: {
+            claims: true,
+            lease: {
+                include: {
+                    property: { select: { name: true, address: true } },
+                    tenant: { select: { firstName: true, lastName: true } }
+                }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    return { success: true, insurances };
+}
