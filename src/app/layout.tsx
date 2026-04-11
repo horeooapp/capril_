@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 // import { Geist, Geist_Mono } from "next/font/google"; // Removed due to DNS issue during production builds
 import "./globals.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
@@ -72,6 +73,7 @@ export default function RootLayout({
       <body className="antialiased font-sans flex flex-col min-h-screen">
         <MobileRuntimeDirector />
         {children}
+        <Toaster position="bottom-right" richColors />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
