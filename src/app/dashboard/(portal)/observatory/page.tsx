@@ -1,100 +1,164 @@
 "use client"
 
-import React from "react"
-import { LineChart, MapPin, TrendingUp, TrendingDown, Eye, Activity, Map } from "lucide-react"
+import React, { useState } from "react"
+import { Map, Navigation, MapPin, Search, Layers, Hexagon, Radar, Crosshair, MapPinned, ActivitySquare, AlertOctagon } from "lucide-react"
 
-export default function ObservatoryDashboardPage() {
+export default function GeoRadarDashboardPage() {
+    const [properties] = useState([
+        {
+            id: "PROP-09X",
+            name: "Immeuble Le Zénith",
+            district: "Cocody Ambassades",
+            lat: 5.3453,
+            lng: -4.0123,
+            status: "SAFE",
+            rentability: "HAUTE",
+            units: 24,
+            warning: null
+        },
+        {
+            id: "PROP-12Y",
+            name: "Cour Commune Sicogi",
+            district: "Yopougon Niangon",
+            lat: 5.3190,
+            lng: -4.0833,
+            status: "CRITICAL",
+            rentability: "FAIBLE",
+            units: 8,
+            warning: "Zone Rouge: 60% d'Impayés"
+        },
+        {
+            id: "PROP-03Z",
+            name: "Villa Duplex",
+            district: "Marcory Zone 4",
+            lat: 5.2931,
+            lng: -3.9789,
+            status: "SAFE",
+            rentability: "MOYENNE",
+            units: 1,
+            warning: null
+        }
+    ])
+
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
-             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500 bg-[#0B1120] min-h-[90vh] rounded-[3rem] shadow-inner text-slate-300">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
-                        <LineChart className="text-blue-500" size={32} /> Observatoire (IA)
+                     <div className="mb-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
+                        <Radar size={12} /> Cartographie Satellitaire Active
+                    </div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tighter flex items-center gap-3 mt-2">
+                        Radar <span className="text-emerald-400">Géospatial</span>
                     </h1>
-                    <p className="text-sm font-medium text-qtext-mid mt-1">
-                        Plateforme nationale d'analyse des tendances immobilières par zone courante.
+                    <p className="text-sm font-medium text-slate-400 mt-1">
+                        Analyse topographique des risques et suivi GPS du portefeuille (Abidjan).
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
-                        <Map size={16} /> Mode Carte
+                    <button className="bg-slate-800 border text-slate-300 border-slate-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
+                        <Layers size={16} /> Filtres Heatmap
                     </button>
-                    <button className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-md flex items-center gap-2">
-                        Extraire Rapport Zone
+                    <button className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-md flex items-center gap-2">
+                        <Navigation size={16} /> Cadrer sur Abidjan
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {/* Simulateur de Zones */}
-                 <div className="bg-white border border-qgrey-2 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow">
-                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                             Zone Premium
+            <div className="flex flex-col xl:flex-row gap-6">
+                 {/* Map Area (Simulated UI) */}
+                 <div className="flex-1 bg-[#0F172A] rounded-[2rem] border border-slate-800 overflow-hidden relative min-h-[500px] shadow-2xl flex items-center justify-center">
+                    
+                    {/* Fake Map Grid Background */}
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                    <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at center, transparent 0%, #0B1120 100%)'}}></div>
+                    
+                    {/* Simulated Radar Sweep */}
+                    <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-500/10 animate-[spin_10s_linear_infinite] flex items-center justify-center">
+                        <div className="w-[600px] h-[600px] rounded-full border border-emerald-500/20 flex items-center justify-center">
+                            <div className="w-[400px] h-[400px] rounded-full border border-emerald-500/30"></div>
                         </div>
-                        <TrendingUp size={20} className="text-qgreen" />
-                     </div>
-                     <h3 className="text-xl font-black text-qnavy-dark mb-1">Cocody Ambassades</h3>
-                     <p className="text-xs font-bold text-qtext-mid mb-6 flex items-center gap-1"><MapPin size={12}/> Abidjan Nord</p>
-                     
-                     <div className="space-y-4">
-                         <div className="flex justify-between items-center border-b border-qgrey-2 pb-2">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Loyer Moyen (Villa)</span>
-                             <span className="font-black text-sm text-qnavy">2.5M FCFA</span>
-                         </div>
-                         <div className="flex justify-between items-center border-b border-qgrey-2 pb-2">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Tension Locative</span>
-                             <span className="font-black text-sm text-qred">Très Forte (98%)</span>
-                         </div>
-                         <div className="flex justify-between items-center">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Évo. sur 1 an</span>
-                             <span className="font-black text-sm text-qgreen">+ 12.4%</span>
-                         </div>
-                     </div>
+                        {/* Sweeper arm */}
+                        <div className="absolute top-1/2 left-1/2 w-1/2 h-[2px] bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-400 origin-left" style={{ clipPath: 'polygon(0 0, 100% -5000%, 100% 5000%)' }}></div>
+                    </div>
+
+                    <div className="absolute top-4 left-4 flex gap-2">
+                        <div className="bg-slate-900/80 backdrop-blur border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                            <Crosshair size={14}/> GPS Actif
+                        </div>
+                    </div>
+
+                    {/* Properties blips on map */}
+                    <div className="absolute top-[35%] left-[60%] group">
+                        <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute"></div>
+                        <div className="w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900 relative z-10 flex items-center justify-center"><MapPinned size={10} className="text-slate-900 hidden group-hover:block"/></div>
+                        <div className="hidden group-hover:block absolute top-6 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 p-3 rounded-xl w-48 shadow-xl z-20">
+                            <p className="text-xs font-bold text-white">Immeuble Le Zénith</p>
+                            <p className="text-[10px] text-slate-400 mt-1">Cocody Ambassades</p>
+                            <p className="text-[10px] text-emerald-400 font-bold mt-2">Rentabilité HAUTE</p>
+                        </div>
+                    </div>
+
+                    <div className="absolute top-[60%] left-[30%] group">
+                        <div className="w-6 h-6 bg-rose-500 rounded-full animate-ping absolute opacity-50"></div>
+                        <div className="w-4 h-4 bg-rose-500 rounded-full border-2 border-slate-900 relative z-10"></div>
+                        <div className="hidden group-hover:block absolute top-6 left-1/2 -translate-x-1/2 bg-slate-900 border border-rose-500/50 p-3 rounded-xl w-48 shadow-xl z-20">
+                            <p className="text-xs font-bold text-white">Cour Commune Sicogi</p>
+                            <p className="text-[10px] text-slate-400 mt-1">Yopougon Niangon</p>
+                            <p className="text-[10px] text-rose-500 font-bold mt-2 flex items-center gap-1"><AlertOctagon size={10}/> ZONE ROUGE (60% Impayés)</p>
+                        </div>
+                    </div>
+
+                     <div className="absolute top-[70%] left-[55%] group">
+                        <div className="w-4 h-4 bg-emerald-500 rounded-full animate-ping absolute opacity-30"></div>
+                        <div className="w-4 h-4 bg-emerald-600 rounded-full border-2 border-slate-900 relative z-10"></div>
+                        <div className="hidden group-hover:block absolute top-6 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-700 p-3 rounded-xl w-48 shadow-xl z-20">
+                            <p className="text-xs font-bold text-white">Villa Duplex</p>
+                            <p className="text-[10px] text-slate-400 mt-1">Marcory Zone 4</p>
+                        </div>
+                    </div>
+
                  </div>
 
-                 <div className="bg-white border border-qgrey-2 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow">
-                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-orange-50 text-orange-600 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-orange-100">
-                             Zone Intermédiaire
-                        </div>
-                        <TrendingUp size={20} className="text-qgreen" />
+                 {/* Assets Register */}
+                 <div className="w-full xl:w-[400px] shrink-0 flex flex-col gap-4">
+                     <div className="flex items-center gap-2 px-2">
+                        <ActivitySquare className="text-slate-500" size={16} />
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Actifs Télémétriques</h3>
                      </div>
-                     <h3 className="text-xl font-black text-qnavy-dark mb-1">Marcory Zone 4</h3>
-                     <p className="text-xs font-bold text-qtext-mid mb-6 flex items-center gap-1"><MapPin size={12}/> Abidjan Sud</p>
-                     
-                     <div className="space-y-4">
-                         <div className="flex justify-between items-center border-b border-qgrey-2 pb-2">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Loyer Moyen (Appart)</span>
-                             <span className="font-black text-sm text-qnavy">850K FCFA</span>
-                         </div>
-                         <div className="flex justify-between items-center border-b border-qgrey-2 pb-2">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Tension Locative</span>
-                             <span className="font-black text-sm text-orange-500">Moyenne (60%)</span>
-                         </div>
-                         <div className="flex justify-between items-center">
-                             <span className="text-[10px] font-bold text-qtext-light uppercase">Évo. sur 1 an</span>
-                             <span className="font-black text-sm text-qgreen">+ 5.1%</span>
-                         </div>
-                     </div>
-                 </div>
 
-                 <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] border border-qnavy rounded-[2rem] p-6 shadow-lg text-white flex flex-col justify-between relative overflow-hidden">
-                     <Activity className="absolute -right-10 -top-10 text-white opacity-5" size={150} />
-                     <div>
-                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-300 mb-2">QAPRIL Core Engine</h3>
-                        <p className="text-sm text-gray-300 font-medium leading-relaxed">Croisez vos propres loyers de mandat avec l'évolution nationale pour ajuster vos grilles tarifaires automatiquement à l'échéance des baux.</p>
+                     <div className="space-y-3">
+                         {properties.map(p => (
+                             <div key={p.id} className="bg-slate-800/50 border border-slate-700 hover:border-slate-500 transition-colors p-4 rounded-2xl flex flex-col gap-3 cursor-pointer group">
+                                 <div className="flex justify-between items-start">
+                                     <div>
+                                        <p className="font-bold text-sm text-white group-hover:text-emerald-400 transition-colors">{p.name}</p>
+                                        <p className="text-[10px] font-bold text-slate-500 mt-0.5">{p.district}</p>
+                                     </div>
+                                     {p.status === 'SAFE' ? (
+                                         <div className="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded text-[9px] font-black tracking-widest">OK</div>
+                                     ) : (
+                                         <div className="bg-rose-500/10 text-rose-500 px-2 py-1 rounded text-[9px] font-black tracking-widest animate-pulse">RISK</div>
+                                     )}
+                                 </div>
+                                 <div className="flex items-center justify-between pt-3 border-t border-slate-700/50">
+                                     <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
+                                        <MapPin size={10} className="text-slate-500"/>
+                                        {p.lat.toFixed(4)}, {p.lng.toFixed(4)}
+                                     </div>
+                                     <div className="text-[9px] font-black tracking-widest text-slate-500 uppercase">
+                                        {p.units} Lot(s)
+                                     </div>
+                                 </div>
+                                 {p.warning && (
+                                     <div className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20">
+                                         {p.warning}
+                                     </div>
+                                 )}
+                             </div>
+                         ))}
                      </div>
-                     <button className="w-full bg-white text-qnavy font-black text-[10px] uppercase tracking-widest py-3 rounded-xl hover:bg-gray-100 mt-6 shadow-md transition-all">
-                         Démarrer l'Analyse IA
-                     </button>
                  </div>
-            </div>
-            
-            <div className="bg-white rounded-[2rem] border border-qgrey-2 p-8 text-center shadow-sm">
-                <Eye size={40} className="text-qgrey-2 mx-auto mb-4" />
-                <h3 className="text-xl font-black text-qnavy-dark mb-2">Cartographie Nationale Bientôt Disponible</h3>
-                <p className="text-sm font-bold text-qtext-light max-w-lg mx-auto">La vue carte 3D alimentée par nos partenaires OpenStreetMap et les données de l'association nationale des agents sera activée au T4.</p>
             </div>
         </div>
     )
