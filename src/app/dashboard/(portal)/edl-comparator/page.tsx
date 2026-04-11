@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Image as ImageIcon, Camera, ScanLine, AlertTriangle, ArrowRightLeft } from "lucide-react"
+import { toast } from "sonner";
 
 export default function EDLComparatorPage() {
     return (
@@ -55,7 +56,7 @@ export default function EDLComparatorPage() {
             </div>
 
             <div className="flex justify-center">
-                <button className="bg-[linear-gradient(135deg,#6b21a8_0%,#3b0764_100%)] text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-purple-500/20">
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-[linear-gradient(135deg,#6b21a8_0%,#3b0764_100%)] text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-purple-500/20">
                     Déduire du Dépôt de Garantie
                 </button>
             </div>

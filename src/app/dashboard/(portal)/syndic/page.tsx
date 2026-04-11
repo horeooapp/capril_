@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Building2, Users, FileText, CheckCircle, Clock, AlertTriangle, Plus, Landmark } from "lucide-react"
+import { toast } from "sonner";
 
 export default function SyndicDashboardPage() {
     return (
@@ -15,7 +16,7 @@ export default function SyndicDashboardPage() {
                         Assemblées générales, appels de fonds et répartition des quotes-parts.
                     </p>
                 </div>
-                <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                     <Plus size={16} /> Nouvelle Résidence
                 </button>
             </div>
@@ -93,7 +94,7 @@ export default function SyndicDashboardPage() {
                     <div className="bg-blue-500/20 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-blue-400/30 inline-block mb-4">Moteur de Cantièmes</div>
                     <h2 className="text-2xl font-black mb-3">Répartition Automatique des Charges</h2>
                     <p className="text-gray-300 text-sm leading-relaxed mb-6">Le prochain déploiement V4.2 liera directement les millièmes d'un immeuble au générateur de quittances QAPRIL. Fini les facturations manuelles pour la réparation de l'ascenseur.</p>
-                    <button className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
                         Configurer Tantièmes
                     </button>
                 </div>

@@ -20,6 +20,7 @@ import EdlManager from "@/components/dashboard/edl/EdlManager"
 import { getEdlsByLease } from "@/actions/edl-actions"
 import ColocDashboardBox from "@/components/dashboard/coloc/ColocDashboardBox"
 import { getLeaseColocataires, getMonthlySynthesis } from "@/actions/coloc-actions"
+import { toast } from "sonner";
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -350,7 +351,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                         ) : (
                                             <div className="mt-2">
                                                 <p className="text-[11px] text-white font-bold leading-relaxed">Couvrez 100% de vos risques locatifs avec QAPRIL Assurance.</p>
-                                                <button className="mt-4 w-full bg-white hover:bg-qgrey-1 text-qnavy text-[10px] font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">
+                                                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="mt-4 w-full bg-white hover:bg-qgrey-1 text-qnavy text-[10px] font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">
                                                     Activer Protection
                                                 </button>
                                                 <p className="text-[8px] text-white/50 text-center mt-3 font-bold uppercase tracking-[0.2em]">Partenariat National</p>

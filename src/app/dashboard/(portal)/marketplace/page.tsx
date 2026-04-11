@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Store, Globe, Eye, ArrowUpRight, Plus, MapPin, CheckCircle, Search } from "lucide-react"
+import { toast } from "sonner";
 
 export default function MarketplaceDashboardPage() {
     const [listings] = useState<any[]>([
@@ -22,10 +23,10 @@ export default function MarketplaceDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Créer une Annonce
                     </button>
-                    <button className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Globe size={16} /> Voir Mon Vitrine
                     </button>
                 </div>
@@ -94,7 +95,7 @@ export default function MarketplaceDashboardPage() {
                                     )}
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qorange transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Gérer</button>
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qorange transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Gérer</button>
                                 </td>
                             </tr>
                         ))}

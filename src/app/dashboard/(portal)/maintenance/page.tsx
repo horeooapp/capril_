@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Wrench, CheckCircle, Clock, AlertTriangle, Plus, Search, Filter, PenTool } from "lucide-react"
+import { toast } from "sonner";
 
 export default function MaintenanceDashboardPage() {
     const [tickets] = useState<any[]>([
@@ -22,7 +23,7 @@ export default function MaintenanceDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Déclarer Panne
                     </button>
                 </div>
@@ -84,7 +85,7 @@ export default function MaintenanceDashboardPage() {
                                     {t.status === 'RESOLU' && <span className="flex items-center gap-1.5 text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg"><CheckCircle size={10}/> Résolu</span>}
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qblue transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Estimer</button>
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qblue transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Estimer</button>
                                 </td>
                             </tr>
                         ))}

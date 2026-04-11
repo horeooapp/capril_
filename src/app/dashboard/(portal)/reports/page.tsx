@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { FileText, Download, ChartPie, CheckCircle, Clock, Calendar, CheckSquare, Search, SendHorizontal, Calculator } from "lucide-react"
+import { toast } from "sonner";
 
 export default function ReportsDashboardPage() {
     const [crgs] = useState([
@@ -62,10 +63,10 @@ export default function ReportsDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Calendar size={16} /> Historique Mensuel
                     </button>
-                    <button className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2">
                         <Calculator size={16} /> Clôturer Avril 2026
                     </button>
                 </div>
@@ -154,11 +155,11 @@ export default function ReportsDashboardPage() {
                                                     <CheckCircle size={14} />
                                                 </span>
                                             ) : (
-                                                <button className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-qorange-pale text-qorange hover:bg-orange-200 transition-colors" title="Payer (Reversement)">
+                                                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-qorange-pale text-qorange hover:bg-orange-200 transition-colors" title="Payer (Reversement)">
                                                     <Clock size={14} />
                                                 </button>
                                             )}
-                                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-qgrey-2 text-qnavy hover:bg-qgrey-1 transition-colors group-hover:block" title="Télécharger PDF">
+                                            <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-qgrey-2 text-qnavy hover:bg-qgrey-1 transition-colors group-hover:block" title="Télécharger PDF">
                                                 <Download size={14} />
                                             </button>
                                         </div>

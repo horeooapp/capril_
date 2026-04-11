@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { motion } from "framer-motion"
 import { Bot, MessageCircle, CheckCircle2, Search, SmartphoneNfc, FileSignature, Zap, MoreHorizontal, MessageSquareWarning, RefreshCw, BarChart4 } from "lucide-react"
+import { toast } from "sonner";
 
 export default function BdqAiCockpitPage() {
     // Mock Data reflecting BdqConversationState
@@ -68,10 +69,10 @@ export default function BdqAiCockpitPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart4 size={16} /> Rapport API
                     </button>
-                    <button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Initier Nouvelle Saisie IA
                     </button>
                 </div>

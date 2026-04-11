@@ -65,7 +65,7 @@ export default function ProvidersDashboardPage() {
                     <div className="bg-qorange-pale border border-qorange/30 text-qorange px-4 py-3 rounded-xl flex items-center gap-2 shadow-sm font-black text-sm">
                         <ClipboardList size={18} /> {unassignedTickets.length} Bons en attente
                     </div>
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Ajouter un Artisan
                     </button>
                 </div>

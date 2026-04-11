@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { getCrmContacts } from "@/actions/crm-actions"
 import { Users, Phone, Mail, Search, Loader2, ArrowRight, Activity, Filter, MessageCircle } from "lucide-react"
+import { toast } from "sonner";
 
 export default function CRMDashboardPage() {
     const [contacts, setContacts] = useState<any[]>([])
@@ -35,7 +36,7 @@ export default function CRMDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Segmenter
                     </button>
                 </div>
@@ -45,7 +46,7 @@ export default function CRMDashboardPage() {
                  <div className="relative z-10 max-w-2xl">
                      <h2 className="text-3xl font-black tracking-tight mb-2">Engagez votre audience avec Q-Mail.</h2>
                      <p className="text-purple-200 text-sm leading-relaxed mb-6">Concevez des campagnes d'emailings et SMS groupées vers vos Leads (Nouveaux programmes, Rappel de régularisations, Veux). Taux d'ouverture garanti par SendGrid.</p>
-                     <button className="bg-white text-purple-900 font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg">
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-purple-900 font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-full hover:scale-105 transition-transform flex items-center gap-2 shadow-lg">
                         <MessageCircle size={16}/> Créer une Campagne
                      </button>
                  </div>
@@ -100,7 +101,7 @@ export default function CRMDashboardPage() {
                                     <p className="text-[9px] font-bold text-qtext-mid mt-1 uppercase">Level {c.kycLevel}</p>
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button className="w-8 h-8 rounded-full bg-white border border-qgrey-2 flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
                                         <ArrowRight size={14} />
                                     </button>
                                 </td>

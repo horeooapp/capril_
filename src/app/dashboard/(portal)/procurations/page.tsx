@@ -2,6 +2,7 @@
 
 import React from "react"
 import { FileSignature, ShieldCheck, Download, Plus, Clock, Key } from "lucide-react"
+import { toast } from "sonner";
 
 export default function ProcurationsDashboardPage() {
     return (
@@ -16,7 +17,7 @@ export default function ProcurationsDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Émettre Délégation
                     </button>
                 </div>
@@ -55,7 +56,7 @@ export default function ProcurationsDashboardPage() {
                                 <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg">Active</span>
                             </td>
                             <td className="p-5 text-right">
-                                <button className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-purple-600 transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg flex items-center gap-1 ml-auto">
+                                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-purple-600 transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg flex items-center gap-1 ml-auto">
                                     <Download size={12}/> Copie PDF
                                 </button>
                             </td>

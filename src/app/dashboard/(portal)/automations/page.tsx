@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Bot, Zap, Mail, MessageSquare, Clock, Settings2, Play, Pause, AlertTriangle } from "lucide-react"
+import { toast } from "sonner";
 
 export default function AutomationsDashboardPage() {
     const [toggles, setToggles] = useState({
@@ -23,8 +24,8 @@ export default function AutomationsDashboardPage() {
                     </p>
                 </div>
                 <div className="flex bg-qgrey-1 rounded-xl p-1 border border-qgrey-2 shadow-inner">
-                     <button className="px-6 py-2 bg-white text-qnavy font-black text-xs uppercase tracking-widest rounded-lg shadow-sm">Workflows</button>
-                     <button className="px-6 py-2 text-qtext-light font-black text-xs uppercase tracking-widest hover:text-qnavy">Logs Cron</button>
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="px-6 py-2 bg-white text-qnavy font-black text-xs uppercase tracking-widest rounded-lg shadow-sm">Workflows</button>
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="px-6 py-2 text-qtext-light font-black text-xs uppercase tracking-widest hover:text-qnavy">Logs Cron</button>
                 </div>
             </div>
 
@@ -124,7 +125,7 @@ export default function AutomationsDashboardPage() {
                             Nos instances Cron tournent en continu côté serveur (BullMQ/Redis) pour garantir la stricte exécution de vos mandats, même quand l'agence est fermée de nuit.
                         </p>
                     </div>
-                    <button className="bg-white/10 hover:bg-white border border-white/20 hover:text-qnavy text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md shrink-0 backdrop-blur-md">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white/10 hover:bg-white border border-white/20 hover:text-qnavy text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md shrink-0 backdrop-blur-md">
                         Créer Script Custom
                     </button>
                 </div>

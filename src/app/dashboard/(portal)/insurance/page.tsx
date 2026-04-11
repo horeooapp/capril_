@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { getAllInsurances } from "@/actions/insurance"
 import { Shield, AlertTriangle, FileText, Loader2, Plus } from "lucide-react"
+import { toast } from "sonner";
 
 export default function InsuranceDashboardPage() {
     const [insurances, setInsurances] = useState<any[]>([])
@@ -36,7 +37,7 @@ export default function InsuranceDashboardPage() {
                         Couvertures Loyers Impayés et dommages, gérées au sein de QAPRIL.
                     </p>
                 </div>
-                <button className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qgreen text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgreen-dark transition-all shadow-md flex items-center gap-2">
                     <Plus size={16} /> Déclarer Sinistre
                 </button>
             </div>

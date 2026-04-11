@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Megaphone, Globe, CheckCircle2, ShoppingCart, MessageCircle, ExternalLink, Activity, Network, MousePointerClick, RefreshCw, BarChart } from "lucide-react"
+import { toast } from "sonner";
 
 export default function SyndicationDashboardPage() {
     // Mock Annonces Vacantes
@@ -55,10 +56,10 @@ export default function SyndicationDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart size={16} /> Analytics Leads
                     </button>
-                    <button className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <RefreshCw size={16} /> Forcer Synchronisation
                     </button>
                 </div>

@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Search, MapPin, CheckSquare, Plus, FileSignature } from "lucide-react"
+import { toast } from "sonner";
 
 export default function InspectionsDashboardPage() {
     return (
@@ -15,7 +16,7 @@ export default function InspectionsDashboardPage() {
                         Répertoire central des inspections entrantes et sortantes.
                     </p>
                 </div>
-                <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                     <Plus size={16} /> Planifier Inspection
                 </button>
             </div>
@@ -49,7 +50,7 @@ export default function InspectionsDashboardPage() {
                                  <p className="text-[10px] font-black uppercase tracking-widest text-qtext-light">Usure Constatée</p>
                                  <p className="text-lg font-black text-qgreen">0%</p>
                              </div>
-                             <button className="bg-transparent border border-qgrey-2 text-qnavy font-black text-xs uppercase px-4 py-2 rounded-lg hover:bg-qgrey-1 transition-colors">
+                             <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-transparent border border-qgrey-2 text-qnavy font-black text-xs uppercase px-4 py-2 rounded-lg hover:bg-qgrey-1 transition-colors">
                                  Voir Document
                              </button>
                          </div>
@@ -67,7 +68,7 @@ export default function InspectionsDashboardPage() {
                              </div>
                          </div>
                          <div className="flex items-center gap-8">
-                             <button className="bg-qgreen text-white font-black text-xs uppercase px-6 py-3 rounded-xl hover:bg-qgreen-dark transition-colors shadow-sm flex items-center gap-2">
+                             <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qgreen text-white font-black text-xs uppercase px-6 py-3 rounded-xl hover:bg-qgreen-dark transition-colors shadow-sm flex items-center gap-2">
                                 <FileSignature size={14}/> Démarrer Comparatif
                              </button>
                          </div>

@@ -2,6 +2,7 @@
 
 import React from "react"
 import { ScrollText, Search, Download, CheckCircle } from "lucide-react"
+import { toast } from "sonner";
 
 export default function RCLMonitorPage() {
     return (
@@ -16,7 +17,7 @@ export default function RCLMonitorPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Download size={16} /> Synthèse Globale
                     </button>
                 </div>

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { ShieldAlert, Lock, CheckCircle2, ArrowRightLeft, FileCheck, CircleDollarSign, Fingerprint, Banknote } from "lucide-react"
+import { toast } from "sonner";
 
 export default function TrustVaultDashboardPage() {
     const [cautions] = useState([
@@ -53,10 +54,10 @@ export default function TrustVaultDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-amber-100/50 border border-amber-200 text-amber-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-amber-100 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-amber-100/50 border border-amber-200 text-amber-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-amber-100 transition-all shadow-sm flex items-center gap-2">
                         <FileCheck size={16} /> Audit Conformité
                     </button>
-                    <button className="bg-gradient-to-br from-amber-500 to-amber-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-gradient-to-br from-amber-500 to-amber-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg transition-all shadow-md flex items-center gap-2">
                         Transférer au Trésor <ArrowRightLeft size={16} />
                     </button>
                 </div>

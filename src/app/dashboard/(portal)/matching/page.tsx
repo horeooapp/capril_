@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Users, X, Heart, Star, CheckCircle, ShieldAlert } from "lucide-react"
+import { toast } from "sonner";
 
 export default function MatchingDashboardPage() {
     return (
@@ -42,10 +43,10 @@ export default function MatchingDashboardPage() {
                           </div>
                           
                           <div className="flex justify-center gap-8">
-                              <button className="w-16 h-16 rounded-full bg-white border-2 border-red-100 flex items-center justify-center text-red-500 hover:bg-red-50 hover:scale-110 transition-all shadow-md">
+                              <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-16 h-16 rounded-full bg-white border-2 border-red-100 flex items-center justify-center text-red-500 hover:bg-red-50 hover:scale-110 transition-all shadow-md">
                                   <X size={28} />
                               </button>
-                              <button className="w-16 h-16 rounded-full bg-white border-2 border-pink-100 flex items-center justify-center text-pink-500 hover:bg-pink-50 hover:scale-110 transition-all shadow-md">
+                              <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-16 h-16 rounded-full bg-white border-2 border-pink-100 flex items-center justify-center text-pink-500 hover:bg-pink-50 hover:scale-110 transition-all shadow-md">
                                   <Heart size={28} className="fill-pink-500" />
                               </button>
                           </div>

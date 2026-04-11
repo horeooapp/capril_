@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { HardDriveUpload, FileSpreadsheet, CheckCircle, AlertTriangle, Download, ArrowRight, Loader2 } from "lucide-react"
+import { toast } from "sonner";
 
 export default function ImportDashboardPage() {
     const [isUploading, setIsUploading] = useState(false)
@@ -56,7 +57,7 @@ export default function ImportDashboardPage() {
                          <p className="text-sm text-gray-300 font-medium leading-relaxed mb-6">
                              Pour garantir l'intégrité de la base de données, vous devez utiliser le modèle standard QAPRIL fournissant les colonnes pré-requises (Locataire, Loyer, CNI, Échéance).
                          </p>
-                         <button className="w-full bg-white text-qnavy px-4 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-colors shadow-sm flex justify-center items-center gap-2">
+                         <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-full bg-white text-qnavy px-4 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-colors shadow-sm flex justify-center items-center gap-2">
                              <Download size={14} /> Model_Import_QAPRIL.xlsx
                          </button>
                      </div>

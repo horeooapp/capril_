@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { ClipboardList, Search, FileSignature, CheckCircle, ShieldAlert, ArrowRight, UserCheck } from "lucide-react"
+import { toast } from "sonner";
 
 export default function MandatesDashboardPage() {
     const [mandates] = useState<any[]>([
@@ -21,7 +22,7 @@ export default function MandatesDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         <FileSignature size={16} /> Éditer un Mandat
                     </button>
                 </div>
@@ -83,7 +84,7 @@ export default function MandatesDashboardPage() {
                                 </td>
                                 <td className="p-5 text-sm font-bold text-qtext-mid">{m.endDate}</td>
                                 <td className="p-5 text-right">
-                                    <button className="w-8 h-8 rounded-full bg-white border border-qgrey-2 flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
                                         <ArrowRight size={14} />
                                     </button>
                                 </td>

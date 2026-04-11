@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { FileText, Search, Download, CheckCircle, Clock, AlertTriangle, Calculator } from "lucide-react"
+import { toast } from "sonner";
 
 export default function ReceiptsDashboardPage() {
     const [receipts] = useState<any[]>([
@@ -22,10 +23,10 @@ export default function ReceiptsDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Calculator size={16} /> Générer Mois M+1
                     </button>
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         <Download size={16} /> Exporter Fichier DGI
                     </button>
                 </div>
@@ -94,7 +95,7 @@ export default function ReceiptsDashboardPage() {
                                     )}
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Télécharger</button>
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Télécharger</button>
                                 </td>
                             </tr>
                         ))}

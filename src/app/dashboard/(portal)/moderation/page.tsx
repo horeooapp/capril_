@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { ShieldAlert, AlertTriangle, Fingerprint, Eye, Lock, Server, Cpu, Clock, History, Ban, ShieldCheck, Database } from "lucide-react"
+import { toast } from "sonner";
 
 export default function AntiFraudSentinelPage() {
     const [auditLogs] = useState([
@@ -53,10 +54,10 @@ export default function AntiFraudSentinelPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-slate-700 border-slate-300 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-slate-700 border-slate-300 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all shadow-sm flex items-center gap-2">
                         <History size={16} /> Exporter Audit
                     </button>
-                    <button className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black transition-all shadow-md flex items-center gap-2">
                         <Lock size={16} /> Verrouiller le Réseau
                     </button>
                 </div>
@@ -144,7 +145,7 @@ export default function AntiFraudSentinelPage() {
                                     </td>
                                     <td className="p-5 text-right">
                                          {log.status === 'EN_ATTENTE_INVESTIGATION' && (
-                                            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-black uppercase tracking-widest rounded hover:bg-rose-100 transition-colors">
+                                            <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-black uppercase tracking-widest rounded hover:bg-rose-100 transition-colors">
                                                 <Ban size={12} /> Investiguer
                                             </button>
                                         )}

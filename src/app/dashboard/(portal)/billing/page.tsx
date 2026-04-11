@@ -2,6 +2,7 @@
 
 import React from "react"
 import { CreditCard, Check, Zap, Building2, Crown, BadgeCheck } from "lucide-react"
+import { toast } from "sonner";
 
 export default function BillingDashboardPage() {
     return (
@@ -32,7 +33,7 @@ export default function BillingDashboardPage() {
                          <p className="flex items-center gap-3"><Check size={16} className="text-qgreen shrink-0"/> Support email</p>
                      </div>
                      
-                     <button className="w-full mt-auto bg-qgrey-1 text-qtext-light px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-full mt-auto bg-qgrey-1 text-qtext-light px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed">
                          Plan Actuel
                      </button>
                  </div>
@@ -50,7 +51,7 @@ export default function BillingDashboardPage() {
                          <p className="flex items-center gap-3"><Check size={16} className="text-qorange shrink-0"/> Comptabilité & Rapprochement Bancaire</p>
                      </div>
                      
-                     <button className="w-full mt-auto bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-lg">
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-full mt-auto bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-lg">
                          Mettre à niveau
                      </button>
                  </div>
@@ -67,7 +68,7 @@ export default function BillingDashboardPage() {
                          <p className="flex items-center gap-3"><Check size={16} className="text-qnavy shrink-0"/> API Access pour ERP Externe</p>
                      </div>
                      
-                     <button className="w-full mt-auto bg-white border-2 border-qnavy text-qnavy px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy hover:text-white transition-colors">
+                     <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-full mt-auto bg-white border-2 border-qnavy text-qnavy px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy hover:text-white transition-colors">
                          Contacter Ventes
                      </button>
                  </div>
@@ -83,7 +84,7 @@ export default function BillingDashboardPage() {
                         <p className="text-xs font-bold text-qtext-mid">Payez par Wave, Orange Money ou Carte Bancaire.</p>
                     </div>
                 </div>
-                <button className="bg-white text-qnavy border border-qgrey-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all">Ajouter Paiement</button>
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy border border-qgrey-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all">Ajouter Paiement</button>
             </div>
         </div>
     )

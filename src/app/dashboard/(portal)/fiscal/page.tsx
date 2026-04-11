@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Landmark, FileSpreadsheet, Percent, Calculator, Activity, Download } from "lucide-react"
+import { toast } from "sonner";
 
 export default function FiscalDashboardPage() {
     return (
@@ -15,7 +16,7 @@ export default function FiscalDashboardPage() {
                         Moteur fiscal générant automatiquement vos déclarations IFU, TVA, et TAF.
                     </p>
                 </div>
-                <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                     <Download size={16} /> Exporter IFU Annuel
                 </button>
             </div>
@@ -30,7 +31,7 @@ export default function FiscalDashboardPage() {
                         Chaque quittance générée sur QAPRIL ventile automatiquement la base imposable. En fin d'année, votre liasse IFU (Impôt Foncier Unicisé) est prête à être envoyée à la DGI en un clic.
                     </p>
                     <div className="flex gap-4">
-                       <button className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2">
+                       <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2">
                            <FileSpreadsheet size={16} /> Synthèse DGI
                        </button>
                     </div>
@@ -50,7 +51,7 @@ export default function FiscalDashboardPage() {
                                  <p className="text-sm font-black text-qnavy">TVA (18%)</p>
                                  <p className="text-[10px] font-bold text-qtext-light uppercase mt-1">Immobilier Commercial</p>
                              </div>
-                             <button className="bg-white text-qnavy font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg shadow-sm border border-qgrey-2 hover:bg-qnavy hover:text-white transition-colors">
+                             <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy font-black text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg shadow-sm border border-qgrey-2 hover:bg-qnavy hover:text-white transition-colors">
                                  Éditer T3
                              </button>
                          </div>

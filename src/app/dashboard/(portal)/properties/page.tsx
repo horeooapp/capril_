@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { Building2, Search, Plus, MapPin, CheckCircle, Clock, Home, X, Filter, BarChart } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner";
 
 export default function PropertiesDashboardPage() {
     const [properties] = useState<any[]>([
@@ -23,7 +24,7 @@ export default function PropertiesDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Filtres
                     </button>
                     <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">

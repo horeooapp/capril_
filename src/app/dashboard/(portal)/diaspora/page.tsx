@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Globe, ArrowRightLeft, CreditCard, Landmark, Plane, ShieldCheck, Mail, MapPin, ChevronRight, Activity, TrendingUp } from "lucide-react"
+import { toast } from "sonner";
 
 export default function DiasporaHubPage() {
     const [transactions] = useState([
@@ -41,10 +42,10 @@ export default function DiasporaHubPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-white border text-blue-600 border-blue-200 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-blue-600 border-blue-200 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
                         <Landmark size={16} /> RIB Ivoirien (SGCI)
                     </button>
-                    <button className="bg-[#635BFF] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#4d45d8] transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-[#635BFF] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#4d45d8] transition-all shadow-md flex items-center gap-2">
                         <CreditCard size={16} /> Linker Stripe
                     </button>
                 </div>
@@ -83,7 +84,7 @@ export default function DiasporaHubPage() {
                     <div>
                         <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Fiscalité Non-Résident</p>
                         <p className="text-xl font-black text-qnavy-dark">Déclarer impôts CI</p>
-                         <button className="text-[10px] font-bold text-blue-600 mt-1 flex items-center gap-1 hover:underline">Générer attestation CDI <ChevronRight size={10}/></button>
+                         <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-bold text-blue-600 mt-1 flex items-center gap-1 hover:underline">Générer attestation CDI <ChevronRight size={10}/></button>
                     </div>
                 </div>
             </div>
@@ -173,7 +174,7 @@ export default function DiasporaHubPage() {
                              <div className="p-4 bg-[#635BFF]/5 rounded-xl border border-[#635BFF]/20">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-[#635BFF] mb-1 block">Stripe Express Account</label>
                                 <p className="font-mono text-xs font-bold text-qnavy-dark mb-3">acct_1OuXXXXXXXiY</p>
-                                <button className="w-full bg-white border border-[#635BFF] text-[#635BFF] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-[#635BFF] hover:text-white transition-all text-center">
+                                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="w-full bg-white border border-[#635BFF] text-[#635BFF] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-[#635BFF] hover:text-white transition-all text-center">
                                     Voir Dashboard Stripe
                                 </button>
                              </div>

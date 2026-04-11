@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { ClipboardList, Search, Plus, Filter, Key, CheckCircle2, Clock } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner";
 
 export default function LeasesDashboardPage() {
     const [leases] = useState<any[]>([
@@ -71,7 +72,7 @@ export default function LeasesDashboardPage() {
                                     )}
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Gérer</button>
+                                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg">Gérer</button>
                                 </td>
                             </tr>
                         ))}

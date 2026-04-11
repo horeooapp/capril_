@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { addProspect } from "@/actions/champion-actions";
 import ChampionRecoveryDashboard from "@/components/dashboard/champion/ChampionRecoveryDashboard";
+import { toast } from "sonner";
 
 export default function ChampionDashboardClient({ 
   user, 
@@ -141,7 +142,7 @@ export default function ChampionDashboardClient({
                  <div className="flex items-center gap-2 mt-4 ml-1">
                     <a href={`tel:${prospect.telephone}`} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"><Phone size={14} /></a>
                     <a href={`https://wa.me/${prospect.telephone}`} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100"><MessageCircle size={14} /></a>
-                    <button className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-gray-100 transition-colors">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-gray-100 transition-colors">
                        Voir Détails <ChevronRight size={12} />
                     </button>
                  </div>

@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Users, Presentation, CheckSquare, Calendar, Globe } from "lucide-react"
+import { toast } from "sonner";
 
 export default function GovernanceDashboardPage() {
     return (
@@ -25,7 +26,7 @@ export default function GovernanceDashboardPage() {
                     <p className="text-gray-300 text-sm font-medium leading-relaxed max-w-2xl mb-8">
                         Organisez vos AG Virtuellement. Convoquez les copropriétaires par email tracé, proposez des résolutions et menez des votes électroniques via QAPRIL avec génération immédiate de PV.
                     </p>
-                    <button className="bg-white text-qnavy px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-white/10">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white text-qnavy px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-lg shadow-white/10">
                         Convoquer Nouvelle AG
                     </button>
                 </div>

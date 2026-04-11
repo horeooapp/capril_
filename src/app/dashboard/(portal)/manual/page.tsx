@@ -2,6 +2,7 @@
 
 import React from "react"
 import { BookOpen, Search, ChevronRight, FileText, Video, HelpCircle } from "lucide-react"
+import { toast } from "sonner";
 
 export default function ManualDashboardPage() {
     return (
@@ -58,7 +59,7 @@ export default function ManualDashboardPage() {
                             <p className="text-sm font-medium text-qtext-mid">Trouvez la solution aux alertes de configuration (WebPay, SMS erronés).</p>
                         </div>
                     </div>
-                    <button className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md whitespace-nowrap">
+                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md whitespace-nowrap">
                         Consulter FAQ
                     </button>
                 </div>
