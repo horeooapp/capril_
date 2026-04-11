@@ -18,6 +18,8 @@ import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
 import CDCRestitutionBox from "@/components/CDCRestitutionBox"
 import EdlManager from "@/components/dashboard/edl/EdlManager"
 import { getEdlsByLease } from "@/actions/edl-actions"
+import ColocDashboardBox from "@/components/dashboard/coloc/ColocDashboardBox"
+import { getLeaseColocataires, getMonthlySynthesis } from "@/actions/coloc-actions"
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -66,6 +68,11 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     // EDL Feature & Data
     const showEdl = await isFeatureEnabled("M-EDL")
     const edls = showEdl ? await getEdlsByLease(leaseId) : []
+
+    // Colocation Data
+    const colocataires = await getLeaseColocataires(leaseId)
+    const currentMonth = new Date().toISOString().substring(0, 7) // "YYYY-MM"
+    const synthesis = await getMonthlySynthesis(leaseId, currentMonth)
 
     return (
         <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -183,6 +190,11 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Colocation Dashboard */}
+                    <div className="mt-8">
+                        <ColocDashboardBox leaseId={leaseId} colocataires={colocataires} synthesis={synthesis} />
                     </div>
 
                     {/* Procedure Tracking (Added) */}
