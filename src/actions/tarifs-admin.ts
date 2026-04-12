@@ -6,7 +6,8 @@ import { auth } from "@/auth"
 // Type Helper for checking admin
 async function requireAdmin() {
     const session = await auth()
-    const activeRole = session ? (session.user as any).chosenRole || session.user?.role : null;
+    if (!session || !session.user) throw new Error("Unauthorized");
+    const activeRole = (session.user as any).chosenRole || session.user.role;
     if (activeRole !== "ADMIN" && activeRole !== "SUPER_ADMIN") {
         throw new Error("Unauthorized: Admin only")
     }
