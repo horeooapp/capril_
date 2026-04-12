@@ -49,7 +49,7 @@ export default function DashboardLayoutClient({
 
     // Bypasses NextAuth cookie latency by using DB validated role from layout.tsx
     const activeRole = dbActiveRole || session?.user?.chosenRole || session?.user?.role;
-    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole || '');
+    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole || '');
     const isIntermediary = activeRole === 'INTERMEDIARY';
     const isManager = isAgency && (agencyConfig?.isManager !== false);
     const perms = agencyConfig?.permissions || [];

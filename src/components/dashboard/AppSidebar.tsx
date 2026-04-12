@@ -69,7 +69,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             ]
         }
         
-        if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(role)) {
+        if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(role)) {
             const isManager = agencyConfig?.isManager !== false // Default to manager if undefined to prevent locking out legacy users
             const perms = agencyConfig?.permissions || []
 

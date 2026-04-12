@@ -27,20 +27,20 @@ export default function DashboardOverviewClient({
     agencyData?: any,
     tenantData?: any
 }) {
-    if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole)) {
+    if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole)) {
         let payload = undefined;
         if (agencyData) {
             payload = {
                 ...agencyData,
                 candidates: agencyData.candidatures || []
             };
+        } else if (intermData) {
+            payload = {
+                ...intermData,
+                candidates: intermData.candidatures || []
+            };
         }
         return <AgencyPortalWrapper initialData={payload} />;
-    }
-
-    if (activeRole === 'INTERMEDIARY') {
-        // En attendant un wrapper spécifique, un intermédiaire voit la vue propriétaire étendue
-        return <OwnerPortalWrapper user={user} properties={properties} intermData={intermData} activeRole={activeRole} />;
     }
 
     // Par défaut pour tout le monde (Propriétaire, Diaspora, etc.) => Dashboard Propriétaire Premium
