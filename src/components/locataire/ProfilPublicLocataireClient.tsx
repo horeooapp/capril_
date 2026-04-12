@@ -36,7 +36,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
         setLoading(true)
         try {
             await upsertPublicProfile(userId, formData)
-            toast.success("Profil mis à jour avec succès")
+            toast.success("Profil mis Ã  jour avec succÃ¨s")
         } catch (error) {
             toast.error("Erreur lors de la sauvegarde")
         } finally {
@@ -48,7 +48,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
         try {
             await updateProfilVisibilite(userId, newVal)
             setVisibilite(newVal)
-            toast.success(`Visibilité mise à jour : ${newVal}`)
+            toast.success(`VisibilitÃ© mise Ã  jour : ${newVal}`)
         } catch (error) {
             toast.error("Erreur")
         }
@@ -56,9 +56,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
 
     const commsStr = formData.communesSouhaitees.join(', ')
     const typesStr = formData.typeLogement.join(', ')
-
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column: Form */}
             <div className="lg:col-span-2 space-y-6">
@@ -66,13 +64,13 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                 {/* SHARE URL BOX */}
                 <div className="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
                     <div>
-                        <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter text-sm flex items-center gap-2">🔗 Lien du CV Locatif Public</h3>
+                        <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter text-sm flex items-center gap-2">ðŸ”— Lien du CV Locatif Public</h3>
                         <p className="text-xs text-gray-500 mt-1 font-mono">https://qapril.ci/cv/{userId.substring(0,8)}</p>
                     </div>
                     <button 
                         onClick={() => {
                             navigator.clipboard.writeText(`https://qapril.ci/cv/${userId.substring(0,8)}`);
-                            toast.success("Lien copié dans le presse-papier !");
+                            toast.success("Lien copiÃ© dans le presse-papier !");
                         }}
                         className="px-4 py-2 bg-white text-[#1F4E79] font-bold text-xs uppercase tracking-widest rounded-xl shadow hover:bg-gray-50"
                     >
@@ -95,8 +93,8 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                                 className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
                             >
                                 <option value="">Choisir...</option>
-                                <option value="SALARIE">Salarié</option>
-                                <option value="INDEPENDANT">Indépendant</option>
+                                <option value="SALARIE">SalariÃ©</option>
+                                <option value="INDEPENDANT">IndÃ©pendant</option>
                                 <option value="INFORMEL">Informel</option>
                                 <option value="SANS_EMPLOI">Sans emploi</option>
                             </select>
@@ -120,7 +118,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
 
                     <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-2 pt-4">
                         <Search className="text-primary" />
-                        Critères de Recherche
+                        CritÃ¨res de Recherche
                     </h2>
 
                     <div className="space-y-6">
@@ -135,7 +133,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Communes Souhaitées (Séparées par des virgules)</label>
+                            <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Communes SouhaitÃ©es (SÃ©parÃ©es par des virgules)</label>
                             <input 
                                 type="text"
                                 placeholder="ex: Yopougon, Cocody, Riviera"
@@ -162,7 +160,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
             {/* Right Column: Visibility & Privacy */}
             <div className="space-y-6">
                 <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-br from-[#1F4E79] to-[#163a5a] text-white">
-                    <h3 className="font-black uppercase tracking-widest text-[12px] mb-6 opacity-80">Contrôle de Visibilité</h3>
+                    <h3 className="font-black uppercase tracking-widest text-[12px] mb-6 opacity-80">ContrÃ´le de VisibilitÃ©</h3>
                     
                     <div className="grid grid-cols-1 gap-3">
                         <button 
@@ -183,7 +181,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                             <MapPin size={20} />
                             <div className="text-left">
                                 <p className="font-black uppercase text-[11px] tracking-widest">Favoris Proprios</p>
-                                <p className="text-[10px] opacity-70">Seulement via votre numéro</p>
+                                <p className="text-[10px] opacity-70">Seulement via votre numÃ©ro</p>
                             </div>
                         </button>
 
@@ -193,8 +191,8 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                         >
                             <Eye size={20} />
                             <div className="text-left">
-                                <p className="font-black uppercase text-[11px] tracking-widest">Visibilité Totale</p>
-                                <p className="text-[10px] opacity-70">Matching agences activé</p>
+                                <p className="font-black uppercase text-[11px] tracking-widest">VisibilitÃ© Totale</p>
+                                <p className="text-[10px] opacity-70">Matching agences activÃ©</p>
                             </div>
                         </button>
                     </div>
@@ -203,16 +201,16 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                 <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-white">
                     <div className="flex items-center gap-2 mb-4">
                         <Info className="text-blue-500" />
-                        <h4 className="font-black text-[#1F4E79] uppercase text-[12px] tracking-widest">Vie Privée</h4>
+                        <h4 className="font-black text-[#1F4E79] uppercase text-[12px] tracking-widest">Vie PrivÃ©e</h4>
                     </div>
                     <ul className="space-y-4">
                         <li className="flex gap-3 items-start">
                             <CheckCircle2 className="text-emerald-500 shrink-0" size={16} />
-                            <p className="text-[12px] text-gray-500 font-medium">Vos données négatives ne sont jamais visibles.</p>
+                            <p className="text-[12px] text-gray-500 font-medium">Vos donnÃ©es nÃ©gatives ne sont jamais visibles.</p>
                         </li>
                         <li className="flex gap-3 items-start">
                             <CheckCircle2 className="text-emerald-500 shrink-0" size={16} />
-                            <p className="text-[12px] text-gray-500 font-medium">Votre nom est anonymisé pour les agences.</p>
+                            <p className="text-[12px] text-gray-500 font-medium">Votre nom est anonymisÃ© pour les agences.</p>
                         </li>
                         <li className="flex gap-3 items-start">
                             <CheckCircle2 className="text-emerald-500 shrink-0" size={16} />
