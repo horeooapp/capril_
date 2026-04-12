@@ -5,7 +5,8 @@ import { auth } from "@/auth"
 
 async function requireAdmin() {
     const session = await auth()
-    if (!session || !session.user || session.user.role !== "ADMIN") {
+    const activeRole = session ? (session.user as any).chosenRole || session.user?.role : null;
+    if (activeRole !== "ADMIN" && activeRole !== "SUPER_ADMIN") {
         throw new Error("Unauthorized: Admin only")
     }
     return session.user.id

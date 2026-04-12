@@ -8,7 +8,8 @@ export const metadata = {
 
 export default async function AdminGuardrailsPage() {
     const session = await auth()
-    if (!session || session.user.role !== "ADMIN") {
+    const activeRole = session ? (session.user as any).chosenRole || session.user.role : null;
+    if (activeRole !== "ADMIN" && activeRole !== "SUPER_ADMIN") {
         redirect("/admin/login")
     }
 
