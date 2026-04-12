@@ -174,8 +174,10 @@ function LeaseRegistrationForm() {
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none"
                                         >
                                             <option value="">Sélectionnez un bien</option>
-                                            {properties.map(p => (
-                                                <option key={p.id} value={p.id}>{p.propertyCode} - {p.commune}</option>
+                                            {properties.filter(p => !p.isOccupied || p.id === propertyId).map(p => (
+                                                <option key={p.id} value={p.id}>
+                                                    {p.propertyCode} - {p.commune} {p.isOccupied ? "(DÉJÀ LOUÉ)" : ""}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>

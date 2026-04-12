@@ -70,15 +70,27 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                                         <span className="text-xs font-bold text-qnavy">{p.rooms || p.units || 1} Lot(s)</span>
                                     </td>
                                     <td className="p-5">
-                                        {p.status === 'active' || p.status === 'rented' ? (
-                                            <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                                <CheckCircle size={10} /> ACTIF
-                                            </span>
-                                        ) : (
-                                            <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                                <Clock size={10} /> EN ATTENTE
-                                            </span>
-                                        )}
+                                        <div className="flex flex-col gap-2">
+                                            {p.status === 'active' || p.status === 'rented' ? (
+                                                <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
+                                                    <CheckCircle size={10} /> ACTIF
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
+                                                    <Clock size={10} /> EN ATTENTE
+                                                </span>
+                                            )}
+
+                                            {p.isOccupied ? (
+                                                <span className="text-[10px] font-black uppercase text-qblue bg-qblue-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qblue/20 shadow-sm animate-pulse">
+                                                    <Home size={10} /> LOUÉ
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-black uppercase text-qgrey-3 bg-qgrey-1 px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qgrey-2/50 opacity-60">
+                                                    <Search size={10} /> DISPONIBLE
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

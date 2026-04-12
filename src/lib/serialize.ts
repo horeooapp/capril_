@@ -20,15 +20,20 @@ interface RawReceipt {
 /**
  * Helper to serialize BigInt/Decimal and relations for Properties
  */
-export const serializeProperty = (property: any) => {
-    if (!property) return null
+    const activeLeases = (property.leases || []).filter((l: any) => 
+        !['TERMINATED', 'ARCHIVED'].includes(l.status)
+    );
+
     return {
         ...property,
         superficieM2: property.superficieM2 ? Number(property.superficieM2) : null,
         declaredRentFcfa: property.declaredRentFcfa ? Number(property.declaredRentFcfa) : 0,
         gpsLatitude: property.gpsLatitude ? Number(property.gpsLatitude) : null,
         gpsLongitude: property.gpsLongitude ? Number(property.gpsLongitude) : null,
-        leases: (property.leases || []).map(serializeLease)
+        leases: (property.leases || []).map(serializeLease),
+        // Computed fields for Occupancy Management
+        isOccupied: activeLeases.length > 0,
+        occupancyStatus: activeLeases.length > 0 ? 'LOUÉ' : 'DISPONIBLE'
     }
 }
 
@@ -85,7 +90,11 @@ export const serializeLease = (lease: any) => {
             chargesAmount: Number(rec.chargesAmount || 0),
             totalAmount: Number(rec.totalAmount || 0),
             paidAt: rec.paidAt instanceof Date ? rec.paidAt.toISOString() : rec.paidAt
-        }))
+        })),
+        // Expiration management
+        daysSinceCreation: Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)),
+        isExpiringSoon: !['ACTIVE', 'TERMINATED', 'ARCHIVED'].includes(lease.status) && 
+                        Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)) >= 3
     }
 }
 

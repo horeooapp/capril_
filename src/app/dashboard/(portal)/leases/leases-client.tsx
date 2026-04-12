@@ -75,9 +75,16 @@ export default function LeasesDashboardClient({ initialLeases }: { initialLeases
                                             <CheckCircle2 size={10} /> ACTIF
                                         </span>
                                     ) : (
-                                        <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                            <Clock size={10} /> {l.status}
-                                        </span>
+                                        <div className="flex flex-col gap-1.5">
+                                            <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
+                                                <Clock size={10} /> {l.status}
+                                            </span>
+                                            {['DRAFT', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status) && (
+                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${l.daysSinceCreation >= 4 ? 'text-qred bg-qred/5 border-qred/20 animate-pulse' : 'text-qorange-dark bg-qorange-pale border-qorange/20'}`}>
+                                                    Expire dans {Math.max(0, 5 - l.daysSinceCreation)} jours
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
                                 </td>
                                 <td className="p-5 text-right">
