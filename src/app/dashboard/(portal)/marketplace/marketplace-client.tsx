@@ -13,7 +13,7 @@ const FALLBACK = [
     { id: "MKT-03", titre: "Villa Triplex", logement: { city: "Riviera 3" }, loyerDemande: 2000000, statut: "BROUILLON", nbVisites: 0 }
 ]
 
-export default function MarketplaceDashboardClient({ initialAnnonces }: { initialAnnonces: any[] }) {
+export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }: { initialAnnonces: any[], agencyId: string }) {
     const defaultData = initialAnnonces.length > 0 ? initialAnnonces : FALLBACK
     const [listings, setListings] = useState<any[]>(defaultData)
     const [isPending, startTransition] = useTransition()
@@ -57,7 +57,7 @@ export default function MarketplaceDashboardClient({ initialAnnonces }: { initia
                     <button onClick={() => router.push("/dashboard/marketplace/new")} className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Créer une Annonce
                     </button>
-                    <button onClick={() => window.open("https://qapril.ci/store/my-agency", "_blank")} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => window.open(`/store/${agencyId}`, "_blank")} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Globe size={16} /> Voir Ma Vitrine
                     </button>
                 </div>
