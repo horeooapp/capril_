@@ -179,7 +179,7 @@ export async function getLeaseById(leaseId: string) {
 // ── Récupérer les baux d'un locataire ────────────────────
 export async function getLeasesForTenant(tenantId: string) {
   return prisma.lease.findMany({
-    where: { tenantId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
+    where: { tenantId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_SIGNATURE", "PENDING_CONFIRMATION", "LOYER_IMPAYE"] } },
     include: {
       property: { select: { commune: true, address: true, propertyCode: true } },
       receipts: { orderBy: { periodMonth: "desc" }, take: 6 }

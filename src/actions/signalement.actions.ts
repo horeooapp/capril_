@@ -123,7 +123,7 @@ export async function confirmerResolutionLocataire(
 // Stats signalements pour dashboard bailleur
 export async function getStatsSignalements(landlordId: string) {
   const leases = await prisma.lease.findMany({
-    where:  { landlordId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+    where:  { landlordId, status: { not: "ARCHIVED" } },
     select: { id: true }
   });
   const ids = leases.map(l => l.id);

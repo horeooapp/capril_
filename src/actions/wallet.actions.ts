@@ -27,7 +27,7 @@ export async function calculerMontantRecharge(
     select: { walletConfig: { select: { walletBalance: true } } }
   });
   const nbBails = await prisma.lease.count({
-    where: { landlordId: userId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } }
+    where: { landlordId: userId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_SIGNATURE", "PENDING_CONFIRMATION", "LOYER_IMPAYE"] } }
   });
   const solde    = (user?.walletConfig?.walletBalance || 0) ?? 0;
   const besoin   = (nbBails * PRIX_Q * MOIS_COUV) - solde;
@@ -74,7 +74,7 @@ export async function checkAndAlertSoldeBas(userId: string) {
         montantSuggere: montant,
         soldeAuMoment: ((user?.walletConfig?.walletBalance || 0) || 0),
         nbBailsActifs: await prisma.lease.count({
-          where: { landlordId: userId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } }
+          where: { landlordId: userId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_SIGNATURE", "PENDING_CONFIRMATION", "LOYER_IMPAYE"] } }
         }),
         urlGeneree: url, canalEnvoi: user?.walletConfig?.walletCanalAlertePref ?? "WHATSAPP",
         expireAt: new Date(Date.now() + 48 * 3600 * 1000)

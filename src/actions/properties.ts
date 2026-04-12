@@ -422,7 +422,7 @@ export async function getBiensPortefeuille(ownerUserId: string) {
       units: {
         include: {
           leases: {
-            where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+            where: { status: { not: "ARCHIVED" } },
             include: { tenant: { select: { firstName: true, lastName: true } } },
             take: 1
           }
@@ -430,7 +430,7 @@ export async function getBiensPortefeuille(ownerUserId: string) {
         orderBy: { unitLabel: "asc" }
       },
       leases: {
-        where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+        where: { status: { not: "ARCHIVED" } },
         take: 1
       }
     },

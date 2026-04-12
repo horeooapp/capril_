@@ -33,7 +33,7 @@ async function getLocataireDashboardDataRaw(userId: string) {
     const bailsList = await (prisma as any).lease.findMany({
         where: {
             tenantId: userId,
-            status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] }
+            status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'DRAFT', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'LOYER_IMPAYE'] }
         },
         include: { 
             property: true,

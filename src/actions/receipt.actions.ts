@@ -95,7 +95,7 @@ export async function getReceiptsForLease(leaseId: string) {
 // ── Quittances du locataire (espace locataire) ────────────
 export async function getReceiptsForTenant(tenantId: string) {
   const leases = await prisma.lease.findMany({
-    where: { tenantId, status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+    where: { tenantId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_SIGNATURE", "PENDING_CONFIRMATION", "LOYER_IMPAYE"] } },
     select: { id: true }
   });
   return prisma.receipt.findMany({

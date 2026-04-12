@@ -19,7 +19,7 @@ export async function getDashboardAgence(agenceUserId: string) {
         property: { 
           include: {
             leases: { 
-              where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+              where: { status: { not: "ARCHIVED" } },
               include: { tenant: { select: { firstName: true, lastName: true } } } 
             }
           } 

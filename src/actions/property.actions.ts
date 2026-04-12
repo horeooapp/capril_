@@ -134,14 +134,14 @@ export async function getBiensPortefeuille(ownerUserId: string) {
       units: {
         include: {
           leases: {
-            where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+            where: { status: { not: "ARCHIVED" } },
             include: { tenant: { select: { firstName: true, lastName: true } } },
             take: 1
           }
         }
       },
       leases: {
-        where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } },
+        where: { status: { not: "ARCHIVED" } },
         include: { tenant: { select: { firstName: true, lastName: true } } },
         take: 1
       }
@@ -157,7 +157,7 @@ export async function peutCreerBail(propertyId: string): Promise<{
   const bien = await prisma.property.findUnique({
     where: { id: propertyId },
     include: { units: { include: { leases: {
-      where: { status: { in: ["ACTIVE","ACTIVE_DECLARATIF"] } }
+      where: { status: { not: "ARCHIVED" } }
     }}}}
   });
   if (!bien) return { ok: false, raison: "Bien introuvable" };
