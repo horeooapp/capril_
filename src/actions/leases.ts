@@ -116,6 +116,15 @@ export async function createLease(data: {
         const property = await prisma.property.findUnique({ where: { id: data.propertyId } });
         if (!property) throw new Error("Bien introuvable.");
 
+        // 4.1 Strict Availability Check (C-AVAIL-01)
+        const activeLease = await prisma.lease.findFirst({
+            where: {
+                propertyId: data.propertyId,
+                status: { notIn: [LeaseStatus.TERMINATED, LeaseStatus.CANCELLED, LeaseStatus.ARCHIVED] }
+            }
+        });
+        if (activeLease) throw new Error("Ce bien est déjà engagé dans un contrat actif (LOUÉ/EN COURS).");
+
         const realLandlordId = property.ownerUserId;
         let realAgentId: string | null = null;
         let resolvedMandatId: string | null = data.mandatGestionId || null;

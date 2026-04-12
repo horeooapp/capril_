@@ -32,9 +32,9 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
     phone: "",
     email: "",
     propertyId: "",
-    rent: 250000,
-    deposit: 500000,
-    startDate: "2026-04-01",
+    rent: 0,
+    deposit: 0,
+    startDate: new Date().toISOString().split('T')[0],
     type: "BDQ" // Bail Digital QAPRIL
   });
 
@@ -153,7 +153,15 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                     {properties.map(p => (
                       <div 
                         key={p.id}
-                        onClick={() => setFormData({...formData, propertyId: p.id})}
+                        onClick={() => {
+                          const rent = p.declaredRentFcfa || 0;
+                          setFormData({
+                            ...formData, 
+                            propertyId: p.id,
+                            rent: rent,
+                            deposit: rent * 2
+                          });
+                        }}
                         className={`p-6 rounded-[2rem] border-2 transition-all cursor-pointer relative group ${
                           formData.propertyId === p.id ? "border-[#1F4E79] bg-blue-50/20" : "border-slate-100 hover:border-slate-200"
                         }`}

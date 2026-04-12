@@ -35,7 +35,7 @@ function LeaseRegistrationForm() {
     const [advanceMonths, setAdvanceMonths] = useState<number>(0)
     const [agencyFees, setAgencyFees] = useState<number>(0)
     const [isPending, startTransition] = useTransition()
-    const [startDate, setStartDate] = useState("")
+    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
 
     // Autocomplete state
     const [suggestions, setSuggestions] = useState<any[]>([])
@@ -170,7 +170,17 @@ function LeaseRegistrationForm() {
                                         <select 
                                             required 
                                             value={propertyId} 
-                                            onChange={(e) => setPropertyId(e.target.value)}
+                                            onChange={(e) => {
+                                                const id = e.target.value;
+                                                setPropertyId(id);
+                                                const prop = properties.find(p => p.id === id);
+                                                if (prop) {
+                                                    setRentAmount(prop.declaredRentFcfa || 0);
+                                                    setDepositAmount(2); // Default 2 mo
+                                                    setAdvanceMonths(2); // Default 2 mo
+                                                    setPropertyDescription(prop.address || prop.name || "");
+                                                }
+                                            }}
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none"
                                         >
                                             <option value="">Sélectionnez un bien</option>
