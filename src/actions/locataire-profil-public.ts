@@ -24,19 +24,9 @@ export async function getPublicProfile(userId: string) {
         })
 
         if (profil) {
-            // Parse SQLite JSON strings back to arrays
-            try {
-                if (typeof profil.communesSouhaitees === 'string') {
-                    profil.communesSouhaitees = JSON.parse(profil.communesSouhaitees || '[]')
-                }
-                if (typeof profil.typeLogement === 'string') {
-                    profil.typeLogement = JSON.parse(profil.typeLogement || '[]')
-                }
-            } catch (e) {
-                console.error("Error parsing profile strings:", e)
-                profil.communesSouhaitees = []
-                profil.typeLogement = []
-            }
+            // Arrays are natively supported in Postgres. Ensure they are arrays.
+            if (!Array.isArray(profil.communesSouhaitees)) profil.communesSouhaitees = [];
+            if (!Array.isArray(profil.typeLogement)) profil.typeLogement = [];
         }
 
         return profil
@@ -48,11 +38,11 @@ export async function getPublicProfile(userId: string) {
 
 export async function upsertPublicProfile(userId: string, data: any) {
     try {
-        // Preparation for SQLite (stringify arrays)
+        // Postgres natively supports String[]
         const profilDataToSave = {
             ...data,
-            communesSouhaitees: Array.isArray(data.communesSouhaitees) ? JSON.stringify(data.communesSouhaitees) : data.communesSouhaitees,
-            typeLogement: Array.isArray(data.typeLogement) ? JSON.stringify(data.typeLogement) : data.typeLogement
+            communesSouhaitees: Array.isArray(data.communesSouhaitees) ? data.communesSouhaitees : [],
+            typeLogement: Array.isArray(data.typeLogement) ? data.typeLogement : []
         }
 
         const profil = await (prisma as any).locataireProfilPublic.upsert({
@@ -75,9 +65,13 @@ export async function upsertPublicProfile(userId: string, data: any) {
 
 export async function updateProfilVisibilite(userId: string, visibilite: any) {
     try {
-        const profil = await (prisma as any).locataireProfilPublic.update({
+        const profil = await (prisma as any).locataireProfilPublic.upsert({
             where: { userId },
-            data: { visibilite }
+            create: {
+                userId,
+                visibilite
+            },
+            update: { visibilite }
         })
         revalidatePath("/mon-espace-locataire/profil-public")
         return profil
@@ -138,11 +132,11 @@ export async function completeOnboarding(userId: string, data: any) {
             return { success: false, error: "Utilisateur non identifié" }
         }
 
-        // Préparer ProfilData pour SQLite (On transforme les tableaux en JSON string)
+        // Préparer ProfilData pour PostgreSQL
         const profilDataToSave: any = {
             ...data.profilData,
-            communesSouhaitees: data.profilData?.communesSouhaitees ? JSON.stringify(data.profilData.communesSouhaitees) : "[]",
-            typeLogement: data.profilData?.typeLogement ? JSON.stringify(data.profilData.typeLogement) : "[]"
+            communesSouhaitees: Array.isArray(data.profilData?.communesSouhaitees) ? data.profilData.communesSouhaitees : [],
+            typeLogement: Array.isArray(data.profilData?.typeLogement) ? data.profilData.typeLogement : []
         }
         
         // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
