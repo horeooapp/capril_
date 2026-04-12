@@ -194,7 +194,7 @@ export function OwnerPortalDashboard({
             )}
             
             <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">
-              {activeRole === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire Privé' : activeRole === 'INTERMEDIARY' ? 'Intermédiaire de Gestion' : 'Espace Propriétaire'} • Supervision
+              {activeRole === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire Privé' : activeRole === 'INTERMEDIARY' ? 'Intermédiaire de Gestion' : activeRole === 'DIASPORA' ? 'Investisseur Diaspora' : 'Espace Propriétaire'} • Supervision
             </p>
             <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none flex items-center gap-4 flex-wrap">
               Bonjour, {((user?.firstName || '') + ' ' + (user?.lastName || '')).trim() || "Utilisateur"}.
