@@ -67,7 +67,7 @@ export function useLocataires() {
 
   useEffect(() => {
     // Adapter selon l'endpoint d'Achille
-    apiFetch<any[]>('/locataires')
+    apiFetch<any[]>('/mon-espace-locataires')
       .then(setLocataires)
       .catch(console.error)
       .finally(() => setLoading(false));

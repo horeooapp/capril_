@@ -34,7 +34,7 @@ const ROLE_METADATA: Record<string, {
         icon: User,
         color: "#1F4E79",
         glow: "rgba(31, 78, 121, 0.15)",
-        path: "/locataire"
+        path: "/mon-espace-locataire"
     },
     'LANDLORD': {
         title: "Propriétaire",

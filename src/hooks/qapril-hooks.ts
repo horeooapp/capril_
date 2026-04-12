@@ -52,14 +52,14 @@ function useQuery(path: string, deps: any[] = []) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useLocataire() {
-  return useQuery('/locataires/me');
+  return useQuery('/mon-espace-locataires/me');
 }
 
 /**
  * Bail actif du locataire with identity masking logic (MM-04b)
  */
 export function useBailLocataire() {
-  const { data, loading, error } = useQuery('/locataires/me/bail');
+  const { data, loading, error } = useQuery('/mon-espace-locataires/me/bail');
 
   const bailleurAffiche = data ? (() => {
     if (data.typeGestion === 'agreee') {
@@ -89,19 +89,19 @@ export function useBailLocataire() {
 }
 
 export function useQuittancesLocataire() {
-  return useQuery('/locataires/me/quittances');
+  return useQuery('/mon-espace-locataires/me/quittances');
 }
 
 export function useAbonnementsEnergie() {
-  return useQuery('/locataires/me/abonnements-energie');
+  return useQuery('/mon-espace-locataires/me/abonnements-energie');
 }
 
 export function useCautionLocataire() {
-  return useQuery('/locataires/me/caution');
+  return useQuery('/mon-espace-locataires/me/caution');
 }
 
 export function useTicketsLocataire() {
-  const { data, loading, error, refetch } = useQuery('/locataires/me/tickets');
+  const { data, loading, error, refetch } = useQuery('/mon-espace-locataires/me/tickets');
 
   // Defensive array initialization
   const tickets = data || [];
@@ -133,7 +133,7 @@ export function useTicketsLocataire() {
 }
 
 export function useMrlDemande() {
-  return useQuery('/locataires/me/mrl-demandes');
+  return useQuery('/mon-espace-locataires/me/mrl-demandes');
 }
 
 export function useSoumettreRCL() {
@@ -143,7 +143,7 @@ export function useSoumettreRCL() {
   const soumettre = async (payload: any) => {
     setLoading(true);
     try {
-      const res = await apiFetch('/locataires/me/tickets', {
+      const res = await apiFetch('/mon-espace-locataires/me/tickets', {
         method: 'POST',
         body: payload,
       });
@@ -161,7 +161,7 @@ export function useSoumettreRCL() {
 
 export function useRepondreMRL() {
   const repondre = async (demandeId: string, reponse: string) => {
-    return apiFetch(`/locataires/me/mrl-demandes/${demandeId}/repondre`, {
+    return apiFetch(`/mon-espace-locataires/me/mrl-demandes/${demandeId}/repondre`, {
       method: 'POST',
       body: { reponse }, 
     });
@@ -171,7 +171,7 @@ export function useRepondreMRL() {
 
 export function useInitierPreavis() {
   const initier = async (dateDepartSouhaitee: string, creneauEDL: string) => {
-    return apiFetch('/locataires/me/preavis', {
+    return apiFetch('/mon-espace-locataires/me/preavis', {
       method: 'POST',
       body: { dateDepartSouhaitee, creneauEDL },
     });
@@ -297,7 +297,7 @@ export function useSignatures() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export function useMobileMoneyLocataire() {
-  const { data, loading, error } = useQuery('/locataires/me/bail/mobile-money');
+  const { data, loading, error } = useQuery('/mon-espace-locataires/me/bail/mobile-money');
   const numerosActifs = data?.filter((mm: any) => mm.actif) || [];
   const numeroDefaut  = numerosActifs.find((mm: any) => mm.defaut) || numerosActifs[0] || null;
   return { numerosMM: data || [], numerosActifs, numeroDefaut, loading, error };
@@ -311,7 +311,7 @@ export function useInitierPaiementMM() {
     setLoading(true);
     setStatut('en_attente');
     try {
-      return await apiFetch('/locataires/me/bail/paiement-mm/initier', {
+      return await apiFetch('/mon-espace-locataires/me/bail/paiement-mm/initier', {
         method: 'POST',
         body: payload,
       });
@@ -324,7 +324,7 @@ export function useInitierPaiementMM() {
   };
 
   const verifierStatut = async (paiementId: string) => {
-    const res = await apiFetch(`/locataires/me/bail/paiement-mm/${paiementId}/statut`);
+    const res = await apiFetch(`/mon-espace-locataires/me/bail/paiement-mm/${paiementId}/statut`);
     setStatut(res.statut);
     return res;
   };

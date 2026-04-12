@@ -28,7 +28,7 @@ export async function createSignalement(userId: string, bailId: string, data: {
     // Déclencher notification propriétaire (logique à intégrer via ADD-09)
     // EX: sendNotification(proprioId, "Nouveau signalement...")
 
-    revalidatePath("/locataire/signalements")
+    revalidatePath("/mon-espace-locataire/signalements")
     return signalement
 }
 
@@ -50,7 +50,7 @@ export async function confirmSignalementResolution(signalId: string, note?: stri
             noteResolution: note
         }
     })
-    revalidatePath("/locataire/signalements")
+    revalidatePath("/mon-espace-locataire/signalements")
     return updated
 }
 

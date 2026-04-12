@@ -65,7 +65,7 @@ export async function upsertPublicProfile(userId: string, data: any) {
                 ...profilDataToSave
             }
         })
-        revalidatePath("/locataire/profil-public")
+        revalidatePath("/mon-espace-locataire/profil-public")
         return profil
     } catch (error) {
         console.error("Error upserting public profile:", error)
@@ -79,7 +79,7 @@ export async function updateProfilVisibilite(userId: string, visibilite: any) {
             where: { userId },
             data: { visibilite }
         })
-        revalidatePath("/locataire/profil-public")
+        revalidatePath("/mon-espace-locataire/profil-public")
         return profil
     } catch (error) {
         console.error("Error updating visibility:", error)
@@ -176,7 +176,7 @@ export async function completeOnboarding(userId: string, data: any) {
 
         console.log(`[ONBOARDING] Action complete, success:true`);
         
-        revalidatePath("/locataire")
+        revalidatePath("/mon-espace-locataire")
         revalidatePath("/onboarding/tenant")
         
         return { success: true }

@@ -24,7 +24,7 @@ export default function MobileRuntimeDirector() {
                     if (info.id === 'ci.qapril.proprietaire') {
                         router.replace('/dashboard/login') // Redirige vers Propriétaire / Agence
                     } else if (info.id === 'ci.qapril.locataire') {
-                        router.replace('/locataire/login') // Redirige vers Locataire
+                        router.replace('/mon-espace-locataire/login') // Redirige vers Locataire
                     }
                 }
             } catch (err) {

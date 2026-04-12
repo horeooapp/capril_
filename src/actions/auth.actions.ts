@@ -21,7 +21,7 @@ export async function choisirTypeConnexion(type: TypeConnexion) {
 
   // Pour les locataires et admins, rediriger directement vers la bonne page de login si elle existe
   if (type === "LOCATAIRE") {
-      redirect("/locataire/login");
+      redirect("/mon-espace-locataire/login");
   } else if (type === "ADMIN") {
       redirect("/admin/login");
   } else {

@@ -17,13 +17,14 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
     const pathname = usePathname()
 
     const navLinks = [
-        { href: "/locataire", label: "Tableau de Bord", icon: <Home size={20} /> },
-        { href: "/locataire/signalements", label: "Signalements", icon: <ClipboardList size={20} /> },
-        { href: "/locataire/cautions", label: "Ma Caution", icon: <Star size={20} /> },
-        { href: "/locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
-        { href: "/locataire/profil-public", label: "Mon Profil Public", icon: <User size={20} /> },
-        { href: "/locataire/invitations", label: "Invitations", icon: <Send size={20} /> },
-        { href: "/locataire/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
+        { href: "/mon-espace-locataire", label: "Tableau de Bord", icon: <Home size={20} /> },
+        { href: "/mon-espace-locataire/signalements", label: "Signalements", icon: <ClipboardList size={20} /> },
+        { href: "/mon-espace-locataire/cautions", label: "Ma Caution", icon: <Star size={20} /> },
+        { href: "/mon-espace-locataire/passeport", label: "Passeport", icon: <FileText size={20} /> },
+        { href: "/mon-espace-locataire/profil-public", label: "Mon Profil Public", icon: <User size={20} /> },
+        { href: "/mon-espace-locataire/colocation", label: "Colocation", icon: <User size={20} /> },
+        { href: "/mon-espace-locataire/invitations", label: "Invitations", icon: <Send size={20} /> },
+        { href: "/mon-espace-locataire/leases", label: "Contrats", icon: <ClipboardList size={20} /> },
     ]
 
     return (
@@ -34,7 +35,7 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                 className="glass-panel rounded-[2rem] border border-white/40 shadow-2xl shadow-gray-200/50 px-6 py-4 flex items-center justify-between"
             >
                 <div className="flex items-center gap-8">
-                    <Link href="/locataire" className="flex items-center gap-4 group">
+                    <Link href="/mon-espace-locataire" className="flex items-center gap-4 group">
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL Logo" 

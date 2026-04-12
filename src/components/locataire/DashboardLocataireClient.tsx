@@ -50,11 +50,11 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                         </p>
                         
                         <div className="flex flex-wrap gap-4">
-                            <Link href="/locataire/signalements" className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#a64a0e] transition-all shadow-lg active:scale-95">
+                            <Link href="/mon-espace-locataire/signalements" className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#a64a0e] transition-all shadow-lg active:scale-95">
                                 <AlertTriangle size={16} />
                                 Signaler un problème
                             </Link>
-                            <Link href="/locataire/passeport" className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#163a5a] transition-all shadow-lg active:scale-95">
+                            <Link href="/mon-espace-locataire/passeport" className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#163a5a] transition-all shadow-lg active:scale-95">
                                 <FileBadge size={16} />
                                 Mon Passeport
                             </Link>
@@ -98,7 +98,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                         Grade {badge}
                     </div>
                     <p className="text-[14px] text-gray-400 font-medium">Indice de Confiance Locatif</p>
-                    <Link href="/locataire/trust" className="mt-4 text-[12px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline flex items-center gap-1">
+                    <Link href="/mon-espace-locataire/trust" className="mt-4 text-[12px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline flex items-center gap-1">
                         Comment progresser ? <ArrowRight size={14} />
                     </Link>
                 </div>
@@ -116,7 +116,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             {data.bails?.flatMap((b: any) => b.reclamations || []).map((ticket: any, idx: number) => (
                                 <Link 
                                     key={idx} 
-                                    href="/locataire/rights"
+                                    href="/mon-espace-locataire/rights"
                                     className="bg-orange-50 border border-orange-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-orange-100 transition-all font-bold"
                                 >
                                     <div className="flex items-center gap-4">
@@ -138,7 +138,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             {data.bails?.flatMap((b: any) => b.dossiersLitige || []).map((mrl: any, idx: number) => (
                                 <Link 
                                     key={idx} 
-                                    href="/locataire/rights"
+                                    href="/mon-espace-locataire/rights"
                                     className="bg-blue-50 border border-blue-100/50 rounded-2xl p-5 flex justify-between items-center group cursor-pointer hover:bg-blue-100 transition-all font-bold"
                                 >
                                     <div className="flex items-center gap-4">
@@ -195,7 +195,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </div>
                     <div>
                         <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Caution</p>
-                        <Link href="/locataire/cautions" className="text-lg font-black text-[#1F4E79] hover:text-primary transition-colors">
+                        <Link href="/mon-espace-locataire/cautions" className="text-lg font-black text-[#1F4E79] hover:text-primary transition-colors">
                             {data.caution ? 'Certifiée' : 'À certifier'}
                         </Link>
                     </div>
@@ -230,7 +230,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                     </p>
                                 </div>
                             </div>
-                            <Link href="/locataire/leases" className="px-6 py-2 bg-white/50 hover:bg-white border border-white/80 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 transition-all text-xs">
+                            <Link href="/mon-espace-locataire/leases" className="px-6 py-2 bg-white/50 hover:bg-white border border-white/80 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 transition-all text-xs">
                                 Gérer mon bail
                             </Link>
                         </div>
@@ -281,7 +281,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between mb-2 px-2">
                         <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter">Quittances Récentes</h2>
-                        <Link href="/locataire/leases" className="text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">Voir tout</Link>
+                        <Link href="/mon-espace-locataire/leases" className="text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">Voir tout</Link>
                     </div>
                     
                     {data.quittances.length > 0 ? (
@@ -338,13 +338,13 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                  </div>
                              </div>
                          </div>
-                         <Link href="/locataire/profile" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">
+                         <Link href="/mon-espace-locataire/profile" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">
                              Configurer mes canaux (SMS/WhatsApp)
                          </Link>
                     </div>
 
                     {/* Preavis Panel */}
-                    <Link href="/locataire/preavis" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg hover:shadow-xl transition-all group">
+                    <Link href="/mon-espace-locataire/preavis" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg hover:shadow-xl transition-all group">
                         <div className="flex items-start justify-between">
                             <div>
                                 <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Préavis Officiel</h3>
@@ -357,7 +357,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </Link>
 
                     {/* Dossier Locatif Panel */}
-                    <Link href="/locataire/passeport" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all">
+                    <Link href="/mon-espace-locataire/passeport" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all">
                         <div className="absolute top-0 left-0 w-full h-1 bg-[#1F4E79]"></div>
                         <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Dossier de Location</h3>
                         <p className="text-[13px] text-gray-500 font-medium mb-4">Exportez votre dossier certifié QAPRIL pour vos futurs bails.</p>

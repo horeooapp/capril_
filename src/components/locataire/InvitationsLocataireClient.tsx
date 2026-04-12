@@ -129,7 +129,7 @@ export function InvitationsLocataireClient({ initialInvitations }: InvitationsLo
 
                         {inv.statut === 'ACCEPTEE' && (
                             <Link 
-                                href="/locataire" 
+                                href="/mon-espace-locataire" 
                                 className="w-full py-4 bg-emerald-500 text-white rounded-xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 shadow-lg hover:bg-emerald-600 transition-all"
                             >
                                 Accéder au bail <ArrowRight size={14} />

@@ -70,7 +70,7 @@ export async function generatePasseportLocatif(userId: string) {
         }
     })
 
-    revalidatePath("/locataire/passeport")
+    revalidatePath("/mon-espace-locataire/passeport")
     return passeport
 }
 

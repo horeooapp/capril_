@@ -105,7 +105,7 @@ export async function updateProfile(data: { fullName?: string, email?: string, r
         })
 
         revalidatePath("/dashboard")
-        revalidatePath("/locataire")
+        revalidatePath("/mon-espace-locataire")
 
         const { logAction } = await import("./audit")
         await logAction({

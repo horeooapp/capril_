@@ -120,7 +120,7 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                                     {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? "GOUVERNANCE" : session.user.role}
                                 </p>
                                 <Link 
-                                    href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")}
+                                    href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")}
                                     className="inline-flex items-center justify-center w-full gap-3 py-5 bg-gradient-to-r from-[#0B4619] to-[#063010] border border-[#0B4619]/20 text-white rounded-2xl shadow-xl shadow-[#0B4619]/30 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
                                 >
                                     Retourner à mon Espace
@@ -186,7 +186,7 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                         
                         {session?.user ? (
                             <div className="flex gap-4">
-                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")} className="px-6 py-2 bg-[#C55A11] text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all outline-none flex items-center justify-center shadow-lg shadow-[#C55A11]/20">
+                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-6 py-2 bg-[#C55A11] text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all outline-none flex items-center justify-center shadow-lg shadow-[#C55A11]/20">
                                     Retour au Tableau de Bord
                                 </Link>
                             </div>
@@ -216,9 +216,9 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                             </h1>
                             <p className="text-xl text-gray-600 mb-12">Normalisation et sécurisation du marché immobilier ivoirien.</p>
                             {session?.user ? (
-                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/locataire" : "/dashboard")} className="px-10 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block shadow-xl shadow-[#C55A11]/20">Retour au Tableau de Bord</Link>
+                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-10 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block shadow-xl shadow-[#C55A11]/20">Retour au Tableau de Bord</Link>
                             ) : (
-                                <Link href="/locataire/login" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block">Démarrer l'Expérience</Link>
+                                <Link href="/mon-espace-locataire/login" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block">Démarrer l'Expérience</Link>
                             )}
                         </div>
                     </div>

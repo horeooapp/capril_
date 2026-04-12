@@ -9,7 +9,7 @@ export default async function TenantOnboardingPage() {
     const session = await auth()
 
     if (!session?.user) {
-        redirect("/locataire/login")
+        redirect("/mon-espace-locataire/login")
     }
 
     if (session.user.role !== "TENANT") {
@@ -22,7 +22,7 @@ export default async function TenantOnboardingPage() {
 
     if (user?.onboardingComplete) {
         console.log(`[ONBOARDING_PAGE] User already completed onboarding, redirecting to /locataire`);
-        redirect("/locataire")
+        redirect("/mon-espace-locataire")
     }
 
     return (

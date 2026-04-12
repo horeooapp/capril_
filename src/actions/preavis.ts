@@ -42,7 +42,7 @@ export async function createPreavisLocataire(userId: string, bailId: string, dat
     // Update lease status potentially or trigger notifications
     // await prisma.lease.update({ where: { id: bailId }, data: { status: 'DEMANDE_RESILIATION' } })
 
-    revalidatePath("/locataire/contrat")
+    revalidatePath("/mon-espace-locataire/contrat")
     return preavis
 }
 
@@ -61,7 +61,7 @@ export async function accuseReceptionPreavis(preavisId: string) {
             proprioAccuseAt: new Date()
         }
     })
-    revalidatePath("/locataire/contrat")
+    revalidatePath("/mon-espace-locataire/contrat")
     return updated
 }
 

@@ -152,7 +152,7 @@ export default function MobileMenu({
                                                     <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none">{session.user.role}</span>
                                                 </div>
                                                 <Link 
-                                                    href={session.user.role === 'TENANT' ? "/locataire/profile" : "/dashboard/profile"}
+                                                    href={session.user.role === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
                                                     onClick={() => setIsOpen(false)}
                                                     className="bg-qnavy/10 text-qnavy p-2 rounded-lg hover:bg-qnavy hover:text-white transition-all scale-90"
                                                 >
@@ -164,14 +164,14 @@ export default function MobileMenu({
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link 
-                                        href={session.user.role === 'TENANT' ? "/locataire/profile" : "/dashboard/profile"}
+                                        href={session.user.role === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-center bg-qnavy text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-qnavy/20 col-span-2"
                                     >
                                         Gérer mon profil
                                     </Link>
                                     <Link 
-                                        href={session.user.role === 'TENANT' ? "/locataire" : (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
+                                        href={session.user.role === 'TENANT' ? "/mon-espace-locataire" : (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
                                     >
@@ -207,7 +207,7 @@ export default function MobileMenu({
                                     Accès Propriétaire
                                 </Link>
                                 <Link 
-                                    href="/locataire/login"
+                                    href="/mon-espace-locataire/login"
                                     onClick={() => setIsOpen(false)}
                                     className="block w-full text-center bg-[#C55A11] text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all"
                                 >

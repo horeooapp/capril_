@@ -228,7 +228,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                         <p className="text-gray-500 text-[14px] font-medium mb-6">
                             L'émission d'un préavis numérique est obligatoire pour officialiser votre départ et planifier l'état des lieux.
                         </p>
-                        <Link href="/locataire/preavis" className="flex items-center gap-2 text-[#1F4E79] font-black uppercase tracking-widest text-[12px] group-hover:gap-4 transition-all">
+                        <Link href="/mon-espace-locataire/preavis" className="flex items-center gap-2 text-[#1F4E79] font-black uppercase tracking-widest text-[12px] group-hover:gap-4 transition-all">
                             Déclarer mon préavis <ArrowRight size={16} />
                         </Link>
                     </div>

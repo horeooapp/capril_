@@ -209,8 +209,8 @@ export async function updateUserProfile(data: {
         });
 
         revalidatePath('/dashboard/profile')
-        revalidatePath('/locataire/profile')
-        revalidatePath('/locataire')
+        revalidatePath('/mon-espace-locataire/profile')
+        revalidatePath('/mon-espace-locataire')
 
         // Audit Log
         try {

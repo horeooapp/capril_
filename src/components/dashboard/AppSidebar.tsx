@@ -59,13 +59,13 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
     const getNavLinks = () => {
         if (role === 'TENANT') {
             return [
-                { href: "/locataire", label: "Accueil", icon: <LayoutDashboard size={20} /> },
-                { href: "/locataire/leases", label: "Mon bail", icon: <FileText size={20} /> },
-                { href: "/locataire/receipts", label: "Quittances", icon: <Receipt size={20} /> },
-                { href: "/locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
-                { href: "/locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
-                { href: "/locataire/profile", label: "Profil", icon: <User size={20} /> },
-                { href: "/locataire/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
+                { href: "/mon-espace-locataire", label: "Accueil", icon: <LayoutDashboard size={20} /> },
+                { href: "/mon-espace-locataire/leases", label: "Mon bail", icon: <FileText size={20} /> },
+                { href: "/mon-espace-locataire/receipts", label: "Quittances", icon: <Receipt size={20} /> },
+                { href: "/mon-espace-locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
+                { href: "/mon-espace-locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
+                { href: "/mon-espace-locataire/profile", label: "Profil", icon: <User size={20} /> },
+                { href: "/mon-espace-locataire/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
             ]
         }
         
@@ -152,7 +152,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             <div className="h-full bg-white border border-qgrey-2 rounded-[2.25rem] shadow-[0_24px_80px_rgba(13,43,110,0.05)] flex flex-col overflow-hidden relative">
                 {/* Brand Logo Section */}
                 <div className="p-8 shrink-0 flex items-center justify-between">
-                    <Link href={role === 'TENANT' ? "/locataire" : "/dashboard"} className="flex flex-col gap-2 group">
+                    <Link href={role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard"} className="flex flex-col gap-2 group">
                         <ProtectedLogo 
                             src="/logo.png" 
                             alt="QAPRIL" 

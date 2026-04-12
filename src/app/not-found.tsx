@@ -56,7 +56,7 @@ export default function NotFound() {
 
           {/* Quick Links */}
           <div className="mt-24 pt-12 border-t border-gray-100 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-            <Link href="/locataire/login" className="group">
+            <Link href="/mon-espace-locataire/login" className="group">
                 <span className="block text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary mb-2 transition-colors">Portail</span>
                 <span className="font-bold text-gray-900">Locataire</span>
             </Link>

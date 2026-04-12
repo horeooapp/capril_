@@ -104,7 +104,7 @@ export const authConfig = {
                     
                     const effectiveRole = chosenRole || role;
 
-                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/locataire", nextUrl));
+                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     if (effectiveRole === 'ADMIN' || effectiveRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
                     
                     // LANDLORD
@@ -119,7 +119,7 @@ export const authConfig = {
             // 2. PROTECTED ROUTES
             if (!isLoggedIn) {
                 if (pathname.startsWith("/admin")) return Response.redirect(new URL("/admin/login", nextUrl));
-                if (pathname.startsWith("/locataire")) return Response.redirect(new URL("/locataire/login", nextUrl));
+                if (pathname.startsWith("/mon-espace-locataire")) return Response.redirect(new URL("/mon-espace-locataire/login", nextUrl));
                 return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
@@ -143,7 +143,7 @@ export const authConfig = {
             if (pathname.startsWith("/dashboard")) {
                 if (!hasDashAccess) {
                     if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
-                    if (isTenant) return Response.redirect(new URL("/locataire", nextUrl));
+                    if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     return Response.redirect(new URL("/", nextUrl));
                 }
                 if (!onboardingFait && !pathname.startsWith("/onboarding")) {
@@ -152,7 +152,7 @@ export const authConfig = {
             }
             
             // Access to Locataire
-            if (pathname.startsWith("/locataire")) {
+            if (pathname.startsWith("/mon-espace-locataire")) {
                 if (!isTenant) {
                     if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
                     if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
@@ -165,7 +165,7 @@ export const authConfig = {
                 if (!isAdmin) {
                     if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
                          if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
-                         if (isTenant) return Response.redirect(new URL("/locataire", nextUrl));
+                         if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                          return Response.redirect(new URL("/", nextUrl));
                     }
                 }

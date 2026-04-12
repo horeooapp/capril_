@@ -152,7 +152,7 @@ export async function respondToInvitation(invitationId: string, response: 'ACCEP
             data: updateData
         })
 
-        revalidatePath("/locataire/invitations")
+        revalidatePath("/mon-espace-locataire/invitations")
         return updated
     } catch (error) {
         console.error("Error responding to invitation:", error)

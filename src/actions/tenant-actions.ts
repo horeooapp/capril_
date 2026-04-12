@@ -103,3 +103,38 @@ export async function getTenantDashboard() {
         })
     }
 }
+
+export async function splitColocPayment(data: { leaseId: string, targetEmail: string, splitPercentage: number }) {
+    try {
+        const session = await auth()
+        if (!session?.user?.id) return serializeObject({ success: false, error: "Non autorisé" })
+        const userId = session.user.id
+
+        // This implies creating a colocataire invitation
+        const targetUser = await prisma.user.findUnique({
+            where: { email: data.targetEmail }
+        })
+
+        if (!targetUser) {
+             return serializeObject({ success: false, error: "Utilisateur cible non trouvé (doit être inscrit sur QAPRIL)." })
+        }
+
+        const coloc = await prisma.colocataire.create({
+            data: {
+                leaseId: data.leaseId,
+                userId: targetUser.id,
+                role: "SECONDAIRE",
+                pctLoyer: data.splitPercentage,
+                dateEntree: new Date(),
+                modePaiement: "INDIVIDUEL"
+            }
+        })
+
+        return serializeObject({ success: true, coloc })
+
+    } catch (e: any) {
+        console.error("Coloc Error:", e)
+        return serializeObject({ success: false, error: e.message })
+    }
+}
+

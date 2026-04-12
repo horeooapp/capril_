@@ -39,7 +39,7 @@ export default async function DashboardLayout({
     // Role Enforcement based on activeRole, NOT hardcoded dbUser.role
     // because a user with dbUser.role === "TENANT" is allowed here if activeRole === "LANDLORD".
     if (activeRole === "TENANT") {
-        redirect("/locataire")
+        redirect("/mon-espace-locataire")
     }
 
     if (activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") {

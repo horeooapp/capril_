@@ -223,7 +223,7 @@ export async function createManualUtilityBill(data: {
       }
     });
 
-    revalidatePath(`/locataire/cie-sodeci`);
+    revalidatePath(`/mon-espace-locataire/cie-sodeci`);
 
     await writeAuditLog({
       userId: session.user.id,

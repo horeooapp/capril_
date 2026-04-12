@@ -89,7 +89,7 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
 
                 if (result.success) {
                     toast.success("Bienvenue sur QAPRIL !")
-                    window.location.href = "/locataire"
+                    window.location.href = "/mon-espace-locataire"
                 } else {
                     toast.error(result.error || "Erreur lors de la sauvegarde")
                 }

@@ -9,7 +9,7 @@ export default function LoginPage() {
         {
             title: "Locataire",
             description: "Gérez votre habitat, baux et quittances.",
-            href: "/locataire/login",
+            href: "/mon-espace-locataire/login",
             icon: Home,
             color: "from-[#10B981] to-[#059669]",
             shadow: "shadow-[#10B981]/20",

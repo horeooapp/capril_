@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/dashboard/', '/locataire/'],
+      disallow: ['/admin/', '/dashboard/', '/mon-espace-locataire/'],
     },
     sitemap: 'https://www.qapril.ci/sitemap.xml',
   }

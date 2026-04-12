@@ -93,11 +93,11 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-2">Console & Outils</h2>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             {[
-              { href: "/locataire/leases",   icon: <FileText strokeWidth={2.5} size={28} />, label: "Mon Bail",      color: T.teal },
-              { href: "/locataire/receipts", icon: <Receipt strokeWidth={2.5} size={28} />, label: "Paiements",     color: T.green },
-              { href: "/locataire/utilities",icon: <Zap strokeWidth={2.5} size={28} />, label: "CIE/SODECI",  color: T.orange },
-              { href: "/locataire/rights",   icon: <Scale strokeWidth={2.5} size={28} />, label: "Mes Droits",    color: T.purple },
-              { href: "/locataire/trust",    icon: <Award strokeWidth={2.5} size={28} />, label: "Score ICL",     color: T.gold },
+              { href: "/mon-espace-locataire/leases",   icon: <FileText strokeWidth={2.5} size={28} />, label: "Mon Bail",      color: T.teal },
+              { href: "/mon-espace-locataire/receipts", icon: <Receipt strokeWidth={2.5} size={28} />, label: "Paiements",     color: T.green },
+              { href: "/mon-espace-locataire/utilities",icon: <Zap strokeWidth={2.5} size={28} />, label: "CIE/SODECI",  color: T.orange },
+              { href: "/mon-espace-locataire/rights",   icon: <Scale strokeWidth={2.5} size={28} />, label: "Mes Droits",    color: T.purple },
+              { href: "/mon-espace-locataire/trust",    icon: <Award strokeWidth={2.5} size={28} />, label: "Score ICL",     color: T.gold },
             ].map((m, i) => (
               <Link key={i} href={m.href}
                 className="relative overflow-hidden bg-white/60 backdrop-blur-2xl border border-white p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col items-center justify-center gap-3 hover:-translate-y-1 block"
@@ -126,15 +126,15 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
               <h4 className="font-black text-[#A00000] text-sm mb-1">ALERTE LOYER EN RETARD</h4>
               <p className="text-sm text-[#2D3F5E]">Votre loyer de ce mois n'a pas encore été détecté. Si vous avez déjà payé, soumettez votre preuve.</p>
             </div>
-            <Link href="/locataire/leases" className="flex-shrink-0 bg-[#A00000] text-white px-4 py-2 rounded-xl text-xs font-black uppercase">Voir →</Link>
+            <Link href="/mon-espace-locataire/leases" className="flex-shrink-0 bg-[#A00000] text-white px-4 py-2 rounded-xl text-xs font-black uppercase">Voir →</Link>
           </div>
         )}        {/* KPIs */}
         <section>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatCard label="Loyer / mois" value={`${fmt(mainBail?.rentAmount)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/locataire/leases" />
-            <StatCard label="Quittances" value={data?.quittances?.length || 0} icon="🧾" color={T.green} bg={T.greenPale} href="/locataire/receipts" />
-            <StatCard label="Score ICL" value={sc} icon="⭐" color={scColor} bg={scColor + "18"} href="/locataire/trust" />
-            <StatCard label="Caution" value={data?.caution ? "Séquestrée ✓" : "—"} icon="🔒" color={T.teal} bg={T.tealPale} href="/locataire/leases" />
+            <StatCard label="Loyer / mois" value={`${fmt(mainBail?.rentAmount)} F`} icon="💰" color={T.navy} bg={T.navyPale} href="/mon-espace-locataire/leases" />
+            <StatCard label="Quittances" value={data?.quittances?.length || 0} icon="🧾" color={T.green} bg={T.greenPale} href="/mon-espace-locataire/receipts" />
+            <StatCard label="Score ICL" value={sc} icon="⭐" color={scColor} bg={scColor + "18"} href="/mon-espace-locataire/trust" />
+            <StatCard label="Caution" value={data?.caution ? "Séquestrée ✓" : "—"} icon="🔒" color={T.teal} bg={T.tealPale} href="/mon-espace-locataire/leases" />
           </div>
         </section>
 
@@ -143,7 +143,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] px-2">État de l&apos;installation</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Carte logement */}
-            <Link href="/locataire/leases" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group">
+            <Link href="/mon-espace-locataire/leases" className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-xl hover:shadow-2xl transition-all block group">
               <div className="flex justify-between items-start mb-8">
                 <div>
                   <h3 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">{mainBail?.property?.name || "Propriété"}</h3>
@@ -186,7 +186,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
                   <p className="text-xl font-black text-primary mt-2">{fmt(mainBail?.rentAmount)} FCFA</p>
                 </div>
               </div>
-              <Link href="/locataire/leases"
+              <Link href="/mon-espace-locataire/leases"
                 className="w-full block text-center bg-white/10 hover:bg-primary text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/10 hover:border-transparent transition-all">
                 Canaux de Règlement →
               </Link>
@@ -201,11 +201,11 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           <section className="space-y-6">
             <div className="flex justify-between items-end px-2">
               <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">🔌 Services & Utilités</h2>
-              <Link href="/locataire/utilities" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Configuration →</Link>
+              <Link href="/mon-espace-locataire/utilities" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Configuration →</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
               {data.facturesUtilities.slice(0, 3).map((f: any, i: number) => (
-                <Link key={i} href="/locataire/utilities" className="bg-white rounded-2xl p-4 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
+                <Link key={i} href="/mon-espace-locataire/utilities" className="bg-white rounded-2xl p-4 border border-[#D6DCE8] shadow-sm hover:shadow-md transition-shadow block">
                   <div className="text-2xl mb-2">{f.typeUtility === "CIE" ? "⚡" : "💧"}</div>
                   <p className="text-xs font-black uppercase" style={{ color: f.typeUtility === "CIE" ? "#F97316" : T.teal }}>{f.typeUtility}</p>
                   <p className="text-lg font-black text-[#0D2B6E] mt-1">{fmt(f.montantTotal)} F</p>
@@ -221,11 +221,11 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
           <section className="space-y-6">
             <div className="flex justify-between items-end px-2">
               <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Historique des Flux</h2>
-              <Link href="/locataire/receipts" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Accéder aux reçus →</Link>
+              <Link href="/mon-espace-locataire/receipts" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Accéder aux reçus →</Link>
             </div>
             <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden">
               {data.quittances.slice(0, 4).map((q: any, i: number) => (
-                <Link key={q.id} href="/locataire/receipts" className={`flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors block ${i < data.quittances.slice(0, 4).length - 1 ? "border-b border-[#EEF2F7]" : ""}`}>
+                <Link key={q.id} href="/mon-espace-locataire/receipts" className={`flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors block ${i < data.quittances.slice(0, 4).length - 1 ? "border-b border-[#EEF2F7]" : ""}`}>
                   <div className="flex items-center gap-4">
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm ${q.status === "paid" ? "bg-emerald-50" : "bg-red-50"}`}>
                       {q.status === "paid" ? "🧾" : "⚠️"}

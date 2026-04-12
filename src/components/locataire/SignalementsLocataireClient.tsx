@@ -134,7 +134,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                              <div className="flex gap-2">
-                                <button type="button" className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                                <button type="button" className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 transition-colors" onClick={() => { toast.info('Module de caméra en cours de synchronisation.'); }}>
                                     <Camera size={20} />
                                 </button>
                              </div>
@@ -185,11 +185,19 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0">
-                                    <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-gray-400 hover:text-[#1F4E79] transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                                    <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-gray-400 hover:text-[#1F4E79] transition-colors" onClick={() => { toast.info("Ouverture des détails..."); }}>
                                         Voir Détails
                                     </button>
                                     {sig.statut !== "RESOLU" && (
-                                        <button className="px-6 py-3 bg-[#375623]/10 border border-[#375623]/20 text-[#375623] rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-[#375623] hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                                        <button className="px-6 py-3 bg-[#375623]/10 border border-[#375623]/20 text-[#375623] rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-[#375623] hover:text-white transition-all" onClick={async (e) => { 
+                                            e.preventDefault(); 
+                                            toast.promise(import('@/actions/signalements').then(m => m.confirmSignalementResolution(sig.id)), {
+                                                loading: 'Clôture du ticket...', 
+                                                success: 'Signalement marqué comme résolu !',
+                                                error: 'Erreur lors de la clôture.'
+                                            });
+                                            setSignalements(signalements.map((s: any) => s.id === sig.id ? { ...s, statut: 'RESOLU' } : s));
+                                        }}>
                                             Marquer Résolu
                                         </button>
                                     )}

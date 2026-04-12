@@ -23,7 +23,7 @@ export async function scheduleAlerteLoyer(bailId: string, locataireId: string, d
         ]
     })
 
-    revalidatePath("/locataire/profile")
+    revalidatePath("/mon-espace-locataire/profile")
 }
 
 export async function getAlertesLocataire(userId: string) {

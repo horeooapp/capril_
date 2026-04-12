@@ -35,7 +35,7 @@ export async function certifyCautionSaisie(bailId: string, data: {
         }
     })
 
-    revalidatePath("/locataire/contrat")
+    revalidatePath("/mon-espace-locataire/contrat")
     return caution
 }
 
@@ -47,7 +47,7 @@ export async function confirmCautionLocataire(cautionId: string) {
             confirmeAt: new Date()
         }
     })
-    revalidatePath("/locataire/contrat")
+    revalidatePath("/mon-espace-locataire/contrat")
     return updated
 }
 
@@ -74,6 +74,6 @@ export async function closeCautionRestitution(cautionId: string, data: {
             motifRetenue: data.motifRetenue
         }
     })
-    revalidatePath("/locataire/contrat")
+    revalidatePath("/mon-espace-locataire/contrat")
     return updated
 }
