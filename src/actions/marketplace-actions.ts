@@ -49,12 +49,44 @@ export async function publishAnnonce(annonceId: string) {
 
 export async function syncOmnichannel() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autoris�" }
+    if (!session?.user?.id) return { error: "Non autorisé" }
     
     // Simulate Jumia/CoinAfrique/WhatsApp Omnichannel Push
     await new Promise(r => setTimeout(r, 2000))
     
     await logAction({ action: "OMNICHANNEL_SYNC", module: "MARKETPLACE", entityId: "global" })
     
-    return { success: true, message: "Synchronisation multi-plateforme termin�e avec succ�s." }
+    return { success: true, message: "Synchronisation multi-plateforme terminée avec succès." }
+}
+
+export async function getAvailableProperties() {
+    const session = await auth()
+    if (!session?.user?.id) return []
+    try {
+        const props = await prisma.property.findMany({
+            where: { ownerUserId: session.user.id }
+        })
+        return props
+    } catch {
+        return []
+    }
+}
+
+export async function createAnnonce(data: { logementId: string, titre: string, description: string, loyerDemande: number }) {
+    const session = await auth()
+    if (!session?.user?.id) return { error: "Non autorisé" }
+
+    try {
+        const rep = await prisma.annonce.create({
+            data: {
+                ...data,
+                agenceId: session.user.id,
+                statut: "BROUILLON"
+            }
+        })
+        revalidatePath("/dashboard/marketplace")
+        return { success: true, annonce: rep }
+    } catch (e: any) {
+        return { error: "Erreur technique lors de la création." }
+    }
 }
