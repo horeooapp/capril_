@@ -164,6 +164,34 @@ export async function createLease(data: {
             newValues: { reference: lease.leaseReference, type: lease.leaseType }
         });
 
+        // 6. Notifications & Activité Profil Locataire
+        if (tenantId) {
+            // Notification PUSH
+            await prisma.notification.create({
+                data: {
+                    userId: tenantId,
+                    type: "NEW_LEASE",
+                    title: "Nouveau contrat de bail",
+                    content: `Le propriétaire a généré un contrat (${lease.leaseReference}). Veuillez consulter votre espace pour validation.`,
+                    link: `/mon-espace-locataire/leases`,
+                    channel: "PUSH",
+                    status: "sent"
+                }
+            });
+
+            // Mise à jour de l'activité du profil public (Matching/Tinder immo)
+            const profilPublic = await (prisma as any).locataireProfilPublic.findUnique({
+                where: { userId: tenantId }
+            });
+
+            if (profilPublic) {
+                await (prisma as any).locataireProfilPublic.update({
+                    where: { userId: tenantId },
+                    data: { nbInvitationsRecues: { increment: 1 } }
+                });
+            }
+        }
+
         return { success: true, leaseId: lease.id, leaseReference: lease.leaseReference }
 
     } catch (error: unknown) {

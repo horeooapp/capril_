@@ -115,6 +115,32 @@ export async function createLease(data: {
       }
     });
 
+    if (data.tenantId) {
+        // Notification PUSH
+        await prisma.notification.create({
+            data: {
+                userId: data.tenantId,
+                type: "NEW_LEASE",
+                title: "Nouveau contrat de bail",
+                content: `Le propriétaire a généré un contrat (${ref}). Veuillez consulter votre espace pour validation.`,
+                link: `/mon-espace-locataire/leases`,
+                channel: "PUSH",
+                status: "sent"
+            }
+        });
+
+        // Mise à jour de l'activité du profil public
+        const profilPublic = await (prisma as any).locataireProfilPublic.findUnique({
+            where: { userId: data.tenantId }
+        });
+        if (profilPublic) {
+            await (prisma as any).locataireProfilPublic.update({
+                where: { userId: data.tenantId },
+                data: { nbInvitationsRecues: { increment: 1 } }
+            });
+        }
+    }
+
     revalidatePath("/dashboard");
     return { success: true, lease, sha256 };
 
