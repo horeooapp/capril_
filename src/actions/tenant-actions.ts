@@ -59,7 +59,6 @@ export async function getTenantDashboard() {
                     where: { status: { in: ["unpaid", "UNPAID"] } }
                 }
             }
-            }
         })
 
         // ────────────────────────────────────────────────────────
