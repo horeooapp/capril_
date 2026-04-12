@@ -4,11 +4,29 @@ import React, { useState, useTransition } from "react"
 import { motion } from "framer-motion"
 import { Users, Phone, Mail, Search, Loader2, ArrowRight, Activity, Filter, MessageCircle } from "lucide-react"
 import { toast } from "sonner";
-import { launchCampaign } from "@/actions/crm-actions"
+import { launchCampaign, getContactHistory } from "@/actions/crm-actions"
+import { X, Calendar, FileText, Home, ActivitySquare } from "lucide-react"
 
 export default function CRMDashboardClient({ initialContacts }: { initialContacts: any[] }) {
     const [contacts, setContacts] = useState<any[]>(initialContacts)
     const [isPending, startTransition] = useTransition()
+
+    const [selectedContact, setSelectedContact] = useState<any | null>(null)
+    const [contactHistory, setContactHistory] = useState<any | null>(null)
+    const [loadingHistory, setLoadingHistory] = useState(false)
+
+    const handleOpenContact = async (c: any) => {
+        setSelectedContact(c)
+        setLoadingHistory(true)
+        try {
+           const history = await getContactHistory(c.id)
+           setContactHistory(history)
+        } catch(e) {
+           toast.error("Erreur de chargement du dossier.")
+        } finally {
+           setLoadingHistory(false)
+        }
+    }
 
     const handleCampagne = () => {
         startTransition(async () => {
@@ -101,7 +119,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                                     <p className="text-[9px] font-bold text-qtext-mid mt-1 uppercase">Level {c.kycLevel || 1}</p>
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button onClick={(e) => { e.preventDefault(); toast.loading("Redirection en cours...", {id:"r"}); setTimeout(()=>toast.success("Ouverture de la fiche contact...", {id:"r"}), 500); }} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 inline-flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
+                                    <button onClick={(e) => { e.preventDefault(); handleOpenContact(c); }} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 inline-flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
                                         <ArrowRight size={14} />
                                     </button>
                                 </td>
@@ -118,6 +136,85 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                     </tbody>
                 </table>
             </div>
+        </div>
+
+            {selectedContact && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F4E79]/80 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col scale-100 animate-in zoom-in-95 duration-300">
+                        {/* Header */}
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                           <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 rounded-full bg-[#FF8200] text-white flex items-center justify-center font-black text-xl shadow-inner">
+                                  {selectedContact.firstName?.[0] || ""}{selectedContact.lastName?.[0] || ""}
+                              </div>
+                              <div>
+                                  <h3 className="text-xl font-black text-[#1F4E79] capitalize">{selectedContact.firstName} {selectedContact.lastName}</h3>
+                                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{selectedContact.role || 'Contact Client'}</p>
+                              </div>
+                           </div>
+                           <button onClick={() => setSelectedContact(null)} className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm">
+                              <X size={18} />
+                           </button>
+                        </div>
+                        {/* Body */}
+                        <div className="p-6 overflow-y-auto flex-1 space-y-8 select-text">
+                           
+                           <div className="grid grid-cols-2 gap-4">
+                              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                 <p className="text-[10px] uppercase font-black text-gray-400 mb-1">Mobile</p>
+                                 <p className="font-bold text-[#1F4E79]">{selectedContact.phone || 'Non renseigné'}</p>
+                              </div>
+                              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                 <p className="text-[10px] uppercase font-black text-gray-400 mb-1">Email</p>
+                                 <p className="font-bold text-[#1F4E79]">{selectedContact.email || 'Non renseigné'}</p>
+                              </div>
+                           </div>
+
+                           {loadingHistory ? (
+                              <div className="flex justify-center py-12"><Loader2 className="animate-spin text-[#FF8200]" size={32} /></div>
+                           ) : contactHistory ? (
+                              <div className="space-y-6">
+                                 {/* Baux */}
+                                 <div>
+                                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-3"><FileText size={14}/> Dossier de Baux ({contactHistory.leases?.length || 0})</h4>
+                                    {!contactHistory.leases || contactHistory.leases.length === 0 ? <p className="text-sm text-gray-400 bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center italic">Aucun bail associé.</p> : (
+                                       <div className="space-y-2">
+                                         {contactHistory.leases.map((l:any, i:number) => (
+                                            <div key={i} className="p-4 bg-blue-50/30 border border-blue-100 rounded-2xl flex justify-between items-center transition-colors hover:bg-blue-50/60">
+                                               <div>
+                                                  <p className="text-sm font-bold text-[#1F4E79]">{l.property?.propertyCode || 'Propriété Générique'} - {l.property?.commune || l.leaseReference}</p>
+                                                  <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">LOYER : {l.rentAmount?.toLocaleString()} FCFA/Mois</p>
+                                               </div>
+                                               <span className="px-3 py-1.5 bg-white border border-blue-100 rounded-lg truncate text-[10px] font-black text-[#1F4E79]">{l.status}</span>
+                                            </div>
+                                         ))}
+                                       </div>
+                                    )}
+                                 </div>
+
+                                 {/* Candidatures */}
+                                 <div>
+                                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-3"><Home size={14}/> Candidatures ({contactHistory.candidatures?.length || 0})</h4>
+                                    {!contactHistory.candidatures || contactHistory.candidatures.length === 0 ? <p className="text-sm text-gray-400 bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center italic">Aucune candidature soumise.</p> : (
+                                       <div className="space-y-2">
+                                         {contactHistory.candidatures.map((c:any, i:number) => (
+                                            <div key={i} className="p-4 bg-purple-50/30 border border-purple-100 rounded-2xl flex justify-between items-center transition-colors hover:bg-purple-50/60">
+                                               <div>
+                                                  <p className="text-sm font-bold text-purple-900">{c.logement?.propertyCode || 'Bien non défini'}</p>
+                                                  <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mt-1">SOUMISE LE : {new Date(c.createdAt).toLocaleDateString()}</p>
+                                               </div>
+                                               <span className="px-3 py-1.5 bg-white border border-purple-100 rounded-lg truncate text-[10px] font-black text-purple-700">{c.statut}</span>
+                                            </div>
+                                         ))}
+                                       </div>
+                                    )}
+                                 </div>
+                              </div>
+                           ) : null}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
