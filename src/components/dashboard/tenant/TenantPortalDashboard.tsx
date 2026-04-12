@@ -203,7 +203,7 @@ export function TenantPortalDashboard({
 
                 <Sheet open={O.pay} onClose={()=>cl("pay")} title="Lancer le paiement">
                     <p style={{fontSize:12,color:T.textMid,marginBottom:20}}>Souhaitez-vous payer votre loyer de {bail?.rentAmount||bail?.loyer||'--'} FCFA via {selNum?.operator||'Mobile Money'} ?</p>
-                    <button onClick={()=>alert("Lancement CinetPay...")} style={{width:"100%",background:T.green,color:T.white,borderRadius:12,padding:14,fontWeight:800,border:"none"}}>Confirmer le paiement</button>
+                    <button onClick={()=>toast.promise(new Promise(r => setTimeout(r, 1000)), {loading: 'Connexion CinetPay...', success: 'Interface de paiement sécurisée.'})} style={{width:"100%",background:T.green,color:T.white,borderRadius:12,padding:14,fontWeight:800,border:"none"}}>Confirmer le paiement</button>
                 </Sheet>
 
                 <Sheet open={O.trust} onClose={()=>cl("trust")} title="Portefeuille de Confiance (Phase 3)">

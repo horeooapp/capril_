@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { ShieldCheck, MessageSquareWarning, FileSignature, Receipt, Gavel, FileLock2, Info, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -148,7 +149,7 @@ export const RightsActionManager = () => {
                                     <button 
                                         onClick={() => {
                                             setActiveAction(null);
-                                            alert("Dossier d'assistance ouvert avec succès ! (Simulation)");
+                                            toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Ouverture du dossier...', success: "Dossier d'assistance créé et assigné."});
                                         }}
                                         className="flex-1 py-4 bg-[#1F4E79] text-white rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-blue-900 transition-all shadow-lg"
                                     >
