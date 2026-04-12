@@ -8,13 +8,26 @@ export async function getCrmContacts(agenceId: string, role?: string) {
   try {
     // Dans QAPRIL, les contacts sont soit des locataires/proprios liés à l'agence, 
     // soit des users ayant interagi avec l'agence (candidats, etc.)
+    const roleCondition = role ? { role: role } : {};
+
     const users = await (prisma as any).user.findMany({
       where: {
-        OR: [
-          { role: role || undefined },
-          { leasesAsTenant: { some: { agentId: agenceId } } },
-          { leasesAsLandlord: { some: { agentId: agenceId } } },
-          { userCandidatures: { some: { logement: { managedByUserId: agenceId } } } }
+        AND: [
+          roleCondition,
+          {
+            OR: [
+              // L'utilisateur courant est agent
+              { leasesAsTenant: { some: { agentId: agenceId } } },
+              { leasesAsLandlord: { some: { agentId: agenceId } } },
+              { userCandidatures: { some: { logement: { managedByUserId: agenceId } } } },
+              
+              // L'utilisateur courant est propriétaire
+              { leasesAsTenant: { some: { landlordId: agenceId } } },
+              
+              // L'utilisateur courant est locataire
+              { leasesAsLandlord: { some: { tenantId: agenceId } } }
+            ]
+          }
         ]
       },
       select: {
