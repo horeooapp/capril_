@@ -62,7 +62,13 @@ export async function ensurePropertyAccess(propertyId: string) {
     
     if (!hasAccess) {
         const pAccess = await prisma.propertyAccess.findFirst({
-            where: { propertyId, userId, statut: "ACTIF" }
+            where: { 
+                propertyId, 
+                OR: [
+                    { userId, statut: "ACTIF" },
+                    managerId ? { userId: managerId, statut: "ACTIF" } : {}
+                ].filter(c => Object.keys(c).length > 0)
+            }
         })
         if (!pAccess) {
             throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.")
@@ -103,7 +109,13 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
     if (!isParticipant) {
         // Fallback to check if they have access to the property via PropertyAccess
         const pAccess = await prisma.propertyAccess.findFirst({
-            where: { propertyId: lease.propertyId, userId, statut: "ACTIF" }
+            where: { 
+                propertyId: lease.propertyId, 
+                OR: [
+                    { userId, statut: "ACTIF" },
+                    managerId ? { userId: managerId, statut: "ACTIF" } : {}
+                ].filter(c => Object.keys(c).length > 0)
+            }
         })
         if (!pAccess) {
             throw new Error("Accès refusé : Vous n'êtes pas partie prenante de ce bail.")

@@ -28,6 +28,7 @@ export async function getProperties() {
         if (managerId) {
             orConditions.push({ managedByUserId: managerId })
             orConditions.push({ leases: { some: { agentId: managerId } } })
+            orConditions.push({ accessRoles: { some: { userId: managerId, statut: "ACTIF" } } })
         }
 
         const dbProperties = await prisma.property.findMany({
