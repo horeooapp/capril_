@@ -21,27 +21,43 @@ export async function POST(req: Request) {
         // 1. Simuler l'upload d'un fichier sur AWS S3 / Serveur local
         const mockInvoiceUrl = `/uploads/${typeUtility.toLowerCase()}-${Date.now()}.pdf`;
 
-        // 2. Simuler l'appel à une API Vision (ex: OpenAI GPT-4o Vision)
-        // Dans le monde réel :
-        // const response = await openai.chat.completions.create({
-        //     model: "gpt-4-vision-preview",
-        //     messages: [{ role: "user", content: [
-        //         { type: "text", text: "Extrais le montantTTC et la Date limite de paiement de cette facture" },
-        //         { type: "image_url", image_url: { url: imageBufferUrl } }
-        //     ]}]
-        // })
-        await new Promise(resolve => setTimeout(resolve, 2500)); // Simule l'attente du LLM
+        const Tesseract = await import('tesseract.js');
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        const { data: { text } } = await Tesseract.default.recognize(buffer, 'fra', { logger: () => {} });
 
-        // Fake AI data
-        const extractedAmount = typeUtility === "CIE" ? Math.floor(Math.random() * 45000 + 15000) : Math.floor(Math.random() * 15000 + 5000);
+        let extractedAmount = 0;
+        let confidence = 0.5;
+
+        // RegExp to match Total or Net à payer.
+        const regexMontant = /(?:net|total)[^0-9]*?(?:a|à)?\s*(?:payer)?\s*[:=\s]*([0-9\s]+(?:[.,][0-9]{1,2})?)/i;
+        const match = text.match(regexMontant);
+
+        if (match && match[1]) {
+            const montantStr = match[1].replace(/\s+/g, '').replace(',', '.');
+            extractedAmount = parseFloat(montantStr);
+            confidence = 0.92;
+        } else {
+            const allNumbers = text.match(/\b\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{1,2})?\b/g);
+            if (allNumbers) {
+                const numericVals = allNumbers.map((n: string) => parseFloat(n.replace(/\s+/g, '').replace(',', '.'))).filter((n: number) => !isNaN(n));
+                if (numericVals.length > 0) extractedAmount = Math.max(...numericVals);
+                confidence = 0.75;
+            }
+        }
+
+        if (extractedAmount <= 0) {
+             return NextResponse.json({ error: "L'IA n'a pas pu identifier le montant avec certitude. Veuillez procéder par saisie manuelle." }, { status: 400 });
+        }
         
         const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 15); // La facture CIE vient avec +- 15 jours de délai
+        dueDate.setDate(dueDate.getDate() + 15); // Délai standard CIE/SODECI
 
         let facture = null;
 
         // 3. Optionnel : Si leaseId est fourni, pré-créer la facture
-        if (leaseId) {
+        if (leaseId && leaseId !== "LOCATAIRE_SESSION_MOCK") {
             facture = await prisma.factureUtility.create({
                 data: {
                     leaseId,
@@ -53,8 +69,8 @@ export async function POST(req: Request) {
                     montantTotal: extractedAmount,
                     dateLimitePaiement: dueDate,
                     statut: "EN_COURS",
-                    source: "OCR_VISION",
-                    modeUtilities: "PARTAGE_PROPRIO" as any,
+                    source: "OCR_TESSERACT",
+                    modeUtilities: "INDIVIDUEL_LOCATAIRE" as any,
                     invoiceUrl: mockInvoiceUrl
                 }
             });
@@ -65,7 +81,7 @@ export async function POST(req: Request) {
             data: {
                 amount: extractedAmount,
                 dueDate: dueDate.toISOString(),
-                confidence: 0.98,
+                confidence: confidence,
                 invoiceUrl: mockInvoiceUrl,
                 factureId: facture?.id
             }

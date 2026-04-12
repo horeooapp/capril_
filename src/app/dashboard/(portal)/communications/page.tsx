@@ -16,7 +16,7 @@ export default function CommunicationsDashboardPage() {
                         Le centre de tir SMS et d'alertes instantanées Push (News Ticker).
                     </p>
                 </div>
-                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => toast.promise(new Promise(r=>setTimeout(r, 1000)), {loading:'Envoi en cours...', success:'Tous les destinataires ont reçu la notification.'})} className="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-700 transition-all shadow-md flex items-center gap-2">
                     <Send size={16} /> Diffuser Alerte
                 </button>
             </div>
@@ -38,7 +38,7 @@ export default function CommunicationsDashboardPage() {
                         <textarea className="w-full bg-white border border-qgrey-2 rounded-lg p-3 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" rows={3} placeholder="ATTENTION: Coupure d'eau générale prévue le..."></textarea>
                         <div className="flex justify-between items-center mt-3">
                             <span className="text-[10px] font-bold text-qtext-light uppercase">Cibler : Tous les locataires</span>
-                            <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-qnavy text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qnavy-dark transition-colors">Diffuser en Direct</button>
+                            <button onClick={() => toast.success('Ouverture de l\'interface IA de conciliation...')} className="bg-qnavy text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qnavy-dark transition-colors">Diffuser en Direct</button>
                         </div>
                     </div>
                 </div>

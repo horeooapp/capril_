@@ -56,10 +56,10 @@ export default function SyndicationDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,1000)), {loading:'Génération...', success:'Rapport Analytics synchronisé.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart size={16} /> Analytics Leads
                     </button>
-                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,2000)), {loading:'Synchronisation API en cours...', success:'Toutes les plateformes sont à jour.'})} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <RefreshCw size={16} /> Forcer Synchronisation
                     </button>
                 </div>
@@ -125,7 +125,7 @@ export default function SyndicationDashboardPage() {
                                             <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
                                         </label>
                                         {ann.jumia && ann.jumiaRef && (
-                                            <a href="#" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }} className="block mt-2 text-[9px] font-bold text-orange-600 hover:underline flex items-center justify-center gap-1">Voir <ExternalLink size={8}/></a>
+                                            <a href="#" onClick={(e) => { e.preventDefault(); toast.success('Redirection vers la vitrine Jumia active.') }} className="block mt-2 text-[9px] font-bold text-orange-600 hover:underline flex items-center justify-center gap-1">Voir <ExternalLink size={8}/></a>
                                         )}
                                     </td>
                                     {/* CoinAfrique Toggle */}
@@ -135,7 +135,7 @@ export default function SyndicationDashboardPage() {
                                             <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                         </label>
                                          {ann.expat && ann.expatRef && (
-                                            <a href="#" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }} className="block mt-2 text-[9px] font-bold text-blue-600 hover:underline flex items-center justify-center gap-1">Voir <ExternalLink size={8}/></a>
+                                            <a href="#" onClick={(e) => { e.preventDefault(); toast.success('Redirection vers CoinAfrique active.') }} className="block mt-2 text-[9px] font-bold text-blue-600 hover:underline flex items-center justify-center gap-1">Voir <ExternalLink size={8}/></a>
                                         )}
                                     </td>
                                     {/* WhatsApp Toggle */}

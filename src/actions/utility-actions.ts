@@ -190,3 +190,53 @@ export async function scanUtilityBillOCR(formData: FormData) {
     return { error: "Erreur lors de l'analyse OCR du document: " + error.message };
   }
 }
+
+/**
+ * Créer une facture via saisie manuelle (Saisie Rapide)
+ */
+export async function createManualUtilityBill(data: {
+  leaseId: string;
+  typeUtility: UtilityType;
+  montantTotal: number;
+  dateLimitePaiement: Date;
+  identifiantCompteur?: string;
+  source?: string;
+}) {
+  const session = await ensureAuthenticated();
+
+  try {
+    const roleActeur = session.user.role === 'TENANT' ? 'LOCATAIRE' : 'PROPRIO';
+    
+    const facture = await prisma.factureUtility.create({
+      data: {
+        leaseId: data.leaseId,
+        acteurId: session.user.id,
+        roleActeur: roleActeur,
+        typeUtility: data.typeUtility,
+        identifiantCompteur: data.identifiantCompteur || `MANUAL-${Math.floor(Math.random() * 99999)}`,
+        moisFacture: new Date().toISOString().slice(0, 7),
+        montantTotal: data.montantTotal,
+        dateLimitePaiement: data.dateLimitePaiement,
+        statut: "EN_COURS",
+        source: data.source || "SAISIE_MANUELLE",
+        modeUtilities: "INDIVIDUEL_LOCATAIRE" as any
+      }
+    });
+
+    revalidatePath(`/locataire/cie-sodeci`);
+
+    await writeAuditLog({
+      userId: session.user.id,
+      action: "UTILITY_BILL_MANUAL_ENTRY",
+      module: "UTILITY",
+      entityId: facture.id,
+      newValues: { amount: data.montantTotal, type: data.typeUtility }
+    });
+
+    return { success: true, fractureId: facture.id };
+  } catch (error: any) {
+    console.error("Erreur Saisie Manuelle:", error);
+    return { error: error.message || "Erreur inconnue." };
+  }
+}
+

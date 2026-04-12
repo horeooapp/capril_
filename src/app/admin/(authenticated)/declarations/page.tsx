@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { ShieldAlert, CheckCircle2, XCircle, Clock, Search, Filter } from "lucide-react"
 
 export default async function AdminDeclarationsPage() {
+    const { FilterButton } = await import("@/components/admin/actions/AdminButtons");
     const declarations = await (prisma as any).smsDeclaration.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
@@ -53,10 +54,7 @@ export default async function AdminDeclarationsPage() {
                             />
                         </div>
                     </div>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
-                        <Filter size={14} />
-                        Filtrer
-                    </button>
+                    <FilterButton label="Filtrer" className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all" />
                 </div>
 
                 <div className="overflow-x-auto">

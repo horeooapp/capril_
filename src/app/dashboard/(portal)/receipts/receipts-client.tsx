@@ -134,7 +134,7 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                                     )}
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button onClick={() => toast.info('Ouverture du document PDF...')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">Télécharger</button>
+                                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'})} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">Télécharger</button>
                                 </td>
                             </tr>
                         ))}

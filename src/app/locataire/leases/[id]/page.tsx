@@ -7,6 +7,7 @@ import Link from "next/link"
 import ProtectedLogo from "@/components/ProtectedLogo"
 import { getEdlsByLease } from "@/actions/edl-actions"
 import TenantEdlManager from "@/components/dashboard/edl/TenantEdlManager"
+import { ContactSupportButton } from "@/components/tenant/actions/TenantButtons"
 
 export default async function TenantLeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
@@ -162,9 +163,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                         <p className="text-xs text-gray-400 leading-relaxed font-medium">
                             Besoin d&apos;aide avec votre contrat ? Notre service de médiation est disponible 24/7 pour résoudre vos litiges à l&apos;amiable.
                         </p>
-                        <button className="mt-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-gray-700 rounded-lg hover:border-gray-500 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
-                            Contacter le Support
-                        </button>
+                        <ContactSupportButton className="mt-4 w-full py-2 text-[10px] font-black uppercase tracking-widest border border-gray-700 rounded-lg hover:border-gray-500 transition-colors" />
                     </div>
                 </div>
             </div>

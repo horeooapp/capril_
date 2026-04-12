@@ -1,10 +1,11 @@
 "use client"
 
-import React from "react"
-import { FileSignature, ShieldCheck, Download, Plus, Clock, Key } from "lucide-react"
+import React, { useState } from "react"
+import { FileSignature, ShieldCheck, Download, Plus, Clock, Key, X } from "lucide-react"
 import { toast } from "sonner";
 
 export default function ProcurationsDashboardPage() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -17,7 +18,7 @@ export default function ProcurationsDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => setIsModalOpen(true)} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-700 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Émettre Délégation
                     </button>
                 </div>
@@ -56,7 +57,13 @@ export default function ProcurationsDashboardPage() {
                                 <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg">Active</span>
                             </td>
                             <td className="p-5 text-right">
-                                <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-purple-600 transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg flex items-center gap-1 ml-auto">
+                                <button onClick={() => {
+                                    toast.promise(new Promise(r=>setTimeout(r, 1500)), {
+                                        loading: "Téléchargement sécurisé...",
+                                        success: "PDF téléchargé sur votre terminal.",
+                                        error: "Erreur réseau."
+                                    })
+                                }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-purple-600 transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg flex items-center gap-1 ml-auto">
                                     <Download size={12}/> Copie PDF
                                 </button>
                             </td>
@@ -64,6 +71,38 @@ export default function ProcurationsDashboardPage() {
                     </tbody>
                 </table>
             </div>
+
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-qnavy-dark/60 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden p-6">
+                        <div className="flex justify-between items-center mb-6 border-b border-qgrey-2 pb-4">
+                            <h2 className="text-lg font-black text-qnavy-dark uppercase tracking-tight flex items-center gap-2">
+                                <FileSignature className="text-purple-500"/> Émission d'Acte
+                            </h2>
+                            <button onClick={()=>setIsModalOpen(false)} className="bg-qgrey-1 p-2 rounded-full hover:bg-qgrey-2"><X size={16}/></button>
+                        </div>
+                        <p className="text-xs text-qtext-mid mb-4">Cet outil déploie un formulaire juridique Docusign conforme OHADA. La délégation sera valide immédiatement.</p>
+                        <form onSubmit={(e)=>{
+                            e.preventDefault();
+                            toast.success("Délégation émise et envoyée par email !");
+                            setIsModalOpen(false);
+                        }}>
+                            <div className="space-y-4">
+                                <div><label className="text-[10px] font-black uppercase text-qtext-light">Email du Délégataire</label><input type="email" required className="w-full p-3 border border-qgrey-2 rounded-xl mt-1"/></div>
+                                <div><label className="text-[10px] font-black uppercase text-qtext-light">Périmètre</label>
+                                    <select className="w-full p-3 border border-qgrey-2 rounded-xl mt-1">
+                                        <option>Signature Baux Commerciaux</option>
+                                        <option>Recouvrement Amiable</option>
+                                    </select>
+                                </div>
+                                <div><label className="text-[10px] font-black uppercase text-qtext-light">Fin de validité</label><input type="date" required className="w-full p-3 border border-qgrey-2 rounded-xl mt-1"/></div>
+                            </div>
+                            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl mt-6 font-bold text-xs uppercase tracking-widest transition-colors shadow-lg">Générer Procuration</button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

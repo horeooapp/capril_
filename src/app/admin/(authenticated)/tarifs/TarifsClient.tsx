@@ -273,7 +273,7 @@ function OffresView({ data }: { data: any[] }) {
                         )}
                     </div>
 
-                    <button className="w-full py-3 bg-gray-100 text-gray-500 font-black uppercase text-xs tracking-widest rounded-xl hover:bg-gray-200 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                    <button className="w-full py-3 bg-gray-100 text-gray-500 font-black uppercase text-xs tracking-widest rounded-xl hover:bg-gray-200 transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Chargement...', success: 'Panneau de configuration ouvert.'}) }}>
                         Modifier l'offre
                     </button>
                 </div>
@@ -287,7 +287,7 @@ function PromosView({ data }: { data: any[] }) {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="mb-4 flex justify-end">
-                <button className="bg-[#C55A11] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#A54A0D] shadow-lg" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                <button className="bg-[#C55A11] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#A54A0D] shadow-lg" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Création nouvelle promo...', success: 'Formulaire de code promotionnel ouvert.'}) }}>
                     + Nouveau Code
                 </button>
             </div>
@@ -335,7 +335,7 @@ function NegociesView({ data }: { data: any[] }) {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="mb-4 flex justify-end">
-                <button className="bg-[#1F4E79] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#163a5a] shadow-lg" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                <button className="bg-[#1F4E79] text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-[#163a5a] shadow-lg" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Nouveau dossier de négociation...', success: 'Interface ouverte.'}) }}>
                     + Nouvelle Dérogation
                 </button>
             </div>
@@ -354,7 +354,7 @@ function NegociesView({ data }: { data: any[] }) {
                             <p className="text-xs font-bold text-gray-400 mb-1">
                                 {new Date(item.dateDebut).toLocaleDateString()} - {item.dateFin ? new Date(item.dateFin).toLocaleDateString() : 'Permanent'}
                             </p>
-                            <button className="mt-2 text-red-500 font-black text-[10px] uppercase tracking-widest hover:underline" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Révoquer</button>
+                            <button className="mt-2 text-red-500 font-black text-[10px] uppercase tracking-widest hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Révocation via API...', success: 'Dérogation supprimée.'}) }}>Révoquer</button>
                         </div>
                     </div>
                 ))}

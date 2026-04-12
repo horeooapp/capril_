@@ -1,9 +1,9 @@
-import { toast } from "sonner";
 import React from "react"
-import { FileSignature, Search, ShieldCheck, Lock, Hash, ArrowUpRight } from "lucide-react"
+import { FileSignature, Search, ShieldCheck, Lock, Hash } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 export default async function AdminSignaturesPage() {
+    const { PerformActionButton } = await import("@/components/admin/actions/AdminButtons");
     // Search for leases or documents with signature evidence
     const signatures = await (prisma as any).lease.findMany({
         where: { status: "ACTIVE" },
@@ -120,9 +120,7 @@ export default async function AdminSignaturesPage() {
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button className="p-3 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all transform group-hover:scale-110 shadow-sm shadow-emerald-100" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
-                                                <ShieldCheck size={18} />
-                                            </button>
+                                            <PerformActionButton actionName="Téléchargement Preuve Légal" className="p-3 bg-white text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-600 hover:text-white transition-all transform group-hover:scale-110 shadow-sm shadow-emerald-100" label={<ShieldCheck size={18} />} />
                                         </td>
                                     </tr>
                                 ))

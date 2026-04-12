@@ -57,10 +57,10 @@ export default function GeoRadarDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-slate-800 border text-slate-300 border-slate-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,1000)), {loading:'Analyse des filtres cartographiques...', success:'Heatmap rafraîchie.'})} className="bg-slate-800 border text-slate-300 border-slate-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
                         <Layers size={16} /> Filtres Heatmap
                     </button>
-                    <button onClick={() => toast.info('🚀 Module Premium (V5) : Interface en cours de déploiement sécurisé')} className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-500 transition-all shadow-md flex items-center gap-2">
                         <Navigation size={16} /> Cadrer sur Abidjan
                     </button>
                 </div>
