@@ -165,34 +165,34 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                     <div className="grid grid-cols-1 gap-3">
                         <button 
                             onClick={() => toggleVisibilite('INVISIBLE')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVISIBLE' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVISIBLE' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <EyeOff size={20} />
                             <div className="text-left">
-                                <p className="font-black uppercase text-[11px] tracking-widest">Invisible</p>
-                                <p className="text-[10px] opacity-70">Personne ne peut vous trouver</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVISIBLE' ? 'text-[#1F4E79]' : 'text-white'}`}>Invisible</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'INVISIBLE' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Personne ne peut vous trouver</p>
                             </div>
                         </button>
                         
                         <button 
                             onClick={() => toggleVisibilite('INVITATION_PROPRIO')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVITATION_PROPRIO' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVITATION_PROPRIO' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <MapPin size={20} />
                             <div className="text-left">
-                                <p className="font-black uppercase text-[11px] tracking-widest">Favoris Proprios</p>
-                                <p className="text-[10px] opacity-70">Seulement via votre numéro</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVITATION_PROPRIO' ? 'text-[#1F4E79]' : 'text-white'}`}>Favoris Proprios</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'INVITATION_PROPRIO' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Seulement via votre numéro</p>
                             </div>
                         </button>
 
                         <button 
                             onClick={() => toggleVisibilite('TOUS')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'TOUS' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'TOUS' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <Eye size={20} />
                             <div className="text-left">
-                                <p className="font-black uppercase text-[11px] tracking-widest">Visibilité Totale</p>
-                                <p className="text-[10px] opacity-70">Matching agences activé</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'TOUS' ? 'text-[#1F4E79]' : 'text-white'}`}>Visibilité Totale</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'TOUS' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Matching agences activé</p>
                             </div>
                         </button>
                     </div>
