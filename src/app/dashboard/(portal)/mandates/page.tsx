@@ -6,6 +6,8 @@ export default async function MandatesDashboardPage() {
     const session = await auth();
     let mandates: Record<string, any>[] = [];
 
+    let properties: any[] = [];
+
     if (session?.user?.id) {
         mandates = await prisma.mandate.findMany({
             where: {
@@ -17,7 +19,12 @@ export default async function MandatesDashboardPage() {
             take: 20,
             orderBy: { createdAt: "desc" }
         });
+
+        properties = await prisma.property.findMany({
+            take: 50,
+            select: { id: true, name: true, address: true, propertyCode: true }
+        });
     }
 
-    return <MandatesDashboardClient initialMandates={mandates} />;
+    return <MandatesDashboardClient initialMandates={mandates} properties={properties} />
 }

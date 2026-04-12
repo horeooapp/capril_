@@ -29,13 +29,13 @@ export async function createMandate(input: CreateMandateInput) {
             return { error: "La commission ne peut excéder 15%." };
         }
 
-        const mandateRef = await generateMandateRef(input.agentId);
+        const mandateRef = await generateMandateRef(session.user.id);
         
         const mandate = await prisma.mandate.create({
             data: {
                 mandateRef,
                 propertyId: input.propertyId,
-                agentUserId: input.agentId,
+                agentUserId: session.user.id,
                 mandateType: input.mandateType,
                 commissionPct: input.commissionPct,
                 startDate: new Date(input.startDate),
