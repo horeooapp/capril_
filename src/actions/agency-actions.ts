@@ -83,7 +83,7 @@ export async function getAgencyDashboardData() {
                     include: {
                         owner: { select: { firstName: true, lastName: true, id: true } },
                         leases: {
-                            where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },
+                            where: { status: { not: "ARCHIVED" } },
                             include: {
                                 tenant: { select: { firstName: true, lastName: true, id: true } }
                             }
@@ -99,7 +99,7 @@ export async function getAgencyDashboardData() {
             include: {
                 owner: { select: { firstName: true, lastName: true, id: true } },
                 leases: {
-                    where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },
+                    where: { status: { not: "ARCHIVED" } },
                     include: {
                         tenant: { select: { firstName: true, lastName: true, id: true } }
                     }
