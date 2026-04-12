@@ -100,7 +100,7 @@ export default async function EdlAdminPage() {
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-2">
                                                 <User size={14} className="text-gray-300" />
-                                                <span className="text-xs font-black text-gray-900">{edl.lease?.tenants?.[0]?.fullName || "Locataire Inconnu"}</span>
+                                                <span className="text-xs font-black text-gray-900">{edl.lease?.tenant?.firstName ? `${edl.lease.tenant.firstName} ${edl.lease.tenant.lastName}` : "Locataire Inconnu"}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">

@@ -158,7 +158,7 @@ export async function getAllEdls() {
       include: {
         lease: {
           include: {
-            tenants: { select: { firstName: true, lastName: true } },
+            tenant: { select: { firstName: true, lastName: true } },
             property: { select: { address: true } }
           }
         },
@@ -168,6 +168,7 @@ export async function getAllEdls() {
     });
   } catch (error) {
     console.error("[EDL] Admin Fetch Error:", error);
+    return [];
   }
 }
 
