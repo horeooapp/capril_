@@ -34,11 +34,11 @@ export async function getTenantDashboard() {
             return serializeObject({ success: false, error: "Profil utilisateur introuvable." })
         }
 
-        // 3. Trouver le bail actif
+        // 3. Trouver le bail ou le contrat en entente
         const activeLease = await prisma.lease.findFirst({
             where: {
                 tenantId: userId,
-                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF"] }
+                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_CONFIRMATION"] }
             },
             include: {
                 property: true,
