@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { Building2, Search, Plus, MapPin, CheckCircle, Clock, Home, X, Filter, BarChart } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner";
 
 const FALLBACK = [
@@ -13,7 +14,11 @@ const FALLBACK = [
 
 export default function PropertiesDashboardClient({ initialProperties }: { initialProperties: any[] }) {
     const defaultData = initialProperties.length > 0 ? initialProperties : FALLBACK;
-    const [properties] = useState<any[]>(defaultData)
+    const [properties, setProperties] = useState<any[]>(defaultData)
+    const [search, setSearch] = useState("");
+    const router = useRouter();
+
+    const filteredProps = properties.filter(p => (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.propertyCode || p.id).toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
@@ -27,7 +32,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Mise à jour des filtres...', success: 'Filtres appliqués.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.info('Menu des filtres avancés en cours d\'ouverture...')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Filtres
                     </button>
                     <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
@@ -42,7 +47,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                      <div className="p-6 border-b border-qgrey-2 flex items-center bg-qgrey-1/30">
                         <div className="relative flex-1">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                            <input type="text" placeholder="Rechercher un bien par nom ou ID..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qblue focus:ring-1 focus:ring-qblue transition-all" />
+                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un bien par nom ou ID..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qblue focus:ring-1 focus:ring-qblue transition-all" />
                         </div>
                      </div>
                      <table className="w-full text-left border-collapse">
@@ -54,8 +59,8 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                             </tr>
                         </thead>
                         <tbody>
-                            {properties.map(p => (
-                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Chargement des données...', success: 'Fiche propriété ouverte.'})}>
+                            {filteredProps.map(p => (
+                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => router.push(`/dashboard/properties/${p.id}`)}>
                                     <td className="p-5">
                                         <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
                                         <p className="text-[10px] text-qtext-light font-bold mt-1">ID: {p.id.substring(0,8)}</p>
@@ -77,10 +82,10 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                                     </td>
                                 </tr>
                             ))}
-                            {properties.length === 0 && (
+                            {filteredProps.length === 0 && (
                                 <tr>
                                     <td colSpan={3} className="p-8 text-center text-qtext-light text-sm font-medium">
-                                        Aucun bien immobilier enregistré.
+                                        Aucun bien immobilier trouvé.
                                     </td>
                                 </tr>
                             )}

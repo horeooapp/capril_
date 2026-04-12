@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useTransition } from "react"
 import { Megaphone, Globe, CheckCircle2, ShoppingCart, MessageCircle, ExternalLink, Activity, Network, MousePointerClick, RefreshCw, BarChart } from "lucide-react"
 import { toast } from "sonner";
+import { syncOmnichannel } from "@/actions/marketplace-actions";
 
 export default function SyndicationDashboardPage() {
     // Mock Annonces Vacantes
@@ -33,6 +34,7 @@ export default function SyndicationDashboardPage() {
         }
     ])
 
+    const [isPending, startTransition] = useTransition()
     const toggleDiffusion = (index: number, channel: 'jumia' | 'expat' | 'whatsapp') => {
         const updated = [...annonces]
         updated[index][channel] = !updated[index][channel]
@@ -56,10 +58,17 @@ export default function SyndicationDashboardPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,1000)), {loading:'Génération...', success:'Rapport Analytics synchronisé.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => {toast.loading("Génération...", {id:"ana"}); setTimeout(()=>{toast.success("Rapport Analytics synchronisé.", {id:"ana"});}, 1000);}} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart size={16} /> Analytics Leads
                     </button>
-                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,2000)), {loading:'Synchronisation API en cours...', success:'Toutes les plateformes sont à jour.'})} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => {
+                        startTransition(async () => {
+                            toast.loading("Synchronisation API en cours...", { id: "sync" });
+                            const res = await syncOmnichannel();
+                            if(res.success) toast.success(res.message, { id: "sync" });
+                            else toast.error("Erreur de synchronisation", { id: "sync" });
+                        })
+                    }} disabled={isPending} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <RefreshCw size={16} /> Forcer Synchronisation
                     </button>
                 </div>

@@ -3,11 +3,21 @@
 import React, { useState, useTransition } from "react"
 import { Search, MapPin, CheckSquare, Plus, FileSignature } from "lucide-react"
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { triggerEdlComparison } from "@/actions/edl-actions";
 
 export default function InspectionsDashboardClient({ initialEdls }: { initialEdls: any[] }) {
     const [edls] = useState<any[]>(initialEdls.length > 0 ? initialEdls : [])
+    const [search, setSearch] = useState("");
     const [isPending, startTransition] = useTransition()
+    const router = useRouter();
+
+    const filteredEdls = edls.filter(e => 
+        (e.refEdl || '').toLowerCase().includes(search.toLowerCase()) || 
+        (e.lease?.property?.address || '').toLowerCase().includes(search.toLowerCase()) ||
+        (e.lease?.tenant?.firstName || '').toLowerCase().includes(search.toLowerCase()) ||
+        (e.lease?.tenant?.lastName || '').toLowerCase().includes(search.toLowerCase())
+    );
 
     const handleCompare = (edlId: string) => {
         startTransition(async () => {
@@ -31,7 +41,7 @@ export default function InspectionsDashboardClient({ initialEdls }: { initialEdl
                         Répertoire central des inspections entrantes et sortantes.
                     </p>
                 </div>
-                <button onClick={() => toast.success('Ouverture de l\'assistant EDL...')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => router.push('/dashboard/inspections/new')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                     <Plus size={16} /> Planifier Inspection
                 </button>
             </div>
@@ -40,12 +50,12 @@ export default function InspectionsDashboardClient({ initialEdls }: { initialEdl
                 <div className="p-6 border-b border-qgrey-2 flex items-center gap-4 bg-qgrey-1/30">
                     <div className="relative flex-1 max-w-md">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input type="text" placeholder="Rechercher par adresse ou locataire..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qgreen focus:ring-1 focus:ring-qgreen transition-all" />
+                        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher par adresse ou locataire..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qgreen focus:ring-1 focus:ring-qgreen transition-all" />
                     </div>
                 </div>
 
                 <div className="p-10 space-y-4">
-                     {edls.map(e => (
+                     {filteredEdls.map(e => (
                          <div key={e.id} className={`bg-white border ${e.typeEdl === 'SORTIE' ? 'border-qgreen border-dashed' : 'border-qgrey-2'} rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between items-center gap-6`}>
                              <div className="flex items-center gap-6">
                                  <div className={`w-14 h-14 ${e.typeEdl === 'SORTIE' ? 'bg-qgrey-1 text-qtext-mid' : 'bg-qgreen-pale text-qgreen'} rounded-xl flex items-center justify-center font-black text-xl`}>
@@ -73,7 +83,7 @@ export default function InspectionsDashboardClient({ initialEdls }: { initialEdl
                                              <p className="text-[10px] font-black uppercase tracking-widest text-qtext-light">Photos</p>
                                              <p className="text-lg font-black text-qnavy">{e.sections?.length || 0}</p>
                                          </div>
-                                         <button onClick={() => toast.success('Ouverture du document PDF...')} className="bg-transparent border border-qgrey-2 text-qnavy font-black text-xs uppercase px-4 py-2 rounded-lg hover:bg-qgrey-1 transition-colors">
+                                         <button onClick={() => router.push(`/admin/edl/${e.id}`)} className="bg-transparent border border-qgrey-2 text-qnavy font-black text-xs uppercase px-4 py-2 rounded-lg hover:bg-qgrey-1 transition-colors">
                                              Voir Document
                                          </button>
                                      </>
@@ -82,9 +92,9 @@ export default function InspectionsDashboardClient({ initialEdls }: { initialEdl
                          </div>
                      ))}
                      
-                     {edls.length === 0 && (
+                     {filteredEdls.length === 0 && (
                          <div className="text-center p-10 font-bold text-qtext-light">
-                             Aucun état des lieux existant.
+                             Aucun état des lieux existant ou ne correspond à la recherche.
                          </div>
                      )}
                 </div>

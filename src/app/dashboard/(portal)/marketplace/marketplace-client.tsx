@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { Store, Globe, Eye, ArrowUpRight, Plus, MapPin, CheckCircle, Search, Rocket } from "lucide-react"
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { publishAnnonce } from "@/actions/marketplace-actions"
 
 // Fallback statique si DB vide
@@ -16,6 +17,7 @@ export default function MarketplaceDashboardClient({ initialAnnonces }: { initia
     const defaultData = initialAnnonces.length > 0 ? initialAnnonces : FALLBACK
     const [listings, setListings] = useState<any[]>(defaultData)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     const activesCount = listings.filter(l => l.statut === "ACTIVE").length
     const totalViews = listings.reduce((acc, l) => acc + (l.nbVisites || 0), 0)
@@ -52,10 +54,10 @@ export default function MarketplaceDashboardClient({ initialAnnonces }: { initia
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Redirection vers le formulaire de création...')} className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => router.push("/dashboard/marketplace/new")} className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Créer une Annonce
                     </button>
-                    <button onClick={() => toast.success('Ouverture de votre Store en public...')} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => window.open("https://qapril.ci/store/my-agency", "_blank")} className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Globe size={16} /> Voir Ma Vitrine
                     </button>
                 </div>

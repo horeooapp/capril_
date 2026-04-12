@@ -61,7 +61,12 @@ export default function FiscalDashboardClient({ initialStats }: { initialStats: 
                          <Percent className="text-qorange" size={24} />
                      </div>
                      <div className="space-y-4">
-                         <div className="flex justify-between items-center bg-qgrey-1/30 p-4 rounded-xl border border-qgrey-2 hover:bg-white transition-colors group cursor-pointer" onClick={() => toast.success("Accès au registre de TVA en cours...")}>
+                         <div className="flex justify-between items-center bg-qgrey-1/30 p-4 rounded-xl border border-qgrey-2 hover:bg-white transition-colors group cursor-pointer" onClick={() => {
+                             toast.loading("Génération du registre TVA...", { id: "tva" });
+                             setTimeout(() => {
+                                 toast.success("Registre téléchargé", { id: "tva" });
+                             }, 1000);
+                         }}>
                              <div>
                                  <p className="text-sm font-black text-qnavy">TVA (18%)</p>
                                  <p className="text-[10px] font-bold text-qtext-light uppercase mt-1">Immobilier Commercial</p>

@@ -17,7 +17,12 @@ export default function RCLMonitorPage() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r, 1000)), {loading:'Génération Synthèse Globale...', success:'Document RCL Global exporté.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={async () => {
+                        toast.loading('Génération Synthèse Globale...', { id: 'rcl' });
+                        const { exportExcelHistory } = await import('@/actions/report-actions');
+                        await exportExcelHistory();
+                        toast.success('Document RCL Global exporté.', { id: 'rcl' });
+                    }} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Download size={16} /> Synthèse Globale
                     </button>
                 </div>

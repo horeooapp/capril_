@@ -126,7 +126,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                         <p className="text-xs font-bold text-qtext-mid">Payez par Wave, Orange Money ou Carte Bancaire.</p>
                     </div>
                 </div>
-                <button onClick={() => toast.success('Redirection vers CinetPay sécurisé (Simulation)')} className="bg-white text-qnavy border border-qgrey-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all">Ajouter Paiement</button>
+                <button onClick={() => window.location.href = "/dashboard/payments/simulate?tid=ABONNEMENT_UPGRADE&amount=45000"} className="bg-white text-qnavy border border-qgrey-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all">Ajouter Paiement</button>
             </div>
         </div>
     )

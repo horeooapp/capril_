@@ -54,3 +54,21 @@ export async function createSyndicate(formData: FormData) {
         return { error: "Erreur lors de l'enregistrement de la copropriÃ©tÃ©." }
     }
 }
+
+export async function dispatchMilliemes() {
+    const session = await auth()
+    if (!session?.user?.id) return { error: "Non autorisé" }
+
+    try {
+        await logAction({
+            action: "DISPATCH_MILLIEMES",
+            module: "SYNDIC",
+            entityId: session.user.id
+        })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        return { success: true }
+    } catch (e) {
+        return { error: "Erreur de ventilation des millièmes." }
+    }
+}

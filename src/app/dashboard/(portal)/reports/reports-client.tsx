@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { FileText, Download, ChartPie, CheckCircle, Clock, Calendar, CheckSquare, Search, SendHorizontal, Calculator } from "lucide-react"
 import { toast } from "sonner";
-import { payFinancialReport } from "@/actions/report-actions"
+import { payFinancialReport, exportExcelHistory, exportPdfReport, closeMonthWithAI } from "@/actions/report-actions"
 
 export default function ReportsDashboardClient({ initialReports }: { initialReports: any[] }) {
     const [reports, setReports] = useState(initialReports)
@@ -39,10 +39,22 @@ export default function ReportsDashboardClient({ initialReports }: { initialRepo
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Recherche...', success: 'Historique filtré.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => {
+                        startTransition(async () => {
+                            const res = await exportExcelHistory();
+                            if(res.success) toast.success("Historique Excel prêt et téléchargé.");
+                        })
+                    }} disabled={isPending} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50">
                         <Calendar size={16} /> Historique Mensuel
                     </button>
-                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Lancement IA...', success: 'Rapport mensuel généré avec succès.'})} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => {
+                        startTransition(async () => {
+                            toast.loading("Lancement du moteur IA comptable...", { id: "ai-close" })
+                            const res = await closeMonthWithAI(reports[0]?.period || 'mois');
+                            if(res.success) toast.success(res.message, { id: "ai-close" });
+                            else toast.error("Échec IA", { id: "ai-close" });
+                        })
+                    }} disabled={isPending} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2 disabled:opacity-50">
                         <Calculator size={16} /> Clôturer {reports[0]?.period || 'le mois'}
                     </button>
                 </div>
@@ -139,7 +151,12 @@ export default function ReportsDashboardClient({ initialReports }: { initialRepo
                                                     <Clock size={14} />
                                                 </button>
                                             )}
-                                            <button onClick={() => toast.success('Téléchargement du PDF...')} className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-qgrey-2 text-qnavy hover:bg-qgrey-1 transition-colors" title="Télécharger PDF">
+                                            <button onClick={() => {
+                                                startTransition(async () => {
+                                                    await exportPdfReport(c.id);
+                                                    toast.success("Bordereau PDF téléchargé avec succès.");
+                                                })
+                                            }} className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-qgrey-2 text-qnavy hover:bg-qgrey-1 transition-colors" title="Télécharger PDF">
                                                 <Download size={14} />
                                             </button>
                                         </div>

@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { Building2, Users, FileText, CheckCircle, Clock, AlertTriangle, Plus, Landmark, X } from "lucide-react"
 import { toast } from "sonner";
-import { createSyndicate } from "@/actions/syndic-actions"
+import { createSyndicate, dispatchMilliemes } from "@/actions/syndic-actions"
 
 export default function SyndicDashboardClient({ initialSyndicates }: { initialSyndicates: any[] }) {
     const [syndicates, setSyndicates] = useState(initialSyndicates)
@@ -119,7 +119,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                     <div className="bg-blue-500/20 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-blue-400/30 inline-block mb-4">Moteur de Tantièmes</div>
                     <h2 className="text-2xl font-black mb-3">Répartition Automatique des Charges</h2>
                     <p className="text-gray-300 text-sm leading-relaxed mb-6">Un configurateur de millièmes liera directement un immeuble au générateur de quittances QAPRIL.</p>
-                    <button type="button" onClick={() => toast.promise(new Promise(r=>setTimeout(r, 2000)), {loading:'Lancement du moteur de tantièmes...', success:'Millièmes ventilés aux copropriétaires.'})} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
+                    <button type="button" onClick={() => { startTransition(async () => { toast.loading("Lancement du moteur de tantièmes...", { id: "syndic" }); const res = await dispatchMilliemes(); if(res.success) toast.success("Millièmes ventilés aux copropriétaires.", { id: "syndic" }); else toast.error(res.error, { id: "syndic" }); }) }} disabled={isPending} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
                         Configurer Tantièmes
                     </button>
                 </div>

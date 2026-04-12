@@ -30,7 +30,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                     <button onClick={() => toast.success('Ouverture du portail d\'analyse API...')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart4 size={16} /> Rapport API
                     </button>
-                    <button onClick={() => toast.success('Lien WhatsApp généré pour le locataire !')} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Lien WhatsApp généré pour le locataire !"}); }} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Initier Nouvelle Saisie IA
                     </button>
                 </div>

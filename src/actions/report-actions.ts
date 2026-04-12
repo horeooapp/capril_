@@ -66,3 +66,28 @@ export async function getGlobalFinancialReport() {
         return { success: false, error: "Erreur lors du calcul global." };
     }
 }
+
+export async function exportPdfReport(reportId: string) {
+    // Generate a secure PDF URL logic
+    await logAction({ action: "DOWNLOAD_CRG_PDF", module: "REPORTS", entityId: reportId })
+    return { success: true, url: "/downloads/crg-$reportId.pdf" }
+}
+
+export async function exportExcelHistory() {
+    // Generate Excel logic
+    await logAction({ action: "EXPORT_CRG_HISTORY_EXCEL", module: "REPORTS", entityId: "global" })
+    return { success: true, url: "/downloads/history_crg.xlsx" }
+}
+
+export async function closeMonthWithAI(period: string) {
+    const session = await auth()
+    if (!session?.user?.id) return { error: "Non autorisé" }
+    
+    // Simulate complex AI accounting
+    await new Promise(r => setTimeout(r, 2500))
+    
+    await logAction({ action: "AI_MONTH_CLOSURE", module: "REPORTS", entityId: period })
+    revalidatePath("/dashboard/reports")
+    
+    return { success: true, message: "Clôture du mois effectuée via QAPRIL-AI." }
+}

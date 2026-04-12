@@ -43,10 +43,10 @@ export default function MatchingDashboardPage() {
                           </div>
                           
                           <div className="flex justify-center gap-8">
-                              <button onClick={() => toast.error('Candidature rejetée. Le profil ne sera plus suggéré.')} className="w-16 h-16 rounded-full bg-white border-2 border-red-100 flex items-center justify-center text-red-500 hover:bg-red-50 hover:scale-110 transition-all shadow-md">
+                              <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Candidature rejetée. Le profil ne sera plus suggéré."}); }} className="w-16 h-16 rounded-full bg-white border-2 border-red-100 flex items-center justify-center text-red-500 hover:bg-red-50 hover:scale-110 transition-all shadow-md">
                                   <X size={28} />
                               </button>
-                              <button onClick={() => toast.success('Match Immo ! Le dossier locataire vous a été transmis.')} className="w-16 h-16 rounded-full bg-white border-2 border-pink-100 flex items-center justify-center text-pink-500 hover:bg-pink-50 hover:scale-110 transition-all shadow-md">
+                              <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Match Immo ! Le dossier locataire vous a été transmis."}); }} className="w-16 h-16 rounded-full bg-white border-2 border-pink-100 flex items-center justify-center text-pink-500 hover:bg-pink-50 hover:scale-110 transition-all shadow-md">
                                   <Heart size={28} className="fill-pink-500" />
                               </button>
                           </div>

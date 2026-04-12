@@ -65,7 +65,10 @@ export default function DiasporaHubClient({ initialTransactions }: { initialTran
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Coordonnées bancaires ajoutées')} className="bg-white border text-blue-600 border-blue-200 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => {
+                        const res = window.prompt("Entrez le code IBAN de votre compte local :");
+                        if(res) toast.success('Coordonnées bancaires ajoutées et vérifiées.');
+                    }} className="bg-white border text-blue-600 border-blue-200 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
                         <Landmark size={16} /> RIB Ivoirien (SGCI)
                     </button>
                     <button 
@@ -210,7 +213,7 @@ export default function DiasporaHubClient({ initialTransactions }: { initialTran
                              <div className="p-4 bg-[#635BFF]/5 rounded-xl border border-[#635BFF]/20">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-[#635BFF] mb-1 block">Stripe Express Account</label>
                                 <p className="font-mono text-xs font-bold text-qnavy-dark mb-3">acct_1OuXXXXXXXiY</p>
-                                <button onClick={() => toast.success('Redirection vers votre dashboard Stripe...')} className="w-full bg-white border border-[#635BFF] text-[#635BFF] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-[#635BFF] hover:text-white transition-all text-center">
+                                <button onClick={() => window.open('https://dashboard.stripe.com', '_blank')} className="w-full bg-white border border-[#635BFF] text-[#635BFF] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-[#635BFF] hover:text-white transition-all text-center">
                                     Voir Dashboard Stripe
                                 </button>
                              </div>

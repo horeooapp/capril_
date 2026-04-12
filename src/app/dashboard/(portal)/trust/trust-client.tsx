@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { ShieldAlert, Lock, CheckCircle2, ArrowRightLeft, FileCheck, CircleDollarSign, Fingerprint, Banknote } from "lucide-react"
 import { toast } from "sonner";
-import { transferToVault } from "@/actions/trust-actions"
+import { transferToVault, generateTrustAudit } from "@/actions/trust-actions"
 
 export default function TrustVaultDashboardClient({ initialCautions }: { initialCautions: any[] }) {
     const [cautions, setCautions] = useState(initialCautions)
@@ -56,7 +56,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Audit généré : 100% de fiabilité.')} className="bg-amber-100/50 border border-amber-200 text-amber-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-amber-100 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => { startTransition(async () => { toast.loading("Audit en cours...", {id:"audit"}); const res = await generateTrustAudit(); if(res.success) toast.success(res.message, {id:"audit"}); else toast.error(res.error, {id:"audit"}); }) }} disabled={isPending} className="bg-amber-100/50 border border-amber-200 text-amber-700 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-amber-100 transition-all shadow-sm flex items-center gap-2">
                         <FileCheck size={16} /> Audit Conformité
                     </button>
                     <button 

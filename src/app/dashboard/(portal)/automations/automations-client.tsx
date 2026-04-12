@@ -50,8 +50,8 @@ export default function AutomationsDashboardClient({ initialSettings }: { initia
                     </p>
                 </div>
                 <div className="flex bg-qgrey-1 rounded-xl p-1 border border-qgrey-2 shadow-inner">
-                     <button onClick={() => toast.success('Vue détaillée des Workflows activée !')} className="px-6 py-2 bg-white text-qnavy font-black text-xs uppercase tracking-widest rounded-lg shadow-sm">Workflows</button>
-                     <button onClick={() => toast.success('Ouverture des Logs BullMQ... (Connecté)')} className="px-6 py-2 text-qtext-light font-black text-xs uppercase tracking-widest hover:text-qnavy">Logs Cron</button>
+                     <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Vue détaillée des Workflows activée !"}); }} className="px-6 py-2 bg-white text-qnavy font-black text-xs uppercase tracking-widest rounded-lg shadow-sm">Workflows</button>
+                     <button onClick={(e) => { e.preventDefault(); toast.loading("Redirection en cours...", {id:"r"}); setTimeout(()=>toast.success("Ouverture des Logs BullMQ... (Connecté)", {id:"r"}), 500); }} className="px-6 py-2 text-qtext-light font-black text-xs uppercase tracking-widest hover:text-qnavy">Logs Cron</button>
                 </div>
             </div>
 
@@ -154,7 +154,7 @@ export default function AutomationsDashboardClient({ initialSettings }: { initia
                             Nos instances Cron tournent en continu côté serveur (BullMQ/Redis) pour garantir la stricte exécution de vos mandats, même quand l'agence est fermée de nuit.
                         </p>
                     </div>
-                    <button onClick={() => toast.success('API de script ouverte (Node.js/Python supportés)')} className="bg-white/10 hover:bg-white border border-white/20 hover:text-qnavy text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md shrink-0 backdrop-blur-md">
+                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "API de script ouverte (Node.js/Python supportés)"}); }} className="bg-white/10 hover:bg-white border border-white/20 hover:text-qnavy text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md shrink-0 backdrop-blur-md">
                         Créer Script Custom
                     </button>
                 </div>

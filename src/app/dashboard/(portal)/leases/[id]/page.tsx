@@ -21,6 +21,7 @@ import { getEdlsByLease } from "@/actions/edl-actions"
 import ColocDashboardBox from "@/components/dashboard/coloc/ColocDashboardBox"
 import { getLeaseColocataires, getMonthlySynthesis } from "@/actions/coloc-actions"
 import { toast } from "sonner";
+import { InsuranceButton } from "@/components/dashboard/leases/InsuranceButton";
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -351,9 +352,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                         ) : (
                                             <div className="mt-2">
                                                 <p className="text-[11px] text-white font-bold leading-relaxed">Couvrez 100% de vos risques locatifs avec QAPRIL Assurance.</p>
-                                                <button onClick={() => toast.promise(new Promise(r=>setTimeout(r,1000)), {loading:'Génération...', success:'Document d\'assurance téléchargé.'})} className="mt-4 w-full bg-white hover:bg-qgrey-1 text-qnavy text-[10px] font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">
-                                                    Activer Protection
-                                                </button>
+                                                <InsuranceButton leaseId={tLease.id} />
                                                 <p className="text-[8px] text-white/50 text-center mt-3 font-bold uppercase tracking-[0.2em]">Partenariat National</p>
                                             </div>
                                         )}

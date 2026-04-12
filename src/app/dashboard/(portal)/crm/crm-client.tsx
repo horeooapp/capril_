@@ -33,7 +33,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Filtrage des segments CRM disponible prochainement.')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Filtrage des segments CRM disponible prochainement."}); }} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Segmenter
                     </button>
                 </div>
@@ -101,7 +101,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                                     <p className="text-[9px] font-bold text-qtext-mid mt-1 uppercase">Level {c.kycLevel || 1}</p>
                                 </td>
                                 <td className="p-5 text-right">
-                                    <button onClick={() => toast.success('Ouverture de la fiche contact...')} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 inline-flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
+                                    <button onClick={(e) => { e.preventDefault(); toast.loading("Redirection en cours...", {id:"r"}); setTimeout(()=>toast.success("Ouverture de la fiche contact...", {id:"r"}), 500); }} className="w-8 h-8 rounded-full bg-white border border-qgrey-2 inline-flex items-center justify-center text-qnavy hover:bg-qnavy hover:text-white transition-colors ml-auto shadow-sm">
                                         <ArrowRight size={14} />
                                     </button>
                                 </td>

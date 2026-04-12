@@ -3,11 +3,13 @@
 import React, { useState, useTransition } from "react"
 import { Wrench, Search, MapPin, AlertTriangle, PenTool, CheckCircle, Clock } from "lucide-react"
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { resolveMaintenanceTicket } from "@/actions/maintenance-actions";
 
 export default function MaintenanceDashboardClient({ initialIncidents }: { initialIncidents: any[] }) {
     const [incidents] = useState<any[]>(initialIncidents.length > 0 ? initialIncidents : [])
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     const handleResolve = (id: string) => {
         startTransition(async () => {
@@ -32,7 +34,7 @@ export default function MaintenanceDashboardClient({ initialIncidents }: { initi
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Ouverture de la déclaration CACI...')} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => router.push("/dashboard/maintenance/new")} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
                         Déclarer Sinistre
                     </button>
                 </div>
