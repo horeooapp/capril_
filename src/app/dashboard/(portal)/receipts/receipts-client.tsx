@@ -4,6 +4,8 @@ import React, { useState, useTransition } from "react"
 import { FileText, Search, Download, CheckCircle, Clock, AlertTriangle, Calculator } from "lucide-react"
 import { toast } from "sonner";
 import { generateNextMonthReceipts, exportDgiFile, dispatchDigitalDelivery } from "@/actions/receipt-actions"
+import ManualReceiptModal from "@/components/dashboard/ManualReceiptModal"
+import { Plus } from "lucide-react"
 
 // Fallback statique si DB vide
 const FALLBACK = [
@@ -16,6 +18,18 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
     const defaultData = initialReceipts.length > 0 ? initialReceipts : FALLBACK
     const [receipts] = useState<any[]>(defaultData)
     const [isPending, startTransition] = useTransition()
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [selectedReceipt, setSelectedReceipt] = useState<any>(null)
+
+    const openCreateModal = () => {
+        setSelectedReceipt(null)
+        setIsModalOpen(true)
+    }
+
+    const openEditModal = (receipt: any) => {
+        setSelectedReceipt(receipt)
+        setIsModalOpen(true)
+    }
 
     const handleGenerate = () => {
         startTransition(async () => {
@@ -78,6 +92,11 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                         disabled={isPending}
                         className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2 disabled:opacity-50">
                         <Download size={16} /> Exporter Fichier DGI
+                    </button>
+                    <button 
+                        onClick={openCreateModal}
+                        className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-orange-600 transition-all shadow-lg shadow-qorange/20 flex items-center gap-2">
+                        <Plus size={18} /> Nouvelle Quittance
                     </button>
                 </div>
             </div>
@@ -151,6 +170,7 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                                     {r.digitalDeliveryId && (
                                          <span className="text-[9px] font-black uppercase tracking-widest text-qgreen border border-qgreen px-3 py-1.5 rounded-lg">Expédié (CI-POST)</span>
                                     )}
+                                    <button onClick={(e) => { e.stopPropagation(); openEditModal(r); }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qorange transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">Éditer</button>
                                     <button onClick={(e) => { e.stopPropagation(); toast.promise(new Promise(res=>setTimeout(res, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'}); }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">PDF</button>
                                 </td>
                             </tr>
@@ -158,6 +178,12 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                     </tbody>
                 </table>
             </div>
+
+            <ManualReceiptModal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+                initialReceipt={selectedReceipt}
+            />
         </div>
     )
 }

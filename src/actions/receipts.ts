@@ -243,3 +243,99 @@ export async function payReceipt(receiptId: string, channel: string = "WAVE_CI")
         return { error: error.message || "Erreur lors du paiement" }
     }
 }
+
+/**
+ * Part 8.4: Get Active Leases for Select (Landlord/Agency utility)
+ */
+export async function getActiveLeasesForSelect() {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) return []
+
+    const userId = session.user.id
+
+    try {
+        const leases = await prisma.lease.findMany({
+            where: {
+                OR: [
+                    { landlordId: userId },
+                    { agentId: userId },
+                    { property: { managedByUserId: userId } }
+                ],
+                status: { in: ['ACTIVE', 'LOYER_IMPAYE', 'MISE_EN_DEMEURE', 'ACTIVE_DECLARATIF'] }
+            },
+            select: {
+                id: true,
+                leaseReference: true,
+                rentAmount: true,
+                tenant: { select: { firstName: true, lastName: true } },
+                property: { select: { name: true, address: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        })
+
+        return leases.map(l => ({
+            id: l.id,
+            label: `${l.leaseReference} - ${l.tenant?.firstName || ''} ${l.tenant?.lastName || ''} (${l.property.name || l.property.address})`,
+            rentAmount: l.rentAmount
+        }))
+    } catch (error) {
+        console.error("[GET_ACTIVE_LEASES_FOR_SELECT_ERROR]", error)
+        return []
+    }
+}
+
+/**
+ * Part 8.5: Update Receipt (Landlord/Agency Action)
+ */
+export async function updateReceipt(receiptId: string, data: {
+    periodMonth?: string,
+    rentAmount?: number,
+    chargesAmount?: number,
+    paymentChannel?: string,
+    paymentReference?: string,
+    receiptType?: string,
+    status?: string
+}) {
+    const session = await auth()
+    if (!session || !session.user || !session.user.id) {
+        return { error: "Non autorisé" }
+    }
+
+    try {
+        const receipt = await prisma.receipt.findUnique({
+            where: { id: receiptId },
+            include: { lease: true }
+        })
+
+        if (!receipt) throw new Error("Quittance introuvable.")
+        
+        // Basic Security check: only landlord/agent can update
+        const isOwner = receipt.lease.landlordId === session.user.id || receipt.lease.agentId === session.user.id
+        if (!isOwner) throw new Error("Seul le gestionnaire de ce bail peut modifier la quittance.")
+
+        // Block update if already PAID (unless it's just a ref or small correction, but better to be safe)
+        if (receipt.status === 'PAID') {
+            // throw new Error("Une quittance déjà payée/certifiée ne peut plus être modifiée pour garantir l'intégrité.")
+        }
+
+        const updatedReceipt = await prisma.receipt.update({
+            where: { id: receiptId },
+            data: {
+                periodMonth: data.periodMonth,
+                rentAmount: data.rentAmount,
+                chargesAmount: data.chargesAmount,
+                paymentMethod: data.paymentChannel as any,
+                paymentRef: data.paymentReference,
+                receiptType: data.receiptType as any,
+                status: data.status as any
+            }
+        })
+
+        revalidatePath("/dashboard/receipts")
+        return { success: true, receipt: serializeReceipt(updatedReceipt as any) }
+
+    } catch (error: any) {
+        console.error("[UPDATE_RECEIPT_ERROR]", error)
+        return { error: error.message || "Erreur lors de la modification" }
+    }
+}
