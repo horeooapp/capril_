@@ -60,7 +60,6 @@ export default function ManualReceiptModal({
                     chargesAmount,
                     paymentChannel,
                     paymentReference,
-                    receiptType,
                     status
                 })
             } else {
@@ -76,7 +75,7 @@ export default function ManualReceiptModal({
             }
 
             if (result.error) {
-                toast.error(result.message || result.error)
+                toast.error((result as any).message || result.error)
             } else {
                 toast.success(initialReceipt ? "Quittance mise à jour !" : "Quittance générée avec succès !")
                 onClose()

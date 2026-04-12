@@ -293,7 +293,6 @@ export async function updateReceipt(receiptId: string, data: {
     chargesAmount?: number,
     paymentChannel?: string,
     paymentReference?: string,
-    receiptType?: string,
     status?: string
 }) {
     const session = await auth()
@@ -326,7 +325,6 @@ export async function updateReceipt(receiptId: string, data: {
                 chargesAmount: data.chargesAmount,
                 paymentMethod: data.paymentChannel as any,
                 paymentRef: data.paymentReference,
-                receiptType: data.receiptType as any,
                 status: data.status as any
             }
         })
