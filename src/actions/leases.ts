@@ -67,13 +67,28 @@ export async function createLease(data: {
             throw new Error("Votre identité doit être vérifiée (Niveau 2).")
         }
 
+        // Normalize Tenant Phone (Ivory Coast standard: +225 XXXXXXXXXX)
+        let normalizedPhone = data.tenantPhone;
+        if (normalizedPhone) {
+            normalizedPhone = normalizedPhone.replace(/\s+/g, ""); // Remove all spaces
+            if (normalizedPhone.startsWith("0") && normalizedPhone.length === 10) {
+                 normalizedPhone = "+225 " + normalizedPhone;
+            } else if (normalizedPhone.startsWith("225") && normalizedPhone.length === 13) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(3);
+            } else if (normalizedPhone.startsWith("+225") && normalizedPhone.length === 14) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
+            } else if (normalizedPhone.startsWith("+225")) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
+            }
+        }
+
         // 2. Identify Tenant
         let tenantId: string | undefined = undefined;
-        if (data.tenantPhone) {
-            let tenant = await prisma.user.findUnique({ where: { phone: data.tenantPhone } })
+        if (normalizedPhone) {
+            let tenant = await prisma.user.findUnique({ where: { phone: normalizedPhone } })
             if (!tenant) {
                 tenant = await prisma.user.create({
-                    data: { phone: data.tenantPhone, role: Role.TENANT, status: 'pending' }
+                    data: { phone: normalizedPhone, role: Role.TENANT, status: 'pending' }
                 })
             }
             tenantId = tenant.id;

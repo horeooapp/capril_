@@ -44,6 +44,22 @@ export async function createBDQ(data: CreateBdqInput) {
             if (activeLease) throw new Error("Ce logement a déjà un bail actif.")
         }
 
+        // Normalize Telephone (Ivory Coast standard: +225 XXXXXXXXXX)
+        let normalizedPhone = data.telephoneLocataire;
+        if (normalizedPhone) {
+            normalizedPhone = normalizedPhone.replace(/\s+/g, "");
+            if (normalizedPhone.startsWith("0") && normalizedPhone.length === 10) {
+                 normalizedPhone = "+225 " + normalizedPhone;
+            } else if (normalizedPhone.startsWith("225") && normalizedPhone.length === 13) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(3);
+            } else if (normalizedPhone.startsWith("+225") && normalizedPhone.length === 14) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
+            } else if (normalizedPhone.startsWith("+225")) {
+                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
+            }
+            data.telephoneLocataire = normalizedPhone;
+        }
+
         // 2. Generate initial hash for proof
         const declarationData = {
             bailleurId: bailleurId,
