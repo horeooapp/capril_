@@ -135,7 +135,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
             { href: "/dashboard/profile", label: "Profil", icon: <User size={20} /> },
             { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={20} /> },
             { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={20} /> },
-            { href: "/dashboard/trust", label: "Indice ICL", icon: <Star size={20} /> },
+            { href: "/dashboard/icl", label: "Indice ICL", icon: <Star size={20} /> },
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={20} /> },
             ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={20} /> }] : []),
             ...(diasporaAbonnement || role === 'DIASPORA' ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={20} /> }] : []),

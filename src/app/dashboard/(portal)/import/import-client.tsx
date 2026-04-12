@@ -3,25 +3,39 @@
 import React, { useState, useTransition } from "react"
 import { HardDriveUpload, FileSpreadsheet, CheckCircle, AlertTriangle, Download, ArrowRight, Loader2 } from "lucide-react"
 import { toast } from "sonner";
-import { simulateImportProcess } from "@/actions/import-actions"
+import { processCsvImport } from "@/actions/import-actions"
 
 export default function ImportDashboardClient() {
     const [isUploading, setIsUploading] = useState(false)
     const [isPending, startTransition] = useTransition()
 
-    const handleUpload = () => {
+    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
         setIsUploading(true)
         
-        startTransition(async () => {
-             const res = await simulateImportProcess()
-             setIsUploading(false)
-             
-             if (res.error) {
-                 toast.error(res.error)
-             } else {
-                 toast.success(`${res.count} propriétés et locataires importés avec succès !`)
-             }
-        })
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const content = event.target?.result as string;
+            if (!content) {
+                toast.error("Impossible de lire le fichier");
+                setIsUploading(false);
+                return;
+            }
+
+            startTransition(async () => {
+                 const res = await processCsvImport(content)
+                 setIsUploading(false)
+                 
+                 if (res.error) {
+                     toast.error(res.error)
+                 } else {
+                     toast.success(`${res.count} propriétés et locataires importés avec succès !`)
+                 }
+            })
+        };
+        reader.readAsText(file);
     }
 
     return (
@@ -39,7 +53,8 @@ export default function ImportDashboardClient() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
                  {/* Drag and Drop Zone */}
-                 <div onClick={isPending ? undefined : handleUpload} className={`md:col-span-2 bg-white border-2 border-dashed border-qnavy/30 rounded-[2rem] p-12 text-center relative transition-all flex flex-col items-center justify-center min-h-[300px] ${isPending ? 'opacity-90 cursor-not-allowed' : 'hover:bg-qnavy-pale/10 hover:border-qnavy cursor-pointer group'}`}>
+                 <div className={`md:col-span-2 bg-white border-2 border-dashed border-qnavy/30 rounded-[2rem] p-12 text-center relative transition-all flex flex-col items-center justify-center min-h-[300px] ${isPending ? 'opacity-90 cursor-not-allowed' : 'hover:bg-qnavy-pale/10 hover:border-qnavy cursor-pointer group'}`}>
+                     <input type="file" accept=".csv" onChange={handleUpload} disabled={isPending || isUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                      {isUploading ? (
                          <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in">
                              <Loader2 size={48} className="text-qnavy animate-spin mb-4" />
@@ -51,13 +66,11 @@ export default function ImportDashboardClient() {
                              <div className="w-20 h-20 bg-qblue-pale text-qblue rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                  <FileSpreadsheet size={32} />
                              </div>
-                             <h3 className="text-2xl font-black text-qnavy-dark mb-2">Glissez votre fichier ici</h3>
+                             <h3 className="text-2xl font-black text-qnavy-dark mb-2">Glissez votre fichier ici (CSV)</h3>
                              <p className="text-sm font-medium text-qtext-mid mb-8 max-w-md">
-                                 Uniquement les fichiers <strong>.csv</strong> ou <strong>.xlsx</strong>. Taille maximale : 10 MB. Le fichier doit respecter le formatage strict de la matrice QAPRIL.
+                                 Taille maximale : 10 MB. Le fichier doit respecter le formatage strict de la matrice QAPRIL.
                              </p>
-                             <button 
-                                className="bg-qnavy text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-lg pointer-events-none"
-                             >
+                             <button className="bg-qnavy text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-lg pointer-events-none">
                                  Parcourir les fichiers
                              </button>
                          </>

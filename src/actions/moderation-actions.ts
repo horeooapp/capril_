@@ -10,8 +10,8 @@ export async function exportCsvAudit() {
     if (!session?.user?.id) return { error: "Non autorisé" }
     
     await logAction({ action: "EXPORT_CSV_AUDIT", module: "MODERATION", entityId: "global" })
-    await new Promise(r => setTimeout(r, 1000))
     
+    // Fake CSV generation could be here, but for now we just remove timeout
     return { success: true, url: "/downloads/audit.csv" }
 }
 
@@ -20,7 +20,6 @@ export async function initiateLockdown() {
     if (!session?.user?.id) return { error: "Non autorisé" }
     
     await logAction({ action: "SYSTEM_LOCKDOWN", module: "MODERATION", entityId: "global" })
-    await new Promise(r => setTimeout(r, 1000))
     revalidatePath("/dashboard/moderation")
     
     return { success: true, message: "Lockdown initié: Tous les nouveaux Baux sont en pause." }
@@ -31,7 +30,6 @@ export async function closeAuditTicket(ticketId: string) {
     if (!session?.user?.id) return { error: "Non autorisé" }
     
     await logAction({ action: "CLOSE_TICKET", module: "MODERATION", entityId: ticketId })
-    await new Promise(r => setTimeout(r, 500))
     revalidatePath("/dashboard/moderation")
     
     return { success: true, message: `Ticket ${ticketId} clôturé par le Super-Admin.` }

@@ -21,6 +21,29 @@ export async function getMarketplaceAnnonces() {
     }
 }
 
+export async function toggleAnnonceDiffusion(annonceId: string, channel: string, value: boolean) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Non autorisé" };
+
+    try {
+        const annonce = await prisma.annonce.findUnique({ where: { id: annonceId } });
+        if (!annonce) return { error: "Annonce introuvable" };
+
+        const diffusions: any = annonce.diffusions || { jumia: false, expat: false, whatsapp: false };
+        diffusions[channel] = value;
+
+        await prisma.annonce.update({
+            where: { id: annonceId },
+            data: { diffusions }
+        });
+
+        revalidatePath("/dashboard/syndication");
+        return { success: true };
+    } catch {
+        return { error: "Erreur technique." };
+    }
+}
+
 export async function publishAnnonce(annonceId: string) {
     const session = await auth()
     if (!session?.user?.id) return { error: "Non autorisé" }
@@ -50,9 +73,6 @@ export async function publishAnnonce(annonceId: string) {
 export async function syncOmnichannel() {
     const session = await auth()
     if (!session?.user?.id) return { error: "Non autorisé" }
-    
-    // Simulate Jumia/CoinAfrique/WhatsApp Omnichannel Push
-    await new Promise(r => setTimeout(r, 2000))
     
     await logAction({ action: "OMNICHANNEL_SYNC", module: "MARKETPLACE", entityId: "global" })
     

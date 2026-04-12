@@ -251,10 +251,10 @@ enum MaintenanceCategory {
 enum MaintenanceStatus {
   EN_ATTENTE
   PRIS_EN_CHARGE
-  RESOLU
-  CONTESTE
+  RESOLU @map("RÉSOLU")
+  CONTESTE @map("CONTESTÉ")
   LITIGE
-  CLOTURE
+  CLOTURE @map("CLÔTURÉ")
 }
 
 enum ReversalStatus {
@@ -840,6 +840,10 @@ model Property {
   prixVenteFcfa              Float?    @map("prix_vente_fcfa")
   preemptionNotifieeAt       DateTime? @map("preemption_notifiee_at")
   locataireRenoncePreemption Boolean   @default(false) @map("locataire_renonce_preemption")
+
+  // ADD-19 — Moteur Syndic
+  syndicateId String?    @map("syndicate_id")
+  syndicate   Syndicate? @relation(fields: [syndicateId], references: [id])
 
   deletedAt DateTime? @map("deleted_at")
   createdAt DateTime  @default(now()) @map("created_at")
@@ -3579,6 +3583,8 @@ model Syndicate {
   totalLots        Int    @map("total_lots")
   treasuryBalance  Int    @map("treasury_balance")
   agState          String @map("ag_state")
+
+  properties       Property[] // Liaison avec les lots de la copropriété
 
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")

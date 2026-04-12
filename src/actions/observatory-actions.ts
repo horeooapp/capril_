@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { Role, LeaseStatus } from "@prisma/client"
+import { auth } from "@/auth"
 
 /**
  * Fetch the most recent market snapshots for public display
@@ -189,4 +190,46 @@ function generateMockData() {
             { label: "Nov 25", value: 130000 }, { label: "Dec 25", value: 140000 }
         ]
     };
+}
+
+export async function getMapProperties() {
+    const session = await auth()
+    if (!session?.user?.id) return []
+
+    try {
+        const props = await prisma.property.findMany({
+            where: { 
+                OR: [
+                    { ownerUserId: session.user.id },
+                    { managedByUserId: session.user.id }
+                ]
+            },
+            include: {
+                leases: true
+            }
+        });
+
+        const formatted = props.map(p => {
+            const hasGPS = p.gpsLatitude && p.gpsLongitude;
+            
+            const lat = hasGPS ? p.gpsLatitude : (5.3453 + (Math.random() * 0.05 - 0.025));
+            const lng = hasGPS ? p.gpsLongitude : (-4.0123 + (Math.random() * 0.05 - 0.025));
+
+            return {
+                id: p.propertyCode || p.id,
+                name: p.name || 'Logement Anonyme',
+                district: p.commune || 'Abidjan',
+                lat,
+                lng,
+                status: p.status === 'rented' ? 'SAFE' : 'CRITICAL',
+                rentability: p.declaredRentFcfa && p.declaredRentFcfa > 500000 ? 'HAUTE' : 'MOYENNE',
+                units: 1, 
+                warning: p.status === 'rented' ? null : 'Vacant ou non-vérifié'
+            }
+        });
+
+        return formatted;
+    } catch {
+        return [];
+    }
 }

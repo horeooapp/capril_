@@ -10,7 +10,8 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
     const [isPending, startTransition] = useTransition()
     const [isModalOpen, setIsModalOpen] = useState(false)
 
-    const totalLots = syndicates.reduce((acc, s) => acc + s.totalLots, 0)
+    // Calcul basé sur les éléments en base (soit les lots définis manuellement, soit le compte réel des lots liés)
+    const totalLots = syndicates.reduce((acc, s) => acc + (s.properties?.length || s.totalLots), 0)
     const tr = syndicates.reduce((acc, s) => acc + s.treasuryBalance, 0)
     const arrears = syndicates.filter(s => s.treasuryBalance < 0).reduce((acc, s) => acc + s.treasuryBalance, 0)
 
@@ -93,7 +94,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                         {syndicates.map((s) => (
                             <tr key={s.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30">
                                 <td className="p-5 font-bold text-sm text-qnavy-dark">{s.residenceName}</td>
-                                <td className="p-5 text-sm font-black text-qnavy">{s.totalLots} Lots</td>
+                                <td className="p-5 text-sm font-black text-qnavy">{s.properties?.length > 0 ? `${s.properties.length} (Liés)` : `${s.totalLots} (Déclarés)`}</td>
                                 <td className="p-5 text-sm font-black">
                                     <span className={s.treasuryBalance >= 0 ? "text-qgreen" : "text-qred"}>
                                         {s.treasuryBalance.toLocaleString()} FCFA
@@ -118,9 +119,9 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                 <div className="relative z-10 max-w-xl">
                     <div className="bg-blue-500/20 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-blue-400/30 inline-block mb-4">Moteur de Tantièmes</div>
                     <h2 className="text-2xl font-black mb-3">Répartition Automatique des Charges</h2>
-                    <p className="text-gray-300 text-sm leading-relaxed mb-6">Un configurateur de millièmes liera directement un immeuble au générateur de quittances QAPRIL.</p>
-                    <button type="button" onClick={() => { startTransition(async () => { toast.loading("Lancement du moteur de tantièmes...", { id: "syndic" }); const res = await dispatchMilliemes(); if(res.success) toast.success("Millièmes ventilés aux copropriétaires.", { id: "syndic" }); else toast.error(res.error, { id: "syndic" }); }) }} disabled={isPending} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
-                        Configurer Tantièmes
+                    <p className="text-gray-300 text-sm leading-relaxed mb-6">Le moteur de tantièmes ventile automatiquement les déficits et génère les appels de fonds sur les fiches de paramétrage de chaques lots (Biens) liés.</p>
+                    <button type="button" onClick={() => { startTransition(async () => { toast.loading("Calcul des tantièmes en cours...", { id: "syndic" }); const res = await dispatchMilliemes(); if(res.success) toast.success(res.message || "Millièmes ventilés aux copropriétaires.", { id: "syndic" }); else toast.error(res.error, { id: "syndic" }); }) }} disabled={isPending} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
+                        Lancer le Moteur
                     </button>
                 </div>
                 <Building2 size={160} className="absolute right-0 opacity-10 -translate-y-4 pointer-events-none" />

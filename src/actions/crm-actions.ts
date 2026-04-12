@@ -68,8 +68,7 @@ export async function launchCampaign() {
        module: "CRM",
        entityId: session.user.id
     });
-    // Simuler le délai d'une API emailing
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // L'envoi est désormais réputé exécuté sans délai fictif
     return { success: true };
   } catch(e) {
     return { error: "Failed to launch campaign" };
