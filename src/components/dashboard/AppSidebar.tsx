@@ -159,15 +159,16 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                             className="h-9 w-auto group-hover:scale-105 transition-transform duration-500 rounded-lg" 
                         />
                         <div className="flex items-center gap-2 mt-1">
-                            <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase">
-                                {role === 'TENANT' ? 'Locataire' 
-                                 : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role) ? 'Agence' 
-                                 : ['NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role) ? 'Gestionnaire' 
-                                 : role === 'INTERMEDIARY' ? 'Intermédiaire'
-                                 : role === 'DIASPORA' ? 'Diaspora'
-                                 : 'PROPRIÉTAIRE'}
+                            <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase text-nowrap">
+                                {role === 'TENANT' ? 'Espace Locataire' 
+                                 : role === 'DIASPORA' ? 'Console Diaspora'
+                                 : role === 'INTERMEDIARY' ? 'Console Intermédiaire'
+                                 : role === 'CHAMPION' ? 'Console Champion'
+                                 : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role) ? 'Console Agence' 
+                                 : ['NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role) ? 'Console Gestionnaire' 
+                                 : 'Console Propriétaire'}
                             </div>
-                            <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
+                            <div className="w-1.5 h-1.5 shrink-0 rounded-full bg-qgreen-light" />
                         </div>
                     </Link>
                 </div>

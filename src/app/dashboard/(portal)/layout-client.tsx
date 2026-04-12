@@ -92,7 +92,42 @@ export default function DashboardLayoutClient({
         ];
     }
 
+
     const navLinks = getNavLinks();
+
+    const getDashboardTitle = () => {
+        switch (activeRole) {
+            case 'TENANT': return "Console Locataire";
+            case 'DIASPORA': return "Console Diaspora";
+            case 'INTERMEDIARY': return "Console Intermédiaire";
+            case 'CHAMPION': return "Console Champion";
+            case 'AGENCY':
+            case 'AGENCE_AGREE':
+            case 'AGENCY_AGREE': return "Console Agence Certifiée";
+            case 'NON_CERTIFIED_AGENT':
+            case 'AGENCE_NON_AGREE':
+            case 'AGENCY_NON_AGREE': return "Console Gestionnaire";
+            case 'LANDLORD':
+            default: return "Console Propriétaire";
+        }
+    }
+
+    const getRoleBadge = () => {
+        switch (activeRole) {
+            case 'TENANT': return "Locataire";
+            case 'DIASPORA': return "Diaspora";
+            case 'INTERMEDIARY': return "Intermédiaire";
+            case 'CHAMPION': return "Champion";
+            case 'AGENCY':
+            case 'AGENCE_AGREE':
+            case 'AGENCY_AGREE': return "Agence Certifiée";
+            case 'NON_CERTIFIED_AGENT':
+            case 'AGENCE_NON_AGREE':
+            case 'AGENCY_NON_AGREE': return "Gestionnaire";
+            case 'LANDLORD':
+            default: return "Propriétaire Titulaire";
+        }
+    }
 
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
@@ -135,7 +170,7 @@ export default function DashboardLayoutClient({
                             </Link>
 
                             <div className="hidden lg:block">
-                                <h2 className="text-[12px] font-black tracking-[0.2em] text-white uppercase opacity-70">Console d'Excellence Immobilière</h2>
+                                <h2 className="text-[12px] font-black tracking-[0.2em] text-white uppercase opacity-70">{getDashboardTitle()}</h2>
                             </div>
                         </div>
 
@@ -154,9 +189,7 @@ export default function DashboardLayoutClient({
                                     <div className="hidden sm:flex flex-col items-end">
                                         <div className="flex items-center gap-2 mb-1">
                                             <div className="bg-qgreen rounded-md px-2 py-0.5 text-[8px] font-black text-white tracking-[0.2em] uppercase">
-                                                {activeRole === 'CHAMPION' ? 'Champion' 
-                                                 : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(activeRole) ? 'Agence Certifiée' 
-                                                 : 'Bailleur Certifié'}
+                                                {getRoleBadge()}
                                             </div>
                                             <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                                         </div>
