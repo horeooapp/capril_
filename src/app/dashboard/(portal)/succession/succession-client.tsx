@@ -5,8 +5,9 @@ import { Users, FileStack, BookOpen, AlertCircle, ArrowRightLeft, ShieldCheck, M
 import { toast } from "sonner"
 import { createSuccession } from "@/actions/succession-actions"
 
-export default function SuccessionDashboardClient({ initialSuccessions }: { initialSuccessions: any[] }) {
+export default function SuccessionDashboardClient({ initialSuccessions, activeLeases }: { initialSuccessions: any[], activeLeases?: any[] }) {
     const successions = initialSuccessions
+    const leases = activeLeases || []
     const [isSuccModalOpen, setIsSuccModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -178,24 +179,41 @@ export default function SuccessionDashboardClient({ initialSuccessions }: { init
                             <div className="p-6 overflow-y-auto space-y-6">
                                 
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Cible (Titulaire Décédé)</label>
-                                        <input type="text" name="deceasedName" required placeholder="Nom du titulaire décédé..." className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Dossier / Cible de la Succession</label>
+                                            <select name="leaseId" required className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all">
+                                                <option value="">Sélectionnez le contrat du titulaire (Locataire)...</option>
+                                                {leases.map((l: any) => (
+                                                    <option key={l.id} value={l.id}>
+                                                        {l.tenant?.firstName} {l.tenant?.lastName} (Locataire) - {l.property?.propertyCode}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Date du Décès</label>
+                                             <input type="date" name="dateDeces" required className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
+                                        </div>
                                     </div>
                                     <div>
-                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Bénéficiaire (Ayant-droit)</label>
-                                         <input type="text" name="claimantName" required placeholder="Nom de l'héritier..." className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
+                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Nom Complet du Bénéficiaire (Ayant-droit)</label>
+                                         <input type="text" name="beneficiaireExtNom" required placeholder="Nom de l'héritier..." className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Relation / Lien de l'héritier</label>
-                                        <input type="text" name="relation" required placeholder="Ex: Descendant Direct" className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Type du Déclarant Principal</label>
+                                        <select name="declarantType" required className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all">
+                                            <option value="famille">Descendant Direct / Famille</option>
+                                            <option value="notaire">Notaire / Huissier (Liquidation)</option>
+                                            <option value="autre">Autre (Conjoint survivant)</option>
+                                        </select>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Informations du Bien lié</label>
-                                        <input type="text" name="propertyInfo" required placeholder="Ex: Appartement 1 - SICOGI" className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Téléphone du Déclarant / Contact</label>
+                                        <input type="tel" name="declarantPhone" required placeholder="Ex: +225 00 00 00 00" className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all"/>
                                     </div>
                                 </div>
                                 

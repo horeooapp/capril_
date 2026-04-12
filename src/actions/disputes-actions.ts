@@ -20,21 +20,17 @@ export async function createDisputeDLC(formData: FormData) {
             return { error: "Données manquantes" }
         }
 
-        // Generate CACI Hash if sealed
-        let hash = null
+        let hash = ''
         if (isCryptoSealed) {
-            hash = crypto.createHash('sha256').update(`${leaseId}-${type}-${Date.now()}`).digest('hex').substring(0, 16)
+            hash = crypto.createHash('sha256').update(`${leaseId}-${type}-${Date.now()}`).digest('hex')
         }
 
-        const dispute = await prisma.dispute.create({
+        const dlc = await prisma.dossierLitigeCertifie.create({
             data: {
                 leaseId,
-                title: "Dossier Litige Certifié (DLC)",
-                description: "Dossier instancié via l'orchestrateur CACI (V5)",
-                type,
-                severity: "CRITIQUE",
-                hash,
-                isCryptoSealed,
+                hashSha256: hash,
+                statut: "GENERE",
+                notes: `DLC Créé Manuellement. Motif: ${type}`
             }
         })
 
@@ -62,7 +58,7 @@ export async function createDisputeDLC(formData: FormData) {
         }
 
         revalidatePath("/dashboard/disputes")
-        return { success: true, disputeId: dispute.id, hash }
+        return { success: true, disputeId: dlc.id, hash }
     } catch (e) {
         console.error(e)
         return { error: "Erreur lors de la création du dossier contentieux" }
@@ -73,7 +69,7 @@ export async function getAgencyDisputes() {
     const session = await auth()
     if (!session?.user?.id) return []
 
-    const disputes = await prisma.dispute.findMany({
+    const dlcs = await prisma.dossierLitigeCertifie.findMany({
         where: {
             lease: {
                 OR: [
@@ -88,10 +84,31 @@ export async function getAgencyDisputes() {
                     tenant: true,
                     property: true
                 }
-            }
+            },
+            reclamations: true
         },
         orderBy: { createdAt: 'desc' }
     })
 
-    return disputes
+    // Map to expected frontend format
+    return dlcs.map((dlc: any) => {
+        let disputeType = 'CONTENTIEUX'
+        if (dlc.notes && dlc.notes.includes('Motif:')) {
+            disputeType = dlc.notes.split('Motif: ')[1]
+        } else if (dlc.reclamations && dlc.reclamations.length > 0) {
+            disputeType = dlc.reclamations[0].typeReclamation || 'RCL'
+        }
+
+        return {
+            id: dlc.id,
+            hash: dlc.hashSha256?.substring(0, 16) || 'Non-Scellé',
+            severity: "CRITIQUE",
+            type: disputeType,
+            status: dlc.statut === 'GENERE' ? 'OPEN' : (dlc.statut === 'TRANSMIS_CACI' ? 'ESCALATED' : dlc.statut),
+            amountInDispute: dlc.reclamations?.[0]?.pretenduMontant || null,
+            monthsDefeated: 0,
+            createdAt: dlc.createdAt,
+            lease: dlc.lease
+        }
+    })
 }
