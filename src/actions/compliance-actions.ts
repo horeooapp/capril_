@@ -53,6 +53,7 @@ export async function getComplianceDashboard() {
                 alerts: pendingVerification,
             },
             suspiciousProfiles: (suspiciousProfiles || []).map((fp) => ({
+                id: fp.userId,
                 name: (fp.user.firstName ? fp.user.firstName + " " : "") + (fp.user.lastName || "") || "Utilisateur Inconnu",
                 score: (fp.fraudScore || 0),
                 reason: (fp.fraudFlags as any)?.reason || "Score de risque élevé"
@@ -65,6 +66,54 @@ export async function getComplianceDashboard() {
         };
     } catch (error: any) {
         console.error("[Compliance Action] Error:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function clearFraudScore(userId: string) {
+    try {
+        const session = await auth();
+        if (session?.user?.role !== "SUPER_ADMIN" && session?.user?.role !== "ADMIN") {
+            throw new Error("Accès refusé");
+        }
+        await prisma.userFraudProfile.deleteMany({
+            where: { userId }
+        });
+        await prisma.auditLog.create({
+            data: {
+                module: "FRAUD", action: "CLEARED_SCORE", entityId: userId, userId: session.user.id, ipAddress: "N/A"
+            }
+        });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function banUser(userId: string, reason: string) {
+    try {
+        const session = await auth();
+        if (session?.user?.role !== "SUPER_ADMIN" && session?.user?.role !== "ADMIN") {
+            throw new Error("Accès refusé");
+        }
+        await prisma.user.update({
+            where: { id: userId },
+            data: { status: "BANNED" }
+        });
+        await prisma.fraudBlacklist.create({
+            data: {
+                userId: userId,
+                motif: reason,
+                ajouteParId: session.user.id
+            }
+        });
+        await prisma.auditLog.create({
+            data: {
+                module: "FRAUD", action: "USER_BANNED", entityId: userId, userId: session.user.id, ipAddress: "N/A", newValues: { reason }
+            }
+        });
+        return { success: true };
+    } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
