@@ -13,7 +13,9 @@ import {
     Plus,
     X,
     MessageSquare,
-    CreditCard
+    CreditCard,
+    Briefcase,
+    Building
 } from "lucide-react"
 import { toast } from "sonner"
 import { findLocataireByPhone, searchLocataires } from "@/actions/search-locataire"
@@ -39,6 +41,14 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
         date: "",
         message: ""
     })
+
+    // Criteria Search State
+    const [criteriaData, setCriteriaData] = useState({
+        commune: "",
+        budgetMax: "",
+        statutPro: ""
+    })
+    const [criteriaResults, setCriteriaResults] = useState<any[]>([])
 
     const handlePhoneSearch = async () => {
         if (!phone) return
@@ -76,8 +86,28 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
             })
             toast.success("Invitation envoyée avec succès !")
             setInvitationModal({ open: false, locataire: null })
-        } catch (error) {
-            toast.error("Erreur lors de l'envoi")
+        } catch (error: any) {
+            toast.error(error.message || "Erreur lors de l'envoi")
+        }
+    }
+
+    const handleCriteriaSearch = async () => {
+        setLoading(true)
+        try {
+            const filters: any = {};
+            if (criteriaData.commune) filters.communes = [criteriaData.commune];
+            if (criteriaData.budgetMax) filters.budgetMax = parseInt(criteriaData.budgetMax);
+            if (criteriaData.statutPro) filters.statutPro = criteriaData.statutPro;
+
+            const res = await searchLocataires(filters)
+            setCriteriaResults(res)
+            if (res.length === 0) {
+                toast.info("Aucun locataire ne correspond à ces critères.")
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Erreur lors de la recherche par critères.")
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -176,12 +206,109 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                 </div>
             )}
 
-            {/* Criteria Search Content (Placeholder for Agencies) */}
+            {/* Criteria Search Content for Agencies */}
             {activeTab === 'CRITERIA' && (
-                <div className="glass-panel p-24 rounded-[3rem] bg-white border border-white/40 shadow-xl text-center">
-                    <Filter size={48} className="mx-auto text-gray-300 mb-6" />
-                    <h3 className="text-2xl font-black text-gray-400 uppercase tracking-tighter italic">Moteur de Matching Agencia</h3>
-                    <p className="text-gray-400 max-w-md mx-auto mt-4 font-medium">Bientôt disponible. Les agences PRO STANDARD pourront matcher les locataires par critères géographiques et budgétaires.</p>
+                <div className="space-y-8 animate-in fade-in duration-500">
+                    <div className="glass-panel p-8 rounded-[2rem] bg-white border border-white/40 shadow-xl max-w-4xl">
+                        <label className="text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] mb-4 block">Définissez vos critères (Agences Pro)</label>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="relative">
+                                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <select 
+                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-bold text-gray-700"
+                                    value={criteriaData.commune}
+                                    onChange={(e) => setCriteriaData({...criteriaData, commune: e.target.value})}
+                                >
+                                    <option value="">Toutes les communes</option>
+                                    <option value="Cocody">Cocody</option>
+                                    <option value="Marcory">Marcory</option>
+                                    <option value="Plateau">Plateau</option>
+                                    <option value="Yopougon">Yopougon</option>
+                                    <option value="Treichville">Treichville</option>
+                                </select>
+                            </div>
+                            <div className="relative">
+                                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input 
+                                    type="number" 
+                                    placeholder="Budget Max (FCFA)" 
+                                    value={criteriaData.budgetMax}
+                                    onChange={(e) => setCriteriaData({...criteriaData, budgetMax: e.target.value})}
+                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-bold text-gray-700"
+                                />
+                            </div>
+                            <div className="relative">
+                                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <select 
+                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-bold text-gray-700"
+                                    value={criteriaData.statutPro}
+                                    onChange={(e) => setCriteriaData({...criteriaData, statutPro: e.target.value})}
+                                >
+                                    <option value="">Tous les statuts</option>
+                                    <option value="SALARIE">Salarié / Fonctionnaire</option>
+                                    <option value="INDEPENDANT">Indépendant</option>
+                                    <option value="INFORMEL">Secteur Informel</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex justify-end">
+                            <button 
+                                onClick={handleCriteriaSearch}
+                                disabled={loading}
+                                className="px-8 py-4 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-[#a64a0e] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                            >
+                                <Filter size={20} />
+                                {loading ? "Recherche..." : "Lancer le Matching"}
+                            </button>
+                        </div>
+                    </div>
+
+                    {criteriaResults.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {criteriaResults.map((profil) => (
+                                <motion.div 
+                                    key={profil.id}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="glass-panel p-6 rounded-[2rem] bg-white border border-white/40 shadow-lg relative overflow-hidden"
+                                >
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-[#1F4E79] font-black text-xl">
+                                                {profil.anonymizedName.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-black text-[#1F4E79]">{profil.anonymizedName}</h4>
+                                                <span className="text-[10px] uppercase font-black text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{profil.statutPro || 'NON DÉFINI'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-2 mb-6">
+                                        <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                                            <span className="text-xs font-bold text-gray-500">Budget Max</span>
+                                            <span className="font-black text-[#C55A11]">{Number(profil.budget || 0).toLocaleString()} FCFA</span>
+                                        </div>
+                                        <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg truncate">
+                                            <span className="text-xs font-bold text-gray-500">Zones</span>
+                                            <span className="font-black text-gray-700 text-xs">{profil.communes?.join(', ') || 'Peu importe'}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center bg-emerald-50 p-2 rounded-lg">
+                                            <span className="text-xs font-bold text-emerald-600">Grade QAPRIL</span>
+                                            <span className="font-black text-emerald-700">Niveau {profil.kycNiveau}</span>
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setInvitationModal({ open: true, locataire: { id: profil.id, firstName: profil.anonymizedName, lastName: "" } })}
+                                        className="w-full py-3 bg-[#1F4E79] text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Plus size={16} /> Envoyer Invitation
+                                    </button>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 

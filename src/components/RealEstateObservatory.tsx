@@ -1,55 +1,37 @@
 "use client"
 import { toast } from "sonner";
-
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion"
 import TrendChart from "./TrendChart"
-
-const residentialData = [
-    { label: "Jan 25", value: 420000 },
-    { label: "Feb 25", value: 435000 },
-    { label: "Mar 25", value: 450000 },
-    { label: "Apr 25", value: 445000 },
-    { label: "May 25", value: 460000 },
-    { label: "Jun 25", value: 475000 },
-    { label: "Jul 25", value: 490000 },
-    { label: "Aug 25", value: 510000 },
-    { label: "Sep 25", value: 505000 },
-    { label: "Oct 25", value: 520000 },
-    { label: "Nov 25", value: 535000 },
-    { label: "Dec 25", value: 550000 }
-]
-
-const commercialData = [
-    { label: "Jan 25", value: 15000 },
-    { label: "Feb 25", value: 15200 },
-    { label: "Mar 25", value: 15500 },
-    { label: "Apr 25", value: 15800 },
-    { label: "May 25", value: 16000 },
-    { label: "Jun 25", value: 16200 },
-    { label: "Jul 25", value: 16500 },
-    { label: "Aug 25", value: 16800 },
-    { label: "Sep 25", value: 17000 },
-    { label: "Oct 25", value: 17200 },
-    { label: "Nov 25", value: 17500 },
-    { label: "Dec 25", value: 18000 }
-]
-
-const landData = [
-    { label: "Jan 25", value: 85000 },
-    { label: "Feb 25", value: 88000 },
-    { label: "Mar 25", value: 92000 },
-    { label: "Apr 25", value: 95000 },
-    { label: "May 25", value: 100000 },
-    { label: "Jun 25", value: 105000 },
-    { label: "Jul 25", value: 110000 },
-    { label: "Aug 25", value: 115000 },
-    { label: "Sep 25", value: 120000 },
-    { label: "Oct 25", value: 125000 },
-    { label: "Nov 25", value: 130000 },
-    { label: "Dec 25", value: 140000 }
-]
+import { getObservatoryTrends, downloadObservatoryReport } from "@/actions/observatory-actions";
 
 export default function RealEstateObservatory() {
+    const [stats, setStats] = useState<any>(null);
+
+    useEffect(() => {
+        async function fetchStats() {
+            const result = await getObservatoryTrends();
+            if (result.success) {
+                setStats(result.data);
+            }
+        }
+        fetchStats();
+    }, []);
+
+    const handleDownload = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        toast.promise(downloadObservatoryReport(), {
+            loading: 'Génération du rapport analytique...',
+            success: (data) => {
+                if (data.success) return data.message;
+                throw new Error(data.error);
+            },
+            error: 'Erreur lors du téléchargement.'
+        });
+    };
+
+    if (!stats) return null; // or a skeleton
+
     return (
         <section id="observatory" className="py-32 bg-white overflow-hidden relative">
             <div className="absolute top-0 right-0 w-full h-full bg-mesh opacity-30 -z-10"></div>
@@ -77,7 +59,7 @@ export default function RealEstateObservatory() {
                     >
                         <TrendChart 
                             title="Loyer Moyen Résidentiel (Abidjan)"
-                            data={residentialData} 
+                            data={stats.residential} 
                             unit="FCFA / Mois"
                             color="#C55A11"
                         />
@@ -91,7 +73,7 @@ export default function RealEstateObservatory() {
                     >
                         <TrendChart 
                             title="Bureaux & Commerces (m²)"
-                            data={commercialData} 
+                            data={stats.commercial} 
                             unit="FCFA / m²"
                             color="#1F4E79"
                         />
@@ -105,7 +87,7 @@ export default function RealEstateObservatory() {
                     >
                         <TrendChart 
                             title="Terrains Péri-urbains (Bingerville)"
-                            data={landData} 
+                            data={stats.land} 
                             unit="FCFA / m²"
                             color="#375623"
                         />
@@ -119,7 +101,7 @@ export default function RealEstateObservatory() {
                             <h3 className="text-2xl font-black mb-4 uppercase tracking-tighter italic">Rapport d&apos;Analyse Trimestriel</h3>
                             <p className="text-gray-400 font-medium max-w-xl">Accédez à l&apos;étude complète des flux migratoires et des variations de prix sectorielles certifiée par le protocole QAPRIL.</p>
                         </div>
-                        <button className="px-10 py-5 bg-primary hover:bg-orange-600 transition-colors rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20 whitespace-nowrap" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                        <button className="px-10 py-5 bg-primary hover:bg-orange-600 transition-colors rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20 whitespace-nowrap" onClick={handleDownload}>
                             Descendre le Rapport PDF
                         </button>
                     </div>
