@@ -42,11 +42,7 @@ export default function SuccessionDashboardClient({ initialSuccessions, activeLe
                 <div className="flex gap-3">
                     <button 
                         onClick={() => {
-                            toast.promise(new Promise(r => setTimeout(r, 1000)), {
-                                loading: "Génération du rapport comptable CACI...",
-                                success: "PDF Généré avec succès. L'audit est prêt.",
-                                error: "Échec de génération."
-                            })
+                            toast.success("Audit de Cautions (CACI) mis en file d'attente. Vous recevrez une notification par email de sa génération.");
                         }}
                         className="bg-white border text-slate-700 border-slate-300 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
                     >

@@ -1,8 +1,9 @@
 "use client"
 
 import React from "react"
-import { Bot, MessageCircle, CheckCircle2, Search, SmartphoneNfc, Plus, Zap, MessageSquareWarning, RefreshCw, BarChart4 } from "lucide-react"
+import { Bot, MessageCircle, CheckCircle2, Search, SmartphoneNfc, Plus, Zap, MessageSquareWarning, RefreshCw, BarChart4, X, Loader2 } from "lucide-react"
 import { toast } from "sonner";
+import { createBDQ } from "@/actions/bdq";
 
 export default function BdqAiCockpitClient({ initialConversations }: { initialConversations: any[] }) {
     const conversations = initialConversations || [];
@@ -11,6 +12,30 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
     const successCount = conversations.filter(c => c.status === "TERMINE_AVEC_SUCCES" || c.status === "COMPLETE").length
     const costFcfa = conversations.reduce((acc, c) => acc + (c.stats?.cost || 0), 0)
     
+    // Modal state
+    const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+    const [isCreating, setIsCreating] = React.useState(false);
+    const [formData, setFormData] = React.useState({ telephoneLocataire: "", nomLocataire: "", descriptionLogement: "" });
+
+    const handleCreateBDQ = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsCreating(true);
+        try {
+            const res = await createBDQ(formData as any);
+            if(res.success) {
+                toast.success("Demande BDQ initiée, attente de confirmation WhatsApp !");
+                setIsCreateOpen(false);
+                setFormData({ telephoneLocataire: "", nomLocataire: "", descriptionLogement: "" });
+            } else {
+                toast.error(res.error || "Erreur lors de l'initiation");
+            }
+        } catch (err) {
+            toast.error("Erreur technique");
+        } finally {
+            setIsCreating(false);
+        }
+    }
+
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
             {/* Header Area */}
@@ -30,7 +55,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                     <button onClick={() => toast.success('Ouverture du portail d\'analyse API...')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <BarChart4 size={16} /> Rapport API
                     </button>
-                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "Lien WhatsApp généré pour le locataire !"}); }} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={(e) => { e.preventDefault(); setIsCreateOpen(true); }} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-md flex items-center gap-2">
                         <Plus size={16} /> Initier Nouvelle Saisie IA
                     </button>
                 </div>
@@ -162,6 +187,37 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                      </div>
                 </div>
             </div>
+
+            {isCreateOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-violet-50/30">
+                            <h2 className="text-xl font-black text-violet-900 flex items-center gap-2"><SmartphoneNfc size={20} className="text-violet-600"/> Nouvelle Saisie BDQ</h2>
+                            <button onClick={() => setIsCreateOpen(false)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-500 hover:bg-gray-50"><X size={16}/></button>
+                        </div>
+                        <form onSubmit={handleCreateBDQ} className="p-6 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 block">Numéro WhatsApp Locataire</label>
+                                <input required type="text" value={formData.telephoneLocataire} onChange={e => setFormData({...formData, telephoneLocataire: e.target.value})} placeholder="ex: 2250102030405" className="w-full border p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-violet-500 outline-none" />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 block">Nom ou Pseudo</label>
+                                <input required type="text" value={formData.nomLocataire} onChange={e => setFormData({...formData, nomLocataire: e.target.value})} placeholder="ex: Tantie Affou" className="w-full border p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-violet-500 outline-none" />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 block">Description Brève Logement</label>
+                                <input required type="text" value={formData.descriptionLogement} onChange={e => setFormData({...formData, descriptionLogement: e.target.value})} placeholder="ex: Entrer Coucher Yopougon" className="w-full border p-3 rounded-xl text-sm font-bold focus:ring-2 focus:ring-violet-500 outline-none" />
+                            </div>
+                            <div className="pt-2">
+                                <button type="submit" disabled={isCreating} className="w-full py-4 rounded-xl bg-violet-600 text-white font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-violet-700 disabled:opacity-50">
+                                    {isCreating ? <Loader2 className="animate-spin" size={16}/> : <Plus size={16}/>}
+                                    Déployer Agent IA
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

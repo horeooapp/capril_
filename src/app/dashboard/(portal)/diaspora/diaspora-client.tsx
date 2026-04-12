@@ -5,26 +5,8 @@ import { Globe, ArrowRightLeft, CreditCard, Landmark, Plane, ShieldCheck, Mail, 
 import { toast } from "sonner";
 import { linkStripeAccount, generateTaxCertificate } from "@/actions/diaspora-actions"
 
-const FALLBACK = [
-    {
-        id: "TX-STRIPE-08A",
-        createdAt: new Date().toISOString(),
-        type: "CREDIT",
-        amount: 450000,
-        status: "COMPLETED"
-    },
-    {
-        id: "TX-SWIFT-08B",
-        createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
-        type: "DEBIT",
-        amount: 45000,
-        status: "PENDING"
-    }
-]
-
 export default function DiasporaHubClient({ initialTransactions }: { initialTransactions: any[] }) {
-    const defaultData = initialTransactions.length > 0 ? initialTransactions : FALLBACK
-    const [transactions] = useState(defaultData)
+    const [transactions] = useState(initialTransactions)
     const [isPending, startTransition] = useTransition()
 
     const handleStripe = () => {

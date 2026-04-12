@@ -59,8 +59,27 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column: Form */}
             <div className="lg:col-span-2 space-y-6">
+
+                {/* SHARE URL BOX */}
+                <div className="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
+                    <div>
+                        <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter text-sm flex items-center gap-2">🔗 Lien du CV Locatif Public</h3>
+                        <p className="text-xs text-gray-500 mt-1 font-mono">https://qapril.ci/cv/{userId.substring(0,8)}</p>
+                    </div>
+                    <button 
+                        onClick={() => {
+                            navigator.clipboard.writeText(`https://qapril.ci/cv/${userId.substring(0,8)}`);
+                            toast.success("Lien copié dans le presse-papier !");
+                        }}
+                        className="px-4 py-2 bg-white text-[#1F4E79] font-bold text-xs uppercase tracking-widest rounded-xl shadow hover:bg-gray-50"
+                    >
+                        Copier
+                    </button>
+                </div>
+
                 <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-white space-y-8">
                     <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-2">
                         <Briefcase className="text-primary" />

@@ -12,6 +12,8 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
     const [simAmount, setSimAmount] = useState<number>(0)
     const [simType, setSimType] = useState<UtilityType>("CIE")
     const [simMode, setSimMode] = useState<string>("PRORATA")
+    const [simPropertyId, setSimPropertyId] = useState<string>("")
+    const [isSimulating, setIsSimulating] = useState(false)
 
     // MODAL STATE
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false)
@@ -251,6 +253,8 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-qtext-light mb-2 block">Cour Commune Ciblée</label>
                                     <select 
+                                        value={simPropertyId}
+                                        onChange={(e) => setSimPropertyId(e.target.value)}
                                         className="w-full p-3 bg-qgrey-1 rounded-xl border border-qgrey-2 text-xs font-bold text-qnavy focus:outline-none focus:ring-1 focus:ring-qblue"
                                     >
                                         <option value="">Sélectionner une propriété...</option>
@@ -287,12 +291,34 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                                 </div>
 
                                 <button 
-                                    onClick={() => {
-                                        toast.success("Intelligence Facture déclenchée.");
-                                        setSimulatorActive(false);
+                                    disabled={isSimulating || !simPropertyId || simAmount <= 0}
+                                    onClick={async () => {
+                                        setIsSimulating(true);
+                                        try {
+                                            const res = await registerAndDistributeUtility({
+                                                leaseId: simPropertyId,
+                                                typeUtility: simType,
+                                                identifiantCompteur: "SIMULATEUR_" + simMode,
+                                                moisFacture: new Date(),
+                                                montantTotal: simAmount,
+                                                source: "ALGORITHME_REPARTITION"
+                                            });
+                                            if (res.success) {
+                                                toast.success("Intelligence Facture déclenchée avec succès. Répartition effectuée !");
+                                                setSimulatorActive(false);
+                                                setSimAmount(0);
+                                                setSimPropertyId("");
+                                            } else {
+                                                toast.error(res.error || "Erreur lors de la répartition");
+                                            }
+                                        } catch (e) {
+                                            toast.error("Une erreur technique s'est produite.");
+                                        } finally {
+                                            setIsSimulating(false);
+                                        }
                                     }}
-                                    className="w-full mt-4 bg-qnavy text-white px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-lg shadow-qnavy/30 flex items-center justify-center gap-3 active:scale-95">
-                                    Lancer la Répartition <ArrowRightLeft size={16} />
+                                    className="w-full mt-4 bg-qnavy text-white px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-lg shadow-qnavy/30 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50">
+                                    {isSimulating ? "Calcul en cours..." : "Lancer la Répartition"} <ArrowRightLeft size={16} />
                                 </button>
                                 
                             </div>
