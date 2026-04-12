@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Role } from "@prisma/client"
 import { serializeLease, serializeObject } from "@/lib/serialize"
+import { normalizePhone } from "@/lib/phone"
 
 export async function getTenantDashboard() {
     try {
@@ -58,7 +59,58 @@ export async function getTenantDashboard() {
                     where: { status: { in: ["unpaid", "UNPAID"] } }
                 }
             }
+            }
         })
+
+        // ────────────────────────────────────────────────────────
+        // LOGIQUE D'AUTORÉPARATION (C-MERGE-AUTO)
+        // Si aucun bail n'est trouvé par ID, on tente une fusion par téléphone normalisé.
+        // ────────────────────────────────────────────────────────
+        if (!activeLease && user.phone) {
+            const normalized = normalizePhone(user.phone);
+            const ghost = await prisma.user.findFirst({
+                where: { phone: normalized, id: { not: userId } }
+            });
+
+            if (ghost && !ghost.email) {
+                console.log(`[C-MERGE-AUTO] Réparation en cours pour ${userId} via ghost ${ghost.id}`);
+                await prisma.$transaction([
+                    prisma.lease.updateMany({ where: { tenantId: ghost.id }, data: { tenantId: userId } }),
+                    prisma.lease.updateMany({ where: { landlordId: ghost.id }, data: { landlordId: userId } }),
+                    prisma.property.updateMany({ where: { ownerUserId: ghost.id }, data: { ownerUserId: userId } }),
+                    prisma.property.updateMany({ where: { managedByUserId: ghost.id }, data: { managedByUserId: userId } }),
+                    // Supprimer le doublon et normaliser le téléphone du compte principal
+                    prisma.user.delete({ where: { id: ghost.id } }),
+                    prisma.user.update({ where: { id: userId }, data: { phone: normalized } })
+                ]);
+
+                // Re-tentative de lecture du bail
+                activeLease = await prisma.lease.findFirst({
+                    where: {
+                        tenantId: userId,
+                        status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_CONFIRMATION"] }
+                    },
+                    include: {
+                        property: true,
+                        landlord: { 
+                            select: { 
+                                lastName: true, 
+                                firstName: true, 
+                                phone: true,
+                                walletConfig: { select: { landlordCode: true } }
+                            } 
+                        },
+                        receipts: {
+                            orderBy: { createdAt: "desc" },
+                            take: 5
+                        },
+                        arrears: {
+                            where: { status: { in: ["unpaid", "UNPAID"] } }
+                        }
+                    }
+                });
+            }
+        }
 
         if (!activeLease) {
             return serializeObject({ success: true, hasLease: false, user })
