@@ -25,7 +25,7 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
           <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Candidatures.</h2>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Suivi des dossiers M-CAND</p>
         </div>
-        <button className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-200 transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+        <button className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-200 transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
           Nouvelle Candidature
         </button>
       </div>

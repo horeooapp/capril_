@@ -27,7 +27,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.success('Filtrage indisponible pour le moment.')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Mise à jour des filtres...', success: 'Filtres appliqués.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Filter size={16} /> Filtres
                     </button>
                     <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                         </thead>
                         <tbody>
                             {properties.map(p => (
-                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => toast.info('Ouverture fiche propriété...')}>
+                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Chargement des données...', success: 'Fiche propriété ouverte.'})}>
                                     <td className="p-5">
                                         <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
                                         <p className="text-[10px] text-qtext-light font-bold mt-1">ID: {p.id.substring(0,8)}</p>

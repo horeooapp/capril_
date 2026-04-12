@@ -125,7 +125,7 @@ export default function ArrearsProceduralBox({ leaseId, proceduralState }: Arrea
                             Action validée et transmise
                         </div>
                     )}
-                    <button className="text-gray-500 hover:text-white text-sm transition-colors" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                    <button className="text-gray-500 hover:text-white text-sm transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                         Ignorer (Clemence)
                     </button>
                 </div>

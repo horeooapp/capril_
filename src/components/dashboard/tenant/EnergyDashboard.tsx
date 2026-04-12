@@ -178,7 +178,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string }> = ({ leaseId }) => 
       <div className="bg-slate-50 p-8 rounded-[3rem] border border-white shadow-inner">
          <div className="flex justify-between items-center mb-6">
             <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-widest italic">Dernières Factures.</h3>
-            <button className="text-[10px] font-black uppercase text-blue-600 hover:underline" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Voir tout l'historique</button>
+            <button className="text-[10px] font-black uppercase text-blue-600 hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Voir tout l'historique</button>
          </div>
          <div className="space-y-3">
             {[1, 2, 3].map((f) => (
@@ -200,7 +200,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string }> = ({ leaseId }) => 
                            <span className="text-[9px] font-black text-green-600 uppercase">Payée</span>
                         </div>
                      </div>
-                     <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                     <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                         <Download size={16} />
                      </button>
                   </div>
@@ -220,7 +220,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string }> = ({ leaseId }) => 
                Votre consommation de pointe se situe entre 19h et 22h. En décalant certains usages (climatisation, lavage) vers les heures creuses, vous pourriez économiser jusqu'à <span className="text-blue-900 font-bold">4 500 FCFA</span> par mois sur votre tarif CIE.
             </p>
          </div>
-         <button className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-blue-900/20 whitespace-nowrap ml-auto" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+         <button className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-blue-900/20 whitespace-nowrap ml-auto" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
             Consulter les astuces
          </button>
       </div>

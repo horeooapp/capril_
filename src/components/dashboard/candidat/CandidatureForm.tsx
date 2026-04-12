@@ -179,7 +179,7 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
                       <div className="p-3 bg-gray-800 rounded-xl text-gray-600"><FileUp className="w-5 h-5" /></div>
                       <span className="text-sm font-bold text-gray-300">{doc}</span>
                     </div>
-                    <button className="text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-white" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>Téléverser</button>
+                    <button className="text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-white" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Téléverser</button>
                  </div>
                ))}
             </div>

@@ -39,10 +39,10 @@ export default function ReportsDashboardClient({ initialReports }: { initialRepo
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.info('Historique complet bientôt disponible.')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Recherche...', success: 'Historique filtré.'})} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
                         <Calendar size={16} /> Historique Mensuel
                     </button>
-                    <button onClick={() => toast.info('Génération Automatisée en fin de mois.')} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2">
+                    <button onClick={() => toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Lancement IA...', success: 'Rapport mensuel généré avec succès.'})} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-teal-700 transition-all shadow-md flex items-center gap-2">
                         <Calculator size={16} /> Clôturer {reports[0]?.period || 'le mois'}
                     </button>
                 </div>

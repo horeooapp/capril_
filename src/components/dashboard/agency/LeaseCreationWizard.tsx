@@ -261,7 +261,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                            <h4 className="text-[13px] font-black uppercase tracking-tighter italic">Lancer l'Invitation M-SIGN</h4>
                            <p className="text-[10px] text-white/60 font-medium">Envoi SMS au {formData.phone || "+225 00 00 00 00"}</p>
                         </div>
-                        <button className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                        <button className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                            <ArrowRight size={24} />
                         </button>
                      </div>

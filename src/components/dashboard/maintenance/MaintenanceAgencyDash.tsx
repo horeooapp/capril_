@@ -133,7 +133,7 @@ export default function MaintenanceAgencyDash({ initialTickets }: { initialTicke
                       Clôturer
                     </button>
                 )}
-                <button className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+                <button className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>

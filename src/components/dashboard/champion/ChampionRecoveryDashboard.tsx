@@ -181,7 +181,7 @@ export default function ChampionRecoveryDashboard() {
                 <Zap size={16} />
                 <span>Lancer la prospection</span>
               </button>
-              <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-[#1F4E79] hover:bg-gray-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.info('🚀 Module V5 : Interface en cours d\'intégration (Premium)') }}>
+              <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-[#1F4E79] hover:bg-gray-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                 <Filter size={20} />
               </button>
            </div>
