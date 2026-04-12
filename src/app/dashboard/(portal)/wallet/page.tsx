@@ -21,7 +21,7 @@ import { getWalletProfile, updateWalletPreferences, processRechargeLink } from "
 import { toast } from "sonner"
 import RechargeDrawer from "@/components/dashboard/owner/RechargeDrawer"
 import Link from "next/link"
-import { Landmark } from "lucide-react"
+import { Landmark, Activity } from "lucide-react"
 
 export default function WalletPage() {
   const [profile, setProfile] = useState<any>(null)
@@ -132,23 +132,43 @@ export default function WalletPage() {
         </div>
       </div>
 
-      {/* Raccourci vers le registre C.D.C */}
-      <div className="p-4 bg-white border border-qgrey-2 rounded-[1.5rem] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-2 bg-blue-50 rounded-xl">
-             <Landmark className="text-[#1F4E79]" size={20} />
+      {/* Raccourcis: C.D.C & Réconciliation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-4 bg-white border border-gray-200 rounded-[1.5rem] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-all hover:shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-blue-50 rounded-xl">
+              <Landmark className="text-[#1F4E79]" size={20} />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-wider">Caisse des Dépôts</h3>
+              <p className="text-[10px] font-bold text-gray-500">Registre des cautions sécurisées.</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-wider">Caisse des Dépôts (CDC)</h3>
-            <p className="text-[10px] font-bold text-gray-500">Registre Global de vos cautions sécurisées.</p>
-          </div>
+          <Link 
+            href="/dashboard/wallet/cdc"
+            className="px-6 py-3 bg-[#1F4E79] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all flex items-center gap-2 shadow-md shrink-0 w-full sm:w-auto justify-center"
+          >
+            Le Registre <ChevronRight size={14} />
+          </Link>
         </div>
-        <Link 
-          href="/dashboard/wallet/cdc"
-          className="px-6 py-3 bg-[#1F4E79] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all flex items-center gap-2 shadow-md shrink-0 w-full sm:w-auto justify-center"
-        >
-          Voir le Registre <ChevronRight size={14} />
-        </Link>
+
+        <div className="p-4 bg-white border border-gray-200 rounded-[1.5rem] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-all hover:shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="p-2 bg-purple-50 rounded-xl">
+              <Activity className="text-purple-600" size={20} />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-wider">Réconciliation</h3>
+              <p className="text-[10px] font-bold text-gray-500">Rapprochement bancaire (Wave / OM).</p>
+            </div>
+          </div>
+          <Link 
+            href="/dashboard/wallet/reconciliation"
+            className="px-6 py-3 bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all flex items-center gap-2 shadow-md shrink-0 w-full sm:w-auto justify-center"
+          >
+            Audits P.G.W <ChevronRight size={14} />
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -227,3 +227,40 @@ export async function exportDgiFile() {
         return { error: "Erreur technique." };
     }
 }
+export async function dispatchDigitalDelivery(receiptId: string, deliveryMode: string, recipientData: any) {
+    const session = await ensureAuthenticated();
+    try {
+        const receipt = await prisma.receipt.findUnique({ where: { id: receiptId } });
+        if (!receipt) throw new Error("Quittance introuvable.");
+
+        // Create Digital Delivery tracking record
+        const delivery = await prisma.digitalDelivery.create({
+            data: {
+                trackingNumber: `CI-POST-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`,
+                deliveryMode,
+                recipientData: JSON.stringify(recipientData),
+                status: 'submitted'
+            }
+        });
+
+        // Link delivery to receipt
+        await prisma.receipt.update({
+            where: { id: receiptId },
+            data: { digitalDeliveryId: delivery.id }
+        });
+
+        await writeAuditLog({
+            userId: session.user.id,
+            action: "DIGITAL_DELIVERY_DISPATCHED",
+            module: "RECEIPTS",
+            entityId: receiptId,
+            newValues: { tracking: delivery.trackingNumber, mode: deliveryMode }
+        });
+
+        revalidatePath("/dashboard/receipts");
+        return { success: true, tracking: delivery.trackingNumber };
+    } catch (e: any) {
+        console.error(e)
+        return { error: "Erreur technique lors du dispatch postal." };
+    }
+}

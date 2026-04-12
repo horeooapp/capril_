@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { FileText, Search, Download, CheckCircle, Clock, AlertTriangle, Calculator } from "lucide-react"
 import { toast } from "sonner";
-import { generateNextMonthReceipts, exportDgiFile } from "@/actions/receipt-actions"
+import { generateNextMonthReceipts, exportDgiFile, dispatchDigitalDelivery } from "@/actions/receipt-actions"
 
 // Fallback statique si DB vide
 const FALLBACK = [
@@ -35,6 +35,17 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                 loading: "Compilation des écritures comptables...",
                 success: "Fichier DGI prêt. Le téléchargement commence.",
                 error: "Erreur lors de l'export."
+            })
+        })
+    }
+
+    const handleDigitalDelivery = (receiptId: string) => {
+        startTransition(async () => {
+            const promise = dispatchDigitalDelivery(receiptId, 'maposte_number', { addr: 'Default Customer' })
+            toast.promise(promise, {
+                loading: "Expédition digitale via La Poste CI...",
+                success: (data) => `Quittance expédiée ! Tracking: ${data.tracking || ''}`,
+                error: "Erreur technique lors de l'expédition."
             })
         })
     }
@@ -106,7 +117,7 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                             <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Période</th>
                             <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Montant TTC</th>
                             <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Statut</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light text-right">PDF</th>
+                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,8 +144,14 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                                         </span>
                                     )}
                                 </td>
-                                <td className="p-5 text-right">
-                                    <button onClick={() => toast.promise(new Promise(r=>setTimeout(r, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'})} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">Télécharger</button>
+                                <td className="p-5 text-right flex justify-end gap-2">
+                                    {r.status === 'PAID' && !r.digitalDeliveryId && (
+                                        <button onClick={(e) => { e.stopPropagation(); handleDigitalDelivery(r.id); }} disabled={isPending} className="text-[9px] font-black uppercase tracking-widest text-orange-600 hover:text-white hover:bg-orange-600 transition-colors border border-orange-200 px-3 py-1.5 rounded-lg bg-orange-50 disabled:opacity-50">La Poste CI</button>
+                                    )}
+                                    {r.digitalDeliveryId && (
+                                         <span className="text-[9px] font-black uppercase tracking-widest text-qgreen border border-qgreen px-3 py-1.5 rounded-lg">Expédié (CI-POST)</span>
+                                    )}
+                                    <button onClick={(e) => { e.stopPropagation(); toast.promise(new Promise(res=>setTimeout(res, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'}); }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">PDF</button>
                                 </td>
                             </tr>
                         ))}
