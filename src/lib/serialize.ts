@@ -20,6 +20,9 @@ interface RawReceipt {
 /**
  * Helper to serialize BigInt/Decimal and relations for Properties
  */
+export const serializeProperty = (property: any) => {
+    if (!property) return null;
+
     const activeLeases = (property.leases || []).filter((l: any) => 
         !['TERMINATED', 'ARCHIVED'].includes(l.status)
     );
