@@ -57,7 +57,7 @@ export async function createSyndicate(formData: FormData) {
 
 export async function dispatchMilliemes() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autorisï¿½" }
 
     try {
         await logAction({
@@ -69,6 +69,6 @@ export async function dispatchMilliemes() {
         await new Promise(resolve => setTimeout(resolve, 2000))
         return { success: true }
     } catch (e) {
-        return { error: "Erreur de ventilation des millièmes." }
+        return { error: "Erreur de ventilation des milliï¿½mes." }
     }
 }

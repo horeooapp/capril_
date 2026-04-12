@@ -49,12 +49,12 @@ export async function publishAnnonce(annonceId: string) {
 
 export async function syncOmnichannel() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autorisï¿½" }
     
     // Simulate Jumia/CoinAfrique/WhatsApp Omnichannel Push
     await new Promise(r => setTimeout(r, 2000))
     
     await logAction({ action: "OMNICHANNEL_SYNC", module: "MARKETPLACE", entityId: "global" })
     
-    return { success: true, message: "Synchronisation multi-plateforme terminée avec succès." }
+    return { success: true, message: "Synchronisation multi-plateforme terminï¿½e avec succï¿½s." }
 }

@@ -50,9 +50,9 @@ export async function transferToVault(cautionId: string) {
 
 export async function generateTrustAudit() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autorisï¿½" }
     
     await logAction({ action: "GENERATE_TRUST_AUDIT", module: "TRUST_VAULT", entityId: session.user.id })
     await new Promise(r => setTimeout(r, 1000))
-    return { success: true, message: "Audit généré : 100% de fiabilité." }
+    return { success: true, message: "Audit gï¿½nï¿½rï¿½ : 100% de fiabilitï¿½." }
 }

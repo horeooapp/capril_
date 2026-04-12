@@ -81,7 +81,7 @@ export async function exportExcelHistory() {
 
 export async function closeMonthWithAI(period: string) {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autorisï¿½" }
     
     // Simulate complex AI accounting
     await new Promise(r => setTimeout(r, 2500))
@@ -89,5 +89,5 @@ export async function closeMonthWithAI(period: string) {
     await logAction({ action: "AI_MONTH_CLOSURE", module: "REPORTS", entityId: period })
     revalidatePath("/dashboard/reports")
     
-    return { success: true, message: "Clôture du mois effectuée via QAPRIL-AI." }
+    return { success: true, message: "Clï¿½ture du mois effectuï¿½e via QAPRIL-AI." }
 }
