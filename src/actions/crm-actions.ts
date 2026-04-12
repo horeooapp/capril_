@@ -6,28 +6,35 @@ import { logAction } from "./audit";
 
 export async function getCrmContacts(agenceId: string, role?: string) {
   try {
-    // Dans QAPRIL, les contacts sont soit des locataires/proprios liés à l'agence, 
-    // soit des users ayant interagi avec l'agence (candidats, etc.)
+    const fullUser = await prisma.user.findUnique({
+      where: { id: agenceId },
+      select: { agencyConfig: true }
+    });
+    const managerId = (fullUser?.agencyConfig as any)?.managerId;
+
     const roleCondition = role ? { role: role } : {};
+
+    const orConditions: any[] = [
+      { leasesAsTenant: { some: { agentId: agenceId } } },
+      { leasesAsLandlord: { some: { agentId: agenceId } } },
+      { userCandidatures: { some: { logement: { managedByUserId: agenceId } } } }
+    ];
+
+    if (managerId) {
+      orConditions.push({ leasesAsTenant: { some: { agentId: managerId } } });
+      orConditions.push({ leasesAsLandlord: { some: { agentId: managerId } } });
+      orConditions.push({ userCandidatures: { some: { logement: { managedByUserId: managerId } } } });
+    }
+
+    // Propriétaire / Locataire direct
+    orConditions.push({ leasesAsTenant: { some: { landlordId: agenceId } } });
+    orConditions.push({ leasesAsLandlord: { some: { tenantId: agenceId } } });
 
     const users = await (prisma as any).user.findMany({
       where: {
         AND: [
           roleCondition,
-          {
-            OR: [
-              // L'utilisateur courant est agent
-              { leasesAsTenant: { some: { agentId: agenceId } } },
-              { leasesAsLandlord: { some: { agentId: agenceId } } },
-              { userCandidatures: { some: { logement: { managedByUserId: agenceId } } } },
-              
-              // L'utilisateur courant est propriétaire
-              { leasesAsTenant: { some: { landlordId: agenceId } } },
-              
-              // L'utilisateur courant est locataire
-              { leasesAsLandlord: { some: { tenantId: agenceId } } }
-            ]
-          }
+          { OR: orConditions }
         ]
       },
       select: {

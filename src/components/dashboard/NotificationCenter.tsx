@@ -14,7 +14,7 @@ interface Notification {
     createdAt: string;
 }
 
-export default function NotificationCenter() {
+export default function NotificationCenter({ variant = 'default' }: { variant?: 'default' | 'tenant' }) {
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
@@ -56,7 +56,7 @@ export default function NotificationCenter() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+                className={`relative p-2 rounded-full transition-colors ${variant === 'tenant' ? 'text-qnavy hover:bg-qnavy/5' : 'text-white hover:bg-white/10'}`}
             >
                 <span className="text-xl">🔔</span>
                 {unreadCount > 0 && (
@@ -73,7 +73,7 @@ export default function NotificationCenter() {
                         onClick={() => setIsOpen(false)}
                     />
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl z-20 overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="bg-orange-500 p-4">
+                        <div className={`${variant === 'tenant' ? 'bg-qnavy' : 'bg-orange-500'} p-4`}>
                             <h3 className="text-white font-black uppercase tracking-tight">Notifications</h3>
                         </div>
                         <div className="max-h-[400px] overflow-y-auto">
@@ -95,7 +95,7 @@ export default function NotificationCenter() {
                                                 {!n.read && (
                                                     <button 
                                                         onClick={() => handleMarkAsRead(n.id)}
-                                                        className="text-[10px] text-orange-600 font-bold uppercase hover:underline"
+                                                        className={`text-[10px] font-bold uppercase hover:underline ${variant === 'tenant' ? 'text-qnavy' : 'text-orange-600'}`}
                                                     >
                                                         Lu
                                                     </button>

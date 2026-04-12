@@ -24,6 +24,7 @@ import {
     Zap
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import NotificationCenter from "@/components/dashboard/NotificationCenter"
 
 export default function LocataireDashboardPage() {
     const { data: session, status } = useSession()
@@ -169,7 +170,10 @@ export default function LocataireDashboardPage() {
                     </div>
                     <div className="pr-6">
                         <p className="text-[8px] font-black uppercase tracking-widest text-qtext-light leading-none mb-1">Dernière Quittance</p>
-                        <p className="text-[10px] font-black text-qnavy-dark uppercase">Le 05 Avr. 2026</p>
+                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-tighter">Le 05 Avr. 2026</p>
+                    </div>
+                    <div className="border-l border-qgrey-2 pl-2 pr-4 h-10 flex items-center">
+                        <NotificationCenter variant="tenant" />
                     </div>
                 </motion.div>
             </header>

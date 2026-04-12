@@ -56,8 +56,12 @@ export default async function TenantLeasesPage() {
                                                 {lease.property?.commune}, {lease.property?.address}
                                             </p>
                                         </div>
-                                        <span className="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-200">
-                                            {lease.status}
+                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                            lease.status === 'ACTIVE' ? 'bg-green-100 text-green-700 border-green-200' :
+                                            lease.status === 'PENDING_SIGNATURE' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                                            'bg-gray-100 text-gray-700 border-gray-200'
+                                        }`}>
+                                            {lease.status === 'PENDING_SIGNATURE' ? 'À SIGNER' : lease.status}
                                         </span>
                                     </div>
 
@@ -140,11 +144,18 @@ export default async function TenantLeasesPage() {
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="pt-4 flex gap-3">
-                                        <DownloadLeaseButton leaseId={lease.id} />
-                                        <Link href={`/mon-espace-locataire/trust`} className="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 uppercase tracking-wider">
-                                            Voir mon score
-                                        </Link>
+                                    <div className="pt-4 flex flex-col gap-3">
+                                        {lease.status === 'PENDING_SIGNATURE' && (
+                                            <Link href={`/mon-espace-locataire/leases/${lease.id}/signature`} className="w-full bg-qgreen text-white py-4 rounded-xl font-black text-sm text-center hover:opacity-90 transition-all shadow-lg shadow-qgreen/20 uppercase tracking-widest animate-bounce">
+                                                🖋️ Signer mon Bail maintenant
+                                            </Link>
+                                        )}
+                                        <div className="flex gap-3">
+                                            <DownloadLeaseButton leaseId={lease.id} />
+                                            <Link href={`/mon-espace-locataire/trust`} className="flex-1 bg-qnavy text-white py-3 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-lg shadow-qnavy/20 uppercase tracking-wider">
+                                                Voir mon score
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

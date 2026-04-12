@@ -9,6 +9,7 @@ import { Role, TypeBail, LeaseStatus } from "@prisma/client"
 import { serializeLease } from "@/lib/serialize"
 import { Prisma } from "@prisma/client"
 import { writeAuditLog } from "@/lib/audit"
+import { normalizePhone } from "@/lib/phone"
 
 interface CommercialData {
     indexationType: 'fixed' | 'ipc';
@@ -68,19 +69,7 @@ export async function createLease(data: {
         }
 
         // Normalize Tenant Phone (Ivory Coast standard: +225 XXXXXXXXXX)
-        let normalizedPhone = data.tenantPhone;
-        if (normalizedPhone) {
-            normalizedPhone = normalizedPhone.replace(/\s+/g, ""); // Remove all spaces
-            if (normalizedPhone.startsWith("0") && normalizedPhone.length === 10) {
-                 normalizedPhone = "+225 " + normalizedPhone;
-            } else if (normalizedPhone.startsWith("225") && normalizedPhone.length === 13) {
-                 normalizedPhone = "+225 " + normalizedPhone.substring(3);
-            } else if (normalizedPhone.startsWith("+225") && normalizedPhone.length === 14) {
-                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
-            } else if (normalizedPhone.startsWith("+225")) {
-                 normalizedPhone = "+225 " + normalizedPhone.substring(4);
-            }
-        }
+        const normalizedPhone = data.tenantPhone ? normalizePhone(data.tenantPhone) : ""
 
         // 2. Identify Tenant
         let tenantId: string | undefined = undefined;
@@ -187,7 +176,7 @@ export async function createLease(data: {
                     userId: tenantId,
                     type: "NEW_LEASE",
                     title: "Nouveau contrat de bail",
-                    content: `Le propriétaire a généré un contrat (${lease.leaseReference}). Veuillez consulter votre espace pour validation.`,
+                    content: `Le propriétaire a généré un contrat (${lease.leaseReference}). Veuillez consulter votre espace pour validation et signature.`,
                     link: `/mon-espace-locataire/leases`,
                     channel: "PUSH",
                     status: "sent"
