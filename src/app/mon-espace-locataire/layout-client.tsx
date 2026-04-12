@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake } from "lucide-react"
 
 import { SessionProvider } from "next-auth/react"
 
@@ -56,6 +56,7 @@ export default function LocataireLayoutClient({
                             { href: "/mon-espace-locataire/leases", label: "Mon bail", icon: <FileText size={24} /> },
                             { href: "/mon-espace-locataire/receipts", label: "Quittances", icon: <Receipt size={24} /> },
                             { href: "/mon-espace-locataire/cie-sodeci", label: "CIE/SODECI", icon: <Zap size={24} /> },
+                            { href: "/mon-espace-locataire/profil-public", label: "Matching", icon: <Handshake size={24} /> },
                             { href: "/mon-espace-locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/profile", label: "Profil", icon: <User size={24} /> },
                             { href: "/mon-espace-locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },

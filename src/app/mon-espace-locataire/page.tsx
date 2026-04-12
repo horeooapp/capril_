@@ -357,6 +357,23 @@ export default function LocataireDashboardPage() {
                     </div>
                 </BentoItem>
 
+                {/* MATCHING TINDER IMMO CARD (12 cols, 1 row) */}
+                <BentoItem className="md:col-span-12 md:row-span-1 p-8 flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-qgold/10 via-qorange-pale to-white border border-qgold/20 shadow-lg group overflow-hidden" delay={0.7}>
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-qgold/20 rounded-full blur-[80px] pointer-events-none group-hover:scale-150 transition-transform duration-1000"></div>
+                    <div className="flex items-center gap-6 relative z-10 w-full md:w-auto mb-6 md:mb-0">
+                        <div className="w-16 h-16 bg-white rounded-[1.2rem] flex items-center justify-center shadow-xl shadow-qgold/10">
+                            <span className="text-3xl animate-bounce-slow">🔥</span>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-xl font-black text-qnavy-dark uppercase tracking-tighter mb-1">Le "Tinder" de l'Immobilier</h3>
+                            <p className="text-[12px] font-medium text-qtext-mid max-w-lg">Soumettez votre profil locatif (Budget, Communes) aux bailleurs et laissez les logements venir à vous. Matching IA instantané.</p>
+                        </div>
+                    </div>
+                    <Link href="/mon-espace-locataire/profil-public" className="w-full md:w-auto relative z-10 h-14 px-10 bg-qnavy-dark text-white rounded-[1.2rem] flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl hover:-translate-y-1 active:scale-95">
+                        <Search size={16} /> Configurer mon profil
+                    </Link>
+                </BentoItem>
+
             </div>
 
             {/* 3. Footer Branding */}

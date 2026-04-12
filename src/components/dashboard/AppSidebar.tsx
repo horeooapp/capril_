@@ -63,6 +63,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 { href: "/mon-espace-locataire/leases", label: "Mon bail", icon: <FileText size={20} /> },
                 { href: "/mon-espace-locataire/receipts", label: "Quittances", icon: <Receipt size={20} /> },
                 { href: "/mon-espace-locataire/cie-sodeci", label: "CIE / SODECI", icon: <Zap size={20} /> },
+                { href: "/mon-espace-locataire/profil-public", label: "Matching Immo", icon: <Handshake size={20} /> },
                 { href: "/mon-espace-locataire/rights", label: "Mes droits", icon: <ShieldAlert size={20} /> },
                 { href: "/mon-espace-locataire/profile", label: "Profil", icon: <User size={20} /> },
                 { href: "/mon-espace-locataire/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
