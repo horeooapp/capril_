@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { createLease } from "@/actions/leases"
 import { createBDQ } from "@/actions/bdq"
 import { getProperties } from "@/actions/properties"
+import { searchLocataireByPhonePartial } from "@/actions/search-locataire"
 import AgentBailDeclaratif from "@/components/AgentBailDeclaratif"
 
 // Define TypeBail locally to avoid @prisma/client bundling issues in Client Components
@@ -35,6 +36,10 @@ function LeaseRegistrationForm() {
     const [agencyFees, setAgencyFees] = useState<number>(0)
     const [isPending, startTransition] = useTransition()
     const [startDate, setStartDate] = useState("")
+
+    // Autocomplete state
+    const [suggestions, setSuggestions] = useState<any[]>([])
+    const [showSuggestions, setShowSuggestions] = useState(false)
 
     useEffect(() => {
         getProperties().then(setProperties).catch(console.error)
@@ -184,15 +189,48 @@ function LeaseRegistrationForm() {
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none" 
                                         />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 relative">
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Locataire (Mobile)</label>
                                         <input 
                                             required type="tel" 
                                             value={tenantPhone}
-                                            onChange={(e) => setTenantPhone(e.target.value)}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setTenantPhone(val);
+                                                if (val.length >= 3) {
+                                                    searchLocataireByPhonePartial(val).then(results => {
+                                                        setSuggestions(results);
+                                                        setShowSuggestions(true);
+                                                    });
+                                                } else {
+                                                    setShowSuggestions(false);
+                                                }
+                                            }}
+                                            onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true) }}
+                                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                             placeholder="+225 00 00 00 00" 
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none" 
                                         />
+                                        {showSuggestions && suggestions.length > 0 && (
+                                            <ul className="absolute z-10 w-full bg-white border border-gray-200 mt-1 rounded-2xl shadow-2xl max-h-60 overflow-y-auto overflow-x-hidden">
+                                                {suggestions.map((s, idx) => (
+                                                    <li 
+                                                        key={idx}
+                                                        className="px-5 py-3 hover:bg-orange-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
+                                                        onClick={() => {
+                                                            setTenantPhone(s.phone);
+                                                            if (s.fullName !== "Locataire Inconnu") {
+                                                                setTenantName(s.fullName);
+                                                            }
+                                                            setShowSuggestions(false);
+                                                        }}
+                                                    >
+                                                        <div className="font-bold text-gray-900 text-sm">{s.fullName}</div>
+                                                        <div className="text-xs font-black text-[#FF8200]">{s.phone}</div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                     </div>
                                     {typeBail === TypeBail.DECLARATIF_BDQ && !propertyId && (
                                         <div className="md:col-span-2 space-y-2">

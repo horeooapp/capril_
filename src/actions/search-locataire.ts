@@ -150,3 +150,36 @@ export async function searchLocataires(filters: {
         throw new Error("Erreur lors de la recherche")
     }
 }
+
+// INV-02 : Recherche partielle pour auto-complétion au moment de la création d'un bail
+export async function searchLocataireByPhonePartial(phoneQuery: string) {
+    if (!phoneQuery || phoneQuery.length < 3) return [];
+    
+    try {
+        const users = await (prisma.user as any).findMany({
+            where: {
+                role: 'TENANT',
+                phone: {
+                    contains: phoneQuery
+                    // mode: 'insensitive' // Works nicely in Postgres
+                }
+            },
+            take: 5,
+            select: {
+                id: true,
+                phone: true,
+                firstName: true,
+                lastName: true
+            }
+        });
+
+        return users.map((u: any) => ({
+            id: u.id,
+            phone: u.phone,
+            fullName: (u.firstName ? u.firstName + " " : "") + (u.lastName || "") || "Locataire Inconnu"
+        }));
+    } catch (e) {
+        console.error("Erreur auto-complétion téléphone:", e);
+        return [];
+    }
+}
