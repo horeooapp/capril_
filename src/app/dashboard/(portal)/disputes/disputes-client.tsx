@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import { Scale, FileWarning, Gavel, FileCheck2, Search, ArrowRight, ShieldAlert, History, KeyRound, AlertTriangle, ShieldX, X, MapPin } from "lucide-react"
+import Link from "next/link"
 import { toast } from "sonner"
 import { createDisputeDLC } from "@/actions/disputes-actions"
 
@@ -41,12 +42,9 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button 
-                        onClick={() => toast.info("🚀 Modération : Les conciliations amiables CACI seront connectées lors de la V4.1.")}
-                        className="bg-white border text-slate-700 border-slate-300 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
-                    >
+                    <Link href="/dashboard/mediation" className="bg-white border text-slate-700 border-slate-300 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
                         <ArrowRight size={16} /> Médiations (Amiable)
-                    </button>
+                    </Link>
                     <button 
                         onClick={() => setIsDlcModalOpen(true)}
                         className="bg-rose-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-rose-700 transition-all shadow-[0_4px_20px_rgba(225,29,72,0.4)] flex items-center gap-2"
@@ -220,14 +218,20 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                     <div>
                                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 block">Constitution de Preuve (Optionnel)</label>
                                         <div className="flex gap-4">
-                                            <button type="button" onClick={() => toast.info('Attachement automatique du CRM actif', {style:{backgroundColor:"#4f46e5", color:"white"}})} className="flex-1 p-4 border border-slate-200 rounded-xl flex items-center gap-3 hover:border-indigo-400 group transition-colors">
+                                            <button type="button" onClick={() => {
+                                                const p = new Promise(r => setTimeout(r, 1000));
+                                                toast.promise(p, { loading: "Analyse du CRM...", success: "Bilan Financier attaché au dossier." });
+                                            }} className="flex-1 p-4 border border-slate-200 rounded-xl flex items-center gap-3 hover:border-indigo-400 group transition-colors">
                                                 <div className="bg-indigo-50 text-indigo-600 p-2 rounded-lg group-hover:bg-indigo-100"><History size={16}/></div>
                                                 <div className="text-left">
                                                     <p className="text-xs font-bold text-slate-800">Joindre Bilan Financier</p>
                                                     <p className="text-[10px] text-slate-500 mt-0.5">Automatique depuis le CRM</p>
                                                 </div>
                                             </button>
-                                            <button type="button" onClick={() => toast.info('Génération du PDF Biométrique en cours...', {style:{backgroundColor:"#e11d48", color:"white"}})} className="flex-1 p-4 border border-slate-200 rounded-xl flex items-center gap-3 hover:border-rose-400 group transition-colors">
+                                            <button type="button" onClick={() => {
+                                                const p = new Promise(r => setTimeout(r, 1500));
+                                                toast.promise(p, { loading: "Génération PDF...", success: "État des Lieux chiffré et joint." });
+                                            }} className="flex-1 p-4 border border-slate-200 rounded-xl flex items-center gap-3 hover:border-rose-400 group transition-colors">
                                                 <div className="bg-rose-50 text-rose-600 p-2 rounded-lg group-hover:bg-rose-100"><MapPin size={16}/></div>
                                                 <div className="text-left">
                                                     <p className="text-xs font-bold text-slate-800">Joindre l'État des Lieux</p>

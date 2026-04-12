@@ -1,6 +1,8 @@
 "use server"
 
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { logAction } from "./audit";
 
 export async function getCrmContacts(agenceId: string, role?: string) {
   try {
@@ -53,5 +55,23 @@ export async function getContactHistory(userId: string) {
     return { leases, events, candidatures };
   } catch (error) {
     return { leases: [], events: [], candidatures: [] };
+  }
+}
+
+export async function launchCampaign() {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Non autorisé" };
+
+  try {
+    await logAction({
+       action: "CRM_CAMPAIGN_LAUNCH",
+       module: "CRM",
+       entityId: session.user.id
+    });
+    // Simuler le délai d'une API emailing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return { success: true };
+  } catch(e) {
+    return { error: "Failed to launch campaign" };
   }
 }

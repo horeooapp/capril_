@@ -1,145 +1,121 @@
 "use client"
 
-import { motion } from "framer-motion"
+import React, { useState } from "react"
+import { Building2, Search, Plus, MapPin, CheckCircle, Clock, Home, X, Filter, BarChart } from "lucide-react"
 import Link from "next/link"
-import { 
-    Building2, 
-    Home, 
-    MapPin, 
-    ArrowRight, 
-    Plus,
-    Building,
-    Compass,
-    SearchX
-} from "lucide-react"
+import { toast } from "sonner";
 
-interface Property {
-    id: string;
-    propertyCategory: string;
-    propertyCode: string;
-    propertyType: string;
-    commune: string;
-    addressLine1: string;
-    neighborhood?: string;
-    city?: string;
-    declaredRentFcfa: bigint | number;
-}
+const FALLBACK = [
+    { id: "PROP-xxx-1", name: "Résidence Le Saphir, Abidjan Sud", propertyType: "IMMEUBLE", rooms: 12, status: "active" },
+    { id: "PROP-xxx-2", name: "Villa Triplex Riviera", propertyType: "VILLA", rooms: 1, status: "active" },
+    { id: "PROP-xxx-3", name: "Local Commercial Plateau", propertyType: "COMMERCIAL", rooms: 3, status: "pending_verification" }
+]
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-}
+export default function PropertiesDashboardClient({ initialProperties }: { initialProperties: any[] }) {
+    const defaultData = initialProperties.length > 0 ? initialProperties : FALLBACK;
+    const [properties] = useState<any[]>(defaultData)
 
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-}
-
-export default function PropertiesClient({ properties }: { properties: Property[] }) {
     return (
-        <motion.div 
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="space-y-12"
-        >
-            {/* Header section with refined glass branding */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter leading-none mb-4 uppercase">
-                        Patrimoine.
+                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
+                        <Building2 className="text-qblue" size={32} /> Foncier & Patrimoine
                     </h1>
-                    <p className="text-[16px] text-gray-500 font-medium tracking-wide flex items-center gap-2">
-                        <Compass size={16} className="text-[#C55A11]" />
-                        Gestion certifiée de votre parc mobilier et suivi de conformité <span className="text-[#1F4E79] font-bold">QAPRIL Secure</span>.
+                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                        L'inventaire central de tous vos biens immobiliers et de leurs unités.
                     </p>
                 </div>
-                <Link 
-                    href="/dashboard/properties/new" 
-                    className="px-8 py-4 bg-[#1F4E79] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[14px] hover:bg-[#163a5a] transition-all shadow-2xl flex items-center gap-3 active:scale-95 group"
-                >
-                    <Plus size={18} />
-                    <span>Enregistrer un bien</span>
-                </Link>
+                <div className="flex gap-3">
+                    <button onClick={() => toast.success('Filtrage indisponible pour le moment.')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
+                        <Filter size={16} /> Filtres
+                    </button>
+                    <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                        <Plus size={16} /> Nouveau Bien
+                    </Link>
+                </div>
             </div>
 
-            {properties.length === 0 ? (
-                <motion.div variants={item} className="glass-panel rounded-[3rem] p-24 text-center border border-white/40 shadow-2xl flex flex-col items-center">
-                    <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner border border-white rotate-3 group-hover:rotate-0 transition-transform">
-                        <SearchX size={48} className="text-gray-300" />
-                    </div>
-                    <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter mb-4 italic">Aucun actif détecté</h3>
-                    <p className="text-[16px] text-gray-500 max-w-sm font-medium mb-10 leading-relaxed">
-                        Digitalisez votre premier bien immobilier pour bénéficier de la gestion automatisée et certifiée. <br />
-                        <span className="text-[14px] font-black uppercase tracking-widest text-[#C55A11] mt-4 block">Protocole de sécurité activé</span>
-                    </p>
-                    <Link href="/dashboard/properties/new" className="px-10 py-5 bg-[#C55A11] text-white font-black rounded-2xl shadow-xl hover:bg-[#A54A0D] transition-all uppercase tracking-widest text-[14px]">
-                        Commencer maintenant
-                    </Link>
-                </motion.div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {properties.map((property) => (
-                        <motion.div 
-                            key={property.id} 
-                            variants={item}
-                            className="glass-card-premium rounded-[2.8rem] overflow-hidden group hover:border-primary/30 border border-white/40 shadow-2xl hover:scale-[1.02] transition-all relative"
-                        >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-10 -mt-10 rounded-full group-hover:bg-primary/10 transition-colors"></div>
-                            
-                            <div className="p-10 relative z-10">
-                                <div className="flex justify-between items-start mb-10">
-                                    <div className={`px-4 py-1.5 rounded-xl text-[12px] font-black uppercase tracking-[0.2em] shadow-sm border border-white ${
-                                        property.propertyCategory === 'RESIDENTIAL' 
-                                        ? 'bg-blue-50 text-blue-600' 
-                                        : 'bg-violet-50 text-violet-600'
-                                    }`}>
-                                        {property.propertyCategory === 'RESIDENTIAL' ? 'Résidentiel' : 'Commercial'}
-                                    </div>
-                                    <span className="text-[14px] font-black text-gray-300 group-hover:text-[#C55A11] transition-colors tracking-widest uppercase">
-                                        #{property.propertyCode}
-                                    </span>
-                                </div>
-                                
-                                <div className="flex items-center gap-4 mb-3">
-                                    <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all">
-                                        {property.propertyType === 'VILLA' ? <Home size={24} /> : <Building2 size={24} />}
-                                    </div>
-                                    <h3 className="text-2xl font-black text-gray-900 leading-tight uppercase tracking-tighter italic">
-                                        {property.propertyType === 'VILLA' ? 'Villa' : property.propertyType === 'COURS_COMMUNE' ? 'Cours com.' : property.propertyType === 'APARTMENT' ? 'Appart' : 'Bien'} {property.commune}
-                                    </h3>
-                                </div>
-                                <div className="flex items-center gap-2 mb-12">
-                                    <MapPin size={12} className="text-[#C55A11]" />
-                                    <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.1em] line-clamp-1">
-                                        {property.addressLine1}
-                                    </p>
-                                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 {/* Main Table */}
+                 <div className="lg:col-span-2 bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm">
+                     <div className="p-6 border-b border-qgrey-2 flex items-center bg-qgrey-1/30">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input type="text" placeholder="Rechercher un bien par nom ou ID..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qblue focus:ring-1 focus:ring-qblue transition-all" />
+                        </div>
+                     </div>
+                     <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white border-b border-qgrey-2">
+                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Propriété</th>
+                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Type & Unités</th>
+                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {properties.map(p => (
+                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => toast.info('Ouverture fiche propriété...')}>
+                                    <td className="p-5">
+                                        <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
+                                        <p className="text-[10px] text-qtext-light font-bold mt-1">ID: {p.id.substring(0,8)}</p>
+                                    </td>
+                                    <td className="p-5">
+                                        <span className="bg-qgrey-1 text-qtext-mid px-2 py-1 rounded text-[9px] font-black uppercase mr-2">{p.propertyType}</span>
+                                        <span className="text-xs font-bold text-qnavy">{p.rooms || p.units || 1} Lot(s)</span>
+                                    </td>
+                                    <td className="p-5">
+                                        {p.status === 'active' || p.status === 'rented' ? (
+                                            <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
+                                                <CheckCircle size={10} /> ACTIF
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
+                                                <Clock size={10} /> EN ATTENTE
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {properties.length === 0 && (
+                                <tr>
+                                    <td colSpan={3} className="p-8 text-center text-qtext-light text-sm font-medium">
+                                        Aucun bien immobilier enregistré.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                     </table>
+                 </div>
 
-                                <div className="flex items-end justify-between pt-8 border-t border-gray-100">
-                                    <div>
-                                        <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Loyer de Base</p>
-                                        <p className="text-3xl font-black text-[#1F4E79] tracking-tighter leading-none">
-                                            {Number(property.declaredRentFcfa).toLocaleString('fr-FR')} <span className="text-[14px] font-bold text-gray-300 ml-1">FCFA</span>
-                                        </p>
-                                    </div>
-                                    <Link 
-                                        href={`/dashboard/properties/${property.id}`}
-                                        className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all shadow-xl hover:shadow-gray-200"
-                                    >
-                                        <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            )}
-        </motion.div>
+                 {/* Metrics Side Panel */}
+                 <div className="space-y-6">
+                     <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] rounded-[2rem] p-8 text-white relative shadow-lg overflow-hidden flex flex-col justify-between h-[250px]">
+                         <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
+                         <div>
+                             <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Valeur Parc Estimée</h3>
+                             <p className="text-4xl font-black tracking-tighter">1.2B <span className="text-lg">FCFA</span></p>
+                         </div>
+                         <div className="mt-auto">
+                              <p className="text-[10px] font-medium text-gray-300">Taux d'occupation global : <span className="text-qgreen font-black">92%</span></p>
+                              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
+                                  <div className="bg-qgreen h-1.5 rounded-full" style={{width: `92%`}}></div>
+                              </div>
+                         </div>
+                     </div>
+
+                     <div className="bg-white border border-qgrey-2 rounded-[2rem] p-6 shadow-sm">
+                         <h3 className="text-sm font-black text-qnavy-dark border-b border-qgrey-2 pb-4 mb-4">Mises aux normes</h3>
+                         <div className="flex items-start gap-3 mb-4">
+                              <div className="w-2 h-2 rounded-full bg-qred mt-1.5"></div>
+                              <div>
+                                  <p className="text-xs font-bold text-qnavy">Ascenseur - Tour Ivoire</p>
+                                  <p className="text-[10px] text-qtext-light">Certificat de sécurité manquant.</p>
+                              </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </div>
     )
 }

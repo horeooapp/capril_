@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { writeAuditLog } from "@/lib/audit";
 
 /**
  * EDL-01 : Initier un état des lieux (Entrée ou Sortie)
@@ -167,6 +168,24 @@ export async function getAllEdls() {
     });
   } catch (error) {
     console.error("[EDL] Admin Fetch Error:", error);
-    return [];
   }
+}
+
+export async function triggerEdlComparison(outEdlId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Non autorisé" };
+
+    try {
+        await writeAuditLog({
+            action: "EDL_COMPARISON_TRIGGERED",
+            module: "EDL",
+            entityId: outEdlId,
+            userId: session.user.id,
+            newValues: { message: "Analyse comparative IA (Entrée/Sortie) déclenchée." }
+        });
+
+        return { success: true };
+    } catch(e) {
+        return { error: "Erreur lors du verrouillage pour comparaison." };
+    }
 }

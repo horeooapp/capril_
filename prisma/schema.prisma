@@ -3552,3 +3552,57 @@ model Succession {
 
   @@map("successions")
 }
+
+// ═══════════════════════════════════════════════════════
+// TRUST VAULT (Cautions CACI)
+// ═══════════════════════════════════════════════════════
+model VaultCaution {
+  id               String @id @default(uuid())
+  tenantName       String @map("tenant_name")
+  propertyInfo     String @map("property_info")
+  amount           Int
+  hash             String
+  status           String @default("A_TRANSFERER")
+  dateConsignation String? @map("date_consignation")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("vault_cautions")
+}
+
+// ═══════════════════════════════════════════════════════
+// SYNDIC (Copropriétés)
+// ═══════════════════════════════════════════════════════
+model Syndicate {
+  id               String @id @default(uuid())
+  residenceName    String @map("residence_name")
+  totalLots        Int    @map("total_lots")
+  treasuryBalance  Int    @map("treasury_balance")
+  agState          String @map("ag_state")
+
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("syndicates")
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPTES RENDUS DE GÉRANCE (CRG / Reports)
+// ═══════════════════════════════════════════════════════
+model FinancialReport {
+  id               String @id @default(uuid())
+  ownerName        String @map("owner_name")
+  period           String
+  propertiesCount  Int    @default(1) @map("properties_count")
+  totalGross       Int    @map("total_gross")
+  agencyFee        Int    @map("agency_fee")
+  tva              Int    @default(0)
+  repairCosts      Int    @default(0) @map("repair_costs")
+  netPayout        Int    @map("net_payout")
+  status           String @default("EN_ATTENTE")
+
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("financial_reports")
+}

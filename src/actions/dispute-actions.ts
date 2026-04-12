@@ -258,3 +258,31 @@ export async function getDisputes() {
         orderBy: { createdAt: 'desc' }
     });
 }
+
+export async function escalateDispute(disputeId: string) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error("Authentification requise.");
+    }
+
+    try {
+        await prisma.dispute.update({
+            where: { id: disputeId },
+            data: { status: 'IN_MEDIATION' }
+        });
+
+        const { writeAuditLog } = await import("@/lib/audit");
+        await writeAuditLog({
+            action: "DISPUTE_ESCALATED_CACI",
+            module: "DISPUTE",
+            entityId: disputeId,
+            userId: session.user.id,
+            newValues: { message: "Litige transféré à la CACI pour médiation." }
+        });
+
+        revalidatePath("/dashboard/disputes");
+        return { success: true };
+    } catch (e) {
+        return { error: "Erreur lors de l'escalade temporelle." };
+    }
+}

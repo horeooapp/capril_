@@ -170,3 +170,34 @@ export async function getMandateAnalytics(mandateId: string) {
         status: mandate.status
     };
 }
+
+export async function updateMandateStatus(mandateId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Non autorisé" };
+
+    try {
+        const mandate = await prisma.mandate.findUnique({ where: { id: mandateId }});
+        if (!mandate) return { error: "Mandat introuvable" };
+
+        const newStatus = mandate.status === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+
+        await prisma.mandate.update({
+            where: { id: mandateId },
+            data: { status: newStatus as any }
+        });
+
+        const { writeAuditLog } = await import("@/lib/audit");
+        await writeAuditLog({
+            action: "MANDATE_STATUS_CHANGED",
+            module: "MANDATE",
+            entityId: mandateId,
+            userId: session.user.id,
+            newValues: { status: newStatus }
+        });
+
+        revalidatePath("/dashboard/mandates");
+        return { success: true, newStatus };
+    } catch(e) {
+        return { error: "Erreur lors de la mise à jour." };
+    }
+}

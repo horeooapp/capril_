@@ -35,9 +35,31 @@ export async function createDisputeDLC(formData: FormData) {
                 severity: "CRITIQUE",
                 hash,
                 isCryptoSealed,
-                status: "ESCALATED"
             }
         })
+
+        const lease = await prisma.lease.findUnique({
+             where: { id: leaseId },
+             include: { tenant: true, property: true }
+        });
+
+        if (lease?.tenant?.email) {
+             const { sendEmail, wrapInPremiumTemplate } = await import("@/lib/email");
+             await sendEmail({
+                  to: lease.tenant.email,
+                  subject: "MISE EN DEMEURE - Chambre d'Arbitrage (CACI)",
+                  html: wrapInPremiumTemplate(`
+                       <h3 style="color: #e11d48;">AVERTISSEMENT LÉGAL</h3>
+                       <p>Cher(e) locataire,</p>
+                       <p>Un Dossier Litige Certifié (DLC) a été scellé à l'encontre de votre contrat de bail (Réf: ${lease.leaseReference}) concernant le bien situé à : ${lease.property?.address}.</p>
+                       <p><strong>Motif de l'infraction :</strong> ${type}</p>
+                       ${isCryptoSealed ? `<p>Ce dossier est scellé cryptographiquement (Certificat SHA-256 : <strong>${hash}</strong>). Cette empreinte est désormais opposable devant la juridiction de commerce (CACI).</p>` : ''}
+                       <p>Nous vous intimons l'ordre de régulariser la situation sous 8 jours, faute de quoi des procédures d'expulsion (Eviction Prononcée) seront exécutoires.</p>
+                       <br/>
+                       <p><em>Le Tribunal d'Arbitrage</em></p>
+                  `, "Dossier Litige Certifié (DLC) Ouvert")
+             });
+        }
 
         revalidatePath("/dashboard/disputes")
         return { success: true, disputeId: dispute.id, hash }

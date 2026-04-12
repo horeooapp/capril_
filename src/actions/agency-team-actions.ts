@@ -121,8 +121,21 @@ export async function inviteCollaborator(formData: { email: string, permissions:
             createdOrUpdatedUserId = newUser.id
         }
 
-        // Dans un monde de production, on enverrait l'email ici
-        // Ex: sendEmail(formData.email, `qapril.ci/invite/${token}`)
+        // Send Email
+        const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci"}/invite/${token}`
+        const { sendEmail, wrapInPremiumTemplate } = await import("@/lib/email")
+        
+        await sendEmail({
+            to: formData.email,
+            subject: "Mise en réseau Professionnelle - QAPRIL",
+            html: wrapInPremiumTemplate(`
+                <p>Vous avez été invité(e) en tant que <strong>${formData.poste || "COLLABORATEUR"}</strong> au sein du réseau de confiance QAPRIL.</p>
+                <p>Pour activer votre poste de gestion sur l'infrastructure sécurisée, veuillez accepter cette affectation :</p>
+                <div style="margin: 32px 0; text-align: center;">
+                    <a href="${inviteLink}" style="background-color: #1B3A6B; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 13px;">Accepter l'Affectation</a>
+                </div>
+            `, "Invitation Agence")
+        });
         
         return { 
             success: true, 

@@ -5,6 +5,8 @@
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { writeAuditLog } from "@/lib/audit";
 
 // ── Créer un bail ────────────────────────────────────────
 export async function createLease(data: {
@@ -236,4 +238,35 @@ export async function verifierEtatDesLieuxObligatoire(leaseId: string) {
   }
 
   return true;
+}
+
+export async function renewLeaseAction(leaseId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Non autorisé" };
+
+    try {
+        const lease = await prisma.lease.findUnique({ where: { id: leaseId }});
+        if (!lease) return { error: "Bail introuvable" };
+        
+        const newEndDate = lease.endDate ? new Date(lease.endDate) : new Date();
+        newEndDate.setFullYear(newEndDate.getFullYear() + 1);
+
+        await prisma.lease.update({
+            where: { id: leaseId },
+            data: { endDate: newEndDate }
+        });
+
+        await writeAuditLog({
+            action: "LEASE_RENEWED",
+            module: "LEASE",
+            entityId: leaseId,
+            userId: session.user.id,
+            newValues: { message: "Opération de renouvellement exécutée." }
+        });
+
+        revalidatePath("/dashboard/leases");
+        return { success: true };
+    } catch(e) {
+        return { error: "Erreur lors du renouvellement." };
+    }
 }
