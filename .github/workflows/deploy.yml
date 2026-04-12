@@ -228,6 +228,10 @@ jobs:
           echo "SMS_GATEWAY_PROVIDER=${{ vars.SMS_GATEWAY_PROVIDER }}" >> .env
           echo "SMS_API_KEY=${{ secrets.SMS_API_KEY }}" >> .env
           echo "SMS_SENDER_NAME=${{ vars.SMS_SENDER_NAME }}" >> .env
+          echo "ORANGE_SMS_CLIENT_ID=${{ secrets.ORANGE_SMS_CLIENT_ID }}" >> .env
+          echo "ORANGE_SMS_CLIENT_SECRET=${{ secrets.ORANGE_SMS_CLIENT_SECRET }}" >> .env
+          echo "ORANGE_SMS_SENDER_NUMBER=${{ vars.ORANGE_SMS_SENDER_NUMBER || 'tel:+22500000000' }}" >> .env
+          echo "ORANGE_SMS_SENDER_NAME=${{ vars.ORANGE_SMS_SENDER_NAME || 'QAPRIL' }}" >> .env
           echo "USSD_SHARED_SECRET=${{ secrets.USSD_SHARED_SECRET }}" >> .env
           echo "NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}" >> .env
           echo "OTP_TTL_SECONDS=${{ vars.OTP_TTL_SECONDS || 600 }}" >> .env

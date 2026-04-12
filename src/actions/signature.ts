@@ -39,12 +39,12 @@ export async function initiateLeaseSignature(leaseId: string) {
             data: { signingOtp: otp }
         })
 
-        // Envoi de l'OTP réel via la Gateway SMS (Orange/MTN/Moov)
+        // Envoi de l'OTP réel via la Gateway SMS Orange (Canal Interne Robuste)
         if (lease.tenant.phone) {
             const { sendSMS } = await import("@/lib/sms");
             const smsMessage = `QAPRIL - Code de Signature Électronique du bail : ${otp}. Ne partagez ce code de scellement avec personne.`;
-            await sendSMS(lease.tenant.phone, smsMessage);
-            console.log(`[SIGNATURE] SMS OTP envoyé au ${lease.tenant.phone}`);
+            await sendSMS(lease.tenant.phone, smsMessage, "ORANGE");
+            console.log(`[SIGNATURE] SMS OTP envoyé via Orange au ${lease.tenant.phone}`);
         } else {
             console.warn(`[SIGNATURE] Impossible d'envoyer l'OTP : Le locataire n'a pas de téléphone.`);
         }

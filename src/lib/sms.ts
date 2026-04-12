@@ -55,13 +55,94 @@ export class RapidAPIVerifyService implements SMSService {
   }
 }
 
-export function getSMSService() {
-  const provider = process.env.SMS_GATEWAY_PROVIDER || "RAPIDAPI_VERIFY";
-  if (provider === "TWILIO") return new TwilioService();
+export class OrangeSMSService implements SMSService {
+  private clientId: string;
+  private clientSecret: string;
+  private senderNumber: string; // tel:+22500000000
+  private senderName: string;
+
+  constructor() {
+    this.clientId = process.env.ORANGE_SMS_CLIENT_ID || "";
+    this.clientSecret = process.env.ORANGE_SMS_CLIENT_SECRET || "";
+    this.senderNumber = process.env.ORANGE_SMS_SENDER_NUMBER || "tel:+22500000000";
+    this.senderName = process.env.ORANGE_SMS_SENDER_NAME || "QAPRIL";
+  }
+
+  private async getAccessToken() {
+    const auth = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
+    const response = await fetch("https://api.orange.com/oauth/v3/token", {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "grant_type=client_credentials"
+    });
+
+    if (!response.ok) {
+      throw new Error(`Orange Auth Failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  }
+
+  async sendOTP(phone: string, otp: string) {
+    const message = `[QAPRIL] Votre code de sécurité est : ${otp}. Ne le partagez pas.`;
+    return this.sendMessage(phone, message);
+  }
+
+  async sendMessage(phone: string, message: string) {
+    if (!this.clientId || !this.clientSecret) {
+      return { success: false, error: "Orange SMS credentials missing" };
+    }
+
+    try {
+      const token = await this.getAccessToken();
+      const formattedPhone = phone.startsWith("+") ? phone : `+225${phone}`; // Default to CI if no prefix
+      const address = `tel:${formattedPhone}`;
+      
+      const payload = {
+        outboundSMSMessageRequest: {
+          address: address,
+          senderAddress: this.senderNumber,
+          outboundSMSTextMessage: {
+            message: message
+          },
+          senderName: this.senderName
+        }
+      };
+
+      const response = await fetch(`https://api.orange.com/smsmessaging/v1/outbound/${encodeURIComponent(this.senderNumber)}/requests`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message || response.statusText };
+      }
+
+      const data = await response.json();
+      return { success: true, messageId: data.outboundSMSMessageRequest.resourceURL };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+}
+
+export function getSMSService(provider?: string) {
+  const activeProvider = provider || process.env.SMS_GATEWAY_PROVIDER || "RAPIDAPI_VERIFY";
+  if (activeProvider === "TWILIO") return new TwilioService();
+  if (activeProvider === "ORANGE") return new OrangeSMSService();
   return new RapidAPIVerifyService();
 }
 
-export async function sendSMS(phone: string, message: string) {
-  const result = await getSMSService().sendMessage(phone, message);
+export async function sendSMS(phone: string, message: string, forceProvider?: string) {
+  const result = await getSMSService(forceProvider).sendMessage(phone, message);
   return result.success === true;
 }
