@@ -73,15 +73,34 @@ export async function getTenantDashboard() {
 
             if (ghost && !ghost.email) {
                 console.log(`[C-MERGE-AUTO] Réparation en cours pour ${userId} via ghost ${ghost.id}`);
-                await prisma.$transaction([
-                    prisma.lease.updateMany({ where: { tenantId: ghost.id }, data: { tenantId: userId } }),
-                    prisma.lease.updateMany({ where: { landlordId: ghost.id }, data: { landlordId: userId } }),
-                    prisma.property.updateMany({ where: { ownerUserId: ghost.id }, data: { ownerUserId: userId } }),
-                    prisma.property.updateMany({ where: { managedByUserId: ghost.id }, data: { managedByUserId: userId } }),
-                    // Supprimer le doublon et normaliser le téléphone du compte principal
-                    prisma.user.delete({ where: { id: ghost.id } }),
-                    prisma.user.update({ where: { id: userId }, data: { phone: normalized } })
-                ]);
+                await prisma.$transaction(async (tx) => {
+                    // 1. Libérer le téléphone du ghost pour éviter le conflit d'unicité
+                    await tx.user.update({ where: { id: ghost.id }, data: { phone: `MERGED_${ghost.id.substring(0,8)}` } });
+
+                    // 2. Transfert des Baux et Propriétés
+                    await tx.lease.updateMany({ where: { tenantId: ghost.id }, data: { tenantId: userId } });
+                    await tx.lease.updateMany({ where: { landlordId: ghost.id }, data: { landlordId: userId } });
+                    await tx.lease.updateMany({ where: { agentId: ghost.id }, data: { agentId: userId } });
+                    await tx.property.updateMany({ where: { ownerUserId: ghost.id }, data: { ownerUserId: userId } });
+                    await tx.property.updateMany({ where: { managedByUserId: ghost.id }, data: { managedByUserId: userId } });
+
+                    // 3. Nettoyage des relations à contrainte d'unicité (on garde celles du compte principal)
+                    await tx.locataireProfile.deleteMany({ where: { userId: ghost.id } });
+                    await (tx as any).locataireProfilPublic?.deleteMany({ where: { userId: ghost.id } });
+                    await tx.userCapacite.deleteMany({ where: { userId: ghost.id } });
+
+                    // 4. Transfert des relations secondaires
+                    await tx.notification.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
+                    await tx.reliabilityScore.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
+                    await tx.propertyAccess.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
+                    await tx.candidature.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
+
+                    // 5. Mise à jour du téléphone du compte principal
+                    await tx.user.update({ where: { id: userId }, data: { phone: normalized } });
+
+                    // 6. Suppression définitive du ghost
+                    await tx.user.delete({ where: { id: ghost.id } });
+                });
 
                 // Re-tentative de lecture du bail
                 activeLease = await prisma.lease.findFirst({
