@@ -133,10 +133,10 @@ export default function DashboardLayoutClient({
 
     return (
         <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden">
-            {/* Solid QAPRIL background */}
-            <div className="fixed inset-0 bg-[#F2F5FA] -z-20"></div>
+            {/* Pure Light Grey workspace */}
+            <div className="fixed inset-0 bg-qbg -z-20"></div>
             
-            {/* Vertical Sidebar - Only for Desktop */}
+            {/* Vertical Sidebar - Dark Mode Fixe */}
             {session?.user && (
                 <AppSidebar 
                     role={activeRole} 
@@ -149,63 +149,58 @@ export default function DashboardLayoutClient({
             )}
 
             <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
-                {/* Ultra Premium Floating Header - Simplified for Sidebar */}
-                <header className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                    <motion.div 
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        className="h-24 px-8 rounded-[2.25rem] flex items-center justify-between border border-qnavy/10 shadow-[0_24px_80px_rgba(13,43,110,0.15)] bg-[linear-gradient(145deg,var(--color-qnavy-dark)_0%,var(--color-qgreen)_100%)] relative overflow-hidden"
-                    >
-                        {/* Motif décoratif V4 */}
-                        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white opacity-5 mix-blend-overlay"></div>
+                {/* Ultra Clean Top Navigation Bar */}
+                <header className="sticky top-0 z-50 bg-white border-b border-qgrey-2 shadow-sm">
+                    <div className="h-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex items-center justify-between">
                         
-                        <div className="flex items-center gap-10 relative z-10">
-                            {/* Mobile Logo Only or Sidebar Toggle */}
-                            <Link href="/dashboard" className="flex lg:hidden items-center space-x-5 group">
+                        <div className="flex items-center gap-6">
+                            {/* Mobile Logo */}
+                            <Link href="/dashboard" className="flex lg:hidden items-center group">
                                 <ProtectedLogo 
                                     src="/logo.png" 
                                     alt="QAPRIL Logo" 
-                                    className="h-11 w-auto group-hover:scale-105 transition-transform duration-700 rounded-xl shadow-2xl border border-white/60" 
+                                    className="h-8 w-auto group-hover:scale-105 transition-transform duration-700" 
                                 />
                             </Link>
 
-                            <div className="hidden lg:block">
-                                <h2 className="text-[12px] font-black tracking-[0.2em] text-white uppercase opacity-70">{getDashboardTitle()}</h2>
+                            <div className="hidden lg:flex items-center gap-4">
+                                <h2 className="text-sm font-bold text-qnavy tracking-wide uppercase">{getDashboardTitle()}</h2>
+                                <div className="h-4 w-px bg-qgrey-2"></div>
+                                <span className="text-xs font-semibold text-qtext-light">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 relative z-10">
-                            <div className="hidden lg:flex items-center gap-6 px-6 border-r border-white/20 h-10">
-                                <button className="text-white/60 hover:text-white transition-colors">
+                        <div className="flex items-center gap-4">
+                            <div className="hidden lg:flex items-center gap-4 pr-6 border-r border-qgrey-2 h-8">
+                                <button className="text-qtext-light hover:text-qnavy transition-colors">
                                     <Search size={18} />
                                 </button>
-                                <div className="text-white/80 hover:text-white transition-colors">
+                                <div className="text-qtext-light hover:text-qnavy transition-colors">
                                     <NotificationCenter />
                                 </div>
                             </div>
 
                             {session?.user && (
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-4 pl-2 lg:pl-0">
                                     <div className="hidden sm:flex flex-col items-end">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <div className="bg-qgreen rounded-md px-2 py-0.5 text-[8px] font-black text-white tracking-[0.2em] uppercase">
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <div className="bg-qgreen/10 text-qgreen rounded px-2 py-0.5 text-[9px] font-bold tracking-widest uppercase">
                                                 {getRoleBadge()}
                                             </div>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-qgreen-light" />
                                         </div>
-                                        <span className="text-[16px] font-black tracking-tight text-white uppercase drop-shadow-sm">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</span>
+                                        <span className="text-[13px] font-bold text-qtext-mid">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</span>
                                     </div>
                                     <Link 
                                         href="/dashboard/profile"
-                                        className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 text-white flex items-center justify-center shadow-lg group hover:bg-white/20 transition-all cursor-pointer"
+                                        className="w-10 h-10 rounded-full bg-qbg border border-qgrey-2 text-qnavy flex items-center justify-center hover:bg-qgrey-2 transition-all cursor-pointer"
                                     >
-                                        <User size={20} />
+                                        <User size={18} />
                                     </Link>
 
                                     {/* Quick Logout Button */}
                                     <button 
                                         onClick={handleLogout}
-                                        className="hidden sm:flex items-center justify-center h-11 w-11 bg-white/5 border border-white/10 text-white/50 rounded-[14px] hover:bg-qred hover:text-white hover:border-qred transition-all active:scale-95 group"
+                                        className="hidden sm:flex items-center justify-center w-10 h-10 text-qtext-light hover:bg-qred-pale hover:text-qred rounded-full transition-all group"
                                         title="Déconnexion"
                                     >
                                         <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
@@ -213,7 +208,7 @@ export default function DashboardLayoutClient({
                                 </div>
                             )}
                             
-                            <div className="flex xl:hidden text-white drop-shadow-sm">
+                            <div className="flex xl:hidden text-qnavy">
                                 <MobileMenu 
                                     links={navLinks} 
                                     session={session} 
@@ -222,7 +217,7 @@ export default function DashboardLayoutClient({
                                 />
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </header>
 
                 {/* Main Content with Entry Animations */}

@@ -16,6 +16,7 @@ import ImpactStats from "@/components/ImpactStats";
 import RealEstateObservatory from "@/components/RealEstateObservatory";
 import GeographicRentAnalysis from "@/components/GeographicRentAnalysis";
 import RentRanking from "@/components/RentRanking";
+import InteractiveBackground from "@/components/ui/InteractiveBackground";
 
 export const dynamic = "force-dynamic";
 
@@ -84,16 +85,9 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
         return (
             <div className="relative min-h-screen bg-[#F5F7FA] overflow-hidden flex flex-col font-sans">
                 {ticker}
-                <div className="absolute inset-0 z-0">
-                    <img 
-                        src="/images/abidjan_plateau_bg.png" 
-                        alt="Plateau Abidjan" 
-                        className="w-full h-full object-cover opacity-80 scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/50 to-white/95 backdrop-blur-[2px]"></div>
-                </div>
+                <InteractiveBackground />
 
-                <header className="relative z-20 w-full px-8 py-10">
+                <header className="relative z-20 w-full px-8 py-10 animate-fade-in-up">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                         <Link href="/" className="flex items-center space-x-6 group">
                             <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700 shadow-xl shadow-black/5 bg-white/50 backdrop-blur-md p-1" />
@@ -106,13 +100,13 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
 
                 <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 pb-20 text-center">
                     <div className="max-w-5xl w-full">
-                        <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-black text-[#0B4619] leading-[1.1] mb-12 uppercase drop-shadow-sm flex flex-col items-center">
-                            <span className="tracking-widest">Quittancement <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#E85D04]">Autonome</span></span>
-                            <span className="text-2xl md:text-4xl text-gray-800 opacity-90 mt-4 tracking-[0.2em] font-extrabold">PLATEFORME DE RESSOURCES</span>
-                            <span className="text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#0B4619] via-[#125B25] to-[#0B4619] italic mt-2">IMMOBILIÈRES LOCATIVES.</span>
+                        <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-black tracking-tighter text-qnavy leading-[1.1] mb-10 flex flex-col items-center">
+                            <span className="animate-fade-in-up delay-100">Quittancement <span className="text-transparent bg-clip-text bg-gradient-to-r from-qgold to-qorange">Autonome</span></span>
+                            <span className="text-2xl md:text-3xl text-qtext-mid mt-4 tracking-[0.1em] font-bold animate-fade-in-up delay-200">PLATEFORME DE RESSOURCES</span>
+                            <span className="text-3xl md:text-4xl text-qnavy mt-2 opacity-90 animate-fade-in-up delay-300">IMMOBILIÈRES LOCATIVES</span>
                         </h1>
                         {session?.user ? (
-                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 bg-white/70 backdrop-blur-3xl border border-white/40 shadow-2xl shadow-black/5 rounded-[2.5rem] transition-all hover:-translate-y-2 text-center">
+                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 animate-fade-in-up delay-400">
                                 <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-widest leading-relaxed">
                                     {session.user.fullName || session.user.email}
                                 </h2>
@@ -127,23 +121,25 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                                 </Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-8">
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group px-10 py-10 bg-white/80 backdrop-blur-2xl border border-white border-b-4 border-b-[#0B4619] rounded-[2.5rem] shadow-xl shadow-black/5 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
-                                    <button type="submit" className="w-full outline-none">
-                                        <span className="font-black uppercase tracking-[0.3em] text-[#0B4619] text-xs block mb-2">Accès Gouvernance</span>
-                                        <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest block">Contrôle DGI & Audit</span>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-12 perspective-[1000px]">
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-sm text-center cursor-pointer relative overflow-hidden animate-fade-in-up delay-300">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
+                                        <span className="font-black uppercase tracking-widest text-[#E2E8F0] text-xs block mb-2 drop-shadow-sm group-hover:text-qgold transition-colors">Accès Gouvernance</span>
+                                        <span className="text-[10px] font-semibold text-white/50 uppercase tracking-wider block group-hover:text-white transition-colors">Contrôle DGI & Audit</span>
                                     </button>
                                 </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group px-10 py-10 bg-white/80 backdrop-blur-2xl border border-white border-b-4 border-b-[#F77F00] rounded-[2.5rem] shadow-xl shadow-black/5 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
-                                    <button type="submit" className="w-full outline-none">
-                                        <span className="font-black uppercase tracking-[0.3em] text-gray-900 text-xs block mb-2">Espace Bailleur</span>
-                                        <span className="text-[9px] font-black text-[#F77F00] uppercase tracking-widest block">Gestion de Patrimoine</span>
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-sm text-center cursor-pointer relative overflow-hidden transform translate-z-10 bg-gradient-to-r from-[rgba(10,15,29,0.9)] to-[rgba(20,25,45,0.7)] animate-fade-in-up delay-400">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-qgold/10 rounded-full blur-2xl pointer-events-none"></div>
+                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
+                                        <span className="font-extrabold uppercase tracking-widest text-qgold text-xs block mb-2 group-hover:text-white transition-colors group-hover:drop-shadow-[0_0_10px_rgba(203,163,88,0.5)]">Espace Bailleur</span>
+                                        <span className="text-[10px] font-semibold text-qgold/60 uppercase tracking-wider block transition-colors group-hover:text-qgold">Gestion de Patrimoine</span>
                                     </button>
                                 </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group px-10 py-10 bg-gradient-to-br from-[#0B4619] to-[#063010] border border-[#0B4619]/20 rounded-[2.5rem] shadow-xl shadow-[#0B4619]/30 transition-all hover:-translate-y-2 hover:shadow-2xl text-center cursor-pointer">
-                                    <button type="submit" className="w-full outline-none">
-                                        <span className="font-black uppercase tracking-[0.3em] text-white text-xs block mb-2">Portail Locataire</span>
-                                        <span className="text-[9px] font-black text-white/70 uppercase tracking-widest block">Consultation & Reçus</span>
+                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-md text-center cursor-pointer relative overflow-hidden animate-fade-in-up delay-500">
+                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
+                                        <span className="font-extrabold uppercase tracking-widest text-white text-xs block mb-2 drop-shadow-sm group-hover:text-[#038258] transition-colors">Portail Locataire</span>
+                                        <span className="text-[10px] font-semibold text-white/70 uppercase tracking-wider block transition-colors group-hover:text-white">Consultation & Reçus</span>
                                     </button>
                                 </form>
                             </div>
@@ -209,16 +205,16 @@ export default async function Home(props: { searchParams: Promise<{ [key: string
                     <HeroSlider />
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                         <div className="max-w-2xl text-center md:text-left">
-                            <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-black text-gray-900 mb-8 leading-[1.1] tracking-tight flex flex-col">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0B4619] to-[#125B25] drop-shadow-sm mb-1">Quittancement Autonome</span>
-                                <span className="text-gray-800 tracking-wide mb-1">Plateforme de Ressources</span>
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F77F00] to-[#C55A11] italic">Immobilières Locatives.</span>
+                            <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-bold text-qnavy mb-8 leading-[1.1] tracking-tighter flex flex-col">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-qnavy to-qnavy-light drop-shadow-sm mb-1 uppercase tracking-tight">Quittancement Autonome</span>
+                                <span className="text-qtext-mid font-medium tracking-wide mb-1">Plateforme de Ressources</span>
+                                <span className="text-qgold italic font-bold">Immobilières Locatives.</span>
                             </h1>
-                            <p className="text-xl text-gray-600 mb-12">Normalisation et sécurisation du marché immobilier ivoirien.</p>
+                            <p className="text-lg md:text-xl text-qtext-light mb-12 font-medium">Normalisation et sécurité du marché immobilier Ivoirien.</p>
                             {session?.user ? (
-                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-10 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block shadow-xl shadow-[#C55A11]/20">Retour au Tableau de Bord</Link>
+                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-10 py-4 bg-qnavy text-white rounded-xl font-black uppercase tracking-widest text-sm inline-block shadow-lg hover:shadow-xl hover:bg-qnavy-light transition-all">Retour au Tableau de Bord</Link>
                             ) : (
-                                <Link href="/mon-espace-locataire/login" className="px-10 py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm inline-block">Démarrer l'Expérience</Link>
+                                <Link href="/mon-espace-locataire/login" className="px-10 py-4 bg-qnavy text-white rounded-xl font-bold uppercase tracking-wider text-sm inline-block shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all">Démarrer l'Expérience</Link>
                             )}
                         </div>
                     </div>

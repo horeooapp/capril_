@@ -148,16 +148,18 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
     const navLinks = getNavLinks()
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-[60] p-6 hidden lg:block">
-            <div className="h-full bg-white border border-qgrey-2 rounded-[2.25rem] shadow-[0_24px_80px_rgba(13,43,110,0.05)] flex flex-col overflow-hidden relative">
+        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-[60] hidden lg:block">
+            <div className="h-full bg-qnavy border-r border-qnavy-light shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative">
                 {/* Brand Logo Section */}
-                <div className="p-8 shrink-0 flex items-center justify-between">
+                <div className="p-8 shrink-0 flex items-center justify-between border-b border-white/5">
                     <Link href={role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard"} className="flex flex-col gap-2 group">
-                        <ProtectedLogo 
-                            src="/logo.png" 
-                            alt="QAPRIL" 
-                            className="h-9 w-auto group-hover:scale-105 transition-transform duration-500 rounded-lg" 
-                        />
+                        <div className="bg-white/90 p-2 rounded-xl inline-block group-hover:scale-105 transition-transform">
+                            <ProtectedLogo 
+                                src="/logo.png" 
+                                alt="QAPRIL" 
+                                className="h-8 w-auto mix-blend-multiply" 
+                            />
+                        </div>
                         <div className="flex items-center gap-2 mt-1">
                             <div className="bg-qgreen rounded-md px-2 py-0.5 text-[9px] font-black text-white tracking-[0.15em] uppercase text-nowrap">
                                 {role === 'TENANT' ? 'Espace Locataire' 
@@ -178,7 +180,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                     {/* Public Home Link */}
                     <Link 
                         href="/"
-                        className="relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all text-qtext-light hover:text-qorange hover:bg-qorange-pale border border-dashed border-qgrey-2 hover:border-qorange/30 mb-6"
+                        className="relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all text-white/50 hover:text-qgold hover:bg-white/5 border border-dashed border-white/10 hover:border-qgold/30 mt-6 mb-6"
                     >
                         <span className="relative z-10 transition-transform group-hover:scale-110">
                             <Home size={18} />
@@ -197,13 +199,13 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                                 className={`relative group flex items-center gap-4 px-6 py-3.5 rounded-xl transition-all ${
                                     isActive 
                                     ? "text-white" 
-                                    : "text-qtext-light hover:text-qnavy hover:bg-qnavy-pale"
+                                    : "text-white/60 hover:text-white hover:bg-white/5"
                                 }`}
                             >
                                 {isActive && (
                                     <motion.div 
                                         layoutId="sidebar-active-pill"
-                                        className="absolute inset-0 bg-qnavy rounded-xl shadow-[0_8px_16px_rgba(13,43,110,0.2)]"
+                                        className="absolute inset-0 bg-white/10 border border-white/10 rounded-xl"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
@@ -228,11 +230,11 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                 </nav>
 
                 {/* Footer Section */}
-                <div className="p-6 mt-auto border-t border-qgrey-1 bg-qgrey-1/30">
+                <div className="p-6 mt-auto border-t border-white/5 bg-black/10">
                     {eligibleRoles && eligibleRoles.length > 1 && (
                         <Link 
                             href="/auth/choose-role"
-                            className="w-full h-10 mb-2 bg-white text-qnavy border border-qgrey-2 rounded-xl flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-widest hover:bg-qnavy-pale transition-all active:scale-95 group shadow-sm"
+                            className="w-full h-10 mb-2 bg-white/5 text-white border border-white/10 rounded-xl flex items-center justify-center gap-3 font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95 group shadow-sm"
                         >
                             <User size={14} className="group-hover:scale-110 transition-transform" />
                             Changer de Profil
@@ -241,7 +243,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                     {(role === 'LANDLORD' || role === 'AGENCY' || role === 'CHAMPION') && (
                         <Link 
                             href="/onboarding"
-                            className="w-full h-10 mb-2 bg-white text-[#C55A11] border border-[#C55A11]/20 rounded-xl flex items-center justify-center gap-3 font-black text-[10px] uppercase tracking-widest hover:bg-orange-50 transition-all active:scale-95 group shadow-sm"
+                            className="w-full h-10 mb-2 bg-white/5 text-qgold border border-qgold/20 rounded-xl flex items-center justify-center gap-3 font-bold text-[10px] uppercase tracking-widest hover:bg-qgold/10 transition-all active:scale-95 group shadow-sm"
                         >
                             <Building2 size={14} className="group-hover:scale-110 transition-transform" />
                             Ajouter une Casquette
@@ -249,16 +251,16 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                     )}
                     <button 
                         onClick={onLogout}
-                        className="w-full h-12 bg-qred-pale text-qred rounded-xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-qred hover:text-white transition-all active:scale-95 group shadow-sm"
+                        className="w-full h-12 bg-white/5 text-qred-pale border border-qred/20 rounded-xl flex items-center justify-center gap-3 font-bold text-[11px] uppercase tracking-widest hover:bg-qred hover:text-white hover:border-transparent transition-all active:scale-95 group shadow-sm"
                     >
                         <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
                         Déconnexion
                     </button>
                     
                     <div className="mt-5 text-center">
-                        <p className="text-[9px] font-black text-qtext-light uppercase tracking-widest leading-relaxed">
+                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest leading-relaxed">
                             QAPRIL Portal V4 <br/>
-                            <span className="opacity-70">{userName || 'Compte Certifié'}</span>
+                            <span className="opacity-70 text-white/80">{userName || 'Compte Certifié'}</span>
                         </p>
                     </div>
                 </div>

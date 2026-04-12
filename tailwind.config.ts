@@ -13,21 +13,21 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         qapril: {
-          navy:   "#1B3A6B",
-          amber:  "#F5A800",
-          green:  "#007A4D",
-          red:    "#CC2020",
-          orange: "#C05000",
-          blue:   "#1B5AAA",
-          bg:     "#EEF3FB",
-          border: "#D0DFF5",
-          light:  "#F0F5FF",
-          muted:  "#4A6A8A",
+          navy:   "#0A0F1D", // Midnight Onyx
+          amber:  "#CBA358", // Imperial Gold
+          green:  "#026343", // Trust Emerald
+          red:    "#B31A1A", // Corporate Red
+          orange: "#D48B30", // Muted Bronze
+          blue:   "#1E3A8A", // Deep Web Blue
+          bg:     "#F6F8FA", // Clean Light Grey
+          border: "#E2E8F0", // Slate Border
+          light:  "#FFFFFF", // Pure surface
+          muted:  "#64748B", // Slate Muted
         }
       },
       fontFamily: {
-        sans: ["DM Sans", "system-ui", "sans-serif"],
-        mono: ["DM Mono", "monospace"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        mono: ["Geist Mono", "monospace"],
       },
     },
   },

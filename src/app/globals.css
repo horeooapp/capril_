@@ -1,39 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
 
 @theme {
-  --color-qnavy: #0D2B6E;
-  --color-qnavy-dark: #071A45;
-  --color-qnavy-light: #1A3D8C;
-  --color-qnavy-pale: #EEF2FA;
+  --color-qnavy: #0A0F1D;
+  --color-qnavy-dark: #05080F;
+  --color-qnavy-light: #162238;
+  --color-qnavy-pale: #F1F4F9;
   
-  --color-qgreen: #1A7A3C;
-  --color-qgreen-light: #22A050;
-  --color-qgreen-pale: #E8F5EE;
+  --color-qgreen: #026343;
+  --color-qgreen-light: #038258;
+  --color-qgreen-pale: #E6F0EC;
   
-  --color-qorange: #C05B00;
-  --color-qorange-pale: #FFF3E0;
+  --color-qorange: #CBA358;
+  --color-qorange-pale: #F8F5EE;
   
-  --color-qred: #A00000;
-  --color-qred-pale: #FEECEC;
+  --color-qred: #B31A1A;
+  --color-qred-pale: #FCE8E8;
   
-  --color-qgold: #C9A84C;
-  --color-qgold-pale: #FDF6E3;
+  --color-qgold: #D4AF37;
+  --color-qgold-pale: #FBF8F1;
   
-  --color-qteal: #0E7490;
-  --color-qteal-pale: #E0F4F9;
+  --color-qteal: #0F5A66;
+  --color-qteal-pale: #E5F1F3;
   
-  --color-qpurple: #5B21B6;
-  --color-qpurple-pale: #EDE9FE;
+  --color-qpurple: #4C1D95;
+  --color-qpurple-pale: #F5F3FF;
   
-  --color-qgrey-1: #EEF2F7;
-  --color-qgrey-2: #D6DCE8;
-  --color-qgrey-3: #8FA0BC;
-  --color-qgrey-4: #4A5B7A;
+  --color-qgrey-1: #F8FAFC;
+  --color-qgrey-2: #E2E8F0;
+  --color-qgrey-3: #94A3B8;
+  --color-qgrey-4: #475569;
   
-  --color-qtext: #0A1930;
-  --color-qtext-mid: #2D3F5E;
-  --color-qtext-light: #6A7D9E;
+  --color-qtext: #0F172A;
+  --color-qtext-mid: #334155;
+  --color-qtext-light: #64748B;
 
   --color-primary: var(--color-qnavy);
   --color-secondary: var(--color-qgreen);
@@ -42,17 +42,17 @@
 }
 
 :root {
-  --background: #F2F5FA;
-  --foreground: #0A1930;
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --glass-shadow: 0 24px 80px rgba(13, 43, 110, 0.05); /* Navy 5% */
+  --background: #F6F8FA;
+  --foreground: #0F172A;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); 
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -79,27 +79,75 @@ input:not([type="checkbox"]):not([type="radio"]) {
   min-height: 48px;
 }
 
-/* Premium Glassmorphism */
+/* Premium Glassmorphism & 3D */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 24px 60px -10px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  transform-style: preserve-3d;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+  backdrop-filter: blur(16px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
+  border-left: 1px solid rgba(255, 255, 255, 0.6);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.08),
+    inset 0 2px 20px rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+  transform: perspective(1000px) translateZ(0);
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
 }
 
 .glass-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
-  border-color: rgba(255, 130, 0, 0.2);
+  transform: perspective(1000px) translateZ(20px) translateY(-5px);
+  box-shadow: 
+    0 30px 60px -15px rgba(0, 0, 0, 0.12),
+    inset 0 2px 30px rgba(255, 255, 255, 0.8);
+  border-top-color: rgba(255, 255, 255, 1);
+}
+
+.glass-card-3d {
+  background: linear-gradient(145deg, rgba(10, 15, 29, 0.9), rgba(10, 15, 29, 0.6));
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 40px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  transform: perspective(1000px) rotateX(2deg);
+  transition: all 0.5s ease;
+}
+.glass-card-3d:hover {
+  transform: perspective(1000px) rotateX(0deg) translateZ(30px);
+  box-shadow: 
+    0 30px 50px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(203, 163, 88, 0.3);
+}
+.glass-card-3d::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: skewX(-25deg);
+  transition: 0.7s;
+}
+.glass-card-3d:hover::after {
+  animation: shimmer-effect 1.5s infinite;
+}
+
+@keyframes shimmer-effect {
+  0% { left: -100%; }
+  100% { left: 200%; }
 }
 
 .bg-ivory-pattern {
@@ -107,13 +155,12 @@ input:not([type="checkbox"]):not([type="radio"]) {
   inset: 0;
   z-index: -1;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 130, 0, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(0, 158, 96, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(203, 163, 88, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(2, 99, 67, 0.03) 0px, transparent 50%),
     url('/assets/dashboard-bg.png');
   background-size: cover;
   background-position: center;
-  filter: contrast(1.05) brightness(1.02);
-  opacity: 0.15;
+  opacity: 0.2;
   pointer-events: none;
 }
 
@@ -145,37 +192,36 @@ input:not([type="checkbox"]):not([type="radio"]) {
 
 /* Glow Effects */
 .glow-primary {
-  box-shadow: 0 0 20px -5px rgba(255, 130, 0, 0.3);
+  box-shadow: 0 0 40px -10px rgba(203, 163, 88, 0.15); /* Soft Gold Glow */
 }
 
 .glow-secondary {
-  box-shadow: 0 0 20px -5px rgba(0, 158, 96, 0.3);
+  box-shadow: 0 0 40px -10px rgba(2, 99, 67, 0.15); /* Soft Emerald Glow */
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 30px -5px rgba(255, 130, 0, 0.4);
+  box-shadow: 0 0 50px -10px rgba(203, 163, 88, 0.2);
 }
 
 /* Enhanced Glass-Card */
 .glass-card-premium {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.03);
   box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 2px 4px -1px rgba(0, 0, 0, 0.03),
-    inset 0 0 20px 0 rgba(255, 255, 255, 0.2);
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    0 10px 40px -10px rgba(0, 0, 0, 0.04),
+    inset 0 0 0 1px rgba(255, 255, 255, 1);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .glass-card-premium:hover {
-  transform: translateY(-8px) scale(1.01);
-  background: rgba(255, 255, 255, 0.9);
-  border-color: var(--color-ivoire-orange);
+  transform: translateY(-4px);
+  background: #FFFFFF;
+  border-color: rgba(203, 163, 88, 0.15); /* Imperial Gold */
   box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.1),
-    0 0 20px -5px rgba(255, 130, 0, 0.2);
+    0 20px 40px -10px rgba(0, 0, 0, 0.06),
+    0 0 20px -5px rgba(203, 163, 88, 0.1);
 }
 
 /* Custom Animations */
@@ -198,8 +244,33 @@ input:not([type="checkbox"]):not([type="radio"]) {
   background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
 }
 
+/* Enhanced Reappearance Utilities */
+.animate-fade-in-up {
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .institutional-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 2px solid rgba(255, 130, 0, 0.1);
+  box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
