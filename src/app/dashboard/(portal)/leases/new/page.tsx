@@ -184,8 +184,8 @@ function LeaseRegistrationForm() {
                                             className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#FF8200] outline-none"
                                         >
                                             <option value="">Sélectionnez un bien</option>
-                                            {properties.filter(p => !p.isOccupied || p.id === propertyId).map(p => (
-                                                <option key={p.id} value={p.id}>
+                                            {properties.map(p => (
+                                                <option key={p.id} value={p.id} disabled={p.isOccupied && p.id !== propertyId}>
                                                     {p.propertyCode} - {p.commune} {p.isOccupied ? "(DÉJÀ LOUÉ)" : ""}
                                                 </option>
                                             ))}
@@ -244,6 +244,14 @@ function LeaseRegistrationForm() {
                                             </ul>
                                         )}
                                     </div>
+                                    {properties.find(p => p.id === propertyId)?.isOccupied && (
+                                        <div className="md:col-span-2 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in duration-300">
+                                            <div className="text-2xl">🚫</div>
+                                            <p className="text-sm font-black text-red-600 uppercase tracking-tighter">
+                                                Ce bien est déjà sous contrat actif. Impossible de créer un doublon.
+                                            </p>
+                                        </div>
+                                    )}
                                     {typeBail === TypeBail.DECLARATIF_BDQ && !propertyId && (
                                         <div className="md:col-span-2 space-y-2">
                                             <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Description du Logement</label>
@@ -324,7 +332,14 @@ function LeaseRegistrationForm() {
                         )}
 
                         {step < 3 ? (
-                            <button type="button" onClick={handleNext} className="px-12 py-4 bg-gray-900 text-white font-black rounded-2xl shadow-xl transform transition-all hover:scale-105 active:scale-95">Suivant</button>
+                            <button 
+                                type="button" 
+                                onClick={handleNext} 
+                                disabled={step === 1 && properties.find(p => p.id === propertyId)?.isOccupied}
+                                className="px-12 py-4 bg-gray-900 text-white font-black rounded-2xl shadow-xl transform transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:grayscale"
+                            >
+                                Suivant
+                            </button>
                         ) : (
                             <button 
                                 type="submit" 
