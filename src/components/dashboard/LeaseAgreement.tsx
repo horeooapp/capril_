@@ -67,13 +67,13 @@ export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                             <p className="text-[10px] uppercase font-bold text-gray-400 font-sans mb-1">Le Bailleur (Propriétaire)</p>
-                            <p className="font-bold underline">{lease.property.owner.name}</p>
-                            <p className="text-sm italic">{lease.property.owner.email}</p>
+                            <p className="font-bold underline">{(lease as any).property?.owner?.name || (lease as any).landlord?.fullName || "[Nom non renseigné]"}</p>
+                            <p className="text-sm italic">{(lease as any).property?.owner?.email || (lease as any).landlord?.email || ""}</p>
                         </div>
                         <div>
                             <p className="text-[10px] uppercase font-bold text-gray-400 font-sans mb-1">Le Preneur (Locataire)</p>
-                            <p className="font-bold underline">{lease.tenant.name}</p>
-                            <p className="text-sm italic">{lease.tenant.email}</p>
+                            <p className="font-bold underline">{lease.tenant.name || (lease.tenant as any).fullName || "[Nom non renseigné]"}</p>
+                            <p className="text-sm italic">{lease.tenant.email || ""}</p>
                         </div>
                     </div>
                 </section>
@@ -136,7 +136,7 @@ export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
                         <p className="text-[10px] font-black uppercase mb-4">Signature du Bailleur</p>
                         {lease.ownerSignature ? (
                             <div className="h-24 flex flex-col items-center justify-center border-2 border-dashed border-primary/30 rounded-xl bg-primary/5">
-                                <span className="text-primary font-black italic text-xl uppercase tracking-tighter">Signé par {lease.property.owner.name}</span>
+                                <span className="text-primary font-black italic text-xl uppercase tracking-tighter">Signé par {(lease as any).property?.owner?.name || (lease as any).landlord?.fullName || "Bailleur"}</span>
                                 <span className="text-[8px] text-gray-400 mt-1 uppercase font-bold">{lease.ownerSignature}</span>
                             </div>
                         ) : (
@@ -149,7 +149,7 @@ export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
                         <p className="text-[10px] font-black uppercase mb-4">Signature du Preneur</p>
                         {lease.tenantSignature ? (
                             <div className="h-24 flex flex-col items-center justify-center border-2 border-dashed border-primary/30 rounded-xl bg-primary/5">
-                                <span className="text-primary font-black italic text-xl uppercase tracking-tighter">Signé par {lease.tenant.name}</span>
+                                <span className="text-primary font-black italic text-xl uppercase tracking-tighter">Signé par {lease.tenant.name || (lease.tenant as any).fullName || "Preneur"}</span>
                                 <span className="text-[8px] text-gray-400 mt-1 uppercase font-bold">{lease.tenantSignature}</span>
                             </div>
                         ) : (

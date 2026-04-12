@@ -17,8 +17,8 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
   const depositAmount = lease.deposit || 0;
   const avanceAmount = lease.avanceLoyer || 0;
   
-  const landlordName = (landlord.firstName + " " + landlord.lastName).trim();
-  const tenantName = (tenant.firstName + " " + tenant.lastName).trim();
+  const landlordName = landlord.fullName || (landlord.firstName ? (landlord.firstName + " " + (landlord.lastName || "")).trim() : "[Nom non renseigné]");
+  const tenantName = tenant.fullName || (tenant.firstName ? (tenant.firstName + " " + (tenant.lastName || "")).trim() : "[Nom non renseigné]");
   
   const startDate = lease.startDate ? new Date(lease.startDate) : new Date();
   const startStr = format(startDate, 'dd MMMM yyyy', { locale: fr });

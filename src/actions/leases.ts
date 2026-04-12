@@ -250,7 +250,12 @@ export async function getTenantLeases() {
 
     try {
         const leases = await prisma.lease.findMany({
-            where: { tenantId: session.user.id },
+            where: {
+                OR: [
+                    { tenantId: session.user.id },
+                    { colocataires: { some: { userId: session.user.id } } }
+                ]
+            },
             include: {
                 property: true,
                 landlord: { select: { firstName: true, lastName: true, walletConfig: { select: { landlordCode: true } } } },

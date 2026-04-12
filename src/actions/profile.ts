@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { writeAuditLog } from "@/lib/audit"
+import { normalizePhone } from "@/lib/phone"
 
 /**
  * Updates the user's personal profile information.
@@ -72,6 +73,32 @@ export async function updateUserProfile(data: {
         
         const fullName = `${finalFirstName?.trim() || ''} ${finalLastName?.trim() || ''}`.trim() || undefined;
 
+        const normalizedPhone = normalizePhone(data.phone);
+
+        // ────────────────────────────────────────────────────────
+        // LOGIQUE DE FUSION DE COMPTES (Rule: C-MERGE-01)
+        // Si un compte "fantôme" (sans email) possède déjà ce téléphone, 
+        // on rapatrie ses baux/biens vers le compte actif avant de le supprimer.
+        // ────────────────────────────────────────────────────────
+        const ghostUser = await prisma.user.findFirst({
+            where: { 
+                phone: normalizedPhone,
+                id: { not: session.user.id }
+            }
+        });
+
+        if (ghostUser && !ghostUser.email) {
+            await prisma.$transaction([
+                prisma.lease.updateMany({ where: { tenantId: ghostUser.id }, data: { tenantId: session.user.id } }),
+                prisma.lease.updateMany({ where: { landlordId: ghostUser.id }, data: { landlordId: session.user.id } }),
+                prisma.lease.updateMany({ where: { agentId: ghostUser.id }, data: { agentId: session.user.id } }),
+                prisma.property.updateMany({ where: { ownerUserId: ghostUser.id }, data: { ownerUserId: session.user.id } }),
+                prisma.property.updateMany({ where: { managedByUserId: ghostUser.id }, data: { managedByUserId: session.user.id } }),
+                prisma.user.delete({ where: { id: ghostUser.id } })
+            ]);
+            console.log(`[C-MERGE-01] Merged ghost user ${ghostUser.id} into ${session.user.id}`);
+        }
+
         await prisma.$transaction(async (tx) => {
             // Update User
             await tx.user.update({
@@ -84,7 +111,7 @@ export async function updateUserProfile(data: {
                     neighborhood: data.neighborhood, // Allowed
                     profession: data.profession,     // Allowed
                     salary: data.salary,             // Allowed
-                    phone: data.phone,               // Allowed
+                    phone: normalizedPhone,          // Normalized
                     ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Allowed
                     kycLevel: newKycLevel
                 }

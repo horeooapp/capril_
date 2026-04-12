@@ -7,25 +7,61 @@ const SEUIL_WALLET = Number(process.env.QAPRIL_WALLET_SEUIL_DEFAUT ?? 1000);
 
 // ── Dashboard bailleur complet ────────────────────────────
 export async function getDashboardBailleur(landlordId: string) {
-  const [user, leases, recentReceipts] = await Promise.all([
+  // 1. Get User Context (to handle Agency Collaborators)
+  const [user, configUser] = await Promise.all([
     prisma.user.findUnique({
       where:  { id: landlordId },
       include: { walletConfig: true }
     }),
-    prisma.lease.findMany({
-      where:   { landlordId, status: { not: "ARCHIVED" } },
-      include: {
-        property: { select: { commune: true, address: true, propertyCode: true } },
-        tenant:   { select: { firstName: true, lastName: true, phone: true } },
-        receipts: { orderBy: { periodMonth: "desc" }, take: 1 }
-      }
-    }),
-    prisma.receipt.findMany({
-      where:   { lease: { landlordId }, createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
-      orderBy: { createdAt: "desc" },
-      take:    20
+    prisma.user.findUnique({
+      where: { id: landlordId },
+      select: { agencyConfig: true }
     })
   ]);
+
+  const config = (configUser?.agencyConfig as any);
+  const managerId = config?.managerId;
+
+  // 2. Hierarchical Query
+  // - Leases where user is landlord or agent
+  // - Leases on properties managed by the user
+  // - (If collab) Leases managed by their agency manager
+  // - (If manager) Leases managed by their collaborators
+  const leases = await prisma.lease.findMany({
+    where: {
+      OR: [
+        { landlordId },
+        { agentId: landlordId },
+        { property: { managedByUserId: landlordId } },
+        ...(managerId ? [
+            { agentId: managerId },
+            { property: { managedByUserId: managerId } }
+        ] : []),
+        { agent: { agencyConfig: { path: ['managerId'], equals: landlordId } } }
+      ],
+      status: { not: "ARCHIVED" }
+    },
+    include: {
+      property: { select: { commune: true, address: true, propertyCode: true, unitLabel: true } },
+      tenant:   { select: { firstName: true, lastName: true, phone: true } },
+      receipts: { orderBy: { periodMonth: "desc" }, take: 1 }
+    }
+  });
+
+  const recentReceipts = await prisma.receipt.findMany({
+    where: { 
+      lease: { 
+        OR: [
+          { landlordId },
+          { agentId: landlordId },
+          managerId ? { agentId: managerId } : {}
+        ].filter(c => Object.keys(c).length > 0)
+      }, 
+      createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } 
+    },
+    orderBy: { createdAt: "desc" },
+    take:    20
+  });
 
   const actifs  = leases.filter(l => ["ACTIVE","ACTIVE_DECLARATIF"].includes(l.status));
   const vacants = leases.filter(l => l.property && ["ACTIVE","LOYER_IMPAYE"].includes(l.status)).length;

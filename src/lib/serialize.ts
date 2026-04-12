@@ -44,7 +44,11 @@ export const serializeLease = (lease: any) => {
                        (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
 
     const landlordData = lease.landlord ? {
-        fullName: shouldMask ? (lease.landlord.walletConfig?.landlordCode || "BAI-CODE-PENDING") : ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || "N/A"),
+        fullName: shouldMask 
+            ? (lease.landlord.walletConfig?.landlordCode || "BAI-CODE-PENDING") 
+            : ((lease.landlord.firstName || lease.landlord.lastName) 
+                ? ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "")).trim()
+                : (lease.landlord.phone || "Propriétaire [Nom non renseigné]")),
         phone: shouldMask ? null : (lease.landlord.phone || null),
         email: shouldMask ? null : (lease.landlord.email || null),
         landlordCode: lease.landlord.walletConfig?.landlordCode || null
@@ -52,7 +56,9 @@ export const serializeLease = (lease: any) => {
 
     const tenantData = lease.tenant ? {
         id: lease.tenant.id || null,
-        fullName: (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || (lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || null,
+        fullName: (lease.tenant.firstName || lease.tenant.lastName)
+            ? ((lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "")).trim()
+            : (lease.tenant.phone ? `Locataire (${lease.tenant.phone})` : "Locataire [Nom non renseigné]"),
         phone: lease.tenant.phone || null,
         // ICL-CONSENT-01: Score transparency requires explicit consent in the lease
         reliabilityScore: lease.scoreConsent ? (lease.tenant.reliabilityScores?.[0]?.score || 750) : null
