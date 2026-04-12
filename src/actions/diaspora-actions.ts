@@ -39,7 +39,7 @@ export async function generateTaxCertificate() {
     if (!session?.user?.id) return { error: "Non autorisÃ©" }
 
     try {
-        let lease = await prisma.lease.findFirst({ where: { landlordId: session.user.id } })
+        const lease = await prisma.lease.findFirst({ where: { landlordId: session.user.id } })
         if (!lease) {
             return { error: "Aucun bail rattaché pour générer un bilan fiscal." }
         }
