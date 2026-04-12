@@ -136,7 +136,6 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                     </tbody>
                 </table>
             </div>
-        </div>
 
             {selectedContact && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1F4E79]/80 backdrop-blur-md animate-in fade-in duration-300">
