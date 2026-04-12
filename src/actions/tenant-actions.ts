@@ -93,7 +93,7 @@ export async function getTenantDashboard() {
                     await tx.notification.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
                     await tx.reliabilityScore.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
                     await tx.propertyAccess.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
-                    await tx.candidature.updateMany({ where: { userId: ghost.id }, data: { userId: userId } });
+                    await tx.candidature.updateMany({ where: { candidatId: ghost.id }, data: { candidatId: userId } });
 
                     // 5. Mise à jour du téléphone du compte principal
                     await tx.user.update({ where: { id: userId }, data: { phone: normalized } });
