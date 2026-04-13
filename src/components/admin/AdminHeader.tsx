@@ -1,31 +1,6 @@
-"use client"
-
+import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion } from "framer-motion"
-import { 
-    LayoutDashboard, 
-    Telescope, 
-    Users, 
-    ShieldCheck, 
-    Settings, 
-    FileText, 
-    LogOut, 
-    User,
-    Activity,
-    Settings2,
-    Briefcase,
-    Database,
-    ShieldAlert,
-    ArrowRightLeft,
-    BarChart3,
-    Newspaper,
-    BookOpen,
-    Home
-} from "lucide-react"
-import ProtectedLogo from "@/components/ProtectedLogo"
-import NotificationCenter from "@/components/dashboard/NotificationCenter"
-import MobileMenu from "@/components/MobileMenu"
 
 interface AdminHeaderProps {
     session: any
@@ -35,112 +10,37 @@ interface AdminHeaderProps {
 export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
     const pathname = usePathname()
 
-    const navLinks = [
-        { href: "/admin", label: "Vue Globale", icon: <LayoutDashboard size={18} /> },
-        { href: "/admin/agency", label: "Agence", icon: <Briefcase size={18} /> },
-        { href: "/admin/migration", label: "Migration", icon: <Database size={18} /> },
-        { href: "/admin/reversals", label: "Paiements", icon: <ArrowRightLeft size={18} /> },
-        { href: "/admin/reports", label: "Rapports", icon: <BarChart3 size={18} /> },
-        { href: "/admin/news", label: "Actualités", icon: <Newspaper size={18} /> },
-        { href: "/admin/compliance", label: "Conformité", icon: <ShieldAlert size={18} /> },
-        { href: "/admin/settings/features", label: "Modules", icon: <Settings2 size={18} /> },
-        { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
-        { href: "/admin/audit", label: "Audit", icon: <ShieldCheck size={18} /> },
-        { href: "/admin/manual", label: "Manuel", icon: <BookOpen size={18} /> },
-    ]
-
     return (
-        <header className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-            <motion.div 
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="glass-panel h-20 px-8 rounded-[2rem] flex items-center justify-between border border-white/40 shadow-2xl shadow-gray-950/20"
-            >
-                <div className="flex items-center gap-8">
-                    {/* Logo - Hidden on large screens where sidebar is visible */}
-                    <Link href="/admin" className="flex lg:hidden items-center group">
-                        <ProtectedLogo 
-                            src="/logo.png" 
-                            alt="QAPRIL Logo" 
-                            className="h-12 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-lg" 
-                        />
-                    </Link>
-
-                    {/* Back to Home Link for Mobile and Small Screens */}
-                    <div className="flex lg:hidden items-center gap-2">
-                        <Link 
-                            href="/"
-                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/10 transition-colors border border-gray-100"
-                            title="Retour à l'Accueil"
-                        >
-                            <Home size={18} />
-                        </Link>
-                    </div>
-
-                    {/* Breadcrumb or Title for Desktop */}
-                    <div className="hidden lg:flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#C55A11]"></div>
-                        <span className="text-[12px] font-black tracking-[0.3em] text-[#1F4E79] uppercase">
-                            {navLinks.find(l => l.href === pathname)?.label || "Administration"}
-                        </span>
-                    </div>
+        <div className="topbar">
+            <div className="topbar-left">
+                <div className="breadcrumb">
+                    qapril / <span>{pathname === '/admin' ? 'Tableau de bord' : pathname.replace('/admin/', '').toUpperCase()}</span>
                 </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="hidden lg:flex items-center gap-6 px-6 border-x border-gray-100/50 h-10">
-                        <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
-                             <Activity size={14} className="animate-pulse" />
-                             <span className="text-[9px] font-black uppercase tracking-widest">Live Node: ABJ-01</span>
-                        </div>
-                        <Link 
-                            href="/"
-                            className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/10 transition-colors border border-gray-100"
-                            title="Retour à l'Accueil"
-                        >
-                            <Home size={18} />
-                        </Link>
-                        <NotificationCenter />
-                    </div>
-
-                    {session?.user && (
-                        <div className="hidden lg:flex items-center gap-3">
-                            <div className="flex flex-col items-end">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[14px] font-black tracking-widest text-[#1F4E79] uppercase">
-                                        {session.user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
-                                    </span>
-                                    {session.user.activePlanTier && (
-                                        <span className="text-[9px] font-black bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200 uppercase tracking-tighter">
-                                            {session.user.activePlanTier}
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="text-[12px] font-bold text-[#C55A11] uppercase tracking-tighter">{session.user.email}</span>
-                            </div>
-                            <div className="w-10 h-10 rounded-2xl bg-gray-900 text-white flex items-center justify-center shadow-lg group hover:rotate-6 transition-all cursor-pointer border border-gray-800">
-                                <User size={20} />
-                            </div>
-                        </div>
-                    )}
-                    
-                    <div className="flex lg:hidden">
-                        <MobileMenu 
-                            links={navLinks.map(l => ({ ...l, icon: undefined }))} 
-                            session={session} 
-                            variant="light" 
-                            onLogout={onLogout} 
-                        />
-                    </div>
-
-                    <button 
-                        onClick={onLogout}
-                        className="flex items-center justify-center h-12 w-12 bg-white border border-gray-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all shadow-sm active:scale-95 group"
-                        title="Déconnexion"
-                    >
-                        <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
-                    </button>
+                <div className="search-bar">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="4" stroke="#8B949E" strokeWidth="1.3"/><path d="M8.5 8.5L11 11" stroke="#8B949E" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                    <input placeholder="Chercher bail, locataire..." />
                 </div>
-            </motion.div>
-        </header>
+            </div>
+            
+            <div className="topbar-right">
+                <div className="top-btn" title="Notifications">
+                    <div className="notif-dot"></div>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1a4 4 0 014 4v2.5l1 1.5H2L3 7.5V5a4 4 0 014-4zM5.5 11a1.5 1.5 0 003 0" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
+                </div>
+                
+                <div className="top-btn" onClick={onLogout} title="Déconnexion (Rapide)" style={{ cursor: 'pointer' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 14H3a2 2 0 01-2-2V4a2 2 0 012-2h3M10 11l4-3-4-3M14 8H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                
+                <div style={{
+                    width: '28px', height: '28px', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--ci-orange), var(--ci-or))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '10px', fontWeight: 700, color: '#fff'
+                }}>
+                    {session?.user?.fullName ? session.user.fullName.substring(0, 2).toUpperCase() : 'SA'}
+                </div>
+            </div>
+        </div>
     )
 }

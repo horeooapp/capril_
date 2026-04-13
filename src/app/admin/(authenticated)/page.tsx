@@ -214,534 +214,256 @@ export default async function AdminDashboardOverview() {
 
     try {
         return (
-            <div className="space-y-12 pb-16 relative">
-                <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
-                
-                {isDbIncomplete && (
-                    <div className="bg-red-50 border-2 border-red-100 p-6 rounded-3xl flex items-center gap-6 animate-pulse mb-8">
-                        <div className="p-4 bg-red-100 text-red-600 rounded-2xl">
-                            <ShieldAlert size={32} />
-                        </div>
-                        <div className="flex-1">
-                            <h3 className="font-black text-red-900 uppercase">Synchronisation Base de Données Partielle</h3>
-                            <p className="text-red-700/60 text-sm font-medium">Certaines tables (Payments, Fraud, SMS) semblent absentes de {process.env.DATABASE_URL?.split('@')[1] || "la base"}.</p>
-                        </div>
-                        <SyncButton />
-                    </div>
-                )}
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+            <>
+                <div className="page-header">
                     <div>
-                        <div className="mb-3 bg-gradient-to-r from-orange-400 to-qnavy text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full inline-block animate-pulse shadow-md">
-                            Mise à jour v4.0 (Grand Éveil) : 100% Modules Actifs
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-black text-[#1F4E79] tracking-tighter leading-none mb-4 uppercase animate-in fade-in slide-in-from-left-4 duration-700 ease-out">
-                            Supervision.
-                        </h1>
-                        <p className="text-[#C55A11] font-bold tracking-wide">
-                            Contrôle intégral des flux <span className="text-primary font-bold">QAPRIL National</span>.
-                        </p>
+                        <h1 className="page-title">Survision Centrale</h1>
+                        <p className="page-sub">Contrôle intégral des flux - Hub Abidjan</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <LandingToggle initialEnabled={isLandingEnabled} />
-                        <div className="flex flex-col items-end">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Niveau d&apos;accès</span>
-                            <span className="text-sm font-bold text-gray-900">ADMINISTRATEUR CENTRAL</span>
-                        </div>
+                    <div className="date-badge">
+                        {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
                 </div>
 
-                {/* THE CONTROL TOWER — REG-2026-001 Unified Module Hub */}
-                <ModuleRegistryGrid />
-
-                {/* Core Global Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <StatCard 
-                        title="Reversements (M-PAY)" 
-                        value={safeData.totalReversals === -1 ? "N/A" : (safeData.totalReversals || 0).toString()} 
-                        icon={<CreditCard size={28} />} 
-                        color="emerald"
-                        trend="Nouveauté"
-                        delay={0.1}
-                        href="/admin/reversals"
-                    />
-                    <StatCard 
-                        title="Alertes Fraude (M-GUARD)" 
-                        value={safeData.fraudAlerts === -1 ? "N/A" : (safeData.fraudAlerts || 0).toString()} 
-                        icon={<Zap size={28} />} 
-                        color="red"
-                        trend="Haute Vigilance"
-                        delay={0.2}
-                    />
-                    <StatCard 
-                        title="Droits Collectés (DGI)" 
-                        value={`${safeData.totalDgi.toLocaleString()} FCFA`} 
-                        icon={<ShieldCheck size={28} />} 
-                        color="blue"
-                        trend="Fiscalité M17"
-                        delay={0.3}
-                        href="/admin/fiscal"
-                    />
-                    <StatCard 
-                        title="Auto-KYC IA" 
-                        value={`${safeData.kycAutoRate}%`} 
-                        icon={<UserCheck size={28} />} 
-                        color="purple"
-                        trend="Efficience"
-                        delay={0.4}
-                        href="/admin/compliance"
-                    />
-                    <StatCard 
-                        title="Litiges Ouverts" 
-                        value={safeData.activeMediations.toString()} 
-                        icon={<Scale size={28} />} 
-                        color="orange"
-                        trend="Médiation"
-                        delay={0.45}
-                        href="/admin/disputes"
-                    />
-                    <StatCard 
-                        title="Consignation CDC" 
-                        value={`${safeData.cdcAmount.toLocaleString()} FCFA`} 
-                        icon={<ShieldCheck size={28} />} 
-                        color="emerald"
-                        trend="Sécurisé"
-                        delay={0.5}
-                    />
-
-                </div>
-
-                {/* ADD-06/08: Innovation & IA Monitoring */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary px-2">Innovation & Transition Digitale (ADD-06/08)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="Bails Déclaratifs (BDQ)" 
-                            value={safeData.totalBdqs === -1 ? "N/A" : safeData.totalBdqs.toLocaleString()} 
-                            icon={<FileSignature size={28} />} 
-                            color="orange"
-                            trend={`${safeData.confirmedBdqs} Confirmés`}
-                            delay={0.45}
-                        />
-                        <StatCard 
-                            title="Conversations IA" 
-                            value={safeData.totalAiConv.toLocaleString()} 
-                            icon={<MessageSquare size={28} />} 
-                            color="emerald"
-                            trend="Activité"
-                            delay={0.5}
-                        />
-                        <StatCard 
-                            title="Coût API Assistant" 
-                            value={`${safeData.totalAiCost.toLocaleString()} FCFA`} 
-                            icon={<Bot size={28} />} 
-                            color="indigo"
-                            trend="Claude 3.5 Sonnet"
-                            delay={0.55}
-                        />
-                        <StatCard 
-                            title="TVA Collectée (Logement)" 
-                            value={`${safeData.tvaCollectee.toLocaleString()} FCFA`} 
-                            icon={<Banknote size={28} />} 
-                            color="amber"
-                            trend="M-TVA 18%"
-                            delay={0.6}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-11 : Rôles & Déclarations SMS */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-orange-600 px-2">Supervision ADD-11 : Rôles & SMS</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                        title="Déclarations SMS" 
-                        value={safeData.totalSmsDeclarations.toLocaleString()} 
-                        icon={<MessageSquare size={28} />} 
-                        color="orange"
-                        trend={`${safeData.confirmedSmsDeclarations} Confirmées`}
-                        delay={0.1}
-                        href="/admin/declarations"
-                    />
-                        <StatCard 
-                            title="Gestionnaires Actifs" 
-                            value={safeData.totalManagers.toLocaleString()} 
-                            icon={<Users size={28} />} 
-                            color="blue"
-                            trend="Intermédiaires"
-                            delay={0.2}
-                        />
-                        <StatCard 
-                            title="Agents de Terrain" 
-                            value={safeData.totalAgents.toLocaleString()} 
-                            icon={<ShieldCheck size={28} />} 
-                            color="emerald"
-                            trend="Vérification"
-                            delay={0.3}
-                        />
-                        <StatCard 
-                            title="Relances Auto." 
-                            value="Actif" 
-                            icon={<Zap size={28} />} 
-                            color="indigo"
-                            trend="H+2 / H+6"
-                            delay={0.4}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-14: Profils Autonomes & Matching */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-emerald-600 px-2">Supervision ADD-14 : Profils & Matching</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                        title="Profils Publics" 
-                        value={safeData.totalPublicProfiles.toLocaleString()} 
-                        icon={<Users size={28} />} 
-                        color="emerald"
-                        trend="Locataires Autonomes"
-                        delay={0.1}
-                        href="/admin/users"
-                    />
-                    <StatCard 
-                        title="Invitations Actives" 
-                        value={safeData.activeInvitations.toLocaleString()} 
-                        icon={<Send size={28} />} 
-                        color="orange"
-                        trend="Propositions"
-                        delay={0.2}
-                        href="/admin/declarations"
-                    />
-                        <StatCard 
-                            title="Matchs Réussis" 
-                            value={safeData.matchRate.toLocaleString()} 
-                            icon={<Handshake size={28} />} 
-                            color="indigo"
-                            trend="Baux Activés"
-                            delay={0.3}
-                        />
-                        <StatCard 
-                            title="Consultations Profil" 
-                            value={safeData.totalConsultations.toLocaleString()} 
-                            icon={<ShieldCheck size={28} />} 
-                            color="slate"
-                            trend="Visibilité"
-                            delay={0.4}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-07 : Wallet & Rechargements */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-blue-600 px-2">Supervision ADD-07 : Wallet & Automatisations</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="Liens Générés" 
-                            value={safeData.totalWalletLinks.toLocaleString()} 
-                            icon={<ExternalLink size={28} />} 
-                            color="blue"
-                            trend="Deep Links"
-                            delay={0.1}
-                        />
-                        <StatCard 
-                            title="Taux de Clics" 
-                            value={safeData.totalWalletLinks > 0 ? `${Math.round((safeData.totalWalletClicks / safeData.totalWalletLinks) * 100)}%` : "0%"} 
-                            icon={<Zap size={28} />} 
-                            color="orange"
-                            trend={`${safeData.totalWalletClicks} Clics`}
-                            delay={0.2}
-                        />
-                        <StatCard 
-                            title="Conversions" 
-                            value={`${safeData.walletConversionRate}%`} 
-                            icon={<Wallet size={28} />} 
-                            color="emerald"
-                            trend={`${safeData.totalWalletConversions} Rechargés`}
-                            delay={0.3}
-                        />
-                        <StatCard 
-                            title="Configs Actives" 
-                            value={safeData.activeWalletConfigs.toLocaleString()} 
-                            icon={<RefreshCw size={28} />} 
-                            color="indigo"
-                            trend="Rappels Auto."
-                            delay={0.4}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-15 : États des Lieux & Rapports */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-600 px-2">Supervision ADD-15 : États des Lieux & Rapports</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="États des Lieux" 
-                            value={safeData.totalEdls.toLocaleString()} 
-                            icon={<ClipboardCheck size={28} />} 
-                            color="slate"
-                            trend={`${safeData.certifiedEdls} Certifiés`}
-                            delay={0.5}
-                            href="/admin/edl"
-                        />
-                        <StatCard 
-                            title="Taux Certification" 
-                            value={safeData.totalEdls > 0 ? `${Math.round((safeData.certifiedEdls / safeData.totalEdls) * 100)}%` : "0%"} 
-                            icon={<ShieldCheck size={28} />} 
-                            color="emerald"
-                            trend="SHA-256"
-                            delay={0.6}
-                            href="/admin/edl"
-                        />
-                        <StatCard 
-                            title="Rapports Mensuels" 
-                            value={safeData.totalMonthlyReports.toLocaleString()} 
-                            icon={<FileText size={28} />} 
-                            color="blue"
-                            trend="Générés"
-                            delay={0.7}
-                            href="/admin/reports"
-                        />
-                        <StatCard 
-                            title="Délivrance Auto." 
-                            value="100%" 
-                            icon={<Zap size={28} />} 
-                            color="indigo"
-                            trend="Délivrés"
-                            delay={0.8}
-                        />
-                    </div>
-                </div>
-
-                {/* Vision Opérationnelle (Nouveau) */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 px-2">Indicateurs de Performance Opérationnelle</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="Locataires Certifiés" 
-                            value={safeData.totalTenants.toLocaleString()} 
-                            icon={<Users size={28} />} 
-                            color="emerald"
-                            trend="+12% ce mois"
-                            delay={0.5}
-                        />
-                        <StatCard 
-                            title="Propriétaires & Agences" 
-                            value={(safeData.totalLandlords + safeData.totalAgencies).toLocaleString()} 
-                            icon={<Building2 size={28} />} 
-                            color="slate"
-                            trend="Actifs"
-                            delay={0.6}
-                        />
-                        <StatCard 
-                            title="Contrats de Bail Actifs" 
-                            value={safeData.totalLeases.toLocaleString()} 
-                            icon={<FileText size={28} />} 
-                            color="amber"
-                            trend="Sécurisés"
-                            delay={0.7}
-                        />
-                        <StatCard 
-                            title="Licences & Certificats" 
-                            value={safeData.totalCertificates.toLocaleString()} 
-                            icon={<Award size={28} />} 
-                            color="indigo"
-                            trend="Conformes"
-                            delay={0.8}
-                        />
-                    </div>
-                </div>
-
-                {/* ADD-16 : Compliance & Arbitrage */}
-                <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-red-600 px-2">Supervision ADD-16 : Réclamations & Arbitrage CACI</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StatCard 
-                            title="Réclamations" 
-                            value={safeData.totalReclamations.toLocaleString()} 
-                            icon={<AlertTriangle size={28} />} 
-                            color="red"
-                            trend="Droits Locataire"
-                            delay={0.1}
-                            href="/admin/reclamations"
-                        />
-                        <StatCard 
-                            title="Litiges CACI" 
-                            value={safeData.totalLitiges.toLocaleString()} 
-                            icon={<Scale size={28} />} 
-                            color="orange"
-                            trend="Dossiers Certifiés"
-                            delay={0.2}
-                            href="/admin/disputes"
-                        />
-                        <StatCard 
-                            title="Promos Actives" 
-                            value={safeData.activePromos.toLocaleString()} 
-                            icon={<Zap size={28} />} 
-                            color="emerald"
-                            trend="Agilité Tarifaire"
-                            delay={0.3}
-                            href="/admin/tarifs"
-                        />
-                    </div>
-                </div>
-
-                {/* Montant Total des Transactions */}
-                <div className="glass-card-premium p-10 rounded-[3rem] bg-gray-900 text-white relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary blur-[150px] opacity-20 -mr-40 -mt-40 group-hover:opacity-30 transition-opacity"></div>
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div>
-                            <p className="label-tech text-primary mb-4 text-xs font-black uppercase tracking-widest">Flux Transactionnel Total (Reçus Certifiés)</p>
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-2">
-                                {safeData.totalPayments.toLocaleString()} <span className="text-2xl text-primary/60 font-bold uppercase tracking-tighter">FCFA</span>
-                            </h2>
-                            <p className="text-white/40 font-medium">Cumul des loyers et frais sécurisés par le protocole QAPRIL.</p>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="p-8 bg-white/5 rounded-[2rem] border border-white/10 text-center">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Colocataires</p>
-                                <p className="text-2xl font-black">{safeData.totalColocs}</p>
-                            </div>
-                            <div className="p-8 bg-white/5 rounded-[2rem] border border-white/10 text-center">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Mandats</p>
-                                <p className="text-2xl font-black">{safeData.totalMandates}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Market Intelligence & Observatory (Reserved for Admin) */}
-                <div className="space-y-10">
-                    <div className="flex items-center gap-4 px-2">
-                        <div className="p-3 bg-primary/10 text-primary rounded-2xl">
-                            <BarChart size={24} />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter italic">Intelligence Marché & Observatoire</h3>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Données consolidées du Registre National</p>
-                        </div>
+                <div className="kpi-grid">
+                    <div className="kpi-card orange">
+                        <div className="kpi-glow"></div>
+                        <div className="kpi-label">Volume Encaissements</div>
+                        <div className="kpi-val">{safeData.totalPayments.toLocaleString()} F</div>
+                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Stable</div>
                     </div>
                     
-                    <RealEstateObservatory />
+                    <div className="kpi-card vert">
+                        <div className="kpi-glow"></div>
+                        <div className="kpi-label">Baux Actifs</div>
+                        <div className="kpi-val">{safeData.totalLeases}</div>
+                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> +12 ce mois</div>
+                    </div>
                     
-                    <div className="space-y-12">
-                        <div className="space-y-6">
-                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Le Palmarès Locatif (Indice de Positionnement)</h4>
-                            <RentRanking />
-                        </div>
-                        <div className="space-y-6">
-                            <h4 className="label-tech text-gray-400 text-[10px] font-black uppercase tracking-widest px-2">Cartographie des Loyers (Analyse Géographique)</h4>
-                            <GeographicRentAnalysis />
-                        </div>
+                    <div className="kpi-card or">
+                        <div className="kpi-glow"></div>
+                        <div className="kpi-label">Médiation & Litiges</div>
+                        <div className="kpi-val">{safeData.activeMediations}</div>
+                        <div className="kpi-delta down"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1.5V8.5M5 8.5L8.5 5M5 8.5L1.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Haute Vigilance</div>
+                    </div>
+                    
+                    <div className="kpi-card gris">
+                        <div className="kpi-glow"></div>
+                        <div className="kpi-label">Taux Certification KYC</div>
+                        <div className="kpi-val">{safeData.kycAutoRate}%</div>
+                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> QAPRIL IA</div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <div className="lg:col-span-2 space-y-10">
-                        {/* Stream Principal */}
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">Activités Réseau Temps Réel</h3>
-                                <div className="flex items-center gap-2">
-                                    <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                    </span>
-                                    <span className="text-[9px] font-bold text-green-600 uppercase tracking-widest">Live Sync</span>
-                                </div>
-                            </div>
-                            <LiveActivityStream logs={safeData.recentAuditLogs} />
+                <div className="dash-grid">
+                    <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="panel-header">
+                            <h2 className="panel-title">Tendance Loyers (6 Mois)</h2>
+                            <div className="panel-action">Voir le rapport</div>
+                        </div>
+                        <div className="chart-bars" style={{ flex: 1, marginBottom: '24px' }}>
+                            <div className="bar-col"><div className="bar orange" style={{height: '35%'}}></div><div className="bar-label">NOV</div></div>
+                            <div className="bar-col"><div className="bar vert" style={{height: '45%'}}></div><div className="bar-label">DEC</div></div>
+                            <div className="bar-col"><div className="bar or" style={{height: '75%'}}></div><div className="bar-label">JAN</div></div>
+                            <div className="bar-col"><div className="bar vert" style={{height: '60%'}}></div><div className="bar-label">FEV</div></div>
+                            <div className="bar-col"><div className="bar orange" style={{height: '50%'}}></div><div className="bar-label">MAR</div></div>
+                            <div className="bar-col"><div className="bar vert" style={{height: '90%'}}></div><div className="bar-label" style={{color: 'var(--text-main)', fontWeight: 700}}>AVR</div></div>
                         </div>
 
-                        {/* Infos Système Complémentaires */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <StatCard 
-                                title="Baux Terrains" 
-                                value={safeData.totalLandLeases.toString()} 
-                                icon={<ArrowUpRight size={28} />} 
-                                color="amber"
-                                delay={0.9}
-                            />
-                            <StatCard 
-                                title="Utilisateurs Plateforme" 
-                                value={safeData.totalUsers.toString()} 
-                                icon={<Users size={28} />} 
-                                color="slate"
-                                delay={1.0}
-                            />
-                            <StatCard 
-                                title="Modules Système" 
-                                value={`${safeData.activeModules}/${safeData.totalModules}`} 
-                                icon={<Settings2 size={28} />} 
-                                color="indigo"
-                                trend="Configuration"
-                                delay={1.1}
-                            />
+                        <div className="panel-header" style={{ marginTop: 'auto' }}>
+                            <h2 className="panel-title">Surveillance Baux Actifs</h2>
+                            <div className="panel-action">Filtrer</div>
                         </div>
-                    </div>
-
-                    <div className="space-y-10">
-                        {/* Section Validation Identité */}
-                        <div className="glass-card-premium p-8 rounded-[2.5rem] border border-orange-100 shadow-xl shadow-orange-500/5">
-                            <div className="flex items-center justify-between mb-8">
-                                <h4 className="label-tech text-orange-600 text-[10px] font-black uppercase tracking-widest">Validation Identité</h4>
-                                <div className="px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full text-[8px] font-black uppercase tracking-tighter animate-pulse">
-                                    {safeData.documentsUnderReview.length} En attente
-                                </div>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                {safeData.documentsUnderReview.length === 0 ? (
-                                    <p className="text-[10px] text-gray-400 italic text-center py-4">Tous les KYC sont à jour.</p>
-                                ) : (
-                                    safeData.documentsUnderReview.map((doc: any) => (
-                                        <div key={doc.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 group/item hover:bg-orange-50 transition-colors">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-[10px] font-black text-gray-900 truncate max-w-[120px]">{(doc.user?.firstName ? doc.user.firstName + " " : "") + (doc.user?.lastName || "")}</span>
-                                                <span className="text-[8px] font-bold text-gray-400 uppercase">{new Date(doc.createdAt).toLocaleDateString()}</span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-bold text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg uppercase tracking-widest">
-                                                    {doc.docType}
-                                                </span>
-                                                <Link href={`/admin/validation/${doc.id}`} className="text-[9px] font-black text-primary hover:underline uppercase tracking-widest opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                                    Vérifier →
-                                                </Link>
-                                            </div>
+                        <table className="lease-table">
+                            <thead>
+                                <tr>
+                                    <th>Locataire</th>
+                                    <th>Localisation</th>
+                                    <th>Montant</th>
+                                    <th>Statut Actuel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar t-av1">KO</div>
+                                            <div className="t-name">Kouadio O.</div>
                                         </div>
-                                    ))
+                                    </td>
+                                    <td><div className="t-loc">Cocody, Angré</div></td>
+                                    <td><div className="t-name">350.000 F</div></td>
+                                    <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar t-av2">MD</div>
+                                            <div className="t-name">Marc D.</div>
+                                        </div>
+                                    </td>
+                                    <td><div className="t-loc">Marcory, Zone 4</div></td>
+                                    <td><div className="t-name">850.000 F</div></td>
+                                    <td><div className="pill pill-pending"><div className="pill-dot"></div>En attente EDL</div></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar t-av3">SA</div>
+                                            <div className="t-name">Sylla A.</div>
+                                        </div>
+                                    </td>
+                                    <td><div className="t-loc">Riviera Palmeraie</div></td>
+                                    <td><div className="t-name">180.000 F</div></td>
+                                    <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar t-av4">JB</div>
+                                            <div className="t-name">Jean B.</div>
+                                        </div>
+                                    </td>
+                                    <td><div className="t-loc">Yopougon, Toits Rouges</div></td>
+                                    <td><div className="t-name">120.000 F</div></td>
+                                    <td><div className="pill pill-impaye"><div className="pill-dot"></div>Impayé (8j)</div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="right-col">
+                        <div className="panel" style={{ paddingBottom: '12px' }}>
+                            <div className="panel-header">
+                                <h2 className="panel-title">Transactions Mobile</h2>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B949E" strokeWidth="1.5"/><path d="M8 5v3l2 2" stroke="#8B949E" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                            </div>
+                            <div className="mm-grid">
+                                <div className="mm-card wave">
+                                    <div className="mm-op">WAVE</div>
+                                    <div className="mm-amount">4.2M</div>
+                                    <div className="mm-sub">Reçus aujourd'hui</div>
+                                </div>
+                                <div className="mm-card orange-op">
+                                    <div className="mm-op">ORANGE</div>
+                                    <div className="mm-amount">1.8M</div>
+                                    <div className="mm-sub">Reçus aujourd'hui</div>
+                                </div>
+                                <div className="mm-card mtn">
+                                    <div className="mm-op">MTN</div>
+                                    <div className="mm-amount">840K</div>
+                                    <div className="mm-sub">Reçus aujourd'hui</div>
+                                </div>
+                                <div className="mm-card mtn-card">
+                                    <div className="mm-op">TRESOR/CDC</div>
+                                    <div className="mm-amount text-white">{safeData.cdcAmount.toLocaleString() || '0'}</div>
+                                    <div className="mm-sub">Consignations</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="ci-map" title="Carte simplifiée CI">
+                            <div className="ci-map-inner">
+                                <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', opacity: 0.1 }}>
+                                    <path d="M100,20 C140,20 180,60 180,100 C180,140 140,180 100,180 C60,180 20,140 20,100 C20,60 60,20 100,20 Z" fill="currentColor" stroke="none" />
+                                    <path d="M80,60 L120,40 L160,80 L140,140 L70,160 L40,100 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+                                </svg>
+                                {/* Abidjan Ping */}
+                                <div className="map-dot" style={{ bottom: '30%', right: '40%', background: 'var(--ci-vert)' }}></div>
+                                {/* San Pedro Ping */}
+                                <div className="map-dot" style={{ bottom: '25%', left: '35%', background: 'var(--ci-orange)' }}></div>
+                                {/* Bouake Ping */}
+                                <div className="map-dot" style={{ top: '45%', left: '50%', background: 'var(--ci-or)' }}></div>
+                                <div style={{ position: 'absolute', bottom: '12px', left: '12px', fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '1px' }}>
+                                    RÉSEAU ACTIF
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="panel" style={{ flex: 1 }}>
+                            <div className="panel-header">
+                                <h2 className="panel-title">Audit IA & Logs</h2>
+                            </div>
+                            <div className="activity-list">
+                                {safeData.recentAuditLogs?.slice(0, 4).map((log: any) => (
+                                    <div className="activity-item" key={log.id}>
+                                        <div className="act-icon vert"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                                        <div>
+                                            <div className="act-text">{log.action || 'Événement système'}</div>
+                                            <div className="act-time">{new Date(log.createdAt).toLocaleTimeString()} - {(log.user?.firstName || 'Système')}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                                {(!safeData.recentAuditLogs || safeData.recentAuditLogs.length === 0) && (
+                                    <div className="activity-item">
+                                        <div className="act-icon orange"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 12l4-8 4 8" stroke="currentColor" strokeWidth="1.5"/></svg></div>
+                                        <div>
+                                            <div className="act-text">En attente d'événements</div>
+                                            <div className="act-time">À l'instant - SysAdmin</div>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
-                            
-                            <Link href="/admin/validation" className="block w-full text-center mt-6 p-4 border border-dashed border-gray-200 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-gray-50 transition-colors">
-                                Gérer tout le KYC
-                            </Link>
                         </div>
-
-                        <section className="bg-gray-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600 blur-[130px] opacity-20 -mr-40 -mt-40 group-hover:opacity-40 transition-opacity"></div>
-                            <h4 className="label-tech text-primary mb-6 text-xs font-black uppercase tracking-widest">Moteur Fiscal Consolidated</h4>
-                            <p className="text-2xl font-black mb-10 leading-tight">Consolider tous les flux <br /><span className="text-orange-400">DGI Côte d&apos;Ivoire</span>.</p>
-                            <Link href="/admin/fiscal" className="flex items-center justify-between w-full p-6 bg-white/10 hover:bg-primary transition-all rounded-2xl border border-white/10 hover:border-transparent group/btn">
-                                <span className="font-black uppercase tracking-widest text-[10px]">Lancer le rapport</span>
-                                <ArrowUpRight size={20} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                            </Link>
-                        </section>
-
-
                     </div>
                 </div>
-            </div>
+
+                <div className="ci-stripe"></div>
+
+                <div className="bottom-row">
+                    <div className="panel">
+                        <div className="panel-header">
+                            <h2 className="panel-title">Reversements DGI</h2>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,102,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-orange)' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                            <div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.totalDgi.toLocaleString()} F</div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Droits M17 collectés</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="panel">
+                        <div className="panel-header">
+                            <h2 className="panel-title">M-GUARD & Fraudes</h2>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(244,196,48,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-or)' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/><path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+                            </div>
+                            <div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.fraudAlerts} Alertes</div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Profils risqués détectés</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="panel">
+                        <div className="panel-header">
+                            <h2 className="panel-title">SMS Déclarations</h2>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(0,154,61,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-vert)' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                            <div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.totalSmsDeclarations} Total</div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Confirmées: {safeData.confirmedSmsDeclarations}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </>
         )
     } catch (error: any) {
         return (
-            <div className="p-12 bg-red-50/50 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center backdrop-blur-xl">
-                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-red-200/50 rotate-3">
-                    <AlertTriangle size={36} />
-                </div>
-                <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tighter uppercase italic">Interruption Supervision.</h2>
-                <code className="text-[10px] text-red-700 bg-white p-6 rounded-2xl border border-red-200 max-w-full overflow-auto">
-                    {String(error)}
-                </code>
+            <div style={{ padding: '40px', background: 'var(--ci-nuit2)', borderRadius: '16px', border: '1px solid var(--ci-orange)' }}>
+                <h2 style={{ color: 'var(--ci-orange)', fontFamily: 'var(--font-head)', fontSize: '24px' }}>Erreur Critique</h2>
+                <p style={{ color: 'var(--text-muted)' }}>{String(error)}</p>
             </div>
         )
     }

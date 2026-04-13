@@ -1,151 +1,95 @@
-"use client"
-
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion } from "framer-motion"
-import { 
-    LayoutDashboard, 
-    Briefcase, 
-    Database, 
-    ArrowRightLeft, 
-    BarChart3, 
-    ShieldAlert, 
-    Settings2, 
-    Users, 
-    ShieldCheck, 
-    Newspaper,
-    LogOut,
-    ChevronRight,
-    Bot,
-    Scale,
-    BookOpen,
-    Trophy,
-    ClipboardCheck,
-    User,
-    Home,
-    Globe,
-    AlertCircle
-} from "lucide-react"
-import ProtectedLogo from "@/components/ProtectedLogo"
 
 interface AdminSidebarProps {
-    onLogout: () => Promise<void>
+    onLogout: () => Promise<void>;
+    sessionUser?: any;
 }
 
-export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
+export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProps) {
     const pathname = usePathname()
 
-    const menuItems = [
-        { href: "/admin", label: "Tableau de Bord", icon: <LayoutDashboard size={20} /> },
-        { href: "/admin/agency", label: "Gestion Agence", icon: <Briefcase size={20} /> },
-        { href: "/admin/fiscal", label: "Fiscalité DGI", icon: <ShieldCheck size={20} /> },
-        { href: "/admin/candidates", label: "Candidatures", icon: <Users size={20} /> },
-        { href: "/admin/reclamations", label: "Réclamations RCL", icon: <AlertCircle size={20} /> },
-        { href: "/admin/diaspora", label: "Pack Diaspora", icon: <Globe size={20} /> },
-        { href: "/admin/migration", label: "Migration Data", icon: <Database size={20} /> },
-        { href: "/admin/reversals", label: "Paiements PGW", icon: <ArrowRightLeft size={20} /> },
-        { href: "/admin/declarations", label: "Déclarations SMS/WA", icon: <ShieldAlert size={20} /> },
-        { href: "/admin/reports", label: "Rapports & Stats", icon: <BarChart3 size={20} /> },
-        { href: "/admin/news", label: "Actualités Ticker", icon: <Newspaper size={20} />, active: true },
-        { href: "/admin/compliance", label: "Conformité KYC", icon: <ShieldAlert size={20} /> },
-        { href: "/admin/guardrails", label: "Garde-fous (M-GUARD)", icon: <AlertCircle size={20} /> },
-        { href: "/admin/disputes", label: "Médiation & Litiges", icon: <Scale size={20} /> },
-        { href: "/admin/system/ai-monitoring", label: "Supervision IA", icon: <Bot size={20} /> },
-        { href: "/admin/system", label: "Configuration Système", icon: <Settings2 size={20} /> },
-        { href: "/admin/users", label: "Utilisateurs", icon: <Users size={20} /> },
-        { href: "/admin/edl", label: "États des Lieux", icon: <ClipboardCheck size={20} /> },
-        { href: "/admin/audit", label: "Logs d'Audit", icon: <ShieldCheck size={20} /> },
-        { href: "/admin/manual", label: "Manuel Officiel", icon: <BookOpen size={20} /> },
-        { href: "/admin/settings/profile", label: "Mon Profil", icon: <User size={20} /> },
-    ]
-
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-[60] p-6 hidden lg:block">
-            <div className="h-full glass-panel border border-white/20 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden">
-                {/* Brand Logo Section */}
-                <div className="p-8 border-b border-white/10 shrink-0">
-                    <Link href="/admin" className="flex items-center gap-4 group">
-                        <ProtectedLogo 
-                            src="/logo.png" 
-                            alt="QAPRIL" 
-                            className="h-10 w-auto group-hover:scale-110 transition-transform duration-500" 
-                        />
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black tracking-[0.2em] text-[#C55A11] uppercase">Management</span>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* Navigation Links */}
-                <nav className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar mt-4">
-                    {/* Public Home Link is allowed for Admin, rendering the Black Portal */}
-                    <Link 
-                        href="/"
-                        className="relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all text-gray-400 hover:text-ivoire-orange hover:bg-ivoire-orange/5 border border-dashed border-gray-100 hover:border-ivoire-orange/30 mb-4"
-                    >
-                        <span className="relative z-10 transition-transform group-hover:scale-110">
-                            <Home size={20} />
-                        </span>
-                        <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] flex-1">
-                            Retour à l&apos;Accueil
-                        </span>
-                    </Link>
-
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href
-                        return (
-                            <Link 
-                                key={item.href} 
-                                href={item.href}
-                                className={`relative group flex items-center gap-4 px-6 py-4 rounded-2xl transition-all ${
-                                    isActive 
-                                    ? "text-white" 
-                                    : "text-gray-500 hover:text-[#1F4E79] hover:bg-white/40"
-                                }`}
-                            >
-                                {isActive && (
-                                    <motion.div 
-                                        layoutId="sidebar-active-pill"
-                                        className="absolute inset-0 bg-[#1F4E79] rounded-2xl shadow-lg shadow-[#1F4E79]/20"
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
-                                <span className={`relative z-10 transition-transform ${isActive ? "scale-110" : "group-hover:translate-x-1"}`}>
-                                    {item.icon}
-                                </span>
-                                <span className="relative z-10 text-[13px] font-bold uppercase tracking-widest flex-1">
-                                    {item.label}
-                                </span>
-                                {isActive && (
-                                    <motion.span 
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="relative z-10"
-                                    >
-                                        <ChevronRight size={14} />
-                                    </motion.span>
-                                )}
-                            </Link>
-                        )
-                    })}
-                </nav>
-
-                {/* Footer Section */}
-                <div className="p-6 mt-auto border-t border-white/10">
-                    <button 
-                        onClick={onLogout}
-                        className="w-full h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-widest hover:bg-red-100 transition-all active:scale-95 group shadow-sm"
-                    >
-                        <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        Déconnexion
-                    </button>
-                    
-                    <div className="mt-6 text-center">
-                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">QAPRIL OS v3.2 Premium</p>
-                    </div>
-                </div>
+        <div className="sidebar">
+          <Link href="/admin" className="logo" style={{ textDecoration: 'none' }}>
+            <div className="logo-mark">Q</div>
+            <div>
+              <div className="logo-text">qapril</div>
+              <span className="logo-sub">Admin</span>
             </div>
-        </aside>
+          </Link>
+          
+          <nav className="nav">
+            <div className="nav-section">Principal</div>
+            <Link href="/admin" className={`nav-item ${pathname === '/admin' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+              Tableau de bord
+            </Link>
+            <Link href="/admin/agency" className={`nav-item ${pathname === '/admin/agency' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/></svg>
+              Baux
+              <span className="nav-badge">12</span>
+            </Link>
+            <Link href="/admin/reversals" className={`nav-item ${pathname === '/admin/reversals' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M5 3V2M11 3V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M2 7H14" stroke="currentColor" strokeWidth="1.2"/></svg>
+              Loyers
+              <span className="nav-badge" style={{ background: 'var(--ci-or)', color: 'var(--ci-nuit)' }}>3</span>
+            </Link>
+            <div className="nav-item">
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1C5.24 1 3 3.24 3 6c0 4 5 9 5 9s5-5 5-9c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 118 5a1.5 1.5 0 010 3z" fill="currentColor"/></svg>
+              Biens
+            </div>
+            <Link href="/admin/users" className={`nav-item ${pathname === '/admin/users' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="3" stroke="currentColor" strokeWidth="1.5"/><path d="M1 14c0-3.31 2.24-6 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5"/><path d="M10.5 11H12V9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Utilisateurs
+            </Link>
+
+            <div className="nav-section">Finances</div>
+            <Link href="/admin/fiscal" className={`nav-item ${pathname === '/admin/fiscal' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a2 2 0 014 0v1" stroke="currentColor" strokeWidth="1.5"/><circle cx="8" cy="9" r="1.5" fill="currentColor"/></svg>
+              CDC / Cautions
+            </Link>
+            <Link href="/admin/reclamations" className={`nav-item ${pathname === '/admin/reclamations' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8l3 3 4-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Paiements
+            </Link>
+            <Link href="/admin/reports" className={`nav-item ${pathname === '/admin/reports' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              Rapports CRG
+            </Link>
+
+            <div className="nav-section">Opérations</div>
+            <Link href="/admin/disputes" className={`nav-item ${pathname === '/admin/disputes' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              Médiation
+            </Link>
+            <Link href="/admin/edl" className={`nav-item ${pathname === '/admin/edl' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 10V13H5L13 5L10 2L2 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+              EDL
+            </Link>
+            <Link href="/admin/system" className={`nav-item ${pathname === '/admin/system' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1v5M4 4l3 2M12 4l-3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><circle cx="8" cy="10" r="4" stroke="currentColor" strokeWidth="1.5"/></svg>
+              Paramètres
+            </Link>
+
+            {/* Logout button mimicking a nav-item */}
+            <div className="nav-item" onClick={onLogout} style={{ color: '#FF6600', marginTop: '20px' }}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a2 2 0 01-2-2V4a2 2 0 012-2h3M10 11l4-3-4-3M14 8H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Déconnexion
+            </div>
+          </nav>
+          
+          <div className="sidebar-bottom">
+            <div className="user-mini">
+              <div className="user-avatar">{sessionUser?.fullName ? sessionUser.fullName.substring(0, 2).toUpperCase() : 'SA'}</div>
+              <div className="user-info">
+                <p>{sessionUser?.fullName || 'Super Admin'}</p>
+                <span>{sessionUser?.role || 'SUPER_ADMIN'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
     )
 }
+
