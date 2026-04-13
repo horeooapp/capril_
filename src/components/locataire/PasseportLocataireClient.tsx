@@ -33,7 +33,6 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
         }
     }
 
-    return (
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -172,7 +171,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                     </div>
                                 </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             </div>

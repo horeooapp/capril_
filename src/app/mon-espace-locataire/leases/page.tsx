@@ -1,17 +1,35 @@
-import { toast } from "sonner";
+"use client"
+
+import { useEffect, useState } from "react"
 import { getTenantLeases } from "@/actions/leases"
 import Link from "next/link"
+import { motion } from "framer-motion"
+import { toast } from "sonner"
 
-export default async function TenantLeasesPage() {
-    const { DownloadLeaseButton } = await import("@/components/tenant/actions/TenantButtons");
-    let leases: any[] = []
-    try {
-        leases = await getTenantLeases()
-    } catch (err) {
-        console.error("[TenantLeasesPage] Failed to load leases:", err)
-    }
+export default function TenantLeasesPage() {
+    const [leases, setLeases] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+    const [DownloadLeaseButton, setDownloadLeaseButton] = useState<any>(null)
 
-    return (
+    useEffect(() => {
+        async function loadLeases() {
+            try {
+                const data = await getTenantLeases()
+                setLeases(data || [])
+                
+                // Dynamic import of the button component
+                const { DownloadLeaseButton: Btn } = await import("@/components/tenant/actions/TenantButtons");
+                setDownloadLeaseButton(() => Btn);
+            } catch (err) {
+                console.error("[TenantLeasesPage] Failed to load leases:", err)
+                toast.error("Erreur de chargement des baux")
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadLeases()
+    }, [])
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -30,6 +48,15 @@ export default async function TenantLeasesPage() {
             y: 0,
             transition: { duration: 0.5, ease: "easeOut" }
         }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+                <div className="w-10 h-10 border-4 border-qnavy-pale border-t-qnavy rounded-full animate-spin"></div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-qtext-light">Chargement de vos contrats...</p>
+            </div>
+        )
     }
 
     return (
@@ -180,17 +207,17 @@ export default async function TenantLeasesPage() {
                                             </Link>
                                         )}
                                         <div className="flex gap-3">
-                                            <DownloadLeaseButton leaseId={lease.id} />
+                                            {DownloadLeaseButton && <DownloadLeaseButton leaseId={lease.id} />}
                                             <Link href={`/mon-espace-locataire/trust`} className="flex-1 bg-qnavy text-white py-3 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-lg shadow-qnavy/20 uppercase tracking-wider">
                                                 Voir mon score
                                             </Link>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         )
                     })}
-                </div>
+                </motion.div>
             )}
 
             {/* Educational Banner */}
