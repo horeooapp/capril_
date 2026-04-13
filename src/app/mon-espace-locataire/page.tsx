@@ -119,13 +119,30 @@ export default function LocataireDashboardPage() {
     const lease = dashboardData.lease
     const utilities = dashboardData.utilities || []
     
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.3
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+        }
+    }
+
     // Bento Grid Item Wrapper
     const BentoItem = ({ children, className = "", delay = 0 }: { children: React.ReactNode, className?: string, delay?: number }) => (
         <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+            variants={itemVariants}
             className={`premium-stat-card overflow-hidden group relative bg-white ${className}`}
         >
             {children}
@@ -133,7 +150,12 @@ export default function LocataireDashboardPage() {
     )
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-10">
+        <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="max-w-[1200px] mx-auto px-4 py-8 space-y-10"
+        >
             {/* 1. Header & Quick Status */}
             <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                 <div>
@@ -149,9 +171,9 @@ export default function LocataireDashboardPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-5xl font-black text-qnavy-dark tracking-tighter uppercase"
+                        className="text-3xl sm:text-4xl md:text-5xl font-black text-qnavy-dark tracking-tighter uppercase leading-none"
                     >
-                        Bonjour, <span className="text-qgreen">{dashboardData.user?.firstName || 'Locataire'}</span>
+                        Bonjour, <span className="text-qgreen whitespace-nowrap">{dashboardData.user?.firstName || 'Locataire'}</span>
                     </motion.h1>
                 </div>
 
@@ -159,7 +181,7 @@ export default function LocataireDashboardPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="flex items-center gap-4 bg-white/50 backdrop-blur-xl p-2 rounded-[2.5rem] border border-white shadow-xl shadow-qnavy/5"
+                    className="flex items-center gap-4 bg-white/50 backdrop-blur-xl p-2 rounded-[2.5rem] border border-white shadow-xl shadow-qnavy/5 w-full sm:w-auto"
                 >
                     <div className="flex -space-x-2 overflow-hidden ml-2">
                         {[1, 2, 3].map((i) => (
@@ -168,9 +190,9 @@ export default function LocataireDashboardPage() {
                             </div>
                         ))}
                     </div>
-                    <div className="pr-6">
+                    <div className="pr-6 flex-1 sm:flex-none overflow-hidden">
                         <p className="text-[8px] font-black uppercase tracking-widest text-qtext-light leading-none mb-1">Dernière Quittance</p>
-                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-tighter">
+                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-tighter truncate">
                             {lease.lastReceiptDate 
                                 ? `Le ${new Date(lease.lastReceiptDate).toLocaleDateString('fr-CI', { day: '2-digit', month: 'short', year: 'numeric' })}`
                                 : "Aucune émise"}
@@ -183,36 +205,35 @@ export default function LocataireDashboardPage() {
             </header>
 
             {/* 2. The Bento Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[180px] md:auto-rows-[160px]">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-min md:auto-rows-[160px]">
                 
                 {/* PRIMARY HERO: Rent & Payment (6 cols, 2 rows) */}
-                <BentoItem className="md:col-span-8 md:row-span-2 p-8 flex flex-col justify-between bg-qnavy-dark text-white border-none shadow-2xl shadow-qnavy/30 group">
+                <BentoItem className="md:col-span-8 md:row-span-2 p-6 sm:p-8 flex flex-col justify-between bg-qnavy-dark text-white border-none shadow-2xl shadow-qnavy/30 group min-h-[220px]">
                     <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,rgba(26,61,140,0.4),transparent_60%)] pointer-events-none"></div>
                     
                     <div className="z-10">
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <span className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-white/10">Loyer du Mois</span>
                             <div className="h-8 w-8 bg-qgreen rounded-full flex items-center justify-center shadow-lg shadow-qgreen/40">
                                 <ShieldCheck size={16} />
                             </div>
                         </div>
                         
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-6xl md:text-7xl font-black tracking-tighter leading-none italic">
+                        <div className="flex items-baseline gap-2 overflow-hidden">
+                            <span className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-none italic whitespace-nowrap">
                                 {lease.rentAmount.toLocaleString()}
                             </span>
-                            <span className="text-xl font-medium opacity-50 uppercase tracking-widest italic">FCFA</span>
+                            <span className="text-sm sm:text-xl font-medium opacity-50 uppercase tracking-widest italic">FCFA</span>
                         </div>
-                        <p className="text-xs font-medium opacity-60 mt-4 max-w-xs">
-                            Date limite : <span className="font-black text-white/90 uppercase mx-1">
+                        <p className="text-[10px] sm:text-xs font-medium opacity-60 mt-4 max-w-xs">
+                            Date limite : <span className="font-black text-white/90 uppercase mx-1 whitespace-nowrap">
                                 {new Date(lease.rentDeadline).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </span>
-                            Propulsion Blockchain Immobilière.
                         </p>
                     </div>
 
-                    <div className="mt-8 flex gap-3 z-10">
-                        <Link href="/mon-espace-locataire/receipts" className="flex-1 bg-white text-qnavy-dark hover:bg-qgrey-1 font-black rounded-2xl px-6 py-4 text-xs uppercase tracking-widest transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2">
+                    <div className="mt-6 sm:mt-8 flex gap-3 z-10">
+                        <Link href="/mon-espace-locataire/receipts" className="flex-1 bg-white text-qnavy-dark hover:bg-qgrey-1 font-black rounded-2xl px-6 py-4 text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2">
                            Régler maintenant <ArrowUpRight size={18} />
                         </Link>
                         <button className="h-14 w-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all" onClick={(e) => { e.preventDefault(); router.push('/mon-espace-locataire/receipts') }}>

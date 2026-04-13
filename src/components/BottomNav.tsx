@@ -2,9 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Home, Receipt, Building2, Bell, User } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Home, Receipt, Building2, Bell, User, Menu, X } from 'lucide-react'
 
 interface BottomNavItem {
     href?: string
@@ -19,6 +19,7 @@ interface BottomNavProps {
 
 export default function BottomNav({ items }: BottomNavProps) {
     const pathname = usePathname()
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false)
 
     const defaultItems: BottomNavItem[] = [
         { href: "/dashboard", label: "Accueil", icon: <Home size={24} /> },
@@ -29,56 +30,121 @@ export default function BottomNav({ items }: BottomNavProps) {
     ]
 
     const navItems = items || defaultItems
+    const hasMore = navItems.length > 5
+    const coreItems = hasMore ? navItems.slice(0, 4) : navItems
+    const moreItems = hasMore ? navItems.slice(4) : []
+
+    const NavItem = ({ item, isActive, isMore = false }: { item: BottomNavItem, isActive: boolean, isMore?: boolean }) => {
+        const content = (
+            <>
+                <div className={`${isActive ? "scale-110 text-[#1F4E79]" : "scale-100 text-gray-400"} transition-all duration-300 relative`}>
+                    {item.icon}
+                    {isActive && (
+                        <motion.div 
+                            layoutId="nav-glow"
+                            className="absolute -inset-2 bg-[#1F4E79]/5 blur-lg rounded-full -z-10"
+                        />
+                    )}
+                </div>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? "text-[#1F4E79] opacity-100" : "text-gray-400 opacity-60"}`}>
+                    {item.label}
+                </span>
+            </>
+        )
+
+        const className = `flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl transition-all relative flex-1 min-w-0 ${isMore ? "p-4 bg-gray-50/50 border border-gray-100/50" : ""}`
+
+        if (item.onClick) {
+            return (
+                <button
+                    onClick={() => { item.onClick?.(); setIsMenuOpen(false); }}
+                    className={className}
+                >
+                    {content}
+                </button>
+            )
+        }
+
+        return (
+            <Link 
+                href={item.href || '#'}
+                onClick={() => setIsMenuOpen(false)}
+                className={className}
+            >
+                {content}
+            </Link>
+        )
+    }
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden">
-            <div className="bg-white/90 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-start px-6 pb-8 pt-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] gap-4 overflow-x-auto no-scrollbar scroll-smooth">
-                {navItems.map((item: any) => {
-                    const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
+        <>
+            <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden safe-bottom">
+                <div className="bg-white/95 backdrop-blur-2xl border-t border-gray-100/50 flex items-center justify-around px-4 pb-8 pt-4 shadow-[0_-20px_60px_rgba(0,0,0,0.1)]">
+                    {coreItems.map((item) => (
+                        <NavItem 
+                            key={item.label} 
+                            item={item} 
+                            isActive={pathname === item.href} 
+                        />
+                    ))}
                     
-                    const content = (
-                        <>
-                            {isActive && (
-                                <motion.div 
-                                    layoutId="bottom-nav-active"
-                                    className="absolute inset-0 bg-[#D6E4F0] rounded-2xl -z-10"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                            <div className={`${isActive ? "scale-110" : "scale-100"} transition-transform`}>
-                                {item.icon}
-                            </div>
-                            <span className={`text-[10px] font-black uppercase tracking-tighter ${isActive ? "opacity-100" : "opacity-60"}`}>
-                                {item.label}
-                            </span>
-                        </>
-                    )
-
-                    if (item.onClick) {
-                        return (
-                            <button
-                                key={item.label}
-                                onClick={item.onClick}
-                                className="flex flex-col items-center gap-1.5 px-3 py-2 rounded-2xl transition-all relative shrink-0 text-red-500 font-bold"
-                            >
-                                {content}
-                            </button>
-                        )
-                    }
-
-                    return (
-                        <Link 
-                            key={item.href}
-                            href={item.href}
-                            className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-2xl transition-all relative shrink-0 min-w-[60px] ${
-                                isActive ? "text-[#1F4E79]" : "text-gray-400"
-                            }`}
+                    {hasMore && (
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className={`flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl transition-all relative flex-1 min-w-0 ${isMenuOpen ? "text-[#1F4E79]" : "text-gray-400"}`}
                         >
-                            {content}
-                        </Link>
-                    )
-                })}
-            </div>
-        </nav>
+                            <div className="transition-transform duration-300">
+                                {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-widest opacity-60">
+                                {isMenuOpen ? "Fermer" : "Menu"}
+                            </span>
+                        </button>
+                    )}
+                </div>
+            </nav>
+
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 100, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 100, scale: 0.95 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-x-4 bottom-[100px] z-[90] lg:hidden focus:outline-none"
+                    >
+                        <div className="bg-white/98 backdrop-blur-3xl border border-gray-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] p-8 overflow-hidden">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center">Sections Additionnelles</h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                {moreItems.map((item, i) => (
+                                    <motion.div
+                                        key={item.label}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                    >
+                                        <NavItem 
+                                            item={item} 
+                                            isActive={pathname === item.href}
+                                            isMore
+                                        />
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            
+            {isMenuOpen && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[80] lg:hidden"
+                    onClick={() => setIsMenuOpen(false)}
+                />
+            )}
+        </>
     )
 }

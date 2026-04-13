@@ -41,30 +41,34 @@ export default function LocataireLayoutClient({
                 {/* Header removed per user request for cleaner UI */}
 
                 {/* Main Content */}
-                <main className={session ? "flex-1 w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" : "flex-1"}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        {children}
-                    </motion.div>
+                <main className={session ? "flex-1 w-full max-w-7xl mx-auto pt-12 pb-32 px-4 sm:px-6 lg:px-8" : "flex-1"}>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={session ? "authenticated" : "public"}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                        >
+                            {children}
+                        </motion.div>
+                    </AnimatePresence>
 
                     {session && (
                         <BottomNav items={[
                             { href: "/mon-espace-locataire", label: "Accueil", icon: <Home size={24} /> },
-                            { href: "/mon-espace-locataire/leases", label: "Mon bail", icon: <FileText size={24} /> },
-                            { href: "/mon-espace-locataire/receipts", label: "Quittances", icon: <Receipt size={24} /> },
-                            { href: "/mon-espace-locataire/cie-sodeci", label: "CIE/SODECI", icon: <Zap size={24} /> },
+                            { href: "/mon-espace-locataire/leases", label: "Bail", icon: <FileText size={20} /> },
+                            { href: "/mon-espace-locataire/receipts", label: "Loyers", icon: <Receipt size={24} /> },
+                            { href: "/mon-espace-locataire/cie-sodeci", label: "Factures", icon: <Zap size={24} /> },
                             { href: "/mon-espace-locataire/profil-public", label: "Matching", icon: <Handshake size={24} /> },
-                            { href: "/mon-espace-locataire/rights", label: "Mes droits", icon: <ShieldAlert size={24} /> },
+                            { href: "/mon-espace-locataire/rights", label: "Litiges", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/profile", label: "Profil", icon: <User size={24} /> },
+                            { href: "/mon-espace-locataire/passeport", label: "Passeport", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
-                            // Show "Profils" if the user has multiple roles OR multiple capacities
                             ...((session.user.eligibleRoles?.length > 1 || (session.user as any).capacites?.length > 1) 
-                                ? [{ href: "/auth/choose-role", label: "Profils", icon: <User size={24} /> }] 
+                                ? [{ href: "/auth/choose-role", label: "Rôles", icon: <User size={24} /> }] 
                                 : []),
-                            { label: "Quitter", icon: <LogOut size={24} />, onClick: () => onLogout() },
+                            { label: "Déconnexion", icon: <LogOut size={24} />, onClick: () => onLogout() },
                         ]} />
                     )}
                 </main>
