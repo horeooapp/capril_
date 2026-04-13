@@ -780,11 +780,11 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <div className="footer-col">
               <h4>Entreprise</h4>
               <div className="footer-links">
-                <a href="#" className="footer-link">À propos</a>
-                <a href="#" className="footer-link">Blog</a>
-                <a href="#" className="footer-link">Presse</a>
-                <a href="#" className="footer-link">Carrières</a>
-                <a href="#" className="footer-link">Contact</a>
+                <Link href="/a-propos" className="footer-link">À propos</Link>
+                <Link href="/blog" className="footer-link">Blog</Link>
+                <Link href="/presse" className="footer-link">Presse</Link>
+                <Link href="/carriere" className="footer-link">Carrières</Link>
+                <Link href="/contact" className="footer-link">Contact</Link>
               </div>
             </div>
           </div>
