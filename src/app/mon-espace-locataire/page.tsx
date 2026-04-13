@@ -343,7 +343,7 @@ export default function LocataireDashboardPage() {
                     </div>
 
                     <div className="mt-6 sm:mt-8 flex gap-3 z-10">
-                        <Link href="/mon-espace-locataire/receipts" className="flex-1 bg-white text-qnavy-dark hover:bg-qgrey-1 font-black rounded-2xl px-6 py-4 text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2">
+                        <Link href="/mon-espace-locataire/payment" className="flex-1 bg-white text-qnavy-dark hover:bg-qgrey-1 font-black rounded-2xl px-6 py-4 text-[10px] sm:text-xs uppercase tracking-widest transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2">
                            Régler maintenant <ArrowUpRight size={18} />
                         </Link>
                         <button className="h-14 w-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all" onClick={(e) => { e.preventDefault(); router.push('/mon-espace-locataire/receipts') }}>

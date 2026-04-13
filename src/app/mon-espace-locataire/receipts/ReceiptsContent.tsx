@@ -43,17 +43,23 @@ export default function ReceiptsContent({ receipts, lease }: any) {
                     </p>
                 </div>
 
-                {lease.computedStatus === "EN_RETARD" && (
-                    <div className="bg-qred-pale p-5 rounded-[1.5rem] shadow-sm border border-qred/20 flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto">
-                        <div className="text-left sm:text-right">
-                            <p className="text-[9px] font-black text-qred uppercase tracking-widest">Solde Dû</p>
-                            <p className="text-lg sm:text-xl font-black text-qred-dark whitespace-nowrap">{lease.totalArrears.toLocaleString()} <span className="text-xs">FCFA</span></p>
+                <div className="flex items-center gap-4">
+                    {lease.computedStatus === "EN_RETARD" ? (
+                        <div className="bg-qred-pale p-5 rounded-[1.5rem] shadow-sm border border-qred/20 flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto">
+                            <div className="text-left sm:text-right">
+                                <p className="text-[9px] font-black text-qred uppercase tracking-widest">Solde Dû</p>
+                                <p className="text-lg sm:text-xl font-black text-qred-dark whitespace-nowrap">{lease.totalArrears.toLocaleString()} <span className="text-xs">FCFA</span></p>
+                            </div>
+                            <Link href="/mon-espace-locataire/payment" className="bg-qred hover:bg-qred-dark text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] tracking-widest transition-all shadow-md shadow-qred/30 shrink-0">
+                                Payer Maintenant →
+                            </Link>
                         </div>
-                        <Link href="/mon-espace-locataire/payment" className="bg-qred hover:bg-qred-dark text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] tracking-widest transition-all shadow-md shadow-qred/30 shrink-0">
-                            Payer →
+                    ) : (
+                        <Link href="/mon-espace-locataire/payment" className="bg-qnavy hover:bg-qnavy-dark text-white font-black px-8 py-4 rounded-2xl uppercase text-[10px] tracking-widest transition-all shadow-xl shadow-qnavy/20 flex items-center gap-2">
+                           Régler mon Loyer <ShieldCheck size={16} />
                         </Link>
-                    </div>
-                )}
+                    )}
+                </div>
             </motion.div>
 
             {/* List */}
