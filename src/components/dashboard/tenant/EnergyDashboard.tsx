@@ -167,7 +167,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
          </div>
 
          <div className="h-64 flex items-end justify-between gap-4 px-4">
-            {data.map((d: any, i) => (
+            {filteredData.map((d: any, i) => (
                <div key={i} className="flex-grow flex flex-col items-center group relative h-full justify-end">
                   {/* Tooltip */}
                   <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 shadow-xl pointer-events-none">
@@ -177,7 +177,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                   {/* Bar */}
                   <motion.div 
                     initial={{ height: 0 }}
-                    animate={{ height: `${((d.kwh || d.m3) / maxVal) * 100}%` }}
+                    animate={{ height: `${(d.val / maxVal) * 100}%` }}
                     transition={{ delay: i * 0.1, duration: 0.8, ease: "easeOut" }}
                     className={`w-full max-w-[60px] rounded-t-2xl relative cursor-pointer hover:brightness-110 transition-all ${
                       activeProvider === 'cie' ? "bg-gradient-to-t from-orange-400 to-orange-500" : "bg-gradient-to-t from-blue-400 to-blue-500"
@@ -203,21 +203,21 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-widest italic">Dernières Factures.</h3>
             <button className="text-[10px] font-black uppercase text-blue-600 hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Voir tout l'historique</button>
          </div>
-         <div className="space-y-3">
-            {[1, 2, 3].map((f) => (
+          <div className="space-y-3">
+            {filteredData.slice(0, 5).map((f: any, i: number) => (
                <div key={f} className="bg-white p-5 rounded-3xl flex items-center justify-between border border-slate-100 hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-4">
                      <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
                         <Calendar size={20} />
                      </div>
                      <div>
-                        <div className="text-[13px] font-black text-[#1F4E79] uppercase">Facture {activeProvider.toUpperCase()} — {f === 1 ? 'Janvier 2026' : 'Décembre 2025'}</div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Référence : #{activeProvider.toUpperCase()}-00{f}82</div>
+                        <div className="text-[13px] font-black text-[#1F4E79] uppercase">Facture {activeProvider.toUpperCase()} — {f.month}</div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Réduction Profil Activée</div>
                      </div>
                   </div>
                   <div className="flex items-center gap-6">
                      <div className="text-right">
-                        <div className="text-[15px] font-black text-slate-900 font-mono">24 850 FCFA</div>
+                        <div className="text-[15px] font-black text-slate-900 font-mono">{f.cost.toLocaleString()} FCFA</div>
                         <div className="flex items-center gap-1 justify-end">
                            <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                            <span className="text-[9px] font-black text-green-600 uppercase">Payée</span>

@@ -213,6 +213,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
                             </div>
                         </motion.div>
                     </div>
+                )}
             </AnimatePresence>
         </>
     );
