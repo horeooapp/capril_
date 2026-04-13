@@ -112,7 +112,7 @@ export async function submitTenantRightRequest(payload: {
                         leaseId: lease.id,
                         locataireId: userId,
                         logementId: lease.propertyId,
-                        categorie: payload.data.categorie || MaintenanceCategory.AUTRE,
+                        categorie: payload.data.categorie || MaintenanceCategory.MAI_AU,
                         description: payload.data.description,
                         urgence: payload.data.urgence || "NORMALE",
                         ticketRef: `MAI-${Date.now().toString().slice(-4)}`
@@ -160,10 +160,10 @@ export async function submitTenantRightRequest(payload: {
                 } else {
                     // Rappel Simple : Notification par SMS au bailleur
                     if (lease.landlord.phone) {
-                        await sendSMS({
-                            to: lease.landlord.phone,
-                            message: `[QAPRIL] Rappel de votre locataire : ${payload.data.description}. Veuillez régulariser la situation sur votre espace bailleur.`
-                        })
+                        await sendSMS(
+                            lease.landlord.phone,
+                            `[QAPRIL] Rappel de votre locataire : ${payload.data.description}. Veuillez régulariser la situation sur votre espace bailleur.`
+                        )
                     }
                     result = { success: true, message: "Rappel envoyé au bailleur" }
                 }
