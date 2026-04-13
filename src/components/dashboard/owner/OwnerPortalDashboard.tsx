@@ -21,14 +21,14 @@ import Link from "next/link"
 import { retirerProperty } from "@/actions/property.actions"
 
 const T = {
-  navy: "#0D2B6E", navyPale: "#EEF2FA",
-  green: "#1A7A3C", greenLight: "#22A050", greenPale: "#E8F5EE",
-  orange: "#C05B00", orangePale: "#FFF3E0",
-  red: "#A00000", redPale: "#FEECEC",
-  teal: "#0E7490", tealPale: "#E0F4F9",
-  gold: "#C9A84C", goldPale: "#FDF6E3",
-  grey1: "#F2F5FA", grey2: "#D6DCE8", grey3: "#8FA0BC", grey4: "#4A5B7A",
-  textMid: "#2D3F5E", textLight: "#6A7D9E",
+  navy: "#0F1117", navyPale: "#F1F4F9",
+  green: "#00C896", greenLight: "#1FA4FF", greenPale: "#E6F0EC",
+  orange: "#FF8B00", orangePale: "#FFF0D6",
+  red: "#FF4E50", redPale: "#FFE8E8",
+  teal: "#00C896", tealPale: "#CCFAEE",
+  gold: "#FF8B00", goldPale: "#FFF0D6",
+  grey1: "#F8FAFC", grey2: "#E2E8F0", grey3: "#94A3B8", grey4: "#475569",
+  textMid: "#334155", textLight: "#64748B",
 };
 
 const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
@@ -193,10 +193,10 @@ export function OwnerPortalDashboard({
               </motion.div>
             )}
             
-            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] mb-2">
+            <p className="text-[10px] font-black text-[#FF8B00] uppercase tracking-[0.3em] mb-2">
               {activeRole === 'NON_CERTIFIED_AGENT' ? 'Gestionnaire Privé' : activeRole === 'INTERMEDIARY' ? 'Intermédiaire de Gestion' : activeRole === 'DIASPORA' ? 'Investisseur Diaspora' : 'Espace Propriétaire'} • Supervision
             </p>
-            <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none flex items-center gap-4 flex-wrap">
+            <h1 className="text-4xl md:text-5xl font-black text-[#0F1117] tracking-tighter uppercase leading-none flex items-center gap-4 flex-wrap">
               Bonjour, {((user?.firstName || '') + ' ' + (user?.lastName || '')).trim() || "Utilisateur"}.
               {intermData && (
                 <span className="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-100 rounded-lg text-[9px] font-black uppercase tracking-widest leading-none">
@@ -216,9 +216,9 @@ export function OwnerPortalDashboard({
                </button>
                <button 
                   onClick={() => setActiveTab("wallet")}
-                  className={`text-[12px] font-black uppercase tracking-[0.2em] pb-2 border-b-2 transition-all flex items-center gap-2 ${activeTab === "wallet" ? "border-[#C55A11] text-[#C55A11]" : "border-transparent text-gray-400 hover:text-gray-600"}`}
+                  className={`text-[12px] font-black uppercase tracking-[0.2em] pb-2 border-b-2 transition-all flex items-center gap-2 ${activeTab === "wallet" ? "border-[#FF8B00] text-[#FF8B00]" : "border-transparent text-gray-400 hover:text-gray-600"}`}
                >
-                 Mon Wallet <span className="bg-[#C55A11] text-white text-[8px] px-1.5 py-0.5 rounded-full">NOUVEAU</span>
+                 Mon Wallet <span className="bg-[#FF8B00] text-white text-[8px] px-1.5 py-0.5 rounded-full">NOUVEAU</span>
                </button>
             </div>
           </div>

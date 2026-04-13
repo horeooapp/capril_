@@ -206,11 +206,11 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                                 {isActive && (
                                     <motion.div 
                                         layoutId="sidebar-active-pill"
-                                        className="absolute inset-0 bg-white/10 border border-white/10 rounded-xl"
+                                        className="absolute inset-0 bg-[#FF8B00]/15 shadow-[inset_4px_0_0_#FF8B00] rounded-r-xl"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
-                                <span className={`relative z-10 transition-transform ${isActive ? "scale-110" : "group-hover:translate-x-1"}`}>
+                                <span className={`relative z-10 transition-transform ${isActive ? "scale-110 text-[#FF8B00]" : "group-hover:translate-x-1"}`}>
                                     {item.icon}
                                 </span>
                                 <span className="relative z-10 text-[12px] font-black uppercase tracking-widest flex-1">

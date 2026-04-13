@@ -132,9 +132,9 @@ export default function DashboardLayoutClient({
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden">
-            {/* Pure Light Grey workspace */}
-            <div className="fixed inset-0 bg-qbg -z-20"></div>
+        <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden font-sans">
+            {/* Soft Cream workspace */}
+            <div className="fixed inset-0 bg-background -z-20"></div>
             
             {/* Vertical Sidebar - Dark Mode Fixe */}
             {session?.user && (
@@ -149,8 +149,8 @@ export default function DashboardLayoutClient({
             )}
 
             <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
-                {/* Ultra Clean Top Navigation Bar */}
-                <header className="sticky top-0 z-50 bg-white border-b border-qgrey-2 shadow-sm">
+                {/* Custom Redesign Top Navigation Bar */}
+                <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-[0_4px_24px_rgba(0,0,0,.02)]">
                     <div className="h-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex items-center justify-between">
                         
                         <div className="flex items-center gap-6">
