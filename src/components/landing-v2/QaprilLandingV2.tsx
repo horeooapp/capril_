@@ -116,7 +116,10 @@ export default function QaprilLandingV2({ session }: { session: any }) {
         {session?.user ? (
             <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
         ) : (
-            <button onClick={() => handleLoginClick("LOCATAIRE")} className="nav-cta">Démarrer gratuitement →</button>
+            <div className="flex items-center gap-4">
+                <Link href="/mon-espace-locataire/login" className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full">Connexion Locataire</Link>
+                <Link href="/dashboard/login" className="nav-cta">Connexion Propriétaire</Link>
+            </div>
         )}
         <button className="nav-hamburger" aria-label="Menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span></span><span></span><span></span>

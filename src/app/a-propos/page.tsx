@@ -13,7 +13,10 @@ export default function AboutPage() {
         <Link href="/" className="nav-logo" style={{ textDecoration: 'none' }}>
           <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
         </Link>
-        <Link href="/" className="nav-cta" style={{ transform: 'none' }}>Accueil →</Link>
+        <div className="flex items-center gap-4">
+            <Link href="/mon-espace-locataire/login" className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full">Connexion Locataire</Link>
+            <Link href="/dashboard/login" className="bg-ink text-white font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-ink/80 transition-colors">Connexion Propriétaire</Link>
+        </div>
       </nav>
 
       <main className="relative z-10" style={{ paddingBottom: '100px' }}>

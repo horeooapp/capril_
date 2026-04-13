@@ -90,7 +90,7 @@ export const authConfig = {
                 pathname.startsWith("/api/webhooks") ||
                 pathname.startsWith("/api/public") ||
                 pathname.startsWith("/auth/") ||
-                ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact"].includes(pathname);
+                ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies"].includes(pathname);
 
             if (isPublic) {
                 if (isLoggedIn && pathname.includes("/login")) {
