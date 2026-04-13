@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 
 export default function BlogPage() {
@@ -87,26 +88,7 @@ export default function BlogPage() {
       </main>
 
       {/* FOOTER */}
-      <footer>
-        <div className="footer-inner" style={{ paddingTop: '20px' }}>
-          <div className="footer-bottom">
-            <div className="footer-legal flex flex-wrap items-center gap-x-4 gap-y-2 justify-center md:justify-start">
-              <span>© 2025 QAPRIL Technologies · Tous droits réservés</span>
-              <span className="hidden md:inline text-white/30">|</span>
-              <div className="flex flex-wrap items-center gap-4 text-white/50 text-[11px] uppercase tracking-widest">
-                <Link href="/cgu" className="hover:text-white transition-colors">CGU</Link>
-                <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions Légales</Link>
-                <Link href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</Link>
-                <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-              </div>
-            </div>
-            <div className="footer-badges">
-              <div className="f-badge">🏛 ANAH-CI</div>
-              <div className="f-badge">🏦 CDC-CI</div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

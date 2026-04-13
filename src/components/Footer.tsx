@@ -39,6 +39,7 @@ export default function Footer() {
                   <Link href="/dashboard/login" className="footer-link">Propriétaires</Link>
                   <Link href="/dashboard/login" className="footer-link">Agences immobilières</Link>
                   <Link href="/dashboard/login" className="footer-link">Agents NC</Link>
+                  <Link href="/devenir-champion" className="footer-link">Devenir Champion</Link>
                 </div>
               </div>
               <div className="footer-col">
