@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
 
-export default function QaprilLandingV2() {
+export default function QaprilLandingV2({ session }: { session: any }) {
   const [activeTab, setActiveTab] = useState("tenant");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -93,6 +93,9 @@ export default function QaprilLandingV2() {
      await choisirTypeConnexion(role);
   };
 
+  const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
+  const dashUrl = isAdmin ? "/admin" : (session?.user?.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard");
+
   return (
     <div className="landing-v2-wrapper font-sans text-ink bg-cream pb-0">
       <div className="custom-cursor" ref={cursorRef}></div>
@@ -111,7 +114,11 @@ export default function QaprilLandingV2() {
           <a href="#users" className="nav-link">Pour qui ?</a>
           <a href="#pricing" className="nav-link">Tarifs</a>
         </div>
-        <button onClick={() => handleLoginClick("LOCATAIRE")} className="nav-cta">Démarrer gratuitement →</button>
+        {session?.user ? (
+            <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
+        ) : (
+            <button onClick={() => handleLoginClick("LOCATAIRE")} className="nav-cta">Démarrer gratuitement →</button>
+        )}
         <button className="nav-hamburger" aria-label="Menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           <span></span><span></span><span></span>
         </button>
@@ -123,7 +130,11 @@ export default function QaprilLandingV2() {
           <a href="#how" onClick={() => setMobileMenuOpen(false)}>Comment ça marche</a>
           <a href="#users" onClick={() => setMobileMenuOpen(false)}>Pour qui ?</a>
           <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
-          <button onClick={() => { setMobileMenuOpen(false); handleLoginClick("LOCATAIRE"); }} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer' }}>Démarrer →</button>
+          {session?.user ? (
+            <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
+          ) : (
+            <button onClick={() => { setMobileMenuOpen(false); handleLoginClick("LOCATAIRE"); }} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer' }}>Démarrer →</button>
+          )}
         </div>
       )}
 
@@ -145,7 +156,11 @@ export default function QaprilLandingV2() {
             <h1>La gestion<br/>locative <span className="accent-mango">enfin</span><br/><span className="accent-sky">simple</span> & digitale</h1>
             <p className="hero-desc">QAPRIL connecte locataires, propriétaires et agences immobilières sur une seule plateforme. Payez votre loyer, gérez vos biens, formalisez vos baux — tout en quelques clics.</p>
             <div className="hero-actions">
-              <button onClick={() => handleLoginClick("BAILLEUR")} className="btn-hero btn-hero-primary">🚀 Commencer gratuitement</button>
+              {session?.user ? (
+                  <Link href={dashUrl} className="btn-hero btn-hero-primary">🚀 Retourner au Dashboard</Link>
+              ) : (
+                  <button onClick={() => handleLoginClick("BAILLEUR")} className="btn-hero btn-hero-primary">🚀 Commencer gratuitement</button>
+              )}
               <a href="#features" className="btn-hero btn-hero-secondary">▷ Voir la démo</a>
             </div>
             <div className="hero-trust">
@@ -716,7 +731,11 @@ export default function QaprilLandingV2() {
         <div className="cta-inner">
           <h2>Rejoignez 4 800+ Ivoiriens<br/>qui gèrent mieux leur logement</h2>
           <p>Inscription gratuite · Aucune carte bancaire requise · Actif en 5 minutes</p>
-          <button onClick={() => handleLoginClick("LOCATAIRE")} className="btn-cta-white">🚀 Créer mon compte gratuitement</button>
+          {session?.user ? (
+            <Link href={dashUrl} className="btn-cta-white">🚀 Accéder à mon Dashboard</Link>
+          ) : (
+            <button onClick={() => handleLoginClick("LOCATAIRE")} className="btn-cta-white">🚀 Créer mon compte gratuitement</button>
+          )}
           <div className="cta-sub">✓ Gratuit pour les locataires · ✓ Essai 30 jours pour les propriétaires · ✓ Support WhatsApp inclus</div>
         </div>
       </div>
