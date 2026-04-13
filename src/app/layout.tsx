@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import "./landing-v2.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
+import CookieConsent from "@/components/CookieConsent";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.qapril.ci"),
   title: {
@@ -107,6 +108,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <CookieConsent />
       </body>
     </html>
   );
