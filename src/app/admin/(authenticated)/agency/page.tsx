@@ -65,49 +65,47 @@ export default function AgencyDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-10">
+    <div className="space-y-12 pb-16 relative">
+      <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
+
       {/* Header Contextuel */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-        <div className="relative">
-          <motion.div 
-            initial={{ width: 0 }} animate={{ width: "100%" }}
-            className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-indigo-600 to-transparent" 
-          />
-          <h1 className="text-4xl font-black tracking-tighter flex items-center gap-3">
-            <Briefcase className="w-10 h-10 text-indigo-500" />
-            AGENCY <span className="text-indigo-500 italic">CORE</span>
+      <div className="page-header flex-col md:flex-row items-start md:items-center">
+        <div>
+          <h1 className="page-title flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-[#C55A11]" />
+            AGENCY <span className="text-[#C55A11] italic">CORE</span>
           </h1>
-          <p className="text-gray-500 text-sm font-bold uppercase tracking-widest mt-2 ml-1">Système de pilotage QAPRIL v3.0</p>
+          <p className="page-sub">Vigilance et pilotage des flux agences - Hub National</p>
         </div>
 
-        <div className="flex items-center gap-4 bg-gray-900/50 p-2 rounded-2xl border border-gray-800 backdrop-blur-md">
+        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
           <div className="flex -space-x-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="w-10 h-10 rounded-full bg-gray-800 border-2 border-black flex items-center justify-center text-[10px] font-bold">
+              <div key={i} className="w-10 h-10 rounded-full bg-[var(--ci-nuit2)] border-2 border-black flex items-center justify-center text-[10px] font-bold text-white">
                 A{i}
               </div>
             ))}
           </div>
-          <div className="p-3 bg-indigo-500/10 rounded-xl">
-            <span className="text-xs font-black text-indigo-500">4 Collaborateurs</span>
+          <div className="p-3 bg-[rgba(255,102,0,0.1)] rounded-xl">
+            <span className="text-xs font-black text-[#FF6600]">4 Collaborateurs</span>
           </div>
-          <button className="p-3 bg-gray-800 hover:bg-gray-700 rounded-xl transition-all relative" onClick={(e) => { e.preventDefault(); toast.success('Lectures mises à jour : Aucune alerte urgente.') }}>
+          <button className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all relative text-white" onClick={(e) => { e.preventDefault(); toast.success('Lectures mises à jour : Aucune alerte urgente.') }}>
             <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_10px_red]" />
           </button>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex gap-1 bg-gray-900/50 p-1.5 rounded-2xl border border-gray-800 w-fit mb-10 shadow-inner overflow-x-auto max-w-full no-scrollbar">
+      <div className="flex gap-1 bg-white/5 p-1.5 rounded-2xl border border-[rgba(255,102,0,0.2)] w-fit shadow-inner overflow-x-auto max-w-full no-scrollbar">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
               activeTab === tab.id 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" 
-                : "text-gray-500 hover:text-gray-300 hover:bg-gray-800"
+                ? "bg-[var(--ci-orange)] text-white shadow-lg shadow-[rgba(255,102,0,0.4)]" 
+                : "text-[var(--text-muted)] hover:text-white hover:bg-white/5"
             }`}
           >
             {tab.icon}
@@ -119,18 +117,20 @@ export default function AgencyDashboardPage() {
       {/* Main Container */}
       <div className="relative min-h-[600px]">
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center font-black tracking-widest text-indigo-500/20 animate-pulse text-4xl">
-            LOADING ASSETS...
+          <div className="absolute inset-0 flex items-center justify-center font-black tracking-widest text-[#FF6600]/20 animate-pulse text-4xl">
+            SYNCHRONISATION CORE...
           </div>
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: -10 }}
+              transition={{ duration: 0.3 }}
               className="w-full"
             >
+              {/* Note: Components inside here might still have some white bg that we will strip incrementally if needed. */}
               {activeTab === "PLANNING" && <AgencyCalendar initialEvents={events} />}
               {activeTab === "CRM" && <ContactBoard contacts={contacts} />}
               {activeTab === "MAINT" && <MaintenanceAgencyDash initialTickets={maintenanceTickets} />}
@@ -142,12 +142,12 @@ export default function AgencyDashboardPage() {
       </div>
 
       {/* Bottom Status Bar */}
-      <div className="mt-12 flex justify-between items-center border-t border-gray-800 pt-8 opacity-50 grayscale hover:grayscale-0 transition-all">
+      <div className="flex justify-between items-center border-t border-white/5 pt-8 opacity-60 grayscale hover:grayscale-0 transition-all mt-12">
         <div className="flex items-center gap-4">
-          <ShieldCheck className="w-5 h-5 text-green-500" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Temps réel certifié par QAPRIL Gateway</span>
+          <ShieldCheck className="w-5 h-5 text-[var(--ci-vert)]" />
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Architecture Sécurisée - Nuit V2</span>
         </div>
-        <div className="text-[10px] font-mono text-gray-500 uppercase">SESSION_ID: PROD-{new Date().getFullYear()}-CORE</div>
+        <div className="text-[10px] font-mono text-gray-600 uppercase">SESSION_ID: PROD-{new Date().getFullYear()}-CORE</div>
       </div>
     </div>
   );
