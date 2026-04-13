@@ -126,7 +126,7 @@ export default function LocataireDashboardPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
-            className={`premium-stat-card overflow-hidden group relative ${className}`}
+            className={`premium-stat-card overflow-hidden group relative bg-white ${className}`}
         >
             {children}
         </motion.div>

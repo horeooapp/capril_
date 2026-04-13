@@ -277,7 +277,6 @@ input:not([type="checkbox"]):not([type="radio"]) {
 }
 
 .premium-stat-card {
-  background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.03);
   box-shadow: 0 10px 40px -10px rgba(13, 43, 110, 0.05);
   border-radius: 1.5rem;

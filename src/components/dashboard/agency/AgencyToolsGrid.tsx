@@ -20,7 +20,7 @@ export const AgencyToolsGrid: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
-              className="p-6 premium-stat-card cursor-pointer group flex flex-col justify-between h-full"
+              className="p-6 premium-stat-card bg-white cursor-pointer group flex flex-col justify-between h-full"
             >
               <div className="flex justify-between items-start mb-6">
                 <div 

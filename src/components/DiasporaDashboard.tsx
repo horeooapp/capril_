@@ -87,7 +87,7 @@ const SecTitle = ({ label, right }: { label: string, right?: React.ReactNode }) 
 );
 
 const Card = ({ children, className = "" }: any) => (
-  <div className={`premium-stat-card p-8 ${className}`}>
+  <div className={`premium-stat-card bg-white p-8 ${className}`}>
     {children}
   </div>
 );

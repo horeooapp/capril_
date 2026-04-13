@@ -49,7 +49,7 @@ function PropSectionHeader({ label, right }: any) {
 
 const StatCard = ({ label, value, icon, color, bg, href }: any) => {
   const inner = (
-    <div className={`premium-stat-card p-6 flex flex-col gap-2 h-full ${href ? "cursor-pointer" : ""}`}>
+    <div className={`premium-stat-card bg-white p-6 flex flex-col gap-2 h-full ${href ? "cursor-pointer" : ""}`}>
       <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm border" style={{ backgroundColor: bg || '#F9FAFB', borderColor: (color || '#E5E7EB') + "40", color: color || '#111827' }}>{icon}</div>
       <div className="text-2xl font-black mt-2" style={{ color: '#111827' }}>{value}</div>
       <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{label}</div>
@@ -276,7 +276,7 @@ export function OwnerPortalDashboard({
 
         {/* TAUX D'ENCAISSEMENT PROMINENT */}
         <section className="max-w-4xl mx-auto w-full">
-          <Link href="/dashboard/wallet" className="premium-stat-card p-10 block group relative overflow-hidden">
+          <Link href="/dashboard/wallet" className="premium-stat-card bg-white p-10 block group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary blur-[100px] opacity-5 -mr-32 -mt-32 group-hover:opacity-10 transition-opacity"></div>
             <div className="relative z-10">
               <div className="flex justify-between items-end mb-8">
@@ -318,7 +318,7 @@ export function OwnerPortalDashboard({
               const s = entiteStats(e);
               return (
                 <div key={e.id}
-                  className="premium-stat-card p-8 cursor-pointer group"
+                  className="premium-stat-card bg-white p-8 cursor-pointer group"
                   style={{ borderLeftWidth: 6, borderLeftColor: s.impayes > 0 ? T.red : T.green }}
                   onClick={() => setSelectedEntite(selectedEntite?.id === e.id ? null : e)}>
                   <div className="flex items-center gap-6">

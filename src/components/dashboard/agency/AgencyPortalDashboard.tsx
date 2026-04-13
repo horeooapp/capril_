@@ -98,7 +98,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
               <div className="space-y-12">
                 {/* Active Alerts - MM-07 Protocol */}
                 <div className="px-4">
-                  <div className="premium-stat-card p-10 relative overflow-hidden group border-red-100/50">
+                  <div className="premium-stat-card bg-white p-10 relative overflow-hidden group border-red-100/50">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-red-500 blur-[120px] opacity-5 -mr-40 -mt-40 group-hover:opacity-10 transition-opacity"></div>
                     <h3 className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 relative z-10">
                        <ShieldCheck size={16} className="text-red-500" />

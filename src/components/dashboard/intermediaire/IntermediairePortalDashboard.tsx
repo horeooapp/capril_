@@ -64,7 +64,7 @@ const TabBtn = ({ id, active, icon: Icon, label, onClick }: any) => (
 )
 
 const KpiCard = ({ label, value, unit, icon: Icon, color, bg, sub }: any) => (
-  <div className="premium-stat-card p-4 flex flex-col justify-between min-h-[130px]">
+  <div className="premium-stat-card bg-white p-4 flex flex-col justify-between min-h-[130px]">
     <div className="flex justify-between items-start">
       <div className="p-2 rounded-xl bg-white/80 shadow-sm">
         <Icon size={16} style={{ color }} />
