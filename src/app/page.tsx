@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import "../app/landing-v2.css"; // Injecting the new frontend scoped CSS
 import QaprilLandingV2 from "@/components/landing-v2/QaprilLandingV2";
 
 export const dynamic = "force-dynamic";

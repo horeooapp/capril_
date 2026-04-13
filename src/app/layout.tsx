@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 // import { Geist, Geist_Mono } from "next/font/google"; // Removed due to DNS issue during production builds
 import "./globals.css";
+import "./landing-v2.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.qapril.ci"),
