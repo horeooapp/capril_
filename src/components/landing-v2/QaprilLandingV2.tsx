@@ -164,7 +164,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
                 style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </AnimatePresence>
-            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255, 251, 245, 0.90)', zIndex: 1 }}></div>
+            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255, 251, 245, 0.40)', zIndex: 1 }}></div>
           </div>
           <div className="hero-blob-1" style={{ zIndex: 2, opacity: 0.5 }}></div>
           <div className="hero-blob-2" style={{ zIndex: 2, opacity: 0.5 }}></div>
