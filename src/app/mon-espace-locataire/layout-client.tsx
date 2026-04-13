@@ -13,13 +13,16 @@ interface LocataireLayoutClientProps {
     children: React.ReactNode
     session: any
     onLogout: () => Promise<void>
+    dbActiveRole?: string
 }
 
 export default function LocataireLayoutClient({
     children,
     session,
-    onLogout
+    onLogout,
+    dbActiveRole
 }: LocataireLayoutClientProps) {
+    const activeRole = dbActiveRole || session?.user?.role;
     return (
         <SessionProvider session={session}>
             <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">

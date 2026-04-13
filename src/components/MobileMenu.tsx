@@ -26,6 +26,7 @@ interface MobileMenuProps {
     brandName?: string
     variant?: 'light' | 'dark' | 'primary'
     onLogout?: () => Promise<void> | void
+    activeRole?: string | null
 }
 
 export default function MobileMenu({ 
@@ -34,9 +35,11 @@ export default function MobileMenu({
     logoSrc = "/logo.png", 
     brandName = "QAPRIL", 
     variant = 'light',
-    onLogout 
+    onLogout,
+    activeRole
 }: MobileMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const displayRole = activeRole || session?.user?.role || 'CLIENT';
 
     const toggleMenu = () => setIsOpen(!isOpen)
 
@@ -73,7 +76,7 @@ export default function MobileMenu({
         <div className="xl:hidden flex items-center">
             <button 
                 onClick={toggleMenu}
-                className={`p-2.5 rounded-2xl ${s.button} transition-all active:scale-90 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none`}
+                className={`p-2.5 rounded-2xl ${s.button} transition-all active:scale-90 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none relative z-[110]`}
                 aria-label="Toggle menu"
             >
                 {isOpen ? (
@@ -103,18 +106,10 @@ export default function MobileMenu({
                         <div className="flex items-center space-x-3">
                             <img src={logoSrc} alt="Logo" className="h-10 w-auto" />
                             <div className="flex flex-col">
-                                <span className="font-black text-xl tracking-tighter uppercase leading-none">{brandName}</span>
-                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-[#1F4E79] mt-0.5">Navigation</span>
+                                <span className="font-black text-xl tracking-tighter uppercase leading-none whitespace-nowrap">{brandName}</span>
+                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-[#1F4E79] mt-0.5 whitespace-nowrap">Navigation</span>
                             </div>
                         </div>
-                        <button 
-                            onClick={toggleMenu} 
-                            className={`${s.button} p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-all`}
-                        >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
                     </div>
 
                     {/* Navigation */}
@@ -129,7 +124,7 @@ export default function MobileMenu({
                                 <span className="text-2xl group-hover:scale-110 transition-transform">
                                     {link.icon || <span className="w-2 h-2 rounded-full bg-[#1F4E79]/40"></span>}
                                 </span>
-                                <span className="text-[16px] font-bold uppercase tracking-widest">{link.label}</span>
+                                <span className="text-[16px] font-bold uppercase tracking-widest whitespace-nowrap">{link.label}</span>
                             </Link>
                         ))}
                     </nav>
@@ -141,18 +136,18 @@ export default function MobileMenu({
                                 <div className="px-6 py-6 bg-white/50 backdrop-blur-xl dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/10 shadow-inner">
                                     <p className="text-[12px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-[#1F4E79]/10 flex items-center justify-center text-[#1F4E79] font-black text-sm border border-[#1F4E79]/20">
-                                            {session.user.role?.charAt(0)}
+                                        <div className="w-12 h-12 rounded-full bg-[#1F4E79]/10 flex items-center justify-center text-[#1F4E79] font-black text-sm border border-[#1F4E79]/20 flex-shrink-0">
+                                            {displayRole.charAt(0)}
                                         </div>
                                         <div className="flex flex-col min-w-0 flex-1">
                                             <p className="text-[14px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
                                             <div className="flex items-center justify-between mt-1">
                                                 <div className="flex items-center">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                                    <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none">{session.user.role}</span>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)] flex-shrink-0"></span>
+                                                    <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none truncate">{displayRole}</span>
                                                 </div>
                                                 <Link 
-                                                    href={session.user.role === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
+                                                    href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
                                                     onClick={() => setIsOpen(false)}
                                                     className="bg-qnavy/10 text-qnavy p-2 rounded-lg hover:bg-qnavy hover:text-white transition-all scale-90"
                                                 >
@@ -164,14 +159,14 @@ export default function MobileMenu({
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link 
-                                        href={session.user.role === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
+                                        href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-center bg-qnavy text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-qnavy/20 col-span-2"
                                     >
                                         Gérer mon profil
                                     </Link>
                                     <Link 
-                                        href={session.user.role === 'TENANT' ? "/mon-espace-locataire" : (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
+                                        href={displayRole === 'TENANT' ? "/mon-espace-locataire" : (displayRole === 'ADMIN' || displayRole === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
                                     >

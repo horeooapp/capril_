@@ -27,7 +27,9 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    // CRITICAL: Verify active role carefully. We prioritize DB state (capaciteActive) because cookie updates can lag behind UI.
+    // CRITICAL (Rule R-01): Verify active role carefully. 
+    // We prioritize DB state (capaciteActive) because cookie updates can lag behind UI.
+    // If capaciteActive is null, we fallback to session's chosenRole or default role.
     const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
     const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
     if (!isGloballyActive) {

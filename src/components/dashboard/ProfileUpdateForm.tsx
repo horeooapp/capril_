@@ -11,12 +11,24 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
 
-    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole || '');
+    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole || '');
+    
+    // SAFE ISO DATE SERIALIZATION (Prevents "Invalid Date" crash)
+    const getInitialDate = (dateVal: any) => {
+        if (!dateVal) return "";
+        try {
+            const d = new Date(dateVal);
+            if (isNaN(d.getTime())) return "";
+            return d.toISOString().split('T')[0];
+        } catch (e) {
+            return "";
+        }
+    };
 
     const [formData, setFormData] = useState({
         firstName: initialData?.firstName || "",
         lastName: initialData?.lastName || "",
-        birthDate: initialData?.birthDate ? new Date(initialData.birthDate).toISOString().split('T')[0] : "",
+        birthDate: getInitialDate(initialData?.birthDate),
         birthPlace: initialData?.birthPlace || "",
         neighborhood: initialData?.neighborhood || "",
         profession: initialData?.profession || "",

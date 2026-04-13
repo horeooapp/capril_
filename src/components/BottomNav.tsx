@@ -46,7 +46,7 @@ export default function BottomNav({ items }: BottomNavProps) {
                         />
                     )}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? "text-[#1F4E79] opacity-100" : "text-gray-400 opacity-60"}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest truncate w-full text-center whitespace-nowrap ${isActive ? "text-[#1F4E79] opacity-100" : "text-gray-400 opacity-60"}`}>
                     {item.label}
                 </span>
             </>

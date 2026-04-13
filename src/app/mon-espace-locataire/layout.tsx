@@ -23,7 +23,9 @@ export default async function LocataireLayout({
              where: { id: session.user.id },
              select: { capaciteActive: true }
         });
-        computedRole = (dbUser as any)?.capaciteActive || computedRole;
+        
+        // CRITICAL (Rule R-01): Standardized Role Identification
+        computedRole = (dbUser as any)?.capaciteActive || (session.user as any).chosenRole || session.user.role;
 
         // CRITICAL: Verify Global Role Concurrency Lock
         const isGloballyActive = await isRoleGloballyActive(session.user.id, computedRole);
@@ -76,6 +78,7 @@ export default async function LocataireLayout({
         <LocataireLayoutClient 
             session={session} 
             onLogout={handleLogout}
+            dbActiveRole={computedRole}
         >
             {children}
         </LocataireLayoutClient>

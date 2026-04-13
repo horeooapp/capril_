@@ -213,7 +213,8 @@ export default function DashboardLayoutClient({
                                     links={navLinks} 
                                     session={session} 
                                     variant="dark" 
-                                    onLogout={() => signOut()} 
+                                    onLogout={() => signOut()}
+                                    activeRole={activeRole} 
                                 />
                             </div>
                         </div>

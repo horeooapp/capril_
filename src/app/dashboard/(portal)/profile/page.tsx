@@ -37,9 +37,9 @@ export default async function OwnerProfilePage() {
     const rccmDoc = user?.identityDocuments?.find(d => d.docType === 'RCCM');
     const nifDoc = user?.identityDocuments?.find(d => d.docType === 'NIF');
     const agrementDoc = user?.identityDocuments?.find(d => d.docType === 'AGREMENT');
-    const activeRole = (session.user as any)?.chosenRole || session.user.role;
-    
-    const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole);
+    // CRITICAL (Rule R-01): Standardized Role Identification
+    const activeRole = (user as any).capaciteActive || (session.user as any)?.chosenRole || session.user.role;
+    const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole);
 
     let displayRole = "PROPRIÉTAIRE";
     if (isAgencyRole) displayRole = "AGENCE";
