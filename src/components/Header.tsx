@@ -17,9 +17,8 @@ export default function Header() {
   return (
     <div className="landing-v2-wrapper" style={{ minHeight: 'auto', background: 'transparent' }}>
       <nav className={scrolled ? "scrolled" : ""} style={{ position: 'sticky', top: 0, zIndex: 500, borderBottom: '1px solid rgba(255,139,0,.12)' }}>
-        <Link href="/" className="nav-logo">
-          <div className="nav-logo-sq">Q</div>
-          QAPRIL
+        <Link href="/" className="nav-logo" style={{ textDecoration: 'none' }}>
+          <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
         </Link>
         <div className="nav-links">
           <Link href="/a-propos" className="nav-link">À Propos</Link>
