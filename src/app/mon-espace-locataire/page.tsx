@@ -330,13 +330,13 @@ export default function LocataireDashboardPage() {
                         </div>
                         
                         <div className="flex items-baseline gap-2 overflow-hidden">
-                            <span className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-none italic whitespace-nowrap">
+                            <span className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-none italic whitespace-nowrap text-[#FF8200]">
                                 {lease.rentAmount.toLocaleString()}
                             </span>
-                            <span className="text-sm sm:text-xl font-medium opacity-50 uppercase tracking-widest italic">FCFA</span>
+                            <span className="text-sm sm:text-xl font-medium opacity-70 uppercase tracking-widest italic text-[#FF8200]/80">FCFA</span>
                         </div>
-                        <p className="text-[10px] sm:text-xs font-medium opacity-60 mt-4 max-w-xs">
-                            Date limite : <span className="font-black text-white/90 uppercase mx-1 whitespace-nowrap">
+                        <p className="text-[10px] sm:text-xs font-bold text-qgreen-light mt-4 max-w-xs uppercase tracking-widest">
+                            Date limite : <span className="font-black text-white px-2 py-0.5 bg-qgreen/20 rounded-lg mx-1 whitespace-nowrap">
                                 {new Date(lease.rentDeadline).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </span>
                         </p>
