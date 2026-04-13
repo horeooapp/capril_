@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { Role } from "@prisma/client"
+import { Role, BdqStatut } from "@prisma/client"
 import { serializeLease, serializeObject } from "@/lib/serialize"
 import { normalizePhone } from "@/lib/phone"
 
@@ -130,8 +130,30 @@ export async function getTenantDashboard() {
             }
         }
 
+        // 3.1 Détecter les Déclarations M-SIGN (Situations A/B/C) en attente
+        const normalized = user.phone ? normalizePhone(user.phone) : null;
+        const pendingDeclarations = normalized ? await prisma.bailDeclaratif.findMany({
+            where: {
+                telephoneLocataire: normalized,
+                statut: BdqStatut.PENDING_LOCATAIRE
+            },
+            include: {
+                bailleur: {
+                    select: { firstName: true, lastName: true }
+                },
+                property: {
+                    select: { name: true, address: true, commune: true, city: true }
+                }
+            }
+        }) : [];
+
         if (!activeLease) {
-            return serializeObject({ success: true, hasLease: false, user })
+            return serializeObject({ 
+                success: true, 
+                hasLease: false, 
+                user,
+                pendingDeclarations: pendingDeclarations 
+            })
         }
 
         // 4. Calculer les statistiques du loyer
@@ -172,7 +194,8 @@ export async function getTenantDashboard() {
                 rentDeadline: rentDeadline.toISOString()
             },
             utilities,
-            score: locataireProfile?.scoreActuel || 750
+            score: locataireProfile?.scoreActuel || 750,
+            pendingDeclarations
         })
 
     } catch (error: any) {

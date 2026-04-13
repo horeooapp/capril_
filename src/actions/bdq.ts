@@ -6,6 +6,7 @@ import { BdqStatut, TypeBail, LeaseStatus, Role, Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { generateProofHash } from "@/lib/proof"
 import { sendSMS } from "@/lib/sms"
+import { normalizePhone } from "@/lib/phone"
 
 export type CreateBdqInput = {
     propertyId?: string
@@ -228,6 +229,42 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
     } catch (error: any) {
         console.error("[BDQ_CONFIRM_ERROR]", error)
         return { error: error.message || "Erreur lors de la confirmation." }
+    }
+}
+
+/**
+ * Confirm a BDQ directly from the Tenant Dashboard (No OTP needed if authenticated)
+ */
+export async function confirmBDQFromDashboard(bdqId: string, reponse: "OUI" | "NON", motif?: string) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) throw new Error("Non autorisé.");
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { phone: true }
+        });
+        if (!user || !user.phone) throw new Error("Profil utilisateur incomplet.");
+
+        const bdq = await prisma.bailDeclaratif.findUnique({
+            where: { id: bdqId }
+        });
+
+        if (!bdq) throw new Error("Déclaration introuvable.");
+
+        // Verification of phone number matching
+        const normalizedUser = normalizePhone(user.phone);
+        const normalizedBDQ = bdq.telephoneLocataire;
+
+        if (normalizedUser !== normalizedBDQ) {
+            throw new Error("Cette déclaration ne vous est pas destinée.");
+        }
+
+        // Reuse existing logic via Situation A/B/C logic or direct confirm
+        return await confirmBDQ(bdqId, "DASHBOARD_AUTH", reponse, motif);
+    } catch (e: any) {
+        console.error("[BDQ_DASHBOARD_CONFIRM] Error:", e);
+        return { success: false, error: e.message };
     }
 }
 

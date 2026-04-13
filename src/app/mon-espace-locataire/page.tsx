@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { getTenantDashboard } from "@/actions/tenant-actions"
 import Link from "next/link"
 import { 
@@ -21,13 +21,18 @@ import {
     Headset,
     MapPin,
     ArrowUpRight,
-    Zap
+    Zap,
+    CheckCircle,
+    XCircle,
+    Info
 } from "lucide-react"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
+import { confirmBDQFromDashboard } from "@/actions/bdq"
 
 export default function LocataireDashboardPage() {
     const { data: session, status } = useSession()
+    const [isPending, startTransition] = useTransition()
     const [dashboardData, setDashboardData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [isMounted, setIsMounted] = useState(false)
@@ -85,32 +90,125 @@ export default function LocataireDashboardPage() {
     }
 
     if (!dashboardData.hasLease) {
+        const pending = dashboardData.pendingDeclarations || [];
+
         return (
-            <div className="flex flex-col items-center justify-center h-[75vh] text-center px-4 relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center min-h-[85vh] text-center px-4 relative overflow-hidden py-20">
                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-qnavy/5 blur-[120px] rounded-full pointer-events-none"></div>
                 
                 <motion.div 
                     initial={{ y: 40, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative z-10"
+                    className="relative z-10 w-full max-w-4xl"
                 >
-                    <div className="w-28 h-28 bg-white border border-qgrey-2 rounded-[2rem] flex items-center justify-center text-5xl shadow-xl shadow-qnavy/5 mb-8 mx-auto">🏠</div>
-                    <h1 className="text-4xl font-black text-qnavy-dark mb-6 tracking-tighter leading-tight uppercase">
-                        Prêt à habiter <br /> en toute sérénité ?
-                    </h1>
-                    <p className="text-qtext-mid max-w-md mx-auto mb-10 font-medium leading-relaxed">
-                        Aucun bail actif n'est rattaché à votre compte ({dashboardData.user?.phone || 'Profil incomplet'}). 
-                        Digitalisez votre location pour profiter du <strong>Passeport Confiance QAPRIL</strong>.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/onboarding/tenant" className="bg-qnavy hover:bg-qnavy-dark text-white font-black px-10 py-5 rounded-2xl shadow-2xl shadow-qnavy/20 transition-all hover:-translate-y-1 uppercase tracking-widest text-xs">
-                            Compléter mon Profil
-                        </Link>
-                        <button onClick={() => router.push('/contact')} className="bg-white border border-qgrey-2 text-qnavy-dark font-black px-10 py-5 rounded-2xl hover:bg-qgrey-1 transition-all uppercase tracking-widest text-xs">
-                            Aide & Support
-                        </button>
-                    </div>
+                    {pending.length > 0 ? (
+                        <div className="space-y-12">
+                             <div className="space-y-4">
+                                <div className="w-20 h-20 bg-qorange-pale rounded-3xl flex items-center justify-center text-4xl shadow-xl shadow-qorange/10 mx-auto mb-6">🔔</div>
+                                <h1 className="text-3xl md:text-5xl font-black text-qnavy-dark tracking-tighter uppercase leading-tight italic">
+                                    Invitation M-SIGN <br /> Reçue.
+                                </h1>
+                                <p className="text-qtext-mid max-w-xl mx-auto font-medium leading-relaxed">
+                                    Un gérant immobilier a déclaré votre occupation. Confirmez pour activer votre bail digital et votre <strong>Passeport Confiance</strong>.
+                                </p>
+                             </div>
+
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                                {pending.map((bdq: any) => (
+                                    <div key={bdq.id} className="bg-white border border-qgrey-2 p-8 rounded-[2.5rem] shadow-xl shadow-qnavy/5 relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-qnavy/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
+                                        
+                                        <div className="relative z-10 space-y-6">
+                                            <div className="flex justify-between items-start">
+                                                <Badge label="BAIL DÉCLARATIF" color="#C55A11" bg="#FFF4ED" size={9} />
+                                                <span className="text-[10px] font-mono text-qtext-light">{bdq.id.substring(0,8).toUpperCase()}</span>
+                                            </div>
+
+                                            <div>
+                                                <h3 className="text-xl font-black text-qnavy-dark uppercase tracking-tighter mb-1">
+                                                    {bdq.property?.name || bdq.descriptionLogement.split(',')[0]}
+                                                </h3>
+                                                <div className="flex items-center gap-1.5 text-qtext-light">
+                                                    <MapPin size={12} />
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">{bdq.property?.commune || "Adresse déclarée"}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-4 bg-slate-50 rounded-2xl space-y-3">
+                                                <div className="flex justify-between">
+                                                    <span className="text-[9px] font-black uppercase text-slate-400">Loyer</span>
+                                                    <span className="text-sm font-black text-qnavy">{bdq.loyerDeclareMensuel.toLocaleString()} FCFA</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-[9px] font-black uppercase text-slate-400">Bailleur</span>
+                                                    <span className="text-[10px] font-bold text-slate-600">{bdq.bailleur?.firstName} {bdq.bailleur?.lastName}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3 pt-2">
+                                                <button 
+                                                    disabled={isPending}
+                                                    onClick={async () => {
+                                                        startTransition(async () => {
+                                                            const res = await confirmBDQFromDashboard(bdq.id, "OUI");
+                                                            if (res.success) {
+                                                                toast.success("Bail confirmé ! Félicitations.");
+                                                                window.location.reload();
+                                                            } else {
+                                                                toast.error(res.error || "Erreur lors de la confirmation.");
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="flex items-center justify-center gap-2 bg-qgreen hover:bg-qgreen-dark text-white font-black py-4 rounded-xl text-[10px] uppercase tracking-widest transition-all disabled:opacity-50"
+                                                >
+                                                    <CheckCircle size={16} /> Confirmer
+                                                </button>
+                                                <button 
+                                                    disabled={isPending}
+                                                    onClick={async () => {
+                                                        const motif = prompt("Veuillez indiquer le motif de contestation :");
+                                                        if (!motif) return;
+                                                        startTransition(async () => {
+                                                            const res = await confirmBDQFromDashboard(bdq.id, "NON", motif);
+                                                            if (res.success) {
+                                                                toast.info("Déclaration contestée. Médiation ouverte.");
+                                                                window.location.reload();
+                                                            } else {
+                                                                toast.error(res.error || "Erreur.");
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="flex items-center justify-center gap-2 bg-white border border-qgrey-2 text-qred hover:bg-qred-pale font-black py-4 rounded-xl text-[10px] uppercase tracking-widest transition-all disabled:opacity-50"
+                                                >
+                                                    <XCircle size={16} /> Contester
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                             </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="w-28 h-28 bg-white border border-qgrey-2 rounded-[2rem] flex items-center justify-center text-5xl shadow-xl shadow-qnavy/5 mb-8 mx-auto">🏠</div>
+                            <h1 className="text-4xl font-black text-qnavy-dark mb-6 tracking-tighter leading-tight uppercase">
+                                Prêt à habiter <br /> en toute sérénité ?
+                            </h1>
+                            <p className="text-qtext-mid max-w-md mx-auto mb-10 font-medium leading-relaxed">
+                                Aucun bail actif n'est rattaché à votre compte ({dashboardData.user?.phone || 'Profil incomplet'}). 
+                                Digitalisez votre location pour profiter du <strong>Passeport Confiance QAPRIL</strong>.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Link href="/onboarding/tenant" className="bg-qnavy hover:bg-qnavy-dark text-white font-black px-10 py-5 rounded-2xl shadow-2xl shadow-qnavy/20 transition-all hover:-translate-y-1 uppercase tracking-widest text-xs">
+                                    Compléter mon Profil
+                                </Link>
+                                <button onClick={() => router.push('/contact')} className="bg-white border border-qgrey-2 text-qnavy-dark font-black px-10 py-5 rounded-2xl hover:bg-qgrey-1 transition-all uppercase tracking-widest text-xs">
+                                    Aide & Support
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </motion.div>
             </div>
         )
@@ -147,6 +245,16 @@ export default function LocataireDashboardPage() {
         >
             {children}
         </motion.div>
+    )
+
+    // Badge locally defined or imported
+    const Badge = ({ label, color, bg, size = 10 }: any) => (
+        <span 
+            style={{ backgroundColor: bg, color: color, fontSize: `${size}px` }} 
+            className="px-3 py-1 rounded-full font-black uppercase tracking-widest"
+        >
+            {label}
+        </span>
     )
 
     return (
