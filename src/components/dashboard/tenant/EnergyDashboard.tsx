@@ -65,7 +65,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             Scannez votre première facture pour activer votre dashboard énergétique et comparer votre consommation avec la moyenne nationale.
           </p>
           <div className="pt-4">
-            <UploadFactureOCR leaseId={leaseId || "LOCATAIRE_SESSION_MOCK"} onUploadComplete={() => window.location.reload()} />
+            <UploadFactureOCR leaseId={leaseId || "LOCATAIRE_SESSION_MOCK"} />
           </div>
         </div>
       </div>
