@@ -30,7 +30,7 @@ export default function MentionsLegalesPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start pb-8 border-b border-black/5">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">01</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">L'Éditeur</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">L'Éditeur</h3>
                 </div>
                 <div className="md:col-span-3 space-y-4">
                     <p className="text-lg font-medium text-ink3 leading-relaxed">
@@ -52,7 +52,7 @@ export default function MentionsLegalesPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start pb-8 border-b border-black/5">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">02</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Hébergement</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Hébergement</h3>
                 </div>
                 <div className="md:col-span-3">
                     <p className="text-lg font-medium text-ink3 leading-relaxed mb-6">
@@ -69,7 +69,7 @@ export default function MentionsLegalesPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">03</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Cookies</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Cookies</h3>
                 </div>
                 <div className="md:col-span-3 p-10 bg-white rounded-[2.5rem] border border-black/5 shadow-xl shadow-black/5">
                     <p className="text-lg font-medium text-ink3 leading-relaxed">

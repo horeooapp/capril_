@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start pb-8 border-b border-black/5">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">01</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Collecte</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Collecte</h3>
                 </div>
                 <div className="md:col-span-3 space-y-4">
                     <p className="text-lg font-medium text-ink3 leading-relaxed">
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start pb-8 border-b border-black/5">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">02</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Utilisation</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Utilisation</h3>
                 </div>
                 <div className="md:col-span-3">
                     <p className="text-lg font-medium text-ink3 leading-relaxed mb-6">
@@ -83,7 +83,7 @@ export default function PrivacyPolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start pb-8 border-b border-black/5">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">03</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Conservation</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Conservation</h3>
                 </div>
                 <div className="md:col-span-3">
                     <p className="text-lg font-medium text-ink3 leading-relaxed border-l-4 pl-8 py-2" style={{ borderColor: 'var(--lime-d)' }}>
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
                 <div className="md:col-span-1">
                     <span className="text-5xl font-black text-black/5 block mb-2">04</span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-ink">Vos Droits</h2>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-ink">Vos Droits</h3>
                 </div>
                 <div className="md:col-span-3 p-10 bg-white rounded-[2.5rem] border border-black/5 shadow-xl shadow-black/5">
                     <p className="text-lg font-medium text-ink3 leading-relaxed mb-8">

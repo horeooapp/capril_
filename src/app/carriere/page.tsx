@@ -50,7 +50,7 @@ export default function CarrierePage() {
 
         {/* OPEN POSITIONS */}
         <section>
-            <h2 className="text-3xl font-black uppercase tracking-tight text-ink mb-10 text-center">Postes Ouverts</h2>
+            <h3 className="text-3xl font-black uppercase tracking-tight text-ink mb-10 text-center">Postes Ouverts</h3>
             
             <div className="space-y-4 max-w-4xl mx-auto">
                 {/* JOB 1 */}

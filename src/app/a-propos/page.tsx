@@ -46,7 +46,7 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
               <div>
-                <h2 className="text-4xl md:text-5xl font-black text-ink uppercase tracking-tighter mb-10">Notre Vision</h2>
+                <h3 className="text-4xl md:text-5xl font-black text-ink uppercase tracking-tighter mb-10">Notre Vision</h3>
                 <p className="text-lg text-ink3 font-medium leading-relaxed mb-12">
                   Nous croyons que la transparence est le fondement de tout marché immobilier sain. En digitalisant chaque contrat, chaque quittance et chaque incident, nous créons un écosystème où la fraude n'a plus sa place.
                 </p>

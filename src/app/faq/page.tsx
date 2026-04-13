@@ -83,9 +83,9 @@ export default function FAQPage() {
         
         {/* CTA */}
         <section className="py-24 text-center">
-            <h2 className="text-3xl font-black text-ink leading-none mb-8 uppercase">
+            <h3 className="text-3xl font-black text-ink leading-none mb-8 uppercase">
                 Encore une question ?
-            </h2>
+            </h3>
             <Link href="/contact" className="px-10 py-5 bg-ink text-white rounded-full font-black uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl shadow-black/20 inline-block">
                 Contacter notre support
             </Link>

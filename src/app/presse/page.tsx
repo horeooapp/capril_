@@ -29,7 +29,7 @@ export default function PressePage() {
 
         {/* MEDIA KIT & ASSETS */}
         <section className="mb-24">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-ink mb-10">Kit Média (Brand Assets)</h2>
+            <h3 className="text-3xl font-black uppercase tracking-tight text-ink mb-10">Kit Média (Brand Assets)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-white p-8 rounded-[2rem] border border-black/5 shadow-xl shadow-black/5 flex items-center justify-between">
                     <div>
@@ -50,7 +50,7 @@ export default function PressePage() {
 
         {/* PRESS RELEASES */}
         <section>
-            <h2 className="text-3xl font-black uppercase tracking-tight text-ink mb-10">Derniers Communiqués</h2>
+            <h3 className="text-3xl font-black uppercase tracking-tight text-ink mb-10">Derniers Communiqués</h3>
             <div className="space-y-6">
                 
                 <div className="bg-white p-8 rounded-[2rem] border border-black/5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-black/10 transition-colors cursor-pointer">
