@@ -153,17 +153,22 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       <section className="hero" id="hero">
         <div className="hero-bg">
           <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-            <AnimatePresence>
-              <motion.img 
-                key={bgIndex}
-                src={`/slider/bg_slider_${bgIndex + 1}.png`}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.8 }}
-                style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }}
+            {[0, 1, 2, 3, 4].map((index) => (
+              <img
+                key={index}
+                src={`/slider/bg_slider_${index + 1}.png`}
+                alt={`QAPRIL Slider ${index + 1}`}
+                className="transition-all duration-[2000ms] ease-in-out"
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  opacity: bgIndex === index ? 1 : 0,
+                  transform: bgIndex === index ? 'scale(1)' : 'scale(1.05)'
+                }}
               />
-            </AnimatePresence>
+            ))}
             <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255, 251, 245, 0.40)', zIndex: 1 }}></div>
           </div>
           <div className="hero-blob-1" style={{ zIndex: 2, opacity: 0.5 }}></div>
