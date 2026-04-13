@@ -8,6 +8,14 @@ export default function QaprilLandingV2({ session }: { session: any }) {
   const [activeTab, setActiveTab] = useState("tenant");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex(prev => (prev + 1) % 5);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, []);
   
   const cursorRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
@@ -143,9 +151,23 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       {/* ═══ HERO ═══ */}
       <section className="hero" id="hero">
         <div className="hero-bg">
-          <div className="hero-blob-1"></div>
-          <div className="hero-blob-2"></div>
-          <div className="hero-dots"></div>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+            <AnimatePresence>
+              <motion.img 
+                key={bgIndex}
+                src={`/slider/bg_slider_${bgIndex + 1}.png`}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.8 }}
+                style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </AnimatePresence>
+            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255, 251, 245, 0.90)', zIndex: 1 }}></div>
+          </div>
+          <div className="hero-blob-1" style={{ zIndex: 2, opacity: 0.5 }}></div>
+          <div className="hero-blob-2" style={{ zIndex: 2, opacity: 0.5 }}></div>
+          <div className="hero-dots" style={{ zIndex: 2 }}></div>
         </div>
         <div className="hero-content">
           <div className="hero-left">
