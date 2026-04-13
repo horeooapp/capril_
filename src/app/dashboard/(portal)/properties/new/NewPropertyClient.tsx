@@ -61,9 +61,13 @@ export default function NewPropertyClient() {
             parentPropertyId: parentId,
             commune: formData.get("commune") as string,
             address: formData.get("addressLine1") as string,
-            propertyType: (formData.get("propertyType") as string) || finalTypeStructure,
+            propertyType: (formData.get("propertyType") as string) || (finalTypeStructure === 'INDEPENDANT' ? 'STUDIO' : 'APARTMENT'),
             declaredRentFcfa: parseInt(formData.get("rent") as string) || undefined,
             superficieM2: parseFloat(formData.get("area") as string) || undefined,
+
+            // Bulk Creation Fields
+            nbUnits: structureCategory === 'PARENT' ? (parseInt(formData.get("nbUnits") as string) || 0) : 0,
+            unitRent: structureCategory === 'PARENT' ? (parseInt(formData.get("unitRent") as string) || 0) : 0,
         }
 
         startTransition(async () => {
@@ -143,6 +147,19 @@ export default function NewPropertyClient() {
                                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nom de la structure (Obligatoire)</label>
                                         <input required name="name" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none" placeholder="Ex: Imm. Les Palmiers, Cour Kone..." />
                                         <p className="text-[10px] text-gray-400 mt-1 italic">Ce nom préfixera tous les baux des unités à l'intérieur.</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:col-span-2">
+                                        <div className="bg-sky-50/30 p-4 rounded-xl border border-sky-100/50">
+                                            <label className="block text-[10px] font-black text-sky-700 uppercase tracking-widest mb-2">Nombre d'unités</label>
+                                            <input type="number" name="nbUnits" min="0" defaultValue="0" className="w-full px-3 py-2 bg-white border border-sky-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none text-sm font-bold" />
+                                            <p className="text-[9px] text-sky-600/70 mt-1">Génère automatiquement les appartements/portes.</p>
+                                        </div>
+                                        <div className="bg-sky-50/30 p-4 rounded-xl border border-sky-100/50">
+                                            <label className="block text-[10px] font-black text-sky-700 uppercase tracking-widest mb-2">Loyer par unité (FCFA)</label>
+                                            <input type="number" name="unitRent" min="0" placeholder="Ex: 150000" className="w-full px-3 py-2 bg-white border border-sky-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none text-sm font-bold" />
+                                            <p className="text-[9px] text-sky-600/70 mt-1">Loyer par défaut de chaque future unité.</p>
+                                        </div>
                                     </div>
                                 </>
                             )}

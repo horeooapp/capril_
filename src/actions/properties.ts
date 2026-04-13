@@ -333,104 +333,155 @@ export async function creerBien(data: {
   propertyType:      string;
   declaredRentFcfa?: number;
   superficieM2?:          number;
+
+  // Bulk additions
+  nbUnits?:          number;
+  unitRent?:         number;
 }) {
   try {
     const session = await ensureAuthenticated();
     const ownerUserId = data.ownerUserId || session.user.id;
-    const { typeStructure, unitLabel, parentPropertyId } = data;
+    const { typeStructure, unitLabel, parentPropertyId, nbUnits, unitRent } = data;
 
-    if (typeStructure !== "INDEPENDANT") {
-      if (!unitLabel?.trim() && parentPropertyId) {
-        throw new Error(`Nom de l'unité obligatoire pour un bien enfant`);
+    // ... validation logic omitted for brevity as it remains mostly the same, 
+    // but the actual replacement will include it to maintain file integrity.
+    // I will use a transaction for the whole process.
+
+    return await prisma.$transaction(async (tx) => {
+      if (typeStructure !== "INDEPENDANT") {
+        if (!unitLabel?.trim() && parentPropertyId) {
+          throw new Error(`Nom de l'unité obligatoire pour un bien enfant`);
+        }
+        if (!parentPropertyId && typeStructure !== "COUR_COMMUNE" && typeStructure !== "IMMEUBLE" && typeStructure !== "RESIDENCE") {
+          throw new Error(`Structure parente obligatoire pour un bien enfant`);
+        }
       }
-      if (!parentPropertyId && typeStructure !== "COUR_COMMUNE" && typeStructure !== "IMMEUBLE" && typeStructure !== "RESIDENCE") {
-        throw new Error(`Structure parente obligatoire pour un bien enfant`);
+
+      if (typeStructure !== "INDEPENDANT" && !parentPropertyId) {
+        if (!data.name?.trim()) {
+          throw new Error(`Nom obligatoire pour ${typeStructure}`);
+        }
       }
-    }
 
-    if (typeStructure !== "INDEPENDANT" && !parentPropertyId) {
-      if (!data.name?.trim()) {
-        throw new Error(`Nom obligatoire pour ${typeStructure}`);
+      if (typeStructure !== "INDEPENDANT" && unitLabel && parentPropertyId) {
+        const unitesExistantes = await tx.property.findMany({
+          where: { parentPropertyId, unitLabel: { not: null } },
+          select: { unitLabel: true }
+        });
+        const labelNorm = unitLabel.trim().toLowerCase();
+        const doublon = unitesExistantes.find(u => u.unitLabel?.trim().toLowerCase() === labelNorm);
+        if (doublon) {
+          throw new Error(`L'unite "${doublon.unitLabel}" existe deja. Choisissez un nom different.`);
+        }
       }
-    }
 
-    if (typeStructure !== "INDEPENDANT" && unitLabel && parentPropertyId) {
-      const unitesExistantes = await prisma.property.findMany({
-        where: { parentPropertyId, unitLabel: { not: null } },
-        select: { unitLabel: true }
-      });
-      const labelNorm = unitLabel.trim().toLowerCase();
-      const doublon = unitesExistantes.find(u => u.unitLabel?.trim().toLowerCase() === labelNorm);
-      if (doublon) {
-        throw new Error(`L'unite "${doublon.unitLabel}" existe deja. Choisissez un nom different.`);
+      let parentRef: string | undefined;
+      let inheritedData: any = {};
+
+      if (parentPropertyId) {
+        const parent = await tx.property.findUnique({
+          where: { id: parentPropertyId },
+          select: { 
+            propertyCode: true, 
+            name: true, 
+            commune: true, 
+            address: true, 
+            city: true, 
+            leaseType: true,
+            managedByUserId: true,
+            managementMode: true 
+          }
+        });
+        if (!parent) throw new Error("Structure parente introuvable");
+        parentRef = parent.propertyCode;
+        
+        inheritedData = {
+          commune: parent.commune,
+          address: parent.address,
+          city: parent.city,
+          leaseType: parent.leaseType,
+          managedByUserId: parent.managedByUserId,
+          managementMode: parent.managementMode,
+        };
+
+        if (!data.name && unitLabel) {
+          const parentName = parent.name || parent.propertyCode;
+          inheritedData.name = `${parentName} - ${unitLabel}`;
+        }
       }
-    }
 
-    let parentRef: string | undefined;
-    let inheritedData: any = {};
+      const unitLabelNorm = unitLabel ? normaliserLabel(unitLabel) : undefined;
+      const finalCommune = inheritedData.commune || data.commune;
+      const propertyCode = await genererReference(typeStructure, finalCommune, unitLabelNorm, parentRef);
 
-    if (parentPropertyId) {
-      const parent = await prisma.property.findUnique({
-        where: { id: parentPropertyId },
-        select: { 
-          propertyCode: true, 
-          name: true, 
-          commune: true, 
-          address: true, 
-          city: true, 
-          leaseType: true,
-          managedByUserId: true,
-          managementMode: true 
+      // Calcul Valeur Locative si Bulk
+      let finalDeclaredRent = data.declaredRentFcfa;
+      if (!finalDeclaredRent && nbUnits && unitRent) {
+        finalDeclaredRent = nbUnits * unitRent;
+      }
+
+      const bien = await tx.property.create({
+        data: {
+          propertyCode,
+          ownerUserId,
+          typeStructure,
+          name:             data.name || inheritedData.name,
+          unitLabel:        unitLabelNorm,
+          parentPropertyId: data.parentPropertyId,
+          commune:          finalCommune,
+          address:          inheritedData.address || data.address,
+          city:             inheritedData.city,
+          leaseType:        inheritedData.leaseType || "residential",
+          managedByUserId:  inheritedData.managedByUserId,
+          managementMode:   inheritedData.managementMode || "DIRECT",
+          propertyType:     data.propertyType,
+          declaredRentFcfa: finalDeclaredRent,
+          superficieM2:          data.superficieM2,
+          status:           "active"
         }
       });
-      if (!parent) throw new Error("Structure parente introuvable");
-      parentRef = parent.propertyCode;
-      
-      // Inherit logical fields
-      inheritedData = {
-        commune: parent.commune,
-        address: parent.address,
-        city: parent.city,
-        leaseType: parent.leaseType,
-        managedByUserId: parent.managedByUserId,
-        managementMode: parent.managementMode,
-      };
 
-      // Auto-naming: "Parent Name - Unit Label"
-      if (!data.name && unitLabel) {
-        const parentName = parent.name || parent.propertyCode;
-        inheritedData.name = `${parentName} - ${unitLabel}`;
+      // --- BULK UNIT CREATION ---
+      if (nbUnits && nbUnits > 0 && typeStructure !== 'INDEPENDANT') {
+        const prefix = typeStructure === 'IMMEUBLE' ? 'Apt' : 
+                       typeStructure === 'COUR_COMMUNE' ? 'Porte' : 'Lot';
+        
+        for (let i = 1; i <= nbUnits; i++) {
+          const childLabel = `${prefix} ${i}`;
+          const childLabelNorm = normaliserLabel(childLabel);
+          
+          // Reference for child
+          const childSuffix = childLabelNorm.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+          const childCode = `${bien.propertyCode}-${childSuffix}`;
+
+          await tx.property.create({
+            data: {
+              propertyCode:     childCode,
+              ownerUserId:      ownerUserId,
+              typeStructure:    typeStructure,
+              name:             `${bien.name} - ${childLabel}`,
+              unitLabel:        childLabelNorm,
+              parentPropertyId: bien.id,
+              commune:          bien.commune,
+              address:          bien.address,
+              city:             bien.city,
+              leaseType:        bien.leaseType,
+              managedByUserId:  bien.managedByUserId,
+              managementMode:   bien.managementMode,
+              propertyType:     typeStructure === 'IMMEUBLE' ? 'APARTMENT' : 
+                               typeStructure === 'COUR_COMMUNE' ? 'ROOM' : 'STUDIO',
+              declaredRentFcfa: unitRent,
+              status:           "active"
+            }
+          });
+        }
       }
-    }
 
-    const unitLabelNorm = unitLabel ? normaliserLabel(unitLabel) : undefined;
-    const finalCommune = inheritedData.commune || data.commune;
-    const propertyCode = await genererReference(typeStructure, finalCommune, unitLabelNorm, parentRef);
-
-    const bien = await prisma.property.create({
-      data: {
-        propertyCode,
-        ownerUserId,
-        typeStructure,
-        name:             data.name || inheritedData.name,
-        unitLabel:        unitLabelNorm,
-        parentPropertyId: data.parentPropertyId,
-        commune:          finalCommune,
-        address:          inheritedData.address || data.address,
-        city:             inheritedData.city,
-        leaseType:        inheritedData.leaseType || "residential",
-        managedByUserId:  inheritedData.managedByUserId,
-        managementMode:   inheritedData.managementMode || "DIRECT",
-        propertyType:     data.propertyType,
-        declaredRentFcfa: data.declaredRentFcfa,
-        superficieM2:          data.superficieM2,
-        status:           "active"
-      }
+      revalidatePath("/dashboard");
+      revalidatePath("/dashboard/properties");
+      return { success: true, bien, propertyCode: propertyCode };
     });
 
-    revalidatePath("/dashboard");
-    revalidatePath("/dashboard/properties");
-    return { success: true, bien, propertyCode: propertyCode };
   } catch (error: any) {
     console.error("[créerBien Error]:", error);
     return { error: error.message || "Une erreur est survenue lors de la création du bien." };
