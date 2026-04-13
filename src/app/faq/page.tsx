@@ -1,8 +1,8 @@
- 
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 
 const faqs = [
@@ -32,80 +32,70 @@ export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <div className="bg-white min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
-      {/* HEADER */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-3 group text-decoration-none">
-              <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto drop-shadow-sm group-hover:scale-110 transition-transform" />
-              <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase">QAPRIL</span>
-            </Link>
-            <Link href="/" className="text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">
-              Retour à l&apos;accueil
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="landing-v2-wrapper font-sans text-ink bg-cream min-h-screen overflow-x-hidden relative">
+      <div className="noise-overlay"></div>
 
-      <main>
+      {/* HEADER */}
+      <nav id="navbar" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', boxShadow: '0 4px 24px rgba(0,0,0,.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5%', height: '80px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+        <Link href="/" className="nav-logo" style={{ textDecoration: 'none' }}>
+          <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+        </Link>
+        <div className="flex items-center gap-4">
+            <Link href="/mon-espace-locataire/login" className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full">Connexion Locataire</Link>
+            <Link href="/dashboard/login" className="bg-ink text-white font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-ink/80 transition-colors">Connexion Propriétaire</Link>
+        </div>
+      </nav>
+
+      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         {/* HERO SECTION */}
-        <section className="relative py-32 overflow-hidden bg-gray-50 border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-[0.3em] mb-8">
-              Assistance & FAQ
+        <section className="text-center mb-20">
+            <span className="inline-block px-5 py-2 rounded-full border border-black/10 text-ink text-[11px] font-black uppercase tracking-[0.3em] mb-6 bg-white">
+              Assistance
             </span>
-            <h1 className="text-5xl md:text-8xl font-black text-gray-900 leading-[0.9] tracking-tighter mb-10 uppercase">
+            <h1 className="text-4xl md:text-6xl font-black text-ink leading-[1.1] tracking-tighter mb-6 uppercase">
               Toutes vos <br />
-              <span className="text-primary italic">réponses</span>.
+              <span style={{ color: 'var(--mango)' }}>Réponses</span>
             </h1>
-            <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
-              Vous avez des questions sur le registre national ? Nous avons les réponses pour vous accompagner dans votre transformation digitale immobilière.
+            <p className="text-sm font-bold uppercase tracking-widest text-ink3 mb-24">
+              Base de connaissances officielle
             </p>
-          </div>
         </section>
 
         {/* FAQ ACCORDION */}
-        <section className="py-32 bg-white">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
-                  className={`border-2 rounded-[2rem] transition-all overflow-hidden ${openIndex === index ? 'border-primary bg-orange-50/30 shadow-xl shadow-orange-100/50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+        <section className="space-y-4">
+            {faqs.map((faq, index) => (
+            <div 
+                key={index} 
+                className={`border-2 rounded-[2rem] transition-all overflow-hidden ${openIndex === index ? 'border-none bg-white shadow-xl shadow-black/5' : 'border-black/5 bg-cream hover:border-black/10'}`}
+            >
+                <button 
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full text-left px-8 py-8 flex justify-between items-center focus:outline-none"
                 >
-                  <button 
-                    onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                    className="w-full text-left px-8 py-8 flex justify-between items-center focus:outline-none"
-                  >
-                    <span className="text-xl font-black text-gray-900 uppercase tracking-tight">{faq.q}</span>
-                    <span className={`text-2xl font-black transition-transform duration-300 ${openIndex === index ? 'rotate-45 text-primary' : 'text-gray-300'}`}>
-                      +
-                    </span>
-                  </button>
-                  <div 
-                    className={`px-8 transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}
-                  >
-                    <p className="text-lg text-gray-600 font-medium leading-relaxed border-t border-gray-100 pt-6">
-                      {faq.a}
-                    </p>
-                  </div>
+                <span className="text-xl font-black text-ink uppercase tracking-tight" style={{ color: openIndex === index ? 'var(--mango)' : 'inherit' }}>{faq.q}</span>
+                <span className={`text-2xl font-black transition-transform duration-300 ${openIndex === index ? 'rotate-45' : 'text-black/30'}`} style={{ color: 'var(--mango)' }}>
+                    +
+                </span>
+                </button>
+                <div 
+                className={`px-8 transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}
+                >
+                <p className="text-lg text-ink3 font-medium leading-relaxed border-t border-black/5 pt-6">
+                    {faq.a}
+                </p>
                 </div>
-              ))}
             </div>
-          </div>
+            ))}
         </section>
-
+        
         {/* CTA */}
-        <section className="py-24 bg-gray-900 text-center">
-            <div className="max-w-3xl mx-auto px-4">
-                <h2 className="text-3xl md:text-5xl font-black text-white leading-none mb-8 uppercase">
-                    Encore une question ?
-                </h2>
-                <Link href="/contact" className="px-10 py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl shadow-primary/20 inline-block">
-                    Contacter notre support
-                </Link>
-            </div>
+        <section className="py-24 text-center">
+            <h2 className="text-3xl font-black text-ink leading-none mb-8 uppercase">
+                Encore une question ?
+            </h2>
+            <Link href="/contact" className="px-10 py-5 bg-ink text-white rounded-full font-black uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl shadow-black/20 inline-block">
+                Contacter notre support
+            </Link>
         </section>
       </main>
 

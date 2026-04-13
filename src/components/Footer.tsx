@@ -1,80 +1,78 @@
- 
+"use client";
+
 import Link from "next/link";
+import "../app/landing-v2.css";
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 border-t border-gray-800 print:hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-
-                    {/* Brand and Info */}
-                    <div className="md:col-span-1 space-y-4">
-                        <div className="flex items-center space-x-4 group">
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto opacity-90 group-hover:scale-105 transition-transform duration-500" />
-                        </div>
-                        <p className="text-gray-400 text-sm leading-relaxed">
-                            La plateforme nationale de gestion des loyers et d&apos;émission de quittances certifiées en République de Côte d&apos;Ivoire.
-                        </p>
-                    </div>
-
-                    {/* Navigation */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Plateforme</h3>
-                        <ul className="space-y-2">
-                            <li><Link href="/dashboard/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Propriétaire</Link></li>
-                            <li><Link href="/mon-espace-locataire/login" className="text-sm text-gray-400 hover:text-white transition-colors">Espace Locataire</Link></li>
-                            <li><Link href="/admin" className="text-sm text-gray-400 hover:text-white transition-colors">Observatoire National</Link></li>
-                            <li><Link href="/#comment-ca-marche" className="text-sm text-gray-400 hover:text-white transition-colors">Comment ça marche ?</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Liens Utiles */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">À découvrir</h3>
-                        <ul className="space-y-2">
-                            <li><Link href="/a-propos" className="text-sm text-gray-400 hover:text-white transition-colors">À propos</Link></li>
-                            <li><Link href="/a-propos" className="text-sm text-gray-400 hover:text-white transition-colors">Qui sommes-nous ?</Link></li>
-                            <li><Link href="/faq" className="text-sm text-gray-400 hover:text-white transition-colors">FAQ</Link></li>
-                            <li><Link href="/contact" className="text-sm text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Legal */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Légal</h3>
-                        <ul className="space-y-2">
-                            <li><Link href="/cgu" className="text-sm text-gray-400 hover:text-white transition-colors">Conditions Générales (CGU)</Link></li>
-                            <li><Link href="/confidentialite" className="text-sm text-gray-400 hover:text-white transition-colors">Politique de Confidentialité</Link></li>
-                            <li><Link href="/mentions-legales" className="text-sm text-gray-400 hover:text-white transition-colors">Mentions Légales</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">Contact & Support</h3>
-                        <ul className="space-y-2">
-                            <li className="text-sm text-gray-400 flex items-center">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                support@qapril.net
-                            </li>
-                            <li className="text-sm text-gray-400 flex items-center">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                Assistance USSD
-                            </li>
-                        </ul>
-                    </div>
+      <div className="landing-v2-wrapper font-sans text-ink pb-0" style={{ backgroundColor: 'transparent' }}>
+        <footer>
+          <div className="footer-inner">
+            <div className="footer-top">
+              <div className="footer-brand">
+                <Link href="/" className="footer-logo">
+                  <div style={{ background: 'white', padding: '10px 16px', borderRadius: '14px', display: 'inline-block', marginBottom: '16px' }}>
+                    <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+                  </div>
+                </Link>
+                <p>La plateforme de gestion locative numérique de Côte d'Ivoire. Conçue pour les acteurs du marché immobilier ivoirien.</p>
+                <div className="footer-socials">
+                  <a href="#" className="social-btn">📘</a>
+                  <a href="#" className="social-btn">📷</a>
+                  <a href="#" className="social-btn">💬</a>
+                  <a href="#" className="social-btn">🐦</a>
                 </div>
-
-                {/* Copyright */}
-                <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-sm text-gray-400 mb-4 md:mb-0">
-                        &copy; {new Date().getFullYear()} QAPRIL - Portail National de Normalisation du Marché Locatif. Tous droits réservés.
-                    </p>
-                    <div className="flex space-x-6">
-                        <span className="text-xs text-gray-500">Un service sécurisé pour la République de Côte d&apos;Ivoire</span>
-                    </div>
+              </div>
+              <div className="footer-col">
+                <h4>Produit</h4>
+                <div className="footer-links">
+                  <a href="/#features" className="footer-link">Fonctionnalités</a>
+                  <a href="/#pricing" className="footer-link">Tarifs</a>
+                  <a href="#" className="footer-link">Application mobile</a>
+                  <a href="#" className="footer-link">API & Intégrations</a>
+                  <a href="#" className="footer-link">Nouveautés</a>
                 </div>
+              </div>
+              <div className="footer-col">
+                <h4>Pour vous</h4>
+                <div className="footer-links">
+                  <Link href="/mon-espace-locataire/login" className="footer-link">Locataires</Link>
+                  <Link href="/dashboard/login" className="footer-link">Propriétaires</Link>
+                  <Link href="/dashboard/login" className="footer-link">Agences immobilières</Link>
+                  <Link href="/dashboard/login" className="footer-link">Agents NC</Link>
+                </div>
+              </div>
+              <div className="footer-col">
+                <h4>Entreprise</h4>
+                <div className="footer-links">
+                  <Link href="/a-propos" className="footer-link">À propos</Link>
+                  <Link href="/blog" className="footer-link">Blog</Link>
+                  <Link href="/presse" className="footer-link">Presse</Link>
+                  <Link href="/carriere" className="footer-link">Carrières</Link>
+                  <Link href="/contact" className="footer-link">Contact</Link>
+                </div>
+              </div>
             </div>
+            <div className="footer-bottom">
+              <div className="footer-legal flex flex-wrap items-center gap-x-4 gap-y-2 justify-center md:justify-start">
+                <span>© 2025 QAPRIL Technologies · Abidjan, Côte d'Ivoire · Tous droits réservés</span>
+                <span className="hidden md:inline text-white/30">|</span>
+                <div className="flex flex-wrap items-center gap-4 text-white/50 text-[11px] uppercase tracking-widest">
+                  <Link href="/cgu" className="hover:text-white transition-colors">CGU</Link>
+                  <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions</Link>
+                  <Link href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</Link>
+                  <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+                </div>
+              </div>
+              <div className="footer-badges">
+                <div className="f-badge">🏛 ANAH-CI</div>
+                <div className="f-badge">🏦 CDC-CI</div>
+                <div className="f-badge">📋 DGI</div>
+                <div className="f-badge">🔒 ARTCI</div>
+              </div>
+            </div>
+          </div>
         </footer>
+      </div>
     );
 }
