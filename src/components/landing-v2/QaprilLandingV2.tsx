@@ -105,7 +105,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       {/* ═══ NAV ═══ */}
       <nav id="navbar" style={{ boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,.08)' : 'none' }}>
         <a href="#" className="nav-logo">
-          <img src="/logo.png" alt="QAPRIL Logo" style={{ height: '56px', width: 'auto', marginTop: '-6px', marginBottom: '-6px' }} />
+          <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
         </a>
         <div className="nav-links">
           <a href="#features" className="nav-link">Fonctionnalités</a>
@@ -746,7 +746,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <div className="footer-brand">
               <a href="#" className="footer-logo">
                 <div style={{ background: 'white', padding: '10px 16px', borderRadius: '14px', display: 'inline-block', marginBottom: '16px' }}>
-                  <img src="/logo.png" alt="QAPRIL Logo" style={{ height: '48px', width: 'auto' }} />
+                  <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
                 </div>
               </a>
               <p>La plateforme de gestion locative numérique de Côte d'Ivoire. Conçue pour les acteurs du marché immobilier ivoirien.</p>
