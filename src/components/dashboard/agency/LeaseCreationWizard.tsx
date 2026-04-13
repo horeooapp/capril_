@@ -1,7 +1,7 @@
 "use client"
 import { toast } from "sonner";
 
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -16,7 +16,9 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Badge } from './Badge';
+import { createBDQ } from "@/actions/bdq";
 
 const steps = [
   { id: 1, label: "Locataire", icon: <UserPlus size={20} /> },
@@ -26,6 +28,8 @@ const steps = [
 ];
 
 export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ properties }) => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
@@ -41,13 +45,49 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
   const selectedProperty = properties.find(p => p.id === formData.propertyId);
 
   const nextStep = () => {
+    if (currentStep === 1 && (!formData.name || !formData.phone)) {
+        toast.error("Veuillez renseigner le nom et le téléphone du locataire.");
+        return;
+    }
+    if (currentStep === 2 && !formData.propertyId) {
+        toast.error("Veuillez sélectionner un bien immobilier.");
+        return;
+    }
+
     if (currentStep === 3 && formData.deposit > formData.rent * 2) {
-      alert("La loi Ivoirienne limite la caution à un maximum de 2 mois de loyer.")
+      toast.error("La loi Ivoirienne limite la caution à un maximum de 2 mois de loyer.")
       return;
     }
     setCurrentStep(prev => Math.min(prev + 1, 4))
   };
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
+  const handleComplete = async () => {
+    if (!formData.name || !formData.phone || !formData.propertyId || !formData.rent) {
+        toast.error("Données du bail incomplètes.");
+        return;
+    }
+
+    startTransition(async () => {
+        const result = await createBDQ({
+            propertyId: formData.propertyId,
+            nomLocataire: formData.name,
+            telephoneLocataire: formData.phone,
+            descriptionLogement: selectedProperty?.address || "Logement non spécifié",
+            loyerMensuel: formData.rent,
+            dateEntree: new Date(formData.startDate),
+            sourceCreation: "WIZARD_MSIGN"
+        });
+
+        if (result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success("Bail créé et invitation M-SIGN envoyée au locataire !");
+            router.push("/dashboard/leases");
+            router.refresh();
+        }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -269,8 +309,12 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                            <h4 className="text-[13px] font-black uppercase tracking-tighter italic">Lancer l'Invitation M-SIGN</h4>
                            <p className="text-[10px] text-white/60 font-medium">Envoi SMS au {formData.phone || "+225 00 00 00 00"}</p>
                         </div>
-                        <button className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                           <ArrowRight size={24} />
+                        <button 
+                           disabled={isPending}
+                           className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95 disabled:opacity-50" 
+                           onClick={(e) => { e.preventDefault(); handleComplete(); }}
+                        >
+                           <ArrowRight size={24} className={isPending ? "animate-pulse" : ""} />
                         </button>
                      </div>
                   </div>
