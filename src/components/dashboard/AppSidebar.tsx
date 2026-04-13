@@ -150,7 +150,7 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 w-[280px] z-[60] hidden lg:block">
-            <div className="h-full bg-qnavy border-r border-qnavy-light shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative">
+            <div className="h-full bg-[#065F46] border-r border-[#047857] shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden relative">
                 {/* Brand Logo Section */}
                 <div className="p-8 shrink-0 flex items-center justify-between border-b border-white/5">
                     <Link href={role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard"} className="flex flex-col gap-2 group">
@@ -206,11 +206,11 @@ export default function AppSidebar({ role, onLogout, userName, diasporaAbonnemen
                                 {isActive && (
                                     <motion.div 
                                         layoutId="sidebar-active-pill"
-                                        className="absolute inset-0 bg-[#FF8B00]/15 shadow-[inset_4px_0_0_#FF8B00] rounded-r-xl"
+                                        className="absolute inset-0 bg-[#FF6600]/15 shadow-[inset_4px_0_0_#FF6600] rounded-r-xl"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
-                                <span className={`relative z-10 transition-transform ${isActive ? "scale-110 text-[#FF8B00]" : "group-hover:translate-x-1"}`}>
+                                <span className={`relative z-10 transition-transform ${isActive ? "scale-110 text-[#FF6600]" : "group-hover:translate-x-1"}`}>
                                     {item.icon}
                                 </span>
                                 <span className="relative z-10 text-[12px] font-black uppercase tracking-widest flex-1">
