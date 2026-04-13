@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function QaprilLandingV2({ session }: { session: any }) {
   const [activeTab, setActiveTab] = useState("tenant");
