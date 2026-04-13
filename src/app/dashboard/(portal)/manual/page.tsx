@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
 import { BookOpen, Search, ChevronRight, FileText, Video, HelpCircle } from "lucide-react"
+import Link from "next/link";
 import { toast } from "sonner";
 
 export default function ManualDashboardPage() {
@@ -69,7 +69,7 @@ export default function ManualDashboardPage() {
             
             <div className="text-center pt-8">
                 <p className="text-xs font-bold text-qtext-light">
-                    Besoin d'assistance directe ? <span className="text-qnavy underline cursor-pointer">Ouvrir un ticket technique</span>
+                    Besoin d'assistance directe ? <Link href="/dashboard/maintenance/new" className="text-qnavy underline cursor-pointer hover:text-qnavy-dark transition-colors">Ouvrir un ticket technique</Link>
                 </p>
             </div>
         </div>
