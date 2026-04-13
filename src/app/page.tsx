@@ -1,227 +1,63 @@
- 
 import Link from "next/link";
 import { auth } from "@/auth";
-import Footer from "@/components/Footer";
-import MobileMenu from "@/components/MobileMenu";
-import SectionHeading from "@/components/SectionHeading";
-import AppDepthCards from "@/components/AppDepthCards";
-import HeroSlider from "@/components/HeroSlider";
-import { logout } from "@/actions/auth";
-import NewsTicker from "@/components/NewsTicker";
-import { getActiveNews } from "@/actions/news-actions";
-import { isFeatureEnabled } from "@/lib/features";
-import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import ImpactStats from "@/components/ImpactStats";
-import RealEstateObservatory from "@/components/RealEstateObservatory";
-import GeographicRentAnalysis from "@/components/GeographicRentAnalysis";
-import RentRanking from "@/components/RentRanking";
-import InteractiveBackground from "@/components/ui/InteractiveBackground";
+import "../app/landing-v2.css"; // Injecting the new frontend scoped CSS
+import QaprilLandingV2 from "@/components/landing-v2/QaprilLandingV2";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+export default async function Home() {
   let session = null;
-  let dbNews: any[] = [];
-  let isLandingPageEnabled = false;
-  let stats = { totalLeases: 450, totalSecuredFunds: 125000000, totalFiscal: 15400000, totalUsers: 1200 }; // Fallbacks
-  let flags = { impact: true, observatory: true, geo: true, ranking: true };
 
   try {
     session = await auth();
-    dbNews = await getActiveNews();
-    isLandingPageEnabled = await isFeatureEnabled("LANDING_PAGE");
-    
-    // Fetch Global Impact Stats & Feature Flags
-    const [tLeases, tSecured, tFiscal, tUsers, fImpact, fObs, fGeo, fRank] = await Promise.all([
-        prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 450),
-        prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => ({ _sum: { amount: 125000000 } })),
-        prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => ({ _sum: { totalDgi: 15400000 } })),
-        prisma.user.count().catch(() => 1200),
-        isFeatureEnabled("HOME_IMPACT_STATS"),
-        isFeatureEnabled("HOME_OBSERVATORY"),
-        isFeatureEnabled("HOME_GEO_ANALYSIS"),
-        isFeatureEnabled("HOME_RENT_RANKING")
-    ]);
-
-    stats = {
-        totalLeases: tLeases,
-        totalSecuredFunds: Number((tSecured as any)._sum?.amount || 0),
-        totalFiscal: Number((tFiscal as any)._sum?.totalDgi || 0),
-        totalUsers: tUsers
-    };
-
-    flags = {
-        impact: fImpact,
-        observatory: fObs,
-        geo: fGeo,
-        ranking: fRank
-    };
   } catch (error) {
-    console.error("[HOME] Error during initial data fetch:", error);
+    console.error("[HOME] Error during initial auth fetch:", error);
   }
-
-
 
   const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
 
-  // --- 1. DATA PREPARATION ---
-  const fallbackNews = [
-    { id: "f1", content: "BIENVENUE SUR QAPRIL : PORTAIL NATIONAL DE NORMALISATION DU MARCHÉ LOCATIF." },
-    { id: "f2", content: "DIGITALISATION : TOUTES LES CAUTIONS IMMOBILIÈRES DOIVENT ÊTRE DÉPOSÉES À LA CDC-CI." },
-    { id: "f3", content: "INNOVATION : LE REGISTRE LOCATIF NATIONAL SÉCURISE VOS TRANSACTIONS IMMOBILIÈRES." }
-  ];
-  const newsItems = dbNews.length > 0 ? dbNews : fallbackNews;
-  const ticker = <NewsTicker items={newsItems} />;
-
-    // --- 2. ACCESS CONTROL & REDIRECTION ---
-    // If the user is connected, we ALWAYS bypass the restricted "Black Portal" (which the user calls "landing page").
-    // We let them see the full, unrestricted White Portal (which the user calls "page d'accueil").
-
-    // Show restricted Luminous Portal (which the user calls "Landing Page") 
-    // ONLY if the mode is activated AND the user is not authenticated.
-    if (isLandingPageEnabled && !session?.user) {
-        // Show restricted Luminous Portal
-        return (
-            <div className="relative min-h-screen bg-[#F5F7FA] overflow-hidden flex flex-col font-sans">
-                {ticker}
-                <InteractiveBackground />
-
-                <header className="relative z-20 w-full px-8 py-10 animate-fade-in-up">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                        <Link href="/" className="flex items-center space-x-6 group">
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-24 w-auto relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700 shadow-xl shadow-black/5 bg-white/50 backdrop-blur-md p-1" />
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-[0.6em] text-[#0B4619] mt-2 ml-1">Infrastructure Nationale</span>
-                            </div>
-                        </Link>
-                    </div>
-                </header>
-
-                <main className="relative z-20 flex-1 flex flex-col items-center justify-center px-6 pb-20 text-center">
-                    <div className="max-w-5xl w-full">
-                        <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-black tracking-tighter text-qnavy leading-[1.1] mb-10 flex flex-col items-center">
-                            <span className="animate-fade-in-up delay-100">Quittancement <span className="text-transparent bg-clip-text bg-gradient-to-r from-qgold to-qorange">Autonome</span></span>
-                            <span className="text-2xl md:text-3xl text-qtext-mid mt-4 tracking-[0.1em] font-bold animate-fade-in-up delay-200">PLATEFORME DE RESSOURCES</span>
-                            <span className="text-3xl md:text-4xl text-qnavy mt-2 opacity-90 animate-fade-in-up delay-300">IMMOBILIÈRES LOCATIVES</span>
-                        </h1>
-                        {session?.user ? (
-                            <div className="max-w-xl mx-auto glass-card-premium px-10 py-12 animate-fade-in-up delay-400">
-                                <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-widest leading-relaxed">
-                                    {session.user.fullName || session.user.email}
-                                </h2>
-                                <p className="text-[#0B4619] mb-8 uppercase tracking-[0.3em] text-[10px] font-bold">
-                                    {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? "GOUVERNANCE" : session.user.role}
-                                </p>
-                                <Link 
-                                    href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")}
-                                    className="inline-flex items-center justify-center w-full gap-3 py-5 bg-gradient-to-r from-[#0B4619] to-[#063010] border border-[#0B4619]/20 text-white rounded-2xl shadow-xl shadow-[#0B4619]/30 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
-                                >
-                                    Retourner à mon Espace
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mt-12 perspective-[1000px]">
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("ADMIN") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-sm text-center cursor-pointer relative overflow-hidden animate-fade-in-up delay-300">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
-                                        <span className="font-black uppercase tracking-widest text-[#E2E8F0] text-xs block mb-2 drop-shadow-sm group-hover:text-qgold transition-colors">Accès Gouvernance</span>
-                                        <span className="text-[10px] font-semibold text-white/50 uppercase tracking-wider block group-hover:text-white transition-colors">Contrôle DGI & Audit</span>
-                                    </button>
-                                </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-sm text-center cursor-pointer relative overflow-hidden transform translate-z-10 bg-gradient-to-r from-[rgba(10,15,29,0.9)] to-[rgba(20,25,45,0.7)] animate-fade-in-up delay-400">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-qgold/10 rounded-full blur-2xl pointer-events-none"></div>
-                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
-                                        <span className="font-extrabold uppercase tracking-widest text-qgold text-xs block mb-2 group-hover:text-white transition-colors group-hover:drop-shadow-[0_0_10px_rgba(203,163,88,0.5)]">Espace Bailleur</span>
-                                        <span className="text-[10px] font-semibold text-qgold/60 uppercase tracking-wider block transition-colors group-hover:text-qgold">Gestion de Patrimoine</span>
-                                    </button>
-                                </form>
-                                <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }} className="group px-8 py-10 glass-card-3d rounded-2xl shadow-md text-center cursor-pointer relative overflow-hidden animate-fade-in-up delay-500">
-                                    <button type="submit" className="w-full h-full outline-none relative z-10 block">
-                                        <span className="font-extrabold uppercase tracking-widest text-white text-xs block mb-2 drop-shadow-sm group-hover:text-[#038258] transition-colors">Portail Locataire</span>
-                                        <span className="text-[10px] font-semibold text-white/70 uppercase tracking-wider block transition-colors group-hover:text-white">Consultation & Reçus</span>
-                                    </button>
-                                </form>
-                            </div>
-                        )}
-                    </div>
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
-    // --- 3. RENDERING FULL HOMEPAGE ---
-    const navLinks = [
-        { href: "/impact", label: "Impact" },
-        { href: "/expertise", label: "Expertise" },
-        { href: "/a-propos", label: "À propos" },
-        { href: "/faq", label: "FAQ" },
-        { href: "/contact", label: "Contact" },
-    ];
-
+  // If user is connected, we show a clean portal to bring them back to their dashboard,
+  // honoring the new CSS variables subtly.
+  if (session?.user) {
     return (
-        <div className="bg-gradient-to-b from-[#F5F7FA] via-[#FAFBFC] to-[#F5F7FA] min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900">
-            <div className="sticky top-0 z-[60]">
-                {ticker}
+      <div className="relative min-h-screen bg-[#FFFBF5] overflow-hidden flex flex-col items-center justify-center font-sans">
+        <header className="absolute top-0 w-full px-8 py-10">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+                <Link href="/" className="flex items-center space-x-4">
+                    <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto rounded-xl shadow-lg border border-orange-100" />
+                </Link>
             </div>
-            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-[41px] z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center py-4">
-                        <Link href="/" className="flex items-center space-x-4 group">
-                            <img src="/logo.png" alt="QAPRIL Logo" className="h-20 w-auto group-hover:scale-105 transition-transform duration-700" />
-                        </Link>
+        </header>
 
-                        <nav className="hidden xl:flex space-x-8 items-center">
-                            {navLinks.map((link) => (
-                                <Link key={link.label} href={link.href} className="text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">
-                                    {link.label}
-                                </Link>
-                            ))}
-                        </nav>
-                        
-                        {session?.user ? (
-                            <div className="flex gap-4">
-                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-6 py-2 bg-[#C55A11] text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:scale-105 transition-all outline-none flex items-center justify-center shadow-lg shadow-[#C55A11]/20">
-                                    Retour au Tableau de Bord
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="flex gap-4">
-                                 <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("BAILLEUR") }}>
-                                    <button type="submit" className="px-6 py-2 h-full bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Propriétaire</button>
-                                 </form>
-                                 <form action={async () => { "use server"; const { choisirTypeConnexion } = await import("@/actions/auth.actions"); await choisirTypeConnexion("LOCATAIRE") }}>
-                                    <button type="submit" className="px-6 py-2 h-full bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:scale-105 transition-all">Locataire</button>
-                                 </form>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            <main>
-                <section className="relative min-h-[90vh] flex items-center pt-24 pb-32">
-                    <HeroSlider />
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                        <div className="max-w-2xl text-center md:text-left">
-                            <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-bold text-qnavy mb-8 leading-[1.1] tracking-tighter flex flex-col">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-qnavy to-qnavy-light drop-shadow-sm mb-1 uppercase tracking-tight">Quittancement Autonome</span>
-                                <span className="text-qtext-mid font-medium tracking-wide mb-1">Plateforme de Ressources</span>
-                                <span className="text-qgold italic font-bold">Immobilières Locatives.</span>
-                            </h1>
-                            <p className="text-lg md:text-xl text-qtext-light mb-12 font-medium">Normalisation et sécurité du marché immobilier Ivoirien.</p>
-                            {session?.user ? (
-                                <Link href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")} className="px-10 py-4 bg-qnavy text-white rounded-xl font-black uppercase tracking-widest text-sm inline-block shadow-lg hover:shadow-xl hover:bg-qnavy-light transition-all">Retour au Tableau de Bord</Link>
-                            ) : (
-                                <Link href="/mon-espace-locataire/login" className="px-10 py-4 bg-qnavy text-white rounded-xl font-bold uppercase tracking-wider text-sm inline-block shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all">Démarrer l'Expérience</Link>
-                            )}
-                        </div>
-                    </div>
-                </section>
-                <section className="py-32 bg-transparent"><AppDepthCards /></section>
-            </main>
-            <Footer />
-        </div>
+        <main className="relative z-20 flex flex-col items-center justify-center px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-[#0F1117] leading-[1.1] mb-10 flex flex-col items-center">
+              <span>Quittancement <span className="text-[#FF8B00]">Autonome</span></span>
+              <span className="text-2xl text-[#5C6075] mt-4 tracking-[0.1em] font-bold">PLATEFORME DE RESSOURCES IMMOBILIÈRES</span>
+          </h1>
+          <div className="max-w-xl mx-auto bg-white p-10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-[#FF8B00]/10">
+              <h2 className="text-xl font-black text-[#0F1117] mb-2 uppercase tracking-widest leading-relaxed">
+                  {session.user.fullName || session.user.email}
+              </h2>
+              <p className="text-[#00B4D8] mb-8 uppercase tracking-[0.3em] text-[10px] font-bold">
+                  {isAdmin ? "GOUVERNANCE" : session.user.role}
+              </p>
+              <Link 
+                  href={isAdmin ? "/admin" : (session.user.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard")}
+                  className="inline-flex items-center justify-center w-full gap-3 py-4 bg-gradient-to-r from-[#FF8B00] to-[#FF4E50] text-white rounded-2xl shadow-xl shadow-[#FF8B00]/30 font-black uppercase tracking-widest text-xs transition-transform hover:scale-[1.02]"
+              >
+                  Retourner à mon Espace
+              </Link>
+          </div>
+        </main>
+      </div>
     );
+  }
+
+  // Pure 100% Mockup Frontend Redesign for Unauthenticated users
+  return (
+    <>
+      <QaprilLandingV2 />
+    </>
+  );
 }
+

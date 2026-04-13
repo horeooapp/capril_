@@ -1,30 +1,30 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --color-qnavy: #0A0F1D;
+  --color-qnavy: #0F1117; /* Ink */
   --color-qnavy-dark: #05080F;
-  --color-qnavy-light: #162238;
+  --color-qnavy-light: #2A2D3A; /* Ink2 */
   --color-qnavy-pale: #F1F4F9;
   
-  --color-qgreen: #026343;
-  --color-qgreen-light: #038258;
+  --color-qgreen: #00C896; /* Teal */
+  --color-qgreen-light: #CCFAEE; /* Teal Light */
   --color-qgreen-pale: #E6F0EC;
   
-  --color-qorange: #CBA358;
-  --color-qorange-pale: #F8F5EE;
+  --color-qorange: #FF8B00; /* Mango */
+  --color-qorange-pale: #FFF0D6; /* Mango Light */
   
-  --color-qred: #B31A1A;
-  --color-qred-pale: #FCE8E8;
+  --color-qred: #FF4E50; /* Coral */
+  --color-qred-pale: #FFE8E8; /* Coral Light */
   
-  --color-qgold: #D4AF37;
-  --color-qgold-pale: #FBF8F1;
+  --color-qgold: #FF8B00; /* Re-mapped to Mango */
+  --color-qgold-pale: #FFF0D6;
   
-  --color-qteal: #0F5A66;
-  --color-qteal-pale: #E5F1F3;
+  --color-qteal: #00B4D8; /* Sky */
+  --color-qteal-pale: #D0F4FC; /* Sky Light */
   
-  --color-qpurple: #4C1D95;
-  --color-qpurple-pale: #F5F3FF;
+  --color-qpurple: #E040FB; /* Fuchsia */
+  --color-qpurple-pale: #FCE4FF; /* Fuchsia Light */
   
   --color-qgrey-1: #F8FAFC;
   --color-qgrey-2: #E2E8F0;
@@ -42,8 +42,8 @@
 }
 
 :root {
-  --background: #F6F8FA;
-  --foreground: #0F172A;
+  --background: #FFFBF5; /* Cream */
+  --foreground: #0F1117; /* Ink */
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); 
@@ -52,7 +52,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
