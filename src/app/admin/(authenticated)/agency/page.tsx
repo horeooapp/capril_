@@ -1,10 +1,9 @@
 "use client"
 import { toast } from "sonner";
-
 import { useState, useEffect } from "react";
 import { 
   Calendar, Users, BarChart3, Briefcase, 
-  Settings2, Bell, Search, ShieldCheck, DollarSign 
+  Settings2, Bell, Search, ShieldCheck, DollarSign, Activity
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgencyCalendar from "@/components/dashboard/agenda/AgencyCalendar";
@@ -65,47 +64,37 @@ export default function AgencyDashboardPage() {
   ];
 
   return (
-    <div className="space-y-12 pb-16 relative">
+    <div className="space-y-8 pb-16 relative">
       <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
 
       {/* Header Contextuel */}
-      <div className="page-header flex-col md:flex-row items-start md:items-center">
+      <div className="page-header">
         <div>
-          <h1 className="page-title flex items-center gap-3">
-            <Briefcase className="w-8 h-8 text-[#C55A11]" />
-            AGENCY <span className="text-[#C55A11] italic">CORE</span>
+          <h1 className="page-title flex items-center gap-2">
+            <Briefcase className="w-8 h-8 text-[var(--ci-vert)]" />
+            AGENCY CORE
           </h1>
-          <p className="page-sub">Vigilance et pilotage des flux agences - Hub National</p>
+          <p className="page-sub">Pilotez votre gestion courante, de la prospection à la maintenance.</p>
         </div>
 
-        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
-          <div className="flex -space-x-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="w-10 h-10 rounded-full bg-[var(--ci-nuit2)] border-2 border-black flex items-center justify-center text-[10px] font-bold text-white">
-                A{i}
-              </div>
-            ))}
+        <div className="flex items-center gap-4">
+          <div className="date-badge">
+            <Activity className="w-4 h-4" />
+            PROD-{new Date().getFullYear()}-CORE
           </div>
-          <div className="p-3 bg-[rgba(255,102,0,0.1)] rounded-xl">
-            <span className="text-xs font-black text-[#FF6600]">4 Collaborateurs</span>
-          </div>
-          <button className="p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all relative text-white" onClick={(e) => { e.preventDefault(); toast.success('Lectures mises à jour : Aucune alerte urgente.') }}>
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_10px_red]" />
-          </button>
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex gap-1 bg-white/5 p-1.5 rounded-2xl border border-[rgba(255,102,0,0.2)] w-fit shadow-inner overflow-x-auto max-w-full no-scrollbar">
+      <div className="flex gap-1 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit mb-10 shadow-inner overflow-x-auto max-w-full no-scrollbar">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
               activeTab === tab.id 
-                ? "bg-[var(--ci-orange)] text-white shadow-lg shadow-[rgba(255,102,0,0.4)]" 
-                : "text-[var(--text-muted)] hover:text-white hover:bg-white/5"
+                ? "bg-[var(--ci-orange)] text-white shadow-lg" 
+                : "text-gray-400 hover:text-white hover:bg-white/10"
             }`}
           >
             {tab.icon}
@@ -117,37 +106,54 @@ export default function AgencyDashboardPage() {
       {/* Main Container */}
       <div className="relative min-h-[600px]">
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center font-black tracking-widest text-[#FF6600]/20 animate-pulse text-4xl">
-            SYNCHRONISATION CORE...
+          <div className="absolute inset-0 flex items-center justify-center font-black tracking-widest text-white/10 animate-pulse text-4xl font-mono">
+            CHARGEMENT ASSETS...
           </div>
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, scale: 0.98, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98, y: -10 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               className="w-full"
             >
-              {/* Note: Components inside here might still have some white bg that we will strip incrementally if needed. */}
-              {activeTab === "PLANNING" && <AgencyCalendar initialEvents={events} />}
-              {activeTab === "CRM" && <ContactBoard contacts={contacts} />}
-              {activeTab === "MAINT" && <MaintenanceAgencyDash initialTickets={maintenanceTickets} />}
-              {activeTab === "CAND" && <CandidatManager initialCandidatures={candidatures} loyerLoyer={350000} />}
-              {activeTab === "KPI" && kpiData && <AgencyKpiDash data={kpiData} />}
+              {activeTab === "PLANNING" && (
+                <div className="panel bg-[var(--ci-nuit2)] border border-[var(--ci-orange)]/20 shadow-none">
+                  <AgencyCalendar initialEvents={events} />
+                </div>
+              )}
+              {activeTab === "CRM" && (
+                <div className="panel bg-[var(--ci-nuit2)] border border-[var(--ci-orange)]/20 shadow-none">
+                  <ContactBoard contacts={contacts} />
+                </div>
+              )}
+              {activeTab === "MAINT" && (
+                <div className="panel bg-[var(--ci-nuit2)] border border-[var(--ci-orange)]/20 shadow-none">
+                  <MaintenanceAgencyDash initialTickets={maintenanceTickets} />
+                </div>
+              )}
+              {activeTab === "CAND" && (
+                <div className="panel bg-[var(--ci-nuit2)] border border-[var(--ci-orange)]/20 shadow-none">
+                  <CandidatManager initialCandidatures={candidatures} loyerLoyer={350000} />
+                </div>
+              )}
+              {activeTab === "KPI" && kpiData && (
+                <div className="panel bg-[var(--ci-nuit2)] border border-[var(--ci-orange)]/20 shadow-none p-0 overflow-hidden">
+                  <AgencyKpiDash data={kpiData} />
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         )}
       </div>
 
       {/* Bottom Status Bar */}
-      <div className="flex justify-between items-center border-t border-white/5 pt-8 opacity-60 grayscale hover:grayscale-0 transition-all mt-12">
+      <div className="mt-12 flex justify-between items-center border-t border-white/10 pt-8 opacity-50 transition-opacity hover:opacity-100">
         <div className="flex items-center gap-4">
           <ShieldCheck className="w-5 h-5 text-[var(--ci-vert)]" />
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Architecture Sécurisée - Nuit V2</span>
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Opérations protégées par QAPRIL Core</span>
         </div>
-        <div className="text-[10px] font-mono text-gray-600 uppercase">SESSION_ID: PROD-{new Date().getFullYear()}-CORE</div>
       </div>
     </div>
   );
