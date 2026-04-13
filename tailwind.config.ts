@@ -12,6 +12,24 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        ink: "var(--ink)",
+        ink2: "var(--ink2)",
+        ink3: "var(--ink3)",
+        ink4: "var(--ink4)",
+        cream: "var(--cream)",
+        cream2: "var(--cream2)",
+        mango: "var(--mango)",
+        "mango-d": "var(--mango-d)",
+        "mango-l": "var(--mango-l)",
+        sky: "var(--sky)",
+        "sky-d": "var(--sky-d)",
+        "sky-l": "var(--sky-l)",
+        lime: "var(--lime)",
+        "lime-d": "var(--lime-d)",
+        "lime-l": "var(--lime-l)",
+        teal: "var(--teal)",
+        fuchsia: "var(--fuchsia)",
+        coral: "var(--coral)",
         qapril: {
           navy:   "#0A0F1D", // Midnight Onyx
           amber:  "#CBA358", // Imperial Gold
