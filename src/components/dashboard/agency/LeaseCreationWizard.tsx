@@ -303,16 +303,21 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                   </div>
 
                   <div className="w-full p-6 bg-indigo-900 rounded-[2.5rem] mt-8 text-white relative overflow-hidden group">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400 blur-[40px] opacity-10"></div>
-                     <div className="flex items-center justify-between">
+                     {/* Added pointer-events-none to prevent interception of clicks */}
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400 blur-[40px] opacity-10 pointer-events-none"></div>
+                     <div className="flex items-center justify-between relative z-10">
                         <div className="text-left">
                            <h4 className="text-[13px] font-black uppercase tracking-tighter italic">Lancer l'Invitation M-SIGN</h4>
                            <p className="text-[10px] text-white/60 font-medium">Envoi SMS au {formData.phone || "+225 00 00 00 00"}</p>
                         </div>
                         <button 
+                           type="button"
                            disabled={isPending}
-                           className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95 disabled:opacity-50" 
-                           onClick={(e) => { e.preventDefault(); handleComplete(); }}
+                           className="p-4 bg-white text-indigo-900 rounded-2xl shadow-lg hover:scale-105 transition-transform active:scale-95 disabled:opacity-50 cursor-pointer relative z-20" 
+                           onClick={(e) => { 
+                              e.stopPropagation();
+                              handleComplete(); 
+                           }}
                         >
                            <ArrowRight size={24} className={isPending ? "animate-pulse" : ""} />
                         </button>
