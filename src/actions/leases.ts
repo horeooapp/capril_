@@ -192,7 +192,7 @@ export async function createLease(data: {
                 }
             });
 
-            // Mise à jour de l'activité du profil public (Matching/Tinder immo)
+            // Mise à jour de l'activité du profil public (QAPRIL Match)
             const profilPublic = await (prisma as any).locataireProfilPublic.findUnique({
                 where: { userId: tenantId }
             });

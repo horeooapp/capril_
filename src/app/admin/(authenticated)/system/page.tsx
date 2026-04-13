@@ -111,6 +111,11 @@ const FEATURES: { key: AppFeature; label: string; description: string }[] = [
         label: "Classement des Loyers (Accueil)", 
         description: "Affiche le palmarès des zones les plus chères et attractives." 
     },
+    { 
+        key: "CANDIDATURES", 
+        label: "Qapril Match (Matching IA)", 
+        description: "Active l'algorithme de recommandation locataire/bailleur et le moteur de matching par critères." 
+    },
 ]
 
 export default function SystemPage() {

@@ -14,7 +14,7 @@ export default function MatchingDashboardClient({ candidatures }: { candidatures
                  <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
                     <Users className="text-pink-500 mb-4" size={48} />
                     <h1 className="text-3xl sm:text-5xl font-black text-qnavy-dark uppercase tracking-tighter mb-4">
-                        Tinder Immo
+                        Qapril Match
                     </h1>
                     <p className="text-sm font-medium text-qtext-mid">
                         Aucune nouvelle candidature en attente pour le moment.
@@ -31,7 +31,7 @@ export default function MatchingDashboardClient({ candidatures }: { candidatures
              <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
                 <Users className="text-pink-500 mb-4" size={48} />
                 <h1 className="text-3xl sm:text-5xl font-black text-qnavy-dark uppercase tracking-tighter mb-4">
-                    Le Tinder de l'Immobilier
+                    Qapril Match
                 </h1>
                 <p className="text-sm font-medium text-qtext-mid">
                     Approuvez ou rejetez les candidatures. L'IA de QAPRIL scrute les KYC pour recommander les meilleurs profils.

@@ -508,7 +508,7 @@ export default function LocataireDashboardPage() {
                             <span className="text-3xl animate-bounce-slow">🔥</span>
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xl font-black text-qnavy-dark uppercase tracking-tighter mb-1">Le "Tinder" de l'Immobilier</h3>
+                            <h3 className="text-xl font-black text-qnavy-dark uppercase tracking-tighter mb-1">Qapril Match</h3>
                             <p className="text-[12px] font-medium text-qtext-mid max-w-lg">Soumettez votre profil locatif (Budget, Communes) aux bailleurs et laissez les logements venir à vous. Matching IA instantané.</p>
                         </div>
                     </div>
