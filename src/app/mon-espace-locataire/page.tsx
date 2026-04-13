@@ -30,6 +30,16 @@ import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import { confirmBDQFromDashboard } from "@/actions/bdq"
 
+// Badge component defined outside to avoid ReferenceError in early returns
+const Badge = ({ label, color, bg, size = 10 }: any) => (
+    <span 
+        style={{ backgroundColor: bg, color: color, fontSize: `${size}px` }} 
+        className="px-3 py-1 rounded-full font-black uppercase tracking-widest"
+    >
+        {label}
+    </span>
+)
+
 export default function LocataireDashboardPage() {
     const { data: session, status } = useSession()
     const [isPending, startTransition] = useTransition()
@@ -237,6 +247,8 @@ export default function LocataireDashboardPage() {
         }
     }
 
+
+
     // Bento Grid Item Wrapper
     const BentoItem = ({ children, className = "", delay = 0 }: { children: React.ReactNode, className?: string, delay?: number }) => (
         <motion.div 
@@ -245,16 +257,6 @@ export default function LocataireDashboardPage() {
         >
             {children}
         </motion.div>
-    )
-
-    // Badge locally defined or imported
-    const Badge = ({ label, color, bg, size = 10 }: any) => (
-        <span 
-            style={{ backgroundColor: bg, color: color, fontSize: `${size}px` }} 
-            className="px-3 py-1 rounded-full font-black uppercase tracking-widest"
-        >
-            {label}
-        </span>
     )
 
     return (
