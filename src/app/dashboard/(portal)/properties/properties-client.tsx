@@ -20,6 +20,81 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
 
     const filteredProps = properties.filter(p => (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.propertyCode || p.id).toLowerCase().includes(search.toLowerCase()));
 
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    const toggleExpand = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const next = new Set(expandedIds);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        setExpandedIds(next);
+    };
+
+    // Filter to only show top-level properties (parents or independent)
+    const topLevelProps = filteredProps.filter(p => !p.parentPropertyId);
+
+    const PropertyRow = ({ p, isChild = false }: { p: any, isChild?: boolean }) => (
+        <React.Fragment key={p.id}>
+            <tr 
+                className={`border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer ${isChild ? 'bg-qgrey-1/10 shadow-inner' : ''}`} 
+                onClick={() => router.push(`/dashboard/properties/${p.id}`)}
+            >
+                <td className={`p-5 ${isChild ? 'pl-12' : ''}`}>
+                    <div className="flex items-center gap-3">
+                        {!isChild && (p.units?.length > 0) && (
+                            <button 
+                                onClick={(e) => toggleExpand(p.id, e)}
+                                className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${expandedIds.has(p.id) ? 'bg-qnavy text-white rotate-90' : 'bg-qgrey-1 text-qnavy hover:bg-qgrey-2'}`}
+                            >
+                                <Plus size={12} className={expandedIds.has(p.id) ? 'hidden' : 'block'} />
+                                <span className={expandedIds.has(p.id) ? 'block font-black text-[14px]' : 'hidden'}>-</span>
+                            </button>
+                        )}
+                        {isChild && <div className="w-4 h-px bg-qgrey-2"></div>}
+                        <div>
+                            <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
+                            <p className="text-[10px] text-qtext-light font-bold mt-1 uppercase tracking-widest">
+                                {isChild ? `Unité de : ${p.parentProperty?.name || p.parentPropertyId.substring(0,8)}` : `ID: ${p.id.substring(0,8)}`}
+                            </p>
+                        </div>
+                    </div>
+                </td>
+                <td className="p-5">
+                    <span className="bg-qgrey-1 text-qtext-mid px-2 py-1 rounded text-[9px] font-black uppercase mr-2">{p.propertyType}</span>
+                    <span className="text-xs font-bold text-qnavy">
+                        {(!isChild && p.units?.length > 0) ? `${p.units.length} Unité(s)` : (p.rooms || 1) + " Pièce(s)"}
+                    </span>
+                </td>
+                <td className="p-5">
+                    <div className="flex flex-col gap-2">
+                        {p.status === 'active' || p.status === 'rented' ? (
+                            <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
+                                <CheckCircle size={10} /> ACTIF
+                            </span>
+                        ) : (
+                            <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
+                                <Clock size={10} /> EN ATTENTE
+                            </span>
+                        )}
+
+                        {p.isOccupied || p.leases?.some((l:any) => l.status === 'ACTIVE') ? (
+                            <span className="text-[10px] font-black uppercase text-qblue bg-qblue-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qblue/20 shadow-sm animate-pulse">
+                                <Home size={10} /> LOUÉ
+                            </span>
+                        ) : (
+                            <span className="text-[10px] font-black uppercase text-qgrey-3 bg-qgrey-1 px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qgrey-2/50 opacity-60">
+                                <Search size={10} /> DISPONIBLE
+                            </span>
+                        )}
+                    </div>
+                </td>
+            </tr>
+            {expandedIds.has(p.id) && p.units?.map((unit: any) => (
+                <PropertyRow key={unit.id} p={unit} isChild={true} />
+            ))}
+        </React.Fragment>
+    );
+
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -28,7 +103,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                         <Building2 className="text-qblue" size={32} /> Foncier & Patrimoine
                     </h1>
                     <p className="text-sm font-medium text-qtext-mid mt-1">
-                        L'inventaire central de tous vos biens immobiliers et de leurs unités.
+                        Gérez vos immeubles et leurs unités de manière centralisée.
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -54,47 +129,15 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                         <thead>
                             <tr className="bg-white border-b border-qgrey-2">
                                 <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Propriété</th>
-                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Type & Unités</th>
+                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Unité / Type</th>
                                 <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Statut</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredProps.map(p => (
-                                <tr key={p.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer" onClick={() => router.push(`/dashboard/properties/${p.id}`)}>
-                                    <td className="p-5">
-                                        <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
-                                        <p className="text-[10px] text-qtext-light font-bold mt-1">ID: {p.id.substring(0,8)}</p>
-                                    </td>
-                                    <td className="p-5">
-                                        <span className="bg-qgrey-1 text-qtext-mid px-2 py-1 rounded text-[9px] font-black uppercase mr-2">{p.propertyType}</span>
-                                        <span className="text-xs font-bold text-qnavy">{p.rooms || p.units || 1} Lot(s)</span>
-                                    </td>
-                                    <td className="p-5">
-                                        <div className="flex flex-col gap-2">
-                                            {p.status === 'active' || p.status === 'rented' ? (
-                                                <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
-                                                    <CheckCircle size={10} /> ACTIF
-                                                </span>
-                                            ) : (
-                                                <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
-                                                    <Clock size={10} /> EN ATTENTE
-                                                </span>
-                                            )}
-
-                                            {p.isOccupied ? (
-                                                <span className="text-[10px] font-black uppercase text-qblue bg-qblue-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qblue/20 shadow-sm animate-pulse">
-                                                    <Home size={10} /> LOUÉ
-                                                </span>
-                                            ) : (
-                                                <span className="text-[10px] font-black uppercase text-qgrey-3 bg-qgrey-1 px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qgrey-2/50 opacity-60">
-                                                    <Search size={10} /> DISPONIBLE
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
+                            {topLevelProps.map(p => (
+                                <PropertyRow key={p.id} p={p} />
                             ))}
-                            {filteredProps.length === 0 && (
+                            {topLevelProps.length === 0 && (
                                 <tr>
                                     <td colSpan={3} className="p-8 text-center text-qtext-light text-sm font-medium">
                                         Aucun bien immobilier trouvé.

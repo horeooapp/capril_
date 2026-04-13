@@ -157,7 +157,13 @@ export default function NewPropertyClient() {
                                         ) : parents.length === 0 ? (
                                             <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">Aucune structure parente (Immeuble/Cour) n'a été créée ! Veuillez d'abord en créer une.</div>
                                         ) : (
-                                            <select required name="parentPropertyId" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            <select 
+                                                required 
+                                                name="parentPropertyId" 
+                                                value={selectedParentId}
+                                                onChange={(e) => setSelectedParentId(e.target.value)}
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                                            >
                                                 <option value="">-- Choisir un Immeuble/Résidence/Cour --</option>
                                                 {parents.map(p => (
                                                     <option key={p.id} value={p.id}>{p.name} ({p.commune})</option>
@@ -175,26 +181,49 @@ export default function NewPropertyClient() {
 
                             <hr className="col-span-1 sm:col-span-2 border-gray-100 my-2" />
 
-                            <div className="sm:col-span-2">
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Adresse Locale</label>
-                                <input required name="addressLine1" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] outline-none" placeholder="Ex: Rue des Jardins, Lot 123" />
-                            </div>
+                            {structureCategory !== 'ENFANT' ? (
+                                <>
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Adresse Locale</label>
+                                        <input required name="addressLine1" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] outline-none" placeholder="Ex: Rue des Jardins, Lot 123" />
+                                    </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Commune</label>
-                                <select required name="commune" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] outline-none">
-                                    <option value="Cocody">Cocody</option>
-                                    <option value="Abobo">Abobo</option>
-                                    <option value="Yopougon">Yopougon</option>
-                                    <option value="Treichville">Treichville</option>
-                                    <option value="Marcory">Marcory</option>
-                                    <option value="Koumassi">Koumassi</option>
-                                    <option value="Adjamé">Adjamé</option>
-                                    <option value="Plateau">Plateau</option>
-                                    <option value="Bingerville">Bingerville</option>
-                                    <option value="Autre">Autre...</option>
-                                </select>
-                            </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Commune</label>
+                                        <select required name="commune" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] outline-none">
+                                            <option value="Cocody">Cocody</option>
+                                            <option value="Abobo">Abobo</option>
+                                            <option value="Yopougon">Yopougon</option>
+                                            <option value="Treichville">Treichville</option>
+                                            <option value="Marcory">Marcory</option>
+                                            <option value="Koumassi">Koumassi</option>
+                                            <option value="Adjamé">Adjamé</option>
+                                            <option value="Plateau">Plateau</option>
+                                            <option value="Bingerville">Bingerville</option>
+                                            <option value="Autre">Autre...</option>
+                                        </select>
+                                    </div>
+                                </>
+                            ) : (
+                                selectedParentId && (
+                                    <div className="sm:col-span-2 bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6 animate-in fade-in slide-in-from-top-2">
+                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                            📍 Localisation Héritée du Parent
+                                        </p>
+                                        {(() => {
+                                            const p = parents.find(x => x.id === selectedParentId);
+                                            return (
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-bold text-gray-900">{p?.address || 'Adresse inconnue'}</p>
+                                                    <p className="text-xs font-medium text-emerald-700/70">{p?.commune}</p>
+                                                    <input type="hidden" name="addressLine1" value={p?.address || ''} />
+                                                    <input type="hidden" name="commune" value={p?.commune || ''} />
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+                                )
+                            )}
 
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Loyer déclaré (Optionnel, FCFA/mois)</label>
