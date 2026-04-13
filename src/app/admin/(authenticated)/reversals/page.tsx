@@ -11,76 +11,104 @@ export default async function ReversalsAdminPage() {
     }
 
     return (
-        <div className="p-8 space-y-8">
-            <header className="flex justify-between items-end">
-                <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Console de Reversement</h1>
-                    <p className="text-gray-500 font-medium">Suivi en temps réel de la ventilation des fonds (M-PAY-AUTO)</p>
-                </div>
-                <div className="px-4 py-2 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center gap-2">
-                    <ArrowRightLeft className="w-5 h-5 text-indigo-600" />
-                    <span className="text-sm font-bold text-indigo-700 uppercase">Live Hub</span>
-                </div>
-            </header>
+        <div className="space-y-8 pb-16 relative">
+            <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
 
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
-                        <tr>
-                            <th className="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Référence / Bail</th>
-                            <th className="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Montant Total</th>
-                            <th className="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Honoraires Agence</th>
-                            <th className="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut Reversement</th>
-                            <th className="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {payments.map((payment: any) => (
-                            <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors group">
-                                <td className="p-5">
-                                    <div className="font-bold text-gray-900">{payment.refInterne}</div>
-                                    <div className="text-[10px] text-gray-500 font-mono">{((payment.lease?.landlord?.firstName || '') + " " + (payment.lease?.landlord?.lastName || '')).trim()}</div>
-                                </td>
-                                <td className="p-5">
-                                    <span className="text-lg font-black text-slate-900">
-                                        {Number(payment.montant || 0).toLocaleString()} FCFA
-                                    </span>
-                                </td>
-                                <td className="p-5 text-indigo-600 font-bold">
-                                    {payment.honorairesAgence ? `${Number(payment.honorairesAgence).toLocaleString()} FCFA` : "---"}
-                                </td>
-                                <td className="p-5">
-                                    <div className="flex items-center gap-2">
-                                        {payment.reversalStatus === "REVERSED" ? (
-                                            <span className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                                                <CheckCircle2 size={12} /> Reversé
-                                            </span>
-                                        ) : payment.reversalStatus === "FAILED" ? (
-                                            <span className="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                                                <AlertCircle size={12} /> Échec
-                                            </span>
-                                        ) : (
-                                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                                                En attente
-                                            </span>
-                                        )}
-                                    </div>
-                                </td>
-                                <td className="p-5">
-                                    {payment.reversalStatus !== "REVERSED" && (
-                                        <ReversalRetryButton paymentId={payment.id} />
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {payments.length === 0 && (
-                    <div className="p-20 text-center">
-                        <ArrowRightLeft className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <p className="text-gray-400 font-medium">Aucun flux financier détecté pour le moment.</p>
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title flex items-center gap-2">
+                        <ArrowRightLeft className="w-8 h-8 text-[var(--ci-vert)]" />
+                        CONSOLE DE REVERSEMENT
+                    </h1>
+                    <p className="page-sub">Suivi en temps réel de la ventilation des fonds (M-PAY-AUTO).</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="date-badge flex items-center gap-2">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--ci-vert-light)] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--ci-vert)]"></span>
+                        </span>
+                        Live Hub Connecté
                     </div>
-                )}
+                </div>
+            </div>
+
+            <div className="panel">
+                <div className="panel-header">
+                    <h2 className="panel-title">Flux Financiers Récents</h2>
+                    <div className="panel-action">Actualiser</div>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="lease-table">
+                        <thead>
+                            <tr>
+                                <th>Référence / Bail</th>
+                                <th>Montant Total</th>
+                                <th>Honoraires Agence</th>
+                                <th>Statut Reversement</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {payments.map((payment: any) => (
+                                <tr key={payment.id}>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar t-av1">RF</div>
+                                            <div>
+                                                <div className="t-name">{payment.refInterne}</div>
+                                                <div className="t-loc text-gray-500 font-mono text-[10px]">
+                                                    {((payment.lease?.landlord?.firstName || '') + " " + (payment.lease?.landlord?.lastName || '')).trim() || 'N/A'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className="text-[14px] font-black text-white">
+                                            {Number(payment.montant || 0).toLocaleString()} <span className="text-[10px] text-gray-500">FCFA</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className="text-[12px] font-bold text-[var(--ci-orange)]">
+                                            {payment.honorairesAgence ? `${Number(payment.honorairesAgence).toLocaleString()} FCFA` : "---"}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {payment.reversalStatus === "REVERSED" ? (
+                                            <div className="pill pill-active">
+                                                <div className="pill-dot text-[var(--ci-vert)]"></div>
+                                                Reversé
+                                            </div>
+                                        ) : payment.reversalStatus === "FAILED" ? (
+                                            <div className="pill pill-impaye">
+                                                <div className="pill-dot text-red-500"></div>
+                                                Échec
+                                            </div>
+                                        ) : (
+                                            <div className="pill pill-pending">
+                                                <div className="pill-dot text-[var(--ci-or)]"></div>
+                                                En attente
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {payment.reversalStatus !== "REVERSED" && (
+                                            <div className="inline-block p-1 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors">
+                                                <ReversalRetryButton paymentId={payment.id} />
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {payments.length === 0 && (
+                        <div className="py-16 flex flex-col items-center justify-center opacity-50">
+                            <ArrowRightLeft className="w-12 h-12 text-gray-500 mb-4" />
+                            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-widest">Aucun flux financier détecté</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import React from "react"
-import { AlertCircle, Search, Clock } from "lucide-react"
+import { AlertCircle, Search, Clock, FileWarning } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 import { getSignalements } from "@/actions/signalement-admin-actions"
@@ -18,43 +18,48 @@ export default async function AdminReclamationsPage() {
     const signalements = await getSignalements().catch(() => [])
 
     return (
-        <div className="space-y-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-8 pb-16 relative">
+            <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
+
+            <div className="page-header">
                 <div>
-                    <div className="flex items-center gap-2 text-rose-600 text-[12px] font-black uppercase tracking-[0.3em] mb-2">
-                        <AlertCircle className="w-4 h-4" />
-                        <span>M-RCL • Réclamations</span>
-                    </div>
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">Suivi SAV & Incidents.</h1>
-                    <p className="text-[14px] text-gray-500 font-medium">Contrôle des délais d&apos;intervention et auto-clôture 144h.</p>
+                    <h1 className="page-title flex items-center gap-2">
+                        <FileWarning className="w-8 h-8 text-[var(--ci-orange)]" />
+                        M-RCL • RÉCLAMATIONS
+                    </h1>
+                    <p className="page-sub">Suivi SAV & Incidents. Contrôle des délais d'intervention et auto-clôture 144h.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100 flex items-center gap-2">
+                    <div className="date-badge text-[var(--ci-orange)] border-[var(--ci-orange)]/30 bg-[var(--ci-orange)]/10 flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--ci-orange-light)] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--ci-orange)]"></span>
                         </span>
                         Monitoring Actif
                     </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="glass-panel p-6 rounded-[2rem] border border-white/20">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tickets Ouverts</p>
-                    <p className="text-3xl font-black text-gray-900">{reclamations.length}</p>
+            <div className="kpi-grid">
+                <div className="kpi-card orange">
+                    <div className="kpi-glow"></div>
+                    <span className="kpi-label">Tickets Ouverts</span>
+                    <span className="kpi-val">{reclamations.length}</span>
                 </div>
-                <div className="glass-panel p-6 rounded-[2rem] border border-white/20">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Délai Moyen</p>
-                    <p className="text-3xl font-black text-indigo-600">48h</p>
+                <div className="kpi-card or">
+                    <div className="kpi-glow"></div>
+                    <span className="kpi-label">Délai Moyen</span>
+                    <span className="kpi-val">48h</span>
                 </div>
-                <div className="glass-panel p-6 rounded-[2rem] border border-white/20">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Auto-clôtures (144h)</p>
-                    <p className="text-3xl font-black text-rose-600">0</p>
+                <div className="kpi-card gris">
+                    <div className="kpi-glow"></div>
+                    <span className="kpi-label">Auto-clôtures</span>
+                    <span className="kpi-val">0</span>
                 </div>
-                <div className="glass-panel p-6 rounded-[2rem] border border-white/20">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Satisfaction</p>
-                    <p className="text-3xl font-black text-emerald-600">--%</p>
+                <div className="kpi-card vert">
+                    <div className="kpi-glow"></div>
+                    <span className="kpi-label">Satisfaction</span>
+                    <span className="kpi-val">--%</span>
                 </div>
             </div>
 
