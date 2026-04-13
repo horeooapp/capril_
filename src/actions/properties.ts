@@ -479,7 +479,7 @@ export async function creerBien(data: {
 
       revalidatePath("/dashboard");
       revalidatePath("/dashboard/properties");
-      return { success: true, bien, propertyCode: propertyCode };
+      return { success: true, bien: serializeProperty(bien), propertyCode: propertyCode };
     });
 
   } catch (error: any) {

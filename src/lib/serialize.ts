@@ -20,24 +20,30 @@ interface RawReceipt {
 /**
  * Helper to serialize BigInt/Decimal and relations for Properties
  */
-export const serializeProperty = (property: any) => {
+export const serializeProperty = (property: any): any => {
     if (!property) return null;
 
     const activeLeases = (property.leases || []).filter((l: any) => 
         !['TERMINATED', 'ARCHIVED'].includes(l.status)
     );
 
-    return {
+    const serialized = {
         ...property,
         superficieM2: property.superficieM2 ? Number(property.superficieM2) : null,
         declaredRentFcfa: property.declaredRentFcfa ? Number(property.declaredRentFcfa) : 0,
         gpsLatitude: property.gpsLatitude ? Number(property.gpsLatitude) : null,
         gpsLongitude: property.gpsLongitude ? Number(property.gpsLongitude) : null,
         leases: (property.leases || []).map(serializeLease),
+        // Recursive serialization for Hierarchy
+        units: (property.units || []).map((u: any) => serializeProperty(u)),
+        parentProperty: property.parentProperty ? serializeProperty(property.parentProperty) : null,
         // Computed fields for Occupancy Management
         isOccupied: activeLeases.length > 0,
         occupancyStatus: activeLeases.length > 0 ? 'LOUÉ' : 'DISPONIBLE'
-    }
+    };
+
+    // Final deep serialization to catch remaining Dates/BigInts
+    return serializeObject(serialized);
 }
 
 /**
