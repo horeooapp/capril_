@@ -118,7 +118,12 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                             <div className="border-r border-gray-100">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Période certifiée</p>
                                 <p className="text-lg font-black text-gray-900 uppercase">
-                                    {new Date(receipt.periodStart).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                                    {(() => {
+                                        if (!receipt.periodMonth) return "Mois Inconnu";
+                                        const [year, month] = receipt.periodMonth.split('-').map(Number);
+                                        const date = new Date(year, month - 1);
+                                        return date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                                    })()}
                                 </p>
                                 <p className="text-[10px] text-gray-500 font-bold mt-1 tracking-tighter italic">
                                     Totalité des charges incluses
@@ -127,10 +132,10 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant total réglé</p>
                                 <p className="text-4xl font-black text-gray-900">
-                                    {parseInt(receipt.amountFcfa).toLocaleString()} <span className="text-lg">FCFA</span>
+                                    {Number(receipt.totalAmount || 0).toLocaleString()} <span className="text-lg">FCFA</span>
                                 </p>
                                 <p className="text-[10px] text-[#FF8200] font-black mt-2 uppercase tracking-[0.2em] bg-orange-50 px-3 py-1 rounded-full w-fit mx-auto">
-                                    {receipt.paymentChannel?.replace('_', ' ')}
+                                    {receipt.paymentMethod?.replace('_', ' ')}
                                 </p>
                             </div>
                         </div>
