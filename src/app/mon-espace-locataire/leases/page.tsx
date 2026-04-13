@@ -12,16 +12,37 @@ export default async function TenantLeasesPage() {
     }
 
     return (
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, scale: 0.95, y: 20 },
+        visible: { 
+            opacity: 1, 
+            scale: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
+        }
+    }
+
+    return (
         <div className="space-y-10 pb-20">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div className="space-y-1">
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">Mes Contrats de Bail</h1>
-                    <p className="text-gray-500 font-medium">Consultez et gérez vos engagements locatifs en toute transparence.</p>
+                    <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight uppercase">Mes Baux.</h1>
+                    <p className="text-xs sm:text-sm text-gray-500 font-medium">Consultez et gérez vos engagements locatifs en toute transparence.</p>
                 </div>
-                <div className="bg-white/80 backdrop-blur shadow-sm border border-gray-100 px-6 py-3 rounded-2xl flex items-center space-x-3">
+                <div className="bg-white/80 backdrop-blur shadow-sm border border-gray-100 px-6 py-3 rounded-2xl flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
                     <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-bold text-gray-700">{leases.length} Contrat(s) Actif(s)</span>
+                    <span className="text-xs sm:text-sm font-bold text-gray-700">{leases.length} Contrat(s) Certifié(s)</span>
                 </div>
             </div>
 
@@ -31,32 +52,40 @@ export default async function TenantLeasesPage() {
                     <h2 className="text-2xl font-bold text-gray-400 uppercase">Aucun bail trouvé</h2>
                     <p className="text-gray-400 max-w-md mx-auto">
                         Vous n&apos;avez pas encore de contrats de bail enregistrés sur QAPRIL. 
-                        Contactez votre propriétaire pour la régularisation de votre situation.
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={containerVariants}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+                >
                     {leases.map((lease: any) => {  
                         if (!lease) return null;
                         return (
-                            <div key={lease.id} className="group relative bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500">
+                            <motion.div 
+                                variants={itemVariants}
+                                key={lease.id} 
+                                className="group relative bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
+                            >
                                 {/* Accent Bar */}
                                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-ivoire-orange via-ivoire-white to-ivoire-green"></div>
                                 
-                                <div className="p-8 space-y-6">
+                                <div className="p-6 sm:p-8 space-y-6">
                                     {/* Header: Property Type & Status */}
-                                    <div className="flex justify-between items-start">
-                                        <div className="space-y-1">
-                                            <h3 className="text-xl font-black text-gray-900 uppercase">{lease.property?.propertyType || "LOGEMENT"}</h3>
-                                            <p className="text-sm text-gray-500 flex items-center">
-                                                <svg className="h-4 w-4 mr-1 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="space-y-1 overflow-hidden">
+                                            <h3 className="text-lg sm:text-xl font-black text-gray-900 uppercase truncate">{lease.property?.propertyType || "LOGEMENT"}</h3>
+                                            <p className="text-xs sm:text-sm text-gray-500 flex items-center truncate">
+                                                <svg className="h-4 w-4 mr-1 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
-                                                {lease.property?.commune}, {lease.property?.address}
+                                                <span className="truncate">{lease.property?.commune}, {lease.property?.address}</span>
                                             </p>
                                         </div>
-                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                                        <span className={`px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest border shrink-0 ${
                                             lease.status === 'ACTIVE' ? 'bg-green-100 text-green-700 border-green-200' :
                                             lease.status === 'PENDING_SIGNATURE' ? 'bg-orange-100 text-orange-700 border-orange-200' :
                                             'bg-gray-100 text-gray-700 border-gray-200'
@@ -66,14 +95,14 @@ export default async function TenantLeasesPage() {
                                     </div>
 
                                     {/* Financial Summary */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
                                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Loyer Mensuel</p>
-                                            <p className="text-2xl font-black text-gray-900">{Number(lease.rentAmount).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                            <p className="text-xl sm:text-2xl font-black text-gray-900">{Number(lease.rentAmount).toLocaleString()} <span className="text-xs">FCFA</span></p>
                                         </div>
                                         <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
                                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Caution Gérée</p>
-                                            <p className="text-2xl font-black text-primary">{(Number(lease.depositAmount) || 0).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                            <p className="text-xl sm:text-2xl font-black text-primary">{(Number(lease.depositAmount) || 0).toLocaleString()} <span className="text-xs">FCFA</span></p>
                                         </div>
                                     </div>
 

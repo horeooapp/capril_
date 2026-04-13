@@ -34,16 +34,36 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
     }
 
     return (
-        <div className="space-y-10 animate-in fade-in duration-500">
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
+        }
+    }
+
+    return (
+        <div className="space-y-10">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Passeport Locatif.</h1>
-                    <p className="text-gray-500 font-medium tracking-wide">Valorisez votre historique et facilitez vos futurs emménagements.</p>
+                    <h1 className="text-2xl sm:text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Passeport Locatif.</h1>
+                    <p className="text-xs sm:text-sm text-gray-500 font-medium tracking-wide">Valorisez votre historique et facilitez vos futurs emménagements.</p>
                 </div>
                 <button 
                     onClick={handleGenerate}
                     disabled={loading}
-                    className="flex items-center gap-2 px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[11px] sm:text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 w-full md:w-auto"
                 >
                     <Plus size={18} />
                     {loading ? "Génération..." : "Générer mon Passeport"}
@@ -79,8 +99,8 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                 { label: "Validité", val: "12 mois" }
                              ].map((st, i) => (
                                 <div key={i} className="flex justify-between items-center border-b border-gray-50 pb-3">
-                                    <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">{st.label}</span>
-                                    <span className="text-[13px] font-bold text-[#1F4E79]">{st.val}</span>
+                                    <span className="text-[10px] sm:text-[12px] font-black text-gray-400 uppercase tracking-widest">{st.label}</span>
+                                    <span className="text-[11px] sm:text-[13px] font-bold text-[#1F4E79]">{st.val}</span>
                                 </div>
                              ))}
                          </div>
@@ -97,28 +117,31 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                             <p className="text-gray-400 font-medium italic">Vous n'avez pas encore généré de passeport.</p>
                         </div>
                     ) : (
-                        <div className="grid gap-6">
+                        <motion.div 
+                            initial="hidden"
+                            animate="visible"
+                            variants={containerVariants}
+                            className="grid gap-6"
+                        >
                             {list.map((pass: any, index: number) => (
                                 <motion.div 
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
+                                    variants={itemVariants}
                                     key={pass.id} 
-                                    className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white relative group hover:shadow-2xl transition-all"
+                                    className="glass-panel p-6 sm:p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white relative group hover:shadow-2xl transition-all"
                                 >
                                     <div className="flex flex-col md:flex-row justify-between gap-8">
                                         <div className="space-y-6 flex-1">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-16 h-16 bg-[#1F4E79] text-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-3 transition-transform">
+                                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1F4E79] text-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-3 transition-transform shrink-0">
                                                     <FileBadge size={32} />
                                                 </div>
-                                                <div>
-                                                    <h4 className="text-2xl font-black text-[#1F4E79] tracking-tighter italic uppercase">{pass.refPasseport}</h4>
-                                                    <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Généré le: {new Date(pass.createdAt).toLocaleDateString()}</p>
+                                                <div className="overflow-hidden">
+                                                    <h4 className="text-xl sm:text-2xl font-black text-[#1F4E79] tracking-tighter italic uppercase truncate">{pass.refPasseport}</h4>
+                                                    <p className="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-widest">Généré le: {new Date(pass.createdAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-3 gap-6">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                                                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Score ICL</p>
                                                     <p className="text-xl font-black text-[#1F4E79]">{pass.scoreGlobal}</p>
@@ -135,7 +158,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
 
                                             <div className="flex items-center gap-3 p-3 bg-gray-900 text-white rounded-xl shadow-inner">
                                                 <Hash size={14} className="text-orange-400" />
-                                                <span className="text-[10px] font-mono truncate opacity-60">{pass.hashSha256}</span>
+                                                <span className="text-[9px] sm:text-[10px] font-mono truncate opacity-60">{pass.hashSha256}</span>
                                             </div>
                                         </div>
 

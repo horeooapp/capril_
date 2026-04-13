@@ -204,14 +204,14 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
                         <h3 className="text-sm font-black text-qgreen-dark uppercase tracking-widest">Facture {type} Détectée</h3>
                         <p className="text-xs text-qgreen font-medium mt-1">Les données ont été extraites avec succès (Fiabilité 95%+)</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div className="bg-white p-4 rounded-xl border border-qgreen/10">
-                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Montant Exigé</p>
-                            <p className="text-2xl font-black text-qnavy-dark mt-1">{result.amount.toLocaleString()} <span className="text-sm">FCFA</span></p>
+                            <p className="text-[9px] sm:text-[10px] font-black text-qtext-light uppercase tracking-widest">Montant Exigé</p>
+                            <p className="text-xl sm:text-2xl font-black text-qnavy-dark mt-1">{result.amount.toLocaleString()} <span className="text-sm">FCFA</span></p>
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-qgreen/10">
-                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Limite de Paiement</p>
-                            <p className="text-lg font-black text-qred mt-2">{new Date(result.dueDate).toLocaleDateString()}</p>
+                            <p className="text-[9px] sm:text-[10px] font-black text-qtext-light uppercase tracking-widest">Limite de Paiement</p>
+                            <p className="text-base sm:text-lg font-black text-qred mt-1 sm:mt-2">{new Date(result.dueDate).toLocaleDateString()}</p>
                         </div>
                     </div>
                     <p className="text-[10px] text-qnavy mt-4 font-bold bg-white/50 py-2 px-4 rounded-lg">M-UTILITIES relancera le locataire automatiquement à la date convenue (J-10 puis tous les 3 jours).</p>
