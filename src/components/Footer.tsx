@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-      <div className="landing-v2-wrapper font-sans text-ink pb-0" style={{ backgroundColor: 'transparent' }}>
+      <div className="landing-v2-wrapper font-sans text-ink pb-0" style={{ backgroundColor: 'transparent', minHeight: 'auto' }}>
         <footer>
           <div className="footer-inner">
             <div className="footer-top">
