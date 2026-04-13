@@ -234,7 +234,7 @@ export default function LocataireDashboardPage() {
                         </p>
                     </div>
                     
-                    <Link href="/mon-espace-locataire/passport" className="w-full text-center py-4 rounded-xl border border-dashed border-qgrey-2 text-[10px] font-black uppercase tracking-widest text-qtext-light hover:border-qnavy/40 hover:text-qnavy transition-all group-hover:bg-qnavy-pale/30">
+                    <Link href="/mon-espace-locataire/passeport" className="w-full text-center py-4 rounded-xl border border-dashed border-qgrey-2 text-[10px] font-black uppercase tracking-widest text-qtext-light hover:border-qnavy/40 hover:text-qnavy transition-all group-hover:bg-qnavy-pale/30">
                         Voir les avantages →
                     </Link>
                 </BentoItem>
