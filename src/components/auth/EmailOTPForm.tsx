@@ -18,6 +18,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
     const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL')
     const [email, setEmail] = useState('')
     const [otp, setOtp] = useState('')
+    const [legalAgreed, setLegalAgreed] = useState(false)
     const [isPending, startTransition] = useTransition()
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
@@ -166,11 +167,25 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                 </div>
                             </div>
 
+                            <div className="flex items-start gap-3 pt-2 pb-4">
+                                <input
+                                    type="checkbox"
+                                    id="legalAgreed"
+                                    required
+                                    checked={legalAgreed}
+                                    onChange={(e) => setLegalAgreed(e.target.checked)}
+                                    className={`mt-1 w-4 h-4 rounded border-gray-300 text-current ${theme.inputFocus}`}
+                                />
+                                <label htmlFor="legalAgreed" className="text-[11px] text-gray-500 font-medium leading-relaxed">
+                                    En continuant, j'accepte les <Link href="/cgu" className={`font-bold hover:underline ${theme.accentText}`}>CGU</Link>, les <Link href="/mentions-legales" className={`font-bold hover:underline ${theme.accentText}`}>Mentions Légales</Link>, la <Link href="/confidentialite" className={`font-bold hover:underline ${theme.accentText}`}>Confidentialité</Link> et l'usage des <Link href="/cookies" className={`font-bold hover:underline ${theme.accentText}`}>Cookies</Link>.
+                                </label>
+                            </div>
+
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileHover={legalAgreed ? { scale: 1.02 } : { scale: 1 }}
+                                whileTap={legalAgreed ? { scale: 0.98 } : { scale: 1 }}
                                 type="submit"
-                                disabled={isPending}
+                                disabled={isPending || !legalAgreed}
                                 className={`w-full flex items-center justify-center gap-3 py-5 bg-gradient-to-r ${theme.btn1Bg} text-white rounded-2xl shadow-xl ${theme.btn1Shadow} font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 group`}
                             >
                                 {isPending ? (
