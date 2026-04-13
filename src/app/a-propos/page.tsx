@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Header from "@/components/Header";
 import { motion } from "framer-motion";
 
 export default function AboutPage() {
@@ -9,15 +10,7 @@ export default function AboutPage() {
       <div className="noise-overlay"></div>
 
       {/* HEADER */}
-      <nav id="navbar" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', boxShadow: '0 4px 24px rgba(0,0,0,.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 5%', height: '80px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-        <Link href="/" className="nav-logo" style={{ textDecoration: 'none' }}>
-          <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
-        </Link>
-        <div className="flex items-center gap-4">
-            <Link href="/mon-espace-locataire/login" className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full">Connexion Locataire</Link>
-            <Link href="/dashboard/login" className="bg-ink text-white font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-ink/80 transition-colors">Connexion Propriétaire</Link>
-        </div>
-      </nav>
+      <Header />
 
       <main className="relative z-10" style={{ paddingBottom: '100px' }}>
         {/* HERO SECTION */}

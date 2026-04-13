@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 
@@ -10,21 +11,9 @@ interface ExpertiseClientProps {
 
 export default function ExpertiseClient({ stats }: ExpertiseClientProps) {
   return (
-    <div className="bg-white min-h-screen text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
+    <div className="landing-v2-wrapper font-sans text-ink bg-cream min-h-screen overflow-x-hidden relative">
       {/* HEADER */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <img src="/logo.png" alt="QAPRIL Logo" className="h-14 w-auto drop-shadow-sm group-hover:scale-110 transition-transform" />
-              <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase">QAPRIL</span>
-            </Link>
-            <Link href="/" className="text-[11px] font-black uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">
-              Retour à l&apos;accueil
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main>
         {/* HERO SECTION */}

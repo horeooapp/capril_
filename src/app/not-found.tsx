@@ -1,19 +1,12 @@
  
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-white flex flex-col selection:bg-orange-100 selection:text-orange-900">
-      {/* Header simple */}
-      <header className="py-6 border-b border-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center space-x-3 group w-fit">
-            <img src="/logo.png" alt="QAPRIL Logo" className="h-12 w-auto group-hover:scale-110 transition-transform" />
-            <span className="font-black text-2xl tracking-tighter text-gray-900 uppercase">QAPRIL</span>
-          </Link>
-        </div>
-      </header>
+    <div className="landing-v2-wrapper flex flex-col font-sans text-ink bg-cream min-h-screen overflow-x-hidden relative selection:bg-orange-100 selection:text-orange-900">
+      <Header />
 
       <main className="flex-1 flex items-center justify-center py-20 relative overflow-hidden">
         {/* Background elements */}
