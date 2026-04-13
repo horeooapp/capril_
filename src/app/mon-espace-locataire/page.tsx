@@ -170,7 +170,11 @@ export default function LocataireDashboardPage() {
                     </div>
                     <div className="pr-6">
                         <p className="text-[8px] font-black uppercase tracking-widest text-qtext-light leading-none mb-1">Dernière Quittance</p>
-                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-tighter">Le 05 Avr. 2026</p>
+                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-tighter">
+                            {lease.lastReceiptDate 
+                                ? `Le ${new Date(lease.lastReceiptDate).toLocaleDateString('fr-CI', { day: '2-digit', month: 'short', year: 'numeric' })}`
+                                : "Aucune émise"}
+                        </p>
                     </div>
                     <div className="border-l border-qgrey-2 pl-2 pr-4 h-10 flex items-center">
                         <NotificationCenter variant="tenant" />
@@ -200,7 +204,9 @@ export default function LocataireDashboardPage() {
                             <span className="text-xl font-medium opacity-50 uppercase tracking-widest italic">FCFA</span>
                         </div>
                         <p className="text-xs font-medium opacity-60 mt-4 max-w-xs">
-                            Date limite : <span className="font-black text-white/90 uppercase mx-1">10 Avril 2026</span>
+                            Date limite : <span className="font-black text-white/90 uppercase mx-1">
+                                {new Date(lease.rentDeadline).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </span>
                             Propulsion Blockchain Immobilière.
                         </p>
                     </div>
@@ -244,7 +250,9 @@ export default function LocataireDashboardPage() {
                                  </h3>
                                  <div className="flex items-center gap-1.5 text-qtext-light">
                                      <MapPin size={12} />
-                                     <span className="text-[10px] font-bold uppercase tracking-widest">Cocody, Abidjan</span>
+                                     <span className="text-[10px] font-bold uppercase tracking-widest">
+                                         {lease.property?.commune || "Quartier"}, {lease.property?.city || "Abidjan"}
+                                     </span>
                                  </div>
                              </div>
                         </div>

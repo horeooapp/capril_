@@ -13,7 +13,7 @@ export default async function CieSodeciPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <EnergyDashboard leaseId={lease.id} />
+      <EnergyDashboard leaseId={lease.id} utilities={dashboard.utilities} />
     </div>
   );
 }

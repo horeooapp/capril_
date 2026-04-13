@@ -143,9 +143,17 @@ export async function getTenantDashboard() {
 
         // 5. Utilitaires (Factures OCR CIE/SODECI)
         const utilities = await prisma.factureUtility.findMany({
-            where: { leaseId: activeLease.id, statut: { in: ["EN_COURS", "EN_RETARD"] } },
-            orderBy: { dateLimitePaiement: "asc" }
+            where: { leaseId: activeLease.id },
+            orderBy: { createdAt: "desc" },
+            take: 10
         })
+
+        // Dernière quittance (Date réelle)
+        const lastReceipt = activeLease.receipts[0]
+
+        // Date limite de loyer (le 10 du mois en cours)
+        const now = new Date()
+        const rentDeadline = new Date(now.getFullYear(), now.getMonth(), 10)
 
         // 6. Score Locatif (Passeport)
         const locataireProfile = await prisma.locataireProfile.findUnique({
@@ -159,7 +167,9 @@ export async function getTenantDashboard() {
             lease: {
                 ...serializeLease(activeLease),
                 computedStatus: leaseStatus,
-                totalArrears
+                totalArrears,
+                lastReceiptDate: lastReceipt?.createdAt || null,
+                rentDeadline: rentDeadline.toISOString()
             },
             utilities,
             score: locataireProfile?.scoreActuel || 750

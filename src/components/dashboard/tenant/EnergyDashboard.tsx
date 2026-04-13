@@ -24,30 +24,53 @@ const T = {
   grey: "#94A3B8"
 };
 
-const mockData = {
-  cie: [
-    { month: "Sept", kwh: 320, cost: 24500 },
-    { month: "Oct", kwh: 280, cost: 19800 },
-    { month: "Nov", kwh: 410, cost: 32400 },
-    { month: "Déc", kwh: 390, cost: 30100 },
-    { month: "Jan", kwh: 350, cost: 26800 },
-    { month: "Fév", kwh: 310, cost: 22400 }
-  ],
-  sodeci: [
-    { month: "Sept", m3: 18, cost: 8500 },
-    { month: "Oct", m3: 15, cost: 6800 },
-    { month: "Nov", m3: 22, cost: 11200 },
-    { month: "Déc", m3: 20, cost: 9800 },
-    { month: "Jan", m3: 19, cost: 9200 },
-    { month: "Fév", m3: 17, cost: 7900 }
-  ]
-};
-
-export const EnergyDashboard: React.FC<{ leaseId?: string }> = ({ leaseId }) => {
+export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> = ({ leaseId, utilities = [] }) => {
   const [activeProvider, setActiveProvider] = useState<'cie' | 'sodeci'>('cie');
-  const data = activeProvider === 'cie' ? mockData.cie : mockData.sodeci;
+  
+  // Filtrage et formatage des données réelles
+  const filteredData = utilities
+    .filter(u => u.typeUtility.toLowerCase() === activeProvider)
+    .map(u => ({
+      month: u.moisFacture, // Format "YYYY-MM"
+      val: u.montantTotal,
+      cost: u.montantTotal
+    }))
+    .reverse(); // Ordre chronologique
+
+  const hasData = filteredData.length > 0;
   const unit = activeProvider === 'cie' ? 'kWh' : 'm³';
-  const maxVal = Math.max(...data.map(d => (d as any).kwh || (d as any).m3));
+  const unitLabel = activeProvider === 'cie' ? 'Consommation' : 'Volume';
+  const maxVal = hasData ? Math.max(...filteredData.map(d => d.val)) : 100;
+
+  if (!hasData) {
+    return (
+      <div className="space-y-8 p-1">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 className="text-2xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Énergie & Fluides.</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11] mt-1">Suivi de consommation certifié Rule 3.4</p>
+          </div>
+          <div className="bg-white p-1.5 rounded-2xl flex gap-1 shadow-sm border border-slate-100">
+             <button onClick={() => setActiveProvider('cie')} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeProvider === 'cie' ? "bg-[#1F4E79] text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}>CIE</button>
+             <button onClick={() => setActiveProvider('sodeci')} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeProvider === 'sodeci' ? "bg-blue-500 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}>SODECI</button>
+          </div>
+        </div>
+        
+        <div className="bg-white p-12 rounded-[2.5rem] border-2 border-dashed border-slate-200 text-center space-y-4">
+          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
+              <Zap size={40} />
+          </div>
+          <h3 className="text-xl font-black text-slate-400 uppercase tracking-tight">Aucune donnée pour {activeProvider.toUpperCase()}</h3>
+          <p className="text-slate-400 max-w-sm mx-auto text-sm">
+            Scannez votre première facture pour activer votre dashboard énergétique et comparer votre consommation avec la moyenne nationale.
+          </p>
+          <div className="pt-4">
+            <UploadFactureOCR leaseId={leaseId} onUploadComplete={() => window.location.reload()} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-1">

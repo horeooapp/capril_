@@ -1,20 +1,27 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { ShieldCheck, MessageSquareWarning, FileSignature, Receipt, Gavel, FileLock2, Info } from "lucide-react"
+import { ShieldCheck, MessageSquareWarning, FileSignature, Receipt, Gavel, FileLock2, Info, Clock, CheckCircle } from "lucide-react"
 import { RightsActionManager } from "@/components/dashboard/tenant/RightsActionManager"
+import { getTenantDashboard } from "@/actions/tenant-actions"
+import { getTenantRightsHistory } from "@/actions/tenant-rights-actions"
 
 export const dynamic = "force-dynamic"
 
 export default async function TenantRightsPage() {
     const session = await auth()
-    
-    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    
-    if (!session?.user || activeRole !== "TENANT") {
-        redirect("/mon-espace-locataire/login")
+    if (!session?.user) redirect("/mon-espace-locataire/login")
+
+    const [dashboard, historyResult] = await Promise.all([
+        getTenantDashboard(),
+        getTenantRightsHistory()
+    ])
+
+    if (!dashboard.success || !dashboard.hasLease) {
+        redirect("/mon-espace-locataire")
     }
 
-
+    const leaseId = dashboard.lease.id
+    const history = historyResult.success ? historyResult.data : []
 
     return (
         <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
@@ -52,17 +59,37 @@ export default async function TenantRightsPage() {
             </div>
 
             {/* Actions Grid */}
-            <RightsActionManager />
+            <RightsActionManager leaseId={leaseId} />
 
-            {/* Active Tickets Simulation */}
+            {/* Historique Réel */}
             <div className="mt-12">
                  <h2 className="text-md font-black text-qtext-light mb-6 uppercase tracking-widest">Historique de vos dossiers</h2>
-                 <div className="bg-white rounded-[2rem] border border-qgrey-2 border-dashed p-10 text-center">
-                     <p className="text-sm font-bold text-qtext-mid">Aucun dossier d'assistance en cours.</p>
-                     <p className="text-xs text-qtext-light mt-1">Vos réclamations et préavis s'afficheront ici.</p>
-                 </div>
+                 {history.length > 0 ? (
+                     <div className="grid gap-4">
+                         {history.map((item: any, idx: number) => (
+                             <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-[#97782A]/30 transition-all">
+                                 <div className="flex items-center gap-4">
+                                     <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+                                         {item.status === "RESOLU" || item.status === "CLOS" ? <CheckCircle size={20} className="text-qgreen" /> : <Clock size={20} />}
+                                     </div>
+                                     <div>
+                                         <h4 className="text-[11px] font-black uppercase tracking-widest text-qnavy-dark">{item.title}</h4>
+                                         <p className="text-[10px] text-qtext-light mt-1 uppercase font-bold">
+                                             {new Date(item.date).toLocaleDateString('fr-CI', { day: '2-digit', month: 'short', year: 'numeric' })} • {item.status}
+                                         </p>
+                                     </div>
+                                 </div>
+                                 <div className="text-[9px] font-black text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">Voir Détails →</div>
+                             </div>
+                         ))}
+                     </div>
+                 ) : (
+                     <div className="bg-white rounded-[2rem] border border-qgrey-2 border-dashed p-10 text-center">
+                         <p className="text-sm font-bold text-qtext-mid">Aucun dossier d'assistance en cours.</p>
+                         <p className="text-xs text-qtext-light mt-1">Vos réclamations et préavis s'afficheront ici.</p>
+                     </div>
+                 )}
             </div>
-            
         </div>
     )
 }
