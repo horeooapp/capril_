@@ -144,6 +144,3 @@ export default async function TenantReceiptsPage() {
         </motion.div>
     )
 }
-        </div>
-    )
-}

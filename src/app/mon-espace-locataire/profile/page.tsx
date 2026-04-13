@@ -185,5 +185,3 @@ export default async function TenantProfilePage() {
         </motion.div>
     )
 }
-    )
-}

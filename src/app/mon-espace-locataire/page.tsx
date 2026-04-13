@@ -417,6 +417,6 @@ export default function LocataireDashboardPage() {
                     <span className="text-[9px] font-black uppercase tracking-[0.4em] italic leading-none">Protocole National Certifié V.4.0</span>
                 </div>
             </footer>
-        </div>
+        </motion.div>
     )
 }
