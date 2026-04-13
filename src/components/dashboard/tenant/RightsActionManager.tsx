@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { ShieldCheck, MessageSquareWarning, FileSignature, Receipt, Gavel, FileLock2, Info, X, Zap } from "lucide-react";
