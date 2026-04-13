@@ -23,7 +23,7 @@ import {
     ArrowUpRight,
     Zap
 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 
 export default function LocataireDashboardPage() {
@@ -119,7 +119,7 @@ export default function LocataireDashboardPage() {
     const lease = dashboardData.lease
     const utilities = dashboardData.utilities || []
     
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -130,7 +130,7 @@ export default function LocataireDashboardPage() {
         }
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: { 
             opacity: 1, 

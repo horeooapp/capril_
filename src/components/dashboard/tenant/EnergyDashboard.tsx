@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Zap, 
   Droplets, 
@@ -72,7 +72,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
     );
   }
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -82,7 +82,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
         }
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 15 },
         visible: { 
             opacity: 1, 

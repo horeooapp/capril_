@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"

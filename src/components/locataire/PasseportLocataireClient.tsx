@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { generatePasseportLocatif } from "@/actions/passeport"
 import { toast } from "sonner"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 
 export default function PasseportLocataireClient({ passeports: initialPasseports, userId }: any) {
     const [list, setList] = useState(initialPasseports)
@@ -33,7 +33,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
         }
     }
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -43,7 +43,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
         }
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 15 },
         visible: { 
             opacity: 1, 
