@@ -8,7 +8,8 @@ import {
     LayoutDashboard, Building2, ClipboardList, FileText, Handshake, Star, Bot, Trophy, Globe,
     LogOut, Home, User, BarChart3, Settings, Zap, ShieldAlert, Receipt, Wallet, BookOpen, Users,
     Shield, Scale, Store, FileSignature, LineChart, CreditCard, Landmark, Calculator, Wrench,
-    MapPin, HardDriveUpload, SmartphoneNfc, MessageSquareWarning, BarChartHorizontal, Megaphone
+    MapPin, HardDriveUpload, SmartphoneNfc, MessageSquareWarning, BarChartHorizontal, Megaphone,
+    CalendarDays, MessageSquare, FileBadge
 } from "lucide-react"
 
 import RoleSwitcher from "./RoleSwitcher"
@@ -77,18 +78,23 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
         // Default Links (Landlord)
         const commonLinks = [
             { href: "/dashboard", label: "Synthèse", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
             { href: "/dashboard/properties", label: "Mes biens", icon: <Building2 size={18} /> },
+            { href: "/dashboard/mandates", label: "Mes mandats", icon: <FileSignature size={18} /> },
             { href: "/dashboard/leases", label: "Mes baux", icon: <ClipboardList size={18} /> },
             { href: "/dashboard/receipts", label: "Loyers", icon: <Receipt size={18} /> },
             { href: "/dashboard/disputes", label: "Impayés", icon: <Scale size={18} /> },
             { href: "/dashboard/inspections", label: "États des lieux", icon: <MapPin size={18} /> },
             { href: "/dashboard/maintenance", label: "Maintenance", icon: <Wrench size={18} /> },
+            { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} /> },
             { href: "/dashboard/fiscal", label: "Fiscal DGI", icon: <Landmark size={18} /> },
             { href: "/dashboard/documents", label: "Documents", icon: <FileText size={18} /> },
+            { href: "/dashboard/certificates", label: "Certificats", icon: <FileBadge size={18} /> },
             { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
             { href: "/dashboard/insurance", label: "Assurances", icon: <Shield size={18} /> },
             { href: "/dashboard/succession", label: "Successions", icon: <Users size={18} /> },
             { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={18} /> },
+            { href: "/dashboard/automations", label: "Automatisations", icon: <Zap size={18} /> },
             { href: "/dashboard/marketplace", label: "Marketplace", icon: <Store size={18} /> },
             { href: "/dashboard/procurations", label: "Procurations", icon: <FileSignature size={18} /> },
             { href: "/dashboard/charges", label: "Régul. Charges", icon: <Calculator size={18} /> },
