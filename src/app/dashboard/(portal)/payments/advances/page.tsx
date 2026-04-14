@@ -6,6 +6,8 @@ import { getPrepaymentRequests, handlePrepaymentApproval } from "@/actions/prepa
 import { toast } from "sonner"
 import { CalendarDays, CheckCircle2, ChevronLeft, Loader2, XCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { SectionCard } from "@/components/dashboard/ui/SectionCard"
+import { Badge } from "@/components/dashboard/ui/Badge"
 
 export default function LandlordAdvancesPage() {
     const [requests, setRequests] = useState<any[]>([])
@@ -62,78 +64,74 @@ export default function LandlordAdvancesPage() {
         }
     }
 
-    if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-qorange" size={40} /></div>
+    if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-amber-500" size={40} /></div>
 
     const pendingRequests = requests.filter(r => r.status === 'PENDING')
     const historicalRequests = requests.filter(r => r.status !== 'PENDING')
 
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8">
+        <div className="space-y-6 relative">
             <div className="flex items-center gap-4 mb-6">
-                <Link href="/dashboard/receipts" className="p-2 hover:bg-qgrey-1 rounded-xl transition-colors">
-                    <ChevronLeft className="text-qtext-light" />
+                <Link href="/dashboard/receipts" className="p-2 hover:bg-slate-100 rounded-[10px] transition-colors">
+                    <ChevronLeft className="text-slate-500" />
                 </Link>
                 <div className="flex flex-col">
-                    <h1 className="text-3xl font-black text-qnavy-dark uppercase tracking-tighter">Avances sur Loyer</h1>
-                    <p className="text-sm font-bold text-qtext-mid bg-qorange-pale w-fit px-2 rounded-md text-qorange mt-1">
+                    <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Avances sur Loyer</h1>
+                    <p className="text-[12px] font-bold text-amber-700 bg-amber-50 w-fit px-2.5 py-0.5 rounded-[6px] border border-amber-200 mt-1">
                         Paiements Anticipés Multi-mois
                     </p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2rem] border border-qgrey-2 p-8 shadow-[0_12px_40px_rgba(13,43,110,0.06)]">
-                <h2 className="text-xl font-black text-qnavy-dark mb-6 flex items-center gap-3">
-                    <AlertCircle className="text-qorange" /> Demandes en Attente ({pendingRequests.length})
-                </h2>
-
+            <SectionCard title={`Demandes en Attente (${pendingRequests.length})`} icon={<AlertCircle className="text-amber-500" />}>
                 {pendingRequests.length === 0 ? (
-                    <div className="text-center py-10 bg-qgrey-1/30 rounded-2xl border border-dashed border-qgrey-2">
-                        <p className="text-sm font-bold text-qtext-light">Aucune demande de paiement anticipé en cours.</p>
+                    <div className="text-center py-10 bg-slate-50 rounded-[12px] border border-dashed border-slate-200">
+                        <p className="text-[13px] font-bold text-slate-500">Aucune demande de paiement anticipé en cours.</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
                         {pendingRequests.map(req => (
-                            <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} key={req.id} className="p-6 rounded-2xl border border-qorange/30 bg-qorange/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} key={req.id} className="p-6 rounded-[16px] border border-amber-200 bg-amber-50/50 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
                                 <div>
-                                    <h3 className="font-black text-qnavy-dark capitalize">{req.tenant.firstName} {req.tenant.lastName}</h3>
-                                    <p className="text-sm text-qtext-mid font-bold">Bien: {req.lease.property.name || req.lease.property.address}</p>
-                                    <div className="mt-2 text-xs font-black uppercase bg-white px-3 py-1 rounded-lg border border-qorange/20 inline-block text-qorange">
+                                    <h3 className="font-bold text-[15px] text-slate-900 capitalize">{req.tenant.firstName} {req.tenant.lastName}</h3>
+                                    <p className="text-[13px] text-slate-600 font-medium mt-1">Bien: {req.lease.property.name || req.lease.property.address}</p>
+                                    <div className="mt-3 text-[11px] font-bold uppercase bg-white px-3 py-1.5 rounded-[8px] border border-amber-200 inline-block text-amber-700 shadow-sm">
                                         Demande : {req.monthsCount} Mois d'Avance
                                     </div>
-                                    <p className="mt-2 text-xl font-black text-qnavy">{req.totalAmount.toLocaleString()} FCFA</p>
-                                    {req.reason && <p className="text-sm italic text-qtext-mid mt-2">"{req.reason}"</p>}
+                                    <p className="mt-3 text-2xl font-black text-slate-900">{req.totalAmount.toLocaleString()} <span className="text-[14px] text-slate-500 font-bold">FCFA</span></p>
+                                    {req.reason && <p className="text-[13px] italic text-slate-500 mt-2 bg-white/50 p-2 rounded-[8px] border border-amber-100">"{req.reason}"</p>}
                                 </div>
 
-                                <div className="flex flex-col gap-3 min-w-[200px]">
+                                <div className="flex flex-col gap-3 min-w-[220px]">
                                     {showRejectInput !== req.id ? (
                                         <>
                                             <button 
                                                 onClick={() => handleAction(req.id, true)} 
                                                 disabled={processingId === req.id}
-                                                className="w-full bg-qgreen hover:bg-qgreen-dark text-white font-black py-3 rounded-xl flex justify-center items-center gap-2 transition-all shadow-md"
+                                                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-[10px] flex justify-center items-center gap-2 transition-all shadow-md text-[13px]"
                                             >
-                                                {processingId === req.id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
+                                                {processingId === req.id ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
                                                 Approuver
                                             </button>
                                             <button 
                                                 onClick={() => handleAction(req.id, false)}
-                                                className="w-full bg-white hover:bg-qred-pale border-2 border-qred/20 hover:border-qred text-qred font-black py-3 rounded-xl flex justify-center items-center gap-2 transition-all"
+                                                className="w-full bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 font-bold py-2.5 px-4 rounded-[10px] flex justify-center items-center gap-2 transition-all text-[13px]"
                                             >
                                                 Refuser
                                             </button>
                                         </>
                                     ) : (
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
                                             <input 
                                                 type="text" 
                                                 placeholder="Motif du refus..." 
                                                 value={rejectReason}
                                                 onChange={(e) => setRejectReason(e.target.value)}
-                                                className="w-full text-xs p-3 border rounded-xl"
+                                                className="w-full text-[13px] p-3 bg-white border border-rose-200 rounded-[10px] focus:outline-none focus:ring-1 focus:ring-rose-500 shadow-sm"
                                             />
                                             <div className="flex gap-2">
-                                                <button onClick={() => setShowRejectInput(null)} className="flex-1 py-2 bg-qgrey-2 rounded-xl text-xs font-bold">Annuler</button>
-                                                <button onClick={() => handleAction(req.id, false)} disabled={processingId === req.id} className="flex-1 py-2 bg-qred text-white rounded-xl text-xs font-bold flex justify-center items-center">
+                                                <button onClick={() => setShowRejectInput(null)} className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 rounded-[8px] text-[12px] font-bold text-slate-600 transition-colors">Annuler</button>
+                                                <button onClick={() => handleAction(req.id, false)} disabled={processingId === req.id} className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-[8px] text-[12px] font-bold flex justify-center items-center transition-colors shadow-sm">
                                                     {processingId === req.id ? <Loader2 className="animate-spin size-4" /> : "Confirmer"}
                                                 </button>
                                             </div>
@@ -144,31 +142,27 @@ export default function LandlordAdvancesPage() {
                         ))}
                     </div>
                 )}
-            </div>
+            </SectionCard>
 
             {/* Historique */}
             {historicalRequests.length > 0 && (
-                <div className="bg-white rounded-[2rem] border border-qgrey-2 p-8 shadow-sm opacity-80">
-                    <h2 className="text-xl font-black text-qnavy-dark mb-6 flex items-center gap-3">
-                        <CalendarDays className="text-qnavy" /> Historique
-                    </h2>
+                <SectionCard title="Historique" icon={<CalendarDays className="text-slate-500" />}>
                     <div className="space-y-3">
                         {historicalRequests.map(req => (
-                            <div key={req.id} className="p-4 rounded-xl border border-qgrey-2 bg-qgrey-1/20 flex justify-between items-center">
+                            <div key={req.id} className="p-4 rounded-[12px] border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div>
-                                    <p className="font-black text-sm text-qnavy">{req.tenant.firstName} {req.tenant.lastName} - {req.monthsCount} Mois</p>
-                                    <p className="text-xs text-qtext-mid">{req.totalAmount.toLocaleString()} FCFA</p>
+                                    <p className="font-bold text-[14px] text-slate-800">{req.tenant.firstName} {req.tenant.lastName} <span className="text-slate-400 font-medium">- {req.monthsCount} Mois</span></p>
+                                    <p className="text-[13px] text-slate-600 font-medium mt-1">{req.totalAmount.toLocaleString()} FCFA</p>
                                 </div>
-                                <div className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border ${
-                                    req.status === 'APPROVED' ? 'bg-qgreen/10 border-qgreen/20 text-qgreen' : 
-                                    req.status === 'REJECTED' ? 'bg-qred/10 border-qred/20 text-qred' : 'bg-qgrey-2 text-qtext-mid'
-                                }`}>
-                                    {req.status}
+                                <div>
+                                    {req.status === 'APPROVED' && <Badge variant="success">Approuvé</Badge>}
+                                    {req.status === 'REJECTED' && <Badge variant="error">Refusé</Badge>}
+                                    {req.status !== 'APPROVED' && req.status !== 'REJECTED' && <Badge variant="neutral">{req.status}</Badge>}
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
+                </SectionCard>
             )}
         </div>
     )

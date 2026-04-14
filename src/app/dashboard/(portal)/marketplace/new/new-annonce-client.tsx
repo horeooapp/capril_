@@ -40,32 +40,37 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-6 relative max-w-4xl mx-auto">
             {/* Header */}
             <div>
                 <button 
                     onClick={() => router.back()} 
-                    className="text-qtext-light hover:text-qnavy flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] mb-6 transition-colors"
+                    className="text-slate-400 hover:text-slate-700 flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] mb-6 transition-colors"
                 >
                     <ArrowLeft size={14} /> Retour au store
                 </button>
-                <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
-                    <Megaphone className="text-qorange" size={32} /> Rédiger une Annonce
-                </h1>
-                <p className="text-sm font-medium text-qtext-mid mt-1">
-                    Préparez l'annonce pour votre bien. Elle sera enregistrée en brouillon avant diffusion.
-                </p>
+                <div className="flex flex-col gap-2">
+                     <div className="mb-2 bg-orange-50 border border-orange-200 text-orange-700 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-[6px] inline-flex items-center gap-2 shadow-sm max-w-max">
+                        <Home size={12} /> Publication
+                    </div>
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                        Rédiger une Annonce
+                    </h1>
+                    <p className="text-[13.5px] font-medium text-slate-500 mt-1">
+                        Préparez l'annonce pour votre bien. Elle sera enregistrée en brouillon avant diffusion.
+                    </p>
+                </div>
             </div>
 
-            <form onSubmit={handleCreate} className="bg-white rounded-[2rem] border border-qgrey-2 p-8 shadow-sm space-y-8">
+            <form onSubmit={handleCreate} className="bg-white rounded-[24px] border border-slate-200 p-8 shadow-sm space-y-8">
                 
                 {/* Choix du Bien */}
                 <div>
-                    <label className="block text-xs font-black text-qnavy-dark uppercase tracking-widest mb-3">Sélectionner le bien immobilier <span className="text-red-500">*</span></label>
+                    <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-3">Sélectionner le bien immobilier <span className="text-red-500">*</span></label>
                     <select 
                         value={form.logementId} 
                         onChange={(e) => setForm({...form, logementId: e.target.value})}
-                        className="w-full p-4 bg-white border-2 border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:border-qorange focus:ring-0 outline-none transition-colors"
+                        className="w-full p-4 bg-white border border-slate-200 rounded-[12px] text-[13px] font-bold text-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-colors"
                         required
                     >
                         <option value="" disabled>--- Choisissez un bien dans votre portefeuille ---</option>
@@ -77,31 +82,31 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                     </select>
                 </div>
 
-                <hr className="border-qgrey-2" />
+                <hr className="border-slate-100" />
 
                 {/* Titre & Loyer */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-xs font-black text-qnavy-dark uppercase tracking-widest mb-3">Titre Accrocheur <span className="text-red-500">*</span></label>
+                        <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-3">Titre Accrocheur <span className="text-red-500">*</span></label>
                         <input 
                             type="text" 
                             value={form.titre} 
                             onChange={(e) => setForm({...form, titre: e.target.value})}
                             placeholder="Ex: Magnifique Appartement 3 Pièces - Riviera Golf"
-                            className="w-full p-4 bg-white border-2 border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:border-qorange focus:ring-0 outline-none transition-colors"
+                            className="w-full p-4 bg-white border border-slate-200 rounded-[12px] text-[13px] font-bold text-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-colors"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-black text-qnavy-dark uppercase tracking-widest mb-3">Loyer Mensuel (FCFA) <span className="text-red-500">*</span></label>
+                        <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-3">Loyer Mensuel (FCFA) <span className="text-red-500">*</span></label>
                         <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₣</span>
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-[13px]">FCFA</span>
                             <input 
                                 type="number" 
                                 value={form.loyerDemande} 
                                 onChange={(e) => setForm({...form, loyerDemande: e.target.value})}
                                 placeholder="350000"
-                                className="w-full pl-8 p-4 bg-white border-2 border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:border-qorange focus:ring-0 outline-none transition-colors"
+                                className="w-full pl-14 p-4 bg-white border border-slate-200 rounded-[12px] text-[13px] font-bold text-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-colors"
                                 required
                             />
                         </div>
@@ -110,13 +115,13 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
 
                 {/* Description */}
                 <div>
-                    <label className="block text-xs font-black text-qnavy-dark uppercase tracking-widest mb-3">Description Complète <span className="text-red-500">*</span></label>
+                    <label className="block text-[11px] font-bold text-slate-900 uppercase tracking-widest mb-3">Description Complète <span className="text-red-500">*</span></label>
                     <textarea 
                         rows={6}
                         value={form.description} 
                         onChange={(e) => setForm({...form, description: e.target.value})}
                         placeholder="Décrivez les atouts de votre bien, les pièces, les commodités à proximité..."
-                        className="w-full p-4 bg-white border-2 border-qgrey-2 rounded-xl text-sm font-medium text-gray-700 focus:border-qorange focus:ring-0 outline-none transition-colors resize-none"
+                        className="w-full p-4 bg-white border border-slate-200 rounded-[12px] text-[13px] font-medium text-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-colors resize-none leading-relaxed"
                         required
                     />
                 </div>
@@ -125,7 +130,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                     <button 
                         type="submit" 
                         disabled={isPending}
-                        className="bg-qorange text-white px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 active:-translate-y-1 disabled:opacity-50 flex items-center gap-2"
+                        className="bg-orange-500 text-white px-8 py-3.5 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-orange-600 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
                     >
                         {isPending ? "Création en cours..." : "Suivant : Sauvegarder Brouillon"}
                     </button>

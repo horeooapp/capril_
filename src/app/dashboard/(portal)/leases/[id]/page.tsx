@@ -1,4 +1,3 @@
- 
 import { getLeaseById } from "@/actions/leases"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
@@ -12,7 +11,7 @@ import { LeaseStatus } from "@prisma/client"
 import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
 import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
 import { isFeatureEnabled } from "@/lib/features"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, FileText, Download, Edit3, ShieldAlert, CheckCircle2, ShieldCheck } from "lucide-react"
 import { getLeaseProceduralState } from "@/lib/arrears-engine"
 import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
 import CDCRestitutionBox from "@/components/CDCRestitutionBox"
@@ -77,31 +76,33 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     const synthesis = await getMonthlySynthesis(leaseId, currentMonth)
 
     return (
-        <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-8 relative">
             {/* Hybrid Automation: Arrears Procedural Action */}
             {proceduralState.active && (
                 <ArrearsProceduralBox leaseId={leaseId} proceduralState={proceduralState} />
             )}
 
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] p-6 md:p-8 rounded-[2rem] border border-qgrey-2 gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white shadow-sm p-6 md:p-8 rounded-[20px] border border-slate-200 gap-6">
                 <div>
-                    <h1 className="text-3xl md:text-4xl font-black text-qnavy-dark tracking-tighter uppercase">Détails du Bail</h1>
-                    <p className="text-sm font-black text-qorange uppercase tracking-widest mt-2">{tLease.leaseReference}</p>
+                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase flex items-center gap-3">
+                        <FileText className="text-slate-500" size={32}/> Détails du Bail
+                    </h1>
+                    <p className="text-sm font-bold text-amber-600 uppercase tracking-widest mt-2">{tLease.leaseReference}</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                     {(tLease.status === "DRAFT" || tLease.status === "PENDING_SIGNATURE" || tLease.status === "PENDING_CONFIRMATION") && (
                         <Link
                             href={`/dashboard/leases/${tLease.id}/edit`}
-                            className="inline-flex items-center px-6 py-3 border border-qnavy/20 shadow-sm text-[11px] font-black rounded-xl text-qnavy bg-qnavy-pale hover:bg-qnavy hover:text-white transition-all uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
                         >
-                            ✏️ Éditer Intégralement
+                            <Edit3 size={16}/> Éditer Intégralement
                         </Link>
                     )}
                     <Link
                         href={`/dashboard/certificates/${tLease.id}`}
-                        className="inline-flex items-center px-6 py-3 border border-qgrey-2 shadow-sm text-[11px] font-black rounded-xl text-qnavy-dark bg-white hover:bg-qgrey-1 transition-all uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
                     >
-                        📄 Certificat
+                        <Download size={16}/> Certificat
                     </Link>
                     <GenerateReceiptForm leaseId={tLease.id} monthlyRentFcfa={tLease.rentAmount} />
                 </div>
@@ -109,14 +110,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
             {/* Alerte Signature si PENDING_SIGNATURE */}
             {(tLease.status === "PENDING_SIGNATURE" || tLease.status === "DRAFT") && (
-                <div className="p-6 bg-qorange-pale border border-qorange/20 rounded-[2rem] flex flex-col md:flex-row justify-between items-center shadow-lg shadow-qorange/10 animate-pulse gap-6">
-                    <div>
-                        <h3 className="text-lg font-black text-qorange uppercase tracking-widest flex items-center gap-2"><span>✍️</span> Validation Requise</h3>
-                        <p className="text-qorange-dark text-sm font-bold mt-1">Ce contrat global (BDQ/Numérique) est en attente de signature bilatérale.</p>
+                <div className="p-6 bg-amber-50 border border-amber-200 rounded-[20px] flex flex-col items-start shadow-sm">
+                    <div className="flex items-center gap-3 mb-4 text-amber-700">
+                        <ShieldAlert size={24}/>
+                        <div>
+                            <h3 className="text-[13px] font-black uppercase tracking-widest">Validation Requise</h3>
+                            <p className="text-[12px] font-medium mt-1">Ce contrat global (BDQ/Numérique) est en attente de signature bilatérale.</p>
+                        </div>
                     </div>
                     <Link 
                         href={`/dashboard/leases/${tLease.id}/signature`}
-                        className="px-8 py-4 bg-qorange text-white font-black rounded-[1.2rem] hover:opacity-90 transition-opacity uppercase tracking-widest text-[11px] shadow-[0_8px_20px_rgba(255,130,0,0.3)] shrink-0"
+                        className="w-full sm:w-auto px-6 py-3 bg-amber-600 text-white font-bold rounded-[10px] hover:bg-amber-700 transition-colors uppercase tracking-widest text-[11px] shadow-sm flex items-center justify-center gap-2"
                     >
                         Accéder à la Signature
                     </Link>
@@ -126,16 +130,15 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 {/* Main Info */}
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white rounded-[2rem] p-8 border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.06)] relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-qnavy-pale rounded-bl-[100%] z-0"></div>
-                        <h2 className="text-xl font-black text-qnavy-dark mb-6 border-b border-qgrey-2 pb-4 flex items-center relative z-10 uppercase tracking-widest">
-                            <span className="mr-3 text-qorange">🤝</span> Parties Actives
+                    <div className="bg-white rounded-[20px] p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+                        <h2 className="text-lg font-black text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2 uppercase tracking-tight">
+                            <span className="text-amber-500">🤝</span> Parties Actives
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                            <div className="space-y-3 bg-background p-6 rounded-3xl border border-qgrey-2">
-                                <h3 className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Preneur (Locataire)</h3>
-                                <p className="text-xl font-black text-qnavy-dark">{tLease.tenant?.fullName || "Non défini"}</p>
-                                <p className="text-[11px] text-qtext-mid font-black px-3 py-1 bg-qgrey-1 rounded-lg inline-block">{tLease.tenant?.email || "En attente d'inscription"}</p>
+                            <div className="space-y-3 bg-slate-50 p-6 rounded-[16px] border border-slate-100">
+                                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preneur (Locataire)</h3>
+                                <p className="text-[18px] font-black text-slate-900">{tLease.tenant?.fullName || "Non défini"}</p>
+                                <p className="text-[12px] text-slate-600 font-medium">{tLease.tenant?.email || "En attente d'inscription"}</p>
                                 <div className="pt-2">
                                     <ReliabilityBadge score={tLease.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
@@ -146,11 +149,11 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 {tLease.cdcDeposits?.[0] && (tLease.status === "TERMINATED" || tLease.status === "ACTIVE") && (
                                     <CDCRestitutionBox leaseId={leaseId} deposit={tLease.cdcDeposits[0]} />
                                 )}
-                                <div className="bg-qnavy-pale p-6 rounded-3xl border border-qnavy/10 h-full">
-                                    <h3 className="text-[10px] font-black text-qnavy uppercase tracking-widest mb-3">Bien Immobilier Concédé</h3>
-                                    <p className="text-lg font-black text-qnavy-dark leading-tight">{tLease.property.name || tLease.property.address}</p>
-                                    <p className="text-sm font-bold text-qtext-mid mt-1">{tLease.property.commune}</p>
-                                    <span className="mt-3 inline-block px-3 py-1 bg-white text-qnavy text-[10px] font-black uppercase tracking-widest rounded-md border border-qnavy/20">
+                                <div className="bg-slate-50 p-6 rounded-[16px] border border-slate-100 h-full">
+                                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Bien Immobilier Concédé</h3>
+                                    <p className="text-[14px] font-black text-slate-900 leading-tight">{tLease.property.name || tLease.property.address}</p>
+                                    <p className="text-[13px] font-medium text-slate-500 mt-1">{tLease.property.commune}</p>
+                                    <span className="mt-3 inline-block px-3 py-1 bg-white text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-[6px] border border-slate-200 shadow-sm">
                                         Type: {tLease.property.propertyType}
                                     </span>
                                 </div>
@@ -159,34 +162,34 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     </div>
 
                     {/* Financial Summary Section */}
-                    <div className="bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] rounded-[2rem] p-8 border border-qgrey-2">
-                        <h2 className="text-xl font-black text-qnavy-dark mb-6 border-b border-qgrey-2 pb-4 flex items-center uppercase tracking-widest">
-                            <span className="mr-3 text-qgreen">💳</span> Bilan Financier
+                    <div className="bg-white shadow-sm rounded-[20px] p-8 border border-slate-200">
+                        <h2 className="text-lg font-black text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2 uppercase tracking-tight">
+                            <span className="text-emerald-500">💳</span> Bilan Financier
                         </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
-                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Loyer Net</p>
-                                <p className="text-2xl font-black text-qnavy-dark italic">{Number(tLease.rentAmount).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Loyer Net</p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.rentAmount).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
                             </div>
-                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
-                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Charges</p>
-                                <p className="text-2xl font-black text-qtext-mid italic">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
+                            <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Charges</p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
                             </div>
-                            <div className="space-y-1.5 p-4 bg-background rounded-2xl border border-qgrey-2">
-                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Caution</p>
-                                <p className="text-2xl font-black text-qtext-mid italic">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-[10px] font-bold text-qtext-mid not-italic">FCFA</span></p>
+                            <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Caution</p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
                             </div>
-                            <div className="space-y-1.5 pt-2">
-                                <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest mb-2">Cycle de vie</p>
+                            <div className="p-5">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cycle de vie</p>
                                 <div>
-                                    <span className={`inline-flex items-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                                    <span className={`inline-flex items-center px-3 py-1.5 rounded-[8px] text-[10px] font-bold uppercase tracking-widest border shadow-sm ${
                                         tLease.status === 'ACTIVE' 
-                                            ? 'bg-qgreen-pale text-qgreen border-qgreen/20' 
+                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                                             : tLease.status === 'LOYER_IMPAYE' || tLease.status === 'MISE_EN_DEMEURE'
-                                                ? 'bg-qred-pale text-qred border-qred/20 animate-pulse'
-                                                : 'bg-qorange-pale text-qorange border-qorange/20'
+                                                ? 'bg-rose-50 text-rose-600 border-rose-200 animate-pulse'
+                                                : 'bg-amber-50 text-amber-700 border-amber-200'
                                     }`}>
-                                        <span className={`w-1.5 h-1.5 rounded-full mr-2 ${tLease.status === 'ACTIVE' ? 'bg-qgreen' : 'bg-qred'}`}></span>
+                                        <span className={`w-1.5 h-1.5 rounded-full mr-2 ${tLease.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
                                         {tLease.status}
                                     </span>
                                 </div>
@@ -201,41 +204,41 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Procedure Tracking (Added) */}
                     {(tLease.procedurePhases?.length > 0 || tLease.status !== "ACTIVE") && (
-                        <div className="bg-white shadow rounded-2xl overflow-hidden border border-gray-100 italic">
-                            <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
-                                <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                                    <span className="mr-2">⚖️</span> Suivi de la Procédure de Recouvrement
+                        <div className="bg-white shadow-sm rounded-[20px] overflow-hidden border border-slate-200">
+                            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                                <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-widest flex items-center">
+                                    <span className="mr-2">⚖️</span> Suivi de Quartier
                                 </h2>
-                                <span className="text-[10px] bg-red-600 text-white px-2 py-1 rounded font-bold uppercase tracking-widest">Valeur Probante QAPRIL</span>
+                                <span className="text-[9px] bg-rose-50 text-rose-600 px-2 py-1 rounded-[6px] font-bold uppercase tracking-widest border border-rose-200">Valeur Probante QAPRIL</span>
                             </div>
                             <div className="p-6 space-y-4">
                                 {tLease.procedurePhases?.map((phase: { phaseNumber: number, name: string, description: string, createdAt: string | Date }, idx: number) => (
                                     <div key={idx} className="flex space-x-4">
                                         <div className="flex flex-col items-center">
-                                            <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                                            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-[12px] border border-rose-200">
                                                 {phase.phaseNumber}
                                             </div>
-                                            {idx < (tLease.procedurePhases.length - 1) && <div className="w-0.5 h-full bg-red-200 my-1"></div>}
+                                            {idx < (tLease.procedurePhases.length - 1) && <div className="w-0.5 h-full bg-slate-200 my-1"></div>}
                                         </div>
                                         <div className="flex-1 pb-4">
-                                            <p className="text-sm font-black text-gray-900">{phase.name}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{phase.description}</p>
-                                            <p className="text-[10px] text-gray-400 mt-2 font-mono">Horodatage: {new Date(phase.createdAt).toLocaleString('fr-FR')}</p>
+                                            <p className="text-[13px] font-bold text-slate-900">{phase.name}</p>
+                                            <p className="text-[12px] font-medium text-slate-500 mt-1">{phase.description}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 mt-2 font-mono">Horodatage: {new Date(phase.createdAt).toLocaleString('fr-FR')}</p>
                                         </div>
                                     </div>
                                 ))}
                                 {tLease.repaymentPlans?.[0] && (
-                                    <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                                        <h4 className="text-sm font-bold text-blue-900 mb-2">🤝 Plan de Clémence en cours</h4>
-                                        <p className="text-xs text-blue-800">{tLease.repaymentPlans[0].details}</p>
+                                    <div className="mt-4 p-5 bg-blue-50 border border-blue-100 rounded-[12px]">
+                                        <h4 className="text-[12px] font-bold text-blue-900 mb-2">🤝 Plan de Clémence en cours</h4>
+                                        <p className="text-[11px] font-medium text-blue-800">{tLease.repaymentPlans[0].details}</p>
                                         <div className="mt-3 flex items-center space-x-4">
-                                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-widest border border-blue-200 ${
-                                                tLease.repaymentPlans[0].status === 'ACCEPTED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                                            <span className={`text-[10px] px-2 py-1 rounded-[6px] font-bold uppercase tracking-widest border ${
+                                                tLease.repaymentPlans[0].status === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-100 text-blue-800 border-blue-200'
                                             }`}>
                                                 Status: {tLease.repaymentPlans[0].status}
                                             </span>
                                             {tLease.repaymentPlans[0].tenantSignature && (
-                                                <span className="text-[10px] text-green-600 font-bold italic">✓ Signé par le locataire</span>
+                                                <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1"><CheckCircle2 size={12}/> Signé locataire</span>
                                             )}
                                         </div>
                                     </div>
@@ -246,7 +249,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Mediation Section */}
                     {showMediation && (
-                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
+                        <div className="bg-white shadow-sm rounded-[20px] p-8 border border-slate-200">
                             <MediationCenter 
                                 leaseId={tLease.id} 
                                 userId={userId} 
@@ -257,27 +260,25 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* EDL Section */}
                     {showEdl && (
-                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100">
+                        <div className="bg-white shadow-sm rounded-[20px] p-8 border border-slate-200">
                             <EdlManager leaseId={tLease.id} initialEdls={edls} />
                         </div>
                     )}
 
                     {/* Reminders History (M-RECOUVREMENT) */}
                     {tLease.reminders?.length > 0 && (
-                        <div className="bg-white shadow rounded-2xl p-6 border border-gray-100 italic">
-                            <h2 className="text-lg font-black text-gray-800 mb-4 flex items-center">
-                                <span className="mr-2">📢</span> Historique des Relances
+                        <div className="bg-white shadow-sm rounded-[20px] p-8 border border-slate-200">
+                            <h2 className="text-[14px] font-black text-slate-900 mb-6 flex items-center uppercase tracking-widest">
+                                <span className="mr-2 text-slate-400">📢</span> Historique des Relances
                             </h2>
                             <div className="space-y-3">
                                 {tLease.reminders.map((rem: any, idx: number) => (
-                                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-[12px] border border-slate-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-1.5 bg-gray-200 rounded-lg text-gray-600">
-                                                <AlertCircle size={14} />
-                                            </div>
-                                            <span className="text-xs font-bold text-gray-700 uppercase tracking-tighter">{rem.type}</span>
+                                            <AlertCircle size={16} className="text-slate-400" />
+                                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{rem.type}</span>
                                         </div>
-                                        <span className="text-[10px] text-gray-400 font-mono">{new Date(rem.sentAt).toLocaleDateString()}</span>
+                                        <span className="text-[10px] text-slate-500 font-bold font-mono">{new Date(rem.sentAt).toLocaleDateString()}</span>
                                     </div>
                                 ))}
                             </div>
@@ -297,35 +298,35 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                     {/* Security Pack (Escrow/CDC) */}
                     {(showCdc || showInsurance) && (
-                        <div className="bg-white shadow-[0_12px_40px_rgba(13,43,110,0.06)] rounded-[2rem] p-8 border-t-[6px] border-qnavy border-x border-b border-qgrey-2 overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(circle_at_top_right,var(--color-qnavy-pale),transparent_70%)] pointer-events-none"></div>
-                            <h2 className="text-[13px] font-black text-qnavy-dark mb-6 uppercase tracking-[0.2em]">Pack Sécurité & Preuve</h2>
+                        <div className="bg-slate-900 rounded-[20px] p-8 shadow-lg relative overflow-hidden text-white border border-slate-800">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none"><ShieldCheck size={100}/></div>
+                            <h2 className="text-[11px] font-bold text-slate-400 mb-6 uppercase tracking-widest">Pack Sécurité & Preuve</h2>
 
                             <div className="space-y-5 relative z-10">
                                 {showCdc && (
-                                    <div className="p-5 bg-background rounded-[1.5rem] border border-qgrey-2">
+                                    <div className="p-5 bg-white/5 rounded-[16px] border border-white/10 backdrop-blur-sm">
                                         <div className="flex justify-between items-center mb-3">
-                                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">Caution Demandée</p>
-                                            <span className="text-[12px] font-black text-qnavy-dark">{Number(tLease.depositAmount || 0).toLocaleString()} FCFA</span>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caution</p>
+                                            <span className="text-[12px] font-black">{Number(tLease.depositAmount || 0).toLocaleString()} FCFA</span>
                                         </div>
                                         
                                         {tLease.cdcDeposits?.[0] ? (
-                                            <div className="mt-4 text-center py-4 bg-qgreen-pale rounded-xl border border-qgreen/20">
-                                                <p className="text-[11px] font-black text-qgreen uppercase tracking-widest flex items-center justify-center gap-2">
-                                                    ✓ CAUTION SÉCURISÉE (CDC)
+                                            <div className="mt-4 p-4 bg-emerald-500/20 rounded-[10px] border border-emerald-500/30 text-center">
+                                                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center justify-center gap-2 mb-1">
+                                                    <CheckCircle2 size={12}/> Sécurisée (CDC)
                                                 </p>
-                                                <p className="text-[9px] text-qgreen-dark font-bold mt-2">Réf: {tLease.cdcDeposits[0].cdcReference || "Traitement..."}</p>
+                                                <p className="text-[9px] text-emerald-200 font-mono">Réf: {tLease.cdcDeposits[0].cdcReference || "Traitement..."}</p>
                                             </div>
                                         ) : (
-                                            <div className="mt-4 p-5 bg-qred-pale border border-qred/20 rounded-xl flex flex-col items-center shadow-[inset_0_2px_10px_rgba(255,0,0,0.03)]">
-                                                <p className="text-[13px] font-black text-qred uppercase tracking-widest mb-1">Non sécurisé</p>
-                                                <p className="text-[10px] text-qred font-bold leading-relaxed text-center mb-4 max-w-[200px]">La caution n'a pas été versée numériquement. Risque de litige et perte de preuve.</p>
+                                            <div className="mt-4 p-4 bg-rose-500/10 border border-rose-500/20 rounded-[10px]">
+                                                <p className="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1 flex items-center justify-center gap-1"><ShieldAlert size={12}/> Non sécurisé</p>
+                                                <p className="text-[10px] text-slate-300 mb-4 text-center">La caution n'est pas versée.</p>
                                                 
                                                 <Link 
                                                     href={`/dashboard/payments/simulate?tid=CAUT_${tLease.id}&amount=${tLease.depositAmount}`}
-                                                    className="w-full text-center px-4 py-3.5 bg-qred text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition-all shadow-md shadow-qred/30 active:scale-95"
+                                                    className="block w-full text-center px-4 py-3 bg-white text-slate-900 text-[10px] font-bold uppercase tracking-widest rounded-[8px] hover:bg-slate-100 transition-colors shadow-sm"
                                                 >
-                                                    Paiement Caution (Carte/Wave)
+                                                    Payer par Carte/Wave
                                                 </Link>
                                             </div>
                                         )}
@@ -333,27 +334,23 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 )}
 
                                 {showInsurance && (
-                                    <div className={`p-5 rounded-[1.5rem] border-2 transition-all ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-qgreen-pale border-qgreen/20' : 'bg-[linear-gradient(135deg,var(--color-qnavy-light)_0%,var(--color-qnavy)_100%)] border-qnavy-dark shadow-[0_8px_20px_rgba(13,43,110,0.2)]'}`}>
-                                        <div className="flex justify-between items-start mb-3">
-                                            <p className={`text-[10px] font-black uppercase tracking-widest ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'text-qgreen-dark' : 'text-white/70'}`}>Assurance Impayés</p>
+                                    <div className={`p-5 rounded-[16px] border backdrop-blur-sm ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-indigo-900/50 border-indigo-500/30'}`}>
+                                        <div className="flex justify-between items-center mb-3">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Assurance</p>
                                             {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
-                                                <span className="text-[10px] bg-qgreen text-white px-3 py-1 rounded-full font-black shadow-sm uppercase tracking-widest">ACTIVE</span>
+                                                <span className="text-[9px] bg-emerald-500 text-white px-2 py-1 rounded-[6px] font-bold uppercase tracking-widest">ACTIVE</span>
                                             ) : (
-                                                <span className="text-[10px] bg-white/20 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest backdrop-blur-sm">ABSENTE</span>
+                                                <span className="text-[9px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-1 rounded-[6px] font-bold uppercase tracking-widest">ABSENTE</span>
                                             )}
                                         </div>
                                         {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (
-                                            <div className="mt-2">
-                                                <p className="text-md font-black text-qgreen-dark flex items-center">
-                                                    <span className="mr-2">🛡️</span> {tLease.insurance.provider}
-                                                </p>
-                                                <p className="text-[10px] text-qgreen mt-2 font-bold uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-lg border border-qgreen/10">Police: {tLease.insurance.policyNo}</p>
+                                            <div className="mt-2 text-center">
+                                                <p className="text-[12px] font-black text-emerald-400">{tLease.insurance.provider}</p>
+                                                <p className="text-[9px] text-emerald-200 mt-2 font-mono">Police: {tLease.insurance.policyNo}</p>
                                             </div>
                                         ) : (
                                             <div className="mt-2">
-                                                <p className="text-[11px] text-white font-bold leading-relaxed">Couvrez 100% de vos risques locatifs avec QAPRIL Assurance.</p>
                                                 <InsuranceButton leaseId={tLease.id} />
-                                                <p className="text-[8px] text-white/50 text-center mt-3 font-bold uppercase tracking-[0.2em]">Partenariat National</p>
                                             </div>
                                         )}
                                     </div>
@@ -363,7 +360,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     )}
 
                     {/* Procedure Actions Sidebar */}
-                    <div className="bg-white rounded-[2rem] p-6 border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.06)]">
+                    <div className="bg-white rounded-[20px] p-6 border border-slate-200 shadow-sm">
                         <LeaseProcedureActions leaseId={leaseId} currentStatus={tLease.status} />
                     </div>
                 </div>
