@@ -32,10 +32,14 @@ export default async function DashboardLayout({
     // If capaciteActive is null, we fallback to session's chosenRole or default role.
     const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
     const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
-    if (!isGloballyActive) {
+    if (!isGloballyActive && activeRole) {
         // Just sync redis with DB to self-heal
-        const { redis } = await import("@/lib/redis");
-        if (redis) await redis.set(`user:active_role:${session.user.id}`, activeRole);
+        try {
+            const { redis } = await import("@/lib/redis");
+            if (redis) await redis.set(`user:active_role:${session.user.id}`, activeRole);
+        } catch(e) {
+            console.error("Redis self-heal error:", e);
+        }
     }
 
     // Role Enforcement based on activeRole, NOT hardcoded dbUser.role
