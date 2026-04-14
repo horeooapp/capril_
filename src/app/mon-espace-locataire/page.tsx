@@ -469,32 +469,45 @@ export default function LocataireDashboardPage() {
                     </Link>
                 </BentoItem>
 
-                {/* LEGAL RIGHTS CARD (7 cols, 1 row) */}
-                <BentoItem className="md:col-span-7 md:row-span-1 p-6 flex items-center justify-between bg-[radial-gradient(ellipse_at_right,rgba(26,61,140,0.05),transparent_70%)]" delay={0.5}>
+                {/* LEGAL RIGHTS CARD (5 cols, 1 row) */}
+                <BentoItem className="md:col-span-5 md:row-span-1 p-6 flex items-center justify-between bg-[radial-gradient(ellipse_at_right,rgba(26,61,140,0.05),transparent_70%)]" delay={0.5}>
                     <div className="flex items-center gap-6">
                         <div className="w-14 h-14 bg-qgreen-pale rounded-full flex items-center justify-center text-qgreen shadow-inner">
                             <ShieldCheck size={28} />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black text-qnavy-dark uppercase tracking-widest italic leading-tight">Centre de Recours & Droits</h3>
-                            <p className="text-[10px] text-qtext-mid font-medium mt-1">Ouvrez un ticket pour une maintenance ou un litige juridique.</p>
+                            <h3 className="text-sm font-black text-qnavy-dark uppercase tracking-widest italic leading-tight">Centre de Recours</h3>
+                            <p className="text-[9px] text-qtext-mid font-medium mt-1">Maintenance ou litige.</p>
                         </div>
                     </div>
-                    <Link href="/mon-espace-locataire/rights" className="h-14 px-8 bg-white border border-qgrey-2 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm">
-                        Ouvrir un ticket
+                    <Link href="/mon-espace-locataire/rights" className="h-14 px-6 bg-white border border-qgrey-2 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm shrink-0">
+                        Ouvrir
                     </Link>
                 </BentoItem>
 
-                {/* SUPPORT BOX (5 cols, 1 row) */}
-                <BentoItem className="md:col-span-5 md:row-span-1 p-6 flex items-center gap-6 bg-qgrey-1/20 border-dashed" delay={0.6}>
-                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-qgrey-1 flex items-center justify-center">
-                        <Headset size={20} className="text-qnavy" />
+                {/* MANUAL BOX (3 cols, 1 row) */}
+                <BentoItem className="md:col-span-3 md:row-span-1 p-6 flex flex-col justify-between bg-qnavy-pale border-none group hover:bg-qnavy transition-colors duration-500" delay={0.55}>
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-qnavy/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <BookOpen size={16} className="text-qnavy" />
+                        </div>
+                        <p className="text-[10px] font-black text-qnavy-dark uppercase tracking-widest leading-none group-hover:text-white transition-colors">Manuel<br/>Officiel</p>
+                    </div>
+                    <Link href="/mon-espace-locataire/manual" className="mt-auto inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-qnavy group-hover:text-white transition-colors">
+                        Consulter le guide <ArrowUpRight size={12} />
+                    </Link>
+                </BentoItem>
+
+                {/* SUPPORT BOX (4 cols, 1 row) */}
+                <BentoItem className="md:col-span-4 md:row-span-1 p-6 flex items-center gap-4 bg-qgrey-1/20 border-dashed" delay={0.6}>
+                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-qgrey-1 flex items-center justify-center">
+                        <Headset size={16} className="text-qnavy" />
                     </div>
                     <div className="flex-1">
-                         <p className="text-[9px] font-black text-qtext-light uppercase tracking-widest leading-none mb-1">Besoin d'aide ?</p>
-                         <p className="text-[10px] font-black text-qnavy-dark">Assistance Directe QAPRIL</p>
-                         <div className="flex gap-4 mt-3">
-                            <Link href="/contact" className="text-[9px] font-black text-qnavy hover:underline uppercase tracking-widest">Support →</Link>
+                         <p className="text-[8px] font-black text-qtext-light uppercase tracking-widest leading-none mb-1">Besoin d'aide ?</p>
+                         <p className="text-[10px] font-black text-qnavy-dark leading-none">Support QAPRIL</p>
+                         <div className="flex gap-4 mt-2">
+                            <Link href="/contact" className="text-[9px] font-black text-qnavy hover:underline uppercase tracking-widest">Aide →</Link>
                             <Link href="/faq" className="text-[9px] font-black text-qtext-light hover:underline uppercase tracking-widest">FAQ →</Link>
                          </div>
                     </div>
