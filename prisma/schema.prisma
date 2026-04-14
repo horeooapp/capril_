@@ -251,10 +251,10 @@ enum MaintenanceCategory {
 enum MaintenanceStatus {
   EN_ATTENTE
   PRIS_EN_CHARGE
-  RESOLU @map("RÉSOLU")
-  CONTESTE @map("CONTESTÉ")
+  RESOLU         @map("RÉSOLU")
+  CONTESTE       @map("CONTESTÉ")
   LITIGE
-  CLOTURE @map("CLÔTURÉ")
+  CLOTURE        @map("CLÔTURÉ")
 }
 
 enum ReversalStatus {
@@ -704,7 +704,7 @@ model User {
   repartitionsUtilities RepartitionUtility[]
   walletTransactions    WalletTransaction[]
 
-  automationSettings    AutomationSettings?
+  automationSettings AutomationSettings?
 
   @@index([phone])
   @@index([role])
@@ -928,18 +928,18 @@ model Lease {
   seuilJ7  Boolean @default(true) @map("seuil_j7")
   seuilJ15 Boolean @default(true) @map("seuil_j15")
 
-  id               String       @id @default(uuid()) @map("lease_id")
-  leaseReference   String       @unique @map("lease_reference") // BAIL-2026-00123
-  propertyId       String       @map("property_id")
-  property         Property     @relation(fields: [propertyId], references: [id])
-  landlordId       String       @map("landlord_id")
-  landlord         User         @relation("LeaseLandlord", fields: [landlordId], references: [id])
-  landlordEntityId String?      @map("landlord_entity_id")
-  landlordEntity   LegalEntity? @relation("LandlordLeases", fields: [landlordEntityId], references: [id])
-  tenantId         String?      @map("tenant_id")
-  tenant           User?        @relation("LeaseTenant", fields: [tenantId], references: [id])
-  tenantEntityId   String?      @map("tenant_entity_id")
-  tenantEntity     LegalEntity? @relation("LeaseTenantEntity", fields: [tenantEntityId], references: [id])
+  id               String         @id @default(uuid()) @map("lease_id")
+  leaseReference   String         @unique @map("lease_reference") // BAIL-2026-00123
+  propertyId       String         @map("property_id")
+  property         Property       @relation(fields: [propertyId], references: [id])
+  landlordId       String         @map("landlord_id")
+  landlord         User           @relation("LeaseLandlord", fields: [landlordId], references: [id])
+  landlordEntityId String?        @map("landlord_entity_id")
+  landlordEntity   LegalEntity?   @relation("LandlordLeases", fields: [landlordEntityId], references: [id])
+  tenantId         String?        @map("tenant_id")
+  tenant           User?          @relation("LeaseTenant", fields: [tenantId], references: [id])
+  tenantEntityId   String?        @map("tenant_entity_id")
+  tenantEntity     LegalEntity?   @relation("LeaseTenantEntity", fields: [tenantEntityId], references: [id])
   agentId          String?        @map("agent_id")
   agent            User?          @relation("LeaseAgent", fields: [agentId], references: [id])
   mandatGestionId  String?        @map("mandat_gestion_id")
@@ -1220,9 +1220,9 @@ model Mandate {
   cancelledByUserId String?   @map("cancelled_by")
   cancelReason      String?   @map("cancel_reason")
 
-  proofHash String? @map("proof_hash")
-  pdfUrl    String? @map("pdf_url")
-  history MandateHistory[]
+  proofHash String?          @map("proof_hash")
+  pdfUrl    String?          @map("pdf_url")
+  history   MandateHistory[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1421,13 +1421,13 @@ model Dispute {
   amountInDispute Int?          @map("amount_in_dispute")
   status          DisputeStatus @default(OPEN)
   resolution      String?
-  
+
   // Nouveaux champs pour le Triage Judiciaire (DLC) CACI
-  type            String        @default("AUTRE") // DEFAUT_PAIEMENT, DEGRADATION_LOURDE, SOUS_LOCATION_ILLICITE, TROUBLES_VOISINAGE
-  severity        String        @default("NORMALE") // NORMALE, HAUTE, CRITIQUE
-  hash            String?       @map("hash_caci") // Hash cryptographique CACI
-  monthsDefeated  Int           @default(0) @map("months_defeated")
-  isCryptoSealed  Boolean       @default(false) @map("is_crypto_sealed")
+  type           String  @default("AUTRE") // DEFAUT_PAIEMENT, DEGRADATION_LOURDE, SOUS_LOCATION_ILLICITE, TROUBLES_VOISINAGE
+  severity       String  @default("NORMALE") // NORMALE, HAUTE, CRITIQUE
+  hash           String? @map("hash_caci") // Hash cryptographique CACI
+  monthsDefeated Int     @default(0) @map("months_defeated")
+  isCryptoSealed Boolean @default(false) @map("is_crypto_sealed")
 
   messages DisputeMessage[]
 
@@ -3525,13 +3525,13 @@ model MandatGestionBien {
 // AUTOMATIONS (Part 25)
 // ═══════════════════════════════════════════════════════
 model AutomationSettings {
-  id             String @id @default(uuid())
-  userId         String @unique @map("user_id")
-  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  autoRelance    Boolean @default(true) @map("auto_relance")
-  autoQuittance  Boolean @default(true) @map("auto_quittance")
-  autoAssurance  Boolean @default(false) @map("auto_assurance")
-  customScripts  Json?   @map("custom_scripts")
+  id            String  @id @default(uuid())
+  userId        String  @unique @map("user_id")
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  autoRelance   Boolean @default(true) @map("auto_relance")
+  autoQuittance Boolean @default(true) @map("auto_quittance")
+  autoAssurance Boolean @default(false) @map("auto_assurance")
+  customScripts Json?   @map("custom_scripts")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -3543,13 +3543,13 @@ model AutomationSettings {
 // SUCCESSION (Part 26)
 // ═══════════════════════════════════════════════════════
 model Succession {
-  id           String @id @default(uuid())
-  deceasedName String @map("deceased_name")
-  claimantName String @map("claimant_name")
+  id           String  @id @default(uuid())
+  deceasedName String  @map("deceased_name")
+  claimantName String  @map("claimant_name")
   relation     String
-  propertyInfo String @map("property_info")
+  propertyInfo String  @map("property_info")
   notaire      String?
-  status       String @default("EN_ATTENTE_ATTESTATION")
+  status       String  @default("EN_ATTENTE_ATTESTATION")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -3561,13 +3561,13 @@ model Succession {
 // TRUST VAULT (Cautions CACI)
 // ═══════════════════════════════════════════════════════
 model VaultCaution {
-  id               String @id @default(uuid())
-  tenantName       String @map("tenant_name")
-  propertyInfo     String @map("property_info")
+  id               String   @id @default(uuid())
+  tenantName       String   @map("tenant_name")
+  propertyInfo     String   @map("property_info")
   amount           Int
   hash             String
-  status           String @default("A_TRANSFERER")
-  dateConsignation String? @map("date_consignation")
+  status           String   @default("A_TRANSFERER")
+  dateConsignation String?  @map("date_consignation")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
@@ -3578,16 +3578,16 @@ model VaultCaution {
 // SYNDIC (Copropriétés)
 // ═══════════════════════════════════════════════════════
 model Syndicate {
-  id               String @id @default(uuid())
-  residenceName    String @map("residence_name")
-  totalLots        Int    @map("total_lots")
-  treasuryBalance  Int    @map("treasury_balance")
-  agState          String @map("ag_state")
+  id              String @id @default(uuid())
+  residenceName   String @map("residence_name")
+  totalLots       Int    @map("total_lots")
+  treasuryBalance Int    @map("treasury_balance")
+  agState         String @map("ag_state")
 
-  properties       Property[] // Liaison avec les lots de la copropriété
+  properties Property[] // Liaison avec les lots de la copropriété
 
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("syndicates")
 }
@@ -3596,19 +3596,19 @@ model Syndicate {
 // COMPTES RENDUS DE GÉRANCE (CRG / Reports)
 // ═══════════════════════════════════════════════════════
 model FinancialReport {
-  id               String @id @default(uuid())
-  ownerName        String @map("owner_name")
-  period           String
-  propertiesCount  Int    @default(1) @map("properties_count")
-  totalGross       Int    @map("total_gross")
-  agencyFee        Int    @map("agency_fee")
-  tva              Int    @default(0)
-  repairCosts      Int    @default(0) @map("repair_costs")
-  netPayout        Int    @map("net_payout")
-  status           String @default("EN_ATTENTE")
+  id              String @id @default(uuid())
+  ownerName       String @map("owner_name")
+  period          String
+  propertiesCount Int    @default(1) @map("properties_count")
+  totalGross      Int    @map("total_gross")
+  agencyFee       Int    @map("agency_fee")
+  tva             Int    @default(0)
+  repairCosts     Int    @default(0) @map("repair_costs")
+  netPayout       Int    @map("net_payout")
+  status          String @default("EN_ATTENTE")
 
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("financial_reports")
 }

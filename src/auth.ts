@@ -68,6 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const user = await prisma.user.findFirst({
                         where: { email },
                         include: {
+                            diasporaProfile: true,
                             capacites: { where: { actif: true } },
                             _count: {
                                 select: {
@@ -99,7 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         // ROLE DETECTION & ENFORCEMENT
                         const userRole = (user.role || '').toUpperCase();
-                        const isDiaspora = (user as any).diasporaAbonnement === true;
+                        const isDiaspora = !!(user as any).diasporaProfile?.diasporaAbonnement || (user as any).diasporaAbonnement === true || userRole === 'DIASPORA';
                         const isLandlord = userRole === 'LANDLORD' || userRole === 'LANDLORD_PRO' || user._count.propertiesOwned > 0;
                         const isTenant = userRole === 'TENANT' || user._count.leasesAsTenant > 0;
                         const isAgency = userRole === 'AGENCY' || userRole === 'NON_CERTIFIED_AGENT' || user._count.mandates > 0;
