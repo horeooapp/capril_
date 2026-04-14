@@ -12,11 +12,13 @@ type TabType = 'overview' | 'biens' | 'candidats' | 'outils';
 export function AgencyPortalDashboardV2({ 
   user, 
   properties, 
-  candidatures = [] 
+  candidatures = [],
+  aggregates
 }: { 
   user: any, 
   properties: any[], 
-  candidatures?: any[] 
+  candidatures?: any[],
+  aggregates?: any
 }) {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
@@ -28,6 +30,8 @@ export function AgencyPortalDashboardV2({
   const dispRate = totalUnites > 0 ? Math.round((leasedUnites / totalUnites) * 100) : 0;
   
   const pendingCands = candidatures.filter(c => c.status === "PENDING" || c.status === "VERIFIED").length;
+
+  const walletBalance = aggregates?.walletBalance || 0;
 
   return (
     <div className="space-y-6">
@@ -75,8 +79,8 @@ export function AgencyPortalDashboardV2({
             />
             <StatCard 
                 label="Commissions (Est.)" 
-                value="0 ₣" 
-                sub="à reverser : 0 ₣" 
+                value={`${fmt(walletBalance)} ₣`} 
+                sub={`à reverser : ${fmt(walletBalance)} ₣`} 
                 trend="up" 
             />
           </div>

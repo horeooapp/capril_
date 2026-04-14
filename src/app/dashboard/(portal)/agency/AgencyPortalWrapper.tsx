@@ -5,7 +5,7 @@ import { useAgencyData } from '@/hooks/qapril-web-hooks';
 import { AgencyPortalDashboardV2 } from '@/components/dashboard/agency/AgencyPortalDashboardV2';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-export default function AgencyPortalWrapper({ initialData }: { initialData?: any }) {
+export default function AgencyPortalWrapper({ initialData, aggregates }: { initialData?: any, aggregates?: any }) {
   const { data, loading, error } = useAgencyData(initialData);
 
   if (loading) {
@@ -46,6 +46,7 @@ export default function AgencyPortalWrapper({ initialData }: { initialData?: any
       user={data.user} 
       properties={data.properties} 
       candidatures={data.candidates} 
+      aggregates={aggregates}
     />
   );
 }

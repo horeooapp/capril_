@@ -14,7 +14,8 @@ export default function DashboardOverviewClient({
     agencyData,
     diasporaData,
     intermData,
-    properties
+    properties,
+    aggregates
 }: { 
     user: any,
     activeRole: string,
@@ -25,7 +26,8 @@ export default function DashboardOverviewClient({
     diasporaData?: any,
     intermData?: any,
     agencyData?: any,
-    tenantData?: any
+    tenantData?: any,
+    aggregates?: any
 }) {
     if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole)) {
         let payload = undefined;
@@ -40,9 +42,9 @@ export default function DashboardOverviewClient({
                 candidates: intermData.candidatures || []
             };
         }
-        return <AgencyPortalWrapper initialData={payload} />;
+        return <AgencyPortalWrapper initialData={payload} aggregates={aggregates} />;
     }
 
     // Par défaut pour tout le monde (Propriétaire, Diaspora, etc.) => Dashboard Propriétaire Premium
-    return <OwnerPortalWrapper user={user} properties={properties} diasporaData={diasporaData} activeRole={activeRole} />;
+    return <OwnerPortalWrapper user={user} properties={properties} diasporaData={diasporaData} activeRole={activeRole} aggregates={aggregates} />;
 }

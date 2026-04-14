@@ -10,11 +10,13 @@ import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, Chevron
 export function OwnerPortalDashboardV2({ 
   user, 
   properties: initialProperties,
-  activeRole
+  activeRole,
+  aggregates
 }: { 
   user: any, 
   properties: any[],
-  activeRole?: string
+  activeRole?: string,
+  aggregates?: any
 }) {
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
 
@@ -53,8 +55,14 @@ export function OwnerPortalDashboardV2({
   }, [entities]);
 
   const recentPayments: any[] = useMemo(() => {
-    return []
-  }, []);
+    return aggregates?.recentPayments || []
+  }, [aggregates]);
+
+  const activeAlerts: any[] = useMemo(() => {
+      return aggregates?.alerts || []
+  }, [aggregates]);
+
+  const walletBalance = aggregates?.walletBalance || 0;
 
   return (
     <div className="space-y-6">
@@ -80,7 +88,7 @@ export function OwnerPortalDashboardV2({
         />
         <StatCard 
             label="Wallet QAPRIL" 
-            value="0 ₣" 
+            value={`${fmt(walletBalance)} ₣`} 
             sub="Solde disponible" 
         />
       </div>
@@ -141,7 +149,16 @@ export function OwnerPortalDashboardV2({
       </div>
 
       <SectionCard title="Alertes & Actions Requises" action="Tout archiver">
-         <div className="text-[12px] text-slate-400 py-4 text-center">Aucune alerte en cours.</div>
+         {activeAlerts.length === 0 ? (
+           <div className="text-[12px] text-slate-400 py-4 text-center">Aucune alerte en cours.</div>
+         ) : activeAlerts.map((a: any, i: number) => (
+           <div key={i} className="flex justify-between items-center p-2 mb-2 bg-slate-50 rounded-[7px] text-[12.5px]">
+             <span className="text-slate-700 font-medium">{a.icon} {a.text}</span>
+             <button className="px-3 py-1 bg-white border border-slate-200 rounded-[5px] text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-200 transition-colors">
+               {a.btn}
+             </button>
+           </div>
+         ))}
       </SectionCard>
 
     </div>
