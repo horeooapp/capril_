@@ -326,12 +326,23 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               </div>
               <div className="fc-visual">
                 <div style={{ background: 'white', borderRadius: '12px', padding: '14px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#FF6600', display: 'grid', placeItems: 'center', fontSize: '16px' }}>🟠</div>
+                  <div className="flex flex-col items-center justify-center text-white bg-black shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
+                    <div className="bg-[#FF6600] w-6 h-4 flex items-end px-0.5 pb-[1px] mt-0.5 rounded-[2px]" style={{ justifyContent: 'center' }}>
+                        <span className="text-[5px] font-black tracking-tight leading-none text-white">orange</span>
+                    </div>
+                    <span className="text-[3px] font-black text-white mt-0.5 tracking-[0.2em] uppercase">Money</span>
+                  </div>
                   <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Orange Money</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>85 000 FCFA · confirmé ✓</div></div>
                   <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+2s</div>
                 </div>
                 <div style={{ background: 'white', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#1FA4FF', display: 'grid', placeItems: 'center', fontSize: '16px' }}>🔵</div>
+                  <div className="flex flex-col items-center justify-center text-white bg-[#18A9DB] shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
+                    <div className="flex items-center gap-0 mt-0.5">
+                      <span className="text-sm -mt-0.5">🐧</span>
+                      <span className="text-sm font-extrabold tracking-tighter leading-none">wave</span>
+                    </div>
+                    <span className="font-black opacity-90 tracking-widest mt-0.5 leading-none uppercase" style={{ fontSize: '4px' }}>Ton djê est calé</span>
+                  </div>
                   <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Wave CI</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>160 000 FCFA · confirmé ✓</div></div>
                   <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+1s</div>
                 </div>
