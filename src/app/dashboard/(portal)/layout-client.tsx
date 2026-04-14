@@ -47,7 +47,6 @@ export default function DashboardLayoutClient({
 }) {
     const pathname = usePathname()
 
-    // Bypasses NextAuth cookie latency by using DB validated role from layout.tsx
     const activeRole = dbActiveRole || session?.user?.chosenRole || session?.user?.role;
     const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole || '');
     const isIntermediary = activeRole === 'INTERMEDIARY';
@@ -92,7 +91,6 @@ export default function DashboardLayoutClient({
         ];
     }
 
-
     const navLinks = getNavLinks();
 
     const getDashboardTitle = () => {
@@ -103,12 +101,12 @@ export default function DashboardLayoutClient({
             case 'CHAMPION': return "Console Champion";
             case 'AGENCY':
             case 'AGENCE_AGREE':
-            case 'AGENCY_AGREE': return "Console Agence Certifiée";
+            case 'AGENCY_AGREE': return "Agence Certifiée";
             case 'NON_CERTIFIED_AGENT':
             case 'AGENCE_NON_AGREE':
-            case 'AGENCY_NON_AGREE': return "Console Gestionnaire";
+            case 'AGENCY_NON_AGREE': return "Gestionnaire";
             case 'LANDLORD':
-            default: return "Console Propriétaire";
+            default: return "Propriétaire Titulaire";
         }
     }
 
@@ -132,11 +130,15 @@ export default function DashboardLayoutClient({
     const handleLogout = () => signOut({ callbackUrl: "/" });
 
     return (
-        <div className="min-h-screen bg-background flex flex-col relative overflow-x-hidden font-sans">
-            {/* Soft Cream workspace */}
-            <div className="fixed inset-0 bg-background -z-20"></div>
-            
-            {/* Vertical Sidebar - Dark Mode Fixe */}
+        <div className="flex bg-[var(--ci-nuit)] min-h-screen relative overflow-hidden font-sans text-white admin-wrapper">
+            {/* Visual Mesh Background Fix pour Portal */}
+            <div className="fixed inset-0 pointer-events-none z-0 mix-blend-screen opacity-40">
+                <div className="absolute inset-0 bg-[url('/mesh-dark.svg')] bg-cover bg-center"></div>
+                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[var(--ci-vert)] opacity-[0.03] blur-[120px]"></div>
+                <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[var(--ci-or)] opacity-[0.03] blur-[120px]"></div>
+            </div>
+
+            {/* Sidebar Injection */}
             {session?.user && (
                 <AppSidebar 
                     role={activeRole} 
@@ -148,93 +150,77 @@ export default function DashboardLayoutClient({
                 />
             )}
 
-            <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
-                {/* Custom Redesign Top Navigation Bar */}
-                <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-white/20 shadow-[0_4px_24px_rgba(0,0,0,.02)]">
-                    <div className="h-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex items-center justify-between">
-                        
-                        <div className="flex items-center gap-6">
-                            {/* Mobile Logo */}
-                            <Link href="/dashboard" className="flex lg:hidden items-center group">
-                                <ProtectedLogo 
-                                    src="/logo.png" 
-                                    alt="QAPRIL Logo" 
-                                    className="h-8 w-auto group-hover:scale-105 transition-transform duration-700" 
-                                />
-                            </Link>
+            <main className="main-content flex-1 max-w-[100vw] lg:max-w-[calc(100vw-300px)] min-h-screen flex flex-col z-10 transition-all duration-300 relative lg:ml-[300px]">
+                {/* Onyx Topbar */}
+                <div className="topbar">
+                    <div className="topbar-search">
+                        <Search size={18} className="text-gray-500" />
+                        <input type="text" placeholder="Rechercher un logement, bail, dossier..." />
+                    </div>
 
-                            <div className="hidden lg:flex items-center gap-4">
-                                <h2 className="text-sm font-bold text-qnavy tracking-wide uppercase">{getDashboardTitle()}</h2>
-                                <div className="h-4 w-px bg-qgrey-2"></div>
-                                <span className="text-xs font-semibold text-qtext-light">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                            </div>
+                    <div className="topbar-actions">
+                        <Link href="/dashboard" className="flex lg:hidden items-center group mr-auto">
+                            <ProtectedLogo 
+                                src="/logo-white.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-8 w-auto group-hover:scale-105 transition-transform duration-700 brightness-0 invert" 
+                            />
+                        </Link>
+                        
+                        <div className="date-badge hidden md:flex items-center gap-2">
+                            {getDashboardTitle()}
+                        </div>
+                        
+                        <div className="text-gray-400 hover:text-white transition-colors cursor-pointer">
+                            <NotificationCenter />
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="hidden lg:flex items-center gap-4 pr-6 border-r border-qgrey-2 h-8">
-                                <button className="text-qtext-light hover:text-qnavy transition-colors">
-                                    <Search size={18} />
+                        {session?.user && (
+                            <div className="topbar-user">
+                                <div className="text-right hidden sm:block">
+                                    <div className="u-name">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</div>
+                                    <div className="u-role">{getRoleBadge()}</div>
+                                </div>
+                                <div className="u-avatar">
+                                    <User size={18} className="text-[var(--ci-vert)]" />
+                                </div>
+                                <button 
+                                    onClick={handleLogout}
+                                    className="ml-2 flex items-center justify-center w-10 h-10 bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-400 rounded-xl transition-all border border-white/5 hover:border-red-500/30 group"
+                                    title="Déconnexion"
+                                >
+                                    <LogOut size={16} className="group-hover:translate-x-0.5 transition-transform" />
                                 </button>
-                                <div className="text-qtext-light hover:text-qnavy transition-colors">
-                                    <NotificationCenter />
-                                </div>
                             </div>
+                        )}
 
-                            {session?.user && (
-                                <div className="flex items-center gap-4 pl-2 lg:pl-0">
-                                    <div className="hidden sm:flex flex-col items-end">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <div className="bg-qgreen/10 text-qgreen rounded px-2 py-0.5 text-[9px] font-bold tracking-widest uppercase">
-                                                {getRoleBadge()}
-                                            </div>
-                                        </div>
-                                        <span className="text-[13px] font-bold text-qtext-mid">{(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}</span>
-                                    </div>
-                                    <Link 
-                                        href="/dashboard/profile"
-                                        className="w-10 h-10 rounded-full bg-qbg border border-qgrey-2 text-qnavy flex items-center justify-center hover:bg-qgrey-2 transition-all cursor-pointer"
-                                    >
-                                        <User size={18} />
-                                    </Link>
-
-                                    {/* Quick Logout Button */}
-                                    <button 
-                                        onClick={handleLogout}
-                                        className="hidden sm:flex items-center justify-center w-10 h-10 text-qtext-light hover:bg-qred-pale hover:text-qred rounded-full transition-all group"
-                                        title="Déconnexion"
-                                    >
-                                        <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
-                                    </button>
-                                </div>
-                            )}
-                            
-                            <div className="flex xl:hidden text-qnavy">
-                                <MobileMenu 
-                                    links={navLinks} 
-                                    session={session} 
-                                    variant="dark" 
-                                    onLogout={() => signOut()}
-                                    activeRole={activeRole} 
-                                />
-                            </div>
+                        <div className="flex xl:hidden text-white ml-4">
+                            <MobileMenu 
+                                links={navLinks} 
+                                session={session} 
+                                variant="dark" 
+                                onLogout={() => signOut()}
+                                activeRole={activeRole} 
+                            />
                         </div>
                     </div>
-                </header>
+                </div>
 
-                {/* Main Content with Entry Animations */}
-                <main className="flex-1 w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                >
-                    {children}
-                </motion.div>
+                {/* Animated Content Wrapper */}
+                <div className="p-8 lg:p-12 overflow-y-auto overflow-x-hidden relative h-full">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
+                        {children}
+                    </motion.div>
+                </div>
                 
+                {/* Mobile Bottom Nav */}
                 {session?.user && (
                     <BottomNav items={[
                         ...navLinks, 
-                        // Show "Profils" if the user has multiple roles OR is a manager (to allow switching to other capacities)
                         ...((session.user.eligibleRoles?.length > 1 || (session.user as any).capacites?.length > 1)
                             ? [{ href: "/auth/choose-role", label: "Profils", icon: <User size={24} /> }] 
                             : []),
@@ -242,18 +228,6 @@ export default function DashboardLayoutClient({
                     ]} />
                 )}
             </main>
-
-            {/* Footer de courtoisie Premium - Uniquement sur Desktop */}
-            <footer className="w-full max-w-7xl mx-auto px-8 py-10 border-t border-gray-100/50 mt-12 mb-24 hidden lg:block">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2024 QAPRIL • Excellence en Gestion Immobilière</p>
-                    <div className="flex gap-10">
-                        <span className="text-[14px] font-black text-[#1F4E79] uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Centre d'aide</span>
-                        <span className="text-[14px] font-black text-gray-400 uppercase tracking-[0.2em] cursor-pointer hover:opacity-70 transition-opacity">Sécurité</span>
-                    </div>
-                </div>
-            </footer>
         </div>
-    </div>
     )
 }

@@ -27,10 +27,10 @@ export default function WalletDashboard() {
   if (loading && !data) {
     return (
       <div className="p-12 text-center space-y-4">
-        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center animate-spin mx-auto text-[#1F4E79]">
+        <div className="w-16 h-16 bg-[var(--ci-nuit2)] border border-[var(--ci-nuit3)] rounded-full flex items-center justify-center animate-spin mx-auto text-[var(--ci-or)]">
           <Zap size={32} />
         </div>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Chargement du Wallet...</p>
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chargement du Wallet...</p>
       </div>
     );
   }
@@ -48,39 +48,39 @@ export default function WalletDashboard() {
         <motion.div 
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className="lg:col-span-8 p-12 rounded-[4rem] bg-[#1F4E79] text-white relative overflow-hidden group shadow-blue-900/40 shadow-2xl border border-white/10"
+           className="lg:col-span-8 p-10 rounded-[2rem] bg-gradient-to-br from-[var(--ci-nuit2)] to-[var(--ci-nuit3)] text-white relative overflow-hidden group border border-[var(--ci-nuit3)] shadow-2xl"
         >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#C55A11] blur-[120px] opacity-10 -mr-20 -mt-20 group-hover:opacity-20 transition-opacity"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--ci-or)] blur-[120px] opacity-10 -mr-20 -mt-20 group-hover:opacity-20 transition-opacity"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row justify-between h-full gap-12">
             <div className="space-y-12 flex-1">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <Wallet size={20} className="text-[#C55A11]" />
+                <div className="w-10 h-10 bg-[var(--ci-nuit)] border border-[var(--ci-nuit3)] rounded-xl flex items-center justify-center">
+                  <Wallet size={20} className="text-[var(--ci-or)]" />
                 </div>
-                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-white/60">Solde Disponible.</span>
+                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-gray-400">Solde Disponible.</span>
               </div>
               
               <div className="space-y-2">
-                <h1 className="text-7xl font-black tracking-tighter leading-none italic">
-                  {solde.toLocaleString()} <span className="text-3xl font-normal opacity-50 not-italic">FCFA</span>
+                <h1 className="text-7xl font-black tracking-tighter leading-none italic font-mono">
+                  {solde.toLocaleString()} <span className="text-3xl font-normal opacity-50 not-italic">F</span>
                 </h1>
                 {isOverdrawn && (
-                  <div className="flex items-center gap-2 text-[#C55A11] font-black text-xs uppercase tracking-widest animate-pulse">
+                  <div className="flex items-center gap-2 text-[var(--ci-orange)] font-black text-xs uppercase tracking-widest animate-pulse mt-4">
                     <AlertTriangle size={16} />
                     Mode Crédit Activé (Découvert autorisé)
                   </div>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/10">
+              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-[var(--ci-nuit3)]">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Consommation Mensuelle</p>
-                  <p className="text-xl font-black">≈ {stats.consoMensuelle.toLocaleString()} <span className="text-xs opacity-40">FCFA</span></p>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Consommation Mensuelle</p>
+                  <p className="text-xl font-black font-mono">≈ {stats.consoMensuelle.toLocaleString()} <span className="text-xs opacity-50">FCFA</span></p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Autonomie Estimée</p>
-                  <p className="text-xl font-black">{stats.autonomieMois} <span className="text-xs opacity-40">MOIS</span></p>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Autonomie Estimée</p>
+                  <p className="text-xl font-black">{stats.autonomieMois} <span className="text-xs opacity-50">MOIS</span></p>
                 </div>
               </div>
             </div>
@@ -88,12 +88,12 @@ export default function WalletDashboard() {
             <div className="flex flex-col justify-end gap-4 w-full md:w-64">
                <button 
                   onClick={() => setIsRechargeOpen(true)}
-                  className="w-full py-6 bg-[#C55A11] text-white rounded-[2rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-950/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-6 bg-[var(--ci-or)] text-[var(--ci-nuit2)] rounded-xl font-black text-[14px] uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(255,139,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
                >
-                 <Zap size={20} />
+                 <Zap size={20} className="text-[var(--ci-nuit2)]" />
                  Recharger
                </button>
-               <Link href="/dashboard/wallet" className="w-full py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] font-black text-[12px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+               <Link href="/dashboard/wallet" className="w-full py-5 bg-[var(--ci-nuit)] hover:bg-[var(--ci-nuit3)] text-gray-300 border border-[var(--ci-nuit3)] rounded-xl font-black text-[12px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
                  Configuration
                </Link>
             </div>
@@ -102,26 +102,27 @@ export default function WalletDashboard() {
 
         {/* Small Stats Column */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-           <div className="glass-panel p-8 rounded-[3rem] border border-white group hover:shadow-2xl transition-all h-full flex flex-col justify-between">
+           <div className="panel flex flex-col justify-between h-full group hover:border-[var(--ci-green)]/30 transition-all border border-[var(--ci-nuit3)]">
               <div className="flex items-center justify-between">
-                <ShieldCheck className="text-emerald-500" size={32} />
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full">Sécurisé</span>
+                <ShieldCheck className="text-[var(--ci-vert)]" size={32} />
+                <span className="px-3 py-1 bg-[var(--ci-vert)]/10 text-[var(--ci-vert)] text-[10px] font-black uppercase tracking-widest rounded-full border border-[var(--ci-vert)]/20">Sécurisé</span>
               </div>
               <div className="space-y-2 mt-8">
-                <h4 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Limites de Crédit.</h4>
+                <h4 className="text-xl font-black text-white tracking-tighter uppercase italic">Limites de Crédit.</h4>
                 <p className="text-xs text-gray-400 font-medium leading-relaxed">
-                  Votre compte bénéficie d'une tolérance de <span className="font-black text-[#C55A11]">{Math.abs(decouvertMax).toLocaleString()} FCFA</span> pour éviter tout arrêt de service lors de l'émission de vos quittances.
+                  Votre compte bénéficie d'une tolérance de <span className="font-black text-[var(--ci-or)]">{Math.abs(decouvertMax).toLocaleString()} FCFA</span> pour éviter tout arrêt de service lors de l'émission de vos quittances.
                 </p>
               </div>
            </div>
-           <div className="bg-gray-900 text-white p-8 rounded-[3rem] overflow-hidden relative group h-full">
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#C55A11] blur-[80px] opacity-20"></div>
-              <div className="flex flex-col h-full justify-between relative z-10">
-                <Smartphone size={28} className="text-[#C55A11]" />
+           
+           <div className="panel bg-[var(--ci-nuit2)] text-white overflow-hidden relative group h-full border border-[var(--ci-nuit3)]">
+              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[var(--ci-or)] blur-[80px] opacity-10 pointer-events-none"></div>
+              <div className="flex flex-col h-full justify-between relative z-10 w-full">
+                <Smartphone size={28} className="text-[var(--ci-or)]" />
                 <div className="mt-8 space-y-1">
-                   <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Service Clients</p>
-                   <p className="text-lg font-black italic uppercase tracking-tighter">Support Wallet Direct.</p>
-                   <button className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.2em] flex items-center gap-2 mt-2 group-hover:gap-4 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                   <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Service Clients</p>
+                   <p className="text-lg font-black italic uppercase tracking-tighter text-white">Support Wallet Direct.</p>
+                   <button className="text-[10px] font-black text-[var(--ci-or)] uppercase tracking-[0.2em] flex items-center gap-2 mt-2 group-hover:gap-4 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                       Contacter sur WhatsApp <ArrowRight size={14} />
                    </button>
                 </div>
@@ -131,24 +132,23 @@ export default function WalletDashboard() {
       </div>
 
       {/* Transaction History */}
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="panel space-y-8">
+        <div className="flex items-center justify-between border-b border-[var(--ci-nuit3)] pb-4">
           <div className="flex flex-col">
-            <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic">Historique.</h3>
+            <h3 className="text-3xl font-black text-white uppercase tracking-tighter italic">Historique.</h3>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest">Flux financiers récents</span>
-              <span className="h-[1px] w-8 bg-gray-200"></span>
+              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Flux financiers récents</span>
             </div>
           </div>
-          <button className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-white text-[#1F4E79] rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all border border-transparent hover:border-gray-100 shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+          <button className="flex items-center gap-3 px-6 py-3 bg-[var(--ci-nuit2)] hover:bg-[var(--ci-nuit3)] text-white rounded-lg text-[10px] font-black uppercase tracking-[0.2em] border border-[var(--ci-nuit3)] transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
              Exporter Relevé
           </button>
         </div>
 
         <div className="space-y-4">
           {historique.length === 0 ? (
-            <div className="p-20 text-center bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
-              <Clock size={48} className="mx-auto text-gray-200 mb-4" />
+            <div className="p-20 text-center bg-[var(--ci-nuit2)] rounded-[2rem] border border-dashed border-[var(--ci-nuit3)]">
+              <Clock size={48} className="mx-auto text-gray-500 mb-4" />
               <p className="text-sm font-black text-gray-400 uppercase tracking-widest italic">Aucune transaction trouvée.</p>
             </div>
           ) : (
@@ -157,28 +157,28 @@ export default function WalletDashboard() {
                 key={tx.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-8 bg-white hover:bg-gray-50/50 border border-gray-100 rounded-[2.5rem] transition-all group"
+                className="flex items-center justify-between p-6 bg-[var(--ci-nuit2)] hover:bg-[var(--ci-nuit3)] border border-[var(--ci-nuit3)] hover:border-[var(--ci-or)]/30 rounded-2xl transition-all group"
               >
                 <div className="flex items-center gap-6">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl shadow-lg ${
-                    tx.type === 'CREDIT' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-ivoire-orange'
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl shadow-lg border ${
+                    tx.type === 'CREDIT' ? 'bg-[var(--ci-vert)]/10 text-[var(--ci-vert)] border-[var(--ci-vert)]/20' : 'bg-[var(--ci-orange)]/10 text-[var(--ci-orange)] border-[var(--ci-orange)]/20'
                   }`}>
                     {tx.type === 'CREDIT' ? <ArrowUpRight size={24} /> : <ArrowDownLeft size={24} />}
                   </div>
                   <div>
-                    <h5 className="text-lg font-black text-[#1F4E79] tracking-tighter uppercase leading-none">{tx.label}</h5>
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                    <h5 className="text-[14px] font-black text-white tracking-tighter uppercase leading-none">{tx.label}</h5>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2 flex items-center gap-2">
                        {new Date(tx.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                       <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
+                       <span className="w-1 h-1 bg-[var(--ci-nuit3)] rounded-full"></span>
                        Ref: {tx.reference.substring(0, 15)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right space-y-1">
-                   <p className={`text-2xl font-black ${tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-[#1F4E79]'}`}>
-                      {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} <span className="text-sm font-normal opacity-50">FCFA</span>
+                   <p className={`text-xl font-bold font-mono ${tx.type === 'CREDIT' ? 'text-[var(--ci-vert)]' : 'text-white'}`}>
+                      {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} <span className="text-xs font-normal opacity-50">FCFA</span>
                    </p>
-                   <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Solde: {tx.balanceAfter.toLocaleString()} FCFA</p>
+                   <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Solde: {tx.balanceAfter.toLocaleString()} FCFA</p>
                 </div>
               </motion.div>
             ))

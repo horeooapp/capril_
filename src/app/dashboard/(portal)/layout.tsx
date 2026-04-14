@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma"
 import DashboardLayoutClient from "./layout-client"
 import { isRoleGloballyActive } from "@/lib/role-lock"
 
+// Import Midnight Onyx V2 Stylesheet
+import "@/app/admin/admin-v2.css"
+
 export const dynamic = "force-dynamic"
 
 export default async function DashboardLayout({
@@ -49,8 +52,10 @@ export default async function DashboardLayout({
     }
 
     return (
-        <DashboardLayoutClient session={session} dbActiveRole={activeRole} agencyConfig={(dbUser as any).agencyConfig}>
-            {children}
-        </DashboardLayoutClient>
+        <div className="admin-v2">
+            <DashboardLayoutClient session={session} dbActiveRole={activeRole} agencyConfig={(dbUser as any).agencyConfig}>
+                {children}
+            </DashboardLayoutClient>
+        </div>
     )
 }

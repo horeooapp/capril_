@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { T, biens } from '@/constants/agency-data';
 import { TrendingUp, ShieldAlert, Home, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -31,28 +30,28 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
     {
       icon: "💰",
       label: "Loyers théoriques",
-      value: `${fmt(totalLoyers)} FCFA`,
+      value: `${fmt(totalLoyers)} F`,
       sub: "Avril 2026",
-      color: T.navy,
-      bg: T.navyPale,
+      color: "var(--ci-bleu)",
+      bg: "rgba(100, 150, 200, 0.1)",
       href: "/dashboard/wallet"
     },
     {
       icon: "✅",
       label: "Encaissé",
-      value: `${fmt(encaisse)} FCFA`,
-      sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du portefeuille` : "0% du portefeuille",
-      color: T.green,
-      bg: T.greenPale,
+      value: `${fmt(encaisse)} F`,
+      sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du parc` : "0% du parc",
+      color: "var(--ci-vert)",
+      bg: "rgba(10, 255, 100, 0.1)",
       href: "/dashboard/receipts"
     },
     {
       icon: "⚠️",
       label: "Impayés",
       value: `${activeLeases.filter(l => l.status === 'OVERDUE').length} bien(s)`,
-      sub: "Procédure M07 active",
-      color: T.red,
-      bg: T.redPale,
+      sub: "Procédure Recouvrement",
+      color: "var(--ci-orange)",
+      bg: "rgba(255, 120, 0, 0.1)",
       href: "/dashboard/rcl-monitor"
     },
     {
@@ -60,27 +59,30 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
       label: "Portefeuille",
       value: `${totalBiens} biens`,
       sub: `${vacants} vacant${vacants > 1 ? "s" : ""}`,
-      color: T.teal,
-      bg: T.tealPale,
+      color: "var(--ci-purple)",
+      bg: "rgba(180, 100, 255, 0.1)",
       href: "/dashboard/properties"
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((k, i) => (
         <Link key={i} href={k.href}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card-premium p-8 group overflow-hidden border-t-4 h-full cursor-pointer hover:shadow-xl transition-shadow"
-            style={{ borderTopColor: k.color }}
+            className="kpi-card group cursor-pointer block h-full flex flex-col justify-between items-start text-left"
+            style={{ 
+               borderLeft: `4px solid ${k.color}`, 
+               background: `linear-gradient(to right, ${k.bg}, transparent)`
+            }}
           >
-            <div className="flex justify-between items-start mb-10">
-              <div className="text-3xl group-hover:scale-110 transition-transform duration-500">{k.icon}</div>
+            <div className="w-full flex justify-between items-start mb-6">
+              <div className="text-3xl group-hover:scale-110 group-hover:drop-shadow-lg transition-transform duration-500">{k.icon}</div>
               <div 
-                className="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border"
+                className="text-[9px] font-black px-2 py-1 rounded-sm uppercase tracking-widest border"
                 style={{ backgroundColor: `${k.color}10`, color: k.color, borderColor: `${k.color}20` }}
               >
                 {k.sub}
@@ -88,14 +90,13 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
             </div>
             <div>
               <div 
-                className="text-3xl font-black mb-2 tracking-tighter leading-none"
+                className="text-2xl font-black mb-1 font-mono tracking-tight"
                 style={{ color: k.color }}
               >
                 {k.value}
               </div>
               <div 
-                className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70"
-                style={{ color: k.color }}
+                className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500"
               >
                 {k.label}
               </div>
