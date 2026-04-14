@@ -24,7 +24,9 @@ import {
     Zap,
     CheckCircle,
     XCircle,
-    Info
+    Info,
+    BookOpen,
+    Users
 } from "lucide-react"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -511,6 +513,52 @@ export default function LocataireDashboardPage() {
                             <Link href="/faq" className="text-[9px] font-black text-qtext-light hover:underline uppercase tracking-widest">FAQ →</Link>
                          </div>
                     </div>
+                </BentoItem>
+
+                {/* NEW ROW: LATENT SERVICES (12 cols total) */}
+                <BentoItem className="md:col-span-4 md:row-span-1 p-6 flex items-center justify-between border border-qgrey-1 hover:border-qnavy/30 transition-colors group" delay={0.65}>
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-qorange-pale rounded-full flex items-center justify-center text-qorange">
+                            <Users size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-black text-qnavy-dark uppercase tracking-widest leading-tight">Colocation</h3>
+                            <p className="text-[9px] text-qtext-mid font-medium">Gérer les parts de loyer.</p>
+                        </div>
+                    </div>
+                    <Link href="/mon-espace-locataire/colocation" className="p-2 bg-qgrey-1 rounded-full group-hover:bg-qnavy group-hover:text-white transition-colors">
+                        <ChevronRight size={14} />
+                    </Link>
+                </BentoItem>
+
+                <BentoItem className="md:col-span-4 md:row-span-1 p-6 flex items-center justify-between border border-qgrey-1 hover:border-qnavy/30 transition-colors group" delay={0.68}>
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-qnavy-pale rounded-full flex items-center justify-center text-qnavy">
+                            <Calendar size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-black text-qnavy-dark uppercase tracking-widest leading-tight">Préavis</h3>
+                            <p className="text-[9px] text-qtext-mid font-medium">Déclarer son départ.</p>
+                        </div>
+                    </div>
+                    <Link href="/mon-espace-locataire/preavis" className="p-2 bg-qgrey-1 rounded-full group-hover:bg-qnavy group-hover:text-white transition-colors">
+                        <ChevronRight size={14} />
+                    </Link>
+                </BentoItem>
+
+                <BentoItem className="md:col-span-4 md:row-span-1 p-6 flex items-center justify-between border border-qgrey-1 hover:border-qnavy/30 transition-colors group" delay={0.71}>
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                            <AlertCircle size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-xs font-black text-qnavy-dark uppercase tracking-widest leading-tight">Voisinage</h3>
+                            <p className="text-[9px] text-qtext-mid font-medium">Signaler une nuisance.</p>
+                        </div>
+                    </div>
+                    <Link href="/mon-espace-locataire/signalements" className="p-2 bg-qgrey-1 rounded-full group-hover:bg-qnavy group-hover:text-white transition-colors">
+                        <ChevronRight size={14} />
+                    </Link>
                 </BentoItem>
 
                 {/* MATCHING TINDER IMMO CARD (12 cols, 1 row) */}
