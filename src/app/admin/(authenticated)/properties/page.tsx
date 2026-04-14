@@ -1,0 +1,107 @@
+import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
+import { Building2, Home } from "lucide-react"
+
+export const dynamic = "force-dynamic"
+
+export default async function AdminPropertiesPage() {
+    const session = await auth()
+    
+    // Fetch all properties
+    const properties = await prisma.property.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+            owner: { select: { firstName: true, lastName: true, phone: true, email: true } },
+            managedBy: { select: { firstName: true, lastName: true, legalEntity: { select: { companyName: true } } } },
+            _count: { select: { leases: true } }
+        }
+    })
+
+    return (
+        <div className="space-y-12 pb-16 relative">
+            <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
+
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">Inventaire des Biens</h1>
+                    <p className="page-sub">Vue d'ensemble du parc immobilier global.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="date-badge">
+                        {properties.length} Biens Enregistrés
+                    </div>
+                </div>
+            </div>
+
+            <div className="panel">
+                <div className="panel-header">
+                    <h2 className="panel-title">Registre Foncier</h2>
+                    <div className="panel-action">Rechercher...</div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                    <table className="lease-table">
+                        <thead>
+                            <tr>
+                                <th>Référence / Nom</th>
+                                <th>Propriétaire</th>
+                                <th>Localisation</th>
+                                <th>Occupation</th>
+                                <th>Gestionnaire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {properties.map((prop) => {
+                                const ownerName = prop.owner?.firstName ? `${prop.owner.firstName} ${prop.owner.lastName || ''}` : prop.owner?.phone || prop.owner?.email || 'Inconnu'
+                                const managerName = prop.managedBy?.legalEntity?.companyName || (prop.managedBy?.firstName ? `${prop.managedBy.firstName} ${prop.managedBy.lastName || ''}` : "Propriétaire En Direct")
+                                const hasLeases = prop._count.leases > 0;
+
+                                return (
+                                <tr key={prop.id}>
+                                    <td>
+                                        <div className="tenant-cell">
+                                            <div className="t-avatar" style={{ backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
+                                                {prop.propertyType === 'RESIDENCE' || prop.propertyType === 'IMMEUBLE' ? <Building2 size={16} /> : <Home size={16} />}
+                                            </div>
+                                            <div>
+                                                <div className="t-name font-mono text-[11px]">{prop.propertyCode}</div>
+                                                <div className="t-loc text-[10px] text-gray-500">{prop.name || prop.propertyType}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="t-name">{ownerName}</div>
+                                    </td>
+                                    <td>
+                                        <div className="t-name text-gray-400 truncate max-w-[200px]">{prop.commune}</div>
+                                        <div className="t-loc text-[10px] truncate max-w-[200px]">{prop.address}</div>
+                                    </td>
+                                    <td>
+                                        {hasLeases ? (
+                                            <div className="pill pill-active"><div className="pill-dot"></div>Occupé ({prop._count.leases})</div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest bg-gray-900 border border-gray-800 px-3 py-1 rounded-full w-max">
+                                                Vacant
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div className="t-name text-gray-400">{managerName}</div>
+                                    </td>
+                                </tr>
+                            )})}
+                            
+                            {properties.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-8 text-gray-500">
+                                        Aucun bien immobilier enregistré.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    )
+}

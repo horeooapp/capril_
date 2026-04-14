@@ -146,6 +146,20 @@ export default async function AdminDashboardOverview() {
         prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
     ]);
     
+    // Fetch recent items for UI displays
+    const recentLeases = await prisma.lease.findMany({
+        where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
+        take: 4,
+        orderBy: { createdAt: 'desc' },
+        include: { tenant: true, property: { select: { propertyCode: true, commune: true } } }
+    }).catch(() => []);
+
+    const recentReceipts = await prisma.receipt.findMany({
+        where: { status: { in: ['paid', 'PAID', 'Paid'] } },
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+    }).catch(() => []);
+    
     // Check for missing tables
     const isDbIncomplete = [
         totalPaymentsRes, 
@@ -284,50 +298,25 @@ export default async function AdminDashboardOverview() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div className="tenant-cell">
-                                            <div className="t-avatar t-av1">KO</div>
-                                            <div className="t-name">Kouadio O.</div>
-                                        </div>
-                                    </td>
-                                    <td><div className="t-loc">Cocody, Angré</div></td>
-                                    <td><div className="t-name">350.000 F</div></td>
-                                    <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="tenant-cell">
-                                            <div className="t-avatar t-av2">MD</div>
-                                            <div className="t-name">Marc D.</div>
-                                        </div>
-                                    </td>
-                                    <td><div className="t-loc">Marcory, Zone 4</div></td>
-                                    <td><div className="t-name">850.000 F</div></td>
-                                    <td><div className="pill pill-pending"><div className="pill-dot"></div>En attente EDL</div></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="tenant-cell">
-                                            <div className="t-avatar t-av3">SA</div>
-                                            <div className="t-name">Sylla A.</div>
-                                        </div>
-                                    </td>
-                                    <td><div className="t-loc">Riviera Palmeraie</div></td>
-                                    <td><div className="t-name">180.000 F</div></td>
-                                    <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="tenant-cell">
-                                            <div className="t-avatar t-av4">JB</div>
-                                            <div className="t-name">Jean B.</div>
-                                        </div>
-                                    </td>
-                                    <td><div className="t-loc">Yopougon, Toits Rouges</div></td>
-                                    <td><div className="t-name">120.000 F</div></td>
-                                    <td><div className="pill pill-impaye"><div className="pill-dot"></div>Impayé (8j)</div></td>
-                                </tr>
+                                {recentLeases.map(lease => {
+                                    const tInitials = ((lease.tenant as any)?.firstName?.charAt(0) || lease.tenant?.email?.charAt(0) || "?").toUpperCase() + ((lease.tenant as any)?.lastName?.charAt(0) || "").toUpperCase();
+                                    const tName = (lease.tenant as any)?.firstName ? `${(lease.tenant as any).firstName} ${(lease.tenant as any).lastName || ''}` : lease.tenant?.phone || lease.tenant?.email || 'Inconnu';
+                                    return (
+                                    <tr key={lease.id}>
+                                        <td>
+                                            <div className="tenant-cell">
+                                                <div className="t-avatar" style={{backgroundColor: 'var(--ci-nuit2)'}}>{tInitials}</div>
+                                                <div className="t-name text-[11px] truncate">{tName}</div>
+                                            </div>
+                                        </td>
+                                        <td><div className="t-loc truncate">{lease.property?.commune || 'Inconnue'}</div></td>
+                                        <td><div className="t-name">{(lease.rentAmount + lease.chargesAmount).toLocaleString()} F</div></td>
+                                        <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
+                                    </tr>
+                                )})}
+                                {recentLeases.length === 0 && (
+                                    <tr><td colSpan={4} className="text-center text-gray-500 py-4">Aucun bail récent.</td></tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -335,29 +324,24 @@ export default async function AdminDashboardOverview() {
                     <div className="right-col">
                         <div className="panel" style={{ paddingBottom: '12px' }}>
                             <div className="panel-header">
-                                <h2 className="panel-title">Transactions Mobile</h2>
+                                <h2 className="panel-title">Passerelles & Quittances</h2>
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B949E" strokeWidth="1.5"/><path d="M8 5v3l2 2" stroke="#8B949E" strokeWidth="1.5" strokeLinecap="round"/></svg>
                             </div>
                             <div className="mm-grid">
-                                <div className="mm-card wave">
-                                    <div className="mm-op">WAVE</div>
-                                    <div className="mm-amount">4.2M</div>
-                                    <div className="mm-sub">Reçus aujourd'hui</div>
-                                </div>
-                                <div className="mm-card orange-op">
-                                    <div className="mm-op">ORANGE</div>
-                                    <div className="mm-amount">1.8M</div>
-                                    <div className="mm-sub">Reçus aujourd'hui</div>
-                                </div>
-                                <div className="mm-card mtn">
-                                    <div className="mm-op">MTN</div>
-                                    <div className="mm-amount">840K</div>
-                                    <div className="mm-sub">Reçus aujourd'hui</div>
-                                </div>
-                                <div className="mm-card mtn-card">
+                                {recentReceipts.map((rec, idx) => (
+                                    <div key={rec.id} className="mm-card mtn-card" style={{ borderColor: 'var(--ci-orange)' }}>
+                                        <div className="mm-op">Reçu #{idx+1}</div>
+                                        <div className="mm-amount">{rec.totalAmount.toLocaleString()} F</div>
+                                        <div className="mm-sub capitalize">{rec.month} {rec.year}</div>
+                                    </div>
+                                ))}
+                                {recentReceipts.length === 0 && (
+                                    <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
+                                )}
+                                <div className="mm-card mtn-card mt-2 col-span-2">
                                     <div className="mm-op">TRESOR/CDC</div>
-                                    <div className="mm-amount text-white">{safeData.cdcAmount.toLocaleString() || '0'}</div>
-                                    <div className="mm-sub">Consignations</div>
+                                    <div className="mm-amount text-white">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
+                                    <div className="mm-sub">Fonds Consignés Global</div>
                                 </div>
                             </div>
                         </div>

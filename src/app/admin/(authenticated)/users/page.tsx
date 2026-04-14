@@ -64,8 +64,8 @@ export default async function AdminUsersPage() {
                                                 {initials}
                                             </div>
                                             <div>
-                                                <div className="t-name">{((user as any).firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}` : "Profil Inconnu")}</div>
-                                                <div className="t-loc text-[10px] text-gray-500">{user.email || user.phone}</div>
+                                                <div className="t-name">{((user as any).firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}` : (user.email || user.phone || "Profil Inconnu"))}</div>
+                                                <div className="t-loc text-[10px] text-gray-500">{user.email || user.phone || 'Sans Contact'}</div>
                                             </div>
                                         </div>
                                     </td>
