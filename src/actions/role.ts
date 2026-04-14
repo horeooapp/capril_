@@ -22,7 +22,7 @@ export async function setChosenRole(role: string) {
     try {
         // Set the global lock in Redis & Database
         if (redis) {
-            await redis.set(`user:active_role:${session.user.id}`, role).catch(e => console.error("Redis error:", e));
+            await redis.set(`user:active_role:${session.user.id}`, role).catch((e: any) => console.error("Redis error:", e));
         }
         
         const { prisma } = await import("@/lib/prisma");
