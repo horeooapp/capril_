@@ -7,7 +7,7 @@ import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 import { Building2, Users, FileText, Settings2, BarChart3, Receipt, ClipboardList, ShieldCheck } from "lucide-react"
 
-type TabType = 'overview' | 'biens' | 'candidats' | 'outils';
+
 
 export function AgencyPortalDashboardV2({ 
   user, 
@@ -20,7 +20,6 @@ export function AgencyPortalDashboardV2({
   candidatures?: any[],
   aggregates?: any
 }) {
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
 
   // Compute mock / realistic stats
@@ -39,27 +38,26 @@ export function AgencyPortalDashboardV2({
       {/* HEADER / NAVIGATION INTÉGRÉE SI BESOIN */}
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {[
-              { id: 'overview', label: 'Vue Globale', icon: <BarChart3 size={16} /> },
-              { id: 'biens', label: 'Mandats', icon: <Building2 size={16} /> },
-              { id: 'candidats', label: 'Dossiers Locataires', icon: <Users size={16} /> },
-              { id: 'outils', label: 'CRG & Reversements', icon: <FileText size={16} /> },
+              { href: '/dashboard', label: 'Vue Globale', icon: <BarChart3 size={16} />, active: true },
+              { href: '/dashboard/mandates', label: 'Mandats', icon: <Building2 size={16} /> },
+              { href: '/dashboard/matching', label: 'Dossiers Locataires', icon: <Users size={16} /> },
+              { href: '/dashboard/reports', label: 'CRG & Reversements', icon: <FileText size={16} /> },
           ].map((t) => (
-              <button 
-                  key={t.id} 
-                  onClick={() => setActiveTab(t.id as TabType)}
+              <Link 
+                  key={t.href} 
+                  href={t.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-[12.5px] font-semibold transition-colors whitespace-nowrap ${
-                      activeTab === t.id 
+                      t.active 
                       ? "bg-slate-800 text-white" 
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
                   }`}
               >
                   {t.icon} {t.label}
-              </button>
+              </Link>
           ))}
       </div>
 
-      {activeTab === 'overview' && (
-        <div className="space-y-6">
+      <div className="space-y-6">
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <StatCard 
@@ -123,17 +121,6 @@ export function AgencyPortalDashboardV2({
              </div>
           </SectionCard>
         </div>
-      )}
-
-      {/* Fallback to legacy components for other tabs temporarily during migration */}
-      {activeTab !== 'overview' && (
-         <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500">
-             <Settings2 className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-             <h3 className="text-lg font-bold text-slate-700 mb-2">Module en cours de modernisation</h3>
-             <p className="text-sm">Cette section est actuellement en cours de migration vers le nouveau Design System.</p>
-             <button onClick={() => setActiveTab('overview')} className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-md text-[12.5px] font-semibold">Retour à l'overview</button>
-         </div>
-      )}
     </div>
   );
 }
