@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
 import { SubscriptionManager } from "@/components/dashboard/SubscriptionManager"
+import { SectionCard } from "@/components/dashboard/ui/SectionCard"
+import { StatCard } from "@/components/dashboard/ui/StatCard"
 
 export default async function OwnerProfilePage() {
     const session = await auth()
@@ -20,11 +22,11 @@ export default async function OwnerProfilePage() {
 
     if (!user) {
         return (
-            <div className="flex h-[50vh] items-center justify-center animate-in fade-in zoom-in duration-500">
-                <div className="glass-panel p-8 text-center max-w-sm rounded-3xl border border-red-500/30 bg-red-50/50">
-                    <h2 className="text-xl font-bold text-red-600 mb-2">Profil introuvable</h2>
-                    <p className="text-sm text-gray-600 mb-6">Impossible de charger vos données. Votre compte a peut-être été supprimé.</p>
-                    <Link href="/login" className="px-6 py-2 bg-red-600 text-white rounded-xl text-sm font-bold uppercase tracking-wide cursor-pointer hover:bg-red-700">Se Reconnecter</Link>
+            <div className="flex h-[50vh] items-center justify-center animate-in fade-in duration-500">
+                <div className="p-8 text-center max-w-sm rounded-[12px] border border-rose-200 bg-rose-50 shadow-sm">
+                    <h2 className="text-lg font-bold text-rose-700 mb-2">Profil introuvable</h2>
+                    <p className="text-[13px] text-rose-600 mb-6 font-medium">Impossible de charger vos données. Votre compte a peut-être été supprimé.</p>
+                    <Link href="/login" className="px-6 py-2.5 bg-rose-600 text-white rounded-[8px] text-[12px] font-semibold uppercase tracking-wide hover:bg-rose-700 transition">Se Reconnecter</Link>
                 </div>
             </div>
         )
@@ -37,7 +39,7 @@ export default async function OwnerProfilePage() {
     const rccmDoc = user?.identityDocuments?.find(d => d.docType === 'RCCM');
     const nifDoc = user?.identityDocuments?.find(d => d.docType === 'NIF');
     const agrementDoc = user?.identityDocuments?.find(d => d.docType === 'AGREMENT');
-    // CRITICAL (Rule R-01): Standardized Role Identification
+    
     const activeRole = (user as any).capaciteActive || (session.user as any)?.chosenRole || session.user.role;
     const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole);
 
@@ -47,46 +49,42 @@ export default async function OwnerProfilePage() {
     if (activeRole === "CHAMPION") displayRole = "CHAMPION";
 
     return (
-        <div className="space-y-10 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="space-y-6 pb-24">
+            
             {/* Header / Hero */}
-            <div className="glass-panel p-8 md:p-12 rounded-[3rem] border border-white/40 shadow-xl bg-white/50 backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#1F4E79]/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-24 h-24 bg-[#1F4E79]/5 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl border border-[#1F4E79]/10 shadow-inner overflow-hidden">
-                        {user?.avatarUrl ? (
-                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                        ) : (
-                            <User size={48} className="text-[#1F4E79]" />
-                        )}
-                    </div>
-                    <div className="text-center md:text-left">
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-2 text-[#1F4E79]">
-                            {isAgencyRole && agencyProfile?.nomAgence 
-                                ? agencyProfile.nomAgence 
-                                : ((user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL")
-                            }
-                        </h1>
-                        <p className="text-gray-500 font-medium tracking-tight uppercase text-xs">{isAgencyRole && agencyProfile?.adresseLocal ? agencyProfile.adresseLocal : user?.email}</p>
-                        <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
-                            <span className="px-4 py-1.5 bg-white border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 shadow-sm">
-                                Niveau KYC : {user?.kycLevel || 1}
-                            </span>
-                            <span className="px-4 py-1.5 bg-[#C55A11] rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-orange-900/20">
-                                {displayRole}
-                            </span>
-                        </div>
+            <div className="p-6 md:p-8 rounded-[12px] border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-3xl border border-slate-200 shadow-sm overflow-hidden shrink-0">
+                    {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={32} className="text-slate-400" />
+                    )}
+                </div>
+                <div className="text-center md:text-left flex-1">
+                    <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 mb-1">
+                        {isAgencyRole && agencyProfile?.nomAgence 
+                            ? agencyProfile.nomAgence 
+                            : ((user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || "Utilisateur QAPRIL")
+                        }
+                    </h1>
+                    <p className="text-slate-500 font-medium text-[13px]">{isAgencyRole && agencyProfile?.adresseLocal ? agencyProfile.adresseLocal : user?.email}</p>
+                    
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+                        <span className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-[6px] text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                            Niveau KYC : {user?.kycLevel || 1}
+                        </span>
+                        <span className="px-3 py-1 bg-slate-800 rounded-[6px] text-[10px] font-bold uppercase tracking-widest text-white">
+                            {displayRole}
+                        </span>
                     </div>
                 </div>
             </div>
 
-            {/* Profile Sections */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Information Personnelle (Interactive) */}
-                <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white">
-                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter mb-6 flex items-center gap-3">
-                        <Settings size={22} className="text-gray-400" />
-                        Mise à jour du Profil
-                    </h3>
+            {/* Main Sections */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                {/* Profile Form */}
+                <SectionCard title="Mise à jour du Profil" icon={<Settings size={18} className="text-slate-400"/>}>
                     <ProfileUpdateForm 
                         activeRole={activeRole}
                         initialData={{
@@ -100,10 +98,8 @@ export default async function OwnerProfilePage() {
                             email: user?.email,
                             profession: user?.profession,
                             salary: user?.salary,
-                            // Perso
                             docType: primaryDoc?.docType,
                             docNumber: primaryDoc?.docNumber,
-                            // Agency
                             dfe: agencyProfile?.dfe || dfeDoc?.docNumber,
                             rccm: agencyProfile?.rccm || rccmDoc?.docNumber,
                             nif: agencyProfile?.nif || nifDoc?.docNumber,
@@ -115,66 +111,61 @@ export default async function OwnerProfilePage() {
                             numEnregistrement: agencyProfile?.numEnregistrement
                         }} 
                     />
-                </div>
+                </SectionCard>
 
                 {/* Score & Trust Portfolio */}
-                <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-gradient-to-br from-indigo-50/50 to-white">
-                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter mb-6 flex items-center gap-3">
-                        <Star size={22} className="text-indigo-500" />
-                        Indice de Confiance
-                    </h3>
-                    <div className="p-6 bg-white rounded-[2rem] border border-indigo-100 shadow-inner flex items-center justify-between mb-6">
-                        <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Score {displayRole}</p>
-                            <p className="text-3xl font-black text-indigo-600">890 <span className="text-sm">/ 1000</span></p>
-                        </div>
-                        <div className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[12px] uppercase tracking-widest border border-indigo-100">
-                            Excellent
-                        </div>
-                    </div>
-                    <p className="text-[13px] text-gray-500 font-medium mb-6 leading-relaxed">
-                        Votre score est calculé à partir de la conformité de vos baux et de la promptitude de vos quittances.
-                    </p>
-                    <Link href="/dashboard/trust" className="block text-center py-4 border-2 border-dashed border-indigo-100 rounded-2xl text-[11px] font-black text-indigo-400 uppercase tracking-widest hover:bg-indigo-50 hover:border-indigo-200 transition-all">
-                        Détails du score
-                    </Link>
-                </div>
-
-                {/* Securité & Notifications */}
-                <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white">
-                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter mb-6 flex items-center gap-3">
-                        <ShieldCheck size={22} className="text-emerald-500" />
-                        Sécurité & Alertes
-                    </h3>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                            <span className="text-sm font-bold text-gray-700">Notifications SMS</span>
-                            <div className="w-10 h-5 bg-emerald-500 rounded-full relative">
-                                <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-white rounded-full"></div>
+                <div className="space-y-6">
+                    <SectionCard title="Indice de Confiance" icon={<Star size={18} className="text-sky-500"/>} className="bg-sky-50/50">
+                        <div className="p-5 bg-white rounded-[8px] border border-sky-100 shadow-sm flex items-center justify-between mb-4">
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Score {displayRole}</p>
+                                <p className="text-2xl font-black text-slate-800">890 <span className="text-sm font-semibold text-slate-400">/ 1000</span></p>
+                            </div>
+                            <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-[6px] font-bold text-[11px] uppercase tracking-widest border border-emerald-100">
+                                Excellent
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
-                            <span className="text-sm font-bold text-gray-700">Alertes WhatsApp</span>
-                            <div className="w-10 h-5 bg-emerald-500 rounded-full relative">
-                                <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-white rounded-full"></div>
+                        <p className="text-[12.5px] text-slate-600 font-medium mb-5 leading-relaxed">
+                            Votre score est calculé à partir de la conformité de vos baux et de la promptitude de vos quittances.
+                        </p>
+                        <Link href="/dashboard/trust" className="block text-center py-2.5 bg-white border border-slate-200 rounded-[8px] text-[11px] font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-all">
+                            Détails du score
+                        </Link>
+                    </SectionCard>
+
+                    <SectionCard title="Sécurité & Alertes" icon={<ShieldCheck size={18} className="text-emerald-500"/>}>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-[8px] border border-slate-100">
+                                <span className="text-[13px] font-semibold text-slate-700">Notifications SMS</span>
+                                <div className="w-8 h-4 bg-emerald-500 rounded-full relative">
+                                    <div className="absolute top-0.5 right-0.5 w-3 h-3 bg-white rounded-full shadow-sm"></div>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-[8px] border border-slate-100">
+                                <span className="text-[13px] font-semibold text-slate-700">Alertes WhatsApp</span>
+                                <div className="w-8 h-4 bg-emerald-500 rounded-full relative">
+                                    <div className="absolute top-0.5 right-0.5 w-3 h-3 bg-white rounded-full shadow-sm"></div>
+                                </div>
                             </div>
                         </div>
+                    </SectionCard>
+
+                    <SectionCard title="Abonnement">
+                       <SubscriptionManager currentPlan="PREMIUM AGREE" />
+                    </SectionCard>
+
+                    {/* Zone de Danger */}
+                    <div className="pt-2 border-t border-slate-200">
+                      <DeleteAccountSection />
                     </div>
                 </div>
-
-                {/* Wallet / Abonnement */}
-                <SubscriptionManager currentPlan="PREMIUM AGREE" />
             </div>
 
-            {/* Zone de Danger: Suppression de Compte */}
-            <DeleteAccountSection />
-
-            {/* Disclaimer */}
-            <div className="text-center px-8">
-                <p className="text-[11px] font-black text-gray-300 uppercase tracking-[0.3em] mb-4">
+            <div className="text-center py-6">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] mb-3">
                     Membre Certifié QAPRIL • Depuis {new Date().getFullYear()}
                 </p>
-                <div className="h-1 w-20 bg-gray-100 mx-auto rounded-full"></div>
+                <div className="h-[1px] w-12 bg-slate-200 mx-auto"></div>
             </div>
         </div>
     )

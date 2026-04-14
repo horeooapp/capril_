@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type BadgeColor = 'green' | 'red' | 'amber' | 'blue' | 'sky' | 'violet' | 'gray';
+export type BadgeColor = 'green' | 'red' | 'amber' | 'blue' | 'sky' | 'violet' | 'gray' | 'rose';
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -16,6 +16,7 @@ export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray' }) => {
     sky: "bg-sky-100 text-sky-800",
     violet: "bg-violet-100 text-violet-800",
     gray: "bg-slate-100 text-slate-700",
+    rose: "bg-rose-100 text-rose-800",
   };
   
   return (
