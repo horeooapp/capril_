@@ -1,11 +1,13 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { FileText, Search, Download, CheckCircle, Clock, AlertTriangle, Calculator } from "lucide-react"
+import { FileText, Search, Download, Calculator, Plus, AlertTriangle, Send } from "lucide-react"
 import { toast } from "sonner";
 import { generateNextMonthReceipts, exportDgiFile, dispatchDigitalDelivery } from "@/actions/receipt-actions"
 import ManualReceiptModal from "@/components/dashboard/ManualReceiptModal"
-import { Plus } from "lucide-react"
+import { SectionCard } from "@/components/dashboard/ui/SectionCard"
+import { StatCard } from "@/components/dashboard/ui/StatCard"
+import { Badge } from "@/components/dashboard/ui/Badge"
 
 // Fallback statique si DB vide
 const FALLBACK = [
@@ -20,6 +22,12 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
     const [isPending, startTransition] = useTransition()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedReceipt, setSelectedReceipt] = useState<any>(null)
+    const [search, setSearch] = useState("");
+
+    const filteredReceipts = receipts.filter(r => 
+        (r.id || '').toLowerCase().includes(search.toLowerCase()) || 
+        (r.leaseId || '').toLowerCase().includes(search.toLowerCase())
+    );
 
     const openCreateModal = () => {
         setSelectedReceipt(null)
@@ -70,114 +78,143 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
     const overdue = receipts.filter(r => r.status === 'OVERDUE').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
     
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-6">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
-                        <FileText className="text-qgreen" size={32} /> Quittances & Recouvrement
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                        <FileText className="text-slate-700" size={32} /> Quittances & Recouvrement
                     </h1>
-                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                    <p className="text-[13.5px] font-medium text-slate-500 mt-1">
                         Le registre d'Avis d'Échéance, paiement WebPay et reçus officiels.
                     </p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                     <button 
                         onClick={handleGenerate}
                         disabled={isPending}
-                        className="bg-white text-qnavy border border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50">
+                        className="bg-white text-slate-700 border border-slate-200 px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 flex-1 sm:flex-none">
                         <Calculator size={16} /> Générer Mois M+1
                     </button>
                     <button 
                         onClick={handleExport}
                         disabled={isPending}
-                        className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2 disabled:opacity-50">
-                        <Download size={16} /> Exporter Fichier DGI
+                        className="bg-slate-800 text-white px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-700 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 flex-1 sm:flex-none">
+                        <Download size={16} /> Fichier DGI
                     </button>
                     <button 
                         onClick={openCreateModal}
-                        className="bg-qorange text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-orange-600 transition-all shadow-lg shadow-qorange/20 flex items-center gap-2">
-                        <Plus size={18} /> Nouvelle Quittance
+                        className="bg-emerald-600 text-white px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                        <Plus size={16} /> Nouveau Reçu
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                 <div className="bg-white border border-qgrey-2 rounded-3xl p-6 shadow-sm">
-                     <p className="text-[10px] uppercase tracking-widest font-black text-qtext-light">Taux Recouvrement</p>
-                     <p className="text-3xl font-black text-qgreen mt-1">82%</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                 <StatCard 
+                     label="Taux Recouvrement" 
+                     value="82%" 
+                     sub="Objectif 90%" 
+                     trend="up" 
+                 />
+                 <StatCard 
+                     label="Encaissé (Mois)" 
+                     value={`${(encaiss).toLocaleString()} ₣`} 
+                     sub="Paiements confirmés" 
+                 />
+                 <div className="bg-slate-50 border border-slate-200 rounded-[10px] p-4 flex flex-col justify-between">
+                     <p className="text-[12px] font-semibold text-slate-500 uppercase">En Attente</p>
+                     <div>
+                        <p className="text-2xl font-black text-rose-500 mt-2">{(pending).toLocaleString()} ₣</p>
+                        <p className="text-[11px] text-slate-400 mt-1">À recevoir ce mois-ci</p>
+                     </div>
                  </div>
-                 <div className="bg-qgreen-pale border border-qgreen/20 rounded-3xl p-6 shadow-sm">
-                     <p className="text-[10px] uppercase tracking-widest font-black text-qgreen-dark">Encaissé (Mois)</p>
-                     <p className="text-2xl font-black text-qgreen mt-1">{(encaiss).toLocaleString()} <span className="text-sm">FCFA</span></p>
-                 </div>
-                 <div className="bg-white border border-qgrey-2 rounded-3xl p-6 shadow-sm">
-                     <p className="text-[10px] uppercase tracking-widest font-black text-qtext-light">En Attente</p>
-                     <p className="text-2xl font-black text-qnavy-dark mt-1">{(pending).toLocaleString()} <span className="text-sm">FCFA</span></p>
-                 </div>
-                 <div className="bg-qred-pale border border-qred/20 rounded-3xl p-6 shadow-sm">
-                     <p className="text-[10px] uppercase tracking-widest font-black text-qred-dark">Impayés (Arriérés)</p>
-                     <p className="text-2xl font-black text-qred mt-1">{(overdue).toLocaleString()} <span className="text-sm">FCFA</span></p>
+                 <div className="bg-rose-50 border border-rose-200 rounded-[10px] p-4 flex flex-col justify-between">
+                     <p className="text-[12px] font-semibold text-rose-700 uppercase">Impayés (Arriérés)</p>
+                     <div>
+                        <p className="text-2xl font-black text-rose-600 mt-2">{(overdue).toLocaleString()} ₣</p>
+                        <p className="text-[11px] text-rose-500 mt-1">Dossiers en contentieux</p>
+                     </div>
                  </div>
             </div>
 
-            <div className="bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm">
-                <div className="p-6 border-b border-qgrey-2 flex flex-col md:flex-row justify-between items-center gap-4 bg-qgrey-1/30">
+            <SectionCard title="Historique & Paiements" noPadding>
+                <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white">
                     <div className="relative flex-1 w-full max-w-md">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input type="text" placeholder="Référence Quittance..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qnavy focus:ring-1 focus:ring-qnavy transition-all" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input 
+                            type="text" 
+                            placeholder="Rechercher (Quittance ou Bail)..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all placeholder:text-slate-400" 
+                        />
                     </div>
                 </div>
 
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-white border-b border-qgrey-2">
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">ID Quittance</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Contrat</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Période</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Montant TTC</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Statut</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {receipts.map(r => (
-                            <tr key={r.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer">
-                                <td className="p-5 font-bold text-xs text-qnavy-dark">{r.id.substring(0,18)}</td>
-                                <td className="p-5 font-bold text-xs text-qtext-mid">{r.leaseId?.substring(0,12) || "N/A"}</td>
-                                <td className="p-5 font-bold text-sm text-qnavy">{r.periodMonth}</td>
-                                <td className="p-5 font-black text-sm text-qnavy-dark">{(r.totalAmount || 0).toLocaleString()} ₣</td>
-                                <td className="p-5">
-                                    {r.status === 'PAID' && (
-                                        <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                            <CheckCircle size={10} /> Payée
-                                        </span>
-                                    )}
-                                    {r.status === 'PENDING' && (
-                                        <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                            <Clock size={10} /> En attente
-                                        </span>
-                                    )}
-                                    {r.status === 'OVERDUE' && (
-                                        <span className="text-[10px] font-black uppercase text-qred bg-qred-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5">
-                                            <AlertTriangle size={10} /> Impayée
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="p-5 text-right flex justify-end gap-2">
-                                    {r.status === 'PAID' && !r.digitalDeliveryId && (
-                                        <button onClick={(e) => { e.stopPropagation(); handleDigitalDelivery(r.id); }} disabled={isPending} className="text-[9px] font-black uppercase tracking-widest text-orange-600 hover:text-white hover:bg-orange-600 transition-colors border border-orange-200 px-3 py-1.5 rounded-lg bg-orange-50 disabled:opacity-50">La Poste CI</button>
-                                    )}
-                                    {r.digitalDeliveryId && (
-                                         <span className="text-[9px] font-black uppercase tracking-widest text-qgreen border border-qgreen px-3 py-1.5 rounded-lg">Expédié (CI-POST)</span>
-                                    )}
-                                    <button onClick={(e) => { e.stopPropagation(); openEditModal(r); }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qorange transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">Éditer</button>
-                                    <button onClick={(e) => { e.stopPropagation(); toast.promise(new Promise(res=>setTimeout(res, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'}); }} className="text-[10px] font-black uppercase tracking-widest text-qnavy hover:text-qgreen transition-colors border border-qgrey-2 px-3 py-1.5 rounded-lg bg-white">PDF</button>
-                                </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">ID Quittance</th>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Contrat</th>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Période</th>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Montant TTC</th>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Statut</th>
+                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide text-right">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {filteredReceipts.map(r => (
+                                <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
+                                    <td className="py-3 px-4 font-semibold text-[13px] text-slate-800">{r.id.substring(0,18)}</td>
+                                    <td className="py-3 px-4 font-medium text-[12.5px] text-slate-500">{r.leaseId?.substring(0,12) || "N/A"}</td>
+                                    <td className="py-3 px-4 font-semibold text-[12.5px] text-slate-700">{r.periodMonth}</td>
+                                    <td className="py-3 px-4 font-black text-[13px] text-slate-900">{(r.totalAmount || 0).toLocaleString()} ₣</td>
+                                    <td className="py-3 px-4">
+                                        {r.status === 'PAID' && <Badge color="green">PAYÉE</Badge>}
+                                        {r.status === 'PENDING' && <Badge color="amber">EN ATTENTE</Badge>}
+                                        {r.status === 'OVERDUE' && (
+                                            <span className="flex items-center gap-1.5 inline-flex text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full text-[11px] font-semibold tracking-wide">
+                                                <AlertTriangle size={12} /> IMPAYÉE
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-3 px-4 text-right flex justify-end gap-2 items-center">
+                                        {r.status === 'PAID' && !r.digitalDeliveryId && (
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleDigitalDelivery(r.id); }} 
+                                                disabled={isPending} 
+                                                className="flex items-center gap-1 text-[11px] font-semibold text-amber-700 hover:bg-amber-100 transition-colors border border-amber-200 px-3 py-1.5 rounded-[6px] bg-amber-50 disabled:opacity-50">
+                                                <Send size={12}/> Envoyer Poste
+                                            </button>
+                                        )}
+                                        {r.digitalDeliveryId && (
+                                             <span className="text-[11px] font-semibold text-emerald-600 border border-emerald-200 bg-emerald-50 px-3 py-1.5 rounded-[6px]">Expédié (POSTE-CI)</span>
+                                        )}
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); openEditModal(r); }} 
+                                            className="text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-300 transition-colors border border-slate-200 px-3 py-1.5 rounded-[6px] bg-white">
+                                            Éditer
+                                        </button>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); toast.promise(new Promise(res=>setTimeout(res, 1000)), {loading:'Génération du document PDF...', success:'Reçu téléchargé avec succès.'}); }} 
+                                            className="text-[11px] font-semibold text-slate-600 hover:text-emerald-600 hover:border-emerald-300 transition-colors border border-slate-200 px-3 py-1.5 rounded-[6px] bg-white">
+                                            PDF
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredReceipts.length === 0 && (
+                                <tr>
+                                    <td colSpan={6} className="py-8 text-center text-sm font-medium text-slate-500">
+                                        Aucune quittance correspondante.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </SectionCard>
 
             <ManualReceiptModal 
                 isOpen={isModalOpen} 

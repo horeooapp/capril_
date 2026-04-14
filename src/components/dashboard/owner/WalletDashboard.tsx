@@ -1,8 +1,7 @@
 'use client'
-import { toast } from "sonner";;
+import { toast } from "sonner";
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -10,15 +9,18 @@ import {
   Zap, 
   Clock, 
   AlertTriangle, 
-  TrendingUp, 
   Plus, 
-  ArrowRight,
+  Download,
   ShieldCheck,
-  Smartphone
+  Smartphone,
+  CreditCard
 } from 'lucide-react';
 import Link from 'next/link';
 import { useWalletData } from '@/hooks/qapril-web-hooks';
 import RechargeDrawer from './RechargeDrawer';
+import { SectionCard } from "@/components/dashboard/ui/SectionCard"
+import { StatCard } from "@/components/dashboard/ui/StatCard"
+import { Badge } from "@/components/dashboard/ui/Badge"
 
 export default function WalletDashboard() {
   const { data, loading, error, recharge, refresh } = useWalletData();
@@ -27,10 +29,10 @@ export default function WalletDashboard() {
   if (loading && !data) {
     return (
       <div className="p-12 text-center space-y-4">
-        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center animate-spin mx-auto text-[#1F4E79]">
+        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center animate-spin mx-auto text-slate-400">
           <Zap size={32} />
         </div>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Chargement du Wallet...</p>
+        <p className="text-[12px] font-semibold text-slate-400 uppercase tracking-widest">Synchronisation du Solde...</p>
       </div>
     );
   }
@@ -40,151 +42,149 @@ export default function WalletDashboard() {
   const isCritical = solde <= decouvertMax;
 
   return (
-    <div className="space-y-12">
-      {/* Wallet Hero Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* Main Card */}
-        <motion.div 
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           className="lg:col-span-8 p-12 rounded-[4rem] bg-[#1F4E79] text-white relative overflow-hidden group shadow-blue-900/40 shadow-2xl border border-white/10"
-        >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#C55A11] blur-[120px] opacity-10 -mr-20 -mt-20 group-hover:opacity-20 transition-opacity"></div>
-          
-          <div className="relative z-10 flex flex-col md:flex-row justify-between h-full gap-12">
-            <div className="space-y-12 flex-1">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <Wallet size={20} className="text-[#C55A11]" />
-                </div>
-                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-white/60">Solde Disponible.</span>
-              </div>
-              
-              <div className="space-y-2">
-                <h1 className="text-7xl font-black tracking-tighter leading-none italic">
-                  {solde.toLocaleString()} <span className="text-3xl font-normal opacity-50 not-italic">FCFA</span>
-                </h1>
-                {isOverdrawn && (
-                  <div className="flex items-center gap-2 text-[#C55A11] font-black text-xs uppercase tracking-widest animate-pulse">
-                    <AlertTriangle size={16} />
-                    Mode Crédit Activé (Découvert autorisé)
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/10">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Consommation Mensuelle</p>
-                  <p className="text-xl font-black">≈ {stats.consoMensuelle.toLocaleString()} <span className="text-xs opacity-40">FCFA</span></p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Autonomie Estimée</p>
-                  <p className="text-xl font-black">{stats.autonomieMois} <span className="text-xs opacity-40">MOIS</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-end gap-4 w-full md:w-64">
-               <button 
-                  onClick={() => setIsRechargeOpen(true)}
-                  className="w-full py-6 bg-[#C55A11] text-white rounded-[2rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-950/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
-               >
-                 <Zap size={20} />
-                 Recharger
-               </button>
-               <Link href="/dashboard/wallet" className="w-full py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] font-black text-[12px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
-                 Configuration
-               </Link>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Small Stats Column */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-           <div className="glass-panel p-8 rounded-[3rem] border border-white group hover:shadow-2xl transition-all h-full flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <ShieldCheck className="text-emerald-500" size={32} />
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full">Sécurisé</span>
-              </div>
-              <div className="space-y-2 mt-8">
-                <h4 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Limites de Crédit.</h4>
-                <p className="text-xs text-gray-400 font-medium leading-relaxed">
-                  Votre compte bénéficie d'une tolérance de <span className="font-black text-[#C55A11]">{Math.abs(decouvertMax).toLocaleString()} FCFA</span> pour éviter tout arrêt de service lors de l'émission de vos quittances.
-                </p>
-              </div>
-           </div>
-           <div className="bg-gray-900 text-white p-8 rounded-[3rem] overflow-hidden relative group h-full">
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#C55A11] blur-[80px] opacity-20"></div>
-              <div className="flex flex-col h-full justify-between relative z-10">
-                <Smartphone size={28} className="text-[#C55A11]" />
-                <div className="mt-8 space-y-1">
-                   <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Service Clients</p>
-                   <p className="text-lg font-black italic uppercase tracking-tighter">Support Wallet Direct.</p>
-                   <button className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.2em] flex items-center gap-2 mt-2 group-hover:gap-4 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                      Contacter sur WhatsApp <ArrowRight size={14} />
-                   </button>
-                </div>
-              </div>
-           </div>
+    <div className="space-y-6">
+      
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+        <div>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                <Wallet className="text-slate-700" size={32} /> E-Wallet
+            </h1>
+            <p className="text-[13.5px] font-medium text-slate-500 mt-1">
+                Gérez votre solde QAPRIL pour l'envoi de quittances et SMS automatisés.
+            </p>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+            <button 
+                onClick={() => setIsRechargeOpen(true)}
+                className="bg-slate-800 text-white px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-700 transition-all shadow-md flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                <Zap size={16} /> Recharger
+            </button>
+            <Link 
+                href="/dashboard/wallet/settings"
+                className="bg-white text-slate-700 border border-slate-200 px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                Configuration
+            </Link>
         </div>
       </div>
 
-      {/* Transaction History */}
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tighter italic">Historique.</h3>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest">Flux financiers récents</span>
-              <span className="h-[1px] w-8 bg-gray-200"></span>
-            </div>
-          </div>
-          <button className="flex items-center gap-3 px-8 py-4 bg-gray-50 hover:bg-white text-[#1F4E79] rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] transition-all border border-transparent hover:border-gray-100 shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-             Exporter Relevé
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          {historique.length === 0 ? (
-            <div className="p-20 text-center bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
-              <Clock size={48} className="mx-auto text-gray-200 mb-4" />
-              <p className="text-sm font-black text-gray-400 uppercase tracking-widest italic">Aucune transaction trouvée.</p>
-            </div>
-          ) : (
-            historique.map((tx: any) => (
-              <motion.div 
-                key={tx.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-8 bg-white hover:bg-gray-50/50 border border-gray-100 rounded-[2.5rem] transition-all group"
-              >
-                <div className="flex items-center gap-6">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl shadow-lg ${
-                    tx.type === 'CREDIT' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-ivoire-orange'
-                  }`}>
-                    {tx.type === 'CREDIT' ? <ArrowUpRight size={24} /> : <ArrowDownLeft size={24} />}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+         {/* Main Balance Big Card */}
+         <div className={`col-span-1 lg:col-span-2 rounded-[12px] p-6 text-white relative overflow-hidden shadow-sm ${isOverdrawn ? 'bg-rose-600' : 'bg-slate-800'}`}>
+            <Wallet size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
+            <div className="relative z-10 flex flex-col justify-between h-full">
+               <div>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/50 mb-1">Solde Disponible</h3>
+                  <div className="flex items-baseline gap-2">
+                     <p className="text-4xl font-black tracking-tight mt-1">{solde.toLocaleString()}</p>
+                     <span className="text-sm font-medium text-white/70">FCFA</span>
                   </div>
+                  {isOverdrawn && (
+                    <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-white/20 rounded-[4px] text-[10px] font-bold uppercase tracking-widest">
+                      <AlertTriangle size={12} /> Découvert technique actif
+                    </div>
+                  )}
+               </div>
+               <div className="mt-6 flex justify-between items-end border-t border-white/10 pt-4">
                   <div>
-                    <h5 className="text-lg font-black text-[#1F4E79] tracking-tighter uppercase leading-none">{tx.label}</h5>
-                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest mt-1.5 flex items-center gap-2">
-                       {new Date(tx.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                       <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                       Ref: {tx.reference.substring(0, 15)}
-                    </p>
+                    <p className="text-[10px] uppercase text-white/40 tracking-widest mb-0.5">Moyenne Mensuelle</p>
+                    <p className="text-[13px] font-semibold">{stats.consoMensuelle.toLocaleString()} FCFA</p>
                   </div>
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase text-white/40 tracking-widest mb-0.5">Autonomie</p>
+                    <p className="text-[13px] font-semibold">{stats.autonomieMois} Mois</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         {/* Standard Stats */}
+         <div className="flex flex-col gap-3">
+             <StatCard 
+                 label="Découvert" 
+                 value={`${Math.abs(decouvertMax).toLocaleString()} ₣`} 
+                 sub="Tolérance plafond" 
+             />
+             <div className="bg-emerald-50 border border-emerald-200 rounded-[10px] p-4 flex-1 flex flex-col justify-center">
+                 <div className="flex items-center gap-2 mb-1">
+                     <ShieldCheck size={16} className="text-emerald-600" />
+                     <p className="text-[12px] font-semibold text-emerald-700 uppercase">Protection</p>
+                 </div>
+                 <p className="text-[11px] text-emerald-800 mt-1">Vos services restent actifs dans la limite de la tolérance fixée.</p>
+             </div>
+         </div>
+
+         <div className="flex flex-col gap-3">
+             <div className="bg-slate-50 border border-slate-200 rounded-[10px] p-4 h-full flex flex-col justify-between group relative overflow-hidden">
+                <Smartphone size={60} className="absolute -right-4 -bottom-4 text-slate-200 transition-transform group-hover:scale-110" />
+                <div className="relative z-10">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Support QAPRIL</p>
+                    <p className="text-[14px] font-bold text-slate-800 mt-2 leading-snug">Un problème avec votre solde ou rechargement ?</p>
                 </div>
-                <div className="text-right space-y-1">
-                   <p className={`text-2xl font-black ${tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-[#1F4E79]'}`}>
-                      {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} <span className="text-sm font-normal opacity-50">FCFA</span>
-                   </p>
-                   <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Solde: {tx.balanceAfter.toLocaleString()} FCFA</p>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
+                <button className="text-[11px] font-bold text-sky-600 uppercase tracking-wide flex items-center gap-1.5 mt-4 group-hover:gap-2 transition-all relative z-10" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Redirection...', success: 'Support contacté.'}) }}>
+                    WhatsApp Direct <ArrowUpRight size={14} />
+                </button>
+             </div>
+         </div>
       </div>
+
+      <SectionCard 
+        title="Historique des flux financiers" 
+        action={
+            <div className="flex items-center gap-1" onClick={(e) => { e.preventDefault(); toast.info('Export généré avec succès.') }}>
+               <Download size={14} /> Relevé PDF
+            </div>
+        } 
+        noPadding
+      >
+        <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+                <thead>
+                    <tr>
+                        <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Nature</th>
+                        <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Date</th>
+                        <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Référence</th>
+                        <th className="text-right py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Montant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {historique.map((tx: any) => (
+                        <tr key={tx.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                            <td className="py-3 px-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 flex items-center justify-center rounded-[6px] shrink-0 ${tx.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                                        {tx.type === 'CREDIT' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                                    </div>
+                                    <span className="font-semibold text-[12.5px] text-slate-700">{tx.label}</span>
+                                </div>
+                            </td>
+                            <td className="py-3 px-4 text-[12px] font-medium text-slate-500">
+                                {new Date(tx.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </td>
+                            <td className="py-3 px-4 font-mono text-[11px] tracking-wide text-slate-400">
+                                {tx.reference.substring(0, 15)}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                                <p className={`font-bold text-[13px] ${tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-slate-800'}`}>
+                                    {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} ₣
+                                </p>
+                                <p className="text-[10px] text-slate-400 font-medium">Solde: {tx.balanceAfter.toLocaleString()} ₣</p>
+                            </td>
+                        </tr>
+                    ))}
+                    {historique.length === 0 && (
+                        <tr>
+                            <td colSpan={4} className="py-8 text-center bg-slate-50/50">
+                                <div className="flex flex-col items-center justify-center text-slate-400">
+                                    <Clock size={24} className="mb-2 opacity-50" />
+                                    <p className="text-[12.5px] font-semibold">Aucune transaction trouvée.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+      </SectionCard>
 
       <RechargeDrawer 
           isOpen={isRechargeOpen}
