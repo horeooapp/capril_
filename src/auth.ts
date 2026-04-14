@@ -118,6 +118,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         if (isDiaspora) eligibleRolesSet.add('DIASPORA');
                         if (isAdmin) eligibleRolesSet.add('ADMIN');
 
+                        // ADD MISSING CAPACITIES FROM DATABASE 
+                        if (user.capacites && user.capacites.length > 0) {
+                            user.capacites.forEach((c: any) => {
+                                const cap = c.capacite.toUpperCase();
+                                if (cap === 'PROPRIETAIRE' || cap === 'LANDLORD' || cap === 'LANDLORD_PRO') eligibleRolesSet.add('LANDLORD');
+                                else if (cap === 'LOCATAIRE' || cap === 'TENANT') eligibleRolesSet.add('TENANT');
+                                else if (cap === 'AGENCE_AGREE' || cap === 'AGENCY') { 
+                                    eligibleRolesSet.add('AGENCY');
+                                    eligibleRolesSet.add('AGENCE_AGREE');
+                                }
+                                else if (cap === 'AGENCE_NON_AGREE' || cap === 'GESTIONNAIRE' || cap === 'NON_CERTIFIED_AGENT') {
+                                    eligibleRolesSet.add('NON_CERTIFIED_AGENT');
+                                    eligibleRolesSet.add('AGENCE_NON_AGREE');
+                                }
+                                else if (cap === 'INTERMEDIAIRE' || cap === 'INTERMEDIARY') eligibleRolesSet.add('INTERMEDIARY');
+                                else if (cap === 'DIASPORA') eligibleRolesSet.add('DIASPORA');
+                                else eligibleRolesSet.add(cap); // fallback
+                            });
+                        }
+
                         const reqRole = requestedRoleNormalise;
 
                         // Gestion stricte des privilèges d'administration
