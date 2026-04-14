@@ -38,24 +38,6 @@ export const authConfig = {
                 token.chosenRole = (user as any).capaciteActive || (user as any).chosenRole || null
             }
 
-            // Sync with Redis for immediate UI response (Lock)
-            if (token.id) {
-                try {
-                    const { redis } = await import("@/lib/redis");
-                    if (redis) {
-                        const globalActiveRole = await redis.get(`user:active_role:${token.id}`);
-                        if (globalActiveRole) {
-                            token.chosenRole = globalActiveRole;
-                        } else if (token.chosenRole) {
-                            // If Redis is empty but we have a choice in token, seed Redis
-                            await redis.set(`user:active_role:${token.id}`, token.chosenRole);
-                        }
-                    }
-                } catch (e) {
-                    console.error("[AUTH_CONFIG] Sync Error:", e);
-                }
-            }
-
             return token
         },
         async session({ session, token }) {
