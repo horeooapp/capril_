@@ -35,13 +35,13 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
             <div className="flex gap-4 mb-4">
                 <button 
                     onClick={() => setTab("MAINTENANCE")}
-                    className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${tab === 'MAINTENANCE' ? 'bg-[#1F4E79] text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                    className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${tab === 'MAINTENANCE' ? 'bg-slate-800 text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                 >
                     Maintenance Techniques ({tickets.length})
                 </button>
                 <button 
                     onClick={() => setTab("SIGNALEMENT")}
-                    className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${tab === 'SIGNALEMENT' ? 'bg-[#1F4E79] text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                    className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${tab === 'SIGNALEMENT' ? 'bg-slate-800 text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                 >
                     Signalements Voisinage ({signalements.length})
                 </button>
@@ -94,7 +94,7 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-bold text-gray-700">{(r.locataire?.firstName ? r.locataire.firstName + " " : "") + (r.locataire?.lastName || "")}</span>
-                                                <span className="text-[10px] text-[#1F4E79] font-black uppercase tracking-widest">{r.logement?.propertyCode}</span>
+                                                <span className="text-[10px] text-slate-800 font-black uppercase tracking-widest">{r.logement?.propertyCode}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -130,7 +130,7 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="text-[10px] text-[#1F4E79] font-black uppercase tracking-widest">{s.bail?.property?.propertyCode}</span>
+                                                <span className="text-[10px] text-slate-800 font-black uppercase tracking-widest">{s.bail?.property?.propertyCode}</span>
                                                 <span className="text-xs text-gray-500 truncate w-32">{s.bail?.property?.name}</span>
                                             </div>
                                         </td>

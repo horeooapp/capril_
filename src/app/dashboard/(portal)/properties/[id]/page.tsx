@@ -31,18 +31,18 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         <ArrowLeft size={16} />
                         <span className="text-xs font-bold uppercase tracking-widest">Retour au patrimoine</span>
                     </Link>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase italic leading-none">
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">
                         {property.propertyCode}
                     </h1>
                     <p className="text-gray-500 font-medium mt-2 flex items-center gap-2">
-                        <Building2 size={16} className="text-[#C55A11]" />
+                        <Building2 size={16} className="text-amber-600" />
                         {property.addressLine1}, {property.commune}
                     </p>
                 </div>
                 <div className="flex gap-4">
                      <Link 
                         href={`/dashboard/leases/new?propertyId=${id}`}
-                        className="px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm"
+                        className="px-6 py-3 bg-slate-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm"
                     >
                         <Plus size={18} />
                         Créer un Bail
@@ -65,7 +65,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         <div className="space-y-4">
                             <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl">
                                 <span className="text-xs font-bold text-gray-500 uppercase">Loyer</span>
-                                <span className="font-black text-[#1F4E79]">{Number(property.declaredRentFcfa).toLocaleString()} FCFA</span>
+                                <span className="font-black text-slate-800">{Number(property.declaredRentFcfa).toLocaleString()} FCFA</span>
                             </div>
                             <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl">
                                 <span className="text-xs font-bold text-gray-500 uppercase">Statut</span>
@@ -74,7 +74,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         </div>
                     </div>
 
-                    <div className="bg-[#1F4E79] p-8 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
+                    <div className="bg-slate-800 p-8 rounded-[2rem] text-white shadow-2xl relative overflow-hidden group">
                         <Users className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 group-hover:scale-110 transition-transform" />
                         <h3 className="text-orange-400 font-black text-xs uppercase tracking-widest mb-2">ADD-11 : Multi-Rôles</h3>
                         <p className="text-xs text-blue-100 leading-relaxed font-medium">
@@ -88,7 +88,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                     <section className="glass-panel p-10 rounded-[2.5rem] border-white/40 shadow-2xl">
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Équipe de Gestion</h2>
+                                <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic">Équipe de Gestion</h2>
                                 <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Intermédiaires & Agents Terrain</p>
                             </div>
                             <InviteManagerForm propertyId={id} />

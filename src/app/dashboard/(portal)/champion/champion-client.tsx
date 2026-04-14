@@ -60,13 +60,13 @@ export default function ChampionDashboardClient({
           </div>
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Champion QAPRIL</p>
-            <h1 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase">{(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}</h1>
+            <h1 className="text-xl font-black text-slate-800 tracking-tighter uppercase">{(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
            <button 
              onClick={() => setActiveTab("growth")}
-             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "growth" ? "bg-[#1F4E79] text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "growth" ? "bg-slate-800 text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
            >
              Croissance
            </button>
@@ -80,7 +80,7 @@ export default function ChampionDashboardClient({
         {activeTab === "growth" && (
           <button 
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-orange-900/20 active:scale-95 transition-transform"
+            className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-orange-900/20 active:scale-95 transition-transform"
           >
             <Plus size={16} />
             <span className="hidden md:inline">Nouveau Prospect</span>
@@ -101,7 +101,7 @@ export default function ChampionDashboardClient({
              </div>
              <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-                <p className="text-xl font-black text-[#1F4E79]">
+                <p className="text-xl font-black text-slate-800">
                   {stat.isCurrency ? `${stat.value.toLocaleString()} FCFA` : stat.value}
                 </p>
              </div>
@@ -115,7 +115,7 @@ export default function ChampionDashboardClient({
         {/* Prospects List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-4">
-             <h2 className="text-lg font-black text-[#1F4E79] uppercase tracking-tighter italic">Mes Prospects</h2>
+             <h2 className="text-lg font-black text-slate-800 uppercase tracking-tighter italic">Mes Prospects</h2>
              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{profile?.prospects?.length || 0} Total</span>
           </div>
           

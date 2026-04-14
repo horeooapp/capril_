@@ -3,8 +3,8 @@ import Link from "next/link"
 export default function RightToRcl() {
     return (
         <div className="max-w-4xl mx-auto py-12 px-6">
-            <h1 className="text-3xl font-black text-[#1F4E79] mb-4 uppercase tracking-tight">RCL (Révision de Consistance de Loyer)</h1>
-            <p className="text-gray-600 mb-8 border-l-4 border-[#1F4E79] pl-4">
+            <h1 className="text-3xl font-black text-slate-800 mb-4 uppercase tracking-tight">RCL (Révision de Consistance de Loyer)</h1>
+            <p className="text-gray-600 mb-8 border-l-4 border-slate-800 pl-4">
                 Découvrez vos droits concernant la révision de votre loyer conformément à la loi M07.
             </p>
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 mb-8">
@@ -18,7 +18,7 @@ export default function RightToRcl() {
                     </p>
                 </div>
             </div>
-            <Link href="/mon-espace-locataire/rights" className="text-sm font-bold text-[#1F4E79] hover:underline">
+            <Link href="/mon-espace-locataire/rights" className="text-sm font-bold text-slate-800 hover:underline">
                 ← Retour au Cadrage Légal
             </Link>
         </div>

@@ -58,7 +58,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center gap-3 mb-3"
                     >
-                        <ShieldCheck className="w-8 h-8 text-[#C55A11]" />
+                        <ShieldCheck className="w-8 h-8 text-amber-600" />
                         <h2 className="text-3xl font-black text-white tracking-tight uppercase leading-none">
                             {title}
                         </h2>
@@ -101,7 +101,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-[#C55A11] transition-colors" />
+                                    <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-amber-600 transition-colors" />
                                 </div>
                                 <input
                                     id="email"
@@ -109,7 +109,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-[#C55A11]/10 focus:border-[#C55A11] outline-none transition-all font-bold text-white placeholder:text-gray-600"
+                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-[#C55A11]/10 focus:border-amber-600 outline-none transition-all font-bold text-white placeholder:text-gray-600"
                                     placeholder="admin@qapril.ci"
                                 />
                             </div>
@@ -121,7 +121,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-[#C55A11] transition-colors" />
+                                    <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-amber-600 transition-colors" />
                                 </div>
                                 <input
                                     id="password"
@@ -129,7 +129,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-[#C55A11]/10 focus:border-[#C55A11] outline-none transition-all font-bold text-white placeholder:text-gray-600"
+                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-[#C55A11]/10 focus:border-amber-600 outline-none transition-all font-bold text-white placeholder:text-gray-600"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -157,13 +157,13 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                 <div className="mt-10 pt-6 border-t border-white/5 flex flex-col items-center gap-4">
                     <Link 
                         href="/" 
-                        className="flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-[#C55A11] uppercase tracking-[0.2em] transition-colors group"
+                        className="flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-amber-600 uppercase tracking-[0.2em] transition-colors group"
                     >
                         <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                         Retour à l'accueil
                     </Link>
                     <div className="flex items-center gap-2 opacity-30">
-                        <Activity className="w-3 h-3 text-[#C55A11] animate-pulse" />
+                        <Activity className="w-3 h-3 text-amber-600 animate-pulse" />
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center leading-relaxed">
                             Terminal QAPRIL v3.5 <br />
                             <span className="opacity-50">Accès restreint aux domaines certifiés</span>

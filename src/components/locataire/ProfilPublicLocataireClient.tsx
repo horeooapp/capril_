@@ -64,7 +64,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                 {/* SHARE URL BOX */}
                 <div className="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50 flex items-center justify-between">
                     <div>
-                        <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter text-sm flex items-center gap-2">🔗 Lien du CV Locatif Public</h3>
+                        <h3 className="font-black text-slate-800 uppercase tracking-tighter text-sm flex items-center gap-2">🔗 Lien du CV Locatif Public</h3>
                         <p className="text-xs text-gray-500 mt-1 font-mono">https://qapril.ci/cv/{userId.substring(0,8)}</p>
                     </div>
                     <button 
@@ -72,14 +72,14 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                             navigator.clipboard.writeText(`https://qapril.ci/cv/${userId.substring(0,8)}`);
                             toast.success("Lien copié dans le presse-papier !");
                         }}
-                        className="px-4 py-2 bg-white text-[#1F4E79] font-bold text-xs uppercase tracking-widest rounded-xl shadow hover:bg-gray-50"
+                        className="px-4 py-2 bg-white text-slate-800 font-bold text-xs uppercase tracking-widest rounded-xl shadow hover:bg-gray-50"
                     >
                         Copier
                     </button>
                 </div>
 
                 <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-white space-y-8">
-                    <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-2">
+                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">
                         <Briefcase className="text-primary" />
                         Situation Professionnelle
                     </h2>
@@ -90,7 +90,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                             <select 
                                 value={formData.statutPro}
                                 onChange={(e) => setFormData({...formData, statutPro: e.target.value})}
-                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                             >
                                 <option value="">Choisir...</option>
                                 <option value="SALARIE">Salarié</option>
@@ -104,7 +104,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                             <select 
                                 value={formData.revenuFourchette}
                                 onChange={(e) => setFormData({...formData, revenuFourchette: e.target.value})}
-                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                             >
                                 <option value="">Choisir...</option>
                                 <option value="0-50K">0 - 50k FCFA</option>
@@ -116,7 +116,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                         </div>
                     </div>
 
-                    <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-2 pt-4">
+                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2 pt-4">
                         <Search className="text-primary" />
                         Critères de Recherche
                     </h2>
@@ -128,7 +128,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                                 type="number"
                                 value={formData.budgetMaxFcfa}
                                 onChange={(e) => setFormData({...formData, budgetMaxFcfa: parseInt(e.target.value)})}
-                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-black text-[#1F4E79] text-xl"
+                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-black text-slate-800 text-xl"
                             />
                         </div>
 
@@ -139,7 +139,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                                 placeholder="ex: Yopougon, Cocody, Riviera"
                                 value={commsStr}
                                 onChange={(e) => setFormData({...formData, communesSouhaitees: e.target.value.split(',').map(s => s.trim())})}
-                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                                className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                             />
                         </div>
                     </div>
@@ -148,7 +148,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                         <button 
                             onClick={handleSave}
                             disabled={loading}
-                            className="w-full py-5 bg-[#1F4E79] text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                            className="w-full py-5 bg-slate-800 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                         >
                             <Save size={20} />
                             {loading ? "Enregistrement..." : "Enregistrer mon profil public"}
@@ -159,40 +159,40 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
 
             {/* Right Column: Visibility & Privacy */}
             <div className="space-y-6">
-                <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-br from-[#1F4E79] to-[#163a5a] text-white">
+                <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-gradient-to-br from-slate-800 to-[#163a5a] text-white">
                     <h3 className="font-black uppercase tracking-widest text-[12px] mb-6 opacity-80">Contrôle de Visibilité</h3>
                     
                     <div className="grid grid-cols-1 gap-3">
                         <button 
                             onClick={() => toggleVisibilite('INVISIBLE')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVISIBLE' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVISIBLE' ? 'bg-white text-slate-800 border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <EyeOff size={20} />
                             <div className="text-left">
-                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVISIBLE' ? 'text-[#1F4E79]' : 'text-white'}`}>Invisible</p>
-                                <p className={`text-[10px] font-medium ${visibilite === 'INVISIBLE' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Personne ne peut vous trouver</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVISIBLE' ? 'text-slate-800' : 'text-white'}`}>Invisible</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'INVISIBLE' ? 'text-slate-800/70' : 'text-white/70'}`}>Personne ne peut vous trouver</p>
                             </div>
                         </button>
                         
                         <button 
                             onClick={() => toggleVisibilite('INVITATION_PROPRIO')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVITATION_PROPRIO' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'INVITATION_PROPRIO' ? 'bg-white text-slate-800 border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <MapPin size={20} />
                             <div className="text-left">
-                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVITATION_PROPRIO' ? 'text-[#1F4E79]' : 'text-white'}`}>Favoris Proprios</p>
-                                <p className={`text-[10px] font-medium ${visibilite === 'INVITATION_PROPRIO' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Seulement via votre numéro</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'INVITATION_PROPRIO' ? 'text-slate-800' : 'text-white'}`}>Favoris Proprios</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'INVITATION_PROPRIO' ? 'text-slate-800/70' : 'text-white/70'}`}>Seulement via votre numéro</p>
                             </div>
                         </button>
 
                         <button 
                             onClick={() => toggleVisibilite('TOUS')}
-                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'TOUS' ? 'bg-white text-[#1F4E79] border-white' : 'bg-white/10 text-white border-white/20'}`}
+                            className={`p-4 rounded-2xl flex items-center gap-4 border transition-all ${visibilite === 'TOUS' ? 'bg-white text-slate-800 border-white' : 'bg-white/10 text-white border-white/20'}`}
                         >
                             <Eye size={20} />
                             <div className="text-left">
-                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'TOUS' ? 'text-[#1F4E79]' : 'text-white'}`}>Visibilité Totale</p>
-                                <p className={`text-[10px] font-medium ${visibilite === 'TOUS' ? 'text-[#1F4E79]/70' : 'text-white/70'}`}>Matching agences activé</p>
+                                <p className={`font-black uppercase text-[11px] tracking-widest ${visibilite === 'TOUS' ? 'text-slate-800' : 'text-white'}`}>Visibilité Totale</p>
+                                <p className={`text-[10px] font-medium ${visibilite === 'TOUS' ? 'text-slate-800/70' : 'text-white/70'}`}>Matching agences activé</p>
                             </div>
                         </button>
                     </div>
@@ -201,7 +201,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                 <div className="glass-panel p-8 rounded-[2rem] border border-white/40 shadow-xl bg-white">
                     <div className="flex items-center gap-2 mb-4">
                         <Info className="text-blue-500" />
-                        <h4 className="font-black text-[#1F4E79] uppercase text-[12px] tracking-widest">Vie Privée</h4>
+                        <h4 className="font-black text-slate-800 uppercase text-[12px] tracking-widest">Vie Privée</h4>
                     </div>
                     <ul className="space-y-4">
                         <li className="flex gap-3 items-start">

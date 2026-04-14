@@ -43,7 +43,7 @@ export default function GuardrailsClient() {
                         <div className="p-3 bg-red-50 rounded-2xl text-red-600">
                             <ShieldAlert size={32} />
                         </div>
-                        <h1 className="text-4xl font-black text-[#1F4E79] tracking-tight uppercase">M-GUARD</h1>
+                        <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase">M-GUARD</h1>
                     </div>
                     <p className="text-gray-500 font-medium px-1">Monitoring des limites de mandats et blocages d'intermédiaires frauduleux.</p>
                 </div>

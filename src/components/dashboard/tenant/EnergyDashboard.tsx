@@ -47,11 +47,11 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
       <div className="space-y-8 p-1">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Énergie & Fluides.</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11] mt-1">Suivi de consommation certifié Rule 3.4</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Énergie & Fluides.</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mt-1">Suivi de consommation certifié Rule 3.4</p>
           </div>
           <div className="bg-white p-1.5 rounded-2xl flex gap-1 shadow-sm border border-slate-100">
-             <button onClick={() => setActiveProvider('cie')} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeProvider === 'cie' ? "bg-[#1F4E79] text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}>CIE</button>
+             <button onClick={() => setActiveProvider('cie')} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeProvider === 'cie' ? "bg-slate-800 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}>CIE</button>
              <button onClick={() => setActiveProvider('sodeci')} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeProvider === 'sodeci' ? "bg-blue-500 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"}`}>SODECI</button>
           </div>
         </div>
@@ -96,15 +96,15 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
       {/* Header & Toggle */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Énergie & Fluides.</h2>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11] mt-1">Suivi de consommation certifié Rule 3.4</p>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Énergie & Fluides.</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mt-1">Suivi de consommation certifié Rule 3.4</p>
         </div>
         
         <div className="bg-white p-1.5 rounded-2xl flex flex-wrap sm:flex-nowrap gap-1 shadow-sm border border-slate-100">
            <button 
              onClick={() => setActiveProvider('cie')}
              className={`flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-               activeProvider === 'cie' ? "bg-[#1F4E79] text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+               activeProvider === 'cie' ? "bg-slate-800 text-white shadow-lg" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
              }`}
            >
              <Zap size={14} />
@@ -133,7 +133,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             <div className={`absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-colors ${activeProvider === 'cie' ? "bg-orange-500" : "bg-blue-500"}`}></div>
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Mois en cours (Estimé)</div>
             <div className="flex items-end gap-2">
-               <span className="text-3xl sm:text-4xl font-black text-[#1F4E79] tracking-tighter">
+               <span className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tighter">
                   {activeProvider === 'cie' ? "355" : "19.5"}
                </span>
                <span className="text-lg font-black text-slate-400 uppercase mb-1">{unit}</span>
@@ -147,7 +147,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
          <motion.div variants={itemVariants} className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Coût Prévisionnel</div>
             <div className="flex items-end gap-2">
-               <span className="text-3xl sm:text-4xl font-black text-[#C55A11] tracking-tighter">27 450</span>
+               <span className="text-3xl sm:text-4xl font-black text-amber-600 tracking-tighter">27 450</span>
                <span className="text-lg font-black text-slate-400 uppercase mb-1">FCFA</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-[10px] font-bold text-green-600">
@@ -156,7 +156,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             </div>
          </motion.div>
 
-         <motion.div variants={itemVariants} className="bg-[#1F4E79] p-6 sm:p-8 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
+         <motion.div variants={itemVariants} className="bg-slate-800 p-6 sm:p-8 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
             <div className="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform">
                {activeProvider === 'cie' ? <Zap size={120} /> : <Droplets size={120} />}
             </div>
@@ -182,14 +182,14 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
       >
          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-12">
             <div>
-               <h3 className="text-lg sm:text-xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Historique 6 Mois.</h3>
+               <h3 className="text-lg sm:text-xl font-black text-slate-800 tracking-tighter uppercase italic">Historique 6 Mois.</h3>
                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Évolution de votre empreinte énergétique</p>
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6">
                <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-slate-400">
                   <div className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-slate-100"></div> Moyenne Quartier
                </div>
-               <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-[#1F4E79]">
+               <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-slate-800">
                   <div className={`w-2 sm:w-3 h-2 sm:h-3 rounded-full ${activeProvider === 'cie' ? "bg-orange-500" : "bg-blue-500"}`}></div> Ma Consommation
                </div>
             </div>
@@ -229,7 +229,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
       {/* Invoice List */}
       <div className="bg-slate-50 p-6 sm:p-8 rounded-[3rem] border border-white shadow-inner">
          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-widest italic">Dernières Factures.</h3>
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Dernières Factures.</h3>
             <button className="text-[10px] font-black uppercase text-blue-600 hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Historique</button>
          </div>
           <div className="space-y-4">
@@ -240,7 +240,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                         <Calendar size={18} />
                      </div>
                      <div className="overflow-hidden">
-                        <div className="text-[12px] sm:text-[13px] font-black text-[#1F4E79] uppercase truncate">Facture {activeProvider.toUpperCase()} — {f.month}</div>
+                        <div className="text-[12px] sm:text-[13px] font-black text-slate-800 uppercase truncate">Facture {activeProvider.toUpperCase()} — {f.month}</div>
                         <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Réduction Profil Activée</div>
                      </div>
                   </div>

@@ -43,7 +43,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Risky Profiles */}
             <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl p-8 shadow-sm">
-                <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-wider mb-8 flex items-center gap-3">
+                <h3 className="text-xl font-black text-slate-800 uppercase tracking-wider mb-8 flex items-center gap-3">
                     <Users size={24} className="opacity-50" />
                     Profils Suspects
                 </h3>
@@ -86,7 +86,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
 
             {/* Audit Log / Activity */}
             <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl p-8 shadow-sm">
-                <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-wider mb-8 flex items-center gap-3">
+                <h3 className="text-xl font-black text-slate-800 uppercase tracking-wider mb-8 flex items-center gap-3">
                     <Activity size={24} className="opacity-50" />
                     Journal de Surveillance
                 </h3>
@@ -98,11 +98,11 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
                         <div key={i} className="flex gap-4 group">
                             <div className="w-16 text-right pt-1 font-black text-[10px] text-gray-400 uppercase tracking-widest">{log.time}</div>
                             <div className="relative pt-1">
-                                <div className={`w-3 h-3 rounded-full ${log.type === 'alert' ? 'bg-red-500 animate-pulse ring-4 ring-red-100' : 'bg-[#1F4E79]/30'}`}></div>
-                                {logs && i !== logs.length - 1 && <div className="absolute top-4 left-[5.5px] bottom-[-24px] w-[1px] bg-[#1F4E79]/10"></div>}
+                                <div className={`w-3 h-3 rounded-full ${log.type === 'alert' ? 'bg-red-500 animate-pulse ring-4 ring-red-100' : 'bg-slate-800/30'}`}></div>
+                                {logs && i !== logs.length - 1 && <div className="absolute top-4 left-[5.5px] bottom-[-24px] w-[1px] bg-slate-800/10"></div>}
                             </div>
                             <div className="flex-1 pb-6">
-                                <div className="text-sm font-bold text-gray-600 group-hover:text-[#1F4E79] transition-colors bg-white/50 p-3 rounded-xl border border-white">{log.msg}</div>
+                                <div className="text-sm font-bold text-gray-600 group-hover:text-slate-800 transition-colors bg-white/50 p-3 rounded-xl border border-white">{log.msg}</div>
                             </div>
                         </div>
                     ))}

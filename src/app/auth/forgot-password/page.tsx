@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
                         </Link>
                         <Link 
                             href="/" 
-                            className="mt-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#1F4E79] hover:text-[#C55A11] transition-colors group"
+                            className="mt-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-800 hover:text-amber-600 transition-colors group"
                         >
                             <Home size={14} className="group-hover:scale-110 transition-transform" />
                             Retour à l'accueil

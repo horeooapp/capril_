@@ -47,7 +47,7 @@ export default function StatCard({ title, value, icon: Icon, color, trend, delay
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: delay + 0.3 }}
-                    className="mt-8 pt-6 border-t border-gray-100/50 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#1F4E79]/60"
+                    className="mt-8 pt-6 border-t border-gray-100/50 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-800/60"
                 >
                     <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <ArrowUpRight size={10} />

@@ -70,12 +70,12 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
           key={feature.id}
           className={`p-8 rounded-[32px] border transition-all duration-300 ${
             feature.enabled 
-              ? "bg-white border-[#1F4E79]/10 shadow-sm" 
+              ? "bg-white border-slate-800/10 shadow-sm" 
               : "bg-[#F2F2F2] border-gray-200 opacity-70 grayscale"
           }`}
         >
           <div className="flex items-start justify-between mb-6">
-            <div className={`p-4 rounded-2xl ${feature.enabled ? "bg-[#1F4E79] text-white" : "bg-gray-300 text-gray-600"}`}>
+            <div className={`p-4 rounded-2xl ${feature.enabled ? "bg-slate-800 text-white" : "bg-gray-300 text-gray-600"}`}>
               {getIcon(feature.id)}
             </div>
             {/* Zone de Tap Géreuse P03 (Min 48x48) */}
@@ -96,9 +96,9 @@ export default function FeatureManager({ initialFeatures }: { initialFeatures: F
           </div>
           
           <div className="space-y-3">
-            <h4 className="text-[20px] font-bold text-[#1F4E79] flex items-wrap items-center gap-2 leading-tight">
+            <h4 className="text-[20px] font-bold text-slate-800 flex items-wrap items-center gap-2 leading-tight">
               {feature.name}
-              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-[#D6E4F0] text-[#1F4E79] uppercase tracking-tighter">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-[#D6E4F0] text-slate-800 uppercase tracking-tighter">
                 {feature.id}
               </span>
             </h4>

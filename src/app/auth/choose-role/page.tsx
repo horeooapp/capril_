@@ -161,7 +161,7 @@ function ChooseRoleContent() {
                         y: [0, 50, 0]
                     }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] bg-[#C55A11]/5 rounded-full blur-[120px]"
+                    className="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] bg-amber-600/5 rounded-full blur-[120px]"
                 />
                 <motion.div 
                     animate={{ 
@@ -171,7 +171,7 @@ function ChooseRoleContent() {
                         y: [0, -50, 0]
                     }}
                     transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute -bottom-[10%] -left-[10%] w-[60%] h-[60%] bg-[#1F4E79]/5 rounded-full blur-[120px]"
+                    className="absolute -bottom-[10%] -left-[10%] w-[60%] h-[60%] bg-slate-800/5 rounded-full blur-[120px]"
                 />
                 <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]"></div>
             </div>
@@ -185,7 +185,7 @@ function ChooseRoleContent() {
                     className="text-center mb-16 relative"
                 >
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-100 mb-8 overflow-hidden group">
-                        <Sparkles size={14} className="text-[#C55A11] animate-pulse" />
+                        <Sparkles size={14} className="text-amber-600 animate-pulse" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Expérience QAPRIL V4</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     </div>
@@ -196,9 +196,9 @@ function ChooseRoleContent() {
                         className="h-14 w-auto mx-auto mb-8 drop-shadow-sm" 
                     />
                     
-                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] uppercase tracking-tighter mb-4 leading-none">
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 uppercase tracking-tighter mb-4 leading-none">
                         Ravi de vous revoir,<br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1F4E79] to-[#C55A11]">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-[#C55A11]">
                             {(session.user as any).firstName || (session.user as any).fullName || session.user.email?.split('@')[0]}
                         </span>
                     </h1>
@@ -251,7 +251,7 @@ function ChooseRoleContent() {
                                         <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-40 group-hover:opacity-100 transition-opacity" style={{ color: meta.color }}>
                                             {meta.subtitle}
                                         </p>
-                                        <h3 className="text-2xl font-black text-[#1F4E79] mb-4 uppercase tracking-tight group-hover:text-qnavy-dark transition-colors">
+                                        <h3 className="text-2xl font-black text-slate-800 mb-4 uppercase tracking-tight group-hover:text-qnavy-dark transition-colors">
                                             {meta.title}
                                         </h3>
                                         <p className="text-sm text-slate-400 leading-relaxed font-medium group-hover:text-slate-600 transition-colors">
@@ -262,16 +262,16 @@ function ChooseRoleContent() {
                                     {/* Footer Interaction */}
                                     <div className="relative z-10 mt-8 pt-6 border-t border-slate-50 flex items-center justify-between overflow-hidden">
                                         {selecting === role ? (
-                                            <div className="flex items-center gap-2 text-[#C55A11]">
+                                            <div className="flex items-center gap-2 text-amber-600">
                                                 <Loader2 size={16} className="animate-spin" />
                                                 <span className="text-[11px] font-black uppercase tracking-widest">Connexion...</span>
                                             </div>
                                         ) : (
                                             <>
-                                                <span className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79]/30 group-hover:text-[#1F4E79] transition-colors">
+                                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-800/30 group-hover:text-slate-800 transition-colors">
                                                     Accéder au portail
                                                 </span>
-                                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-[#1F4E79] group-hover:text-white transition-all transform group-hover:translate-x-1 shadow-sm">
+                                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-slate-800 group-hover:text-white transition-all transform group-hover:translate-x-1 shadow-sm">
                                                     <ArrowRight size={16} />
                                                 </div>
                                             </>

@@ -49,8 +49,8 @@ export const EdlComparator: React.FC = () => {
             <ChevronLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">M-EDL Comparator.</h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11]">Audit Comparatif Entrée/Sortie — Réf #EDL-2026-042</p>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">M-EDL Comparator.</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">Audit Comparatif Entrée/Sortie — Réf #EDL-2026-042</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export const EdlComparator: React.FC = () => {
             <Download size={16} />
             Export Certifié PDF
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+          <button className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
             <ShieldCheck size={16} />
             Signer & Clôturer
           </button>
@@ -100,13 +100,13 @@ export const EdlComparator: React.FC = () => {
                 className="absolute inset-y-0 w-1 bg-white cursor-ew-resize group shadow-xl"
                 style={{ left: `${sliderPos}%` }}
               >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-2xl border-2 border-[#1F4E79] group-hover:scale-110 transition-transform">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-2xl border-2 border-slate-800 group-hover:scale-110 transition-transform">
                   <div className="flex gap-0.5">
-                    <ChevronLeft size={14} className="text-[#1F4E79]" />
-                    <ChevronRight size={14} className="text-[#1F4E79]" />
+                    <ChevronLeft size={14} className="text-slate-800" />
+                    <ChevronRight size={14} className="text-slate-800" />
                   </div>
                 </div>
-                <div className="absolute top-4 -translate-x-1/2 left-1/2 px-3 py-1 bg-[#1F4E79] text-white text-[8px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                <div className="absolute top-4 -translate-x-1/2 left-1/2 px-3 py-1 bg-slate-800 text-white text-[8px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                    Faites glisser pour comparer
                 </div>
               </div>
@@ -141,7 +141,7 @@ export const EdlComparator: React.FC = () => {
           </div>
 
           {/* Quick Logs */}
-          <div className="bg-[#1F4E79] p-8 rounded-[3rem] text-white overflow-hidden relative group">
+          <div className="bg-slate-800 p-8 rounded-[3rem] text-white overflow-hidden relative group">
              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 blur-[80px] opacity-10 group-hover:opacity-20 transition-opacity"></div>
              <h3 className="text-xl font-black tracking-tighter uppercase mb-6 italic leading-none">Journal d'Audit.</h3>
              <div className="space-y-4">
@@ -171,8 +171,8 @@ export const EdlComparator: React.FC = () => {
                 <div key={d.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 group relative">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-[#C55A11]">{d.category}</span>
-                      <h4 className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">{d.label}</h4>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-600">{d.category}</span>
+                      <h4 className="text-[13px] font-black text-slate-800 uppercase tracking-tight">{d.label}</h4>
                     </div>
                     <button 
                       onClick={() => setDegradations(degradations.filter(x => x.id !== d.id))}
@@ -188,7 +188,7 @@ export const EdlComparator: React.FC = () => {
                 </div>
               ))}
 
-              <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-[#1F4E79] hover:text-[#1F4E79] transition-all group" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+              <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-slate-800 hover:text-slate-800 transition-all group" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                 <Plus size={18} className="group-hover:rotate-90 transition-transform" />
                 <span className="text-[11px] font-black uppercase tracking-widest">Ajouter une dégradation</span>
               </button>
@@ -203,7 +203,7 @@ export const EdlComparator: React.FC = () => {
                   <span>Total Retenues</span>
                   <span>-{totalRetenue.toLocaleString()} FCFA</span>
                </div>
-               <div className="p-6 bg-[#C55A11] text-white rounded-[2rem] mt-4 shadow-xl shadow-orange-900/10">
+               <div className="p-6 bg-amber-600 text-white rounded-[2rem] mt-4 shadow-xl shadow-orange-900/10">
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-80 text-center">Reste à restituer</div>
                   <div className="text-3xl font-black text-center tracking-tighter font-mono">{soldeRestituer.toLocaleString()} FCFA</div>
                </div>
@@ -213,7 +213,7 @@ export const EdlComparator: React.FC = () => {
                   Le locataire dispose de 72h pour contester.
                </p>
 
-               <button className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 mt-6" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+               <button className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 mt-6" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                   Valider le solde
                   <ArrowRight size={18} />
                </button>

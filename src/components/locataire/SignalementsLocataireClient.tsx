@@ -56,12 +56,12 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 items-center text-center md:text-left">
                 <div className="max-w-md">
-                    <h1 className="text-4xl md:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Signalements.</h1>
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tighter uppercase mb-2">Signalements.</h1>
                     <p className="text-gray-500 font-medium">Tracez vos interventions et communiquez avec votre bailleur de manière professionnelle.</p>
                 </div>
                 <button 
                     onClick={() => setIsAdding(true)}
-                    className="flex items-center justify-center gap-3 px-10 py-5 bg-[#1F4E79] text-white rounded-3xl font-black uppercase tracking-widest text-[13px] hover:bg-[#C55A11] transition-all shadow-2xl hover:shadow-[#1F4E79]/20 active:scale-95 w-full md:w-auto"
+                    className="flex items-center justify-center gap-3 px-10 py-5 bg-slate-800 text-white rounded-3xl font-black uppercase tracking-widest text-[13px] hover:bg-amber-600 transition-all shadow-2xl hover:shadow-[#1F4E79]/20 active:scale-95 w-full md:w-auto"
                 >
                     <Plus size={20} />
                     Nouveau Ticket
@@ -71,7 +71,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
             {isAdding && (
                 <div className="glass-panel p-8 rounded-[2.5rem] border-2 border-primary/20 bg-white/80 shadow-2xl animate-in zoom-in-95 duration-300">
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tight">Ouvrir un ticket d'intervention</h2>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Ouvrir un ticket d'intervention</h2>
                         <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-red-50 text-red-400 rounded-xl transition-colors">
                             <X size={24} />
                         </button>
@@ -82,7 +82,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                             <div>
                                 <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Logement</label>
                                 <select 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-[#1F4E79]"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-slate-800"
                                     value={formData.bailId}
                                     onChange={(e) => setFormData({...formData, bailId: e.target.value})}
                                 >
@@ -94,7 +94,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                             <div>
                                 <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Catégorie</label>
                                 <select 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-[#1F4E79]"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-slate-800"
                                     value={formData.categorie}
                                     onChange={(e) => setFormData({...formData, categorie: e.target.value})}
                                 >
@@ -109,7 +109,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                             <div>
                                 <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Urgence</label>
                                 <select 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-[#1F4E79]"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-white/50 focus:ring-2 focus:ring-primary/20 outline-none font-bold text-slate-800"
                                     value={formData.urgence}
                                     onChange={(e) => setFormData({...formData, urgence: e.target.value})}
                                 >
@@ -141,7 +141,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                              <button 
                                 type="submit"
                                 disabled={loading}
-                                className="flex items-center gap-2 px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                                className="flex items-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50"
                              >
                                 <Send size={18} />
                                 {loading ? "Envoi..." : "Envoyer au bailleur"}
@@ -168,7 +168,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3 mb-1">
-                                            <h4 className="font-black text-[#1F4E79] uppercase tracking-tight">{sig.categorie}</h4>
+                                            <h4 className="font-black text-slate-800 uppercase tracking-tight">{sig.categorie}</h4>
                                             <span className={`px-3 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${getStatusColor(sig.statut)}`}>
                                                 {sig.statut}
                                             </span>
@@ -178,14 +178,14 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                                             <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
                                                 <Clock size={12} /> {new Date(sig.createdAt).toLocaleDateString()}
                                             </span>
-                                            <span className="text-[11px] font-black text-[#C55A11] uppercase tracking-widest">
+                                            <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">
                                                 Urgence: {sig.urgence}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0">
-                                    <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-gray-400 hover:text-[#1F4E79] transition-colors" onClick={() => { toast.info("Ouverture des détails..."); }}>
+                                    <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-gray-400 hover:text-slate-800 transition-colors" onClick={() => { toast.info("Ouverture des détails..."); }}>
                                         Voir Détails
                                     </button>
                                     {sig.statut !== "RESOLU" && (

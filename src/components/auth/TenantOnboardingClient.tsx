@@ -116,11 +116,11 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
             {/* Header Onboarding */}
             <div className="text-center space-y-2">
                 <div className="flex justify-center mb-6">
-                    <div className="bg-[#1F4E79] p-3 rounded-2xl shadow-xl rotate-3">
+                    <div className="bg-slate-800 p-3 rounded-2xl shadow-xl rotate-3">
                         <span className="text-white font-black text-xl tracking-tighter">QA</span>
                     </div>
                 </div>
-                <h1 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Configurez votre Passeport Locatif</h1>
+                <h1 className="text-3xl font-black text-slate-800 uppercase tracking-tighter italic">Configurez votre Passeport Locatif</h1>
                 <p className="text-gray-500 font-medium">Complétez ces 5 étapes pour activer votre matching pro.</p>
             </div>
 
@@ -128,10 +128,10 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
             <div className="flex items-center justify-between px-2">
                 {STEPS.map((step, idx) => (
                     <div key={idx} className="flex flex-col items-center gap-2 group">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${idx <= currentStep ? 'bg-[#1F4E79] text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${idx <= currentStep ? 'bg-slate-800 text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
                             {idx < currentStep ? <CheckCircle2 size={20} /> : step.icon}
                         </div>
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${idx <= currentStep ? 'text-[#1F4E79]' : 'text-gray-300'}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${idx <= currentStep ? 'text-slate-800' : 'text-gray-300'}`}>
                             {step.title}
                         </span>
                     </div>
@@ -170,7 +170,7 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
                     {currentStep < STEPS.length - 1 ? (
                         <button
                             onClick={handleNext}
-                            className="flex-[2] py-4 px-6 rounded-2xl bg-[#1F4E79] font-black uppercase text-[12px] tracking-widest text-white shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"
+                            className="flex-[2] py-4 px-6 rounded-2xl bg-slate-800 font-black uppercase text-[12px] tracking-widest text-white shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"
                         >
                             Continuer
                             <ChevronRight size={18} />
@@ -198,7 +198,7 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
 function IdentityStep({ data, update }: any) {
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter">Vos Informations</h2>
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Vos Informations</h2>
             <div className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Nom Complet</label>
@@ -206,7 +206,7 @@ function IdentityStep({ data, update }: any) {
                         type="text" 
                         value={(data.firstName ? data.firstName + " " : "") + (data.lastName || "")}
                         onChange={(e) => update({...data, fullName: e.target.value})}
-                        className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                        className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                         placeholder="Ex: Jean Kouassi"
                     />
                 </div>
@@ -218,7 +218,7 @@ function IdentityStep({ data, update }: any) {
                             type="text" 
                             value={data.city}
                             onChange={(e) => update({...data, city: e.target.value})}
-                            className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                            className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                             placeholder="Abidjan, Yamoussoukro..."
                         />
                     </div>
@@ -231,7 +231,7 @@ function IdentityStep({ data, update }: any) {
 function ProfessionalStep({ data, update }: any) {
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic flex items-center gap-2">
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic flex items-center gap-2">
                 <Briefcase className="text-primary" />
                 Profil Professionnel
             </h2>
@@ -241,7 +241,7 @@ function ProfessionalStep({ data, update }: any) {
                     <select 
                         value={data.statutPro}
                         onChange={(e) => update({...data, statutPro: e.target.value})}
-                        className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                        className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                     >
                         <option value="SALARIE">Salarié (CDI/CDD)</option>
                         <option value="INDEPENDANT">Entrepreneur / Freelance</option>
@@ -257,7 +257,7 @@ function ProfessionalStep({ data, update }: any) {
                         <select 
                             value={data.revenuFourchette}
                             onChange={(e) => update({...data, revenuFourchette: e.target.value})}
-                            className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-[#1F4E79]"
+                            className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                         >
                             <option value="0-100K">Moins de 100k</option>
                             <option value="100K-250K">100k - 250k</option>
@@ -283,13 +283,13 @@ function SearchCriteriaStep({ data, update }: any) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Quelles zones visez-vous ?</h2>
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic">Quelles zones visez-vous ?</h2>
             <div className="flex flex-wrap gap-2">
                 {communes.map(c => (
                     <button
                         key={c}
                         onClick={() => toggleCommune(c)}
-                        className={`px-4 py-2 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${data.communesSouhaitees.includes(c) ? 'bg-[#1F4E79] text-white shadow-md' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${data.communesSouhaitees.includes(c) ? 'bg-slate-800 text-white shadow-md' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                     >
                         {c}
                     </button>
@@ -306,7 +306,7 @@ function SearchCriteriaStep({ data, update }: any) {
                     onChange={(e) => update({...data, budgetMaxFcfa: parseInt(e.target.value)})}
                     className="w-full accent-[#1F4E79]"
                 />
-                <div className="text-right font-black text-[#1F4E79] text-xl tracking-tighter">
+                <div className="text-right font-black text-slate-800 text-xl tracking-tighter">
                     {data.budgetMaxFcfa.toLocaleString()} FCFA
                 </div>
             </div>
@@ -317,14 +317,14 @@ function SearchCriteriaStep({ data, update }: any) {
 function KYCStep({ data, update }: any) {
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter">Identité Certifiée</h2>
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Identité Certifiée</h2>
             <p className="text-sm text-gray-400 font-medium">Pour protéger la communauté, QAPRIL vérifie chaque profil.</p>
             
             <div className="space-y-4">
                 <select 
                     value={data.docType}
                     onChange={(e) => update({...data, docType: e.target.value})}
-                    className="w-full p-4 rounded-2xl bg-gray-50 border-none font-bold text-[#1F4E79]"
+                    className="w-full p-4 rounded-2xl bg-gray-50 border-none font-bold text-slate-800"
                 >
                     <option value="CNI">Carte Nationale d&apos;Identité</option>
                     <option value="PASSPORT">Passeport</option>
@@ -341,7 +341,7 @@ function KYCStep({ data, update }: any) {
                         <Upload className="text-blue-500" size={32} />
                     </div>
                     <div className="text-center">
-                        <p className="font-black text-[#1F4E79] uppercase text-[12px] tracking-widest">
+                        <p className="font-black text-slate-800 uppercase text-[12px] tracking-widest">
                             {data.file ? data.file.name : "Scanner mon document"}
                         </p>
                         <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-widest">PDF, JPG ou PNG (Max 5Mo)</p>
@@ -355,31 +355,31 @@ function KYCStep({ data, update }: any) {
 function VisibilityStep({ data, update }: any) {
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Visibilité & Diffusion</h2>
+            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic">Visibilité & Diffusion</h2>
             
             <div className="grid grid-cols-1 gap-3">
                 <button 
                     onClick={() => update({...data, visibilite: 'TOUS'})}
-                    className={`p-6 rounded-3xl flex items-center gap-6 border-2 transition-all text-left ${data.visibilite === 'TOUS' ? 'border-[#1F4E79] bg-white shadow-xl' : 'border-gray-50 bg-gray-50/50'}`}
+                    className={`p-6 rounded-3xl flex items-center gap-6 border-2 transition-all text-left ${data.visibilite === 'TOUS' ? 'border-slate-800 bg-white shadow-xl' : 'border-gray-50 bg-gray-50/50'}`}
                 >
-                    <div className={`p-3 rounded-2xl ${data.visibilite === 'TOUS' ? 'bg-[#1F4E79] text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
+                    <div className={`p-3 rounded-2xl ${data.visibilite === 'TOUS' ? 'bg-slate-800 text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
                         <Eye size={24} />
                     </div>
                     <div>
-                        <p className="font-black uppercase text-[13px] tracking-widest text-[#1F4E79]">Profil Public (Reco)</p>
+                        <p className="font-black uppercase text-[13px] tracking-widest text-slate-800">Profil Public (Reco)</p>
                         <p className="text-[11px] text-gray-400 font-medium">Les agences agréées pourront vous proposer des bais en matching.</p>
                     </div>
                 </button>
 
                 <button 
                     onClick={() => update({...data, visibilite: 'INVISIBLE'})}
-                    className={`p-6 rounded-3xl flex items-center gap-6 border-2 transition-all text-left ${data.visibilite === 'INVISIBLE' ? 'border-[#1F4E79] bg-white shadow-xl' : 'border-gray-50 bg-gray-50/50'}`}
+                    className={`p-6 rounded-3xl flex items-center gap-6 border-2 transition-all text-left ${data.visibilite === 'INVISIBLE' ? 'border-slate-800 bg-white shadow-xl' : 'border-gray-50 bg-gray-50/50'}`}
                 >
-                    <div className={`p-3 rounded-2xl ${data.visibilite === 'INVISIBLE' ? 'bg-[#1F4E79] text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
+                    <div className={`p-3 rounded-2xl ${data.visibilite === 'INVISIBLE' ? 'bg-slate-800 text-white shadow-lg' : 'bg-gray-200 text-gray-400'}`}>
                         <Info size={24} />
                     </div>
                     <div>
-                        <p className="font-black uppercase text-[13px] tracking-widest text-[#1F4E79]">Profil Privé</p>
+                        <p className="font-black uppercase text-[13px] tracking-widest text-slate-800">Profil Privé</p>
                         <p className="text-[11px] text-gray-400 font-medium">Vous restez discret. Seuls les bailleurs que vous scannez vous verront.</p>
                     </div>
                 </button>

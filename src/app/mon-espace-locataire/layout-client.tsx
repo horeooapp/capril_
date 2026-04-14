@@ -83,7 +83,7 @@ export default function LocataireLayoutClient({
                         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                             <p className="text-[14px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">© 2024 QAPRIL • Excellence en Gestion Immobilière de Précision</p>
                             <div className="flex gap-8">
-                                <span className="text-[14px] font-black text-[#1F4E79] uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Support Prioritaire</span>
+                                <span className="text-[14px] font-black text-slate-800 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Support Prioritaire</span>
                                 <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Mentions Légales</span>
                             </div>
                         </div>

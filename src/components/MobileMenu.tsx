@@ -108,7 +108,7 @@ export default function MobileMenu({
                             <img src={logoSrc} alt="Logo" className="h-10 w-auto" />
                             <div className="flex flex-col">
                                 <span className="font-black text-xl tracking-tighter uppercase leading-none whitespace-nowrap">{brandName}</span>
-                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-[#1F4E79] mt-0.5 whitespace-nowrap">Navigation</span>
+                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-slate-800 mt-0.5 whitespace-nowrap">Navigation</span>
                             </div>
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export default function MobileMenu({
                                 className={`flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-200 group ${s.link}`}
                             >
                                 <span className="text-2xl group-hover:scale-110 transition-transform">
-                                    {link.icon || <span className="w-2 h-2 rounded-full bg-[#1F4E79]/40"></span>}
+                                    {link.icon || <span className="w-2 h-2 rounded-full bg-slate-800/40"></span>}
                                 </span>
                                 <span className="text-[16px] font-bold uppercase tracking-widest whitespace-nowrap">{link.label}</span>
                             </Link>
@@ -137,7 +137,7 @@ export default function MobileMenu({
                                 <div className="px-6 py-6 bg-white/50 backdrop-blur-xl dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/10 shadow-inner">
                                     <p className="text-[12px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-[#1F4E79]/10 flex items-center justify-center text-[#1F4E79] font-black text-sm border border-[#1F4E79]/20 flex-shrink-0">
+                                        <div className="w-12 h-12 rounded-full bg-slate-800/10 flex items-center justify-center text-slate-800 font-black text-sm border border-slate-800/20 flex-shrink-0">
                                             {displayRole.charAt(0)}
                                         </div>
                                         <div className="flex flex-col min-w-0 flex-1">
@@ -145,7 +145,7 @@ export default function MobileMenu({
                                             <div className="flex items-center justify-between mt-1">
                                                 <div className="flex items-center">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)] flex-shrink-0"></span>
-                                                    <span className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] italic leading-none truncate">{displayRole}</span>
+                                                    <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 italic leading-none truncate">{displayRole}</span>
                                                 </div>
                                                 <Link 
                                                     href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
@@ -195,14 +195,14 @@ export default function MobileMenu({
                                 <Link 
                                     href="/dashboard/login"
                                     onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-[#1F4E79] text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                                    className="block w-full text-center bg-slate-800 text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
                                 >
                                     Accès Propriétaire
                                 </Link>
                                 <Link 
                                     href="/mon-espace-locataire/login"
                                     onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-[#C55A11] text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                    className="block w-full text-center bg-amber-600 text-white py-5 rounded-2xl font-black text-[14px] uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all"
                                 >
                                     Accès Locataire
                                 </Link>

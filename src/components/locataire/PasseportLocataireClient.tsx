@@ -56,13 +56,13 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
         <div className="space-y-10">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl sm:text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Passeport Locatif.</h1>
+                    <h1 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2">Passeport Locatif.</h1>
                     <p className="text-xs sm:text-sm text-gray-500 font-medium tracking-wide">Valorisez votre historique et facilitez vos futurs emménagements.</p>
                 </div>
                 <button 
                     onClick={handleGenerate}
                     disabled={loading}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[11px] sm:text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 w-full md:w-auto"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] sm:text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 w-full md:w-auto"
                 >
                     <Plus size={18} />
                     {loading ? "Génération..." : "Générer mon Passeport"}
@@ -74,23 +74,23 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                 <div className="lg:col-span-1 space-y-6">
                     <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-xl bg-white">
                         <FileBadge size={40} className="mb-6 text-orange-400" />
-                        <h3 className="text-xl font-black uppercase tracking-tight mb-4 text-[#1F4E79]">La Garantie QAPRIL</h3>
+                        <h3 className="text-xl font-black uppercase tracking-tight mb-4 text-slate-800">La Garantie QAPRIL</h3>
                         <p className="text-[14px] leading-relaxed font-medium text-gray-500 mb-6">
                              Votre Passeport Locatif compile vos succès : paiements réguliers, baux menés à terme et score de confiance certifié. 
                              C'est un dossier complet, infalsifiable (SHA-256), prêt à être présenté aux bailleurs les plus exigeants.
                         </p>
                         <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-[#1F4E79]">
+                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-slate-800">
                                 <ShieldCheck size={16} className="text-emerald-500" /> Certifié par l'État (DGI)
                             </div>
-                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-[#1F4E79]">
+                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-slate-800">
                                 <Lock size={16} className="text-orange-400" /> Sécurisé par SHA-256
                             </div>
                         </div>
                     </div>
 
                     <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white">
-                         <h4 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-4">Statistiques Incluses</h4>
+                         <h4 className="font-black text-slate-800 uppercase tracking-tighter mb-4">Statistiques Incluses</h4>
                          <div className="space-y-4">
                              {[
                                 { label: "Historique Paiements", val: "12 mois" },
@@ -99,7 +99,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                              ].map((st, i) => (
                                 <div key={i} className="flex justify-between items-center border-b border-gray-50 pb-3">
                                     <span className="text-[10px] sm:text-[12px] font-black text-gray-400 uppercase tracking-widest">{st.label}</span>
-                                    <span className="text-[11px] sm:text-[13px] font-bold text-[#1F4E79]">{st.val}</span>
+                                    <span className="text-[11px] sm:text-[13px] font-bold text-slate-800">{st.val}</span>
                                 </div>
                              ))}
                          </div>
@@ -108,7 +108,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
 
                 {/* History Panel */}
                 <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter">Mes Passeports Certifiés</h2>
+                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">Mes Passeports Certifiés</h2>
                     
                     {list.length === 0 ? (
                         <div className="glass-panel p-20 rounded-[3rem] text-center border border-white/40 bg-white">
@@ -131,11 +131,11 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                     <div className="flex flex-col md:flex-row justify-between gap-8">
                                         <div className="space-y-6 flex-1">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#1F4E79] text-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-3 transition-transform shrink-0">
+                                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-800 text-white rounded-2xl flex items-center justify-center shadow-xl group-hover:rotate-3 transition-transform shrink-0">
                                                     <FileBadge size={32} />
                                                 </div>
                                                 <div className="overflow-hidden">
-                                                    <h4 className="text-xl sm:text-2xl font-black text-[#1F4E79] tracking-tighter italic uppercase truncate">{pass.refPasseport}</h4>
+                                                    <h4 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tighter italic uppercase truncate">{pass.refPasseport}</h4>
                                                     <p className="text-[10px] sm:text-[11px] font-black text-gray-400 uppercase tracking-widest">Généré le: {new Date(pass.createdAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
@@ -143,11 +143,11 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                                                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Score ICL</p>
-                                                    <p className="text-xl font-black text-[#1F4E79]">{pass.scoreGlobal}</p>
+                                                    <p className="text-xl font-black text-slate-800">{pass.scoreGlobal}</p>
                                                 </div>
                                                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Sérieux</p>
-                                                    <p className="text-xl font-black text-[#C55A11]">{pass.tauxPaiementGlobal}%</p>
+                                                    <p className="text-xl font-black text-amber-600">{pass.tauxPaiementGlobal}%</p>
                                                 </div>
                                                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Bails</p>
@@ -162,7 +162,7 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                         </div>
 
                                         <div className="flex flex-col justify-center items-center md:items-end w-full md:w-auto pt-6 md:pt-0 border-t md:border-t-0 border-gray-100">
-                                            <button className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn" onClick={(e) => { e.preventDefault(); toast.info('Génération PDF en arrière-plan...'); }}>
+                                            <button className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn" onClick={(e) => { e.preventDefault(); toast.info('Génération PDF en arrière-plan...'); }}>
                                                 <Download size={20} className="group-hover/btn:translate-y-1 transition-transform" />
                                                 PDF Premium
                                             </button>

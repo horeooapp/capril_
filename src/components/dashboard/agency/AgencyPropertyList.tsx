@@ -70,7 +70,7 @@ export const AgencyPropertyList: React.FC<{ properties: any[], user?: any }> = (
                         {p.propertyType}
                       </span>
                       <div className="h-1 w-1 bg-slate-200 rounded-full"></div>
-                      <span className="text-xs font-bold text-slate-400">Proprio: <span className="text-[#1F4E79]">{displayBailleur}</span></span>
+                      <span className="text-xs font-bold text-slate-400">Proprio: <span className="text-slate-800">{displayBailleur}</span></span>
                     </div>
                   </div>
                 </div>

@@ -145,7 +145,7 @@ export default function RechargeDrawer({
                   <Wallet size={24} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">Rechargement.</h2>
+                  <h2 className="text-xl font-black text-slate-800 tracking-tighter uppercase leading-none">Rechargement.</h2>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Wallet QAPRIL Zéro Friction</p>
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function RechargeDrawer({
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(Number(e.target.value))}
-                      className="w-full p-6 bg-gray-50 rounded-[1.5rem] text-3xl font-black text-[#1F4E79] focus:ring-2 focus:ring-ivoire-orange outline-none transition-all pr-20"
+                      className="w-full p-6 bg-gray-50 rounded-[1.5rem] text-3xl font-black text-slate-800 focus:ring-2 focus:ring-ivoire-orange outline-none transition-all pr-20"
                    />
                    <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xl font-black text-gray-400">FCFA</span>
                 </div>
@@ -176,7 +176,7 @@ export default function RechargeDrawer({
                       onClick={() => setAmount(val)}
                       className={`p-4 rounded-2xl text-[12px] font-black transition-all border ${
                         amount === val 
-                        ? 'bg-[#1F4E79] text-white border-[#1F4E79] shadow-lg shadow-blue-900/20' 
+                        ? 'bg-slate-800 text-white border-slate-800 shadow-lg shadow-blue-900/20' 
                         : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'
                       }`}
                     >
@@ -204,7 +204,7 @@ export default function RechargeDrawer({
                           <div className={`w-16 h-12 ${op.color} border border-gray-100 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden shrink-0`}>
                             {op.renderLogo()}
                           </div>
-                          <span className={`font-black text-[14px] uppercase tracking-widest ${selectedOp.id === op.id ? 'text-[#1F4E79]' : 'text-gray-500'}`}>
+                          <span className={`font-black text-[14px] uppercase tracking-widest ${selectedOp.id === op.id ? 'text-slate-800' : 'text-gray-500'}`}>
                             {op.name}
                           </span>
                        </div>
@@ -236,7 +236,7 @@ export default function RechargeDrawer({
                <button 
                   disabled={loading || amount < 100}
                   onClick={handleRecharge}
-                  className="w-full py-6 bg-[#C55A11] hover:bg-[#A54A0D] disabled:opacity-50 disabled:grayscale text-white rounded-[1.5rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-900/20 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                  className="w-full py-6 bg-amber-600 hover:bg-[#A54A0D] disabled:opacity-50 disabled:grayscale text-white rounded-[1.5rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-900/20 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                >
                  {loading ? (
                    <>

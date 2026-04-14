@@ -79,13 +79,13 @@ export default async function FeaturesPage() {
       {/* Header Premium - Alignement Charte P01/P02 */}
       <div className="flex flex-col gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[#C55A11] text-[12px] font-black uppercase tracking-[0.3em]">
+          <div className="flex items-center gap-2 text-amber-600 text-[12px] font-black uppercase tracking-[0.3em]">
             <Settings2 className="w-4 h-4" />
             <span>Paramètres Système</span>
           </div>
           {/* H1 Charte : 24sp / Bleu Nuit #1F4E79 */}
-          <h1 className="text-[24sp] md:text-[32px] font-black tracking-tight text-[#1F4E79] uppercase">
-            Gestion du <span className="text-[#C55A11]">Cœur</span>
+          <h1 className="text-[24sp] md:text-[32px] font-black tracking-tight text-slate-800 uppercase">
+            Gestion du <span className="text-amber-600">Cœur</span>
           </h1>
           {/* Body Charte : 16sp */}
           <p className="text-[16px] text-gray-500 max-w-2xl font-medium leading-relaxed">
@@ -96,13 +96,13 @@ export default async function FeaturesPage() {
 
       {/* Alerte Information - Couleurs Charte (Bleu Ciel Info #D6E4F0) */}
       <div className="bg-[#D6E4F0]/30 border border-[#D6E4F0] p-8 rounded-[32px] flex items-start gap-5">
-        <div className="p-3 bg-[#1F4E79] rounded-2xl text-white self-start shadow-md">
+        <div className="p-3 bg-slate-800 rounded-2xl text-white self-start shadow-md">
           <Info className="w-6 h-6" />
         </div>
         <div className="space-y-2">
           {/* H2 Charte : 20sp / Orange #C55A11 */}
-          <h4 className="text-[20px] font-bold text-[#C55A11]">Précaution d'Usage</h4>
-          <p className="text-[16px] text-[#1F4E79]/80 leading-relaxed font-medium">
+          <h4 className="text-[20px] font-bold text-amber-600">Précaution d'Usage</h4>
+          <p className="text-[16px] text-slate-800/80 leading-relaxed font-medium">
             La désactivation d'un module masquera les interfaces correspondantes pour tous les utilisateurs (Locataires, Propriétaires, Agences) mais ne supprimera pas les données en base.
           </p>
         </div>

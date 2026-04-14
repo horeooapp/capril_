@@ -44,7 +44,7 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
                         Mon Profil
                         <span className="hidden sm:inline-block bg-qnavy-dark text-white text-[10px] px-3 py-1 rounded-full not-italic tracking-widest font-black uppercase shadow-md shadow-qnavy/20">LOCATAIRE</span>
                     </h1>
-                    <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-[#C55A11] mt-1 truncate">
+                    <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-amber-600 mt-1 truncate">
                         Données personnelles & Sécurité
                     </p>
                 </div>
@@ -121,8 +121,8 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
             {user?.locataireProfile && (
                 <motion.div variants={itemVariants} className="bg-white p-6 sm:p-10 rounded-[2rem] border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.04)] mt-8">
                      <div className="flex items-center gap-3 border-b-2 border-qgrey-1 pb-6 mb-8">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#C55A11]/10 rounded-xl flex items-center justify-center shrink-0">
-                            <Bell size={22} className="text-[#C55A11]" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-600/10 rounded-xl flex items-center justify-center shrink-0">
+                            <Bell size={22} className="text-amber-600" />
                         </div>
                         <div>
                             <h3 className="text-lg sm:text-xl font-black text-qnavy-dark uppercase tracking-widest leading-none">

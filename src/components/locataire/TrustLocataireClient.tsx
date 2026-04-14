@@ -64,7 +64,7 @@ export default function TrustLocataireClient({ profile }: any) {
                 
                 <div className="relative">
                     <div className="w-48 h-48 rounded-full border-[12px] border-gray-50 flex flex-col items-center justify-center relative bg-white shadow-inner">
-                        <span className="text-6xl font-black text-[#1F4E79] tracking-tighter">{score}</span>
+                        <span className="text-6xl font-black text-slate-800 tracking-tighter">{score}</span>
                         <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Points</span>
                         <motion.div 
                             initial={{ scale: 0 }}
@@ -77,14 +77,14 @@ export default function TrustLocataireClient({ profile }: any) {
                 </div>
 
                 <div className="flex-1 space-y-6 text-center md:text-left relative z-10">
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2 italic">Indice ICL.</h1>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2 italic">Indice ICL.</h1>
                     <p className="text-lg text-gray-500 font-medium">L'Indice de Confiance Locatif est votre meilleure recommandation pour louer sans caution ou négocier votre loyer.</p>
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-[#1F4E79] uppercase tracking-widest flex items-center gap-2">
+                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                             <TrendingUp size={16} className="text-[#375623]" />
                             Score : {badge === 'A+' ? 'Excellent' : badge === 'A' ? 'Très Bon' : 'En progression'}
                          </div>
-                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-[#1F4E79] uppercase tracking-widest flex items-center gap-2">
+                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                             <Zap size={16} className="text-orange-400" />
                             Réactualisé en temps réel
                          </div>
@@ -95,7 +95,7 @@ export default function TrustLocataireClient({ profile }: any) {
             {/* Criteria Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
-                    <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-3">
+                    <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter flex items-center gap-3">
                         <Info size={24} className="text-blue-500" />
                         Critères de Performance
                     </h2>
@@ -108,7 +108,7 @@ export default function TrustLocataireClient({ profile }: any) {
                                             {item.icon}
                                         </div>
                                         <div>
-                                            <h4 className="font-black text-[#1F4E79] uppercase tracking-tight">{item.label}</h4>
+                                            <h4 className="font-black text-slate-800 uppercase tracking-tight">{item.label}</h4>
                                             <p className="text-[12px] text-gray-400 font-medium">{item.desc}</p>
                                         </div>
                                     </div>
@@ -121,7 +121,7 @@ export default function TrustLocataireClient({ profile }: any) {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${item.score}%` }}
                                         transition={{ duration: 1, delay: i * 0.1 }}
-                                        className="h-full bg-gradient-to-r from-[#1F4E79] to-blue-400"
+                                        className="h-full bg-gradient-to-r from-slate-800 to-blue-400"
                                      />
                                 </div>
                             </div>
@@ -131,7 +131,7 @@ export default function TrustLocataireClient({ profile }: any) {
 
                 {/* Benefits / Tips */}
                 <div className="space-y-8">
-                     <div className="glass-panel p-8 rounded-[3rem] border border-white/40 shadow-xl bg-[#1F4E79] text-white">
+                     <div className="glass-panel p-8 rounded-[3rem] border border-white/40 shadow-xl bg-slate-800 text-white">
                          <h3 className="text-xl font-black uppercase tracking-tight mb-8 italic">Privilèges Accès {badge >= 'B' ? 'Premium' : 'Standard'}</h3>
                          <div className="space-y-6">
                              {[
@@ -153,18 +153,18 @@ export default function TrustLocataireClient({ profile }: any) {
                      </div>
 
                      <div className="glass-panel p-8 rounded-[3rem] border border-white/40 shadow-xl bg-orange-50/50">
-                         <h3 className="text-xl font-black text-[#C55A11] uppercase tracking-tight mb-4">Gagner des points ?</h3>
+                         <h3 className="text-xl font-black text-amber-600 uppercase tracking-tight mb-4">Gagner des points ?</h3>
                          <ul className="space-y-4">
                              <li className="flex items-start gap-3">
-                                <div className="w-6 h-6 bg-[#C55A11] text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">1</div>
+                                <div className="w-6 h-6 bg-amber-600 text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">1</div>
                                 <p className="text-[14px] font-medium text-gray-700">Payez vos factures Horeoo à temps via la plateforme (+20 pts).</p>
                              </li>
                              <li className="flex items-start gap-3">
-                                <div className="w-6 h-6 bg-[#C55A11] text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">2</div>
+                                <div className="w-6 h-6 bg-amber-600 text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">2</div>
                                 <p className="text-[14px] font-medium text-gray-700">Faites certifier votre caution par la CDC-CI (+50 pts).</p>
                              </li>
                              <li className="flex items-start gap-3">
-                                <div className="w-6 h-6 bg-[#C55A11] text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">3</div>
+                                <div className="w-6 h-6 bg-amber-600 text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">3</div>
                                 <p className="text-[14px] font-medium text-gray-700">Finalisez votre profil KYC à 100% (+100 pts).</p>
                              </li>
                          </ul>

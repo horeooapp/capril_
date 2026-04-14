@@ -207,7 +207,7 @@ export function NotificationSettings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-[#C55A11] hover:bg-[#A34A0D] text-white px-6 py-3 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 bg-amber-600 hover:bg-[#A34A0D] text-white px-6 py-3 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

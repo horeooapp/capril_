@@ -57,13 +57,13 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
         <div className="space-y-8 animate-in fade-in duration-500">
              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Préavis.</h1>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2">Préavis.</h1>
                     <p className="text-gray-500 font-medium tracking-wide">Déclaration de départ officielle et certifiée SHA-256.</p>
                 </div>
                 {!isCreating && (
                     <button 
                         onClick={() => setIsCreating(true)}
-                        className="flex items-center gap-2 px-8 py-4 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95"
+                        className="flex items-center gap-2 px-8 py-4 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95"
                     >
                         <MessageSquare size={18} />
                         Déclarer mon départ
@@ -72,8 +72,8 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
             </div>
 
             {isCreating && (
-                <div className="glass-panel p-8 md:p-10 rounded-[2.5rem] border-2 border-[#C55A11]/20 bg-white/80 shadow-2xl animate-in zoom-in-95 duration-300">
-                     <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter mb-8 italic">Notice de départ</h2>
+                <div className="glass-panel p-8 md:p-10 rounded-[2.5rem] border-2 border-amber-600/20 bg-white/80 shadow-2xl animate-in zoom-in-95 duration-300">
+                     <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-8 italic">Notice de départ</h2>
                      
                      <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-4">
@@ -89,7 +89,7 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
                                 <input 
                                     type="date"
                                     required
-                                    className="w-full px-6 py-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-black text-[#1F4E79]"
+                                    className="w-full px-6 py-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-black text-slate-800"
                                     value={formData.dateDepartPrevue}
                                     onChange={(e) => setFormData({...formData, dateDepartPrevue: e.target.value})}
                                 />
@@ -110,7 +110,7 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
                              <button 
                                 type="submit"
                                 disabled={loading}
-                                className="flex-1 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                                className="flex-1 py-5 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
                              >
                                 <Send size={18} />
                                 {loading ? "Certification en cours..." : "Signer et envoyer le préavis"}
@@ -128,7 +128,7 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
             )}
 
             <div className="space-y-6">
-                <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter">Historique des demandes</h2>
+                <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">Historique des demandes</h2>
                 {list.length === 0 ? (
                     <div className="glass-panel p-16 rounded-[2.5rem] border border-white/40 text-center">
                         <MessageSquare size={40} className="mx-auto text-gray-100 mb-4" />
@@ -139,18 +139,18 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
                         {list.map((pre: any) => (
                             <div key={pre.id} className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-8 flex items-center gap-2">
-                                     <span className={`px-4 py-1.5 rounded-full border text-[11px] font-black uppercase tracking-widest ${pre.statut === 'EMIS' ? 'bg-orange-50 text-[#C55A11]' : 'bg-emerald-50 text-[#375623]'}`}>
+                                     <span className={`px-4 py-1.5 rounded-full border text-[11px] font-black uppercase tracking-widest ${pre.statut === 'EMIS' ? 'bg-orange-50 text-amber-600' : 'bg-emerald-50 text-[#375623]'}`}>
                                          {pre.statut}
                                      </span>
                                 </div>
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 bg-[#1F4E79] text-white rounded-2xl flex items-center justify-center shadow-lg">
+                                        <div className="w-14 h-14 bg-slate-800 text-white rounded-2xl flex items-center justify-center shadow-lg">
                                             <Calendar size={28} />
                                         </div>
                                         <div>
                                             <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-1">Date de départ prévue</p>
-                                            <p className="text-2xl font-black text-[#1F4E79]">
+                                            <p className="text-2xl font-black text-slate-800">
                                                 {new Date(pre.dateDepartPrevue).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </p>
                                         </div>
@@ -160,7 +160,7 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
                                         <div>
                                             <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Référence Certifiée</p>
                                             <div className="flex items-center gap-3">
-                                                 <Hash size={16} className="text-[#C55A11]" />
+                                                 <Hash size={16} className="text-amber-600" />
                                                  <span className="text-[14px] font-bold text-gray-700">{pre.refPreavis}</span>
                                             </div>
                                         </div>

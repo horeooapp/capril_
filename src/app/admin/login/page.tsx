@@ -12,8 +12,8 @@ export default function AdminLoginPage() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_90%)] opacity-20"></div>
             
             {/* Glowing Orbs */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1F4E79] opacity-20 blur-[120px] rounded-full animate-pulse"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#C55A11] opacity-10 blur-[100px] rounded-full"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-slate-800 opacity-20 blur-[120px] rounded-full animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-amber-600 opacity-10 blur-[100px] rounded-full"></div>
 
             <div className="relative z-10 w-full max-w-lg px-6">
                 <motion.div
@@ -29,9 +29,9 @@ export default function AdminLoginPage() {
                                 alt="QAPRIL Logo" 
                                 className="w-40 h-auto hover:scale-105 transition-transform duration-500 drop-shadow-2xl" 
                             />
-                            <div className="mt-8 inline-flex items-center gap-2 px-3 py-1 bg-[#C55A11]/10 rounded-full border border-[#C55A11]/30">
-                                <Activity className="w-3 h-3 text-[#C55A11] animate-pulse" />
-                                <span className="text-[9px] font-black text-[#C55A11] uppercase tracking-[0.2em]">Console Sécurisée v3.0</span>
+                            <div className="mt-8 inline-flex items-center gap-2 px-3 py-1 bg-amber-600/10 rounded-full border border-amber-600/30">
+                                <Activity className="w-3 h-3 text-amber-600 animate-pulse" />
+                                <span className="text-[9px] font-black text-amber-600 uppercase tracking-[0.2em]">Console Sécurisée v3.0</span>
                             </div>
                         </Link>
                     </div>
@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
                             <span className="text-[7px] font-black text-gray-500 uppercase tracking-widest text-center leading-tight">Bio-Auth <br/> Prête</span>
                         </div>
                         <div className="flex flex-col items-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-                            <Activity className="w-4 h-4 text-[#C55A11] mb-2" />
+                            <Activity className="w-4 h-4 text-amber-600 mb-2" />
                             <span className="text-[7px] font-black text-gray-500 uppercase tracking-widest text-center leading-tight">Réseau <br/> Chiffré</span>
                         </div>
                     </div>

@@ -37,16 +37,16 @@ export const RclMonitor: React.FC = () => {
       <div className="max-w-6xl mx-auto mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">RCL-144 Monitor.</h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11] mt-1">Surveillance des Révisions de Loyer — Règle 6.1</p>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">RCL-144 Monitor.</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mt-1">Surveillance des Révisions de Loyer — Règle 6.1</p>
           </div>
           <div className="flex gap-4">
              <div className="bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tickets Critiques</span>
-                <span className="text-lg font-black text-[#1F4E79]">01</span>
+                <span className="text-lg font-black text-slate-800">01</span>
              </div>
-             <div className="bg-[#1F4E79] px-6 py-3 rounded-2xl text-white shadow-xl shadow-blue-900/20 flex items-center gap-3">
+             <div className="bg-slate-800 px-6 py-3 rounded-2xl text-white shadow-xl shadow-blue-900/20 flex items-center gap-3">
                 <Zap size={16} className="text-orange-400" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Taux d'automatisation</span>
                 <span className="text-lg font-black">94%</span>
@@ -60,7 +60,7 @@ export const RclMonitor: React.FC = () => {
         <div className="lg:col-span-8 space-y-6">
            <div className="flex items-center justify-between px-4">
               <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Procédures en cours</h3>
-              <button className="text-[10px] font-black text-[#1F4E79] uppercase hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Voir les archives</button>
+              <button className="text-[10px] font-black text-slate-800 uppercase hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Voir les archives</button>
            </div>
            
            <div className="space-y-4">
@@ -85,7 +85,7 @@ export const RclMonitor: React.FC = () => {
                                 🏠
                              </div>
                              <div>
-                                <h4 className="text-[15px] font-black text-[#1F4E79] uppercase tracking-tight">{t.property}</h4>
+                                <h4 className="text-[15px] font-black text-slate-800 uppercase tracking-tight">{t.property}</h4>
                                 <div className="flex items-center gap-3 mt-1">
                                    <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400">
                                       <User size={12} />
@@ -100,7 +100,7 @@ export const RclMonitor: React.FC = () => {
                              <div className="flex items-center gap-4">
                                 <div className="text-right">
                                    <div className={`text-sm font-black uppercase tracking-tighter ${
-                                      t.status === 'critical' ? 'text-red-500' : t.status === 'warning' ? 'text-[#C55A11]' : 'text-emerald-500'
+                                      t.status === 'critical' ? 'text-red-500' : t.status === 'warning' ? 'text-amber-600' : 'text-emerald-500'
                                    }`}>
                                       {t.hoursLeft}h Restantes
                                    </div>
@@ -116,7 +116,7 @@ export const RclMonitor: React.FC = () => {
                                         initial={{ strokeDashoffset: 150.8 }}
                                         animate={{ strokeDashoffset: 150.8 - (150.8 * (globalThreshold - t.hoursLeft)) / globalThreshold }}
                                         transition={{ duration: 1.5 }}
-                                        className={t.status === 'critical' ? 'text-red-500' : t.status === 'warning' ? 'text-[#C55A11]' : 'text-emerald-500'}
+                                        className={t.status === 'critical' ? 'text-red-500' : t.status === 'warning' ? 'text-amber-600' : 'text-emerald-500'}
                                       />
                                    </svg>
                                    <Clock size={16} className="absolute text-slate-400" />
@@ -125,7 +125,7 @@ export const RclMonitor: React.FC = () => {
 
                              <button 
                                onClick={() => simulateResolution(t.id)}
-                               className="px-6 py-2 bg-slate-50 text-[#1F4E79] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1F4E79] hover:text-white transition-all shadow-sm"
+                               className="px-6 py-2 bg-slate-50 text-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-all shadow-sm"
                              >
                                 Relancer le Bailleur
                              </button>
@@ -139,7 +139,7 @@ export const RclMonitor: React.FC = () => {
 
         {/* Right: Policy & Stats */}
         <div className="lg:col-span-4 space-y-6">
-           <div className="bg-[#1F4E79] p-8 rounded-[3rem] text-white shadow-xl relative overflow-hidden group">
+           <div className="bg-slate-800 p-8 rounded-[3rem] text-white shadow-xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500 blur-[50px] opacity-10"></div>
               <h3 className="text-xl font-black uppercase tracking-tighter italic mb-6">Protocole RCL-144.</h3>
               <div className="space-y-6">
@@ -178,7 +178,7 @@ export const RclMonitor: React.FC = () => {
               <div className="space-y-4">
                  <div className="flex justify-between items-center text-[12px]">
                     <span className="font-bold text-slate-400 uppercase">Volume Projeté</span>
-                    <span className="font-black text-[#1F4E79]">+1,250,000 FCFA</span>
+                    <span className="font-black text-slate-800">+1,250,000 FCFA</span>
                  </div>
                  <div className="flex justify-between items-center text-[12px]">
                     <span className="font-bold text-slate-400 uppercase">Risque Auto-clôture</span>
@@ -193,7 +193,7 @@ export const RclMonitor: React.FC = () => {
                              animate={{ opacity: 1 }}
                              exit={{ opacity: 0 }}
                              onClick={() => setIsAdjusting(true)}
-                             className="w-full py-4 bg-orange-50 text-[#C55A11] rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-orange-100 transition-all flex items-center justify-center gap-2"
+                             className="w-full py-4 bg-orange-50 text-amber-600 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-orange-100 transition-all flex items-center justify-center gap-2"
                           >
                              Ajuster les seuils
                              <ArrowUpRight size={14} />
@@ -207,8 +207,8 @@ export const RclMonitor: React.FC = () => {
                              className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-100"
                           >
                              <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">Seuil d'alerte (Heures)</span>
-                                <span className="text-lg font-black text-[#C55A11]">{globalThreshold}h</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-800">Seuil d'alerte (Heures)</span>
+                                <span className="text-lg font-black text-amber-600">{globalThreshold}h</span>
                              </div>
                              <input 
                                 type="range" 
@@ -220,7 +220,7 @@ export const RclMonitor: React.FC = () => {
                              <div className="flex gap-2">
                                 <button 
                                    onClick={() => setIsAdjusting(false)}
-                                   className="flex-1 py-3 bg-[#1F4E79] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-900 transition-colors"
+                                   className="flex-1 py-3 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-900 transition-colors"
                                 >
                                    Sauvegarder
                                 </button>

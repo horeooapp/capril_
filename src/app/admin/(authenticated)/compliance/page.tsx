@@ -26,7 +26,7 @@ export default async function CompliancePage() {
                         <div className="p-3 bg-red-50 rounded-2xl text-red-600">
                             <ShieldAlert size={32} />
                         </div>
-                        <h1 className="text-4xl font-black text-[#1F4E79] tracking-tight uppercase">
+                        <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase">
                             Conformité
                         </h1>
                     </div>
@@ -36,7 +36,7 @@ export default async function CompliancePage() {
                 </div>
                 
                 <div className="flex gap-4">
-                    <a href="/admin/validation" className="px-6 py-4 bg-white text-[#1F4E79] font-black rounded-2xl border-2 border-[#1F4E79]/10 hover:bg-gray-50 transition-all flex items-center gap-3 uppercase tracking-widest text-xs">
+                    <a href="/admin/validation" className="px-6 py-4 bg-white text-slate-800 font-black rounded-2xl border-2 border-slate-800/10 hover:bg-gray-50 transition-all flex items-center gap-3 uppercase tracking-widest text-xs">
                         <Search size={18} />
                         Vérifier Document
                     </a>

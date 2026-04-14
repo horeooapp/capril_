@@ -69,7 +69,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Ma Caution.</h1>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2">Ma Caution.</h1>
                     <p className="text-gray-500 font-medium tracking-wide">Certification numérique et traçabilité SHA-256 de vos dépôts.</p>
                 </div>
                 {caution && (
@@ -85,8 +85,8 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                 {!caution ? (
                     <div className="glass-panel p-8 md:p-10 rounded-[2.5rem] border border-white/40 shadow-xl bg-white space-y-8">
                         <div className="flex items-center gap-4 p-4 bg-orange-50 border border-orange-100 rounded-2xl">
-                           <AlertCircle size={24} className="text-[#C55A11]" />
-                           <p className="text-[13px] font-bold text-[#C55A11]">Votre caution n'est pas encore certifiée dans le système QAPRIL Secure.</p>
+                           <AlertCircle size={24} className="text-amber-600" />
+                           <p className="text-[13px] font-bold text-amber-600">Votre caution n'est pas encore certifiée dans le système QAPRIL Secure.</p>
                         </div>
 
                         <form onSubmit={handleCertify} className="space-y-6">
@@ -96,7 +96,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                                     <input 
                                         type="number"
                                         required
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-black text-[#1F4E79]"
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-black text-slate-800"
                                         value={formData.montantFcfa}
                                         onChange={(e) => setFormData({...formData, montantFcfa: parseInt(e.target.value)})}
                                     />
@@ -104,7 +104,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                                 <div>
                                     <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Mode</label>
                                     <select 
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-[#1F4E79]"
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-slate-800"
                                         value={formData.modeVersement}
                                         onChange={(e) => setFormData({...formData, modeVersement: e.target.value})}
                                     >
@@ -118,7 +118,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                              <div>
                                 <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Destination du dépôt</label>
                                 <select 
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-[#1F4E79]"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-slate-800"
                                     value={formData.destination}
                                     onChange={(e) => setFormData({...formData, destination: e.target.value})}
                                 >
@@ -141,7 +141,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                              <button 
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                                className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                              >
                                 <Lock size={18} />
                                 {loading ? "Certification..." : "Certifier mon dépôt"}
@@ -155,14 +155,14 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                         </div>
                         
                         <div>
-                            <h2 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Dépôt Garanti.</h2>
+                            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-1">Dépôt Garanti.</h2>
                             <p className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Référence Certificat: {caution.certificatRef}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Montant Consigné</p>
-                                <p className="text-3xl font-black text-[#1F4E79]">{Number(caution.montantFcfa).toLocaleString()} <span className="text-lg">FCFA</span></p>
+                                <p className="text-3xl font-black text-slate-800">{Number(caution.montantFcfa).toLocaleString()} <span className="text-lg">FCFA</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Date de Versement</p>
@@ -170,7 +170,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Destination</p>
-                                <p className="text-lg font-black text-[#C55A11]">{caution.destination}</p>
+                                <p className="text-lg font-black text-amber-600">{caution.destination}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Méthode</p>
@@ -179,7 +179,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                         </div>
 
                         <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 flex items-start gap-4">
-                            <div className="p-2 bg-[#1F4E79] text-white rounded-xl">
+                            <div className="p-2 bg-slate-800 text-white rounded-xl">
                                 <Hash size={18} />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -202,7 +202,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
 
                 {/* Info Card */}
                 <div className="space-y-6">
-                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-gradient-to-br from-[#1F4E79] to-[#122e47] text-white">
+                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-gradient-to-br from-slate-800 to-[#122e47] text-white">
                         <h3 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2">
                             <ShieldCheck size={24} />
                             Pourquoi certifier ?
@@ -224,11 +224,11 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
 
                     {/* Preavis Card */}
                     <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-white relative overflow-hidden group">
-                        <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tight mb-2">Libérer le Logement ?</h3>
+                        <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight mb-2">Libérer le Logement ?</h3>
                         <p className="text-gray-500 text-[14px] font-medium mb-6">
                             L'émission d'un préavis numérique est obligatoire pour officialiser votre départ et planifier l'état des lieux.
                         </p>
-                        <Link href="/mon-espace-locataire/preavis" className="flex items-center gap-2 text-[#1F4E79] font-black uppercase tracking-widest text-[12px] group-hover:gap-4 transition-all">
+                        <Link href="/mon-espace-locataire/preavis" className="flex items-center gap-2 text-slate-800 font-black uppercase tracking-widest text-[12px] group-hover:gap-4 transition-all">
                             Déclarer mon préavis <ArrowRight size={16} />
                         </Link>
                     </div>

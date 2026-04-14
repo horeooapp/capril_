@@ -64,7 +64,7 @@ export default function MigrationUpload() {
         <div className="flex flex-col items-center">
             {status === "idle" && (
                 <label className="group cursor-pointer">
-                    <div className="px-8 py-4 bg-[#C55A11] text-white font-black rounded-2xl shadow-xl shadow-[#C55A11]/20 group-hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm">
+                    <div className="px-8 py-4 bg-amber-600 text-white font-black rounded-2xl shadow-xl shadow-[#C55A11]/20 group-hover:scale-105 active:scale-95 transition-all flex items-center gap-3 uppercase tracking-widest text-sm">
                         <Upload size={20} />
                         Nouvel Import
                     </div>
@@ -74,13 +74,13 @@ export default function MigrationUpload() {
 
             {(status === "uploading" || status === "processing") && (
                 <div className="flex flex-col items-center gap-4">
-                    <div className="flex items-center gap-3 text-[#1F4E79] font-black uppercase tracking-widest text-sm animate-pulse">
+                    <div className="flex items-center gap-3 text-slate-800 font-black uppercase tracking-widest text-sm animate-pulse">
                         <Loader2 className="animate-spin" size={20} />
                         {status === "uploading" ? "Téléchargement..." : `Traitement (${progress}%)`}
                     </div>
                     <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div 
-                            className="h-full bg-[#C55A11] transition-all duration-300" 
+                            className="h-full bg-amber-600 transition-all duration-300" 
                             style={{ width: `${progress}%` }}
                         />
                     </div>

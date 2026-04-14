@@ -48,7 +48,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
 
     return (
         <div className="w-full max-w-sm">
-            <h2 className="mt-6 text-3xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
+            <h2 className="mt-6 text-3xl font-black text-slate-800 tracking-tighter uppercase leading-none">
                 {title}
             </h2>
             <p className="mt-4 text-[16px] text-gray-500 font-medium">
@@ -64,7 +64,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
             {step === 'PHONE' ? (
                 <form className="space-y-6" onSubmit={handleRequestOTP}>
                     <div>
-                        <label htmlFor="phone" className="block text-[14px] font-black text-[#1F4E79] uppercase tracking-widest mb-2">
+                        <label htmlFor="phone" className="block text-[14px] font-black text-slate-800 uppercase tracking-widest mb-2">
                             Votre Email
                         </label>
                         <div className="mt-1">
@@ -75,7 +75,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                                 required
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
-                                className="appearance-none block w-full px-5 py-4 border border-gray-200 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55A11] focus:border-[#C55A11] text-[16px] font-bold"
+                                className="appearance-none block w-full px-5 py-4 border border-gray-200 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55A11] focus:border-amber-600 text-[16px] font-bold"
                                 placeholder="votre@email.com"
                             />
                         </div>
@@ -85,14 +85,14 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="w-full flex justify-center py-5 px-4 border border-transparent rounded-2xl shadow-xl text-[14px] font-black uppercase tracking-widest text-white bg-[#C55A11] hover:bg-[#A54A0D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C55A11] transition-all active:scale-95 disabled:opacity-50 min-h-[48px]"
+                            className="w-full flex justify-center py-5 px-4 border border-transparent rounded-2xl shadow-xl text-[14px] font-black uppercase tracking-widest text-white bg-amber-600 hover:bg-[#A54A0D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C55A11] transition-all active:scale-95 disabled:opacity-50 min-h-[48px]"
                         >
                             {isPending ? 'Envoi...' : 'Recevoir le code par SMS'}
                         </button>
                     </div>
 
                     <div className="mt-4 p-4 bg-blue-50/50 border border-blue-100 rounded-2xl">
-                        <p className="text-[12px] font-bold text-[#1F4E79] leading-relaxed">
+                        <p className="text-[12px] font-bold text-slate-800 leading-relaxed">
                             Votre compte sera créé automatiquement si nécessaire. <br />
                             <span className="text-[10px] uppercase tracking-widest opacity-60">Protocole QAPRIL Verify activé</span>
                         </p>
@@ -101,7 +101,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
             ) : (
                 <form className="space-y-6" onSubmit={handleVerifyOTP}>
                     <div>
-                        <label htmlFor="otp" className="block text-[14px] font-black text-[#1F4E79] uppercase tracking-widest mb-2">
+                        <label htmlFor="otp" className="block text-[14px] font-black text-slate-800 uppercase tracking-widest mb-2">
                             Code de vérification (6 chiffres)
                         </label>
                         <div className="mt-1">
@@ -113,7 +113,7 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                                 required
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
-                                className="appearance-none block w-full px-5 py-5 border border-gray-200 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55A11] focus:border-[#C55A11] text-2xl text-center tracking-[0.5em] font-black text-[#1F4E79]"
+                                className="appearance-none block w-full px-5 py-5 border border-gray-200 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C55A11] focus:border-amber-600 text-2xl text-center tracking-[0.5em] font-black text-slate-800"
                                 placeholder="000000"
                             />
                         </div>
@@ -123,14 +123,14 @@ export default function AuthForm({ role, redirectPath, title, subtitle }: AuthFo
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="w-full flex justify-center py-5 px-4 border border-transparent rounded-2xl shadow-xl text-[14px] font-black uppercase tracking-widest text-white bg-[#C55A11] hover:bg-[#A54A0D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C55A11] transition-all active:scale-95 disabled:opacity-50 min-h-[48px]"
+                            className="w-full flex justify-center py-5 px-4 border border-transparent rounded-2xl shadow-xl text-[14px] font-black uppercase tracking-widest text-white bg-amber-600 hover:bg-[#A54A0D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C55A11] transition-all active:scale-95 disabled:opacity-50 min-h-[48px]"
                         >
                             {isPending ? 'Vérification...' : 'Se connecter'}
                         </button>
                         <button
                             type="button"
                             onClick={() => setStep('PHONE')}
-                            className="w-full mt-6 text-[14px] font-bold text-gray-400 hover:text-[#1F4E79] uppercase tracking-widest transition-colors"
+                            className="w-full mt-6 text-[14px] font-bold text-gray-400 hover:text-slate-800 uppercase tracking-widest transition-colors"
                         >
                             Modifier le numéro
                         </button>

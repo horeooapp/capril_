@@ -20,7 +20,7 @@ export default function LoginPage() {
             description: "Supervisez votre patrimoine immobilier.",
             href: "/dashboard/login",
             icon: Building2,
-            color: "from-[#1F4E79] to-[#0F172A]",
+            color: "from-slate-800 to-[#0F172A]",
             shadow: "shadow-[#1F4E79]/20",
             tag: "Patrimoine"
         },
@@ -47,10 +47,10 @@ export default function LoginPage() {
                 className="text-center mb-16 relative z-10"
             >
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 mb-6 font-black text-[10px] uppercase tracking-widest text-gray-400">
-                    <Sparkles className="w-3 h-3 text-[#C55A11]" />
+                    <Sparkles className="w-3 h-3 text-amber-600" />
                     Portail Officiel QAPRIL
                 </div>
-                <h1 className="text-5xl font-[1000] text-[#1F4E79] tracking-tighter uppercase leading-none mb-4">
+                <h1 className="text-5xl font-[1000] text-slate-800 tracking-tighter uppercase leading-none mb-4">
                     Choisissez votre <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-500">interface.</span>
                 </h1>
@@ -83,7 +83,7 @@ export default function LoginPage() {
                                     {portal.tag}
                                 </span>
                                 
-                                <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-4 group-hover:text-[#1F4E79] transition-colors">
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-4 group-hover:text-slate-800 transition-colors">
                                     {portal.title}
                                 </h2>
                                 
@@ -91,7 +91,7 @@ export default function LoginPage() {
                                     {portal.description}
                                 </p>
                                 
-                                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1F4E79]">
+                                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-800">
                                     Accéder <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
                 </p>
                 <Link 
                     href="/" 
-                    className="inline-flex items-center gap-2 text-[10px] font-black text-[#1F4E79] hover:text-[#C55A11] uppercase tracking-[0.2em] transition-colors group"
+                    className="inline-flex items-center gap-2 text-[10px] font-black text-slate-800 hover:text-amber-600 uppercase tracking-[0.2em] transition-colors group"
                 >
                     <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                     Retour à l'accueil

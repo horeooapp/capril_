@@ -33,10 +33,10 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                     <div className="mb-2 bg-gradient-to-r from-blue-500 to-[#1F4E79] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
+                     <div className="mb-2 bg-gradient-to-r from-blue-500 to-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
                         <ShieldCheck size={12} /> Audit & Sécurité
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-[#1F4E79] uppercase tracking-tighter flex items-center gap-3 mt-2">
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-800 uppercase tracking-tighter flex items-center gap-3 mt-2">
                         <Activity className="text-blue-500" size={32} /> Rapprochement Bancaire
                     </h1>
                     <p className="text-sm font-medium text-gray-500 mt-1">
@@ -47,7 +47,7 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
                     <button 
                         onClick={() => handleRecon(PaymentCanal.WAVE)}
                         disabled={isPending}
-                        className="bg-[#1F4E79] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#2c6aa5] transition-all shadow-md flex items-center gap-2 disabled:opacity-50">
+                        className="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#2c6aa5] transition-all shadow-md flex items-center gap-2 disabled:opacity-50">
                         <RefreshCw size={16} className={isPending ? 'animate-spin' : ''} /> Synchroniser Wave
                     </button>
                     <button 
@@ -62,7 +62,7 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
                      <p className="text-[10px] uppercase tracking-widest font-black text-gray-500">Opérations Contrôlées Ce Mois</p>
-                     <p className="text-3xl font-black text-[#1F4E79] mt-1">{recons.reduce((acc, r)=> acc + r.nbTransactionsQapril, 0)}</p>
+                     <p className="text-3xl font-black text-slate-800 mt-1">{recons.reduce((acc, r)=> acc + r.nbTransactionsQapril, 0)}</p>
                  </div>
                  <div className="bg-green-50 border border-green-200 rounded-3xl p-6 shadow-sm">
                      <p className="text-[10px] uppercase tracking-widest font-black text-green-700">Volume Total (FCFA)</p>
@@ -76,7 +76,7 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
 
             <div className="bg-white rounded-[2rem] border border-gray-200 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h2 className="text-sm font-black text-[#1F4E79] flex items-center gap-2">
+                    <h2 className="text-sm font-black text-slate-800 flex items-center gap-2">
                         Historique des Audits
                     </h2>
                 </div>
@@ -96,10 +96,10 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
                             {recons.map((r: any) => (
                                 <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                                     <td className="p-4">
-                                        <p className="font-bold text-sm text-[#1F4E79]">{new Date(r.dateRecon).toLocaleDateString()}</p>
+                                        <p className="font-bold text-sm text-slate-800">{new Date(r.dateRecon).toLocaleDateString()}</p>
                                         <p className="text-[10px] font-black uppercase text-gray-400">{new Date(r.dateRecon).toLocaleTimeString()}</p>
                                     </td>
-                                    <td className="p-4 font-black text-xs text-[#1F4E79]">
+                                    <td className="p-4 font-black text-xs text-slate-800">
                                          <span className={`px-3 py-1 rounded-full text-[9px] ${r.canal === 'WAVE' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                                             {r.canal}
                                          </span>

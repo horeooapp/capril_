@@ -48,10 +48,10 @@ export default function OnboardingPage() {
             <div className="flex items-center justify-between mb-12 max-w-sm mx-auto">
                 {steps.map((s, i) => (
                     <div key={s} className="flex flex-col items-center relative group">
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-black transition-all ${i <= currentIdx ? 'bg-[#C55A11] text-white shadow-lg shadow-orange-950/20' : 'bg-white/50 text-gray-400 border border-gray-100'}`}>
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-black transition-all ${i <= currentIdx ? 'bg-amber-600 text-white shadow-lg shadow-orange-950/20' : 'bg-white/50 text-gray-400 border border-gray-100'}`}>
                             {i + 1}
                         </div>
-                        <span className={`text-[9px] mt-2 font-black uppercase tracking-widest ${i <= currentIdx ? 'text-[#C55A11]' : 'text-gray-400'}`}>{s}</span>
+                        <span className={`text-[9px] mt-2 font-black uppercase tracking-widest ${i <= currentIdx ? 'text-amber-600' : 'text-gray-400'}`}>{s}</span>
                     </div>
                 ))}
             </div>
@@ -69,10 +69,10 @@ export default function OnboardingPage() {
                     <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto drop-shadow-2xl" />
                 </div>
                 <div className="text-center space-y-4 mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md border border-white/50 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-[#C55A11] shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md border border-white/50 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-amber-600 shadow-sm">
                         Certification État Ivroirien
                     </div>
-                    <h2 className="text-5xl lg:text-6xl font-[1000] text-[#1F4E79] tracking-tighter uppercase leading-none">
+                    <h2 className="text-5xl lg:text-6xl font-[1000] text-slate-800 tracking-tighter uppercase leading-none">
                         Configuration <br />
                         <span className="italic font-serif normal-case text-gray-900">de votre supervision.</span>
                     </h2>
@@ -93,7 +93,7 @@ export default function OnboardingPage() {
                     {step === 'ROLE' && (
                         <div className="space-y-10">
                             <div className="text-center border-b border-gray-100 pb-8 mb-8">
-                                <h3 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Choisissez votre profil.</h3>
+                                <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic">Choisissez votre profil.</h3>
                                 <p className="text-[14px] text-gray-400 font-medium">Déterminez votre niveau d'accès à l'infrastructure.</p>
                             </div>
                             
@@ -102,14 +102,14 @@ export default function OnboardingPage() {
                                     <div 
                                         key={p.id}
                                         onClick={() => setSelectedProfile(p.id)}
-                                        className={`glass-card-premium p-8 cursor-pointer transition-all flex flex-col gap-6 relative group border ${selectedProfile === p.id ? 'border-[#C55A11] bg-orange-50/20' : 'border-white/40 hover:border-gray-200 bg-white/30'}`}
+                                        className={`glass-card-premium p-8 cursor-pointer transition-all flex flex-col gap-6 relative group border ${selectedProfile === p.id ? 'border-amber-600 bg-orange-50/20' : 'border-white/40 hover:border-gray-200 bg-white/30'}`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform ${selectedProfile === p.id ? 'bg-[#C55A11] text-white' : 'bg-gray-100'}`}>
+                                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform ${selectedProfile === p.id ? 'bg-amber-600 text-white' : 'bg-gray-100'}`}>
                                                 {p.icon}
                                             </div>
                                             {selectedProfile === p.id && (
-                                                <div className="w-6 h-6 bg-[#C55A11] rounded-xl flex items-center justify-center text-[10px] text-white font-bold shadow-lg shadow-orange-950/20">✓</div>
+                                                <div className="w-6 h-6 bg-amber-600 rounded-xl flex items-center justify-center text-[10px] text-white font-bold shadow-lg shadow-orange-950/20">✓</div>
                                             )}
                                         </div>
                                         <div>
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
                     {step === 'PROFILE' && (
                         <div className="max-w-md mx-auto space-y-8 py-8 text-center">
                              <div className="mb-12">
-                                <h3 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter italic">Informations d'identité.</h3>
+                                <h3 className="text-3xl font-black text-slate-800 uppercase tracking-tighter italic">Informations d'identité.</h3>
                                 <p className="text-[14px] text-gray-400 font-medium">Saisissez vos informations officielles.</p>
                             </div>
                             
@@ -136,7 +136,7 @@ export default function OnboardingPage() {
                                         type="text" 
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
-                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-[#C55A11] outline-none transition-all font-bold text-gray-900"
+                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-amber-600 outline-none transition-all font-bold text-gray-900"
                                         placeholder="Ex: Jean Kouassi"
                                     />
                                 </div>
@@ -146,7 +146,7 @@ export default function OnboardingPage() {
                                         type="email" 
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-[#C55A11] outline-none transition-all font-bold text-gray-900"
+                                        className="block w-full px-6 py-5 bg-white/50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-orange-500/10 focus:border-amber-600 outline-none transition-all font-bold text-gray-900"
                                         placeholder="votre@email.com"
                                     />
                                 </div>

@@ -75,26 +75,26 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
             hoverText: "hover:text-[#10B981]"
         },
         LANDLORD: {
-            primaryText: "text-[#1F4E79]",
-            focusWithin: "group-focus-within:text-[#C55A11]",
-            inputFocus: "focus:ring-[#C55A11]/10 focus:border-[#C55A11]",
-            btn1Bg: "from-[#1F4E79] to-[#2c6ca7]",
+            primaryText: "text-slate-800",
+            focusWithin: "group-focus-within:text-amber-600",
+            inputFocus: "focus:ring-[#C55A11]/10 focus:border-amber-600",
+            btn1Bg: "from-slate-800 to-[#2c6ca7]",
             btn1Shadow: "shadow-[#1F4E79]/20",
-            accentText: "text-[#C55A11]",
+            accentText: "text-amber-600",
             btn2Bg: "from-[#C55A11] to-[#E87B2E]",
             btn2Shadow: "shadow-[#C55A11]/20",
-            hoverText: "hover:text-[#1F4E79]"
+            hoverText: "hover:text-slate-800"
         },
         ADMIN: {
-            primaryText: "text-[#C55A11]",
-            focusWithin: "group-focus-within:text-[#C55A11]",
-            inputFocus: "focus:ring-[#C55A11]/10 focus:border-[#C55A11]",
+            primaryText: "text-amber-600",
+            focusWithin: "group-focus-within:text-amber-600",
+            inputFocus: "focus:ring-[#C55A11]/10 focus:border-amber-600",
             btn1Bg: "from-[#C55A11] to-[#E87B2E]",
             btn1Shadow: "shadow-[#C55A11]/20",
-            accentText: "text-[#C55A11]",
+            accentText: "text-amber-600",
             btn2Bg: "from-[#C55A11] to-[#E87B2E]",
             btn2Shadow: "shadow-[#C55A11]/20",
-            hoverText: "hover:text-[#C55A11]"
+            hoverText: "hover:text-amber-600"
         }
     }[role];
 

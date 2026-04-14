@@ -117,14 +117,14 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
             <div className="flex bg-gray-100/50 p-1.5 rounded-[1.5rem] w-fit border border-gray-200">
                 <button 
                     onClick={() => setActiveTab('PHONE')}
-                    className={`px-8 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeTab === 'PHONE' ? 'bg-white shadow-xl text-[#1F4E79]' : 'text-gray-400'}`}
+                    className={`px-8 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeTab === 'PHONE' ? 'bg-white shadow-xl text-slate-800' : 'text-gray-400'}`}
                 >
                     Recherche par Numéro
                 </button>
                 {userRole === 'AGENCE' && (
                     <button 
                         onClick={() => setActiveTab('CRITERIA')}
-                        className={`px-8 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeTab === 'CRITERIA' ? 'bg-white shadow-xl text-[#1F4E79]' : 'text-gray-400'}`}
+                        className={`px-8 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all ${activeTab === 'CRITERIA' ? 'bg-white shadow-xl text-slate-800' : 'text-gray-400'}`}
                     >
                         Matching par Critères
                     </button>
@@ -144,13 +144,13 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                     placeholder="+225 00 00 00 00" 
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-black text-xl text-[#1F4E79]"
+                                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-black text-xl text-slate-800"
                                 />
                             </div>
                             <button 
                                 onClick={handlePhoneSearch}
                                 disabled={loading}
-                                className="w-full md:w-auto px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                className="w-full md:w-auto px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                                 <Search size={20} />
                                 {loading ? "..." : "Trouver"}
@@ -164,27 +164,27 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                             animate={{ opacity: 1, y: 0 }}
                             className="glass-panel p-10 rounded-[3rem] bg-white border border-white/40 shadow-2xl relative overflow-hidden"
                         >
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#1F4E79]/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-slate-800/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                             
                             <div className="flex flex-col md:flex-row gap-10 items-start md:items-center relative z-10">
-                                <div className="w-24 h-24 bg-[#1F4E79] text-white rounded-[2rem] flex items-center justify-center shadow-xl rotate-3">
+                                <div className="w-24 h-24 bg-slate-800 text-white rounded-[2rem] flex items-center justify-center shadow-xl rotate-3">
                                     <User size={48} />
                                 </div>
                                 
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center gap-3">
-                                        <h3 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase">{(searchResult.firstName ? searchResult.firstName + " " : "") + (searchResult.lastName || "")}</h3>
+                                        <h3 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">{(searchResult.firstName ? searchResult.firstName + " " : "") + (searchResult.lastName || "")}</h3>
                                         <div className="px-3 py-1 bg-emerald-50 text-emerald-500 rounded-full border border-emerald-100 flex items-center gap-1.5">
                                             <ShieldCheck size={12} />
                                             <span className="text-[10px] font-black uppercase tracking-widest">Identité Vérifiée</span>
                                         </div>
                                     </div>
-                                    <p className="text-gray-500 font-medium">Recherche un logement : <span className="text-[#1F4E79] font-bold">{searchResult.communesSouhaitees?.join(', ')}</span></p>
+                                    <p className="text-gray-500 font-medium">Recherche un logement : <span className="text-slate-800 font-bold">{searchResult.communesSouhaitees?.join(', ')}</span></p>
                                     
                                     <div className="flex flex-wrap gap-4 pt-2">
                                         <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
                                             <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Budget Max</span>
-                                            <span className="font-black text-[#1F4E79]">{Number(searchResult.revenuFourchette || 0).toLocaleString()} FCFA</span>
+                                            <span className="font-black text-slate-800">{Number(searchResult.revenuFourchette || 0).toLocaleString()} FCFA</span>
                                         </div>
                                         <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
                                             <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Grade QAPRIL</span>
@@ -195,7 +195,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
 
                                 <button 
                                     onClick={() => setInvitationModal({ open: true, locataire: searchResult })}
-                                    className="px-10 py-5 bg-[#C55A11] text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-2xl hover:bg-[#a64a0e] transition-all flex items-center gap-3 active:scale-95 group"
+                                    className="px-10 py-5 bg-amber-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-2xl hover:bg-[#a64a0e] transition-all flex items-center gap-3 active:scale-95 group"
                                 >
                                     <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500" />
                                     <span>Inviter au bail</span>
@@ -255,7 +255,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                             <button 
                                 onClick={handleCriteriaSearch}
                                 disabled={loading}
-                                className="px-8 py-4 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-[#a64a0e] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                className="px-8 py-4 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-[#a64a0e] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                                 <Filter size={20} />
                                 {loading ? "Recherche..." : "Lancer le Matching"}
@@ -274,11 +274,11 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                 >
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-[#1F4E79] font-black text-xl">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-slate-800 font-black text-xl">
                                                 {profil.anonymizedName.charAt(0)}
                                             </div>
                                             <div>
-                                                <h4 className="font-black text-[#1F4E79]">{profil.anonymizedName}</h4>
+                                                <h4 className="font-black text-slate-800">{profil.anonymizedName}</h4>
                                                 <span className="text-[10px] uppercase font-black text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{profil.statutPro || 'NON DÉFINI'}</span>
                                             </div>
                                         </div>
@@ -287,7 +287,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                     <div className="space-y-2 mb-6">
                                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
                                             <span className="text-xs font-bold text-gray-500">Budget Max</span>
-                                            <span className="font-black text-[#C55A11]">{Number(profil.budget || 0).toLocaleString()} FCFA</span>
+                                            <span className="font-black text-amber-600">{Number(profil.budget || 0).toLocaleString()} FCFA</span>
                                         </div>
                                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg truncate">
                                             <span className="text-xs font-bold text-gray-500">Zones</span>
@@ -301,7 +301,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
 
                                     <button 
                                         onClick={() => setInvitationModal({ open: true, locataire: { id: profil.id, firstName: profil.anonymizedName, lastName: "" } })}
-                                        className="w-full py-3 bg-[#1F4E79] text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                                        className="w-full py-3 bg-slate-800 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-md hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                                     >
                                         <Plus size={16} /> Envoyer Invitation
                                     </button>
@@ -329,7 +329,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                         <div className="p-10 space-y-8">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-2xl font-black text-[#1F4E79] uppercase tracking-tighter">Proposition de Bail</h3>
+                                    <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Proposition de Bail</h3>
                                     <p className="text-gray-400 font-medium">À l'attention de <span className="text-gray-900 font-bold">{(invitationModal.locataire?.firstName ? invitationModal.locataire.firstName + " " : "") + (invitationModal.locataire?.lastName || "")}</span></p>
                                 </div>
                                 <button onClick={() => setInvitationModal({ open: false, locataire: null })} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -343,7 +343,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                         <MapPin size={14} /> Logement concerné
                                     </label>
                                     <select 
-                                        className="w-full p-4 rounded-2xl bg-gray-50 border-none font-bold text-[#1F4E79]"
+                                        className="w-full p-4 rounded-2xl bg-gray-50 border-none font-bold text-slate-800"
                                         value={invitationData.propertyId}
                                         onChange={(e) => setInvitationData({...invitationData, propertyId: e.target.value})}
                                     >
@@ -361,7 +361,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                         </label>
                                         <input 
                                             type="number" 
-                                            className="w-full p-4 rounded-2xl bg-gray-50 border-none font-black text-[#C55A11]"
+                                            className="w-full p-4 rounded-2xl bg-gray-50 border-none font-black text-amber-600"
                                             value={invitationData.loyer}
                                             onChange={(e) => setInvitationData({...invitationData, loyer: parseInt(e.target.value)})}
                                         />
@@ -394,7 +394,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
 
                             <button 
                                 onClick={handleSendInvitation}
-                                className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 hover:bg-gray-800 transition-all active:scale-95"
+                                className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 hover:bg-gray-800 transition-all active:scale-95"
                             >
                                 <Send size={20} />
                                 Envoyer l'invitation

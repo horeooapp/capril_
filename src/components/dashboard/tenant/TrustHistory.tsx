@@ -35,30 +35,30 @@ export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
     <div className="space-y-8 p-1">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Transparence & ICL.</h2>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11] mt-1">Audit de consultation de vos données (Rule 3.9)</p>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Transparence & ICL.</h2>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mt-1">Audit de consultation de vos données (Rule 3.9)</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Score & QR */}
         <div className="lg:col-span-4 space-y-6">
            <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm text-center relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#1F4E79]"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
               <div className="mb-6 flex justify-center">
                  <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center p-4 shadow-inner">
-                    <QrCode size={48} className="text-[#1F4E79]" />
+                    <QrCode size={48} className="text-slate-800" />
                  </div>
               </div>
-              <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-widest mb-2">Mon Passeport Digital</h3>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-2">Mon Passeport Digital</h3>
               <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-6">
                  Présentez ce code aux agences pour un accès temporaire (24h) à votre score certifié.
               </p>
-              <button className="w-full py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+              <button className="w-full py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                  Générer un jeton d'accès
               </button>
            </div>
 
-           <div className="bg-[#1F4E79] p-8 rounded-[3rem] shadow-xl text-white">
+           <div className="bg-slate-800 p-8 rounded-[3rem] shadow-xl text-white">
               <h3 className="text-sm font-black uppercase tracking-widest mb-6 opacity-60">Pondération ICL 2026</h3>
               <div className="space-y-6">
                  <div>
@@ -100,10 +100,10 @@ export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
            <div className="bg-white p-8 rounded-[3.5rem] border border-slate-100 shadow-sm h-full">
               <div className="flex items-center justify-between mb-8">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-[#1F4E79]">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-800">
                        <History size={20} />
                     </div>
-                    <h3 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase italic leading-none">Journal des Consultations.</h3>
+                    <h3 className="text-xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Journal des Consultations.</h3>
                  </div>
                  <Badge label={`${logs.length} Activités`} color="#1F4E79" bg="#F0F4F8" size={10} />
               </div>
@@ -121,12 +121,12 @@ export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
                        >
                           <div className="flex items-center gap-4">
                              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${
-                               log.status === 'revoked' ? 'bg-red-50 text-red-300' : 'bg-white text-[#1F4E79]'
+                               log.status === 'revoked' ? 'bg-red-50 text-red-300' : 'bg-white text-slate-800'
                              }`}>
                                 {log.status === 'revoked' ? <Lock size={20} /> : <Eye size={20} />}
                              </div>
                              <div>
-                                <div className="text-[14px] font-black text-[#1F4E79] uppercase tracking-tight">{log.entity}</div>
+                                <div className="text-[14px] font-black text-slate-800 uppercase tracking-tight">{log.entity}</div>
                                 <div className="flex items-center gap-3 mt-1">
                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
                                       <Clock size={12} />

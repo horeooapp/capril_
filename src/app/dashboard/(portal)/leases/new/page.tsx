@@ -287,7 +287,7 @@ function LeaseRegistrationForm() {
                                             <option value={1}>1 mois</option>
                                             <option value={2}>2 mois</option>
                                         </select>
-                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(depositAmount * rentAmount).toLocaleString("fr-FR")} FCFA</p>
+                                        <p className="text-[10px] font-bold text-slate-800 text-right mt-1">Soit {(depositAmount * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Avance (Mois)</label>
@@ -296,7 +296,7 @@ function LeaseRegistrationForm() {
                                             <option value={1}>1 mois</option>
                                             <option value={2}>2 mois</option>
                                         </select>
-                                        <p className="text-[10px] font-bold text-[#1F4E79] text-right mt-1">Soit {(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
+                                        <p className="text-[10px] font-bold text-slate-800 text-right mt-1">Soit {(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-gray-600">Frais d&apos;agence (6% du Loyer)</label>
@@ -358,7 +358,7 @@ function LeaseRegistrationForm() {
 
 export default function LeaseRegistrationPage() {
     return (
-        <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1F4E79]"></div></div>}>
+        <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div></div>}>
             <LeaseModeSelector />
         </Suspense>
     )

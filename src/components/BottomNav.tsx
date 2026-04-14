@@ -37,16 +37,16 @@ export default function BottomNav({ items }: BottomNavProps) {
     const NavItem = ({ item, isActive, isMore = false }: { item: BottomNavItem, isActive: boolean, isMore?: boolean }) => {
         const content = (
             <>
-                <div className={`${isActive ? "scale-110 text-[#1F4E79]" : "scale-100 text-gray-400"} transition-all duration-300 relative`}>
+                <div className={`${isActive ? "scale-110 text-slate-800" : "scale-100 text-gray-400"} transition-all duration-300 relative`}>
                     {item.icon}
                     {isActive && (
                         <motion.div 
                             layoutId="nav-glow"
-                            className="absolute -inset-2 bg-[#1F4E79]/5 blur-lg rounded-full -z-10"
+                            className="absolute -inset-2 bg-slate-800/5 blur-lg rounded-full -z-10"
                         />
                     )}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-widest truncate w-full text-center whitespace-nowrap ${isActive ? "text-[#1F4E79] opacity-100" : "text-gray-400 opacity-60"}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest truncate w-full text-center whitespace-nowrap ${isActive ? "text-slate-800 opacity-100" : "text-gray-400 opacity-60"}`}>
                     {item.label}
                 </span>
             </>
@@ -91,7 +91,7 @@ export default function BottomNav({ items }: BottomNavProps) {
                     {hasMore && (
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={`flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl transition-all relative flex-1 min-w-0 ${isMenuOpen ? "text-[#1F4E79]" : "text-gray-400"}`}
+                            className={`flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl transition-all relative flex-1 min-w-0 ${isMenuOpen ? "text-slate-800" : "text-gray-400"}`}
                         >
                             <div className="transition-transform duration-300">
                                 {isMenuOpen ? <X size={26} /> : <Menu size={26} />}

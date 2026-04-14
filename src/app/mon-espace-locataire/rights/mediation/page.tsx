@@ -3,8 +3,8 @@ import Link from "next/link"
 export default function RightToMediation() {
     return (
         <div className="max-w-4xl mx-auto py-12 px-6">
-            <h1 className="text-3xl font-black text-[#C55A11] mb-4 uppercase tracking-tight">Médiation & Conciliation</h1>
-            <p className="text-gray-600 mb-8 border-l-4 border-[#C55A11] pl-4">
+            <h1 className="text-3xl font-black text-amber-600 mb-4 uppercase tracking-tight">Médiation & Conciliation</h1>
+            <p className="text-gray-600 mb-8 border-l-4 border-amber-600 pl-4">
                 Recours amiables et procédures d'arbitrage en cas de litige avec votre propriétaire.
             </p>
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 mb-8">
@@ -18,7 +18,7 @@ export default function RightToMediation() {
                     </p>
                 </div>
             </div>
-            <Link href="/mon-espace-locataire/rights" className="text-sm font-bold text-[#C55A11] hover:underline">
+            <Link href="/mon-espace-locataire/rights" className="text-sm font-bold text-amber-600 hover:underline">
                 ← Retour au Cadrage Légal
             </Link>
         </div>

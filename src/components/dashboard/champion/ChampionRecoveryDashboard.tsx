@@ -81,7 +81,7 @@ export default function ChampionRecoveryDashboard() {
   if (loading) {
     return (
       <div className="p-20 text-center space-y-4">
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center animate-spin mx-auto text-[#1F4E79]">
+        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center animate-spin mx-auto text-slate-800">
           <Zap size={32} />
         </div>
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Calcul des dossiers prioritaires...</p>
@@ -99,7 +99,7 @@ export default function ChampionRecoveryDashboard() {
         <motion.div 
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className="md:col-span-8 bg-[#1F4E79] rounded-[3.5rem] p-12 text-white relative overflow-hidden shadow-2xl shadow-blue-900/40 group"
+           className="md:col-span-8 bg-slate-800 rounded-[3.5rem] p-12 text-white relative overflow-hidden shadow-2xl shadow-blue-900/40 group"
         >
            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400 blur-[100px] opacity-10 -mr-20 -mt-20"></div>
            <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-12">
@@ -136,9 +136,9 @@ export default function ChampionRecoveryDashboard() {
            <div className="bg-white rounded-[3rem] p-8 border border-gray-100 shadow-xl flex flex-col justify-between h-full group hover:border-blue-100 transition-all">
               <ShieldCheck size={32} className="text-emerald-500" />
               <div className="space-y-2 mt-8">
-                 <h3 className="text-xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Mandat de Confiance.</h3>
+                 <h3 className="text-xl font-black text-slate-800 tracking-tighter uppercase italic">Mandat de Confiance.</h3>
                  <p className="text-xs text-gray-400 font-medium leading-relaxed">
-                   En tant que Champion, vos relances humanisées augmentent le taux de recouvrement de <span className="text-[#1F4E79] font-black underline underline-offset-4 decoration-blue-200">24% en moyenne</span>.
+                   En tant que Champion, vos relances humanisées augmentent le taux de recouvrement de <span className="text-slate-800 font-black underline underline-offset-4 decoration-blue-200">24% en moyenne</span>.
                  </p>
               </div>
            </div>
@@ -176,12 +176,12 @@ export default function ChampionRecoveryDashboard() {
               </div>
               <button 
                  onClick={handleDiscovery}
-                 className="flex items-center gap-2 px-6 py-4 bg-[#1F4E79] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
+                 className="flex items-center gap-2 px-6 py-4 bg-slate-800 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
               >
                 <Zap size={16} />
                 <span>Lancer la prospection</span>
               </button>
-              <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-[#1F4E79] hover:bg-gray-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+              <button className="p-4 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-slate-800 hover:bg-gray-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
                 <Filter size={20} />
               </button>
            </div>
@@ -206,7 +206,7 @@ export default function ChampionRecoveryDashboard() {
                       <div className="w-16 h-16 bg-gray-50 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition-transform duration-500">
                         👤
                       </div>
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-50 text-[10px] font-black text-[#1F4E79]">
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-50 text-[10px] font-black text-slate-800">
                         {item.lease.property.propertyCode.substring(0,2)}
                       </div>
                     </div>
@@ -227,7 +227,7 @@ export default function ChampionRecoveryDashboard() {
                  </div>
 
                  <div className="flex flex-col items-center md:items-end gap-2 w-full md:w-auto">
-                    <p className="text-3xl font-black text-[#1F4E79] tracking-tighter italic">
+                    <p className="text-3xl font-black text-slate-800 tracking-tighter italic">
                        {item.amount.toLocaleString()} <span className="text-sm font-normal opacity-40">FCFA</span>
                     </p>
                     <div className="flex items-center gap-3 w-full">

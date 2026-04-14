@@ -98,8 +98,8 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
             <ChevronLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">M-SIGN Wizard.</h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C55A11]">Émission de Bail Digital Certifié QAPRIL</p>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">M-SIGN Wizard.</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">Émission de Bail Digital Certifié QAPRIL</p>
           </div>
         </div>
 
@@ -111,12 +111,12 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
               <div key={step.id} className="relative z-10 flex flex-col items-center gap-3">
                 <div 
                   className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${
-                    currentStep >= step.id ? "bg-[#1F4E79] text-white shadow-xl shadow-blue-900/20" : "bg-white text-slate-300 border-2 border-slate-100"
+                    currentStep >= step.id ? "bg-slate-800 text-white shadow-xl shadow-blue-900/20" : "bg-white text-slate-300 border-2 border-slate-100"
                   }`}
                 >
                   {currentStep > step.id ? <CheckCircle2 size={24} /> : step.icon}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-widest ${currentStep >= step.id ? "text-[#1F4E79]" : "text-slate-300"}`}>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${currentStep >= step.id ? "text-slate-800" : "text-slate-300"}`}>
                   {step.label}
                 </span>
               </div>
@@ -137,7 +137,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
               {currentStep === 1 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-black text-[#1F4E79] tracking-tight uppercase">Identification du Locataire.</h2>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Identification du Locataire.</h2>
                     <p className="text-slate-400 text-sm font-medium">Saisissez les coordonnées de la partie prenante.</p>
                   </div>
                   <div className="space-y-6">
@@ -186,7 +186,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
               {currentStep === 2 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-black text-[#1F4E79] tracking-tight uppercase">Sélection du Bien.</h2>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Sélection du Bien.</h2>
                     <p className="text-slate-400 text-sm font-medium">Affectez ce bail à une unité de votre portefeuille.</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,15 +203,15 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                           });
                         }}
                         className={`p-6 rounded-[2rem] border-2 transition-all cursor-pointer relative group ${
-                          formData.propertyId === p.id ? "border-[#1F4E79] bg-blue-50/20" : "border-slate-100 hover:border-slate-200"
+                          formData.propertyId === p.id ? "border-slate-800 bg-blue-50/20" : "border-slate-100 hover:border-slate-200"
                         }`}
                       >
                         {formData.propertyId === p.id && (
-                          <div className="absolute top-4 right-4 text-[#1F4E79]">
+                          <div className="absolute top-4 right-4 text-slate-800">
                             <CheckCircle2 size={24} />
                           </div>
                         )}
-                        <h4 className="font-black text-[#1F4E79] uppercase tracking-tight mb-2">{p.address?.split(',')[0]}</h4>
+                        <h4 className="font-black text-slate-800 uppercase tracking-tight mb-2">{p.address?.split(',')[0]}</h4>
                         <div className="flex items-center gap-2">
                            <Badge label={p.propertyCode} color="#1F4E79" bg="#F0F4F8" size={9} />
                            <span className="text-[11px] font-bold text-slate-400">{p.propertyType}</span>
@@ -225,7 +225,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
               {currentStep === 3 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-black text-[#1F4E79] tracking-tight uppercase">Termes & Conditions.</h2>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase">Termes & Conditions.</h2>
                     <p className="text-slate-400 text-sm font-medium">Définissez les paramètres financiers du contrat.</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -247,7 +247,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                         </label>
                         <input 
                           type="number" 
-                          className="w-full bg-slate-50 border-none rounded-2xl p-4 font-black text-xl text-[#C55A11]"
+                          className="w-full bg-slate-50 border-none rounded-2xl p-4 font-black text-xl text-amber-600"
                           value={formData.deposit}
                           onChange={e => setFormData({...formData, deposit: Number(e.target.value)})}
                         />
@@ -282,9 +282,9 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                     <ShieldCheck size={48} />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-black text-[#1F4E79] tracking-tight uppercase italic mb-4">Prêt pour Certification.</h2>
+                    <h2 className="text-3xl font-black text-slate-800 tracking-tight uppercase italic mb-4">Prêt pour Certification.</h2>
                     <p className="text-slate-400 text-sm font-medium max-w-md mx-auto">
-                       Le projet de bail pour <span className="text-[#1F4E79] font-black">{formData.name}</span> à <span className="text-[#1F4E79] font-black">{selectedProperty?.address?.split(',')[0]}</span> est généré. 
+                       Le projet de bail pour <span className="text-slate-800 font-black">{formData.name}</span> à <span className="text-slate-800 font-black">{selectedProperty?.address?.split(',')[0]}</span> est généré. 
                     </p>
                   </div>
 
@@ -297,8 +297,8 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                      </div>
                      <div className="p-6 bg-slate-50 rounded-[2rem] text-left border border-slate-100">
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Droits d'Enregistrement</div>
-                        <div className="text-xl font-black text-[#1F4E79] font-mono">12,500 FCFA</div>
-                        <div className="text-[9px] font-bold text-[#C55A11] uppercase tracking-tighter">Inclus dans les frais QAPRIL</div>
+                        <div className="text-xl font-black text-slate-800 font-mono">12,500 FCFA</div>
+                        <div className="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">Inclus dans les frais QAPRIL</div>
                      </div>
                   </div>
 
@@ -340,7 +340,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
             </button>
             <button 
               onClick={nextStep}
-              className={`px-10 py-5 bg-[#C55A11] text-white rounded-2xl font-black uppercase text-[12px] tracking-widest shadow-xl shadow-orange-900/10 hover:bg-[#a64a0e] transition-all flex items-center gap-3 ${
+              className={`px-10 py-5 bg-amber-600 text-white rounded-2xl font-black uppercase text-[12px] tracking-widest shadow-xl shadow-orange-900/10 hover:bg-[#a64a0e] transition-all flex items-center gap-3 ${
                 currentStep === 4 ? "hidden" : ""
               }`}
             >

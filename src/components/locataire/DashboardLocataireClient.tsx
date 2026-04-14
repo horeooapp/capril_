@@ -42,7 +42,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                 <div className="lg:col-span-2 glass-panel p-8 md:p-10 rounded-[3rem] border border-white/40 shadow-xl bg-gradient-to-br from-white/80 to-blue-50/30 overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                     <div className="relative z-10">
-                        <h1 className="text-3xl md:text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-4">
+                        <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tighter uppercase mb-4">
                             Bonjour, {session?.user?.name?.split(' ')[0] || 'Locataire'}.
                         </h1>
                         <p className="text-gray-500 font-medium mb-8 max-w-md">
@@ -50,11 +50,11 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                         </p>
                         
                         <div className="flex flex-wrap gap-4">
-                            <Link href="/mon-espace-locataire/signalements" className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#a64a0e] transition-all shadow-lg active:scale-95">
+                            <Link href="/mon-espace-locataire/signalements" className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#a64a0e] transition-all shadow-lg active:scale-95">
                                 <AlertTriangle size={16} />
                                 Signaler un problème
                             </Link>
-                            <Link href="/mon-espace-locataire/passeport" className="flex items-center gap-2 px-6 py-3 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#163a5a] transition-all shadow-lg active:scale-95">
+                            <Link href="/mon-espace-locataire/passeport" className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#163a5a] transition-all shadow-lg active:scale-95">
                                 <FileBadge size={16} />
                                 Mon Passeport
                             </Link>
@@ -86,11 +86,11 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                 initial={{ strokeDashoffset: 364.4 }}
                                 animate={{ strokeDashoffset: 364.4 - (364.4 * score) / 1000 }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
-                                className="text-[#1F4E79]"
+                                className="text-slate-800"
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-4xl font-black text-[#1F4E79]">{score}</span>
+                            <span className="text-4xl font-black text-slate-800">{score}</span>
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">/ 1000 Pts</span>
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                         Grade {badge}
                     </div>
                     <p className="text-[14px] text-gray-400 font-medium">Indice de Confiance Locatif</p>
-                    <Link href="/mon-espace-locataire/trust" className="mt-4 text-[12px] font-black text-[#1F4E79] uppercase tracking-widest hover:underline flex items-center gap-1">
+                    <Link href="/mon-espace-locataire/trust" className="mt-4 text-[12px] font-black text-slate-800 uppercase tracking-widest hover:underline flex items-center gap-1">
                         Comment progresser ? <ArrowRight size={14} />
                     </Link>
                 </div>
@@ -124,7 +124,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                             ⚖️
                                         </div>
                                         <div>
-                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                            <div className="text-[13px] font-black text-slate-800 uppercase tracking-tight">
                                                 Révision de Loyer (RCL)
                                             </div>
                                             <div className="text-[11px] font-bold text-orange-600 italic mt-0.5">
@@ -146,7 +146,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                             🤝
                                         </div>
                                         <div>
-                                            <div className="text-[13px] font-black text-[#1F4E79] uppercase tracking-tight">
+                                            <div className="text-[13px] font-black text-slate-800 uppercase tracking-tight">
                                                 Médiation (MRL-01)
                                             </div>
                                             <div className="text-[11px] font-bold text-blue-600 italic mt-0.5">
@@ -171,7 +171,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </div>
                     <div>
                         <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Échéance</p>
-                        <p className="text-lg font-black text-[#1F4E79]">J-{nextPaymentInDays}</p>
+                        <p className="text-lg font-black text-slate-800">J-{nextPaymentInDays}</p>
                     </div>
                 </div>
 
@@ -195,7 +195,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     </div>
                     <div>
                         <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Caution</p>
-                        <Link href="/mon-espace-locataire/cautions" className="text-lg font-black text-[#1F4E79] hover:text-primary transition-colors">
+                        <Link href="/mon-espace-locataire/cautions" className="text-lg font-black text-slate-800 hover:text-primary transition-colors">
                             {data.caution ? 'Certifiée' : 'À certifier'}
                         </Link>
                     </div>
@@ -223,8 +223,8 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                     🏠
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter leading-none italic">Mon Bail Actif.</h3>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-[#C55A11] mt-1.5 flex items-center gap-2">
+                                    <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter leading-none italic">Mon Bail Actif.</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 mt-1.5 flex items-center gap-2">
                                         <ShieldCheck size={12} />
                                         Protection des données (Rule 3.2)
                                     </p>
@@ -239,7 +239,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             <div className="space-y-1">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Propriétaire / Gestionnaire</span>
                                 <div className="space-y-1">
-                                    <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                    <p className="text-lg font-black text-slate-800 leading-none uppercase tracking-tighter">
                                         {data.bails[0].typeGestion === 'agreee' 
                                             ? `Bailleur Masqué (${data.bails[0].landlord?.walletConfig?.landlordCode || "AGREEE"})` 
                                             : (data.bails[0].bailleurMasque 
@@ -255,7 +255,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             </div>
                             <div className="space-y-1">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Logement / Code</span>
-                                <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                <p className="text-lg font-black text-slate-800 leading-none uppercase tracking-tighter">
                                     {data.bails[0].property?.propertyCode || "LOG-XXXX"}
                                 </p>
                                 <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
@@ -264,10 +264,10 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             </div>
                             <div className="space-y-1">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Référence Bail</span>
-                                <p className="text-lg font-black text-[#1F4E79] leading-none uppercase tracking-tighter">
+                                <p className="text-lg font-black text-slate-800 leading-none uppercase tracking-tighter">
                                     {data.bails[0].leaseReference || "BAIL-XXXX"}
                                 </p>
-                                <span className="text-[9px] font-bold text-[#C55A11] uppercase tracking-tighter italic">
+                                <span className="text-[9px] font-bold text-amber-600 uppercase tracking-tighter italic">
                                     SHA-256 Certifié {data.bails[0].sha?.substring(0, 8) || "..."}
                                 </span>
                             </div>
@@ -280,8 +280,8 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center justify-between mb-2 px-2">
-                        <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter">Quittances Récentes</h2>
-                        <Link href="/mon-espace-locataire/leases" className="text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">Voir tout</Link>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">Quittances Récentes</h2>
+                        <Link href="/mon-espace-locataire/leases" className="text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-slate-800">Voir tout</Link>
                     </div>
                     
                     {data.quittances.length > 0 ? (
@@ -293,16 +293,16 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                             <FileText size={20} />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-[#1F4E79]">{q.periodMonth}</p>
+                                            <p className="font-bold text-slate-800">{q.periodMonth}</p>
                                             <p className="text-[12px] text-gray-400 uppercase font-black tracking-widest">Réf: {q.receiptRef}</p>
                                         </div>
                                     </div>
                                     <div className="text-right flex items-center gap-6">
                                         <div className="hidden sm:block">
-                                            <p className="font-black text-[#1F4E79]">{Number(q.totalAmount).toLocaleString()} FCFA</p>
+                                            <p className="font-black text-slate-800">{Number(q.totalAmount).toLocaleString()} FCFA</p>
                                             <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Payé</span>
                                         </div>
-                                        <Link href={`/receipts/${q.id}`} target="_blank" className="p-2 bg-gray-50 rounded-xl hover:bg-[#1F4E79] hover:text-white transition-colors">
+                                        <Link href={`/receipts/${q.id}`} target="_blank" className="p-2 bg-gray-50 rounded-xl hover:bg-slate-800 hover:text-white transition-colors">
                                             <ArrowRight size={18} />
                                         </Link>
                                     </div>
@@ -320,8 +320,8 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                 <div className="space-y-6">
                     {/* Alerte J-3 Panel */}
                     <div className="glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg bg-orange-50/20">
-                         <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-4 flex items-center gap-2">
-                            <Clock size={18} className="text-[#C55A11]" />
+                         <h3 className="font-black text-slate-800 uppercase tracking-tighter mb-4 flex items-center gap-2">
+                            <Clock size={18} className="text-amber-600" />
                             Rappels Automatiques
                          </h3>
                          <div className="space-y-3">
@@ -338,7 +338,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                  </div>
                              </div>
                          </div>
-                         <Link href="/mon-espace-locataire/profile" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-[#1F4E79]">
+                         <Link href="/mon-espace-locataire/profile" className="mt-4 block text-[11px] font-black text-center text-gray-400 uppercase tracking-widest hover:text-slate-800">
                              Configurer mes canaux (SMS/WhatsApp)
                          </Link>
                     </div>
@@ -347,10 +347,10 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     <Link href="/mon-espace-locataire/preavis" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg hover:shadow-xl transition-all group">
                         <div className="flex items-start justify-between">
                             <div>
-                                <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Préavis Officiel</h3>
+                                <h3 className="font-black text-slate-800 uppercase tracking-tighter mb-1">Préavis Officiel</h3>
                                 <p className="text-[13px] text-gray-500 font-medium">Déclarez votre départ en respectant le cadre légal.</p>
                             </div>
-                            <div className="p-3 bg-gray-50 rounded-2xl group-hover:bg-[#1F4E79] group-hover:text-white transition-colors">
+                            <div className="p-3 bg-gray-50 rounded-2xl group-hover:bg-slate-800 group-hover:text-white transition-colors">
                                 <MessageSquare size={20} />
                             </div>
                         </div>
@@ -358,10 +358,10 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
 
                     {/* Dossier Locatif Panel */}
                     <Link href="/mon-espace-locataire/passeport" className="block glass-panel p-6 rounded-[2rem] border border-white/40 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-[#1F4E79]"></div>
-                        <h3 className="font-black text-[#1F4E79] uppercase tracking-tighter mb-1">Dossier de Location</h3>
+                        <div className="absolute top-0 left-0 w-full h-1 bg-slate-800"></div>
+                        <h3 className="font-black text-slate-800 uppercase tracking-tighter mb-1">Dossier de Location</h3>
                         <p className="text-[13px] text-gray-500 font-medium mb-4">Exportez votre dossier certifié QAPRIL pour vos futurs bails.</p>
-                        <span className="block w-full py-3 bg-[#1F4E79] text-white text-center rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all shadow-lg active:scale-95">
+                        <span className="block w-full py-3 bg-slate-800 text-white text-center rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all shadow-lg active:scale-95">
                             Voir & Exporter
                         </span>
                     </Link>

@@ -42,7 +42,7 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                             className="h-14 w-auto drop-shadow-xl group-hover:scale-105 transition-transform duration-500" 
                         />
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.4em] ml-1">Portal Locataire</span>
+                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-[0.4em] ml-1">Portal Locataire</span>
                         </div>
                     </Link>
 
@@ -55,8 +55,8 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                                     href={link.href}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-black uppercase tracking-widest transition-all duration-300 ${
                                         isActive 
-                                        ? "bg-[#1F4E79] text-white shadow-lg shadow-[#1F4E79]/20" 
-                                        : "text-gray-500 hover:text-[#1F4E79] hover:bg-white/60"
+                                        ? "bg-slate-800 text-white shadow-lg shadow-[#1F4E79]/20" 
+                                        : "text-gray-500 hover:text-slate-800 hover:bg-white/60"
                                     }`}
                                 >
                                     {link.icon}
@@ -64,7 +64,7 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                                     {isActive && (
                                             <motion.div 
                                                 layoutId="active-nav"
-                                                className="absolute inset-0 bg-[#1F4E79] -z-10 rounded-xl"
+                                                className="absolute inset-0 bg-slate-800 -z-10 rounded-xl"
                                                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                             />
                                     )}
@@ -80,12 +80,12 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                         <div className="h-8 w-px bg-gray-200 mx-1"></div>
                         {session?.user && (
                             <div className="flex items-center gap-3 pr-3">
-                                <div className="w-9 h-9 rounded-xl bg-[#1F4E79] text-white flex items-center justify-center shadow-lg shadow-[#1F4E79]/20">
+                                <div className="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center shadow-lg shadow-[#1F4E79]/20">
                                     <User size={20} />
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[12px] font-black text-gray-400 uppercase tracking-tighter leading-none">Connecté</span>
-                                    <span className="text-[14px] font-bold text-[#1F4E79] truncate max-w-[120px]">{session.user.email}</span>
+                                    <span className="text-[14px] font-bold text-slate-800 truncate max-w-[120px]">{session.user.email}</span>
                                 </div>
                             </div>
                         )}

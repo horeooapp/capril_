@@ -20,13 +20,13 @@ export default async function DocumentValidationPage({ params }: { params: Promi
             <div className="flex items-center justify-between">
                 <Link 
                     href="/admin" 
-                    className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-[#1F4E79] transition-colors"
+                    className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-slate-800 transition-colors"
                 >
                     <ArrowLeft size={16} />
                     Retour au Cockpit
                 </Link>
-                <div className="px-4 py-2 bg-[#1F4E79]/5 rounded-full border border-[#1F4E79]/10">
-                    <span className="text-[10px] font-black text-[#1F4E79] uppercase tracking-widest">Dossier M-GUARD #{doc.id.slice(0, 8)}</span>
+                <div className="px-4 py-2 bg-slate-800/5 rounded-full border border-slate-800/10">
+                    <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest">Dossier M-GUARD #{doc.id.slice(0, 8)}</span>
                 </div>
             </div>
 

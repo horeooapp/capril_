@@ -35,11 +35,11 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
             <header className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-[#1F4E79] rounded-2xl flex items-center justify-center text-white">
+                        <div className="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center text-white">
                             <Home size={24} />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black text-[#1F4E79] uppercase tracking-tight">Vitrine {agency.firstName} {agency.lastName}</h1>
+                            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Vitrine {agency.firstName} {agency.lastName}</h1>
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1">
                                 <ShieldCheck size={12} className="text-green-500" /> Partenaire Certifié QAPRIL
                             </p>
@@ -54,7 +54,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
             {/* List */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 animate-in fade-in duration-700 slide-in-from-bottom-5">
                 <div className="mb-8 border-l-4 border-[#FF7A00] pl-4">
-                    <h2 className="text-3xl font-black text-[#1F4E79] uppercase tracking-tighter">Biens Disponibles ({annonces.length})</h2>
+                    <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">Biens Disponibles ({annonces.length})</h2>
                     <p className="text-gray-500 font-medium mt-1">Découvrez notre sélection de biens immobiliers exclusifs, vérifiés et prêts à la location.</p>
                 </div>
 
@@ -69,7 +69,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
                                 <div className="h-56 bg-gray-200 relative overflow-hidden">
                                     {/* Placeholder image */}
                                     <div className="absolute inset-0 bg-[linear-gradient(135deg,#1F4E79_0%,#111827_100%)] opacity-10"></div>
-                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-[#1F4E79]">
+                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-800">
                                         {a.logement?.propertyType || "Logement"}
                                     </div>
                                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">
@@ -84,9 +84,9 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
                                     <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                                         <div>
                                             <p className="text-[10px] uppercase font-black tracking-widest text-gray-400">Loyer Mensuel</p>
-                                            <p className="text-2xl font-black text-[#1F4E79]">{a.loyerDemande.toLocaleString()} ₣</p>
+                                            <p className="text-2xl font-black text-slate-800">{a.loyerDemande.toLocaleString()} ₣</p>
                                         </div>
-                                        <button className="bg-gray-100 text-[#1F4E79] w-12 h-12 rounded-xl flex items-center justify-center font-black hover:bg-[#FF7A00] hover:text-white transition-colors">
+                                        <button className="bg-gray-100 text-slate-800 w-12 h-12 rounded-xl flex items-center justify-center font-black hover:bg-[#FF7A00] hover:text-white transition-colors">
                                             +
                                         </button>
                                     </div>

@@ -18,10 +18,10 @@ export default async function MigrationPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-[#1F4E79]/10 rounded-2xl">
-                            <Database className="text-[#1F4E79]" size={32} />
+                        <div className="p-3 bg-slate-800/10 rounded-2xl">
+                            <Database className="text-slate-800" size={32} />
                         </div>
-                        <h1 className="text-4xl font-black text-[#1F4E79] tracking-tight uppercase">
+                        <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase">
                             Migration
                         </h1>
                     </div>
@@ -55,7 +55,7 @@ export default async function MigrationPage() {
             {/* Recent Sessions List */}
             <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl shadow-sm overflow-hidden p-8">
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-xl font-black text-[#1F4E79] uppercase tracking-wider">Sessions Récentes</h2>
+                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-wider">Sessions Récentes</h2>
                     <span className="px-4 py-2 bg-white/60 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border border-white/50">Derniers 30 jours</span>
                 </div>
 

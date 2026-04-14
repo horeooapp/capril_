@@ -46,7 +46,7 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
         return (
             <button 
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-[#C55A11] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A54A0D] transition-all shadow-lg active:scale-95"
+                className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#A54A0D] transition-all shadow-lg active:scale-95"
             >
                 <Plus size={16} />
                 Inviter un collaborateur
@@ -65,11 +65,11 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
                 </button>
 
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#C55A11]">
+                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-amber-600">
                         <UserPlus size={24} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-[#1F4E79] uppercase italic tracking-tighter">Nouvelle Invitation</h3>
+                        <h3 className="text-lg font-black text-slate-800 uppercase italic tracking-tighter">Nouvelle Invitation</h3>
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mandater un collaborateur</p>
                     </div>
                 </div>
@@ -94,36 +94,36 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
                             <button 
                                 type="button"
                                 onClick={() => setSelection("PARENT_AMI")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'PARENT_AMI' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'PARENT_AMI' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Parent / Ami</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Parent / Ami</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Max 2 proprios / 10 biens</span>
                             </button>
                             
                             <button 
                                 type="button"
                                 onClick={() => setSelection("NOTAIRE")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'NOTAIRE' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'NOTAIRE' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Notaire</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Notaire</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Max 5 proprios / 25 biens</span>
                             </button>
 
                             <button 
                                 type="button"
                                 onClick={() => setSelection("HUISSIER")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'HUISSIER' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'HUISSIER' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Huissier</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Huissier</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Sur mandat judiciaire</span>
                             </button>
 
                             <button 
                                 type="button"
                                 onClick={() => setSelection("AVOCAT")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AVOCAT' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AVOCAT' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Avocat</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Avocat</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Sur mandat judiciaire</span>
                             </button>
 
@@ -131,18 +131,18 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
                             <button 
                                 type="button"
                                 onClick={() => setSelection("AGENCE")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AGENCE' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'AGENCE' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Agence ou Pro</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Agence ou Pro</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Agrément CDAIM requis</span>
                             </button>
 
                             <button 
                                 type="button"
                                 onClick={() => setSelection("FIELD_AGENT")}
-                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'FIELD_AGENT' ? 'border-[#C55A11] bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
+                                className={`p-3 rounded-2xl border-2 text-left transition-all ${selection === 'FIELD_AGENT' ? 'border-amber-600 bg-orange-50' : 'border-gray-50 bg-gray-50 text-gray-500'}`}
                             >
-                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-[#1F4E79]">Agent Terrain</span>
+                                <span className="font-black text-[11px] block uppercase tracking-tighter italic text-slate-800">Agent Terrain</span>
                                 <span className="text-[9px] font-medium leading-tight text-gray-500 mt-1 block">Visites & constats</span>
                             </button>
                         </div>
@@ -156,7 +156,7 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
 
                     <button 
                         disabled={loading}
-                        className="w-full py-5 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#163a5a] transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
+                        className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#163a5a] transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
                     >
                         {loading ? <Loader2 size={20} className="animate-spin" /> : "Générer le mandat et inviter"}
                     </button>

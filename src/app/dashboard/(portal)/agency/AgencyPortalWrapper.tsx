@@ -11,8 +11,8 @@ export default function AgencyPortalWrapper({ initialData, aggregates }: { initi
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-12 h-12 text-[#1F4E79] animate-spin" />
-        <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em] font-mono animate-pulse">
+        <Loader2 className="w-12 h-12 text-slate-800 animate-spin" />
+        <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em] font-mono animate-pulse">
           Synchronisation Portfolio...
         </p>
       </div>
@@ -26,12 +26,12 @@ export default function AgencyPortalWrapper({ initialData, aggregates }: { initi
           <AlertCircle size={40} />
         </div>
         <div className="space-y-2">
-          <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Erreur Flux Agence.</h2>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Erreur Flux Agence.</h2>
           <p className="text-sm font-medium text-gray-400">{error}</p>
         </div>
         <button 
           onClick={() => window.location.reload()}
-          className="px-8 py-4 bg-[#1F4E79] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
+          className="px-8 py-4 bg-slate-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
         >
           Réessayer
         </button>

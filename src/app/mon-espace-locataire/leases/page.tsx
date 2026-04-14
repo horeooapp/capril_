@@ -138,7 +138,7 @@ export default function TenantLeasesPage() {
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">Propriétaire / Gestionnaire</span>
                                             <div className="text-right">
-                                                <span className="block font-extrabold text-[#1F4E79] uppercase">
+                                                <span className="block font-extrabold text-slate-800 uppercase">
                                                     {lease.typeGestion === 'agreee' 
                                                         ? `Bailleur Masqué (${lease.landlord?.walletConfig?.landlordCode || "AGREEE"})` 
                                                         : (lease.bailleurMasque 

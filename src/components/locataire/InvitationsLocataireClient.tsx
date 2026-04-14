@@ -76,27 +76,27 @@ export function InvitationsLocataireClient({ initialInvitations }: InvitationsLo
                             </div>
 
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-3 bg-gray-50 rounded-2xl text-[#1F4E79]">
+                                <div className="p-3 bg-gray-50 rounded-2xl text-slate-800">
                                     {inv.invitantType === 'PROPRIETAIRE' ? <User size={24} /> : <Building2 size={24} />}
                                 </div>
                                 <div>
-                                    <p className="font-black text-[#1F4E79] text-lg leading-tight">{(inv.invitant?.firstName ? inv.invitant.firstName + " " : "") + (inv.invitant?.lastName || "") || "Bailleur QAPRIL"}</p>
+                                    <p className="font-black text-slate-800 text-lg leading-tight">{(inv.invitant?.firstName ? inv.invitant.firstName + " " : "") + (inv.invitant?.lastName || "") || "Bailleur QAPRIL"}</p>
                                     <p className="text-[11px] text-gray-400 uppercase font-black tracking-widest">Souhaite vous inviter</p>
                                 </div>
                             </div>
 
                             <div className="space-y-4 mb-6">
                                 <div className="flex items-center gap-3 text-[13px] text-gray-600 font-bold">
-                                    <Home size={16} className="text-[#1F4E79]" />
+                                    <Home size={16} className="text-slate-800" />
                                     <span>{inv.property?.commune || "Biens sans commune"} - {inv.property?.address?.substring(0, 20)}...</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-[13px] text-gray-600 font-bold">
-                                    <Calendar size={16} className="text-[#1F4E79]" />
+                                    <Calendar size={16} className="text-slate-800" />
                                     <span>Début : {new Date(inv.dateDebutProposee).toLocaleDateString()}</span>
                                 </div>
                                 <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100/50">
                                     <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest mb-1">Loyer Proposé</p>
-                                    <p className="text-xl font-black text-[#1F4E79]">{Number(inv.loyerPropose).toLocaleString()} FCFA</p>
+                                    <p className="text-xl font-black text-slate-800">{Number(inv.loyerPropose).toLocaleString()} FCFA</p>
                                 </div>
 
                                 {inv.messageInvitant && (
@@ -120,7 +120,7 @@ export function InvitationsLocataireClient({ initialInvitations }: InvitationsLo
                                 <button 
                                     onClick={() => handleResponse(inv.id, 'ACCEPTEE')}
                                     disabled={loadingId === inv.id}
-                                    className="py-3 px-4 rounded-xl bg-[#1F4E79] text-white font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-50"
+                                    className="py-3 px-4 rounded-xl bg-slate-800 text-white font-black uppercase tracking-widest text-[11px] hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 disabled:opacity-50"
                                 >
                                     <Check size={14} /> Accepter
                                 </button>

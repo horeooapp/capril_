@@ -13,9 +13,9 @@ export default function DiasporaPortalWrapper() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="relative">
           <Loader2 className="w-16 h-16 text-ivoire-orange animate-spin" />
-          <Globe className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-[#1F4E79]" />
+          <Globe className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-slate-800" />
         </div>
-        <p className="text-[10px] font-black text-[#1F4E79] uppercase tracking-[0.4em] font-mono animate-pulse">
+        <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em] font-mono animate-pulse">
           Connexion au réseau international...
         </p>
       </div>
@@ -29,7 +29,7 @@ export default function DiasporaPortalWrapper() {
           <AlertCircle size={40} />
         </div>
         <div className="space-y-2">
-          <h2 className="text-3xl font-black text-[#1F4E79] tracking-tighter uppercase italic">Erreur Flux Diaspora.</h2>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Erreur Flux Diaspora.</h2>
           <p className="text-sm font-medium text-gray-400">{error}</p>
         </div>
         <button 

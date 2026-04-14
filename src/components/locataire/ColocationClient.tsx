@@ -47,7 +47,7 @@ export default function ColocationClient({ bails }: { bails: any[] }) {
         <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500 py-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-[#1F4E79] tracking-tighter uppercase mb-2">Colocation & Scission.</h1>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2">Colocation & Scission.</h1>
                     <p className="text-gray-500 font-medium tracking-wide">Divisez votre loyer. Invitez un colocataire enregistré à payer sa part directement.</p>
                 </div>
                 <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
@@ -60,7 +60,7 @@ export default function ColocationClient({ bails }: { bails: any[] }) {
                     <div className="space-y-4">
                         <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest">Sélectionner le Bail</label>
                         <select 
-                            className="w-full px-4 py-4 rounded-xl border border-gray-100 bg-gray-50 focus:ring-2 focus:ring-[#1F4E79]/20 outline-none font-bold text-[#1F4E79]"
+                            className="w-full px-4 py-4 rounded-xl border border-gray-100 bg-gray-50 focus:ring-2 focus:ring-[#1F4E79]/20 outline-none font-bold text-slate-800"
                             value={formData.leaseId}
                             onChange={(e) => setFormData({...formData, leaseId: e.target.value})}
                             required
@@ -97,7 +97,7 @@ export default function ColocationClient({ bails }: { bails: any[] }) {
                                     value={formData.splitPercentage}
                                     onChange={(e) => setFormData({...formData, splitPercentage: Number(e.target.value)})}
                                 />
-                                <div className="w-16 text-center font-black text-[#1F4E79] bg-blue-50 py-2 rounded-xl border border-blue-100">
+                                <div className="w-16 text-center font-black text-slate-800 bg-blue-50 py-2 rounded-xl border border-blue-100">
                                     {formData.splitPercentage}%
                                 </div>
                             </div>
@@ -108,7 +108,7 @@ export default function ColocationClient({ bails }: { bails: any[] }) {
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="flex items-center gap-2 px-8 py-4 bg-[#1F4E79] text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                            className="flex items-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[13px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50"
                         >
                             <Users size={18} />
                             {loading ? "Envoi..." : "Envoyer l'invitation"}

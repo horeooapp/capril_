@@ -69,9 +69,9 @@ export default function AdminProfilePage() {
                     <p className="text-gray-500 font-medium tracking-wide">Gérez vos paramètres de sécurité personnels.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 bg-[#1F4E79] text-white rounded-2xl flex items-center gap-2 shadow-lg shadow-[#1F4E79]/20">
+                    <div className="px-4 py-2 bg-slate-800 text-white rounded-2xl flex items-center gap-2 shadow-lg shadow-[#1F4E79]/20">
                         <ShieldCheck size={16} className="text-primary" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#C55A11]">Sécurité Maximale</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-600">Sécurité Maximale</span>
                     </div>
                 </div>
             </div>
@@ -135,7 +135,7 @@ export default function AdminProfilePage() {
                                         required
                                         value={formData.currentPassword}
                                         onChange={(e) => setFormData({...formData, currentPassword: e.target.value})}
-                                        className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-[#C55A11] focus:ring-0 transition-all outline-none"
+                                        className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-amber-600 focus:ring-0 transition-all outline-none"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -148,7 +148,7 @@ export default function AdminProfilePage() {
                                             required
                                             value={formData.newPassword}
                                             onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
-                                            className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-[#1F4E79] focus:ring-0 transition-all outline-none"
+                                            className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-slate-800 focus:ring-0 transition-all outline-none"
                                             placeholder="Min. 8 caractères"
                                         />
                                     </div>
@@ -159,7 +159,7 @@ export default function AdminProfilePage() {
                                             required
                                             value={formData.confirmPassword}
                                             onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                                            className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-[#1F4E79] focus:ring-0 transition-all outline-none"
+                                            className="w-full h-16 bg-gray-50 border border-transparent rounded-[1.5rem] px-8 text-sm font-bold focus:bg-white focus:border-slate-800 focus:ring-0 transition-all outline-none"
                                             placeholder="Confirmation"
                                         />
                                     </div>

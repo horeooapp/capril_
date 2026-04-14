@@ -17,7 +17,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
             type: "MAINTENANCE",
             title: "Demande d'Intervention (Travaux)",
             description: "Plomberie, électricité, étanchéité. Signalez un sinistre à votre propriétaire via la règle d'assistance sécurisée (RCL-05).",
-            icon: <MessageSquareWarning size={20} className="text-[#C55A11]" />,
+            icon: <MessageSquareWarning size={20} className="text-amber-600" />,
             badge: "Délai 144h Max",
             bgColor: "bg-orange-50",
             borderColor: "border-orange-200"
@@ -28,7 +28,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
             subType: "QUITTANCE",
             title: "Réclamation Quittance",
             description: "Paiement envoyé mais quittance certifiée manquante. Forcer l'édition avec preuve de paiement Mobile Money.",
-            icon: <Receipt size={20} className="text-[#1F4E79]" />,
+            icon: <Receipt size={20} className="text-slate-800" />,
             badge: "Pénalité J+3",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200"
@@ -113,7 +113,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
                                      {action.badge}
                                  </span>
                              </div>
-                             <h3 className="text-sm font-black text-[#1F4E79] uppercase tracking-widest mb-2 leading-tight">
+                             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-2 leading-tight">
                                  {action.title}
                              </h3>
                              <p className="text-xs font-medium text-slate-500 leading-relaxed">
@@ -148,7 +148,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
                                     <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-slate-100 text-slate-500">
                                         {activeAction.badge}
                                     </span>
-                                    <h3 className="text-xl font-black text-[#1F4E79] uppercase tracking-tighter leading-tight mt-1">
+                                    <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter leading-tight mt-1">
                                         {activeAction.title}
                                     </h3>
                                 </div>
@@ -162,7 +162,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
                                         value={formData.details}
                                         onChange={(e) => setFormData({ ...formData, details: e.target.value })}
                                         placeholder={activeAction.type === "PREAVIS" ? "Précisez votre date de départ..." : "Veuillez fournir un maximum de détails..."}
-                                        className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-[#C55A11] transition-colors resize-none" 
+                                        className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-amber-600 transition-colors resize-none" 
                                     />
                                 </div>
 
@@ -206,7 +206,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
                                     <button 
                                         disabled={isSubmitting}
                                         onClick={handleSubmit}
-                                        className="flex-1 py-4 bg-[#1F4E79] text-white rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-blue-900 transition-all shadow-lg disabled:opacity-50"
+                                        className="flex-1 py-4 bg-slate-800 text-white rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-blue-900 transition-all shadow-lg disabled:opacity-50"
                                     >
                                         {isSubmitting ? "Envoi..." : "Soumettre"}
                                     </button>

@@ -41,14 +41,14 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
       <div className="px-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 institutional-header p-6 rounded-[2rem]">
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-[#C55A11] uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
-            <h1 className="text-4xl lg:text-5xl font-black text-[#1F4E79] tracking-tighter uppercase leading-none">
+            <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em]">Module de Supervision • Agence</p>
+            <h1 className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tighter uppercase leading-none">
               Console Agence.
             </h1>
-            <p className="text-sm font-medium text-gray-500 mt-2 border-l-2 border-[#1F4E79] pl-4 uppercase tracking-widest flex items-center gap-2">
-              <span className="text-[#1F4E79] font-black">{(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || user?.name || "Agence Sans Nom"}</span>
+            <p className="text-sm font-medium text-gray-500 mt-2 border-l-2 border-slate-800 pl-4 uppercase tracking-widest flex items-center gap-2">
+              <span className="text-slate-800 font-black">{(user?.firstName ? user.firstName + " " : "") + (user?.lastName || "") || user?.name || "Agence Sans Nom"}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-              <span className="text-[10px] font-black text-[#C55A11]">
+              <span className="text-[10px] font-black text-amber-600">
                 {user?.isCertified ? "Agréée QAPRIL" : "Certification en cours"}
               </span>
             </p>
@@ -65,8 +65,8 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
               onClick={() => setActiveTab(tab.id as TabType)}
               className={`flex items-center gap-3 px-8 py-4 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#1F4E79] text-white shadow-xl shadow-blue-900/20"
-                  : "text-gray-400 hover:text-[#1F4E79] hover:bg-white"
+                  ? "bg-slate-800 text-white shadow-xl shadow-blue-900/20"
+                  : "text-gray-400 hover:text-slate-800 hover:bg-white"
               }`}
             >
               {tab.icon}

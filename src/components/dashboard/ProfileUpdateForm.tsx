@@ -140,7 +140,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
 
             <div className={`grid grid-cols-1 ${isAgency ? '' : 'md:grid-cols-2'} gap-6`}>
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#1F4E79] pl-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-800 pl-2">
                         {isAgency ? "Nom de Famille (Représentant Légal)" : "Nom de Famille"}
                     </label>
                     <input 
@@ -240,7 +240,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
 
             {!isAgency ? (
                 <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] space-y-4">
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-2">
+                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-2">
                         <ShieldCheck size={16} /> Pièce d'Identité (Obligatoire KYC 2)
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -274,9 +274,9 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                     </div>
                 </div>
             ) : (
-                <div className="p-8 bg-[#1F4E79]/5 border border-[#1F4E79]/10 rounded-[2.5rem] space-y-6">
-                    <h4 className="text-[12px] font-black uppercase tracking-widest text-[#1F4E79] flex items-center gap-3">
-                        <ShieldCheck size={20} className="text-[#C55A11]" /> 
+                <div className="p-8 bg-slate-800/5 border border-slate-800/10 rounded-[2.5rem] space-y-6">
+                    <h4 className="text-[12px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-3">
+                        <ShieldCheck size={20} className="text-amber-600" /> 
                         Identité Professionnelle & Conformité Fiscale
                     </h4>
                     
@@ -287,7 +287,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                 required 
                                 value={formData.nomAgence}
                                 onChange={(e) => setFormData({...formData, nomAgence: e.target.value})}
-                                className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                 placeholder="Ex: QAPRIL IMMOBILIER"
                             />
                         </div>
@@ -298,18 +298,18 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                 required 
                                 value={formData.adresseLocal}
                                 onChange={(e) => setFormData({...formData, adresseLocal: e.target.value})}
-                                className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                 placeholder="Adresse complète de l'agence..."
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#1F4E79]/10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800/10">
                             <div className="space-y-2">
                                 <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 pl-2">N° Agrément Ministériel</label>
                                 <input  
                                     value={formData.agrement}
                                     onChange={(e) => setFormData({...formData, agrement: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="Numéro d'agrément"
                                 />
                             </div>
@@ -319,7 +319,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                     required 
                                     value={formData.nif}
                                     onChange={(e) => setFormData({...formData, nif: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="N° Compte Contribuable"
                                 />
                             </div>
@@ -329,7 +329,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                     required 
                                     value={formData.rccm}
                                     onChange={(e) => setFormData({...formData, rccm: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="Registre de Commerce"
                                 />
                             </div>
@@ -339,7 +339,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                     required 
                                     value={formData.dfe}
                                     onChange={(e) => setFormData({...formData, dfe: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="Déclaration Fiscale d'Existence"
                                 />
                             </div>
@@ -348,7 +348,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                 <input 
                                     value={formData.rcPro}
                                     onChange={(e) => setFormData({...formData, rcPro: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="Ex: Police N°..."
                                 />
                             </div>
@@ -357,7 +357,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                                 <input 
                                     value={formData.garantieFinanciere}
                                     onChange={(e) => setFormData({...formData, garantieFinanciere: e.target.value})}
-                                    className="w-full bg-white border border-[#1F4E79]/20 rounded-2xl p-4 font-bold text-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
+                                    className="w-full bg-white border border-slate-800/20 rounded-2xl p-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#1F4E79] outline-none shadow-sm" 
                                     placeholder="Attestation..."
                                 />
                             </div>
@@ -378,7 +378,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
             <button 
                 type="submit" 
                 disabled={isPending}
-                className="w-full mt-6 py-5 bg-[#1F4E79] text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[13px] shadow-xl shadow-blue-900/20 hover:bg-blue-900 transition-all disabled:opacity-50 flex justify-center items-center active:scale-95 touch-manipulation"
+                className="w-full mt-6 py-5 bg-slate-800 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-[13px] shadow-xl shadow-blue-900/20 hover:bg-blue-900 transition-all disabled:opacity-50 flex justify-center items-center active:scale-95 touch-manipulation"
             >
                 {isPending ? "Mise à jour..." : "Enregistrer et Valider profil"}
             </button>
