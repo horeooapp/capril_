@@ -69,7 +69,7 @@ export default function DashboardLayoutClient({
         if (path.includes('/wallet')) return { title: 'Mon Wallet', subtitle: 'Solde et virements de loyers' };
         if (path.includes('/profile')) return { title: 'Mon profil', subtitle: 'Paramètres du compte' };
         if (path.includes('/mandates')) return { title: 'Mandats', subtitle: 'Actes de gestion' };
-        return { title: 'Portail QAPRIL', subtitle: 'Interface utilisateur centralisée' };
+        return { title: 'Dashboards', subtitle: 'https://qapril.ci/dashboard' };
     }
 
     const unreadNotifMode = false; // Add real hook later

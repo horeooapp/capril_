@@ -6,6 +6,7 @@ import { ChevronDown, User, Home, Building2, Globe, Handshake, ShieldCheck, Brie
 import { setChosenRole } from "@/actions/role"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 interface RoleSwitcherProps {
     currentRole: string
@@ -39,14 +40,18 @@ export default function RoleSwitcher({ currentRole, eligibleRoles }: RoleSwitche
         try {
             const res = await setChosenRole(role)
             if (res.success) {
+                toast.success(`Profil ${role} activé`)
                 // Update local session
                 await update({ chosenRole: role })
                 // Redirect and refresh
                 router.push(res.redirectUrl || "/dashboard")
                 router.refresh()
+            } else if (res.error) {
+                toast.error(res.error)
             }
         } catch (error) {
             console.error("Failed to switch role:", error)
+            toast.error("Erreur technique lors du basculement")
         } finally {
             setIsOpen(false)
             setSwitchingTo(null)

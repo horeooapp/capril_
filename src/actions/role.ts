@@ -19,23 +19,28 @@ export async function setChosenRole(role: string) {
         return { error: "Rôle non autorisé pour cet utilisateur" }
     }
 
-    // Set the global lock in Redis & Database
-    if (redis) {
-        await redis.set(`user:active_role:${session.user.id}`, role);
-    }
-    
-    const { prisma } = await import("@/lib/prisma");
-    await prisma.user.update({
-        where: { id: session.user.id },
-        data: { capaciteActive: role }
-    });
-    
-    console.log(`[AUTH] User ${session.user.email} chose role: ${role}`)
-    
-    // Determine redirect path
-    let redirectUrl = "/dashboard";
-    if (role === "TENANT") redirectUrl = "/mon-espace-locataire";
-    if (role === "ADMIN" || role === "SUPER_ADMIN") redirectUrl = "/admin";
+    try {
+        // Set the global lock in Redis & Database
+        if (redis) {
+            await redis.set(`user:active_role:${session.user.id}`, role).catch(e => console.error("Redis error:", e));
+        }
+        
+        const { prisma } = await import("@/lib/prisma");
+        await prisma.user.update({
+            where: { id: session.user.id },
+            data: { capaciteActive: role }
+        });
+        
+        console.log(`[AUTH] User ${session.user.email} chose role: ${role}`)
+        
+        // Determine redirect path
+        let redirectUrl = "/dashboard";
+        if (role === "TENANT") redirectUrl = "/mon-espace-locataire";
+        if (role === "ADMIN" || role === "SUPER_ADMIN") redirectUrl = "/admin";
 
-    return { success: true, chosenRole: role, redirectUrl }
+        return { success: true, chosenRole: role, redirectUrl }
+    } catch (error: any) {
+        console.error("[AUTH] setChosenRole Critical Error:", error);
+        return { error: "Erreur lors du changement de rôle", details: error.message }
+    }
 }
