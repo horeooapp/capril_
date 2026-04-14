@@ -72,18 +72,18 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Info Panel */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-xl bg-gradient-to-br from-[#1F4E79] to-[#0d2133] text-white">
+                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-xl bg-white">
                         <FileBadge size={40} className="mb-6 text-orange-400" />
-                        <h3 className="text-xl font-black uppercase tracking-tight mb-4">La Garantie QAPRIL</h3>
-                        <p className="text-[14px] leading-relaxed opacity-80 mb-6">
+                        <h3 className="text-xl font-black uppercase tracking-tight mb-4 text-[#1F4E79]">La Garantie QAPRIL</h3>
+                        <p className="text-[14px] leading-relaxed font-medium text-gray-500 mb-6">
                              Votre Passeport Locatif compile vos succès : paiements réguliers, baux menés à terme et score de confiance certifié. 
                              C'est un dossier complet, infalsifiable (SHA-256), prêt à être présenté aux bailleurs les plus exigeants.
                         </p>
                         <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest">
-                                <ShieldCheck size={16} className="text-emerald-400" /> Certifié par l'État (DGI)
+                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-[#1F4E79]">
+                                <ShieldCheck size={16} className="text-emerald-500" /> Certifié par l'État (DGI)
                             </div>
-                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest">
+                            <div className="flex items-center gap-3 text-[12px] font-black uppercase tracking-widest text-[#1F4E79]">
                                 <Lock size={16} className="text-orange-400" /> Sécurisé par SHA-256
                             </div>
                         </div>
