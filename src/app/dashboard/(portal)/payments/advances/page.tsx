@@ -155,9 +155,9 @@ export default function LandlordAdvancesPage() {
                                     <p className="text-[13px] text-slate-600 font-medium mt-1">{req.totalAmount.toLocaleString()} FCFA</p>
                                 </div>
                                 <div>
-                                    {req.status === 'APPROVED' && <Badge variant="success">Approuvé</Badge>}
-                                    {req.status === 'REJECTED' && <Badge variant="error">Refusé</Badge>}
-                                    {req.status !== 'APPROVED' && req.status !== 'REJECTED' && <Badge variant="neutral">{req.status}</Badge>}
+                                    {req.status === 'APPROVED' && <Badge color="green">Approuvé</Badge>}
+                                    {req.status === 'REJECTED' && <Badge color="red">Refusé</Badge>}
+                                    {req.status !== 'APPROVED' && req.status !== 'REJECTED' && <Badge color="gray">{req.status}</Badge>}
                                 </div>
                             </div>
                         ))}

@@ -73,10 +73,9 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                 </div>
 
                 <StatCard 
-                    title="Cadrages Réussis"
+                    label="Cadrages Réussis"
                     value={`${successCount}`}
-                    subtitle="baux formalisés"
-                    icon={<CheckCircle2 size={16} className="text-emerald-500" />}
+                    sub="baux formalisés"
                 />
 
                 <div className="bg-violet-50/50 p-6 rounded-[16px] border border-violet-100 shadow-sm flex flex-col justify-center">
@@ -85,10 +84,9 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                 </div>
 
                 <StatCard 
-                    title="Coût Estimé LLM"
+                    label="Coût Estimé LLM"
                     value={costFcfa.toLocaleString()}
-                    subtitle="FCFA"
-                    icon={<Bot size={16} className="text-slate-400" />}
+                    sub="FCFA"
                 />
             </div>
 
@@ -144,17 +142,17 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                                             </td>
                                             <td className="py-4 pr-2 text-right">
                                                 {c.status === 'EN_COURS' && (
-                                                    <Badge variant="info" className="animate-pulse bg-violet-100 text-violet-700 border-violet-200">
+                                                    <Badge color="blue" className="animate-pulse bg-violet-100 text-violet-700 border-violet-200">
                                                         <RefreshCw size={10} className="animate-spin duration-[3000ms] mr-1 inline" /> Processing
                                                     </Badge>
                                                 )}
                                                 {(c.status === 'TERMINE_AVEC_SUCCES' || c.status === 'COMPLETE') && (
-                                                    <Badge variant="success">
+                                                    <Badge color="green">
                                                         <CheckCircle2 size={10} className="mr-1 inline" /> Complété
                                                     </Badge>
                                                 )}
                                                 {c.status === 'BLOCAGE_IA' && (
-                                                    <Badge variant="error" className="bg-rose-50 text-rose-600 border border-rose-200">
+                                                    <Badge color="red" className="bg-rose-50 text-rose-600 border border-rose-200">
                                                         <MessageSquareWarning size={10} className="mr-1 inline" /> Human Override
                                                     </Badge>
                                                 )}

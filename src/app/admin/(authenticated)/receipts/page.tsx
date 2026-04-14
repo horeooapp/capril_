@@ -65,7 +65,8 @@ export default async function AdminReceiptsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {receipts.map((receipt) => {
+                            {receipts.map((r) => {
+                                const receipt: any = r;
                                 const tenantName = receipt.lease?.tenant?.firstName ? `${receipt.lease.tenant.firstName} ${receipt.lease.tenant.lastName || ''}` : receipt.lease?.tenant?.phone || receipt.lease?.tenant?.email || 'Inconnu'
                                 const isPaid = receipt.status?.toLowerCase() === "paid"
 
@@ -77,7 +78,7 @@ export default async function AdminReceiptsPage() {
                                                 <Banknote size={16} />
                                             </div>
                                             <div>
-                                                <div className="t-name font-mono text-[11px]">{receipt.receiptNumber || 'Non généré'}</div>
+                                                <div className="t-name font-mono text-[11px]">{receipt.receiptRef || 'Non généré'}</div>
                                                 <div className="t-loc text-[10px] text-gray-500">{receipt.lease?.property?.name || receipt.lease?.property?.propertyCode || 'Bien Inconnu'}</div>
                                             </div>
                                         </div>
@@ -86,7 +87,7 @@ export default async function AdminReceiptsPage() {
                                         <div className="t-name">{tenantName}</div>
                                     </td>
                                     <td>
-                                        <div className="t-name text-gray-400 capitalize">{receipt.month} {receipt.year}</div>
+                                        <div className="t-name text-gray-400 capitalize">{receipt.periodMonth}</div>
                                     </td>
                                     <td>
                                         <div className="t-name font-mono text-[var(--ci-orange)]">{receipt.totalAmount.toLocaleString()} F</div>

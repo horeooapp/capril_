@@ -92,15 +92,15 @@ export default function MandatesDashboardClient({ initialMandates, properties }:
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                  <StatCard 
-                    title="Mandats Actifs"
+                    label="Mandats Actifs"
                     value={`${mandates.filter(m => m.status === 'ACTIVE').length}`}
                  />
                  <StatCard 
-                    title="Taux Moyen (Gestion)"
+                    label="Taux Moyen (Gestion)"
                     value={`${mandates.length > 0 ? (mandates.reduce((acc, m) => acc + Number(m.commissionPct||0), 0) / mandates.length).toFixed(1) : 0}%`}
                  />
                  <StatCard 
-                    title="Total Mandats"
+                    label="Total Mandats"
                     value={`${mandates.length}`}
                  />
             </div>
@@ -131,9 +131,9 @@ export default function MandatesDashboardClient({ initialMandates, properties }:
                                         <span className="font-bold text-[13px] text-slate-900">{m.mandateRef || m.id.substring(0,8)}</span>
                                         <div className="mt-1">
                                             {(m.status === 'ACTIVE' || m.status === 'ACTIF') ? (
-                                                <Badge variant="success" className="inline-flex items-center gap-1"><CheckCircle size={10}/> Actif</Badge>
+                                                <Badge color="green" className="inline-flex items-center gap-1"><CheckCircle size={10}/> Actif</Badge>
                                             ) : (
-                                                <Badge variant="error" className="inline-flex items-center gap-1"><ShieldAlert size={10}/> {m.status}</Badge>
+                                                <Badge color="red" className="inline-flex items-center gap-1"><ShieldAlert size={10}/> {m.status}</Badge>
                                             )}
                                         </div>
                                     </td>

@@ -79,7 +79,7 @@ export default function FiscalDashboardClient({ initialStats }: { initialStats: 
                                  <p className="text-[14px] font-bold text-slate-900">TAF (Taxe Actions Financières)</p>
                                  <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">Paiements Mobile Money</p>
                              </div>
-                             <Badge variant="success" className="flex items-center gap-1.5"><CheckCircle2 size={12}/> Prélevé à la source</Badge>
+                             <Badge color="green" className="flex items-center gap-1.5"><CheckCircle2 size={12}/> Prélevé à la source</Badge>
                          </div>
                      </div>
                  </SectionCard>

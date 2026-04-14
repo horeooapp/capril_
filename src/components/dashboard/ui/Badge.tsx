@@ -5,9 +5,10 @@ export type BadgeColor = 'green' | 'red' | 'amber' | 'blue' | 'sky' | 'violet' |
 interface BadgeProps {
   children: React.ReactNode;
   color?: BadgeColor;
+  className?: string;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray' }) => {
+export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray', className = '' }) => {
   const map = {
     green: "bg-emerald-100 text-emerald-800",
     red: "bg-rose-100 text-rose-800",
@@ -22,7 +23,7 @@ export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray' }) => {
   };
   
   return (
-    <span className={`inline-block px-2 py-0.5 rounded-[6px] text-[10.5px] font-bold uppercase tracking-widest ${map[color]}`}>
+    <span className={`inline-block px-2 py-0.5 rounded-[6px] text-[10.5px] font-bold uppercase tracking-widest ${map[color]} ${className}`}>
       {children}
     </span>
   );

@@ -101,9 +101,9 @@ export default function ProcurationDashboardClient({ initialProcurations }: { in
                                         <td className="py-4 text-[13px] font-medium text-slate-600">{proc.droits?.action || "Global"}</td>
                                         <td className="py-4">
                                             {proc.actif ? (
-                                                <Badge variant="success">Active</Badge>
+                                                <Badge color="green">Active</Badge>
                                             ) : (
-                                                <Badge variant="error">Expirée</Badge>
+                                                <Badge color="red">Expirée</Badge>
                                             )}
                                         </td>
                                         <td className="py-4 text-right pr-2">

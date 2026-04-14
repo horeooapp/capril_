@@ -143,14 +143,12 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <StatCard
-                     title="Index CIE Relevés (Mois)"
+                     label="Index CIE Relevés (Mois)"
                      value={`${properties.length * 2} compteurs`}
-                     icon={<Zap />}
                  />
                  <StatCard
-                     title="Index SODECI Relevés"
+                     label="Index SODECI Relevés"
                      value={`${properties.length} compteurs`}
-                     icon={<Droplets />}
                  />
                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-[16px] shadow-md flex items-center gap-4 relative overflow-hidden border border-slate-700">
                     <Calculator className="absolute -right-4 -bottom-4 text-white/5" size={100} />

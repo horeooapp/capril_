@@ -331,8 +331,8 @@ export default async function AdminDashboardOverview() {
                                 {recentReceipts.map((rec, idx) => (
                                     <div key={rec.id} className="mm-card mtn-card" style={{ borderColor: 'var(--ci-orange)' }}>
                                         <div className="mm-op">Reçu #{idx+1}</div>
-                                        <div className="mm-amount">{rec.totalAmount.toLocaleString()} F</div>
-                                        <div className="mm-sub capitalize">{rec.month} {rec.year}</div>
+                                        <div className="mm-amount">{(rec as any).totalAmount.toLocaleString()} F</div>
+                                        <div className="mm-sub capitalize">{(rec as any).periodMonth}</div>
                                     </div>
                                 ))}
                                 {recentReceipts.length === 0 && (

@@ -12,7 +12,7 @@ export default async function AdminPropertiesPage() {
         orderBy: { createdAt: 'desc' },
         include: {
             owner: { select: { firstName: true, lastName: true, phone: true, email: true } },
-            managedBy: { select: { firstName: true, lastName: true, legalEntity: { select: { companyName: true } } } },
+            manager: { select: { firstName: true, lastName: true, legalEntity: { select: { companyName: true } } } },
             _count: { select: { leases: true } }
         }
     })
@@ -51,10 +51,11 @@ export default async function AdminPropertiesPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {properties.map((prop) => {
+                            {properties.map((p) => {
+                                const prop: any = p;
                                 const ownerName = prop.owner?.firstName ? `${prop.owner.firstName} ${prop.owner.lastName || ''}` : prop.owner?.phone || prop.owner?.email || 'Inconnu'
-                                const managerName = prop.managedBy?.legalEntity?.companyName || (prop.managedBy?.firstName ? `${prop.managedBy.firstName} ${prop.managedBy.lastName || ''}` : "Propriétaire En Direct")
-                                const hasLeases = prop._count.leases > 0;
+                                const managerName = prop.manager?.legalEntity?.companyName || (prop.manager?.firstName ? `${prop.manager.firstName} ${prop.manager.lastName || ''}` : "Propriétaire En Direct")
+                                const hasLeases = prop._count?.leases > 0;
 
                                 return (
                                 <tr key={prop.id}>

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { ShieldAlert, Lock, CheckCircle2, ArrowRightLeft, FileCheck, CircleDollarSign, Fingerprint, Banknote } from "lucide-react"
+import { ShieldAlert, Lock, CheckCircle2, ArrowRightLeft, FileCheck, CircleDollarSign, Fingerprint, Banknote, AlertTriangle } from "lucide-react"
 import { toast } from "sonner";
 import { transferToVault, generateTrustAudit } from "@/actions/trust-actions"
 

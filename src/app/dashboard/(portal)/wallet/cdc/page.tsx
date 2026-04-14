@@ -97,11 +97,11 @@ export default async function CDCGlobalDashboard() {
                                                     <span className="font-black text-slate-800 text-[14px]">{d.amount.toLocaleString()} FCFA</span>
                                                 </td>
                                                 <td className="py-4">
-                                                    {d.status === 'CONSIGNED' && <Badge variant="success">Consigné</Badge>}
-                                                    {d.status === 'RETURN_REQUESTED' && <Badge variant="warning">Retour demandé</Badge>}
-                                                    {d.status === 'RETURNED' && <Badge variant="neutral">Restitué</Badge>}
+                                                    {d.status === 'CONSIGNED' && <Badge color="green">Consigné</Badge>}
+                                                    {d.status === 'RETURN_REQUESTED' && <Badge color="amber">Retour demandé</Badge>}
+                                                    {d.status === 'RETURNED' && <Badge color="gray">Restitué</Badge>}
                                                     {d.status !== 'CONSIGNED' && d.status !== 'RETURN_REQUESTED' && d.status !== 'RETURNED' && (
-                                                        <Badge variant="info">{d.status}</Badge>
+                                                        <Badge color="blue">{d.status}</Badge>
                                                     )}
                                                     {d.cdcReference && <p className="text-[9px] mt-1.5 text-slate-400 font-mono">Ref: {d.cdcReference}</p>}
                                                 </td>
