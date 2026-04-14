@@ -188,6 +188,10 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 <div className="text-slate-500 text-[10px] flex items-center justify-between">
                     <span>Côte d'Ivoire · FCFA</span>
                 </div>
+                <Link href="/" className="w-full h-8 flex items-center justify-center gap-2 text-[10px] uppercase font-bold tracking-widest transition-colors bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-[6px]">
+                    <Home size={12} />
+                    Retour Accueil
+                </Link>
                 <RoleSwitcher currentRole={role} eligibleRoles={eligibleRoles || []} />
                 <button 
                     onClick={onLogout}

@@ -80,8 +80,13 @@ export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProp
               Paramètres
             </Link>
 
+            <Link href="/" className="nav-item" style={{ marginTop: '10px' }}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 7v7h4v-4h4v4h4V7L8 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Retour Accueil
+            </Link>
+
             {/* Logout button mimicking a nav-item */}
-            <div className="nav-item" onClick={onLogout} style={{ color: '#FF6600', marginTop: '20px' }}>
+            <div className="nav-item cursor-pointer" onClick={onLogout} style={{ color: '#FF6600', marginTop: '5px' }}>
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a2 2 0 01-2-2V4a2 2 0 012-2h3M10 11l4-3-4-3M14 8H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Déconnexion
             </div>

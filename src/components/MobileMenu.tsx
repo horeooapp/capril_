@@ -173,6 +173,13 @@ export default function MobileMenu({
                                     >
                                         Espace
                                     </Link>
+                                    <Link 
+                                        href="/"
+                                        onClick={() => setIsOpen(false)}
+                                        className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
+                                    >
+                                        Accueil
+                                    </Link>
                                     <div className="col-span-2">
                                         <RoleSwitcher 
                                             currentRole={activeRole || (session.user as any).chosenRole || session.user.role} 
