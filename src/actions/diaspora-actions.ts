@@ -84,7 +84,7 @@ export async function generateTaxCertificate() {
 }
 
 export async function simulateSepaVirement(amount: number, desc?: string) {
-    return { success: false, error: "Virement SEPA non disponible dans cette version." };
+    return { success: false, error: "Virement SEPA non disponible dans cette version.", message: "" };
 }
 
 export async function subscribeToDiaspora(formData: any) {
@@ -92,11 +92,22 @@ export async function subscribeToDiaspora(formData: any) {
 }
 
 export async function getDiasporaDashboard() {
-    return { success: true, data: { transactions: [] } };
+    return { 
+        success: true, 
+        data: { 
+            stats: { totalRentFcfa: 0, totalRentDevise: 0, currency: "FCFA", totalAssets: 0, occupancyRate: 0 },
+            properties: [],
+            mandats: [],
+            mobileMoney: [],
+            virements: [],
+            webhooks: [],
+            settings: { iban: "", banque: "", pays: "France", fuseau: "Europe/Paris", devise: "EUR", notifications: [] }
+        } 
+    };
 }
 
 export async function generateDiasporaInvite(email: string) {
-    return { success: false, error: "Service désactivé." };
+    return { success: false, error: "Service désactivé.", inviteUrl: "" };
 }
 
 export async function designateMandatLocal(data: any) {
