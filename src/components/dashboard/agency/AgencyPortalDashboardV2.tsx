@@ -56,15 +56,6 @@ export function AgencyPortalDashboardV2({
 
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* SECURE ALERT */}
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-4">
-            <ShieldCheck size={20} className="text-rose-600 mt-0.5 shrink-0" />
-            <div>
-               <h3 className="text-[13px] font-bold text-rose-800">Protocoles de recouvrement actifs (MM-07)</h3>
-               <p className="text-[12.5px] text-rose-700 mt-1">2 locataires sont en phase de relance avancée. Veuillez vérifier les dossiers en contentieux.</p>
-            </div>
-            <button className="ml-auto px-4 py-1.5 bg-white border border-rose-200 rounded text-[12px] font-semibold text-rose-600 hover:bg-rose-100">Voir les dossiers</button>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <StatCard 
@@ -84,48 +75,31 @@ export function AgencyPortalDashboardV2({
             />
             <StatCard 
                 label="Commissions (Est.)" 
-                value="124 000 ₣" 
-                sub="à reverser : 845k ₣" 
+                value="0 ₣" 
+                sub="à reverser : 0 ₣" 
                 trend="up" 
             />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <SectionCard title="Gestion des candidatures" action="Voir tout">
-              {[
-                { nom: "Bamba K.", bien: "Villa Riviera", statut: "Vérifié", step: "Attente Bail", color: "green" },
-                { nom: "Sylla M.", bien: "Appart. Zone 4", statut: "En cours", step: "A revoir", color: "amber" },
-                { nom: "Touré F.", bien: "Studio Cocody", statut: "Nouveau", step: "Pièces maq.", color: "sky" }
-              ].map((c, i) => (
+              {candidatures.length === 0 ? (
+                 <div className="text-[12px] text-slate-400 py-4 text-center">Aucune candidature vérifiée en cours.</div>
+              ) : candidatures.slice(0, 3).map((c, i) => (
                 <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
                   <div>
-                    <div className="font-medium text-slate-700">{c.nom} <span className="text-slate-400 font-normal ml-2">{c.bien}</span></div>
+                    <div className="font-medium text-slate-700">{c.nom || c.tenantName || `Candidat #${c.id}`} <span className="text-slate-400 font-normal ml-2">{c.bien || c.property?.name || 'Logement non défini'}</span></div>
                   </div>
                   <div className="flex gap-3 items-center text-right">
-                    <span className="text-[11px] text-slate-500">{c.step}</span>
-                    <Badge color={c.color as any}>{c.statut}</Badge>
+                    <span className="text-[11px] text-slate-500">{c.step || 'En validation'}</span>
+                    <Badge color={(c.color || "sky") as any}>{c.status || c.statut}</Badge>
                   </div>
                 </div>
               ))}
             </SectionCard>
 
             <SectionCard title="Mandats & Reversements" action="Détails">
-              {[
-                { mandant: "Société GIM", ref: "MAD-GIM-01", statut: "A REVERSER", montant: "450 000 ₣", color: "amber" },
-                { mandant: "Kone Ali", ref: "MAD-KNA-02", statut: "REVERSÉ", montant: "120 000 ₣", color: "green" },
-                { mandant: "SCI ImmoPlus", ref: "MAD-SCI-04", statut: "SOLDE INSUFF.", montant: "845 000 ₣", color: "rose" }
-              ].map((m, i) => (
-                <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
-                  <div>
-                    <div className="font-medium text-slate-700">{m.mandant}</div>
-                    <div className="text-[11px] text-slate-400 tracking-wider font-mono">{m.ref}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-slate-800">{m.montant}</div>
-                    <Badge color={m.color as any}>{m.statut}</Badge>
-                  </div>
-                </div>
-              ))}
+              <div className="text-[12px] text-slate-400 py-4 text-center">Aucun reversement de mandat en cours.</div>
             </SectionCard>
           </div>
 

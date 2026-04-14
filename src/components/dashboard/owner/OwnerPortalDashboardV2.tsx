@@ -52,12 +52,8 @@ export function OwnerPortalDashboardV2({
     return { totalLoyers, encaisse, impayesN, vacants, total: all.length, loues: all.length - vacants };
   }, [entities]);
 
-  const recentPayments = useMemo(() => {
-    return [
-      { locataire: "Coulibaly A.", mois: "Avr 2026", montant: "350 000 ₣", mode: "WAVE", statut: "COMPLET", color: "green" },
-      { locataire: "Diallo M.", mois: "Avr 2026", montant: "65 000 ₣", mode: "ORANGE", statut: "COMPLET", color: "green" },
-      { locataire: "Koffi R.", mois: "Avr 2026", montant: "40 000 ₣", mode: "SMS", statut: "PARTIEL", color: "blue" },
-    ]
+  const recentPayments: any[] = useMemo(() => {
+    return []
   }, []);
 
   return (
@@ -84,7 +80,7 @@ export function OwnerPortalDashboardV2({
         />
         <StatCard 
             label="Wallet QAPRIL" 
-            value="845 000 ₣" 
+            value="0 ₣" 
             sub="Solde disponible" 
         />
       </div>
@@ -127,7 +123,9 @@ export function OwnerPortalDashboardV2({
         </SectionCard>
 
         <SectionCard title="Derniers flux vérifiés (Quittances)">
-          {recentPayments.map((p, i) => (
+          {recentPayments.length === 0 ? (
+             <div className="text-[12px] text-slate-400 py-4 text-center">Aucun flux récent enregistré.</div>
+          ) : recentPayments.map((p, i) => (
             <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
               <div>
                 <div className="font-medium text-slate-700">{p.locataire}</div>
@@ -143,18 +141,7 @@ export function OwnerPortalDashboardV2({
       </div>
 
       <SectionCard title="Alertes & Actions Requises" action="Tout archiver">
-        {[
-          { icon: "🔴", text: "Loyer impayé J+7 — Aucun paiement détecté sur la parcelle A2", btn: "Relancer" },
-          { icon: "🟡", text: "Déclaration fiscale — Vos baux arrivent à échéance DGI", btn: "Déclarer" },
-          { icon: "🔵", text: "État des lieux de sortie prévu pour le 30 Avril", btn: "Planifier" }
-        ].map((a, i) => (
-          <div key={i} className="flex justify-between items-center p-2 mb-2 bg-slate-50 rounded-[7px] text-[12.5px]">
-            <span className="text-slate-700 font-medium">{a.icon} {a.text}</span>
-            <button className="px-3 py-1 bg-white border border-slate-200 rounded-[5px] text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-200 transition-colors">
-              {a.btn}
-            </button>
-          </div>
-        ))}
+         <div className="text-[12px] text-slate-400 py-4 text-center">Aucune alerte en cours.</div>
       </SectionCard>
 
     </div>
