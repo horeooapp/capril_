@@ -173,8 +173,6 @@ export async function requestCandidateConsent(candidatureId: string) {
         });
 
         // In a real scenario, this would trigger a WhatsApp/SMS alert to the candidate
-        // For now, we simulate the action
-        console.log(`[SMS-MOCK] => Notifying candidate of candidature ${candidatureId} to provide consent (Rule ICL-CONSENT-01)`);
         return { success: true, message: "Demande de consentement envoyée au candidat." };
     } catch (error: any) {
         return { success: false, error: error.message };

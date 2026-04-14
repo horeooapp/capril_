@@ -12,10 +12,10 @@ export async function linkStripeAccount() {
     try {
         await prisma.userDiasporaProfile.upsert({
             where: { userId: session.user.id },
-            update: { diasporaStripeId: "acct_live_qapril_" + session.user.id.substring(0, 8), diasporaAbonnement: true },
+            update: { diasporaStripeId: "", diasporaAbonnement: true },
             create: {
                 userId: session.user.id,
-                diasporaStripeId: "acct_live_qapril_" + session.user.id.substring(0, 8),
+                diasporaStripeId: "", 
                 diasporaAbonnement: true,
                 paysResidence: "France",
             }
@@ -65,8 +65,8 @@ export async function generateTaxCertificate() {
                 fiscalId: fiscal.id,
                 numeroCertificat: "CDI-" + Date.now().toString().substring(5),
                 qrToken: "QR-CDI-" + Date.now(),
-                pdfPath: "https://qapril.ci/api/docs/cdi.pdf",
-                hashSha256: "FAKED-SHA-FOR-NOW"
+                pdfPath: "/api/docs/cdi.pdf",
+                hashSha256: ""
             }
         })
 
@@ -84,21 +84,21 @@ export async function generateTaxCertificate() {
 }
 
 export async function simulateSepaVirement(amount: number, desc?: string) {
-    return { success: true, message: "OK", error: undefined as undefined | string };
+    return { success: false, error: "Virement SEPA non disponible dans cette version." };
 }
 
 export async function subscribeToDiaspora(formData: any) {
-    return { success: true, error: undefined };
+    return { success: false, error: "Service de souscription non disponible." };
 }
 
 export async function getDiasporaDashboard() {
-    return { success: true, data: {} as any };
+    return { success: true, data: { transactions: [] } };
 }
 
 export async function generateDiasporaInvite(email: string) {
-    return { success: true, inviteUrl: "https://invite.link", error: undefined };
+    return { success: false, error: "Service désactivé." };
 }
 
 export async function designateMandatLocal(data: any) {
-    return { success: true, error: undefined };
+    return { success: false, error: "Non implémenté." };
 }

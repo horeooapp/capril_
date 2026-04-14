@@ -26,13 +26,10 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import LandingToggle from "@/components/admin/LandingToggle"
-import DemoToggle from "@/components/admin/DemoToggle"
 import StatCard from "@/components/admin/StatCard"
 import LiveActivityStream from "@/components/admin/LiveActivityStream"
 import { Role } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
-import { getDemoMode } from "@/actions/demo-actions"
-import { getDemoData } from "@/lib/demo-data"
 import { getOverdueStats } from "@/actions/reminder-actions"
 import { ShieldAlert, MapPin, BarChart } from "lucide-react"
 import RealEstateObservatory from "@/components/RealEstateObservatory"
@@ -40,14 +37,12 @@ import GeographicRentAnalysis from "@/components/GeographicRentAnalysis"
 import RentRanking from "@/components/RentRanking"
 import ModuleRegistryGrid from "@/components/admin/ModuleRegistryGrid"
 import SyncButton from "@/components/admin/SyncButton"
+import AdminMarketWidget from "@/components/admin/AdminMarketWidget"
+import { getNationalMarketComparison } from "@/actions/observatory-national"
 
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
-    // Production Mode: Force real data by default
-    const isDemoMode = false
-    const demoData = null
-
     // Parallel data extraction for extreme performance
     const [
         totalUsers,
@@ -95,7 +90,8 @@ export default async function AdminDashboardOverview() {
         totalReclamations,
         totalLitiges,
         activePromos,
-        landingFlag
+        landingFlag,
+        marketIntelligence
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -144,6 +140,7 @@ export default async function AdminDashboardOverview() {
         (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
         (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
         prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
+        getNationalMarketComparison().catch(() => ({ success: false, data: null })),
     ]);
     
     // Fetch recent items for UI displays
@@ -268,6 +265,10 @@ export default async function AdminDashboardOverview() {
                         <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> QAPRIL IA</div>
                     </div>
                 </div>
+
+                {marketIntelligence?.success && marketIntelligence.data && (
+                    <AdminMarketWidget data={marketIntelligence.data} />
+                )}
 
                 <div className="dash-grid">
                     <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
