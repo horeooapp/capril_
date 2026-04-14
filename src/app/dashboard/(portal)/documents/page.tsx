@@ -15,7 +15,7 @@ export default async function DocumentsPage() {
     const leases = await prisma.lease.findMany({
         where: {
             property: {
-                landlordId: session.user.id
+                ownerUserId: session.user.id
             }
         },
         include: {
@@ -28,7 +28,7 @@ export default async function DocumentsPage() {
     const receipts = await prisma.receipt.findMany({
         where: {
             lease: {
-                property: { landlordId: session.user.id }
+                property: { ownerUserId: session.user.id }
             }
         },
         include: { lease: { include: { property: true, tenant: true } } },
@@ -94,10 +94,10 @@ export default async function DocumentsPage() {
                             {leases.length > 0 ? leases.map((lease) => (
                                 <tr key={lease.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4 font-medium text-slate-800">
-                                        {(lease.tenant as any)?.firstName} {(lease.tenant as any)?.lastName || lease.tenant?.email}
+                                        {(lease as any).tenant?.firstName} {(lease as any).tenant?.lastName || (lease as any).tenant?.email || 'N/D'}
                                     </td>
                                     <td className="px-6 py-4 truncate max-w-[200px]">
-                                        {lease.property?.name || lease.property?.address || 'Non spécifié'}
+                                        {(lease as any).property?.name || (lease as any).property?.address || 'Non spécifié'}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={"px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full flex w-fit items-center gap-1 " + (lease.status === 'ACTIVE' ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600")}>
@@ -148,10 +148,10 @@ export default async function DocumentsPage() {
                             {receipts.length > 0 ? receipts.map((rec) => (
                                 <tr key={rec.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4 font-medium text-slate-800">
-                                        {rec.receiptNumber}
+                                        {rec.receiptRef}
                                     </td>
                                     <td className="px-6 py-4">
-                                        {(rec.lease?.tenant as any)?.firstName} {(rec.lease?.tenant as any)?.lastName || rec.lease?.tenant?.email}
+                                        {((rec as any).lease?.tenant as any)?.firstName} {((rec as any).lease?.tenant as any)?.lastName || (rec as any).lease?.tenant?.email || 'N/D'}
                                     </td>
                                     <td className="px-6 py-4 capitalize">
                                         {(rec as any).periodMonth}
