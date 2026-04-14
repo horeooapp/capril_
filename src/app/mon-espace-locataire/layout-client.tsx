@@ -67,6 +67,7 @@ export default function LocataireLayoutClient({
                             { href: "/mon-espace-locataire/rights", label: "Litiges", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/profile", label: "Profil", icon: <User size={24} /> },
                             { href: "/mon-espace-locataire/passeport", label: "Passeport", icon: <ShieldAlert size={24} /> },
+                            { href: "/mon-espace-locataire/cautions", label: "Caution", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
                             ...((session.user.eligibleRoles?.length > 1 || (session.user as any).capacites?.length > 1) 
                                 ? [{ href: "/auth/choose-role", label: "Rôles", icon: <User size={24} /> }] 
