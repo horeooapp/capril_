@@ -4,6 +4,9 @@ import React, { useState, useTransition } from "react"
 import { Building2, Users, FileText, CheckCircle, Clock, AlertTriangle, Plus, Landmark, X } from "lucide-react"
 import { toast } from "sonner";
 import { createSyndicate, dispatchMilliemes } from "@/actions/syndic-actions"
+import { SectionCard } from "@/components/dashboard/ui/SectionCard";
+import { StatCard } from "@/components/dashboard/ui/StatCard";
+import { Badge } from "@/components/dashboard/ui/Badge";
 
 export default function SyndicDashboardClient({ initialSyndicates }: { initialSyndicates: any[] }) {
     const [syndicates, setSyndicates] = useState(initialSyndicates)
@@ -30,132 +33,133 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500 relative">
+        <div className="space-y-6 relative">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
-                        <Landmark className="text-qblue" size={32} /> Gestion Syndic
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
+                        <Landmark className="text-sky-600" size={32} /> Gestion Syndic
                     </h1>
-                    <p className="text-sm font-medium text-qtext-mid mt-1">
+                    <p className="text-[13.5px] font-medium text-slate-500 mt-1">
                         Assemblées générales, appels de fonds et répartition des quotes-parts.
                     </p>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
+                <button onClick={() => setIsModalOpen(true)} className="bg-slate-800 text-white px-5 py-2.5 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:bg-slate-700 transition-colors shadow-sm flex items-center gap-2">
                     <Plus size={16} /> Nouvelle Résidence
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-3xl border border-qgrey-2 shadow-sm flex flex-col justify-between">
-                    <Building2 className="text-qgrey-2 mb-4" size={24} />
-                    <div>
-                        <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest mb-1">Résidences Gérées</p>
-                        <p className="text-3xl font-black text-qnavy-dark">{syndicates.length}</p>
-                    </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl border border-qgrey-2 shadow-sm flex flex-col justify-between">
-                    <Users className="text-qblue mb-4" size={24} />
-                    <div>
-                        <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest mb-1">Lots (Copro)</p>
-                        <p className="text-3xl font-black text-qnavy-dark">{totalLots}</p>
-                    </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl border border-qgrey-2 shadow-sm flex flex-col justify-between">
-                    <FileText className="text-qorange mb-4" size={24} />
-                    <div>
-                        <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest mb-1">Trésorerie Actuelle</p>
-                        <p className="text-3xl font-black text-qnavy-dark">{tr.toLocaleString()} <span className="text-sm">FCFA</span></p>
-                    </div>
-                </div>
-                <div className="bg-qred-pale p-6 rounded-3xl border border-qred/20 shadow-sm flex flex-col justify-between">
-                    <AlertTriangle className="text-qred mb-4" size={24} />
-                    <div>
-                        <p className="text-[10px] font-black text-qred-dark uppercase tracking-widest mb-1">Arriérés Syndic</p>
-                        <p className="text-3xl font-black text-qred">{Math.abs(arrears).toLocaleString()} <span className="text-sm">FCFA</span></p>
-                    </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                 <StatCard 
+                    label="Résidences Gérées" 
+                    value={syndicates.length.toString()} 
+                    sub="Actives" 
+                    trend="up" 
+                 />
+                 <StatCard 
+                    label="Lots (Copro)" 
+                    value={totalLots.toString()} 
+                    sub="Cumul des immeubles" 
+                 />
+                 <StatCard 
+                    label="Trésorerie Actuelle" 
+                    value={<>{tr.toLocaleString()} <span className="text-[14px]">FCFA</span></>} 
+                    sub="Fonds de roulement global"
+                 />
+                 <StatCard 
+                    label="Arriérés Syndic" 
+                    value={<>{Math.abs(arrears).toLocaleString()} <span className="text-[14px]">FCFA</span></>} 
+                    sub="Déficits cumulés"
+                    trend={arrears > 0 ? "down" : undefined}
+                 />
             </div>
 
-            <div className="bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm">
-                <div className="p-6 border-b border-qgrey-2 flex justify-between items-center bg-qgrey-1/30">
-                    <h3 className="text-sm font-black text-qnavy-dark uppercase tracking-widest">Assemblées & Immeubles</h3>
-                </div>
-                
-                <table className="w-full text-left border-collapse min-w-[800px]">
-                    <thead>
-                        <tr className="bg-white border-b border-qgrey-2">
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Copropriété</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Lots</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Trésorerie Associée</th>
-                            <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Dernière AG</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {syndicates.map((s) => (
-                            <tr key={s.id} className="border-b border-qgrey-2 hover:bg-qgrey-1/30">
-                                <td className="p-5 font-bold text-sm text-qnavy-dark">{s.residenceName}</td>
-                                <td className="p-5 text-sm font-black text-qnavy">{s.properties?.length > 0 ? `${s.properties.length} (Liés)` : `${s.totalLots} (Déclarés)`}</td>
-                                <td className="p-5 text-sm font-black">
-                                    <span className={s.treasuryBalance >= 0 ? "text-qgreen" : "text-qred"}>
-                                        {s.treasuryBalance.toLocaleString()} FCFA
-                                    </span>
-                                </td>
-                                <td className="p-5">
-                                    <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${
-                                        s.agState.includes("Validée") ? "bg-qgreen-pale text-qgreen" :
-                                        s.agState.includes("Souffrance") ? "bg-qred-pale text-qred" :
-                                        "bg-qorange-pale text-qorange"
-                                    }`}>
-                                        {s.agState}
-                                    </span>
-                                </td>
+            <SectionCard title="Assemblées & Immeubles" noPadding>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr className="bg-slate-50 border-b border-slate-100">
+                                <th className="p-4 font-bold text-[10px] uppercase tracking-widest text-slate-500">Copropriété</th>
+                                <th className="p-4 font-bold text-[10px] uppercase tracking-widest text-slate-500">Lots</th>
+                                <th className="p-4 font-bold text-[10px] uppercase tracking-widest text-slate-500">Trésorerie Associée</th>
+                                <th className="p-4 font-bold text-[10px] uppercase tracking-widest text-slate-500">Dernière AG</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {syndicates.map((s) => (
+                                <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                                    <td className="p-4 font-bold text-[13.5px] text-slate-900">{s.residenceName}</td>
+                                    <td className="p-4 text-[13px] font-bold text-slate-600">{s.properties?.length > 0 ? `${s.properties.length} (Liés)` : `${s.totalLots} (Déclarés)`}</td>
+                                    <td className="p-4 text-[13px] font-black">
+                                        <span className={s.treasuryBalance >= 0 ? "text-emerald-600" : "text-rose-600"}>
+                                            {s.treasuryBalance.toLocaleString()} FCFA
+                                        </span>
+                                    </td>
+                                    <td className="p-4">
+                                        <Badge color={
+                                            s.agState.includes("Validée") ? "emerald" :
+                                            s.agState.includes("Souffrance") ? "rose" :
+                                            "amber"
+                                        }>
+                                            {s.agState}
+                                        </Badge>
+                                    </td>
+                                </tr>
+                            ))}
+                            {syndicates.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="p-12 text-center text-slate-500 text-[13px] font-medium">
+                                        Aucune résidence ou copropriété en gestion.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </SectionCard>
 
-            <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] rounded-[2rem] p-8 md:p-12 text-white relative shadow-lg overflow-hidden flex flex-col md:flex-row items-center justify-between">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[16px] p-8 md:p-10 text-white relative shadow-md overflow-hidden flex flex-col md:flex-row items-center justify-between border border-slate-700">
                 <div className="relative z-10 max-w-xl">
-                    <div className="bg-blue-500/20 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border border-blue-400/30 inline-block mb-4">Moteur de Tantièmes</div>
+                    <div className="bg-sky-500/20 text-sky-300 px-3 py-1.5 rounded-[6px] text-[10px] font-bold uppercase tracking-widest border border-sky-400/30 inline-flex items-center gap-2 mb-4">
+                        Moteur de Tantièmes
+                    </div>
                     <h2 className="text-2xl font-black mb-3">Répartition Automatique des Charges</h2>
-                    <p className="text-gray-300 text-sm leading-relaxed mb-6">Le moteur de tantièmes ventile automatiquement les déficits et génère les appels de fonds sur les fiches de paramétrage de chaques lots (Biens) liés.</p>
-                    <button type="button" onClick={() => { startTransition(async () => { toast.loading("Calcul des tantièmes en cours...", { id: "syndic" }); const res = await dispatchMilliemes(); if(res.success) toast.success(res.message || "Millièmes ventilés aux copropriétaires.", { id: "syndic" }); else toast.error(res.error, { id: "syndic" }); }) }} disabled={isPending} className="bg-white text-qnavy px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-md">
+                    <p className="text-slate-300 text-[13px] leading-relaxed mb-6">Le moteur de tantièmes ventile automatiquement les déficits et génère les appels de fonds sur les fiches de paramétrage de chaques lots liés.</p>
+                    <button type="button" onClick={() => { startTransition(async () => { toast.loading("Calcul des tantièmes en cours...", { id: "syndic" }); const res = await dispatchMilliemes(); if(res.success) toast.success(res.message || "Millièmes ventilés aux copropriétaires.", { id: "syndic" }); else toast.error(res.error, { id: "syndic" }); }) }} disabled={isPending} className="bg-white text-slate-900 px-5 py-2.5 rounded-[8px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-75">
                         Lancer le Moteur
                     </button>
                 </div>
-                <Building2 size={160} className="absolute right-0 opacity-10 -translate-y-4 pointer-events-none" />
+                <Building2 size={160} className="absolute right-0 opacity-[0.03] -translate-y-4 pointer-events-none" />
             </div>
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-qnavy/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
-                        <div className="p-6 border-b border-qgrey-2 flex justify-between items-center">
-                            <h2 className="text-lg font-black text-qnavy-dark uppercase tracking-tight flex items-center gap-2">
-                                <Landmark size={20}/> Nouvelle Copropriété
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[16px] w-full max-w-md shadow-xl overflow-hidden flex flex-col border border-slate-200">
+                        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h2 className="text-[15px] font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                                <Landmark size={20} className="text-sky-600"/> Nouvelle Copropriété
                             </h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-qtext-light hover:text-qnavy transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-qtext-light mb-2 block">Nom de la Résidence</label>
-                                <input type="text" name="residenceName" required placeholder="Ex: Tour Horizon" className="w-full p-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:outline-none focus:border-qnavy"/>
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Nom de la Résidence</label>
+                                <input type="text" name="residenceName" required placeholder="Ex: Tour Horizon" className="w-full p-2.5 bg-white border border-slate-200 rounded-[8px] text-[13px] font-medium text-slate-900 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"/>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-qtext-light mb-2 block">Nombre de Lots</label>
-                                    <input type="number" name="totalLots" required min="1" placeholder="Ex: 12" className="w-full p-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:outline-none focus:border-qnavy"/>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Nombre de Lots</label>
+                                    <input type="number" name="totalLots" required min="1" placeholder="Ex: 12" className="w-full p-2.5 bg-white border border-slate-200 rounded-[8px] text-[13px] font-medium text-slate-900 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"/>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-qtext-light mb-2 block">Trésorerie Initiale</label>
-                                    <input type="number" name="treasuryBalance" defaultValue="0" className="w-full p-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold text-qnavy focus:outline-none focus:border-qnavy"/>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Trésorerie Initiale</label>
+                                    <input type="number" name="treasuryBalance" defaultValue="0" className="w-full p-2.5 bg-white border border-slate-200 rounded-[8px] text-[13px] font-medium text-slate-900 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"/>
                                 </div>
                             </div>
-                            <button type="submit" disabled={isPending} className="w-full mt-4 bg-qnavy text-white px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all disabled:opacity-50">
-                                {isPending ? 'CRÉATION...' : 'ENREGISTRER LE SYNDIC'}
+                            <button type="submit" disabled={isPending} className="w-full mt-2 bg-slate-800 text-white px-5 py-3 rounded-[8px] font-bold text-[11px] uppercase tracking-widest hover:bg-slate-700 transition-all disabled:opacity-60 shadow-sm">
+                                {isPending ? 'CRÉATION EN COURS...' : 'ENREGISTRER LE SYNDIC'}
                             </button>
                         </form>
                     </div>
