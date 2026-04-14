@@ -46,14 +46,14 @@ export default function CookieConsent() {
             <div className="flex items-start space-x-4 relative z-10">
               <div className="flex-shrink-0 mt-1">
                 <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                  <Cookie className="text-mango w-5 h-5" />
+                  <Cookie className="text-emerald-400 w-5 h-5" />
                 </div>
               </div>
-              <div>
-                <h3 className="text-lg font-black uppercase tracking-tight mb-2">Cookies & Confidentialité</h3>
-                <p className="text-sm text-white/70 font-medium mb-4 leading-relaxed">
+              <div className="flex-1">
+                <h3 className="text-lg font-black uppercase tracking-tight mb-2 text-emerald-400">Cookies & Confidentialité</h3>
+                <p className="text-sm text-emerald-400/90 font-medium mb-4 leading-relaxed">
                   Nous utilisons des cookies pour assurer le bon fonctionnement de la plateforme QAPRIL, analyser son utilisation et sécuriser vos sessions.
-                  <Link href="/cookies" className="text-mango hover:text-mango-l transition-colors ml-1 font-bold underline decoration-mango/30 underline-offset-2 block mt-1">
+                  <Link href="/cookies" className="text-emerald-400 hover:text-emerald-300 transition-colors ml-1 font-bold underline decoration-emerald-400/30 underline-offset-2 block mt-1">
                     En savoir plus
                   </Link>
                 </p>
