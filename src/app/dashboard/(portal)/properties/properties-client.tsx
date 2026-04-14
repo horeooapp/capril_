@@ -1,10 +1,12 @@
 "use client"
 
 import React, { useState } from "react"
-import { Building2, Search, Plus, MapPin, CheckCircle, Clock, Home, X, Filter, BarChart } from "lucide-react"
+import { Building2, Search, Plus, CheckCircle, Clock, Home, Filter, ChevronRight, ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner";
+import { SectionCard } from "@/components/dashboard/ui/SectionCard"
+import { Badge } from "@/components/dashboard/ui/Badge"
 
 const FALLBACK = [
     { id: "PROP-xxx-1", name: "Résidence Le Saphir, Abidjan Sud", propertyType: "IMMEUBLE", rooms: 12, status: "active" },
@@ -30,61 +32,54 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
         setExpandedIds(next);
     };
 
-    // Filter to only show top-level properties (parents or independent)
     const topLevelProps = filteredProps.filter(p => !p.parentPropertyId);
 
     const PropertyRow = ({ p, isChild = false }: { p: any, isChild?: boolean }) => (
         <React.Fragment key={p.id}>
             <tr 
-                className={`border-b border-qgrey-2 hover:bg-qgrey-1/30 transition-colors group cursor-pointer ${isChild ? 'bg-qgrey-1/10 shadow-inner' : ''}`} 
+                className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${isChild ? 'bg-slate-50/50' : ''}`} 
                 onClick={() => router.push(`/dashboard/properties/${p.id}`)}
             >
-                <td className={`p-5 ${isChild ? 'pl-12' : ''}`}>
+                <td className={`py-3 px-4 ${isChild ? 'pl-12' : ''}`}>
                     <div className="flex items-center gap-3">
-                        {!isChild && (p.units?.length > 0) && (
+                        {!isChild && (p.units?.length > 0) ? (
                             <button 
                                 onClick={(e) => toggleExpand(p.id, e)}
-                                className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${expandedIds.has(p.id) ? 'bg-qnavy text-white rotate-90' : 'bg-qgrey-1 text-qnavy hover:bg-qgrey-2'}`}
+                                className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${expandedIds.has(p.id) ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                             >
-                                <Plus size={12} className={expandedIds.has(p.id) ? 'hidden' : 'block'} />
-                                <span className={expandedIds.has(p.id) ? 'block font-black text-[14px]' : 'hidden'}>-</span>
+                                {expandedIds.has(p.id) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             </button>
+                        ) : (
+                            !isChild && <div className="w-6 h-6" />
                         )}
-                        {isChild && <div className="w-4 h-px bg-qgrey-2"></div>}
+                        {isChild && <div className="w-4 h-px bg-slate-300"></div>}
                         <div>
-                            <p className="font-bold text-sm text-qnavy-dark">{p.name || p.propertyCode || "Bien sans nom"}</p>
-                            <p className="text-[10px] text-qtext-light font-bold mt-1 uppercase tracking-widest">
+                            <p className="font-semibold text-[13px] text-slate-800">{p.name || p.propertyCode || "Bien sans nom"}</p>
+                            <p className="text-[11px] text-slate-400 mt-0.5 tracking-wide">
                                 {isChild ? `Unité de : ${p.parentProperty?.name || p.parentPropertyId.substring(0,8)}` : `ID: ${p.id.substring(0,8)}`}
                             </p>
                         </div>
                     </div>
                 </td>
-                <td className="p-5">
-                    <span className="bg-qgrey-1 text-qtext-mid px-2 py-1 rounded text-[9px] font-black uppercase mr-2">{p.propertyType}</span>
-                    <span className="text-xs font-bold text-qnavy">
-                        {(!isChild && p.units?.length > 0) ? `${p.units.length} Unité(s)` : (p.rooms || 1) + " Pièce(s)"}
-                    </span>
+                <td className="py-3 px-4">
+                    <div className="flex items-center gap-2 text-[12.5px] text-slate-700">
+                        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide uppercase">{p.propertyType}</span>
+                        <span className="font-medium">
+                            {(!isChild && p.units?.length > 0) ? `${p.units.length} Unité(s)` : (p.rooms || 1) + " Pièce(s)"}
+                        </span>
+                    </div>
                 </td>
-                <td className="p-5">
-                    <div className="flex flex-col gap-2">
+                <td className="py-3 px-4">
+                    <div className="flex gap-2">
                         {p.status === 'active' || p.status === 'rented' ? (
-                            <span className="text-[10px] font-black uppercase text-qgreen bg-qgreen-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
-                                <CheckCircle size={10} /> ACTIF
-                            </span>
+                            <Badge color="green">ACTIF</Badge>
                         ) : (
-                            <span className="text-[10px] font-black uppercase text-qorange bg-qorange-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit">
-                                <Clock size={10} /> EN ATTENTE
-                            </span>
+                            <Badge color="amber">EN ATTENTE</Badge>
                         )}
-
                         {p.isOccupied || p.leases?.some((l:any) => l.status === 'ACTIVE') ? (
-                            <span className="text-[10px] font-black uppercase text-qblue bg-qblue-pale px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qblue/20 shadow-sm animate-pulse">
-                                <Home size={10} /> LOUÉ
-                            </span>
+                            <Badge color="sky">LOUÉ</Badge>
                         ) : (
-                            <span className="text-[10px] font-black uppercase text-qgrey-3 bg-qgrey-1 px-3 py-1.5 rounded-lg flex inline-flex items-center gap-1.5 w-fit border border-qgrey-2/50 opacity-60">
-                                <Search size={10} /> DISPONIBLE
-                            </span>
+                            <Badge color="gray">DISPONIBLE</Badge>
                         )}
                     </div>
                 </td>
@@ -96,85 +91,97 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
     );
 
     return (
-        <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
-             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
-                        <Building2 className="text-qblue" size={32} /> Foncier & Patrimoine
-                    </h1>
-                    <p className="text-sm font-medium text-qtext-mid mt-1">
-                        Gérez vos immeubles et leurs unités de manière centralisée.
-                    </p>
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="relative w-full sm:w-[350px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <input 
+                        type="text" 
+                        value={search} 
+                        onChange={(e) => setSearch(e.target.value)} 
+                        placeholder="Rechercher (nom, ID)..." 
+                        className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all placeholder:text-slate-400" 
+                    />
                 </div>
-                <div className="flex gap-3">
-                    <button onClick={() => toast.info('Menu des filtres avancés en cours d\'ouverture...')} className="bg-white border text-qnavy border-qgrey-2 px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qgrey-1 transition-all shadow-sm flex items-center gap-2">
-                        <Filter size={16} /> Filtres
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <button 
+                        onClick={() => toast.info('Menu des filtres avancés en cours...')} 
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-[8px] text-[12px] font-semibold hover:bg-slate-50 transition-colors"
+                    >
+                        <Filter size={14} /> Filtres
                     </button>
-                    <Link href="/dashboard/properties/new" className="bg-qnavy text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-qnavy-dark transition-all shadow-md flex items-center gap-2">
-                        <Plus size={16} /> Nouveau Bien
+                    <Link 
+                        href="/dashboard/properties/new" 
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-[8px] text-[12px] font-semibold shadow-sm hover:bg-slate-700 transition-colors"
+                    >
+                        <Plus size={14} /> Nouveau
                     </Link>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                 {/* Main Table */}
-                 <div className="lg:col-span-2 bg-white rounded-[2rem] border border-qgrey-2 overflow-hidden shadow-sm">
-                     <div className="p-6 border-b border-qgrey-2 flex items-center bg-qgrey-1/30">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un bien par nom ou ID..." className="w-full pl-10 pr-4 py-3 bg-white border border-qgrey-2 rounded-xl text-sm font-bold focus:outline-none focus:border-qblue focus:ring-1 focus:ring-qblue transition-all" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                    <SectionCard title="Portefeuille Immobilier" noPadding>
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Propriété</th>
+                                        <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Unité / Type</th>
+                                        <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">État Locatif</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {topLevelProps.map(p => (
+                                        <PropertyRow key={p.id} p={p} />
+                                    ))}
+                                    {topLevelProps.length === 0 && (
+                                        <tr>
+                                            <td colSpan={3} className="py-8 text-center text-slate-500 text-[13px]">
+                                                Aucun bien immobilier trouvé.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                     </div>
-                     <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-white border-b border-qgrey-2">
-                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Propriété</th>
-                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Unité / Type</th>
-                                <th className="p-5 font-black text-[10px] uppercase tracking-widest text-qtext-light">Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topLevelProps.map(p => (
-                                <PropertyRow key={p.id} p={p} />
-                            ))}
-                            {topLevelProps.length === 0 && (
-                                <tr>
-                                    <td colSpan={3} className="p-8 text-center text-qtext-light text-sm font-medium">
-                                        Aucun bien immobilier trouvé.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                     </table>
-                 </div>
+                    </SectionCard>
+                </div>
 
-                 {/* Metrics Side Panel */}
-                 <div className="space-y-6">
-                     <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#111827_100%)] rounded-[2rem] p-8 text-white relative shadow-lg overflow-hidden flex flex-col justify-between h-[250px]">
-                         <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
-                         <div>
-                             <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Valeur Parc Estimée</h3>
-                             <p className="text-4xl font-black tracking-tighter">1.2B <span className="text-lg">FCFA</span></p>
-                         </div>
-                         <div className="mt-auto">
-                              <p className="text-[10px] font-medium text-gray-300">Taux d'occupation global : <span className="text-qgreen font-black">92%</span></p>
-                              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                                  <div className="bg-qgreen h-1.5 rounded-full" style={{width: `92%`}}></div>
-                              </div>
-                         </div>
-                     </div>
+                <div className="space-y-4">
+                    <div className="p-6 bg-slate-800 rounded-[12px] text-white relative shadow-sm overflow-hidden">
+                        <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
+                        <h3 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Valeur Parc (Est.)</h3>
+                        <p className="text-3xl font-black tracking-tight mt-1">1.2B <span className="text-sm font-medium text-slate-300">FCFA</span></p>
+                        
+                        <div className="mt-8">
+                            <p className="text-[11px] font-medium text-slate-300 flex justify-between">
+                                Occupation globale
+                                <span className="text-emerald-400 font-bold">92%</span>
+                            </p>
+                            <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
+                                <div className="bg-emerald-400 h-full rounded-full" style={{width: `92%`}}></div>
+                            </div>
+                        </div>
+                    </div>
 
-                     <div className="bg-white border border-qgrey-2 rounded-[2rem] p-6 shadow-sm">
-                         <h3 className="text-sm font-black text-qnavy-dark border-b border-qgrey-2 pb-4 mb-4">Mises aux normes</h3>
-                         <div className="flex items-start gap-3 mb-4">
-                              <div className="w-2 h-2 rounded-full bg-qred mt-1.5"></div>
-                              <div>
-                                  <p className="text-xs font-bold text-qnavy">Ascenseur - Tour Ivoire</p>
-                                  <p className="text-[10px] text-qtext-light">Certificat de sécurité manquant.</p>
-                              </div>
-                         </div>
-                     </div>
-                 </div>
+                    <SectionCard title="Interventions requises">
+                        <div className="flex items-start gap-3 p-3 bg-rose-50 border border-rose-100 rounded-[8px] mb-2">
+                            <div className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0"></div>
+                            <div>
+                                <p className="text-[12.5px] font-semibold text-rose-900">Ascenseur - Tour Ivoire</p>
+                                <p className="text-[11px] text-rose-700 mt-0.5">Certificat de sécurité manquant.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-100 rounded-[8px]">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
+                            <div>
+                                <p className="text-[12.5px] font-semibold text-amber-900">Toiture - Villa Riviera</p>
+                                <p className="text-[11px] text-amber-700 mt-0.5">Inspection prévue ce mois.</p>
+                            </div>
+                        </div>
+                    </SectionCard>
+                </div>
             </div>
         </div>
     )
