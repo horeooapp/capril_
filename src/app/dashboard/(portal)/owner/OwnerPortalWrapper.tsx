@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { OwnerPortalDashboard } from '@/components/dashboard/owner/OwnerPortalDashboard';
+import { OwnerPortalDashboardV2 } from '@/components/dashboard/owner/OwnerPortalDashboardV2';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function OwnerPortalWrapper({ 
@@ -22,11 +22,9 @@ export default function OwnerPortalWrapper({
   if (!user || !properties) return null;
 
   return (
-    <OwnerPortalDashboard 
+    <OwnerPortalDashboardV2 
       user={user} 
       properties={properties} 
-      diasporaData={diasporaData}
-      intermData={intermData}
       activeRole={activeRole}
     />
   );
