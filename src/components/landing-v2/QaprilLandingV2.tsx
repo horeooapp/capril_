@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, FileText, Landmark, Brain, ShieldCheck, Wallet, CheckCircle2, ChevronRight, Check, User, Home, Building2, UserCheck, Star, Activity, MapPin } from "lucide-react";
 
 export default function QaprilLandingV2({ session }: { session: any }) {
   const [activeTab, setActiveTab] = useState("tenant");
@@ -270,20 +271,20 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       </section>
 
       {/* ═══ TICKER ═══ */}
-      <div className="ticker">
-        <div className="ticker-track" id="ticker">
-            <div className="ticker-item"><div className="ticker-dot"></div> Paiement loyer via <strong>Orange Money, MTN, Wave, Moov</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Quittances PDF <strong>certifiées</strong> automatiquement</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Baux enregistrés à la <strong>DGI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Cautions consignées à la <strong>CDC-CI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Score ICL · <strong>Passeport locatif</strong> numérique</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Agent IA pour baux <strong>déclaratifs</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Paiement loyer via <strong>Orange Money, MTN, Wave, Moov</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Quittances PDF <strong>certifiées</strong> automatiquement</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Baux enregistrés à la <strong>DGI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Cautions consignées à la <strong>CDC-CI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Score ICL · <strong>Passeport locatif</strong> numérique</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Agent IA pour baux <strong>déclaratifs</strong></div>
+      {/* ═══ TICKER ═══ */}
+      <div className="ticker" style={{ background: 'rgba(255, 255, 255, 0.5)', backdropFilter: 'blur(16px)', borderTop: '1px solid rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.7)', padding: '16px 0', opacity: 0.95, zIndex: 10, position: 'relative' }}>
+        <div className="ticker-track" id="ticker" style={{ animationDuration: '40s' }}>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--mango)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Paiement via Orange Money, MTN, Wave</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--sky)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Quittances PDF certifiées</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--lime)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Baux enregistrés DGI</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--teal)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Cautions CDC-CI</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--fuchsia)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Passeport & Agent IA</span></div>
+            
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--mango)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Paiement via Orange Money, MTN, Wave</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--sky)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Quittances PDF certifiées</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--lime)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Baux enregistrés DGI</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--teal)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Cautions CDC-CI</span></div>
+            <div className="ticker-item"><div className="ticker-dot" style={{ background: 'var(--fuchsia)' }}></div> <span style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600 }}>Passeport & Agent IA</span></div>
         </div>
       </div>
 
@@ -314,80 +315,97 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       </div>
 
       {/* ═══ FEATURES ═══ */}
-      <section className="features" id="features">
-        <div className="section-inner">
-          <div className="features-header reveal">
-            <div className="section-eyebrow">✨ Fonctionnalités</div>
-            <h2>Tout ce dont vous avez<br/>besoin en un seul endroit</h2>
-            <p className="section-desc">De la signature du bail au paiement du loyer, en passant par l'état des lieux — QAPRIL couvre tout le cycle locatif ivoirien.</p>
+      <section className="features" id="features" style={{ background: 'linear-gradient(180deg, #FFFBF5 0%, #FFFFFF 100%)', position: 'relative' }}>
+        <div className="section-inner relative z-10">
+          <div className="features-header reveal text-center max-w-4xl mx-auto mb-16">
+            <div className="inline-flex items-center mb-6 px-5 py-2 rounded-full border border-slate-200 bg-white shadow-sm" style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, color: 'var(--mango)' }}>
+              <Sparkles size={16} className="mr-2" /> <span>Tout-en-un</span>
+            </div>
+            <h2 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.1, marginBottom: '24px', letterSpacing: '-0.04em', color: 'var(--ink)' }}>
+              La puissance d'une agence,<br/>la <span style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, color: 'var(--sky)', letterSpacing: '-0.02em', paddingRight: '8px' }}>simplicité</span> d'une app
+            </h2>
+            <p className="section-desc max-w-2xl mx-auto" style={{ fontSize: '1.25rem', color: 'var(--ink3)' }}>
+              De la signature du bail au paiement du loyer mensuel, QAPRIL unifie absolument tout le cycle locatif ivoirien.
+            </p>
           </div>
-          <div className="features-grid">
 
-            <div className="feature-card fc-mango feature-card-large reveal">
-              <div className="fc-text">
-                <div className="fc-icon" style={{ background: 'var(--mango)', color: 'white' }}>💳</div>
-                <h3>Paiement loyer<br/>Mobile Money</h3>
-                <p>Payez et recevez vos loyers via Orange Money, MTN MoMo, Wave et Moov Money. Confirmation instantanée et quittance PDF générée automatiquement.</p>
-                <div className="feature-tag">Orange · MTN · Wave · Moov</div>
-              </div>
-              <div className="fc-visual">
-                <div style={{ background: 'white', borderRadius: '12px', padding: '14px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div className="flex flex-col items-center justify-center text-white bg-black shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
-                    <div className="bg-[#FF6600] w-6 h-4 flex items-end px-0.5 pb-[1px] mt-0.5 rounded-[2px]" style={{ justifyContent: 'center' }}>
-                        <span className="text-[5px] font-black tracking-tight leading-none text-white">orange</span>
-                    </div>
-                    <span className="text-[3px] font-black text-white mt-0.5 tracking-[0.2em] uppercase">Money</span>
+          <div className="features-grid" style={{ display: 'grid', gap: '24px', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+
+            <div className="glass-card feature-card-large reveal col-span-1 md:col-span-2 overflow-hidden relative group" style={{ padding: '40px', borderRadius: '32px', transition: 'all 0.4s ease', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 40px -20px rgba(0,0,0,0.05)' }}>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(255, 139, 0, 0.08), transparent 60%)' }}></div>
+              <div className="relative z-10 flex flex-col md:flex-row gap-10">
+                <div className="fc-text flex-1 flex flex-col justify-center">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm" style={{ background: 'var(--mango)', color: 'white' }}>
+                    <Wallet size={26} strokeWidth={2.5} />
                   </div>
-                  <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Orange Money</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>85 000 FCFA · confirmé ✓</div></div>
-                  <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+2s</div>
-                </div>
-                <div style={{ background: 'white', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div className="flex flex-col items-center justify-center text-white bg-[#18A9DB] shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
-                    <div className="flex items-center gap-0 mt-0.5">
-                      <span className="text-sm -mt-0.5">🐧</span>
-                      <span className="text-sm font-extrabold tracking-tighter leading-none">wave</span>
-                    </div>
-                    <span className="font-black opacity-90 tracking-widest mt-0.5 leading-none uppercase" style={{ fontSize: '4px' }}>Ton djê est calé</span>
+                  <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800, fontSize: '2rem', marginBottom: '16px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>Paiement du loyer<br/>sans friction</h3>
+                  <p style={{ color: 'var(--ink2)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '24px' }}>Payez et encaissez vos loyers via Orange Money, MTN MoMo, Wave et Moov. Rapprochement bancaire quasi instantané, quittances PDF automatiques certifiées Blockchain.</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="px-4 py-1.5 bg-white/80 rounded-full text-xs font-bold shadow-sm border border-slate-100 uppercase tracking-wider text-slate-700">Orange</span>
+                    <span className="px-4 py-1.5 bg-white/80 rounded-full text-xs font-bold shadow-sm border border-slate-100 uppercase tracking-wider text-slate-700">MTN</span>
+                    <span className="px-4 py-1.5 bg-white/80 rounded-full text-xs font-bold shadow-sm border border-slate-100 uppercase tracking-wider text-slate-700">Wave</span>
                   </div>
-                  <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Wave CI</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>160 000 FCFA · confirmé ✓</div></div>
-                  <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+1s</div>
+                </div>
+                
+                <div className="fc-visual flex-1 flex flex-col justify-center gap-4">
+                    <div style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: '20px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid rgba(255,255,255,1)' }}>
+                      <div className="flex flex-col items-center justify-center text-white bg-black shrink-0" style={{ width: '48px', height: '48px', borderRadius: '14px' }}>
+                        <div className="bg-[#FF6600] w-[26px] h-[18px] flex items-end px-[3px] pb-[1px] mt-0.5 rounded-[4px]" style={{ justifyContent: 'center' }}>
+                            <span className="text-[6px] font-black tracking-tight leading-none text-white">orange</span>
+                        </div>
+                        <span className="text-[5px] font-black text-white mt-0.5 tracking-[0.2em] uppercase">Money</span>
+                      </div>
+                      <div className="flex-1">
+                        <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>Orange Money</div>
+                        <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '13px', fontWeight: 500, color: 'var(--ink3)' }}>150 000 FCFA · confirmé ✓</div>
+                      </div>
+                      <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '13px', fontWeight: 800, color: 'var(--lime-d)', background: 'var(--lime-l)', padding: '6px 10px', borderRadius: '10px' }}>+1s</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: '20px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid rgba(255,255,255,1)' }}>
+                      <div className="flex flex-col items-center justify-center text-white bg-[#18A9DB] shrink-0" style={{ width: '48px', height: '48px', borderRadius: '14px' }}>
+                        <div className="flex items-center gap-0 mt-0.5">
+                          <span className="text-base -mt-0.5">🐧</span>
+                          <span className="text-lg font-extrabold tracking-tighter leading-none">wave</span>
+                        </div>
+                        <span className="font-black opacity-90 tracking-[0.2em] uppercase" style={{ fontSize: '4px', marginTop: '2px' }}>Ton djê est calé</span>
+                      </div>
+                      <div className="flex-1">
+                        <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '15px', fontWeight: 800, color: 'var(--ink)' }}>Wave CI</div>
+                        <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '13px', fontWeight: 500, color: 'var(--ink3)' }}>220 000 FCFA · confirmé ✓</div>
+                      </div>
+                      <div style={{ fontFamily: '"Outfit", sans-serif', fontSize: '13px', fontWeight: 800, color: 'var(--lime-d)', background: 'var(--lime-l)', padding: '6px 10px', borderRadius: '10px' }}>-2s</div>
+                    </div>
                 </div>
               </div>
             </div>
 
-            <div className="feature-card fc-sky reveal reveal-d1">
-              <div className="fc-icon" style={{ background: 'var(--sky)', color: 'white' }}>📄</div>
-              <h3>Baux numériques & DGI</h3>
-              <p>Créez, signez électroniquement et enregistrez vos contrats à la DGI. Bail déclaratif par SMS pour les situations existantes.</p>
-              <div className="feature-tag">Signature électronique · DGI</div>
+            <div className="glass-card p-10 rounded-[32px] reveal group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-15px_rgba(0,180,216,0.15)]">
+               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(0, 180, 216, 0.08), transparent 70%)' }}></div>
+               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-transform group-hover:scale-110 duration-500" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}><FileText size={26} strokeWidth={2.5} /></div>
+               <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800, fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.2, letterSpacing: '-0.02em', color: 'var(--ink)' }}>Baux légaux<br/>& Enr. DGI</h3>
+               <p style={{ color: 'var(--ink2)', fontSize: '1.05rem', lineHeight: 1.6 }}>Créez, signez électroniquement et enregistrez vos contrats à la DGI de manière 100% automatisée.</p>
             </div>
 
-            <div className="feature-card fc-lime reveal reveal-d2">
-              <div className="fc-icon" style={{ background: 'var(--lime)', color: 'white' }}>🏛</div>
-              <h3>Cautions CDC-CI</h3>
-              <p>Consignez les cautions à la Caisse des Dépôts et Consignations. Restitution transparente, traçable et légale.</p>
-              <div className="feature-tag">CDC-CI officiel</div>
+            <div className="glass-card p-10 rounded-[32px] reveal reveal-d1 group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-15px_rgba(0,200,150,0.15)]">
+               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(0, 200, 150, 0.08), transparent 70%)' }}></div>
+               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-transform group-hover:scale-110 duration-500" style={{ background: 'var(--lime-l)', color: 'var(--lime-d)' }}><Landmark size={26} strokeWidth={2.5} /></div>
+               <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800, fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.2, letterSpacing: '-0.02em', color: 'var(--ink)' }}>Cautions<br/>CDC-CI</h3>
+               <p style={{ color: 'var(--ink2)', fontSize: '1.05rem', lineHeight: 1.6 }}>Consignez obligatoirement les cautions à la CDC-CI. Garantissez une restitution sans conflit à la fin du bail.</p>
             </div>
 
-            <div className="feature-card fc-fuchsia reveal">
-              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🤖</div>
-              <h3>Agent IA Bail Déclaratif</h3>
-              <p>Notre agent conversationnel guide propriétaires et locataires pour formaliser les baux existants en quelques minutes.</p>
-              <div className="feature-tag">Claude AI · QAPRIL Agent</div>
+            <div className="glass-card p-10 rounded-[32px] reveal reveal-d2 group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-15px_rgba(224,64,251,0.15)]">
+               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(224, 64, 251, 0.08), transparent 70%)' }}></div>
+               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-transform group-hover:scale-110 duration-500" style={{ background: 'var(--fuchsia-l)', color: 'var(--fuchsia-d)' }}><Brain size={26} strokeWidth={2.5} /></div>
+               <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800, fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.2, letterSpacing: '-0.02em', color: 'var(--ink)' }}>Agent IA<br/>Autonome</h3>
+               <p style={{ color: 'var(--ink2)', fontSize: '1.05rem', lineHeight: 1.6 }}>Un assistant conversationnel instruit pour récupérer les baux déclaratifs et piloter les signalements techniques.</p>
             </div>
 
-            <div className="feature-card fc-teal reveal reveal-d1">
-              <div className="fc-icon" style={{ background: 'var(--teal)', color: 'white' }}>📊</div>
-              <h3>Score ICL & Passeport</h3>
-              <p>Construisez votre réputation de locataire fiable. Partagez votre passeport locatif pour accélérer vos candidatures.</p>
-              <div className="feature-tag">Grade A → F · QR Code</div>
-            </div>
-
-            <div className="feature-card fc-coral reveal reveal-d2">
-              <div className="fc-icon" style={{ background: 'var(--coral)', color: 'white' }}>🔧</div>
-              <h3>Maintenance & EDL</h3>
-              <p>Signalez les problèmes, suivez les interventions, réalisez les états des lieux avec photos certifiées.</p>
-              <div className="feature-tag">Photos · Certification</div>
+            <div className="glass-card p-10 rounded-[32px] reveal reveal-d3 group hover:-translate-y-2 transition-all duration-500 relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-15px_rgba(255,78,80,0.15)]">
+               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(255, 78, 80, 0.08), transparent 70%)' }}></div>
+               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-transform group-hover:scale-110 duration-500" style={{ background: 'var(--coral-l)', color: 'var(--coral-d)' }}><ShieldCheck size={26} strokeWidth={2.5} /></div>
+               <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 800, fontSize: '1.6rem', marginBottom: '14px', lineHeight: 1.2, letterSpacing: '-0.02em', color: 'var(--ink)' }}>Score ICL &<br/>Réputation</h3>
+               <p style={{ color: 'var(--ink2)', fontSize: '1.05rem', lineHeight: 1.6 }}>Note universelle de fiabilité locative. Optimisez vos entrées avec des locataires notés A ou B vérifiés.</p>
             </div>
 
           </div>
@@ -395,63 +413,80 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="how" id="how">
-        <div className="section-inner">
-          <div className="how-header reveal">
-            <div className="section-eyebrow">🗺️ Le parcours</div>
-            <h2>Opérationnel en 4 étapes</h2>
-            <p className="section-desc" style={{ margin: '0 auto', textAlign: 'center' }}>De l'inscription à la première quittance, tout se fait en moins d'une heure.</p>
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section className="how" id="how" style={{ background: '#0F1117', color: 'white', position: 'relative', overflow: 'hidden' }}>
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        <div className="section-inner relative z-10 py-24">
+          <div className="how-header reveal text-center max-w-3xl mx-auto mb-20">
+            <div className="inline-flex items-center mb-6 px-5 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md" style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 600, color: 'var(--sky)' }}>
+              <MapPin size={16} className="mr-2" /> <span>Le parcours utilisateur</span>
+            </div>
+            <h2 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: 'clamp(2rem, 4vw, 3.5rem)', lineHeight: 1.1, marginBottom: '20px', letterSpacing: '-0.03em' }}>
+              Opérationnel en <span style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, color: 'var(--mango)', letterSpacing: '-0.02em' }}>4 étapes</span>
+            </h2>
+            <p className="text-slate-400 text-lg">De l'inscription à la première quittance, numérisez votre location en moins d'une heure.</p>
           </div>
-          <div className="how-steps">
-            <div className="how-step reveal">
-              <div className="how-step-num hs-1">
-                1
-                <div className="how-step-emoji">✍️</div>
+          
+          <div className="grid md:grid-cols-4 gap-6 relative">
+            {/* Step Connector Line (desktop) */}
+            <div className="hidden md:block absolute top-[44px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 z-0"></div>
+
+            <div className="reveal relative z-10 text-center group">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-slate-900 border-2 border-slate-700 flex flex-col items-center justify-center transition-all duration-500 group-hover:border-sky-500 group-hover:shadow-[0_0_30px_rgba(0,180,216,0.2)]">
+                <div className="text-sky-400 mb-1"><UserCheck size={28} strokeWidth={2} /></div>
+                <div style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: '20px', color: 'white', opacity: 0.2 }}>01</div>
               </div>
-              <h3>Inscription & KYC</h3>
-              <p>Créez votre compte, vérifiez votre identité en 5 minutes avec votre CNI ou passeport ivoirien.</p>
+              <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: '1.25rem', marginBottom: '12px' }}>Inscription & KYC</h3>
+              <p className="text-slate-400 text-sm leading-relaxed px-4">Créez votre compte, vérifiez votre identité simplement avec votre pièce d'identité.</p>
             </div>
-            <div className="how-step reveal reveal-d1">
-              <div className="how-step-num hs-2">
-                2
-                <div className="how-step-emoji">🏠</div>
+
+            <div className="reveal reveal-d1 relative z-10 text-center group">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-slate-900 border-2 border-slate-700 flex flex-col items-center justify-center transition-all duration-500 group-hover:border-mango-500 group-hover:shadow-[0_0_30px_rgba(255,139,0,0.2)]">
+                <div className="text-mango-400 mb-1"><Home size={28} strokeWidth={2} /></div>
+                <div style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: '20px', color: 'white', opacity: 0.2 }}>02</div>
               </div>
-              <h3>Déclarez votre bien</h3>
-              <p>Propriétaires : ajoutez vos biens, définissez le loyer, invitez votre locataire existant ou recrutez-en un nouveau.</p>
+              <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: '1.25rem', marginBottom: '12px' }}>Déclarez le bien</h3>
+              <p className="text-slate-400 text-sm leading-relaxed px-4">Ajoutez vos biens, définissez le loyer, invitez votre locataire ou un candidat.</p>
             </div>
-            <div className="how-step reveal reveal-d2">
-              <div className="how-step-num hs-3">
-                3
-                <div className="how-step-emoji">📋</div>
+
+            <div className="reveal reveal-d2 relative z-10 text-center group">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-slate-900 border-2 border-slate-700 flex flex-col items-center justify-center transition-all duration-500 group-hover:border-lime-500 group-hover:shadow-[0_0_30px_rgba(0,200,150,0.2)]">
+                <div className="text-lime-400 mb-1"><FileText size={28} strokeWidth={2} /></div>
+                <div style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: '20px', color: 'white', opacity: 0.2 }}>03</div>
               </div>
-              <h3>Signez le bail</h3>
-              <p>Bail écrit ou déclaratif — notre agent IA vous guide. Enregistrement DGI et caution CDC automatisés.</p>
+              <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: '1.25rem', marginBottom: '12px' }}>Signez le bail</h3>
+              <p className="text-slate-400 text-sm leading-relaxed px-4">Bail écrit ou déclaratif généré par l'IA. Enregistrement DGI et caution CDC inclus.</p>
             </div>
-            <div className="how-step reveal reveal-d3">
-              <div className="how-step-num hs-4">
-                4
-                <div className="how-step-emoji">🎉</div>
+
+            <div className="reveal reveal-d3 relative z-10 text-center group">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-slate-900 border-2 border-slate-700 flex flex-col items-center justify-center transition-all duration-500 group-hover:border-teal-500 group-hover:shadow-[0_0_30px_rgba(0,155,126,0.2)]">
+                <div className="text-teal-400 mb-1"><Activity size={28} strokeWidth={2} /></div>
+                <div style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: '20px', color: 'white', opacity: 0.2 }}>04</div>
               </div>
-              <h3>Gérez sereinement</h3>
-              <p>Paiements Mobile Money automatiques, quittances PDF, alertes impayés, relances intelligentes.</p>
+              <h3 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, fontSize: '1.25rem', marginBottom: '12px' }}>Gérez sereinement</h3>
+              <p className="text-slate-400 text-sm leading-relaxed px-4">Paiements Mobile Money automatisés, reçus certifiés, relances et statistiques.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ USERS ═══ */}
-      <section className="users" id="users">
+      <section className="users" id="users" style={{ background: '#F8FAFC', padding: '100px 0' }}>
         <div className="section-inner">
-          <div className="users-header reveal">
-            <div className="section-eyebrow">👥 Pour qui ?</div>
-            <h2>Une plateforme,<br/>tous les acteurs</h2>
+          <div className="users-header reveal text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center mb-6 px-5 py-2 rounded-full border border-slate-200 bg-white shadow-sm" style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, color: 'var(--teal)' }}>
+              <User size={16} className="mr-2" /> <span>Pour qui ?</span>
+            </div>
+            <h2 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', lineHeight: 1.1, color: 'var(--ink)', letterSpacing: '-0.04em' }}>
+              Une seule plateforme, <span style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, color: 'var(--teal)', letterSpacing: '-0.02em', paddingRight: '8px' }}>tous les acteurs</span>
+            </h2>
           </div>
-          <div className="users-tabs">
-            <button className={`user-tab ${activeTab === 'tenant' ? 'active' : ''}`} onClick={() => setActiveTab('tenant')}>🧑 Locataire</button>
-            <button className={`user-tab ${activeTab === 'landlord' ? 'active' : ''}`} onClick={() => setActiveTab('landlord')}>🏠 Propriétaire</button>
-            <button className={`user-tab ${activeTab === 'agency' ? 'active' : ''}`} onClick={() => setActiveTab('agency')}>🏢 Agence</button>
-            <button className={`user-tab ${activeTab === 'agent' ? 'active' : ''}`} onClick={() => setActiveTab('agent')}>🤝 Agent NC</button>
-            <button className={`user-tab ${activeTab === 'champion' ? 'active' : ''}`} onClick={() => setActiveTab('champion')}>⭐ Champion</button>
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <button className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${activeTab === 'tenant' ? 'bg-black text-white shadow-lg' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`} onClick={() => setActiveTab('tenant')}><User size={18} /> Locataire</button>
+            <button className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${activeTab === 'landlord' ? 'bg-black text-white shadow-lg' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`} onClick={() => setActiveTab('landlord')}><Home size={18} /> Propriétaire</button>
+            <button className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${activeTab === 'agency' ? 'bg-black text-white shadow-lg' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`} onClick={() => setActiveTab('agency')}><Building2 size={18} /> Agence</button>
+            <button className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${activeTab === 'agent' ? 'bg-black text-white shadow-lg' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`} onClick={() => setActiveTab('agent')}><UserCheck size={18} /> Agent NC</button>
+            <button className={`px-6 py-3 rounded-full font-semibold transition-all flex items-center gap-2 ${activeTab === 'champion' ? 'bg-black text-white shadow-lg' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`} onClick={() => setActiveTab('champion')}><Star size={18} /> Champion</button>
           </div>
 
           {/* LOCATAIRE */}
@@ -649,80 +684,86 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section className="pricing" id="pricing">
-        <div className="section-inner">
-          <div className="pricing-header reveal">
-            <div className="section-eyebrow">💲 Tarifs</div>
-            <h2>Des offres pour chaque profil</h2>
-            <p className="section-desc" style={{ margin: '0 auto', textAlign: 'center' }}>Commencez gratuitement. Évoluez selon vos besoins.</p>
+      <section className="pricing" id="pricing" style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)', padding: '100px 0' }}>
+        <div className="section-inner relative z-10">
+          <div className="pricing-header reveal text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center mb-6 px-5 py-2 rounded-full border border-slate-200 bg-white shadow-sm" style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 700, color: 'var(--coral)' }}>
+              <Wallet size={16} className="mr-2" /> <span>Tarifs transparents</span>
+            </div>
+            <h2 style={{ fontFamily: '"Outfit", sans-serif', fontWeight: 900, fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', lineHeight: 1.1, color: 'var(--ink)', letterSpacing: '-0.04em', marginBottom: '20px' }}>
+              Des offres pour <span style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, color: 'var(--coral)', letterSpacing: '-0.02em', paddingRight: '8px' }}>chaque profil</span>
+            </h2>
+            <p className="text-slate-500 text-lg">Commencez gratuitement. Évoluez selon vos besoins à votre rythme.</p>
           </div>
-          <div className="pricing-grid">
-            <div className="price-card reveal">
-              <div className="price-badge" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>LOCATAIRE</div>
-              <div className="price-icon">🧑</div>
-              <div className="price-name">Locataire</div>
-              <div className="price-amount">Gratuit</div>
-              <div className="price-period">Pour toujours</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Paiement Mobile Money</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Quittances PDF</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Score ICL</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Passeport locatif</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Signalements</div>
+          
+          <div className="grid md:grid-cols-4 gap-6 max-w-7xl mx-auto items-stretch">
+            <div className="glass-card reveal bg-white p-8 rounded-3xl border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col">
+              <div className="inline-block px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-xs font-bold font-['Outfit'] tracking-widest mb-6">LOCATAIRE</div>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-slate-50 text-slate-800 ring-1 ring-slate-100"><User size={24} /></div>
+              <div className="font-['Outfit'] font-bold text-2xl text-slate-800">Locataire</div>
+              <div className="font-['Outfit'] font-black text-4xl text-slate-900 mt-4 mb-1">Gratuit</div>
+              <div className="text-slate-400 text-sm font-medium mb-8">Pour toujours</div>
+              
+              <div className="space-y-4 mb-8 flex-1">
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Paiement Mobile Money</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Quittances PDF</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Score ICL</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Passeport locatif</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-teal-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Signalements</span></div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("LOCATAIRE")}>Commencer gratuitement</button>
+              <button className="w-full py-4 rounded-xl border-2 border-slate-200 font-bold text-slate-700 hover:border-slate-800 hover:bg-slate-50 transition-colors" onClick={() => handleLoginClick("LOCATAIRE")}>Commencer gratuitement</button>
             </div>
 
-            <div className="price-card reveal reveal-d1">
-              <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>ESSENTIEL</div>
-              <div className="price-icon">🏠</div>
-              <div className="price-name">Essentiel</div>
-              <div className="price-amount">2 500</div>
-              <div className="price-period">FCFA / mois · par bien</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion baux</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Suivi loyers</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Relances auto</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Enregistrement DGI</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Caution CDC-CI</div>
+            <div className="glass-card reveal reveal-d1 bg-white p-8 rounded-3xl border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col">
+              <div className="inline-block px-3 py-1 bg-mango-50 text-mango-600 rounded-full text-xs font-bold font-['Outfit'] tracking-widest mb-6">ESSENTIEL</div>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-slate-50 text-slate-800 ring-1 ring-slate-100"><Home size={24} /></div>
+              <div className="font-['Outfit'] font-bold text-2xl text-slate-800">Essentiel</div>
+              <div className="font-['Outfit'] font-black text-4xl text-slate-900 mt-4 mb-1">2 500</div>
+              <div className="text-slate-400 text-sm font-medium mb-8">FCFA / mois · par bien</div>
+              
+              <div className="space-y-4 mb-8 flex-1">
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-mango-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Gestion baux</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-mango-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Suivi loyers</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-mango-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Relances auto</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-mango-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Enregistrement DGI</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-mango-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Caution CDC-CI</span></div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Essayer 30 jours gratuit</button>
+              <button className="w-full py-4 rounded-xl font-bold bg-slate-800 text-white hover:bg-slate-900 transition-colors shadow-lg" onClick={() => handleLoginClick("BAILLEUR")}>Essayer 30 jours</button>
             </div>
 
-            <div className="price-card featured reveal reveal-d2">
-              <div className="price-badge">⭐ PLUS POPULAIRE</div>
-              <div className="price-icon">🏢</div>
-              <div className="price-name">Pro</div>
-              <div className="price-amount">8 000</div>
-              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>FCFA / mois · illimité</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Essentiel</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Mandats de gestion</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> CRG automatiques</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Agent IA bail déclaratif</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Biens illimités</div>
+            <div className="glass-card reveal reveal-d2 bg-slate-900 p-8 rounded-3xl border border-slate-700 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,180,216,0.5)] md:-translate-y-4 relative flex flex-col z-10">
+              <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-t-3xl"></div>
+              <div className="inline-block px-3 py-1 bg-sky-900/50 text-sky-400 rounded-full text-xs font-bold font-['Outfit'] tracking-widest mb-6 border border-sky-800">⭐ PLUS POPULAIRE</div>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-slate-800 text-white ring-1 ring-slate-700"><Building2 size={24} /></div>
+              <div className="font-['Outfit'] font-bold text-2xl text-white">Pro</div>
+              <div className="font-['Outfit'] font-black text-4xl text-white mt-4 mb-1">8 000</div>
+              <div className="text-slate-400 text-sm font-medium mb-8">FCFA / mois · illimité</div>
+              
+              <div className="space-y-4 mb-8 flex-1">
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5"/> <span className="text-slate-300 text-sm">Tout Essentiel</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5"/> <span className="text-slate-300 text-sm">Mandats de gestion</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5"/> <span className="text-slate-300 text-sm">CRG automatiques</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5"/> <span className="text-slate-300 text-sm">Agent IA bail déclaratif</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-sky-400 shrink-0 mt-0.5"/> <span className="text-slate-300 text-sm font-semibold">Biens illimités</span></div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Commencer avec Pro →</button>
+              <button className="w-full py-4 rounded-xl font-bold bg-white text-slate-900 hover:bg-sky-50 transition-colors shadow-lg shadow-white/10" onClick={() => handleLoginClick("BAILLEUR")}>Commencer avec Pro <ChevronRight size={16} className="inline ml-1"/></button>
             </div>
 
-            <div className="price-card reveal reveal-d3">
-              <div className="price-badge" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>INSTITUTIONNEL</div>
-              <div className="price-icon">🏛</div>
-              <div className="price-name">Institutionnel</div>
-              <div className="price-amount">Sur devis</div>
-              <div className="price-period">SCI · Foncières · Syndics</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Pro</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Multi-entités légales</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> API dédiée</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Onboarding dédié</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> SLA premium</div>
+            <div className="glass-card reveal reveal-d3 bg-white p-8 rounded-3xl border border-slate-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative flex flex-col">
+              <div className="inline-block px-3 py-1 bg-fuchsia-50 text-fuchsia-600 rounded-full text-xs font-bold font-['Outfit'] tracking-widest mb-6">INSTITUTIONNEL</div>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-slate-50 text-slate-800 ring-1 ring-slate-100"><Landmark size={24} /></div>
+              <div className="font-['Outfit'] font-bold text-2xl text-slate-800">Institutionnel</div>
+              <div className="font-['Outfit'] font-black text-4xl text-slate-900 mt-4 mb-1">Sur devis</div>
+              <div className="text-slate-400 text-sm font-medium mb-8">SCI · Foncières · Syndics</div>
+              
+              <div className="space-y-4 mb-8 flex-1">
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-fuchsia-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Tout Pro</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-fuchsia-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Multi-entités légales</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-fuchsia-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">API dédiée</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-fuchsia-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">Onboarding dédié</span></div>
+                <div className="flex items-start gap-3"><CheckCircle2 size={18} className="text-fuchsia-500 shrink-0 mt-0.5"/> <span className="text-slate-600 text-sm">SLA premium</span></div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("ADMIN")}>Contacter l'équipe</button>
+              <button className="w-full py-4 rounded-xl border-2 border-slate-200 font-bold text-slate-700 hover:border-slate-800 hover:bg-slate-50 transition-colors" onClick={() => handleLoginClick("ADMIN")}>Contacter l'équipe</button>
             </div>
           </div>
         </div>
