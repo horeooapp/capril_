@@ -88,7 +88,7 @@ export default function DashboardLayoutClient({
                     themeId={theme.id}
                     diasporaAbonnement={session.user.diasporaAbonnement || activeRole === 'DIASPORA'}
                     agencyConfig={agencyConfig}
-                    eligibleRoles={session.user.eligibleRoles}
+                    eligibleRoles={session.user.eligibleRoles || [session.user.role]}
                 />
             )}
 

@@ -24,7 +24,6 @@ export async function setChosenRole(role: string) {
         await redis.set(`user:active_role:${session.user.id}`, role);
     }
     
-    // Also persist in the DB for consistent sessions across devices
     const { prisma } = await import("@/lib/prisma");
     await prisma.user.update({
         where: { id: session.user.id },
@@ -33,5 +32,10 @@ export async function setChosenRole(role: string) {
     
     console.log(`[AUTH] User ${session.user.email} chose role: ${role}`)
     
-    return { success: true, chosenRole: role }
+    // Determine redirect path
+    let redirectUrl = "/dashboard";
+    if (role === "TENANT") redirectUrl = "/mon-espace-locataire";
+    if (role === "ADMIN" || role === "SUPER_ADMIN") redirectUrl = "/admin";
+
+    return { success: true, chosenRole: role, redirectUrl }
 }

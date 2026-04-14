@@ -4,6 +4,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { User } from 'lucide-react'
+import RoleSwitcher from './dashboard/RoleSwitcher'
 
 interface NavLink {
     href: string
@@ -172,15 +173,12 @@ export default function MobileMenu({
                                     >
                                         Espace
                                     </Link>
-                                    {(session.user as any).eligibleRoles?.length > 1 && (
-                                        <Link 
-                                            href="/auth/choose-role"
-                                            onClick={() => setIsOpen(false)}
-                                            className="flex items-center justify-center bg-[#C55A11]/10 text-[#C55A11] py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all col-span-2 border border-[#C55A11]/20"
-                                        >
-                                            Changer de Profil
-                                        </Link>
-                                    )}
+                                    <div className="col-span-2">
+                                        <RoleSwitcher 
+                                            currentRole={activeRole || (session.user as any).chosenRole || session.user.role} 
+                                            eligibleRoles={(session.user as any).eligibleRoles} 
+                                        />
+                                    </div>
                                     <button 
                                         onClick={() => {
                                             setIsOpen(false);

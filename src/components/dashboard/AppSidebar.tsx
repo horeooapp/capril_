@@ -11,6 +11,8 @@ import {
     MapPin, HardDriveUpload, SmartphoneNfc, MessageSquareWarning, BarChartHorizontal, Megaphone
 } from "lucide-react"
 
+import RoleSwitcher from "./RoleSwitcher"
+
 interface AppSidebarProps {
     role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
     onLogout: () => void | Promise<void>
@@ -174,15 +176,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 <div className="text-slate-500 text-[10px] flex items-center justify-between">
                     <span>Côte d'Ivoire · FCFA</span>
                 </div>
-                {eligibleRoles && eligibleRoles.length > 1 && (
-                    <Link 
-                        href="/auth/choose-role"
-                        className="w-full h-8 bg-slate-800 text-slate-300 rounded-[6px] flex items-center justify-center gap-2 text-[10px] font-medium hover:bg-slate-700 hover:text-white transition-colors"
-                    >
-                        <User size={12} />
-                        Changer de Profil
-                    </Link>
-                )}
+                <RoleSwitcher currentRole={role} eligibleRoles={eligibleRoles || []} />
                 <button 
                     onClick={onLogout}
                     className="w-full h-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-[6px] flex items-center justify-center gap-2 text-[10px] font-medium transition-colors"
