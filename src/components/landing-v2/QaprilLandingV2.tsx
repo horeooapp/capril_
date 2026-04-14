@@ -149,6 +149,10 @@ export default function QaprilLandingV2({ session }: { session: any }) {
         </div>
       )}
 
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+      `}} />
+
       {/* ═══ HERO ═══ */}
       <section className="hero" id="hero">
         <div className="hero-bg">
@@ -183,7 +187,9 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="hero-badge-dot"></div>
               <span>4 800+ utilisateurs actifs</span>
             </div>
-            <h1>La gestion<br/>locative <span className="accent-mango">enfin</span><br/><span className="accent-sky">simple</span> & digitale</h1>
+            <h1 style={{ fontFamily: '"Outfit", "Cabinet Grotesk", sans-serif', fontWeight: 900, letterSpacing: '-0.04em' }}>
+              La gestion<br/>locative <span className="accent-mango" style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, paddingRight: '8px', letterSpacing: '-0.02em' }}>enfin</span><br/><span className="accent-sky">simple</span> & digitale
+            </h1>
             <p className="hero-desc">QAPRIL connecte locataires, propriétaires et agences immobilières sur une seule plateforme. Payez votre loyer, gérez vos biens, formalisez vos baux — tout en quelques clics.</p>
             <div className="hero-actions">
               {session?.user ? (
