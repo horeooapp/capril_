@@ -25,7 +25,7 @@ import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
 import BottomNav from "@/components/BottomNav"
-import { signOut } from "next-auth/react"
+import { signOut, SessionProvider } from "next-auth/react"
 
 import AppSidebar from "@/components/dashboard/AppSidebar"
 
@@ -77,6 +77,7 @@ export default function DashboardLayoutClient({
     const meta = getPageMeta();
 
     return (
+        <SessionProvider session={session}>
         <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-sans">
             
             {/* Sidebar Desktop */}
@@ -174,5 +175,6 @@ export default function DashboardLayoutClient({
                 )}
             </div>
         </div>
+        </SessionProvider>
     )
 }
