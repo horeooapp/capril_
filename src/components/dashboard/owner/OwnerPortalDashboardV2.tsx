@@ -5,7 +5,7 @@ import Link from "next/link"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
-import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, ChevronRight } from "lucide-react"
+import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, ChevronRight, FileSignature, Users, BarChart3 } from "lucide-react"
 
 export function OwnerPortalDashboardV2({ 
   user, 
@@ -97,6 +97,9 @@ export function OwnerPortalDashboardV2({
               { label: "Quittances", icon: <Receipt size={16} />, href: "/dashboard/receipts" },
               { label: "États des lieux", icon: <MapPin size={16} />, href: "/dashboard/inspections" },
               { label: "Procédures", icon: <Scale size={16} />, href: "/dashboard/disputes" },
+              { label: "Mandats", icon: <FileSignature size={16} />, href: "/dashboard/mandates" },
+              { label: "Dossiers Locs.", icon: <Users size={16} />, href: "/dashboard/matching" },
+              { label: "CRG & Flux", icon: <BarChart3 size={16} />, href: "/dashboard/reports" },
               { label: "Portefeuille", icon: <Wallet size={16} />, href: "/dashboard/wallet" },
           ].map((action, i) => (
               <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-200 rounded-[10px] hover:border-emerald-500 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all">
