@@ -17,8 +17,10 @@ import CreateLeaseScreen from '../screens/CreateLeaseScreen';
 import TenantsScreen from '../screens/TenantsScreen';
 import ApplicationsScreen from '../screens/ApplicationsScreen';
 import MessageScreen from '../screens/MessageScreen';
+import FeatureTeaserScreen from '../screens/FeatureTeaserScreen';
 
 import CustomBottomTab from '../components/navigation/CustomBottomTab';
+import CustomDrawer from '../components/navigation/CustomDrawer';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,20 +45,21 @@ function MainTabNavigator() {
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawer {...props} />}
       screenOptions={{
         headerShown: false,
-        drawerStyle: { backgroundColor: Colors.primary, width: 280 },
-        drawerActiveTintColor: Colors.accent,
-        drawerInactiveTintColor: Colors.white,
+        drawerStyle: { width: '85%' },
       }}
     >
-      <Drawer.Screen name="MainTab" component={MainTabNavigator} options={{ title: 'Accueil Propriétaire' }} />
-      <Drawer.Screen name="Diaspora" component={DiasporaScreen} options={{ title: 'Espace Diaspora' }} />
-      
-      {/* Ajout des liens au tiroir principal si Custom SideMenu l'appelle */}
-      <Drawer.Screen name="Wallet" component={WalletScreen} options={{ title: 'Trésorerie & Wallet' }} />
-      <Drawer.Screen name="Tenants" component={TenantsScreen} options={{ title: 'Mes Locataires' }} />
-      <Drawer.Screen name="Applications" component={ApplicationsScreen} options={{ title: 'Candidatures' }} />
+      <Drawer.Screen name="MainTab" component={MainTabNavigator} />
+      <Drawer.Screen name="Diaspora" component={DiasporaScreen} />
+      <Drawer.Screen name="FeatureTeaser" component={FeatureTeaserScreen} />
+      <Drawer.Screen name="PropertiesScreen" component={PropertiesScreen} />
+      <Drawer.Screen name="Wallet" component={WalletScreen} />
+      <Drawer.Screen name="Maintenance" component={MaintenanceScreen} />
+      <Drawer.Screen name="Message" component={MessageScreen} />
+      <Drawer.Screen name="Tenants" component={TenantsScreen} />
+      <Drawer.Screen name="Applications" component={ApplicationsScreen} />
     </Drawer.Navigator>
   );
 }
