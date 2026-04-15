@@ -538,6 +538,8 @@ model User {
   salary             Float?       @map("salary")
   avatarUrl          String?      @map("avatar_url")
   email              String?      @unique
+  emailVerified      Boolean      @default(false) @map("email_verified")
+  emailVerifiedAt    DateTime?    @map("email_verified_at")
   role               Role         @default(TENANT)
   profileType        ProfileType? @map("profile_type")
   kycLevel           Int          @default(0) @map("kyc_level") // 0-4
@@ -705,11 +707,33 @@ model User {
   walletTransactions    WalletTransaction[]
 
   automationSettings AutomationSettings?
+  emailVerificationTokens EmailVerificationToken[]
 
   @@index([phone])
   @@index([role])
   @@map("users")
 }
+
+// ═══════════════════════════════════════════════════════
+// ANNUAIRE URGENCES (Contacts pour Locataires)
+// ═══════════════════════════════════════════════════════
+model AnnuaireUrgences {
+  id          String   @id @default(uuid()) @map("contact_id")
+  name        String   @map("name")
+  category    String   @map("category") // Plomberie, Electricité, Sécurité, etc.
+  phone       String   @map("phone")
+  location    String?  @map("location") 
+  hours       String?  @map("hours")
+  lat         Float?   @map("lat")
+  lng         Float?   @map("lng")
+  iconName    String?  @default("Phone") @map("icon_name")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("annuaire_urgences")
+}
+
 
 // ═══════════════════════════════════════════════════════
 // LEGAL ENTITIES (Part 5.1/Level 4)
@@ -3611,4 +3635,21 @@ model FinancialReport {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("financial_reports")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token     String   @unique          // Le code OTP ou lien token
+  email     String                    // L'email à vérifier
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at") // null = pas encore utilisé
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([token])
+  @@map("email_verification_tokens")
 }

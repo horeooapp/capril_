@@ -1,28 +1,49 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { API_ENDPOINTS } from '../config/api';
 
-export default function MaintenanceScreen() {
+export default function MaintenanceScreen({ route, navigation }: any) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('MOYENNE');
   const [category, setCategory] = useState('PLOMBERIE');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title || !description) return Alert.alert("Erreur", "Veuillez remplir tous les champs");
 
     setLoading(true);
     
-    // Simulation API Call
-    setTimeout(() => {
+    try {
+      // Pour une app en production, on devrait utiliser AsyncStorage ou Context pour le token
+      const token = route.params?.token || 'DUMMY_TOKEN';
+      
+      const res = await fetch(API_ENDPOINTS.TICKETS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'CREATE_TICKET',
+          token, 
+          title, 
+          description, 
+          priority, 
+          category 
+        })
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        Alert.alert("Succès", "Votre déclaration d'incident a été envoyée au propriétaire/à l'agence.");
+        setTitle('');
+        setDescription('');
+      } else {
+        Alert.alert("Erreur", data.error || "Impossible de déclarer l'incident.");
+      }
+    } catch (e) {
+      Alert.alert("Erreur réseau", "Serveur injoignable.");
+    } finally {
       setLoading(false);
-      Alert.alert(
-        "Succès", 
-        "Votre déclaration d'incident a été envoyée au propriétaire/à l'agence."
-      );
-      setTitle('');
-      setDescription('');
-    }, 1500);
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "proprietaire",
+    "name": "Qapril Proprietaires",
     "slug": "proprietaire",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,9 +8,9 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo-qapril.png",
       "resizeMode": "contain",
-      "backgroundColor": "#C55A11"
+      "backgroundColor": "#064E3B"
     },
     "ios": {
       "supportsTablet": true
@@ -18,8 +18,8 @@
     "android": {
       "package": "ci.qapril.proprietaire",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#C55A11"
+        "foregroundImage": "./assets/logo-qapril.png",
+        "backgroundColor": "#064E3B"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false

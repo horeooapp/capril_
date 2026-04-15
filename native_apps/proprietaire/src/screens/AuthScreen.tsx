@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native';
 
 export default function AuthScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
@@ -8,7 +8,7 @@ export default function AuthScreen({ navigation }: any) {
   const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_URL = 'http://192.168.1.9:3000/api/mobile/auth';
+  const API_URL = 'https://www.qapril.ci/api/mobile/auth';
 
   const handleRequestOTP = async () => {
     if (!email) return Alert.alert("Erreur", "Veuillez entrer une adresse.");
@@ -43,8 +43,8 @@ export default function AuthScreen({ navigation }: any) {
       });
       const data = await response.json();
       if (data.success) {
-        // Redirection vers le Dashoard Natif
-        navigation.replace('Main', { token: data.token });
+        // Redirection vers le choix de profil
+        navigation.replace('RoleSelection', { token: data.token });
       } else {
         Alert.alert("Erreur", data.error || "Code incorrect.");
       }
@@ -64,6 +64,10 @@ export default function AuthScreen({ navigation }: any) {
         <StatusBar style="light" />
         
         <View style={styles.header}>
+            <Image 
+               source={require('../../assets/logo-qapril.png')} 
+               style={{width: 80, height: 80, resizeMode: 'contain', marginBottom: 16}} 
+            />
             <Text style={styles.title}>Propriétaire</Text>
             <Text style={styles.subtitle}>Gérez votre patrimoine immobilier</Text>
         </View>
@@ -114,17 +118,17 @@ export default function AuthScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#C55A11' },
+  safeArea: { flex: 1, backgroundColor: '#064E3B' },
   container: { flex: 1, justifyContent: 'center', padding: 24 },
   header: { marginBottom: 40, alignItems: 'center' },
-  title: { fontSize: 42, fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', letterSpacing: 2 },
-  subtitle: { fontSize: 14, color: '#ffedd5', fontWeight: '600', marginTop: 8 },
+  title: { fontSize: 24, fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', letterSpacing: 2 },
+  subtitle: { fontSize: 12, color: '#ffedd5', fontWeight: '600', marginTop: 8 },
   card: { backgroundColor: '#ffffff', borderRadius: 24, padding: 30, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 10 },
   cardTitle: { fontSize: 20, fontWeight: '800', color: '#111827', marginBottom: 24, textAlign: 'center' },
   label: { fontSize: 12, fontWeight: '800', color: '#4b5563', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   input: { backgroundColor: '#f9fafb', borderRadius: 16, paddingHorizontal: 20, paddingVertical: 18, fontSize: 16, fontWeight: '600', color: '#111827', marginBottom: 20, borderWidth: 1, borderColor: '#e5e7eb' },
-  otpInput: { fontSize: 28, letterSpacing: 10, textAlign: 'center', fontWeight: '900', color: '#C55A11' },
-  button: { backgroundColor: '#C55A11', borderRadius: 16, paddingVertical: 18, alignItems: 'center', shadowColor: '#C55A11', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
+  otpInput: { fontSize: 28, letterSpacing: 10, textAlign: 'center', fontWeight: '900', color: '#064E3B' },
+  button: { backgroundColor: '#064E3B', borderRadius: 16, paddingVertical: 18, alignItems: 'center', shadowColor: '#064E3B', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
   buttonText: { color: '#ffffff', fontSize: 14, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 },
   linkButton: { marginTop: 16, alignItems: 'center' },
   linkText: { color: '#6b7280', fontSize: 12, fontWeight: '700', textTransform: 'uppercase' }

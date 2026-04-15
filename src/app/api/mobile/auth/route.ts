@@ -19,10 +19,28 @@ export async function POST(req: Request) {
 
         // 1. Demander un code OTP
         if (action === 'REQUEST_OTP') {
+            const user = await prisma.user.findFirst({ where: { email: normalizedEmail } });
+            if (!user) {
+                return NextResponse.json({ error: "Compte introuvable, veuillez vous inscrire sur le web." }, { status: 403 });
+            }
+
             const newOtp = generateOTP();
-            if (!redis) return NextResponse.json({ error: "Service indisponible" }, { status: 500 });
             
-            await redis.set(`otp:${normalizedEmail}`, newOtp, 'EX', 600); // 10 minutes
+            // Créer le token dans la base de données
+            await prisma.emailVerificationToken.create({
+                data: {
+                    userId: user.id,
+                    token: newOtp,
+                    email: normalizedEmail,
+                    expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                }
+            });
+
+            // On garde Redis en optionnel si configuré, pour compatibilité
+            if (redis) {
+                await redis.set(`otp:${normalizedEmail}`, newOtp, 'EX', 600); 
+            }
+
             const emailResult = await sendOTPEmail(normalizedEmail, newOtp);
             
             if (!emailResult.success) {
@@ -34,31 +52,62 @@ export async function POST(req: Request) {
         // 2. Vérifier le code OTP
         if (action === 'VERIFY_OTP') {
             if (!otp) return NextResponse.json({ error: "Code OTP requis." }, { status: 400 });
-            if (!redis) return NextResponse.json({ error: "Service indisponible" }, { status: 500 });
 
-            const storedOtp = await redis.get(`otp:${normalizedEmail}`);
-            if (!storedOtp || storedOtp !== otp) {
-                return NextResponse.json({ error: "Code incorrect ou expiré." }, { status: 400 });
+            // Trouver le token dans la DB
+            const record = await prisma.emailVerificationToken.findFirst({
+                where: { 
+                    token: otp,
+                    email: normalizedEmail,
+                    usedAt: null
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            if (!record || record.expiresAt < new Date()) {
+                // Fallback optionnel sur Redis si jamais le record DB a échoué mais Redis a fonctionné (rare)
+                let redisMatch = false;
+                if (redis) {
+                    const storedOtp = await redis.get(`otp:${normalizedEmail}`);
+                    if (storedOtp === otp) redisMatch = true;
+                }
+
+                if (!redisMatch) {
+                    return NextResponse.json({ error: "Code incorrect ou expiré." }, { status: 400 });
+                }
             }
 
-            // Récupérer l'utilisateur pour vérifier son rôle
-            const user = await prisma.user.findFirst({ where: { email: normalizedEmail } });
+            // Récupérer l'utilisateur
+            const userId = record?.userId;
+            const user = await prisma.user.findFirst({ 
+                where: userId ? { id: userId } : { email: normalizedEmail } 
+            });
             
-            // Si l'utilisateur n'existe pas, ou vérifier qu'il a le bon rôle selon l'app ciblée...
-            // Pour l'instant, validation simple:
             if (!user) {
-                // Auto-créer selon le rôle si nécessaire (simplifié pour la démo)
-                return NextResponse.json({ error: "Compte introuvable, veuillez vous inscrire sur le web." }, { status: 403 });
+                return NextResponse.json({ error: "Compte introuvable." }, { status: 404 });
             }
 
-            // Simulation d'un Token JWT de session (à implémenter via Jose ou NextAuth adapter)
-            // Dans ce MVP, on retourne les infos de base pour valider l'écran d'accueil React Native.
+            // Valider l'email et marquer le token comme utilisé
+            await prisma.$transaction([
+                ...(record ? [prisma.emailVerificationToken.update({
+                    where: { id: record.id },
+                    data: { usedAt: new Date() }
+                })] : []),
+                prisma.user.update({
+                    where: { id: user.id },
+                    data: { 
+                        emailVerified: true, 
+                        emailVerifiedAt: new Date() 
+                    }
+                })
+            ]);
+
+            // Simulation d'un Token JWT de session
             const fakeAuthToken = crypto.randomUUID();
 
             return NextResponse.json({ 
                 success: true, 
                 token: fakeAuthToken, 
-                user: { id: user.id, email: user.email, role: user.role } 
+                user: { id: user.id, email: user.email, role: user.role, emailVerified: true } 
             });
         }
 

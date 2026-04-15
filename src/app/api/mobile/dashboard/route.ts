@@ -36,15 +36,71 @@ export async function POST(req: Request) {
 
         // Si Locataire
         if (role === 'TENANT') {
-            const hasActiveLease = user.leasesAsTenant && user.leasesAsTenant.length > 0;
+            const activeLease = await prisma.lease.findFirst({
+                where: {
+                    tenantId: token,
+                    status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF"] }
+                },
+                include: {
+                    property: true,
+                    arrears: {
+                        where: { status: { in: ["unpaid", "UNPAID"] } }
+                    },
+                    receipts: {
+                        orderBy: { createdAt: "desc" },
+                        take: 5
+                    }
+                }
+            });
+
+            if (!activeLease) {
+                return NextResponse.json({
+                    success: true,
+                    data: {
+                        greeting: `Bonjour, ${fallbackName}`,
+                        balanceDue: "Aucun bail actif",
+                        totalArrears: 0,
+                        nextDueDate: "-",
+                        recentReceipts: [],
+                        activeRequests: 0,
+                        hasLease: false
+                    }
+                });
+            }
+
+            const totalArrears = activeLease.arrears.reduce((sum, arr) => sum + Number(arr.amount || 0), 0);
+            const nextDueDate = activeLease.paymentDay ? `Le ${activeLease.paymentDay} du mois` : "Non spécifié";
+
+            // Vrais requêtes de maintenance
+            const activeRequestsCount = await prisma.ticketMaintenance.count({
+                where: { propertyId: activeLease.propertyId, status: { not: "RESOLU" } }
+            });
+
             return NextResponse.json({
                 success: true,
                 data: {
                     greeting: `Bonjour, ${fallbackName}`,
-                    balanceDue: hasActiveLease ? "Consultez vos quittances" : "Aucun bail actif",
-                    nextDueDate: "-",
-                    recentReceipts: [],
-                    activeRequests: 0
+                    balanceDue: totalArrears > 0 ? `${totalArrears.toLocaleString('fr-FR')} FCFA` : "À jour",
+                    totalArrears,
+                    nextDueDate,
+                    recentReceipts: activeLease.receipts.map(r => ({
+                        id: r.id,
+                        period: r.periodMonth,
+                        amount: r.totalAmount,
+                        date: r.createdAt,
+                        qrToken: r.qrToken
+                    })),
+                    activeRequests: activeRequestsCount,
+                    hasLease: true,
+                    lease: {
+                        id: activeLease.id,
+                        ref: activeLease.leaseReference,
+                        propertyName: activeLease.property.name || activeLease.property.propertyCode,
+                        address: activeLease.property.address,
+                        rent: activeLease.rentAmount,
+                        charges: activeLease.chargesAmount,
+                        status: activeLease.status
+                    }
                 }
             });
         }
@@ -101,6 +157,10 @@ export async function POST(req: Request) {
 
             const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
+            const pendingRepairsCount = await prisma.ticketMaintenance.count({
+                where: { propertyId: { in: propertiesMobile.map(p => p.id) }, status: "EN_ATTENTE" }
+            });
+
             return NextResponse.json({
                 success: true,
                 data: {
@@ -108,7 +168,7 @@ export async function POST(req: Request) {
                     totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} FCFA`,
                     occupancyRate: `${occupancyRate}%`,
                     properties: propertiesMobile,
-                    pendingRepairs: 0
+                    pendingRepairs: pendingRepairsCount
                 }
             });
         }
