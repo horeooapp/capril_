@@ -101,8 +101,9 @@ export async function POST(req: Request) {
                 })
             ]);
 
-            // Simulation d'un Token JWT de session
-            const fakeAuthToken = crypto.randomUUID();
+            // MVP : on utilise l'ID de l'utilisateur comme token d'authentification 
+            // pour permettre les requêtes via GenericDataScreen
+            const fakeAuthToken = user.id;
 
             return NextResponse.json({ 
                 success: true, 
