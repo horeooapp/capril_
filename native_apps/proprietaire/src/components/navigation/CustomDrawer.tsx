@@ -4,7 +4,7 @@ import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { 
     LayoutDashboard, Home, Key, FileText, Wallet, Coins, AlertCircle, FileCheck, Wrench, MessageSquare, 
     Calendar, Shield, Users, BookOpen, Settings, Zap, Compass, Building, Receipt, FileSignature, 
-    FileSearch, BarChart3, Fingerprint, RefreshCw, FolderSearch, Scale, Link2, MonitorPlay, ChevronDown, ChevronRight
+    FileSearch, BarChart3, Fingerprint, RefreshCw, FolderSearch, Scale, Link2, MonitorPlay, ChevronDown, ChevronRight, LogOut
 } from 'lucide-react-native';
 
 const MENU_CATEGORIES = [
@@ -133,6 +133,21 @@ export default function CustomDrawer(props: any) {
           );
         })}
       </DrawerContentScrollView>
+
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity 
+          style={styles.logoutButton} 
+          onPress={() => {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: 'Auth' }],
+            });
+          }}
+        >
+          <LogOut size={20} color="#dc2626" />
+          <Text style={styles.logoutText}>Me déconnecter</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -204,5 +219,27 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginLeft: 16,
     fontWeight: '600',
+  },
+  logoutContainer: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#f3f4f6',
+    backgroundColor: '#ffffff',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#fee2e2',
+    borderRadius: 12,
+    justifyContent: 'center',
+  },
+  logoutText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#dc2626',
+    marginLeft: 10,
+    textTransform: 'uppercase',
   }
 });
