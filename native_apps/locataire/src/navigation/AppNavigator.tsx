@@ -18,7 +18,8 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 // Menu Inférieur avec Tab Bar Personnalisée
-function MainTabNavigator() {
+function MainTabNavigator({ route }: any) {
+  const token = route.params?.token;
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomBottomTab {...props} />}
@@ -26,16 +27,17 @@ function MainTabNavigator() {
         headerShown: false,
       }}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Contract" component={ContractScreen} />
-      <Tab.Screen name="Services" component={EmergencyServicesScreen} />
-      <Tab.Screen name="Messages" component={MessageScreen} />
+      <Tab.Screen name="Dashboard" component={DashboardScreen} initialParams={{ token }} />
+      <Tab.Screen name="Contract" component={ContractScreen} initialParams={{ token }} />
+      <Tab.Screen name="Services" component={EmergencyServicesScreen} initialParams={{ token }} />
+      <Tab.Screen name="Messages" component={MessageScreen} initialParams={{ token }} />
     </Tab.Navigator>
   );
 }
 
 // Menu Latéral (Drawer)
-function DrawerNavigator() {
+function DrawerNavigator({ route }: any) {
+  const token = route.params?.token;
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -51,16 +53,19 @@ function DrawerNavigator() {
       <Drawer.Screen 
         name="MainTab" 
         component={MainTabNavigator} 
+        initialParams={{ token }}
         options={{ title: 'Accueil' }}
       />
       <Drawer.Screen 
         name="Contract" 
         component={ContractScreen} 
+        initialParams={{ token }}
         options={{ title: 'Mon Contrat' }}
       />
       <Drawer.Screen 
         name="Messages" 
         component={MessageScreen} 
+        initialParams={{ token }}
         options={{ title: 'Messagerie' }}
       />
     </Drawer.Navigator>
