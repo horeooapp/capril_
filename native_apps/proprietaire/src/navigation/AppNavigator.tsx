@@ -38,7 +38,7 @@ function MainTabNavigator({ route }: any) {
       <Tab.Screen name="Dashboard" component={DashboardScreen} initialParams={{ token }} />
       <Tab.Screen name="Contract" component={PropertiesScreen} initialParams={{ token }} />
       <Tab.Screen name="Services" component={MaintenanceScreen} initialParams={{ token }} />
-      <Tab.Screen name="Messages" component={MessageScreen} initialParams={{ token }} />
+      <Tab.Screen name="MenuDrawer" component={MessageScreen} initialParams={{ token }} />
     </Tab.Navigator>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Colors } from '../../theme/colors';
-import { Home, FileText, Activity, MessageSquare, MapPin, CreditCard, Shield } from 'lucide-react-native';
+import { Home, FileText, Activity, MessageSquare, MapPin, CreditCard, Shield, Menu } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
@@ -25,6 +25,11 @@ export default function CustomBottomTab({ state, descriptors, navigation }: Bott
           const isFocused = state.index === index;
 
           const onPress = () => {
+            if (route.name === 'MenuDrawer') {
+               (navigation as any).openDrawer();
+               return;
+            }
+
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -43,8 +48,8 @@ export default function CustomBottomTab({ state, descriptors, navigation }: Bott
               case 'Dashboard': return <Home size={24} color={color} />;
               case 'Contract': return <FileText size={24} color={color} />;
               case 'Services': return <Shield size={24} color={color} />;
-              case 'Messages': return <MessageSquare size={24} color={color} />;
-              default: return <Home size={24} color={color} />;
+              case 'MenuDrawer': return <Menu size={24} color={Colors.white} />;
+              default: return <Menu size={24} color={Colors.white} />;
             }
           };
 
@@ -75,7 +80,7 @@ export default function CustomBottomTab({ state, descriptors, navigation }: Bott
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 15,
     width: '100%',
     height: 90,
     backgroundColor: 'transparent',

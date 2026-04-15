@@ -66,9 +66,8 @@ export default function DashboardScreen({ navigation, route }: any) {
       
       {/* Premium Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.headerIcon}>
-          <Menu size={24} color={Colors.primary} />
-        </TouchableOpacity>
+        <View style={{ width: 40 }} />
+
         <Text style={styles.headerTitle}>Capril Connect</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.profileIcon}>

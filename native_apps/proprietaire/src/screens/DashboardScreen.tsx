@@ -40,9 +40,7 @@ export default function DashboardScreen({ route, navigation }: any) {
 
       {/* Premium Header */}
       <View style={styles.topHeader}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.headerIcon}>
-          <Menu size={24} color="#001C29" />
-        </TouchableOpacity>
+        <View style={{ width: 40 }} />
         <Text style={styles.headerTitle}>Capril Propriétaire</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.profileIcon}>
