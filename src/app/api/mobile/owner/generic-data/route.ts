@@ -80,15 +80,99 @@ export async function POST(req: Request) {
                 }));
                 break;
 
-            case 'Documents':
-                // Les documents viendront de PropertyDocument plus tard - Mock pour valider TS
-                results = [];
+            case 'Matching Locataire':
+                const candidatures: any = await prisma.candidature.findMany({
+                    orderBy: { createdAt: 'desc' }
+                });
+                results = candidatures.map((c: any) => ({
+                    id: c.id,
+                    title: `Candidature ${c.nom} ${c.prenom}`,
+                    subtitle: `Score Qapril: ${c.scoreQapril || 'En attente'}`,
+                    status: c.statut,
+                    date: new Date(c.createdAt).toLocaleDateString('fr-FR'),
+                    type: 'Matching'
+                }));
+                break;
+
+            case 'Agenda & Visites':
+                const visites: any = await prisma.agendaEvenement.findMany();
+                results = visites.map((v: any) => ({
+                    id: v.id,
+                    title: v.titre,
+                    subtitle: `Type: ${v.typeEvent}`,
+                    status: 'PLANIFIÉ',
+                    date: 'N/A',
+                    type: 'Visite'
+                }));
+                break;
+
+            case 'Syndic':
+                const syndicates: any = await prisma.syndicate.findMany();
+                results = syndicates.map((s: any) => ({
+                    id: s.id,
+                    title: s.residenceName,
+                    subtitle: `${s.totalLots} Lots gérés`,
+                    status: s.agState,
+                    date: new Date(s.createdAt).toLocaleDateString('fr-FR'),
+                    amount: s.treasuryBalance,
+                    type: 'Syndic'
+                }));
+                break;
+
+            case 'Successions':
+                const successions: any = await prisma.succession.findMany();
+                results = successions.map((s: any) => ({
+                    id: s.id,
+                    title: `Succession ${s.deceasedName}`,
+                    subtitle: `Revendiquant: ${s.claimantName}`,
+                    status: s.status,
+                    date: new Date(s.createdAt).toLocaleDateString('fr-FR'),
+                    type: 'Succession'
+                }));
+                break;
+
+            case 'Rapports':
+                const rapports: any = await prisma.financialReport.findMany();
+                results = rapports.map((r: any) => ({
+                    id: r.id,
+                    title: `CRG ${r.ownerName}`,
+                    subtitle: `Période: ${r.period}`,
+                    status: r.status,
+                    date: new Date(r.createdAt).toLocaleDateString('fr-FR'),
+                    amount: r.netPayout,
+                    type: 'Rapport'
+                }));
+                break;
+
+            case 'Régulation des Charges':
+                const regules: any = await prisma.regularisationCharges.findMany();
+                results = regules.map((r: any) => ({
+                    id: r.id,
+                    title: `Régularisation ${r.annee}`,
+                    subtitle: `Bail lié: ${r.leaseId}`,
+                    status: r.statut,
+                    date: r.notifieAt ? new Date(r.notifieAt).toLocaleDateString('fr-FR') : 'Non notifié',
+                    amount: r.solde,
+                    type: 'Régul'
+                }));
+                break;
+
+            case 'Automatisations':
+                const automations: any = await prisma.automationSettings.findMany({
+                    where: { userId: token }
+                });
+                results = automations.map((a: any) => ({
+                    id: a.id,
+                    title: `Profil Automatisé`,
+                    subtitle: `Relance: ${a.autoRelance ? 'Oui' : 'Non'} | Quittances: ${a.autoQuittance ? 'Oui' : 'Non'}`,
+                    status: 'ACTIF',
+                    date: new Date(a.updatedAt).toLocaleDateString('fr-FR'),
+                    type: 'Script'
+                }));
                 break;
 
             default:
-                // Pour tous les autres modules ("Assistant IA", "Successions", "Matching Locataire", etc.)
-                // Plutôt que de renvoyer une erreur, on simule une réponse vide permettant à l'UI
-                // de dire chaleureusement "Aucune donnée trouvée pour ce module".
+                // Pour les 3 ou 4 modules finaux n'ayant PAS encore de table Prisma (Assistant IA, Indice ICL, Manuel Officiel, Assurances).
                 results = [];
                 break;
         }
