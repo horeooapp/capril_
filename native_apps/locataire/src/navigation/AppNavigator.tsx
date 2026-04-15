@@ -1,8 +1,9 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { Colors } from '../theme/colors';
+import { LogOut } from 'lucide-react-native';
 
 import AuthScreen from '../screens/AuthScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -35,11 +36,29 @@ function MainTabNavigator({ route }: any) {
   );
 }
 
+// Custom Drawer Content pour le Locataire
+function CustomDrawerContent(props: any) {
+  return (
+    <DrawerContentScrollView {...props} style={{ flex: 1 }}>
+      <SideMenuHeader />
+      <DrawerItemList {...props} />
+      <DrawerItem 
+        label="Déconnexion" 
+        labelStyle={{ color: '#ef4444', fontWeight: 'bold' }}
+        icon={({ color, size }) => <LogOut color="#ef4444" size={size} />}
+        onPress={() => props.navigation.reset({ index: 0, routes: [{ name: 'Auth' }] })} 
+        style={{ marginTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}
+      />
+    </DrawerContentScrollView>
+  );
+}
+
 // Menu Latéral (Drawer)
 function DrawerNavigator({ route }: any) {
   const token = route.params?.token;
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
         drawerStyle: {
