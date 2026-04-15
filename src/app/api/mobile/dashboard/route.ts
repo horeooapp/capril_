@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
             // Vrais requêtes de maintenance
             const activeRequestsCount = await prisma.ticketMaintenance.count({
-                where: { propertyId: activeLease.propertyId, status: { not: "RESOLU" } }
+                where: { logementId: activeLease.propertyId, statut: { in: ['EN_ATTENTE', 'PRIS_EN_CHARGE'] } }
             });
 
             return NextResponse.json({
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
             const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
             const pendingRepairsCount = await prisma.ticketMaintenance.count({
-                where: { propertyId: { in: propertiesMobile.map(p => p.id) }, status: "EN_ATTENTE" }
+                where: { logementId: { in: propertiesMobile.map(p => p.id) }, statut: 'EN_ATTENTE' }
             });
 
             return NextResponse.json({

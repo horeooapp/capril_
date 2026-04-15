@@ -15,10 +15,10 @@ export async function POST(req: Request) {
             const propertyIds = properties.map(p => p.id);
 
             const applications = await prisma.candidature.findMany({
-                where: { propertyId: { in: propertyIds }, status: 'EN_ATTENTE' },
+                where: { logementId: { in: propertyIds }, statut: 'SOUMISE' },
                 include: {
-                    user: { select: { firstName: true, lastName: true, phone: true } },
-                    property: { select: { address: true, propertyType: true } }
+                    candidat: { select: { firstName: true, lastName: true, phone: true } },
+                    logement: { select: { address: true, propertyType: true } }
                 }
             });
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
             const newStatus = action === 'APPROVE' ? 'ACCEPTEE' : 'REFUSEE';
             const updated = await prisma.candidature.update({
                 where: { id: applicationId },
-                data: { status: newStatus }
+                data: { statut: newStatus }
             });
             return NextResponse.json({ success: true, application: updated });
         }

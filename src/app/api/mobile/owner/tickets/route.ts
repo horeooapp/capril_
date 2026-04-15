@@ -16,10 +16,10 @@ export async function POST(req: Request) {
             const propertyIds = properties.map(p => p.id);
 
             const tickets = await prisma.ticketMaintenance.findMany({
-                where: { propertyId: { in: propertyIds } },
+                where: { logementId: { in: propertyIds } },
                 include: {
-                    user: { select: { firstName: true, lastName: true } },
-                    property: { select: { address: true, commune: true } }
+                    locataire: { select: { firstName: true, lastName: true } },
+                    logement: { select: { address: true, commune: true } }
                 },
                 orderBy: { createdAt: 'desc' }
             });
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
             const updated = await prisma.ticketMaintenance.update({
                 where: { id: ticketId },
-                data: { status: newStatus }
+                data: { statut: newStatus }
             });
 
             return NextResponse.json({ success: true, ticket: updated });

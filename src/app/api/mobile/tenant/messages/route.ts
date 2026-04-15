@@ -31,9 +31,7 @@ export async function POST(req: Request) {
                     disputeId: 'MODERATION_SUPPORT', // Simplification technique, à adapter 
                     senderId: user.id,
                     content,
-                    messageType: "STANDARD",
-                    attachmentUrl: documentUrl || null,
-                    isInternal: false
+                    attachments: documentUrl ? [documentUrl] : []
                 }
             });
 

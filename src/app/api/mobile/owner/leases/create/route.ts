@@ -21,6 +21,8 @@ export async function POST(req: Request) {
                 propertyId,
                 tenantId,
                 landlordId: token,
+                leaseReference: `MOB-BAIL-${Date.now()}`,
+                durationMonths: 12,
                 leaseType: leaseType || 'RESIDENTIEL',
                 startDate: new Date(),
                 rentAmount: parseFloat(rentAmount),
@@ -33,10 +35,13 @@ export async function POST(req: Request) {
         await prisma.receipt.create({
             data: {
                 leaseId: lease.id,
-                amount: parseFloat(rentAmount),
-                status: 'UNPAID',
-                type: 'LOVER_AVANCE',
-                dueDate: new Date()
+                totalAmount: parseFloat(rentAmount),
+                rentAmount: parseFloat(rentAmount),
+                periodMonth: new Date().toISOString().substring(0, 7),
+                paymentMethod: 'CASH',
+                receiptRef: `B-REC-${Date.now()}`,
+                status: 'pending',
+                declarative: true
             }
         });
 

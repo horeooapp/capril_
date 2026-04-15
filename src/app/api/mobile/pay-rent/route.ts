@@ -98,13 +98,14 @@ export async function POST(req: Request) {
             await tx.paymentPgw.create({
                 data: {
                     leaseId,
-                    payerUserId: token,
-                    amount,
-                    currency: "XOF",
-                    operator: operator || "MOBILE",
-                    status: "CONFIRMEE",
-                    paymentRef: receipt.paymentRef ?? "",
-                    metadata: { source: "mobile_app_operational" }
+                    moisConcerne: new Date(),
+                    payeurId: token,
+                    beneficiaireId: lease.landlordId || token,
+                    montant: amount,
+                    canal: operator === 'WAVE' ? 'WAVE' : (operator === 'MTN' ? 'MTN' : 'ORANGE'),
+                    statut: "CONFIRMEE",
+                    refInterne: `PGW-${Date.now()}`,
+                    quittanceId: receipt.id
                 }
             });
 

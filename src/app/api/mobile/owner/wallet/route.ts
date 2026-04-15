@@ -47,23 +47,6 @@ export async function POST(req: Request) {
                         userId: token,
                         amount: -amount, // Négatif car débit
                         type: 'WITHDRAWAL',
-                        reference: `WTD-${Date.now()}`,
-                        status: 'PENDING',
-                        metadata: {
-                            withdrawalMethod,
-                            accountDetails
-                        }
-                    }
-                });
-
-                // Créer la demande formelle ReversalTransaction pour les administrateurs
-                await tx.reversalTransaction.create({
-                    data: {
-                        userId: token,
-                        type: 'LANDLORD_RENT',
-                        amount,
-                        currency: 'XOF',
-                        reversalReason: `Retrait vers ${withdrawalMethod}`,
                         status: 'PENDING'
                     }
                 });

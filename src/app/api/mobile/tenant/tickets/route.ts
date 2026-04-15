@@ -29,13 +29,13 @@ export async function POST(req: Request) {
         if (action === 'CREATE_TICKET') {
             const ticket = await prisma.ticketMaintenance.create({
                 data: {
-                    title,
-                    description,
-                    priority: priority === 'CRITIQUE' ? 'HAUTE' : priority, // Mapping basique
-                    categoryId: null, // Si on utilise un enum ou table, on peut adapter
-                    status: 'EN_ATTENTE',
-                    declarantId: user.id,
-                    propertyId: activeLease.propertyId,
+                    ticketRef: `TKT-${Date.now()}`,
+                    description: title ? `${title} - ${description}` : description,
+                    urgence: priority === 'CRITIQUE' ? 'URGENTE' : 'NORMALE',
+                    categorie: 'MAI_AU',
+                    statut: 'EN_ATTENTE',
+                    locataireId: user.id,
+                    logementId: activeLease.propertyId,
                     leaseId: activeLease.id
                 }
             });
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 
         if (action === 'LIST_TICKETS') {
             const tickets = await prisma.ticketMaintenance.findMany({
-                where: { declarantId: user.id },
+                where: { locataireId: user.id },
                 orderBy: { createdAt: 'desc' }
             });
             return NextResponse.json({ success: true, tickets });
