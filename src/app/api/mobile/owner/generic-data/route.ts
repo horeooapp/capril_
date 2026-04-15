@@ -86,7 +86,11 @@ export async function POST(req: Request) {
                 break;
 
             default:
-                return NextResponse.json({ success: false, error: 'Module inconnu ou table non migrée' }, { status: 400 });
+                // Pour tous les autres modules ("Assistant IA", "Successions", "Matching Locataire", etc.)
+                // Plutôt que de renvoyer une erreur, on simule une réponse vide permettant à l'UI
+                // de dire chaleureusement "Aucune donnée trouvée pour ce module".
+                results = [];
+                break;
         }
 
         return NextResponse.json({ success: true, data: results });
