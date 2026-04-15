@@ -19,8 +19,8 @@ const MENU_CATEGORIES = [
         title: "Mon Patrimoine",
         items: [
             { name: 'Mes biens', route: 'PropertiesScreen', icon: Home },
-            { name: 'Mes mandats', route: 'FeatureTeaser', params: { featureName: 'Mes Mandats' }, icon: FileSignature },
-            { name: 'Mes baux', route: 'FeatureTeaser', params: { featureName: 'Mes Baux' }, icon: FileText },
+            { name: 'Mes mandats', route: 'GenericData', params: { featureName: 'Mes Mandats' }, icon: FileSignature },
+            { name: 'Mes baux', route: 'GenericData', params: { featureName: 'Mes Baux' }, icon: FileText },
             { name: 'États des lieux', route: 'FeatureTeaser', params: { featureName: 'États des Lieux' }, icon: FileCheck },
             { name: "Outils d'Import", route: 'FeatureTeaser', params: { featureName: "Outils d'Import" }, icon: FolderSearch }
         ]
@@ -28,8 +28,8 @@ const MENU_CATEGORIES = [
     {
         title: "Pécuniaire & Finances",
         items: [
-            { name: 'Loyers', route: 'FeatureTeaser', params: { featureName: 'Loyers' }, icon: Coins },
-            { name: 'Impayés', route: 'FeatureTeaser', params: { featureName: 'Impayés' }, icon: AlertCircle },
+            { name: 'Loyers', route: 'GenericData', params: { featureName: 'Loyers' }, icon: Coins },
+            { name: 'Impayés', route: 'GenericData', params: { featureName: 'Impayés' }, icon: AlertCircle },
             { name: 'Fiscal DGI', route: 'FeatureTeaser', params: { featureName: 'Fiscalité DGI' }, icon: Building }, 
             { name: 'Mon Wallet', route: 'Wallet', icon: Wallet },
             { name: 'Régul. Charges', route: 'FeatureTeaser', params: { featureName: 'Régulation des Charges' }, icon: RefreshCw }
@@ -51,7 +51,7 @@ const MENU_CATEGORIES = [
     {
         title: "Administration",
         items: [
-            { name: 'Documents', route: 'FeatureTeaser', params: { featureName: 'Documents' }, icon: FileSearch },
+            { name: 'Documents', route: 'GenericData', params: { featureName: 'Documents' }, icon: FileSearch },
             { name: 'Certificats', route: 'FeatureTeaser', params: { featureName: 'Certificats' }, icon: Receipt },
             { name: 'Rapports', route: 'FeatureTeaser', params: { featureName: 'Rapports' }, icon: BarChart3 },
             { name: 'Gouvernance', route: 'FeatureTeaser', params: { featureName: 'Gouvernance' }, icon: Scale }

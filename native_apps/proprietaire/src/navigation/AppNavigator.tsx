@@ -18,6 +18,7 @@ import TenantsScreen from '../screens/TenantsScreen';
 import ApplicationsScreen from '../screens/ApplicationsScreen';
 import MessageScreen from '../screens/MessageScreen';
 import FeatureTeaserScreen from '../screens/FeatureTeaserScreen';
+import GenericDataScreen from '../screens/GenericDataScreen';
 
 import CustomBottomTab from '../components/navigation/CustomBottomTab';
 import CustomDrawer from '../components/navigation/CustomDrawer';
@@ -54,6 +55,7 @@ function DrawerNavigator() {
       <Drawer.Screen name="MainTab" component={MainTabNavigator} />
       <Drawer.Screen name="Diaspora" component={DiasporaScreen} />
       <Drawer.Screen name="FeatureTeaser" component={FeatureTeaserScreen} />
+      <Drawer.Screen name="GenericData" component={GenericDataScreen} />
       <Drawer.Screen name="PropertiesScreen" component={PropertiesScreen} />
       <Drawer.Screen name="Wallet" component={WalletScreen} />
       <Drawer.Screen name="Maintenance" component={MaintenanceScreen} />
