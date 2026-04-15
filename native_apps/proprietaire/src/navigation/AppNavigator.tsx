@@ -28,40 +28,43 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 // Menu Inférieur avec Tab Bar Personnalisée
-function MainTabNavigator() {
+function MainTabNavigator({ route }: any) {
+  const token = route.params?.token;
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomBottomTab {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Contract" component={PropertiesScreen} />
-      <Tab.Screen name="Services" component={MaintenanceScreen} />
-      <Tab.Screen name="Messages" component={MessageScreen} />
+      <Tab.Screen name="Dashboard" component={DashboardScreen} initialParams={{ token }} />
+      <Tab.Screen name="Contract" component={PropertiesScreen} initialParams={{ token }} />
+      <Tab.Screen name="Services" component={MaintenanceScreen} initialParams={{ token }} />
+      <Tab.Screen name="Messages" component={MessageScreen} initialParams={{ token }} />
     </Tab.Navigator>
   );
 }
 
 // Menu Latéral (Drawer)
-function DrawerNavigator() {
+function DrawerNavigator({ route }: any) {
+  const token = route.params?.token;
   return (
     <Drawer.Navigator
-      drawerContent={(props) => <CustomDrawer {...props} />}
+      drawerContent={(props) => <CustomDrawer {...props} token={token} />}
       screenOptions={{
         headerShown: false,
         drawerStyle: { width: '85%' },
       }}
     >
-      <Drawer.Screen name="MainTab" component={MainTabNavigator} />
-      <Drawer.Screen name="Diaspora" component={DiasporaScreen} />
-      <Drawer.Screen name="FeatureTeaser" component={FeatureTeaserScreen} />
-      <Drawer.Screen name="GenericData" component={GenericDataScreen} />
-      <Drawer.Screen name="PropertiesScreen" component={PropertiesScreen} />
-      <Drawer.Screen name="Wallet" component={WalletScreen} />
-      <Drawer.Screen name="Maintenance" component={MaintenanceScreen} />
-      <Drawer.Screen name="Message" component={MessageScreen} />
-      <Drawer.Screen name="Tenants" component={TenantsScreen} />
-      <Drawer.Screen name="Applications" component={ApplicationsScreen} />
+      <Drawer.Screen name="MainTab" component={MainTabNavigator} initialParams={{ token }} />
+      <Drawer.Screen name="Diaspora" component={DiasporaScreen} initialParams={{ token }} />
+      <Drawer.Screen name="FeatureTeaser" component={FeatureTeaserScreen} initialParams={{ token }} />
+      <Drawer.Screen name="GenericData" component={GenericDataScreen} initialParams={{ token }} />
+      <Drawer.Screen name="PropertiesScreen" component={PropertiesScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Wallet" component={WalletScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Maintenance" component={MaintenanceScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Message" component={MessageScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Tenants" component={TenantsScreen} initialParams={{ token }} />
+      <Drawer.Screen name="CreateLease" component={CreateLeaseScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Applications" component={ApplicationsScreen} initialParams={{ token }} />
     </Drawer.Navigator>
   );
 }
