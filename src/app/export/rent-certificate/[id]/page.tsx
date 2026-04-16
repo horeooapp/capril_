@@ -30,7 +30,7 @@ export default async function RentCertificatePage({ params }: { params: Promise<
                     </div>
                     <div className="text-right">
                         <div className="text-xl font-bold text-gray-900">ATTESTATION DE LOYER</div>
-                        <div className="text-sm text-gray-500">REF: CER-{(new Date().getFullYear())}-{Math.floor(1000 + Math.random() * 9000)}</div>
+                        <div className="text-sm text-gray-500">REF: CER-{(new Date(generatedAt).getFullYear())}-{(data as any).referenceNumber}</div>
                     </div>
                 </div>
 
@@ -95,7 +95,7 @@ export default async function RentCertificatePage({ params }: { params: Promise<
                     </div>
 
                     <div className="text-right">
-                        <div className="text-sm text-gray-500 mb-2">Fait à Abidjan, le {new Date().toLocaleDateString('fr-FR')}</div>
+                        <div className="text-sm text-gray-500 mb-2">Fait à Abidjan, le {new Date(generatedAt).toLocaleDateString('fr-FR')}</div>
                         <div className="text-lg font-black text-emerald-900 uppercase">Direction QAPRIL</div>
                     </div>
                 </div>
