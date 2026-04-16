@@ -81,7 +81,7 @@ export default function DashboardScreen({ navigation, route }: any) {
         <View style={styles.headerRight}>
           <TouchableOpacity 
             style={styles.profileIcon}
-            onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id })}
+            onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id, userProfile: data })}
           >
             <User size={20} color={Colors.primary} />
           </TouchableOpacity>

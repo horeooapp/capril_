@@ -16,7 +16,7 @@ import { Colors } from '../theme/colors';
 import { BASE_URL } from '../config/api';
 
 export default function ProfileScreen({ navigation, route }: any) {
-  const { token, leaseId } = route.params || {};
+  const { token, leaseId, userProfile } = route.params || {};
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
 
@@ -85,10 +85,10 @@ export default function ProfileScreen({ navigation, route }: any) {
           <View style={styles.avatarContainer}>
             <User size={40} color={Colors.white} />
           </View>
-          <Text style={styles.userName}>Mon Compte Locataire</Text>
+          <Text style={styles.userName}>{userProfile?.fullName || 'Mon Compte Locataire'}</Text>
           <View style={styles.emailBadge}>
             <Mail size={14} color={Colors.text.muted} />
-            <Text style={styles.userEmail}>Session Active</Text>
+            <Text style={styles.userEmail}>{userProfile?.userEmail || 'Session Active'}</Text>
           </View>
         </View>
 

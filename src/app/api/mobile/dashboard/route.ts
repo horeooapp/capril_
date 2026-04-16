@@ -101,6 +101,8 @@ export async function POST(req: Request) {
                     activeRequests: activeRequestsCount,
                     hasLease: true,
                     userId: user.id,
+                    userEmail: user.email,
+                    fullName: fallbackName,
                     lease: {
                         id: activeLease.id,
                         ref: activeLease.leaseReference,
@@ -204,6 +206,8 @@ export async function POST(req: Request) {
                     occupancyRate: `${occupancyRate}%`,
                     properties: propertiesMobile,
                     userId: user.id,
+                    userEmail: user.email,
+                    fullName: fallbackName,
                     pendingRepairs: pendingRepairsCount,
                     revenueHistory: last6Months
                 }

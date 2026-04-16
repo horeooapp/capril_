@@ -15,7 +15,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { Colors } from '../theme/colors';
 
 export default function ProfileScreen({ navigation, route }: any) {
-  const { token } = route.params || {};
+  const { token, userProfile } = route.params || {};
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
 
@@ -84,10 +84,10 @@ export default function ProfileScreen({ navigation, route }: any) {
           <View style={styles.avatarContainer}>
             <Building size={40} color={Colors.white} />
           </View>
-          <Text style={styles.userName}>Mon Espace Propriétaire</Text>
+          <Text style={styles.userName}>{userProfile?.fullName || 'Mon Espace Propriétaire'}</Text>
           <View style={styles.emailBadge}>
             <Shield size={14} color={Colors.text.muted} />
-            <Text style={styles.userEmail}>Session Sécurisée</Text>
+            <Text style={styles.userEmail}>{userProfile?.userEmail || 'Session Sécurisée'}</Text>
           </View>
         </View>
 
