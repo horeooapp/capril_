@@ -25,7 +25,7 @@ export default async function FinancialReportPage({ params }: { params: Promise<
                     </div>
                     <div className="text-right">
                         <div className="text-xl font-black text-slate-900">BILAN FINANCIER {year}</div>
-                        <div className="text-xs text-slate-500 font-bold uppercase">PROPRIÉTAIRE : {user.name}</div>
+                        <div className="text-xs text-slate-500 font-bold uppercase">PROPRIÉTAIRE : {user.firstName} {user.lastName}</div>
                     </div>
                 </div>
 

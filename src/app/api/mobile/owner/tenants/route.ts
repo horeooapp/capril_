@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import { PasseportService } from '@/lib/passport-service';
 import { NextResponse } from 'next/server';
@@ -26,8 +27,8 @@ export async function POST(req: Request) {
             }
         });
 
-        const tenants = await Promise.all(leases.map(async (l) => {
-            const summary = await PasseportService.getTenantReliabilitySummary(l.tenantId);
+        const tenants = await Promise.all(leases.filter(l => l.tenantId).map(async (l) => {
+            const summary = await PasseportService.getTenantReliabilitySummary(l.tenantId!);
             return {
                 id: l.tenantId,
                 leaseId: l.id,

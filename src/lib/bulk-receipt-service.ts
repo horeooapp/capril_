@@ -12,7 +12,7 @@ export class BulkReceiptService {
     const activeLeases = await prisma.lease.findMany({
       where: {
         property: { ownerUserId: ownerId },
-        status: { in: ["ACTIVE", "LOYER_IMPAYE", "MISE_EN_DEMEURE", "VALIDE"] }
+        status: { in: ["ACTIVE", "LOYER_IMPAYE", "MISE_EN_DEMEURE"] }
       },
       include: {
         property: true,
@@ -62,7 +62,7 @@ export class BulkReceiptService {
     const leases = await prisma.lease.findMany({
       where: {
         property: { ownerUserId: ownerId },
-        status: { in: ["ACTIVE", "LOYER_IMPAYE", "MISE_EN_DEMEURE", "VALIDE"] }
+        status: { in: ["ACTIVE", "LOYER_IMPAYE", "MISE_EN_DEMEURE"] }
       },
       include: {
         receipts: {

@@ -11,12 +11,12 @@ export async function getRentCertificateData(leaseId: string) {
         where: { id: leaseId },
         include: {
             tenant: {
-                select: { name: true, email: true, phone: true }
+                select: { firstName: true, lastName: true, email: true, phone: true }
             },
-            unit: {
+            property: {
                 include: {
-                    property: {
-                        select: { name: true, address: true, city: true }
+                    parentProperty: {
+                        select: { name: true }
                     }
                 }
             },
@@ -52,7 +52,7 @@ export async function getFinancialReportData(userId: string) {
         where: { userId },
         include: {
             user: {
-                select: { name: true, email: true }
+                select: { firstName: true, lastName: true, email: true }
             }
         }
     });
@@ -60,7 +60,7 @@ export async function getFinancialReportData(userId: string) {
     if (!wallet) throw new Error("Wallet not found");
 
     const transactions = await prisma.walletTransaction.findMany({
-        where: { walletId: wallet.id },
+        where: { userId },
         orderBy: { createdAt: 'desc' },
         take: 50 // Last 50 transactions for the report
     });

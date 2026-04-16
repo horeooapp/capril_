@@ -12,6 +12,7 @@ export default async function RentCertificatePage({ params }: { params: Promise<
     }
 
     const { lease, generatedAt } = data;
+    if (!lease.tenant) notFound();
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 sm:p-10 print:p-0 print:bg-white flex justify-center">
@@ -43,15 +44,15 @@ export default async function RentCertificatePage({ params }: { params: Promise<
                         <div className="grid grid-cols-2 gap-y-6 gap-x-12">
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Locataire</label>
-                                <div className="text-lg font-bold text-emerald-950 uppercase">{lease.tenant.name}</div>
+                                <div className="text-lg font-bold text-emerald-950 uppercase">{lease.tenant.firstName} {lease.tenant.lastName}</div>
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Logement concerné</label>
-                                <div className="text-sm font-bold text-emerald-950">{lease.unit.property.name} - {lease.unit.property.address}</div>
+                                <div className="text-sm font-bold text-emerald-950">{(lease as any).property.parentProperty?.name ? `${(lease as any).property.parentProperty.name} - ` : ""}{(lease as any).property.name || (lease as any).property.propertyCode} - {(lease as any).property.address}</div>
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Montant du loyer</label>
-                                <div className="text-lg font-bold text-emerald-950">{lease.rent.toLocaleString()} FCFA / Mois</div>
+                                <div className="text-lg font-bold text-emerald-950">{lease.rentAmount.toLocaleString()} FCFA / Mois</div>
                             </div>
                             <div>
                                 <label className="block text-[10px) font-black uppercase tracking-widest text-emerald-800/60 mb-1">Date d'effet</label>
@@ -62,7 +63,7 @@ export default async function RentCertificatePage({ params }: { params: Promise<
 
                     <div className="text-justify leading-relaxed text-gray-800">
                         est à jour du règlement de ses loyers et charges pour la période citée ci-dessus. 
-                        La dernière quittance a été émise et certifiée numériquement le <span className="font-bold">{new Date(lease.receipts[0]?.paidAt || Date.now()).toLocaleDateString()}</span>.
+                        La dernière quittance a été émise et certifiée numériquement le <span className="font-bold">{new Date(((lease as any).receipts[0]?.paidAt) || Date.now()).toLocaleDateString()}</span>.
                     </div>
 
                     <div className="text-justify leading-relaxed text-gray-800">

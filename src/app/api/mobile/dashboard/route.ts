@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
+import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
     try {
@@ -181,10 +182,9 @@ export async function POST(req: Request) {
                 const monthlyRevenue = await prisma.receipt.aggregate({
                     where: {
                         lease: {
-                            property: { ownerId: userId }
+                            property: { ownerUserId: userId }
                         },
-                        periodMonth: monthNum,
-                        periodYear: yearNum,
+                        periodMonth: `${yearNum}-${String(monthNum).padStart(2, '0')}`,
                         status: { in: ["PAID", "ENCAISSE", "SUCCESS"] }
                     },
                     _sum: { totalAmount: true }

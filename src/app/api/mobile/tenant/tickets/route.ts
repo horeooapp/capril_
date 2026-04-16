@@ -23,7 +23,7 @@ export async function POST(req: Request) {
             where: { id: userId },
             include: {
                 leasesAsTenant: {
-                    where: { status: { in: ["ACTIVE", "LOYER_IMPAYE", "MISE_EN_DEMEURE", "RESILIE", "VALIDE"] } },
+                    where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE", "MISE_EN_DEMEURE", "DEMANDE_RESILIATION"] } },
                     include: { property: true }
                 }
             }

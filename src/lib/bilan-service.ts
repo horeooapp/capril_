@@ -60,7 +60,7 @@ export class BilanService {
       where: {
         lease: { property: { ownerUserId: ownerId } },
         createdAt: { gte: startOfYear, lte: endOfYear },
-        statut: "PAYE"
+        statut: "PAYEE"
       }
     });
 
@@ -76,14 +76,17 @@ export class BilanService {
     }));
 
     receipts.forEach(r => {
-      const month = new Date(r.paidAt).getMonth();
-      totalIncome += r.totalAmount;
-      monthlyBreakdown[month].income += r.totalAmount;
+      if (r.paidAt) {
+        const month = new Date(r.paidAt!).getMonth();
+        totalIncome += r.totalAmount;
+        monthlyBreakdown[month].income += r.totalAmount;
+      }
     });
 
     tickets.forEach(t => {
       const cost = t.coutFinal || 0;
-      const month = new Date(t.dateResolution || t.createdAt).getMonth();
+      const date = t.dateResolution || t.createdAt;
+      const month = new Date(date).getMonth();
       totalMaintenance += cost;
       monthlyBreakdown[month].expenses += cost;
     });
@@ -122,8 +125,10 @@ export class BilanService {
         }
     });
 
+    const ownerName = [owner.firstName, owner.lastName].filter(Boolean).join(" ") || String(owner.phone || "Propriétaire");
+
     return {
-      ownerName: (owner.firstName ? owner.firstName + " " : "") + (owner.lastName || "") || owner.phone,
+      ownerName,
       year,
       totalIncome,
       totalMaintenance,
