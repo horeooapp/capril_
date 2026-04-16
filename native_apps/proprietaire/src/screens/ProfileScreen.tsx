@@ -100,8 +100,8 @@ export default function ProfileScreen({ navigation, route }: any) {
                 <Fingerprint size={20} color={Colors.success} />
               </View>
               <View>
-                <Text style={styles.settingLabel}>FaceID / Empreinte</Text>
-                <Text style={styles.settingSub}>Connexion rapide par biométrie</Text>
+                <Text style={styles.settingLabel}>Connexion Biométrique</Text>
+                <Text style={styles.settingSub}>FaceID / Empreinte digitale</Text>
               </View>
             </View>
             <Switch 
@@ -111,6 +111,19 @@ export default function ProfileScreen({ navigation, route }: any) {
               thumbColor={Colors.white}
             />
           </View>
+
+          <TouchableOpacity style={styles.settingRow}>
+             <View style={styles.settingInfo}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(79, 70, 229, 0.1)' }]}>
+                <Lock size={20} color="#4F46E5" />
+              </View>
+              <View>
+                <Text style={styles.settingLabel}>Changer mon code PIN</Text>
+                <Text style={styles.settingSub}>Sécurité supplémentaire</Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color={Colors.text.muted} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>

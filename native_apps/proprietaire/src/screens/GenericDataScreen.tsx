@@ -20,15 +20,23 @@ export default function GenericDataScreen({ route, navigation }: any) {
 
   const fetchData = async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       const response = await fetch('https://www.qapril.ci/api/mobile/owner/generic-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, moduleName: featureName })
+        body: JSON.stringify({ token, moduleName: featureName }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const json = await response.json();
       if (json.success) setData(json.data);
-    } catch (e) {
+    } catch (e: any) {
+      clearTimeout(timeoutId);
+      if (e.name === 'AbortError') {
+        setData([]);
+      }
       console.error(e);
     } finally {
       setLoading(false);

@@ -12,7 +12,7 @@ const MENU_CATEGORIES = [
         title: "L'Essentiel",
         items: [
             { name: 'Synthèse', route: 'MainTab', icon: LayoutDashboard },
-            { name: 'Profil', route: 'GenericData', params: { featureName: 'Profil Propriétaire' }, icon: Fingerprint },
+            { name: 'Profil', route: 'Profile', icon: Fingerprint },
         ]
     },
     {
@@ -21,8 +21,8 @@ const MENU_CATEGORIES = [
             { name: 'Mes biens', route: 'PropertiesScreen', icon: Home },
             { name: 'Mes mandats', route: 'GenericData', params: { featureName: 'Mes Mandats' }, icon: FileSignature },
             { name: 'Mes baux', route: 'GenericData', params: { featureName: 'Mes Baux' }, icon: FileText },
-            { name: 'États des lieux', route: 'GenericData', params: { featureName: 'États des Lieux' }, icon: FileCheck },
-            { name: "Outils d'Import", route: 'GenericData', params: { featureName: "Outils d'Import" }, icon: FolderSearch }
+            { name: 'États des lieux', route: 'FeatureTeaser', params: { featureName: 'États des Lieux' }, icon: FileCheck },
+            { name: "Outils d'Import", route: 'FeatureTeaser', params: { featureName: "Outils d'Import" }, icon: FolderSearch }
         ]
     },
     {
@@ -30,7 +30,7 @@ const MENU_CATEGORIES = [
         items: [
             { name: 'Loyers', route: 'GenericData', params: { featureName: 'Loyers' }, icon: Coins },
             { name: 'Impayés', route: 'GenericData', params: { featureName: 'Impayés' }, icon: AlertCircle },
-            { name: 'Fiscal DGI', route: 'GenericData', params: { featureName: 'Fiscalité DGI' }, icon: Building }, 
+            { name: 'Fiscal DGI', route: 'FeatureTeaser', params: { featureName: 'Fiscalité DGI' }, icon: Building }, 
             { name: 'Mon Wallet', route: 'Wallet', icon: Wallet },
             { name: 'Régul. Charges', route: 'GenericData', params: { featureName: 'Régulation des Charges' }, icon: RefreshCw }
         ]
@@ -41,20 +41,20 @@ const MENU_CATEGORIES = [
             { name: 'Maintenance', route: 'Maintenance', icon: Wrench },
             { name: 'Messagerie', route: 'Message', icon: MessageSquare },
             { name: 'Agenda & Visites', route: 'GenericData', params: { featureName: 'Agenda & Visites' }, icon: Calendar },
-            { name: 'Assurances', route: 'GenericData', params: { featureName: 'Assurances' }, icon: Shield },
+            { name: 'Assurances', route: 'FeatureTeaser', params: { featureName: 'Assurances' }, icon: Shield },
             { name: 'Successions', route: 'GenericData', params: { featureName: 'Successions' }, icon: Users },
             { name: 'Syndic', route: 'GenericData', params: { featureName: 'Syndic' }, icon: Building },
-            { name: 'Marketplace', route: 'GenericData', params: { featureName: 'Marketplace' }, icon: Compass },
-            { name: 'Procurations', route: 'GenericData', params: { featureName: 'Procurations' }, icon: Key }
+            { name: 'Marketplace', route: 'FeatureTeaser', params: { featureName: 'Marketplace' }, icon: Compass },
+            { name: 'Procurations', route: 'FeatureTeaser', params: { featureName: 'Procurations' }, icon: Key }
         ]
     },
     {
         title: "Administration",
         items: [
-            { name: 'Documents', route: 'GenericData', params: { featureName: 'Documents' }, icon: FileSearch },
-            { name: 'Certificats', route: 'GenericData', params: { featureName: 'Certificats' }, icon: Receipt },
+            { name: 'Documents', route: 'FeatureTeaser', params: { featureName: 'Documents' }, icon: FileSearch },
+            { name: 'Certificats', route: 'FeatureTeaser', params: { featureName: 'Certificats' }, icon: Receipt },
             { name: 'Rapports', route: 'GenericData', params: { featureName: 'Rapports' }, icon: BarChart3 },
-            { name: 'Gouvernance', route: 'GenericData', params: { featureName: 'Gouvernance' }, icon: Scale }
+            { name: 'Gouvernance', route: 'FeatureTeaser', params: { featureName: 'Gouvernance' }, icon: Scale }
         ]
     },
     {
@@ -62,9 +62,9 @@ const MENU_CATEGORIES = [
         items: [
             { name: 'Automatisations', route: 'GenericData', params: { featureName: 'Automatisations' }, icon: Zap },
             { name: 'Matching', route: 'GenericData', params: { featureName: 'Matching Locataire' }, icon: Link2 },
-            { name: 'Indice ICL', route: 'GenericData', params: { featureName: 'Indice ICL' }, icon: BarChart3 },
-            { name: 'Assistant IA', route: 'GenericData', params: { featureName: 'Assistant IA' }, icon: MonitorPlay },
-            { name: 'Manuel Officiel', route: 'GenericData', params: { featureName: 'Manuel Officiel' }, icon: BookOpen }
+            { name: 'Indice ICL', route: 'FeatureTeaser', params: { featureName: 'Indice ICL' }, icon: BarChart3 },
+            { name: 'Assistant IA', route: 'FeatureTeaser', params: { featureName: 'Assistant IA' }, icon: MonitorPlay },
+            { name: 'Manuel Officiel', route: 'FeatureTeaser', params: { featureName: 'Manuel Officiel' }, icon: BookOpen }
         ]
     }
 ];
