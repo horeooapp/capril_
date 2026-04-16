@@ -33,9 +33,14 @@ export async function getRentCertificateData(leaseId: string) {
     // Eligibility check: must have at least one paid receipt and no major arrears (simplified)
     const isEligible = lease.receipts.length > 0;
 
+    const referenceNumber = Math.floor(1000 + Math.random() * 9000);
+    const lastPaymentDate = lease.receipts[0]?.paidAt || new Date();
+
     return {
         lease,
         isEligible,
+        referenceNumber,
+        lastPaymentDate: lastPaymentDate.toISOString(),
         generatedAt: new Date().toISOString(),
         issuer: "QAPRIL AUTOMATED SYSTEM"
     };

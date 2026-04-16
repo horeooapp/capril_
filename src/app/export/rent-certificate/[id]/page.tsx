@@ -40,11 +40,14 @@ export default async function RentCertificatePage({ params }: { params: Promise<
                         Je soussigné, <span className="font-bold">QAPRIL MANAGEMENT</span>, agissant en qualité de gestionnaire pour le compte du bailleur, certifie par la présente que :
                     </div>
 
-                    <div className="bg-emerald-50/50 p-8 rounded-3xl border border-emerald-100 italic">
-                        <div className="grid grid-cols-2 gap-y-6 gap-x-12">
+                    <div className="flex justify-between mb-12 items-end">
+                        <div className="space-y-4">
+                            <div className="bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 inline-block">
+                                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest">Document Certifié</span>
+                            </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Locataire</label>
-                                <div className="text-lg font-bold text-emerald-950 uppercase">{lease.tenant.firstName} {lease.tenant.lastName}</div>
+                                <div className="text-xl font-black text-emerald-950 uppercase tracking-tight">{lease.tenant!.firstName} {lease.tenant!.lastName}</div>
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Logement concerné</label>
@@ -52,22 +55,33 @@ export default async function RentCertificatePage({ params }: { params: Promise<
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-800/60 mb-1">Montant du loyer</label>
-                                <div className="text-lg font-bold text-emerald-950">{lease.rentAmount.toLocaleString()} FCFA / Mois</div>
+                                <div className="text-sm font-bold text-emerald-950 underline decoration-emerald-200 decoration-2 underline-offset-4">{lease.rentAmount?.toLocaleString() || 0} F CFA / mois</div>
                             </div>
-                            <div>
-                                <label className="block text-[10px) font-black uppercase tracking-widest text-emerald-800/60 mb-1">Date d'effet</label>
-                                <div className="text-sm font-bold text-emerald-950">{new Date(lease.startDate).toLocaleDateString()}</div>
-                            </div>
+                        </div>
+                        {/* QR Code Placeholder for authenticity */}
+                        <div className="w-32 h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-[10px] text-gray-400 font-bold text-center p-4 uppercase leading-tight">
+                            Signature Numérique QAPRIL
                         </div>
                     </div>
 
-                    <div className="text-justify leading-relaxed text-gray-800">
-                        est à jour du règlement de ses loyers et charges pour la période citée ci-dessus. 
-                        La dernière quittance a été émise et certifiée numériquement le <span className="font-bold">{new Date(((lease as any).receipts[0]?.paidAt) || Date.now()).toLocaleDateString()}</span>.
-                    </div>
+                    <div className="space-y-8 mb-16">
+                        <div className="bg-white border-l-4 border-emerald-500 p-8 shadow-sm">
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-emerald-900 mb-6">Déclaration du Bailleur / Mandataire</h3>
+                            
+                            <div className="text-justify leading-relaxed text-gray-800 mb-4">
+                                Nous soussignés, **QAPRIL IMMOBILIER**, agissant en qualité de mandataire pour le compte du bailleur, 
+                                certifions que le locataire susmentionné occupant le logement désigné :
+                            </div>
 
-                    <div className="text-justify leading-relaxed text-gray-800">
-                        Cette attestation est délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.
+                            <div className="text-justify leading-relaxed text-gray-800 mb-4">
+                                est à jour du règlement de ses loyers et charges pour la période citée ci-dessus. 
+                                La dernière quittance a été émise et certifiée numériquement le <span className="font-bold">{new Date((data as any).lastPaymentDate).toLocaleDateString()}</span>.
+                            </div>
+                        </div>
+
+                        <div className="text-justify leading-relaxed text-gray-800">
+                            Cette attestation est délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.
+                        </div>
                     </div>
                 </div>
 
