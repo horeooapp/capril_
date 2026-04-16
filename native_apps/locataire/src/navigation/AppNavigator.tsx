@@ -11,8 +11,13 @@ import EmergencyServicesScreen from '../screens/EmergencyServicesScreen';
 import ContractScreen from '../screens/ContractScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PaymentProcessScreen from '../screens/PaymentProcessScreen';
+import ReceiptViewScreen from '../screens/ReceiptView';
 import CustomBottomTab from '../components/navigation/CustomBottomTab';
 import SideMenuHeader from '../components/navigation/SideMenuHeader';
+import { useNotifications } from '../hooks/useNotifications';
+import ScanBillScreen from '../screens/ScanBillScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import PassportScreen from '../screens/PassportScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -56,6 +61,10 @@ function CustomDrawerContent(props: any) {
 // Menu Latéral (Drawer)
 function DrawerNavigator({ route }: any) {
   const token = route.params?.token;
+  
+  // Initialize Push Notifications
+  useNotifications(token);
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -87,6 +96,18 @@ function DrawerNavigator({ route }: any) {
         initialParams={{ token }}
         options={{ title: 'Messagerie' }}
       />
+      <Drawer.Screen 
+        name="Passport" 
+        component={PassportScreen} 
+        initialParams={{ token }}
+        options={{ title: 'Mon Passeport' }}
+      />
+      <Drawer.Screen 
+        name="Profile" 
+        component={ProfileScreen} 
+        initialParams={{ token }}
+        options={{ title: 'Mon Profil' }}
+      />
     </Drawer.Navigator>
   );
 }
@@ -98,6 +119,9 @@ export default function AppNavigator() {
       <Stack.Screen name="Auth" component={AuthScreen} />
       <Stack.Screen name="Main" component={DrawerNavigator} />
       <Stack.Screen name="PaymentProcess" component={PaymentProcessScreen} />
+      <Stack.Screen name="ReceiptView" component={ReceiptViewScreen} />
+      <Stack.Screen name="ScanBill" component={ScanBillScreen} />
+      <Stack.Screen name="Passport" component={PassportScreen} />
     </Stack.Navigator>
   );
 }

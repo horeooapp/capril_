@@ -83,19 +83,29 @@ export async function verifyLeaseSignature(leaseId: string, otp: string, ip: str
             return { success: false, error: "Code OTP invalide ou expiré." }
         }
 
-        await prisma.lease.update({
+        const updated = await prisma.lease.update({
             where: { id: leaseId },
             data: {
                 isSignedElectronically: true,
                 signedAt: new Date(),
                 signingOtp: null, // Clear OTP after use
+                status: "ACTIVE", // Activation du bail
                 signatureContext: {
                     ip,
                     userAgent,
                     timestamp: new Date().toISOString()
                 }
-            } as any
+            } as any,
+            include: { property: true }
         })
+
+        // --- C-AVAIL-02 : Mise à jour du statut du bien ---
+        if (updated.propertyId) {
+            await prisma.property.update({
+                where: { id: updated.propertyId },
+                data: { status: "Occupé" } // Synchronisation avec le dashboard mobile
+            });
+        }
 
         // --- ADD-01 v2 : Calcul Fiscal Automatique ---
         try {

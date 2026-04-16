@@ -100,3 +100,83 @@ export async function generateReceiptPDF(receiptData: {
   return Buffer.from(pdfBytes);
 }
 
+/**
+ * PHASE 2 : PASSEPORT LOCATIF CERTIFIÉ
+ */
+export async function generatePassportPDF(data: {
+    refPasseport: string;
+    tenantName: string;
+    score: number;
+    badge: string;
+    tauxPaiement: number;
+    nbBails: number;
+    hashSha256: string;
+    dateEmission: Date;
+}): Promise<Buffer> {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]);
+    
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
+    const { width, height } = page.getSize();
+    
+    const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
+        page.drawText(text, { x, y, size, font: optFont, color });
+    };
+
+    const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
+        page.drawRectangle({ x, y, width: w, height: h, color });
+    };
+
+    // --- BLUE HEADER (CAPRIL IDENTITY) ---
+    drawRect(0, height - 160, width, 160, rgb(0.02, 0.1, 0.3));
+    drawText('QAPRIL', 50, height - 60, fontBold, 32, rgb(1, 1, 1));
+    drawText('CERTIFICAT DE FIABILITÉ LOCATIVE', 50, height - 90, fontBold, 16, rgb(1, 1, 1));
+    drawText(`Identification : ${data.refPasseport}`, 50, height - 110, font, 10, rgb(0.7, 0.8, 1));
+
+    // --- TENANT INFO ---
+    let currentY = height - 200;
+    drawText('DÉBITEUR / LOCATAIRE :', 50, currentY, fontBold, 10, rgb(0.5, 0.5, 0.5));
+    drawText(data.tenantName.toUpperCase(), 50, currentY - 25, fontBold, 18);
+    
+    // --- SCORE & BADGE ---
+    currentY -= 80;
+    drawRect(50, currentY - 100, 200, 100, rgb(0.95, 0.98, 1));
+    drawText('SCORE DE CONFIANCE', 65, currentY - 25, fontBold, 9);
+    drawText(`${data.score}`, 65, currentY - 70, fontBold, 42, rgb(0.02, 0.1, 0.3));
+    drawText('/ 1000', 160, currentY - 70, fontBold, 18, rgb(0.5, 0.5, 0.5));
+
+    // Badge
+    const badgeColors: any = { 'A+': rgb(0.8, 0.6, 0), 'A': rgb(0.5, 0.5, 0.5), 'B': rgb(0.6, 0.3, 0.1) };
+    const color = badgeColors[data.badge] || rgb(0.2, 0.2, 0.2);
+    drawRect(width - 250, currentY - 100, 200, 100, color);
+    drawText('GRADE QAPRIL', width - 235, currentY - 25, fontBold, 9, rgb(1, 1, 1));
+    drawText(data.badge, width - 175, currentY - 75, fontBold, 50, rgb(1, 1, 1));
+
+    // --- DETAILS ---
+    currentY -= 150;
+    drawText('MÉTRIQUES DE FIABILITÉ (Derniers 12 mois)', 50, currentY, fontBold, 12);
+    currentY -= 30;
+    drawText(`• Taux de paiement à échéance : ${data.tauxPaiement}%`, 60, currentY, font, 11);
+    currentY -= 20;
+    drawText(`• Nombre de contrats analysés : ${data.nbBails}`, 60, currentY, font, 11);
+    currentY -= 20;
+    drawText(`• Statut de vérification d'identité : VÉRIFIÉ (KYC-2)`, 60, currentY, font, 11);
+
+    // --- VERIFICATION QR ---
+    const qrUrl = `https://qapril.ci/p/${data.refPasseport}`;
+    const qrDataUrl = await QRCode.toDataURL(qrUrl, { width: 150 });
+    const qrImage = await pdfDoc.embedPng(qrDataUrl);
+    page.drawImage(qrImage, { x: width - 180, y: 100, width: 120, height: 120 });
+    drawText('Scanner pour vérification', width - 180, 90, font, 8, rgb(0.5, 0.5, 0.5));
+
+    // --- SECURITY FOOTER ---
+    drawRect(50, 40, width - 100, 40, rgb(0.98, 0.98, 0.98));
+    drawText(`SHA-256 Digest: ${data.hashSha256}`, 60, 65, fontMono, 7, rgb(0.5, 0.5, 0.5));
+    drawText(`Certificat émis le ${format(data.dateEmission, 'dd/MM/yyyy')} - Valable 30 jours.`, 60, 50, font, 9, rgb(0.3, 0.3, 0.3));
+
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes);
+}
+

@@ -48,7 +48,7 @@ export default function PaymentProcessScreen({ navigation, route }: any) {
       fetch(API_DASHBOARD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token || 'DUMMY', role: 'TENANT' })
+        body: JSON.stringify({ token, role: 'TENANT' })
       })
       .then(res => res.json())
       .then(json => {

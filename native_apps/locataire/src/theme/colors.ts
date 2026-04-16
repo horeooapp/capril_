@@ -1,21 +1,21 @@
 export const Colors = {
-  primary: '#001C29', // Navy sombre de l'inspiration
-  accent: '#FFF000',  // Jaune vif (Gold)
-  background: '#F0F5F9', // Gris/Bleu très pâle pour le fond
+  primary: '#064E3B', // Emerald Green (QAPRIL New Identity)
+  accent: '#F97316',  // Sunset Orange (Vibrant Accent)
+  background: '#F0FDF4', // Very Pale Mint Green background
   white: '#FFFFFF',
   text: {
-    dark: '#001C29',
-    muted: '#64748B',
+    dark: '#064E3B',
+    muted: '#435D54', // Muted green-grey
     light: '#FFFFFF',
   },
   cardColors: {
-    mint: '#E6F7F5',
-    rose: '#FBE8F0',
-    cream: '#FEF6E4',
-    yellow: '#FFFBE6',
-    orange: '#FFF1E6',
+    mint: '#DCFCE7',
+    rose: '#FEE2E2',
+    cream: '#FEF9C3',
+    yellow: '#FEF08A',
+    orange: '#FFEDD5',
   },
-  border: '#E2E8F0',
+  border: '#D1FAE5',
   success: '#10B981',
   danger: '#EF4444',
 };

@@ -98,6 +98,10 @@ export class NotificationService {
           const ok = await this.envoyerSMS(userId, event, data);
           if (ok) au_moins_un_succes = true;
         }
+        if (canalStr === "push" || isMandatory) {
+          const ok = await this.envoyerPush(userId, event, data);
+          if (ok) au_moins_un_succes = true;
+        }
       }
 
       if (!au_moins_un_succes && CRITIQUES.includes(event)) {
@@ -194,6 +198,39 @@ export class NotificationService {
       console.error("[NotificationService] SMS failed", e);
     }
     return delivered;
+  }
+
+  private static async envoyerPush(userId: string, event: EventType, data: NotificationData): Promise<boolean> {
+    try {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { pushToken: true } });
+      if (!user?.pushToken) return false;
+
+      const title = "QAPRIL App";
+      const body = data.payload?.smsText || "Nouvelle notification importante sur votre espace QAPRIL.";
+
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: user.pushToken,
+          sound: 'default',
+          title: title,
+          body: body,
+          data: { event, referenceId: data.referenceId },
+        }),
+      });
+
+      const resData = await response.json();
+      await this.logNotification(userId, "PUSH", event, data.templateId, response.ok ? "ENVOYE" : "ECHEC");
+      return response.ok;
+    } catch (e) {
+      console.error("[NotificationService] Push failed", e);
+      return false;
+    }
   }
 
   private static async fallbackSmsOnly(userId: string, event: EventType, data: NotificationData) {

@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { NotificationService } from "./notification-service";
 import { MaintenanceCategory, MaintenanceStatus } from "@prisma/client";
+import { WalletService } from "./wallet/transactions";
 
 export class MaintenanceService {
   /**
@@ -50,6 +51,7 @@ export class MaintenanceService {
         payload: {
           titre: "Nouveau ticket de maintenance",
           message: `Un nouveau ticket (${ticket.ticketRef}) a été créé pour le logement ${ticket.lease.property.propertyCode} par ${(ticket.locataire.firstName ? ticket.locataire.firstName + " " : "") + (ticket.locataire.lastName || "")}.`,
+          smsText: `Nouveau ticket maintenance (${ticket.ticketRef}) pour ${ticket.lease.property.propertyCode}.`,
           ticketId: ticket.id,
           ticketRef: ticket.ticketRef
         }
@@ -82,6 +84,7 @@ export class MaintenanceService {
         payload: {
           titre: "Ticket pris en charge",
           message: `Votre ticket ${ticket.ticketRef} est désormais pris en charge.`,
+          smsText: `Votre ticket ${ticket.ticketRef} est maintenant pris en charge.`,
           ticketId: ticket.id,
           statut: ticket.statut
         }
@@ -93,19 +96,42 @@ export class MaintenanceService {
 
   /**
    * Résolution du ticket (MAI-03)
+   * Déclenche également le débit du wallet propriétaire si un coût est spécifié.
    */
-  static async resoudreTicket(ticketId: string, commentaire?: string) {
+  static async resoudreTicket(ticketId: string, commentaire?: string, cost?: number) {
     const ticket = await prisma.ticketMaintenance.update({
       where: { id: ticketId },
       data: {
         statut: "RESOLU",
         dateResolution: new Date(),
         commentaireProprio: commentaire,
+        coutFinal: cost || undefined,
       },
       include: {
         locataire: true,
+        lease: {
+          include: {
+            landlord: true
+          }
+        }
       },
     }) as any;
+
+    // Déclencher le débit financier si un coût est présent
+    if (ticket.coutFinal && ticket.coutFinal > 0) {
+      try {
+        await WalletService.debit(
+          ticket.lease.landlordId,
+          ticket.coutFinal,
+          `Maintenance : ${ticket.ticketRef}`,
+          ticket.id,
+          { ticketRef: ticket.ticketRef, type: "MAINTENANCE" }
+        );
+      } catch (e) {
+        console.error("[MaintenanceService] Erreur lors du débit wallet:", e);
+        // On ne bloque pas la résolution du ticket, mais on log l'erreur
+      }
+    }
 
     await NotificationService.envoyerNotification(
       ticket.locataireId,
@@ -114,12 +140,38 @@ export class MaintenanceService {
         payload: {
           titre: "Travaux terminés",
           message: `Le propriétaire a marqué le ticket ${ticket.ticketRef} comme résolu. Merci de confirmer la fin des travaux dans l'application.`,
+          smsText: `Le ticket ${ticket.ticketRef} a été résolu. Merci de confirmer dans l'app.`,
           ticketId: ticket.id
         }
       }
     );
 
     return ticket;
+  }
+
+  /**
+   * Enregistre ou met à jour le coût d'une intervention sans changer le statut
+   */
+  static async setInterventionCost(ticketId: string, cost: number) {
+    const ticket = await prisma.ticketMaintenance.findUnique({
+      where: { id: ticketId },
+      include: {
+        lease: true
+      }
+    });
+
+    if (!ticket) throw new Error("Ticket introuvable");
+
+    // Mise à jour du coût
+    const updated = await prisma.ticketMaintenance.update({
+      where: { id: ticketId },
+      data: { coutFinal: cost }
+    });
+
+    // Optionnel : On pourrait débiter ici aussi, mais le plan prévoit à la résolution.
+    // Pour l'instant, on se contente de mettre à jour le champ.
+    
+    return updated;
   }
 
   /**
@@ -152,6 +204,9 @@ export class MaintenanceService {
           message: confirme 
             ? `Le locataire a confirmé la résolution du ticket ${ticket.ticketRef}.`
             : `Le locataire a contesté la résolution du ticket ${ticket.ticketRef}.`,
+          smsText: confirme 
+            ? `Le locataire a confirmé la résolution du ticket ${ticket.ticketRef}.`
+            : `CONTESTATION ticket ${ticket.ticketRef} par le locataire.`,
           ticketId: ticket.id,
           confirme
         }

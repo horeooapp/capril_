@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
 
 export async function POST(req: Request) {
     try {
@@ -10,8 +10,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
         }
 
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+
+        const userId = payload.userId;
+
         const user = await prisma.user.findUnique({
-            where: { id: token },
+            where: { id: userId },
             include: {
                 leasesAsTenant: {
                     where: { status: { in: ["ACTIVE", "LOYER_IMPAYE"] } },

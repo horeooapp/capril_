@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000'; // Change to production URL if needed
+const BASE_URL = 'http://localhost:3001'; // Change to production URL if needed
 const ENDPOINT = '/api/mobile/dashboard';
 const CONCURRENT_REQUESTS = 10;
 const TOTAL_REQUESTS = 100;
@@ -17,7 +17,7 @@ async function runTest() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    token: "LOAD_TEST_DUMMY_TOKEN", 
+                    token: "515af59d-4c95-4740-929f-f8003f6406de", 
                     role: "TENANT" 
                 })
             });

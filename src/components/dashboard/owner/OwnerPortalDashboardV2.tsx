@@ -68,7 +68,7 @@ export function OwnerPortalDashboardV2({
     <div className="space-y-6">
       
       {/* STATS RAPIDES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
             label="Biens totaux" 
             value={stats.total.toString()} 
@@ -94,7 +94,7 @@ export function OwnerPortalDashboardV2({
       </div>
 
       {/* QUICK ACTIONS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-3">
           {[
               { label: "Nouveau Bien", icon: <Building2 size={16} />, href: "/dashboard/properties/new" },
               { label: "Générer Bail", icon: <ClipboardList size={16} />, href: "/dashboard/leases/new" },
@@ -114,37 +114,45 @@ export function OwnerPortalDashboardV2({
       </div>
 
       {/* BIFURCATION ETATS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SectionCard title="Biens & État Locatif">
-          {entities.flatMap((e: any) => e.unites).slice(0, 5).map((u: any, i: number) => (
-            <div key={i} className="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0 text-[12.5px]">
-              <span className="text-slate-700 font-medium truncate max-w-[50%]">{u.name || u.label}</span>
-              <div className="flex items-center gap-3">
-                <Badge color={u.statut === "occupé" ? "green" : "gray"}>{u.statut === "occupé" ? "ACTIVE" : "VACANT"}</Badge>
-                <span className="font-semibold text-slate-800 w-[70px] text-right">{fmt(u.loyer)} ₣</span>
-              </div>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <div className="min-w-[300px]">
+              {entities.flatMap((e: any) => e.unites).slice(0, 5).map((u: any, i: number) => (
+                <div key={i} className="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0 text-[12.5px]">
+                  <span className="text-slate-700 font-medium truncate max-w-[55%]">{u.name || u.label}</span>
+                  <div className="flex items-center gap-3">
+                    <Badge color={u.statut === "occupé" ? "green" : "gray"}>{u.statut === "occupé" ? "ACTIVE" : "VACANT"}</Badge>
+                    <span className="font-semibold text-slate-800 w-[70px] text-right">{fmt(u.loyer)} ₣</span>
+                  </div>
+                </div>
+              ))}
+              {entities.length === 0 && (
+                <div className="text-[12px] text-slate-400 py-4 text-center">Aucun bien rattaché à ce espace.</div>
+              )}
             </div>
-          ))}
-          {entities.length === 0 && (
-             <div className="text-[12px] text-slate-400 py-4 text-center">Aucun bien rattaché à ce espace.</div>
-          )}
+          </div>
         </SectionCard>
 
         <SectionCard title="Derniers flux vérifiés (Quittances)">
-          {recentPayments.length === 0 ? (
-             <div className="text-[12px] text-slate-400 py-4 text-center">Aucun flux récent enregistré.</div>
-          ) : recentPayments.map((p, i) => (
-            <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
-              <div>
-                <div className="font-medium text-slate-700">{p.locataire}</div>
-                <div className="text-[11px] text-slate-400">{p.mois} · Pmt {p.mode}</div>
-              </div>
-              <div className="text-right">
-                <div className="font-semibold text-slate-800">{p.montant}</div>
-                <Badge color={p.color as any}>{p.statut}</Badge>
-              </div>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <div className="min-w-[300px]">
+              {recentPayments.length === 0 ? (
+                <div className="text-[12px] text-slate-400 py-4 text-center">Aucun flux récent enregistré.</div>
+              ) : recentPayments.map((p, i) => (
+                <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
+                  <div>
+                    <div className="font-medium text-slate-700">{p.locataire}</div>
+                    <div className="text-[11px] text-slate-400">{p.mois} · Pmt {p.mode}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-slate-800">{p.montant}</div>
+                    <Badge color={p.color as any}>{p.statut}</Badge>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </SectionCard>
       </div>
 

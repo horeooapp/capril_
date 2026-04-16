@@ -20,7 +20,8 @@ import {
   CreditCard, 
   ClipboardList, 
   AlertCircle, 
-  FileText 
+  FileText,
+  Camera
 } from 'lucide-react-native';
 import DashboardCard from '../components/dashboard/DashboardCard';
 import { API_ENDPOINTS } from '../config/api';
@@ -48,6 +49,13 @@ export default function DashboardScreen({ navigation, route }: any) {
         console.error(err);
         setLoading(false);
       });
+
+    // Enregistrer le token push si on a un token de session
+    if (token) {
+      import('../utils/notifications').then(({ registerForPushNotificationsAsync }) => {
+        registerForPushNotificationsAsync(token);
+      });
+    }
   }, []);
 
   if (loading) {
@@ -70,7 +78,10 @@ export default function DashboardScreen({ navigation, route }: any) {
 
         <Text style={styles.headerTitle}>Capril Connect</Text>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.profileIcon}>
+          <TouchableOpacity 
+            style={styles.profileIcon}
+            onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id })}
+          >
             <User size={20} color={Colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerIcon}>
@@ -92,6 +103,23 @@ export default function DashboardScreen({ navigation, route }: any) {
             <ShieldCheck size={40} color={Colors.accent} />
           </View>
         </View>
+
+        {/* SCORE TEASER CARD */}
+        <TouchableOpacity 
+          style={styles.scoreTeaser} 
+          onPress={() => navigation.navigate('Passport', { token })}
+        >
+          <View style={styles.scoreTeaserInfo}>
+            <Award size={24} color={Colors.accent} />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={styles.scoreTeaserTitle}>Score de Fiabilité</Text>
+              <Text style={styles.scoreTeaserSubtitle}>Améliorez votre profil pour vos futurs baux</Text>
+            </View>
+          </View>
+          <View style={styles.scoreBadgeMini}>
+             <Text style={styles.scoreMiniText}>{data?.reliabilityScore || 750}</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* Segmented Tabs */}
         <View style={styles.tabsContainer}>
@@ -129,6 +157,14 @@ export default function DashboardScreen({ navigation, route }: any) {
             }}
           />
           <DashboardCard
+            title="QAPRIL Scan"
+            status="Analyse par IA"
+            subStatus="Régelez vos factures par photo"
+            icon={<Camera size={28} color={Colors.primary} />}
+            backgroundColor={Colors.cardColors.mint}
+            onPress={() => navigation.navigate('ScanBill', { token })}
+          />
+          <DashboardCard
             title="Quittances"
             status={`${data?.recentReceipts?.length || 0} Disponibles`}
             subStatus={data?.recentReceipts?.[0] ? `Dernière : ${data.recentReceipts[0].period}` : "Aucune quittance"}
@@ -136,7 +172,8 @@ export default function DashboardScreen({ navigation, route }: any) {
             backgroundColor={Colors.cardColors.cream}
             onPress={() => {
               if (data?.recentReceipts?.[0]?.qrToken) {
-                Linking.openURL(`https://qapril.app/v/${data.recentReceipts[0].qrToken}`);
+                const url = `https://www.qapril.ci/v/${data.recentReceipts[0].qrToken}`;
+                navigation.navigate('ReceiptView', { url });
               } else {
                 Alert.alert("Information", "Vous n'avez pas encore de quittances certifiées.");
               }
@@ -265,5 +302,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-  }
+  },
+  scoreTeaser: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.white,
+    padding: 16,
+    borderRadius: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    elevation: 2,
+  },
+  scoreTeaserInfo: { flexDirection: 'row', alignItems: 'center' },
+  scoreTeaserTitle: { fontSize: 16, fontWeight: '800', color: Colors.primary },
+  scoreTeaserSubtitle: { fontSize: 11, color: Colors.text.muted, marginTop: 2 },
+  scoreBadgeMini: { 
+    backgroundColor: Colors.primary, 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 12 
+  },
+  scoreMiniText: { color: '#fff', fontSize: 13, fontWeight: '900' }
 });

@@ -1,14 +1,50 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert, Image, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { API_ENDPOINTS } from '../config/api';
+import { Colors } from '../theme/colors';
 
 export default function AuthScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [isLoading, setIsLoading] = useState(false);
+  const [isBioChecking, setIsBioChecking] = useState(true);
 
-  const API_URL = 'https://www.qapril.ci/api/mobile/auth';
+  const API_URL = API_ENDPOINTS.AUTH;
+
+  React.useEffect(() => {
+    handleBiometricCheck();
+  }, []);
+
+  const handleBiometricCheck = async () => {
+    try {
+      const bioEnabled = await AsyncStorage.getItem('biometric_enabled');
+      const savedToken = await AsyncStorage.getItem('saved_token_proprio');
+
+      if (bioEnabled === 'true' && savedToken) {
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if (compatible && enrolled) {
+          const result = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Accès sécurisé QAPRIL Business',
+          });
+
+          if (result.success) {
+            navigation.replace('Main', { token: savedToken });
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[BioAuth Error]", e);
+    } finally {
+      setIsBioChecking(false);
+    }
+  };
 
   const handleRequestOTP = async () => {
     if (!email) return Alert.alert("Erreur", "Veuillez entrer une adresse.");
@@ -73,43 +109,49 @@ export default function AuthScreen({ navigation }: any) {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Connexion Sécurisée</Text>
-
-          {step === 'PHONE' ? (
-            <View>
-              <Text style={styles.label}>Adresse e-mail</Text>
-              <TextInput 
-                style={styles.input}
-                placeholder="votre@email.com"
-                placeholderTextColor="#9ca3af"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-              <TouchableOpacity style={styles.button} onPress={handleRequestOTP} disabled={isLoading}>
-                <Text style={styles.buttonText}>{isLoading ? 'Connexion en cours...' : 'Envoyer un code'}</Text>
-              </TouchableOpacity>
-            </View>
+          {isBioChecking ? (
+            <ActivityIndicator size="large" color={Colors.primary} />
           ) : (
-            <View>
-               <Text style={styles.label}>Code de vérification (6 chiffres)</Text>
-               <TextInput 
-                style={[styles.input, styles.otpInput]}
-                placeholder="000000"
-                placeholderTextColor="#9ca3af"
-                keyboardType="numeric"
-                maxLength={6}
-                value={otp}
-                onChangeText={setOtp}
-              />
-              <TouchableOpacity style={styles.button} onPress={handleVerifyOTP} disabled={isLoading}>
-                <Text style={styles.buttonText}>{isLoading ? 'Vérification...' : 'Valider l\'accès'}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.linkButton} onPress={() => setStep('PHONE')}>
-                <Text style={styles.linkText}>Je n'ai pas reçu de code</Text>
-              </TouchableOpacity>
-            </View>
+            <>
+              <Text style={styles.cardTitle}>Connexion Sécurisée</Text>
+
+              {step === 'PHONE' ? (
+                <View>
+                  <Text style={styles.label}>Adresse e-mail</Text>
+                  <TextInput 
+                    style={styles.input}
+                    placeholder="votre@email.com"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={email}
+                    onChangeText={setEmail}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={handleRequestOTP} disabled={isLoading}>
+                    <Text style={styles.buttonText}>{isLoading ? 'Connexion en cours...' : 'Envoyer un code'}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View>
+                   <Text style={styles.label}>Code de vérification (6 chiffres)</Text>
+                   <TextInput 
+                    style={[styles.input, styles.otpInput]}
+                    placeholder="000000"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="numeric"
+                    maxLength={6}
+                    value={otp}
+                    onChangeText={setOtp}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={handleVerifyOTP} disabled={isLoading}>
+                    <Text style={styles.buttonText}>{isLoading ? 'Vérification...' : 'Valider l\'accès'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.linkButton} onPress={() => setStep('PHONE')}>
+                    <Text style={styles.linkText}>Je n'ai pas reçu de code</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
           )}
         </View>
       </KeyboardAvoidingView>

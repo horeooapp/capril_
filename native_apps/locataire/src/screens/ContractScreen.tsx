@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -24,6 +24,7 @@ import {
   FileText,
   Download
 } from 'lucide-react-native';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function ContractScreen({ navigation, route }: any) {
   const lease = route.params?.lease;
@@ -37,7 +38,7 @@ export default function ContractScreen({ navigation, route }: any) {
   const handleInitiateSignature = async (base64Signature: string) => {
     setLoading(true);
     try {
-      const response = await fetch('https://www.qapril.ci/api/mobile/leases/signature/initiate', {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}/api/mobile/leases/signature/initiate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -65,7 +66,7 @@ export default function ContractScreen({ navigation, route }: any) {
     if (otp.length < 6) return;
     setLoading(true);
     try {
-      const response = await fetch('https://www.qapril.ci/api/mobile/leases/signature/verify', {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}/api/mobile/leases/signature/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -191,19 +192,35 @@ export default function ContractScreen({ navigation, route }: any) {
             </View>
             <Text style={styles.actionText}>Payer</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionItem}>
+          <TouchableOpacity 
+            style={styles.actionItem}
+            onPress={() => {
+              if (lease?.qrToken) {
+                const url = `${API_ENDPOINTS.BASE_URL}/v/${lease.qrToken}`;
+                navigation.navigate('ReceiptView', { url });
+              } else {
+                Alert.alert("Information", "Aucune quittance certifiée disponible pour ce bail pour l'instant.");
+              }
+            }}
+          >
             <View style={styles.actionIconContainer}>
               <FileCheck size={24} color="#059669" />
             </View>
             <Text style={styles.actionText}>Quittance</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionItem}>
+          <TouchableOpacity 
+            style={styles.actionItem}
+            onPress={() => Alert.alert("Information", "La gestion des colocataires sera disponible dans la prochaine mise à jour.")}
+          >
             <View style={styles.actionIconContainer}>
               <Users size={24} color="#2563EB" />
             </View>
             <Text style={styles.actionText}>Co-locat.</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionItem}>
+          <TouchableOpacity 
+            style={styles.actionItem}
+            onPress={() => navigation.navigate('Services', { screen: 'Maintenance' })}
+          >
             <View style={styles.actionIconContainer}>
               <AlertTriangle size={24} color="#DC2626" />
             </View>

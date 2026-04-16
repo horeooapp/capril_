@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
 
 export async function POST(req: Request) {
     try {
@@ -10,13 +10,20 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
         }
 
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+
+        const userId = payload.userId;
+
         const wallet = await prisma.userWalletConfig.findUnique({
-            where: { userId: token }
+            where: { userId }
         });
 
         if (action === 'GET_BALANCE') {
             const history = await prisma.walletTransaction.findMany({
-                where: { userId: token },
+                where: { userId },
                 orderBy: { createdAt: 'desc' },
                 take: 20
             });
@@ -37,14 +44,14 @@ export async function POST(req: Request) {
             const result = await prisma.$transaction(async (tx) => {
                 // Débiter le compte
                 const updatedWallet = await tx.userWalletConfig.update({
-                    where: { userId: token },
+                    where: { userId },
                     data: { walletBalance: { decrement: amount } }
                 });
 
                 // Tracer dans WalletTransaction
                 await tx.walletTransaction.create({
                     data: {
-                        userId: token,
+                        userId,
                         amount: -amount, // Négatif car débit
                         type: 'WITHDRAWAL',
                         status: 'PENDING'

@@ -359,8 +359,17 @@ export async function confirmLeaseBDQ(leaseId: string, otp: string) {
                 status: LeaseStatus.ACTIVE_DECLARATIF,
                 confirmationLocataireSms: true,
                 confirmationLocataireAt: new Date()
-            }
+            },
+            include: { property: true }
         });
+
+        // --- C-AVAIL-02 : Mise à jour du statut du bien ---
+        if (updatedLease.propertyId) {
+            await prisma.property.update({
+                where: { id: updatedLease.propertyId },
+                data: { status: "Occupé" }
+            });
+        }
 
         revalidatePath("/dashboard/leases");
         revalidatePath(`/dashboard/leases/${leaseId}`);

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { ChevronLeft, Plus, CheckCircle } from 'lucide-react-native';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function CreateLeaseScreen({ route, navigation }: any) {
-  const token = route.params?.token || 'DUMMY_TOKEN';
+  const token = route.params?.token;
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -13,8 +14,8 @@ export default function CreateLeaseScreen({ route, navigation }: any) {
   const [rentAmount, setRentAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   
-  const API_PROPERTIES = 'https://www.qapril.ci/api/mobile/owner/properties';
-  const API_CREATE_LEASE = 'https://www.qapril.ci/api/mobile/owner/leases/create';
+  const API_PROPERTIES = API_ENDPOINTS.PROPERTIES;
+  const API_CREATE_LEASE = `${API_ENDPOINTS.BASE_URL}/api/mobile/owner/leases/create`;
 
   useEffect(() => {
     fetch(API_PROPERTIES, {

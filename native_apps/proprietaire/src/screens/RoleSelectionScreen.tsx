@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } fr
 import { ChevronRight, Building, Key, Globe } from 'lucide-react-native';
 
 export default function RoleSelectionScreen({ route, navigation }: any) {
-  const token = route.params?.token || 'DUMMY_TOKEN';
+  const token = route.params?.token;
 
   const selectRole = (roleType: string) => {
     // Dans une version plus avancée, on pourrait sauvegarder ce type dans le backend

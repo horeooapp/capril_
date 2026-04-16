@@ -3,6 +3,7 @@ import { redis } from '@/lib/redis';
 import { prisma } from '@/lib/prisma';
 import { sendOTPEmail } from "@/lib/email";
 import crypto from 'crypto';
+import { signMobileToken } from '@/lib/mobile-auth';
 
 // Fonction interne de génération OTP
 function generateOTP(): string {
@@ -101,13 +102,12 @@ export async function POST(req: Request) {
                 })
             ]);
 
-            // MVP : on utilise l'ID de l'utilisateur comme token d'authentification 
-            // pour permettre les requêtes via GenericDataScreen
-            const fakeAuthToken = user.id;
+            // Sécurité : Génération d'un vrai JWT signé
+            const realToken = await signMobileToken(user.id, user.email || '', role || user.role || 'TENANT');
 
             return NextResponse.json({ 
                 success: true, 
-                token: fakeAuthToken, 
+                token: realToken, 
                 user: { id: user.id, email: user.email, role: user.role, emailVerified: true } 
             });
         }

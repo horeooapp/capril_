@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { ChevronLeft, FileText, CheckCircle, XCircle } from 'lucide-react-native';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function ApplicationsScreen({ route, navigation }: any) {
-  const token = route.params?.token || 'DUMMY_TOKEN';
+  const token = route.params?.token;
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const API_APPS = 'https://www.qapril.ci/api/mobile/owner/applications';
+  const API_APPS = API_ENDPOINTS.APPLICATIONS;
 
   const fetchApplications = () => {
     fetch(API_APPS, {

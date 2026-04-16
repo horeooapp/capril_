@@ -1,19 +1,26 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const { token, role } = body;
 
-        // Validation très basique de sécurité pour MVP
-        if (!token || token === 'DUMMY_TOKEN') {
-            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou manquant." }, { status: 401 });
+        // Validation de sécurité avec JWT
+        if (!token) {
+            return NextResponse.json({ error: "Non autorisé. Jeton manquant." }, { status: 401 });
         }
 
-        // Pour ce MVP, on suppose que le token passé par l'app React Native correspond à l'ID utilisateur
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+
+        const userId = payload.userId;
+
+        // Récupération de l'utilisateur via l'ID extrait du JWT
         const user = await prisma.user.findUnique({
-            where: { id: token },
+            where: { id: userId },
             include: {
                 propertiesOwned: {
                     where: { status: { not: "archived" } },
@@ -38,7 +45,7 @@ export async function POST(req: Request) {
         if (role === 'TENANT') {
             const activeLease = await prisma.lease.findFirst({
                 where: {
-                    tenantId: token,
+                    tenantId: userId,
                     status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF"] }
                 },
                 include: {
@@ -92,6 +99,7 @@ export async function POST(req: Request) {
                     })),
                     activeRequests: activeRequestsCount,
                     hasLease: true,
+                    userId: user.id,
                     lease: {
                         id: activeLease.id,
                         ref: activeLease.leaseReference,
@@ -161,6 +169,33 @@ export async function POST(req: Request) {
                 where: { logementId: { in: propertiesMobile.map(p => p.id) }, statut: 'EN_ATTENTE' }
             });
 
+            // --- CALCUL HISTORIQUE REVENU (6 MOIS) ---
+            const last6Months: any[] = [];
+            const now = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const monthName = d.toLocaleString('fr-FR', { month: 'short' }).toUpperCase();
+                const monthNum = d.getMonth() + 1;
+                const yearNum = d.getFullYear();
+
+                const monthlyRevenue = await prisma.receipt.aggregate({
+                    where: {
+                        lease: {
+                            property: { ownerId: userId }
+                        },
+                        periodMonth: monthNum,
+                        periodYear: yearNum,
+                        status: { in: ["PAID", "ENCAISSE", "SUCCESS"] }
+                    },
+                    _sum: { totalAmount: true }
+                });
+
+                last6Months.push({
+                    month: monthName,
+                    amount: monthlyRevenue._sum.totalAmount || 0
+                });
+            }
+
             return NextResponse.json({
                 success: true,
                 data: {
@@ -168,7 +203,9 @@ export async function POST(req: Request) {
                     totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} FCFA`,
                     occupancyRate: `${occupancyRate}%`,
                     properties: propertiesMobile,
-                    pendingRepairs: pendingRepairsCount
+                    userId: user.id,
+                    pendingRepairs: pendingRepairsCount,
+                    revenueHistory: last6Months
                 }
             });
         }

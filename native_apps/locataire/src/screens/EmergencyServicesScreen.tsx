@@ -28,10 +28,16 @@ import { API_ENDPOINTS } from '../config/api';
 
 export default function EmergencyServicesScreen({ navigation, route }: any) {
   const [contacts, setContacts] = React.useState<any[]>([]);
+  const [filteredContacts, setFilteredContacts] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const token = route?.params?.token || 'DUMMY';
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const token = route?.params?.token;
 
   React.useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     fetch(API_ENDPOINTS.EMERGENCY_CONTACTS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,11 +45,23 @@ export default function EmergencyServicesScreen({ navigation, route }: any) {
     })
     .then(res => res.json())
     .then(data => {
-      if(data.success) setContacts(data.contacts);
+      if(data.success) {
+        setContacts(data.contacts);
+        setFilteredContacts(data.contacts);
+      }
     })
     .catch(console.error)
     .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
+
+  React.useEffect(() => {
+    const filtered = contacts.filter(contact => 
+      contact.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.location?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredContacts(filtered);
+  }, [searchQuery, contacts]);
   const makeCall = (number: string) => {
     Linking.openURL(`tel:${number.replace(/\s/g, '')}`);
   };
@@ -77,33 +95,45 @@ export default function EmergencyServicesScreen({ navigation, route }: any) {
               placeholder="Rechercher un service..." 
               style={styles.searchInput}
               placeholderTextColor={Colors.text.muted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
             />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <X size={18} color={Colors.text.muted} />
+              </TouchableOpacity>
+            )}
           </View>
-          <TouchableOpacity style={styles.filterButton}>
-            <X size={20} color="#EF4444" />
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.filterButton, { backgroundColor: Colors.white, borderColor: Colors.accent }]}>
+          <TouchableOpacity 
+            style={[styles.filterButton, { backgroundColor: Colors.white, borderColor: Colors.border }]}
+            onPress={() => setSearchQuery('')}
+          >
             <Filter size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>
 
-        {/* Tags */}
+        {/* Dynamic Tags */}
         <View style={styles.tagsContainer}>
+          {searchQuery.length > 0 && (
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>Filtre: {searchQuery}</Text>
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <X size={14} color={Colors.primary} style={{ marginLeft: 4 }} />
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={styles.tag}>
-            <Text style={styles.tagText}>Commune: COCODY</Text>
-            <X size={14} color={Colors.primary} style={{ marginLeft: 4 }} />
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>Ville: ABIDJAN</Text>
-            <X size={14} color={Colors.primary} style={{ marginLeft: 4 }} />
+            <Text style={styles.tagText}>{filteredContacts.length} services trouvés</Text>
           </View>
         </View>
 
         {/* List */}
-        {contacts.length === 0 && !loading && (
-          <Text style={{textAlign: 'center', marginTop: 20, color: Colors.text.muted}}>Aucun contact d'urgence trouvé.</Text>
+        {filteredContacts.length === 0 && !loading && (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Aucun contact d'urgence trouvé pour "{searchQuery}".</Text>
+          </View>
         )}
-        {contacts.map((contact: any) => (
+        {filteredContacts.map((contact: any) => (
           <View key={contact.id} style={styles.card}>
             <View style={styles.cardHeader}>
               <View>
@@ -274,4 +304,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   itineraryText: { fontSize: 13, fontWeight: '700', color: Colors.white },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: Colors.text.muted,
+    fontSize: 14,
+    fontWeight: '600',
+  }
 });

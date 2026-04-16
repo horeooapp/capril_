@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
 import { 
     generateReceiptRef, 
     generateQRToken, 
@@ -14,9 +14,17 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { token, leaseId, amount, operator } = body;
 
+        // Validation de sécurité avec JWT
         if (!token || !leaseId || !amount) {
             return NextResponse.json({ error: "Paramètres manquants" }, { status: 400 });
         }
+
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+        
+        const payeurId = payload.userId;
 
         // 1. Récupérer le bail et les infos nécessaires
         const lease = await prisma.lease.findUnique({
@@ -99,8 +107,8 @@ export async function POST(req: Request) {
                 data: {
                     leaseId,
                     moisConcerne: new Date(),
-                    payeurId: token,
-                    beneficiaireId: lease.landlordId || token,
+                    payeurId: payeurId,
+                    beneficiaireId: lease.landlordId || payeurId,
                     montant: amount,
                     canal: operator === 'WAVE' ? 'WAVE' : (operator === 'MTN' ? 'MTN' : 'ORANGE'),
                     statut: "CONFIRMEE",

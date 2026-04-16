@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
-import { ChevronLeft, Wallet, ArrowDownToLine, ArrowUpFromLine, RefreshCcw, Banknote, Smartphone } from 'lucide-react-native';
+import { ChevronLeft, Wallet, ArrowDownToLine, ArrowUpFromLine, RefreshCcw, Banknote, Smartphone, FileText } from 'lucide-react-native';
+import { API_ENDPOINTS, BASE_URL } from '../config/api';
 
 export default function WalletScreen({ route, navigation }: any) {
-  const token = route.params?.token || 'DUMMY_TOKEN';
+  const { token, userId } = route.params || {};
   const [balance, setBalance] = useState<number>(0);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ export default function WalletScreen({ route, navigation }: any) {
   const [withdrawMethod, setWithdrawMethod] = useState<'MOBILE' | 'BANK'>('MOBILE');
   const [accountDetails, setAccountDetails] = useState('');
 
-  const API_WALLET = 'https://www.qapril.ci/api/mobile/owner/wallet';
+  const API_WALLET = API_ENDPOINTS.WALLET;
 
   const fetchWallet = () => {
     setLoading(true);
@@ -107,6 +108,21 @@ export default function WalletScreen({ route, navigation }: any) {
              <ArrowUpFromLine size={18} color="#064E3B" />
              <Text style={styles.withdrawBtnText}>Transférer mes fonds</Text>
            </TouchableOpacity>
+
+           <TouchableOpacity 
+              style={[styles.withdrawButton, { marginTop: 12, backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }]} 
+              onPress={() => {
+                if (userId) {
+                  const url = `${BASE_URL}/export/financial-report/${userId}?token=${token}`;
+                  navigation.navigate('DocumentView', { url, title: 'Bilan Financier' });
+                } else {
+                  Alert.alert("Information", "Données utilisateur manquantes pour l'export.");
+                }
+              }}
+            >
+              <FileText size={18} color="#fff" />
+              <Text style={[styles.withdrawBtnText, { color: '#fff' }]}>Bilan Financier (.pdf)</Text>
+            </TouchableOpacity>
         </View>
 
         <View style={styles.historySection}>

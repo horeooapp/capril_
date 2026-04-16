@@ -19,9 +19,13 @@ import ApplicationsScreen from '../screens/ApplicationsScreen';
 import MessageScreen from '../screens/MessageScreen';
 import FeatureTeaserScreen from '../screens/FeatureTeaserScreen';
 import GenericDataScreen from '../screens/GenericDataScreen';
+import DocumentViewScreen from '../screens/DocumentView';
+import AccountingScreen from '../screens/AccountingScreen';
 
 import CustomBottomTab from '../components/navigation/CustomBottomTab';
 import CustomDrawer from '../components/navigation/CustomDrawer';
+import { useNotifications } from '../hooks/useNotifications';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -46,6 +50,10 @@ function MainTabNavigator({ route }: any) {
 // Menu Latéral (Drawer)
 function DrawerNavigator({ route }: any) {
   const token = route.params?.token;
+  
+  // Initialize Push Notifications
+  useNotifications(token);
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawer {...props} token={token} />}
@@ -65,6 +73,8 @@ function DrawerNavigator({ route }: any) {
       <Drawer.Screen name="Tenants" component={TenantsScreen} initialParams={{ token }} />
       <Drawer.Screen name="CreateLease" component={CreateLeaseScreen} initialParams={{ token }} />
       <Drawer.Screen name="Applications" component={ApplicationsScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Accounting" component={AccountingScreen} initialParams={{ token }} />
+      <Drawer.Screen name="Profile" component={ProfileScreen} initialParams={{ token }} />
     </Drawer.Navigator>
   );
 }
@@ -80,6 +90,8 @@ export default function AppNavigator() {
       <Stack.Screen name="CreateLease" component={CreateLeaseScreen} />
       <Stack.Screen name="Tenants" component={TenantsScreen} />
       <Stack.Screen name="Applications" component={ApplicationsScreen} />
+      <Stack.Screen name="Accounting" component={AccountingScreen} />
+      <Stack.Screen name="DocumentView" component={DocumentViewScreen} />
       <Stack.Screen name="PaymentProcess" component={DashboardScreen} /> 
     </Stack.Navigator>
   );

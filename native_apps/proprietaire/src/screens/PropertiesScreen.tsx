@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { ChevronLeft, Home, User, CreditCard } from 'lucide-react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, TextInput } from 'react-native';
+import { ChevronLeft, Home, User, CreditCard, Search } from 'lucide-react-native';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function PropertiesScreen({ route, navigation }: any) {
-  const token = route.params?.token || 'DUMMY_TOKEN';
+  const token = route.params?.token;
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const API_PROPERTIES = 'https://www.qapril.ci/api/mobile/owner/properties';
+  const API_PROPERTIES = API_ENDPOINTS.PROPERTIES;
+
+  const filteredProperties = properties.filter(p => 
+    p.address.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    p.propertyCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.tenantName?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     fetch(API_PROPERTIES, {
@@ -43,14 +51,31 @@ export default function PropertiesScreen({ route, navigation }: any) {
         <Text style={styles.headerTitle}>Mes Biens Immobiliers</Text>
       </View>
 
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBox}>
+          <Search size={18} color="#9ca3af" />
+          <TextInput 
+            style={styles.searchInput}
+            placeholder="Rechercher une adresse, un code ou un locataire..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#9ca3af"
+          />
+        </View>
+      </View>
+
       <ScrollView contentContainerStyle={styles.container}>
-        {properties.length === 0 && (
+        {properties.length === 0 ? (
           <Text style={styles.emptyText}>Aucun bien enregistré dans votre parc.</Text>
-        )}
-        
-        {properties.map(prop => (
-          <View key={prop.id} style={styles.card}>
-            <View style={styles.cardHeader}>
+        ) : filteredProperties.length === 0 ? (
+          <View style={styles.emptyBox}>
+             <Search size={40} color="#d1d5db" style={{marginBottom: 16}} />
+             <Text style={styles.emptyText}>Aucun résultat pour "{searchQuery}"</Text>
+          </View>
+        ) : (
+          filteredProperties.map(prop => (
+            <View key={prop.id} style={styles.card}>
+                <View style={styles.cardHeader}>
               <View style={styles.iconBox}>
                 <Home size={24} color="#FFF" />
               </View>
@@ -108,6 +133,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#064E3B',
   },
+  searchContainer: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: 12, paddingHorizontal: 16, height: 48, borderWidth: 1, borderColor: '#e5e7eb' },
+  searchInput: { flex: 1, marginLeft: 12, fontSize: 14, color: '#111827', fontWeight: '600' },
+  emptyBox: { alignItems: 'center', marginTop: 40 },
   container: { padding: 16 },
   emptyText: { textAlign: 'center', color: '#6b7280', marginTop: 40 },
   card: {
