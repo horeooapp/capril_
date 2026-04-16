@@ -3,7 +3,7 @@
 import { useState } from "react"
 // LeaseStatus is a plain string field in this schema (no Prisma enum generated)
 type LeaseStatus = string
-import { declareUnpaidRent, sendFormalNotice, initiateTermination, proposeClemency, cancelLease, suspendPropertyAccess } from "@/actions/lease-procedures"
+import { declareUnpaidRent, sendFormalNotice, initiateTermination, proposeClemency, cancelLease, suspendPropertyAccess, completeLitigationDossier } from "@/actions/lease-procedures"
 import { useRouter } from "next/navigation"
 
 interface LeaseProcedureActionsProps {
@@ -110,6 +110,17 @@ export default function LeaseProcedureActions({ leaseId, currentStatus }: { leas
                         className="w-full flex items-center justify-between px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium group"
                     >
                         <span>⚖️ Demander Résiliation (Phase 7)</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                    </button>
+                )}
+
+                {currentStatus === "DEMANDE_RESILIATION" && (
+                    <button
+                        onClick={() => handleAction(completeLitigationDossier)}
+                        disabled={loading}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-red-900 text-white rounded-xl hover:bg-black transition-colors font-black border-2 border-red-500 group animate-pulse"
+                    >
+                        <span>📂 SCELLER DOSSIER CONTENTIEUX (PHASE 8)</span>
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                     </button>
                 )}

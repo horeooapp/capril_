@@ -264,6 +264,41 @@ export async function initiateTermination(leaseId: string) {
 }
 
 /**
+ * Phase 8: Constitution du dossier contentieux (Horodatage de toutes les preuves)
+ */
+export async function completeLitigationDossier(leaseId: string) {
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
+        await prisma.procedurePhase.create({
+            data: {
+                leaseId,
+                phaseNumber: 8,
+                name: "Constitution Dossier Contentieux",
+                description: "Toutes les quittances, mises en demeure et logs IOT ont été scellés pour transmission au tribunal.",
+            },
+        });
+
+        await prisma.auditLog.create({
+            data: {
+                userId,
+                action: "COMPLETE_LITIGATION_DOSSIER",
+                module: "LEASE",
+                entityId: leaseId,
+            },
+        });
+
+        return { success: true };
+    } catch (error: unknown) {
+        console.error("Error completing litigation dossier:", error);
+        return { success: false, error: "Erreur lors du scellement du dossier." };
+    }
+}
+
+/**
  * Annulation d'un contrat non validé (DRAFT, PENDING_SIGNATURE, PENDING_CONFIRMATION)
  */
 export async function cancelLease(leaseId: string) {

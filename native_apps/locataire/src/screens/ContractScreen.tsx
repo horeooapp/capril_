@@ -8,9 +8,13 @@ import {
   Image, 
   TouchableOpacity,
   Alert,
-  Linking
+  Linking,
+  Modal,
+  TextInput,
+  ActivityIndicator
 } from 'react-native';
 import { Colors } from '../theme/colors';
+import SignaturePad from '../components/SignaturePad';
 import { 
   ChevronLeft, 
   Coins, 
@@ -23,6 +27,67 @@ import {
 
 export default function ContractScreen({ navigation, route }: any) {
   const lease = route.params?.lease;
+  const token = route.params?.token;
+  const [showSignModal, setShowSignModal] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [signatureId, setSignatureId] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleInitiateSignature = async (base64Signature: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://www.qapril.ci/api/mobile/leases/signature/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          token, 
+          leaseId: lease.id,
+          documentType: "BAIL"
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSignatureId(result.signatureId);
+        setShowSignModal(false);
+        setShowOtpModal(true);
+      } else {
+        Alert.alert("Erreur", result.error || "Impossible d'initier la signature");
+      }
+    } catch (error) {
+       Alert.alert("Erreur", "Problème de connexion au serveur");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length < 6) return;
+    setLoading(true);
+    try {
+      const response = await fetch('https://www.qapril.ci/api/mobile/leases/signature/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          token, 
+          signatureId, 
+          otp 
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setShowOtpModal(false);
+        Alert.alert("Succès", "Contrat signé avec succès !");
+        navigation.goBack(); // Refresh dashboard
+      } else {
+        Alert.alert("Erreur", result.error || "Code OTP incorrect");
+      }
+    } catch (error) {
+       Alert.alert("Erreur", "Problème de connexion");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDownloadPDF = () => {
     Alert.alert(
@@ -145,6 +210,67 @@ export default function ContractScreen({ navigation, route }: any) {
             <Text style={styles.actionText}>Sinistre</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        {/* Signature Section for Pending Contracts */}
+        {(lease?.status === 'PENDING_SIGNATURE' || lease?.status === 'DRAFT') && (
+          <View style={styles.signSection}>
+            <View style={styles.signNotice}>
+              <Text style={styles.signNoticeTitle}>Action Requise</Text>
+              <Text style={styles.signNoticeText}>
+                Ce contrat est en attente de votre signature électronique certifiée QAPRIL M-SIGN.
+              </Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.signButton} 
+              onPress={() => setShowSignModal(true)}
+            >
+              <Text style={styles.signButtonText}>SIGNER LE CONTRAT MAINTENANT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Signature Modal */}
+        <Modal visible={showSignModal} animationType="slide" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <SafeAreaView style={styles.modalContent}>
+               <View style={styles.modalHeader}>
+                 <Text style={styles.modalTitle}>Signature Tactile</Text>
+                 <TouchableOpacity onPress={() => setShowSignModal(false)}>
+                   <Text style={{ color: Colors.primary, fontWeight: 'bold' }}>Fermer</Text>
+                 </TouchableOpacity>
+               </View>
+               <Text style={styles.modalSubtitle}>Signez à l'aide de votre doigt dans la zone ci-dessous.</Text>
+               <SignaturePad onOK={handleInitiateSignature} description="Signature du bail QAPRIL" />
+               {loading && <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 20 }} />}
+            </SafeAreaView>
+          </View>
+        </Modal>
+
+        {/* OTP Modal */}
+        <Modal visible={showOtpModal} animationType="none" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.otpCard}>
+              <Text style={styles.modalTitle}>Vérification OTP</Text>
+              <Text style={styles.modalSubtitle}>Saisissez le code reçu par SMS pour finaliser votre signature.</Text>
+              <TextInput
+                style={styles.otpInput}
+                keyboardType="number-pad"
+                maxLength={6}
+                placeholder="000000"
+                value={otp}
+                onChangeText={setOtp}
+              />
+              <TouchableOpacity 
+                style={[styles.signButton, { marginTop: 20, backgroundColor: Colors.primary }]}
+                onPress={handleVerifyOtp}
+                disabled={loading}
+              >
+                {loading ? <ActivityIndicator color="white" /> : <Text style={styles.signButtonText}>CONFIRMER</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
@@ -415,5 +541,93 @@ const styles = StyleSheet.create({
     color: '#2563EB',
     fontWeight: '800',
     fontSize: 13,
+  },
+  signSection: {
+    backgroundColor: 'rgba(79, 70, 229, 0.05)',
+    padding: 24,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: Colors.primary,
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  signNotice: {
+    marginBottom: 20,
+  },
+  signNoticeTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: Colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  signNoticeText: {
+    fontSize: 13,
+    color: Colors.text.muted,
+    lineHeight: 18,
+  },
+  signButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  signButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 32,
+    padding: 20,
+    height: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: Colors.primary,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: Colors.text.muted,
+    marginBottom: 20,
+  },
+  otpCard: {
+    backgroundColor: 'white',
+    borderRadius: 24,
+    padding: 30,
+    alignItems: 'center',
+  },
+  otpInput: {
+    width: '100%',
+    height: 60,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.primary,
+    fontSize: 32,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: Colors.primary,
+    letterSpacing: 10,
   }
 });
