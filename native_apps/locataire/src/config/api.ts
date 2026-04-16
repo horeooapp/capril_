@@ -6,6 +6,7 @@
 export const BASE_URL = 'https://www.qapril.ci';
 
 export const API_ENDPOINTS = {
+  BASE_URL,
   AUTH: `${BASE_URL}/api/mobile/auth`,
   DASHBOARD: `${BASE_URL}/api/mobile/dashboard`,
   PAY_RENT: `${BASE_URL}/api/mobile/pay-rent`,

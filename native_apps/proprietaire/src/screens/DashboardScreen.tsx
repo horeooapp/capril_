@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
-import { Menu, User, Bell, Wallet, FilePlus, Users, FileText, ArrowUpRight, TrendingUp } from 'lucide-react-native';
+import { Menu, User, Bell, Wallet, FilePlus, Users, FileText, ArrowUpRight, TrendingUp, Activity } from 'lucide-react-native';
 import { API_ENDPOINTS } from '../config/api';
 import { Colors } from '../theme/colors';
 import RevenueChart from '../components/charts/RevenueChart';

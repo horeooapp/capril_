@@ -107,7 +107,7 @@ export default function PropertiesScreen({ route, navigation }: any) {
             </View>
 
           </View>
-        ))}
+        )))}
       </ScrollView>
     </SafeAreaView>
   );

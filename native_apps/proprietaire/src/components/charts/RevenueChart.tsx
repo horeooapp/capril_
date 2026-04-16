@@ -18,7 +18,7 @@ interface RevenueChartProps {
   subtitle?: string;
 }
 
-export default function RevenueChart({ data }: RevenueChartProps) {
+export default function RevenueChart({ data, title, subtitle }: RevenueChartProps) {
   if (!data || data.length === 0) return null;
 
   const maxAmount = Math.max(...data.map(d => d.amount), 100000); // Fallback to 100k

@@ -114,7 +114,9 @@ export default function AccountingScreen({ navigation, route }: any) {
       });
       const data = await res.json();
       if (data.success) {
+        // @ts-ignore
         const fileUri = `${FileSystem.documentDirectory}${data.fileName}`;
+        // @ts-ignore
         await FileSystem.writeAsStringAsync(fileUri, data.pdfBase64, { encoding: FileSystem.EncodingType.Base64 });
         await Sharing.shareAsync(fileUri);
       }

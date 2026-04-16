@@ -49,12 +49,16 @@ export default function AuthScreen({ navigation }: any) {
   const handleRequestOTP = async () => {
     if (!email) return Alert.alert("Erreur", "Veuillez entrer un email valide.");
     setIsLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'REQUEST_OTP', email, role: 'TENANT' })
+        body: JSON.stringify({ action: 'REQUEST_OTP', email, role: 'TENANT' }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const data = await response.json();
       if (data.success) {
         setStep('OTP');
@@ -62,7 +66,8 @@ export default function AuthScreen({ navigation }: any) {
         Alert.alert("Erreur", data.error || "Impossible d'envoyer le code.");
       }
     } catch (e) {
-      Alert.alert("Erreur de connexion", "Serveur injoignable.");
+      clearTimeout(timeoutId);
+      Alert.alert("Erreur de connexion", "Le serveur est injoignable ou met trop de temps à répondre.");
     } finally {
       setIsLoading(false);
     }
@@ -71,12 +76,16 @@ export default function AuthScreen({ navigation }: any) {
   const handleVerifyOTP = async () => {
     if (!otp) return Alert.alert("Erreur", "Code OTP requis.");
     setIsLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'VERIFY_OTP', email, otp, role: 'TENANT' })
+        body: JSON.stringify({ action: 'VERIFY_OTP', email, otp, role: 'TENANT' }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const data = await response.json();
       if (data.success) {
         // Redirection vers le Main (Dashboard)
@@ -85,7 +94,8 @@ export default function AuthScreen({ navigation }: any) {
         Alert.alert("Erreur", data.error || "Code incorrect.");
       }
     } catch (e) {
-      Alert.alert("Erreur de connexion", "Serveur injoignable.");
+      clearTimeout(timeoutId);
+      Alert.alert("Erreur de connexion", "Le serveur est injoignable ou met trop de temps à répondre.");
     } finally {
       setIsLoading(false);
     }

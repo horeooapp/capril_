@@ -21,7 +21,8 @@ import {
   ClipboardList, 
   AlertCircle, 
   FileText,
-  Camera
+  Camera,
+  Award
 } from 'lucide-react-native';
 import DashboardCard from '../components/dashboard/DashboardCard';
 import { API_ENDPOINTS } from '../config/api';

@@ -9,7 +9,9 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Modal
+  Modal,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Colors } from '../theme/colors';
 import { 

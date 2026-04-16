@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView
 } from 'react-native';
-import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail } from 'lucide-react-native';
+import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail, FileText } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Colors } from '../theme/colors';
