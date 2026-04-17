@@ -22,11 +22,20 @@
         "backgroundColor": "#064E3B"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "edbe7064-bfd4-4162-99a6-d2c731f1f959"
