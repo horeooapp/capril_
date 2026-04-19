@@ -1,9 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
-import { Menu, User, Bell, Wallet, FilePlus, Users, FileText, ArrowUpRight, TrendingUp, Activity } from 'lucide-react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  SafeAreaView, 
+  ScrollView, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  StatusBar,
+  Dimensions
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { 
+  Bell, 
+  TrendingUp, 
+  Activity, 
+  Plus, 
+  Home, 
+  Users, 
+  BarChart3, 
+  User as UserIcon,
+  ChevronRight
+} from 'lucide-react-native';
 import { API_ENDPOINTS } from '../config/api';
 import { Colors } from '../theme/colors';
+import { Typography } from '../theme/typography';
 import RevenueChart from '../components/charts/RevenueChart';
+
+const { width } = Dimensions.get('window');
 
 export default function DashboardScreen({ route, navigation }: any) {
   const token = route.params?.token;
@@ -28,7 +52,6 @@ export default function DashboardScreen({ route, navigation }: any) {
         setLoading(false);
       });
 
-    // Enregistrer le token push si on a un token de session
     if (token) {
       import('../utils/notifications').then(({ registerForPushNotificationsAsync }) => {
         registerForPushNotificationsAsync(token);
@@ -39,270 +62,457 @@ export default function DashboardScreen({ route, navigation }: any) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <ActivityIndicator size="large" color={Colors.qGreen} />
       </View>
     );
   }
 
+  const getStatusStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'loué':
+      case 'loue':
+        return Colors.status.loue;
+      case 'impayé':
+      case 'impaye':
+        return Colors.status.impaye;
+      case 'vacant':
+        return Colors.status.vacant;
+      default:
+        return { bg: Colors.qNavyLight, text: Colors.qNavyMedium };
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Premium Header */}
-      <View style={styles.topHeader}>
-        <View style={{ width: 40 }} />
-        <Text style={styles.headerTitle}>Capril Propriétaire</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity 
-            style={styles.profileIcon}
-            onPress={() => navigation.navigate('Profile', { token, userProfile: data })}
-          >
-            {data?.role === 'LANDLORD_PRO' ? (
-               <View style={styles.proBadge}><Text style={styles.proBadgeText}>PRO</Text></View>
-            ) : (
-               <User size={20} color={Colors.primary} />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIcon}>
-            <Bell size={24} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.greeting}>{data?.greeting || 'Bonjour'}</Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{data?.pendingRepairs || 0} Alertes</Text>
-          </View>
-        </View>
-        
-        {/* ONBOARDING STATE */}
-        {data?.onboarding && (
-          <View style={styles.onboardingCard}>
-             <View style={styles.onboardingIcon}>
-               <FilePlus size={32} color={Colors.white} />
-             </View>
-             <Text style={styles.onboardingTitle}>Bienvenue sur Capril !</Text>
-             <Text style={styles.onboardingText}>
-               Commencez par ajouter votre premier bien immobilier pour activer votre dashboard et suivre vos revenus.
-             </Text>
-             <TouchableOpacity 
-               style={styles.onboardingBtn}
-               onPress={() => navigation.navigate('CreateLease')}
-             >
-               <Text style={styles.onboardingBtnText}>Démarrer maintenant</Text>
-             </TouchableOpacity>
-          </View>
-        )}
-
-        <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Revenus Globaux (Taux d'occupation {data?.occupancyRate})</Text>
-          <View style={styles.balanceRow}>
-            <Text style={styles.balanceAmount}>{data?.totalRevenue || '0 FCFA'}</Text>
-            <View style={styles.trendBadge}>
-              <TrendingUp size={14} color={Colors.white} />
-              <Text style={styles.trendText}>+12%</Text>
+    <View style={styles.mainContainer}>
+      <StatusBar barStyle="light-content" />
+      
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* PRO HEADER */}
+        <LinearGradient
+          colors={[Colors.qGreenDark, Colors.qGreen, Colors.qGreenMedium]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.proHeader}
+        >
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.headerGreeting}>Tableau de bord</Text>
+              <Text style={styles.headerName}>{data?.name || data?.userName || 'Chargement...'}</Text>
             </View>
-          </View>
-        </View>
-
-        {/* REVENUE HISTORY CHART */}
-        {data?.revenueHistory && <RevenueChart data={data.revenueHistory} />}
-
-        {/* Nouveaux Raccourcis Rapides */}
-        <Text style={styles.sectionTitle}>Accès Rapides</Text>
-        <View style={styles.quickActionsContainer}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Wallet', { token, userId: data?.userId })}>
-            <View style={[styles.actionIcon, {backgroundColor: Colors.cardColors.cream}]}><Wallet size={20} color={Colors.primary} /></View>
-            <Text style={styles.actionText}>Tirelire</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('CreateLease')}>
-            <View style={[styles.actionIcon, {backgroundColor: Colors.cardColors.mint}]}><FilePlus size={20} color={Colors.primary} /></View>
-            <Text style={styles.actionText}>Créer Bail</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Tenants')}>
-            <View style={[styles.actionIcon, {backgroundColor: Colors.cardColors.yellow}]}><Users size={20} color={Colors.primary} /></View>
-            <Text style={styles.actionText}>Locataires</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Applications', { token })}>
-            <View style={[styles.actionIcon, {backgroundColor: Colors.cardColors.rose}]}><FileText size={20} color={Colors.primary} /></View>
-            <Text style={styles.actionText}>Dossiers</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Accounting', { token })}>
-            <View style={[styles.actionIcon, {backgroundColor: Colors.cardColors.orange}]}><Activity size={20} color={Colors.primary} /></View>
-            <Text style={styles.actionText}>Compta</Text>
-          </TouchableOpacity>
-        </View>
-        
-        {/* SECTION OBSERVATOIRE (Marché local) */}
-        {data?.marketStats && (
-          <View style={styles.observatoryContainer}>
-            <View style={styles.observatoryHeader}>
-              <Text style={styles.sectionTitle}>Analyse du Marché ({data.marketStats.commune})</Text>
-              <Activity size={18} color={Colors.primary} />
-            </View>
-            <View style={styles.observatoryCard}>
-              <View style={{flex: 1}}>
-                <Text style={styles.obsLabel}>Loyer Moyen (Zone)</Text>
-                <Text style={styles.obsValue}>{data.marketStats.avgRent.toLocaleString('fr-FR')} FCFA</Text>
-                
-                {data.marketStats.marketPositioning !== undefined && (
-                  <View style={styles.positioningRow}>
-                    <TrendingUp size={12} color={data.marketStats.marketPositioning >= 0 ? Colors.success : Colors.danger} />
-                    <Text style={[styles.positioningText, { color: data.marketStats.marketPositioning >= 0 ? Colors.success : Colors.danger }]}>
-                      {data.marketStats.marketPositioning > 0 ? `+${data.marketStats.marketPositioning}%` : `${data.marketStats.marketPositioning}%`} par rapport à vos biens
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View style={[styles.obsTrend, data.marketStats.trendPct >= 0 ? styles.obsTrendUp : styles.obsTrendDown]}>
-                <Text style={styles.obsTrendText}>
-                  {data.marketStats.trendPct >= 0 ? '+' : ''}{data.marketStats.trendPct}%
+            <TouchableOpacity 
+              style={styles.avatarContainer}
+              onPress={() => navigation.navigate('Profile', { token, userProfile: data })}
+            >
+              <View style={styles.avatarLabel}>
+                <Text style={styles.avatarText}>
+                  {(data?.name || 'User').substring(0, 2).toUpperCase()}
                 </Text>
               </View>
-            </View>
-            <Text style={styles.obsFooter}>Basé sur les baux certifiés de la période {data.marketStats.period}</Text>
+              <View style={[styles.notifDot, { backgroundColor: Colors.qCoral }]} />
+            </TouchableOpacity>
           </View>
-        )}
 
-        <Text style={styles.sectionTitle}>Mes Biens Immobiliers</Text>
-        {data?.properties?.map((prop: any) => (
-          <View key={prop.id} style={styles.propertyCard}>
-            <View>
-              <Text style={styles.propertyName}>{prop.name}</Text>
-              <Text style={styles.propertyRent}>{prop.rent}</Text>
+          {/* QUICK STATS */}
+          <View style={styles.phStats}>
+            <View style={styles.phStat}>
+              <Text style={styles.phStatVal}>{data?.properties?.length || 0}</Text>
+              <Text style={styles.phStatLbl}>Biens</Text>
             </View>
-            <View style={[styles.statusBadge, prop.status === 'Loué' ? styles.statusGreen : styles.statusRed]}>
-              <Text style={[styles.statusText, prop.status === 'Loué' ? styles.textGreen : styles.textRed]}>{prop.status}</Text>
+            <View style={styles.phStat}>
+              <Text style={styles.phStatVal}>
+                {data?.properties?.filter((p: any) => p.status.toLowerCase().includes('lou')).length || 0}
+              </Text>
+              <Text style={styles.phStatLbl}>Loués</Text>
+            </View>
+            <View style={styles.phStat}>
+              <Text style={styles.phStatVal}>
+                {data?.properties?.filter((p: any) => p.status.toLowerCase().includes('vacant')).length || 0}
+              </Text>
+              <Text style={styles.phStatLbl}>Vacants</Text>
             </View>
           </View>
-        ))}
+        </LinearGradient>
+
+        <View style={styles.contentBody}>
+          {/* REVENUE CARD */}
+          <LinearGradient
+            colors={[Colors.qNavy, Colors.qNavyMedium]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.revCard}
+          >
+            <Text style={styles.revLbl}>Revenus · {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</Text>
+            <Text style={styles.revAmount}>{data?.totalRevenue || '0 FCFA'}</Text>
+            <Text style={styles.revSub}>Taux d'occupation : {data?.occupancyRate || '0%'}</Text>
+            
+            <View style={styles.revPills}>
+              <View style={[styles.revPill, styles.revPillSuccess]}>
+                <Text style={styles.revPillText}>+12% vs mois dernier</Text>
+              </View>
+              {data?.pendingRepairs > 0 && (
+                <View style={[styles.revPill, styles.revPillDanger]}>
+                  <Text style={styles.revPillText}>{data.pendingRepairs} alertes</Text>
+                </View>
+              )}
+            </View>
+          </LinearGradient>
+
+          {/* REVENUE CHART */}
+          {data?.revenueHistory && (
+            <View style={styles.chartSection}>
+              <Text style={styles.sectionTitle}>Evolution des revenus</Text>
+              <RevenueChart data={data.revenueHistory} />
+            </View>
+          )}
+
+          {/* PROPERTY LIST */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Mes biens immobiliers</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('CreateLease')}>
+              <Text style={styles.seeAll}>Ajouter</Text>
+            </TouchableOpacity>
+          </View>
+
+          {data?.properties?.map((prop: any) => {
+            const statusStyle = getStatusStyle(prop.status);
+            return (
+              <TouchableOpacity key={prop.id} style={styles.bienCard}>
+                <View style={styles.bcTop}>
+                  <View>
+                    <Text style={styles.bcAddr}>{prop.name}</Text>
+                    <Text style={styles.bcType}>{prop.type || 'Appartement'}</Text>
+                  </View>
+                  <View style={[styles.bcStatus, { backgroundColor: statusStyle.bg }]}>
+                    <Text style={[styles.bcStatusText, { color: statusStyle.text }]}>
+                      {prop.status}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.bcBottom}>
+                  <View style={styles.bcTenant}>
+                    <View style={[styles.bcAvatarSm, { backgroundColor: Colors.qGreenLight }]}>
+                      <Text style={[styles.bcAvatarText, { color: Colors.qGreenDark }]}>
+                        {prop.tenantName?.substring(0, 2).toUpperCase() || '??'}
+                      </Text>
+                    </View>
+                    <Text style={styles.bcTenantName}>{prop.tenantName || 'Pas de locataire'}</Text>
+                  </View>
+                  <Text style={[styles.bcAmt, { color: statusStyle.text }]}>
+                    {prop.rent}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+
+          <View style={{ height: 100 }} />
+        </View>
       </ScrollView>
-    </SafeAreaView>
+
+      {/* BOTTOM NAV MOCKUP (Since we are on a screen) */}
+      <View style={styles.bnav}>
+        <TouchableOpacity style={styles.bnItem}>
+          <Home size={22} color={Colors.qGreen} />
+          <Text style={[styles.bnLbl, { color: Colors.qGreen }]}>Accueil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Tenants')}>
+          <Users size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Locataires</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.bnFabContainer} onPress={() => navigation.navigate('CreateLease')}>
+          <LinearGradient
+            colors={[Colors.qGreenDark, Colors.qGreenMedium]}
+            style={styles.bnFab}
+          >
+            <Plus size={28} color={Colors.white} />
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Accounting')}>
+          <BarChart3 size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Compta</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Profile', { token })}>
+          <UserIcon size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Profil</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  container: { padding: 24, paddingTop: 10 },
-  topHeader: {
+  mainContainer: { flex: 1, backgroundColor: Colors.background },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 20 },
+  
+  proHeader: {
+    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 60,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: Colors.white,
+    marginBottom: 24,
   },
-  headerIcon: {
-    padding: 8,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+  headerGreeting: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
   },
-  headerTitle: {
+  headerName: {
+    fontFamily: Typography.fontFamily.heading,
     fontSize: 20,
-    fontWeight: '800',
-    color: Colors.primary,
+    color: Colors.white,
+    marginTop: 2,
   },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  avatarContainer: {
+    position: 'relative',
   },
-  profileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.accent,
+  avatarLabel: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, marginTop: 10 },
-  greeting: { fontSize: 28, fontWeight: '800', color: Colors.primary },
-  badge: { backgroundColor: Colors.cardColors.orange, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
-  badgeText: { color: Colors.primary, fontWeight: '700', fontSize: 12 },
-  balanceCard: { backgroundColor: Colors.primary, padding: 24, borderRadius: 24, marginBottom: 32, shadowColor: Colors.primary, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 15, elevation: 10 },
-  balanceLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600', marginBottom: 8 },
-  balanceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  balanceAmount: { color: Colors.white, fontSize: 32, fontWeight: '900' },
-  trendBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    gap: 4,
+  avatarText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 14,
+    color: Colors.white,
   },
-  trendText: { color: Colors.white, fontSize: 12, fontWeight: '800' },
-  sectionTitle: { fontSize: 17, fontWeight: '800', color: Colors.primary, marginBottom: 16 },
-  propertyCard: { backgroundColor: Colors.white, padding: 20, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: Colors.border },
-  propertyName: { fontSize: 16, fontWeight: '700', color: Colors.primary },
-  propertyRent: { fontSize: 14, color: Colors.text.muted, marginTop: 4 },
-  statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  statusGreen: { backgroundColor: 'rgba(16, 185, 129, 0.1)' },
-  textGreen: { color: Colors.success, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' },
-  statusRed: { backgroundColor: 'rgba(239, 68, 68, 0.1)' },
-  textRed: { color: Colors.danger, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' },
-  statusText: { fontWeight: '800', fontSize: 12, textTransform: 'uppercase' },
-  quickActionsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  actionBtn: { width: '30%', backgroundColor: Colors.white, padding: 12, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
-  actionIcon: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  actionText: { fontSize: 11, fontWeight: '800', color: Colors.primary, textAlign: 'center' },
+  notifDot: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: Colors.qGreen,
+  },
   
-  // Styles Observatoire
-  observatoryContainer: { marginBottom: 32 },
-  observatoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  observatoryCard: { 
-    backgroundColor: Colors.white, 
-    padding: 18, 
-    borderRadius: 20, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  phStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  phStat: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
+    padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
-    marginTop: 8
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  obsLabel: { fontSize: 12, color: Colors.text.muted, fontWeight: '600' },
-  obsValue: { fontSize: 20, fontWeight: '900', color: Colors.primary, marginTop: 4 },
-  obsTrend: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  obsTrendUp: { backgroundColor: 'rgba(16, 185, 129, 0.1)' },
-  obsTrendDown: { backgroundColor: 'rgba(239, 68, 68, 0.1)' },
-  obsTrendText: { fontSize: 13, fontWeight: '800', color: Colors.primary },
-  obsFooter: { fontSize: 10, color: Colors.text.muted, marginTop: 8, fontStyle: 'italic' },
-  positioningRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
-  positioningText: { fontSize: 11, fontWeight: '700' },
-  proBadge: { backgroundColor: Colors.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  proBadgeText: { color: Colors.white, fontSize: 10, fontWeight: '900' },
+  phStatVal: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 18,
+    color: Colors.white,
+  },
+  phStatLbl: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: Typography.fontSize.xs,
+    color: 'rgba(255,255,255,0.6)',
+    marginTop: 2,
+  },
 
-  // Styles Onboarding
-  onboardingCard: { 
-    backgroundColor: Colors.white, 
-    padding: 24, 
-    borderRadius: 24, 
-    alignItems: 'center', 
-    borderWidth: 1, 
-    borderColor: Colors.border, 
-    marginBottom: 32,
-    shadowColor: Colors.primary,
+  contentBody: {
+    paddingHorizontal: 16,
+    marginTop: -25,
+  },
+  
+  revCard: {
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 24,
+    elevation: 8,
+    shadowColor: Colors.qNavy,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+  },
+  revLbl: {
+    fontFamily: Typography.fontFamily.bodyMedium,
+    fontSize: Typography.fontSize.sm,
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  revAmount: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 28,
+    color: Colors.white,
+    marginVertical: 8,
+  },
+  revSub: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: Typography.fontSize.sm,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  revPills: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 16,
+  },
+  revPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  revPillSuccess: {
+    backgroundColor: 'rgba(77, 201, 160, 0.2)',
+    borderColor: 'rgba(77, 201, 160, 0.3)',
+  },
+  revPillDanger: {
+    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+    borderColor: 'rgba(255, 107, 107, 0.3)',
+  },
+  revPillText: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: 10,
+    color: Colors.white,
+  },
+
+  chartSection: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: Typography.fontSize.lg,
+    color: Colors.qNavy,
+  },
+  seeAll: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: Typography.fontSize.sm,
+    color: Colors.qGreen,
+  },
+
+  bienCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  bcTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  bcAddr: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 15,
+    color: Colors.qNavy,
+  },
+  bcType: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 12,
+    color: Colors.qNavyMedium,
+    marginTop: 2,
+  },
+  bcStatus: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  bcStatusText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 10,
+  },
+  bcBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  bcTenant: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  bcAvatarSm: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bcAvatarText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 9,
+  },
+  bcTenantName: {
+    fontFamily: Typography.fontFamily.bodyMedium,
+    fontSize: 13,
+    color: Colors.qNavyMedium,
+  },
+  bcAmt: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 14,
+  },
+
+  bnav: {
+    position: 'absolute',
+    bottom: 0,
+    width: width,
+    height: 80,
+    backgroundColor: Colors.white,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(26, 31, 60, 0.05)',
+  },
+  bnItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  bnLbl: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: 9,
+    color: Colors.qNavyMedium,
+  },
+  bnFabContainer: {
+    marginTop: -40,
+  },
+  bnFab: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: Colors.qGreen,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 2
-  },
-  onboardingIcon: { 
-    width: 64, 
-    height: 64, 
-    borderRadius: 32, 
-    backgroundColor: Colors.primary, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginBottom: 16 
-  },
-  onboardingTitle: { fontSize: 20, fontWeight: '900', color: Colors.primary, marginBottom: 8 },
-  onboardingText: { fontSize: 14, color: Colors.text.muted, textAlign: 'center', lineHeight: 20, marginBottom: 20 },
-  onboardingBtn: { backgroundColor: Colors.cardColors.mint, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  onboardingBtnText: { color: Colors.primary, fontWeight: '800', fontSize: 14 }
+  }
 });
+

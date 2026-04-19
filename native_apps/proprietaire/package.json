@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/sora": "^0.4.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.15.9",
     "@react-navigation/drawer": "^7.9.8",
@@ -18,6 +20,8 @@
     "expo-constants": "~18.0.13",
     "expo-device": "~8.0.10",
     "expo-file-system": "~19.0.21",
+    "expo-font": "~14.0.11",
+    "expo-linear-gradient": "~15.0.8",
     "expo-local-authentication": "~17.0.8",
     "expo-modules-core": "~3.0.29",
     "expo-notifications": "~0.32.16",

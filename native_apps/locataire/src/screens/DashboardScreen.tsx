@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -9,29 +9,32 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  Linking
+  Dimensions
 } from 'react-native';
-import { Colors } from '../theme/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 import { 
-  Menu, 
-  User, 
   Bell, 
-  ShieldCheck, 
-  CreditCard, 
+  Receipt, 
+  Settings, 
   ClipboardList, 
-  AlertCircle, 
-  FileText,
-  Camera,
-  Award
+  BarChart3, 
+  Plus, 
+  Home, 
+  User as UserIcon,
+  CreditCard,
+  CheckCircle,
+  Clock
 } from 'lucide-react-native';
-import DashboardCard from '../components/dashboard/DashboardCard';
+import { Colors } from '../theme/colors';
+import { Typography } from '../theme/typography';
 import { API_ENDPOINTS } from '../config/api';
+
+const { width } = Dimensions.get('window');
 
 export default function DashboardScreen({ navigation, route }: any) {
   const { token } = route.params || {};
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Accueil');
 
   const API_DASHBOARD = API_ENDPOINTS.DASHBOARD;
 
@@ -51,7 +54,6 @@ export default function DashboardScreen({ navigation, route }: any) {
         setLoading(false);
       });
 
-    // Enregistrer le token push si on a un token de session
     if (token) {
       import('../utils/notifications').then(({ registerForPushNotificationsAsync }) => {
         registerForPushNotificationsAsync(token);
@@ -62,268 +64,522 @@ export default function DashboardScreen({ navigation, route }: any) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <ActivityIndicator size="large" color={Colors.qOrange} />
       </View>
     );
   }
 
-  const tabs = ['Accueil', 'Loyer', 'Contrat'];
+  const handlePayment = () => {
+    if (data?.lease?.id) {
+      navigation.navigate('PaymentProcess', { 
+        amount: data.totalArrears || data.lease.rent, 
+        leaseId: data.lease.id,
+        token 
+      });
+    } else {
+      Alert.alert("Information", "Aucun bail actif trouvé pour le paiement.");
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
+    <View style={styles.mainContainer}>
+      <StatusBar barStyle="light-content" />
       
-      {/* Premium Header */}
-      <View style={styles.header}>
-        <View style={{ width: 40 }} />
-
-        <Text style={styles.headerTitle}>Capril Connect</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity 
-            style={styles.profileIcon}
-            onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id, userProfile: data })}
-          >
-            <User size={20} color={Colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIcon}>
-            <Bell size={24} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        {/* Hero Card */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroContent}>
-            <Text style={styles.heroTitle}>Tableau de Bord Immobilier</Text>
-            <Text style={styles.heroSubtitle}>
-              Suivez vos paiements, vos quittances et vos demandes d'intervention en temps réel.
-            </Text>
-          </View>
-          <View style={styles.heroIconContainer}>
-            <ShieldCheck size={40} color={Colors.accent} />
-          </View>
-        </View>
-
-        {/* SCORE TEASER CARD */}
-        <TouchableOpacity 
-          style={styles.scoreTeaser} 
-          onPress={() => navigation.navigate('Passport', { token })}
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* LOC HEADER */}
+        <LinearGradient
+          colors={[Colors.qOrangeDark, Colors.qOrange, Colors.qOrangeMedium]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.locHeader}
         >
-          <View style={styles.scoreTeaserInfo}>
-            <Award size={24} color={Colors.accent} />
-            <View style={{ marginLeft: 12 }}>
-              <Text style={styles.scoreTeaserTitle}>Score de Fiabilité</Text>
-              <Text style={styles.scoreTeaserSubtitle}>Améliorez votre profil pour vos futurs baux</Text>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.headerGreeting}>Bonjour 👋</Text>
+              <Text style={styles.headerName}>{data?.name || 'Locataire'}</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.avatarContainer}
+              onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id, userProfile: data })}
+            >
+              <View style={styles.avatarLabel}>
+                <Text style={styles.avatarText}>
+                  {(data?.name || 'KA').substring(0, 2).toUpperCase()}
+                </Text>
+              </View>
+              <View style={[styles.notifDot, { backgroundColor: Colors.qGreenMedium }]} />
+            </TouchableOpacity>
+          </View>
+
+          {/* PAYMENT CARD (Floating in Header) */}
+          <View style={styles.lhCard}>
+            <Text style={styles.lhAmountLbl}>Loyer en cours</Text>
+            <Text style={styles.lhAmount}>
+              {data?.totalArrears?.toLocaleString() || data?.lease?.rent?.toLocaleString() || '0'} 
+              <Text style={styles.lhAmountCurrency}> FCFA</Text>
+            </Text>
+            <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
+              <CreditCard size={16} color={Colors.qOrange} />
+              <Text style={styles.lhPayBtnText}>Payer maintenant</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.contentBody}>
+          {/* QUICK ACTIONS GRID */}
+          <View style={styles.qaGrid}>
+            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('History')}>
+              <View style={[styles.qaIcon, { backgroundColor: Colors.qOrangeLight }]}>
+                <Text style={styles.emoji}>🧾</Text>
+              </View>
+              <Text style={styles.qaLbl}>Quittances</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Services')}>
+              <View style={[styles.qaIcon, { backgroundColor: Colors.qGreenLight }]}>
+                <Text style={styles.emoji}>🔧</Text>
+              </View>
+              <Text style={styles.qaLbl}>Maintenance</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Contract', { lease: data?.lease })}>
+              <View style={[styles.qaIcon, { backgroundColor: Colors.qNavyLight }]}>
+                <Text style={styles.emoji}>📋</Text>
+              </View>
+              <Text style={styles.qaLbl}>Mon bail</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Passport')}>
+              <View style={[styles.qaIcon, { backgroundColor: Colors.qAmberLight }]}>
+                <Text style={styles.emoji}>📊</Text>
+              </View>
+              <Text style={styles.qaLbl}>Score ICL</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* STATS ROW */}
+          <View style={styles.mcRow}>
+            <View style={styles.mc}>
+              <Text style={styles.emojiSmall}>📅</Text>
+              <Text style={styles.mcVal}>{data?.monthsPaidCount || '14'}</Text>
+              <Text style={styles.mcLbl}>Mois payés</Text>
+              <View style={[styles.mcBadge, styles.badgeGreen]}>
+                <Text style={styles.mcBadgeText}>à temps</Text>
+              </View>
+            </View>
+            <View style={styles.mc}>
+              <Text style={styles.emojiSmall}>⭐</Text>
+              <Text style={styles.mcVal}>{data?.reliabilityScore || '720'} pts</Text>
+              <Text style={styles.mcLbl}>Score ICL</Text>
+              <View style={[styles.mcBadge, styles.badgeOrange]}>
+                <Text style={styles.mcBadgeText}>Grade B</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.scoreBadgeMini}>
-             <Text style={styles.scoreMiniText}>{data?.reliabilityScore || 750}</Text>
+
+          {/* ICL PASSPORT CARD */}
+          <View style={styles.iclCard}>
+            <View style={styles.iclTop}>
+              <Text style={styles.iclTitle}>Passeport locatif</Text>
+              <LinearGradient
+                colors={[Colors.qOrangeDark, Colors.qOrangeMedium]}
+                style={styles.iclGrade}
+              >
+                <Text style={styles.iclGradeText}>B</Text>
+              </LinearGradient>
+            </View>
+            <View style={styles.iclBarWrap}>
+              <View style={[styles.iclBarFill, { width: '72%' }]} />
+            </View>
+            <View style={styles.iclStats}>
+              <View style={styles.iclStat}>
+                <Text style={styles.iclStatVal}>{data?.reliabilityScore || '72'}</Text>
+                <Text style={styles.iclStatLbl}>Score</Text>
+              </View>
+              <View style={styles.iclStat}>
+                <Text style={styles.iclStatVal}>100%</Text>
+                <Text style={styles.iclStatLbl}>Ponctualité</Text>
+              </View>
+              <View style={styles.iclStat}>
+                <Text style={styles.iclStatVal}>{data?.hasLease ? 'Actif' : 'Inactif'}</Text>
+                <Text style={styles.iclStatLbl}>Statut</Text>
+              </View>
+            </View>
           </View>
+
+          {/* ACTIVITY FEED */}
+          <Text style={styles.activTitle}>Activité récente</Text>
+          {data?.recentReceipts?.map((receipt: any, idx: number) => (
+            <View key={receipt.id || idx} style={styles.activItem}>
+              <View style={[styles.aiDot, { backgroundColor: Colors.qGreenLight }]}>
+                <CheckCircle size={18} color={Colors.qGreen} />
+              </View>
+              <View style={styles.aiInfo}>
+                <Text style={styles.aiTitle}>Quittance {receipt.period} reçue</Text>
+                <Text style={styles.aiSub}>{receipt.ref || 'QAPRIL-CERT'}</Text>
+              </View>
+              <Text style={[styles.aiAmt, { color: Colors.qGreenDark }]}>+5 pts</Text>
+            </View>
+          ))}
+          
+          <View style={styles.activItem}>
+            <View style={[styles.aiDot, { backgroundColor: Colors.qOrangeLight }]}>
+              <Clock size={18} color={Colors.qOrange} />
+            </View>
+            <View style={styles.aiInfo}>
+              <Text style={styles.aiTitle}>Paiement confirmé</Text>
+              <Text style={styles.aiSub}>Orange Money · Aujourd'hui</Text>
+            </View>
+            <Text style={[styles.aiAmt, { color: Colors.qOrange }]}>DONE</Text>
+          </View>
+
+          <View style={{ height: 100 }} />
+        </View>
+      </ScrollView>
+
+      {/* BOTTOM NAV */}
+      <View style={styles.bnav}>
+        <TouchableOpacity style={styles.bnItem}>
+          <Home size={22} color={Colors.qOrange} />
+          <Text style={[styles.bnLbl, { color: Colors.qOrange }]}>Accueil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('History')}>
+          <Receipt size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Quittances</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.bnFabContainer} onPress={handlePayment}>
+          <LinearGradient
+            colors={[Colors.qOrange, Colors.qOrangeMedium]}
+            style={styles.bnFab}
+          >
+            <CreditCard size={28} color={Colors.white} />
+          </LinearGradient>
         </TouchableOpacity>
 
-        {/* Segmented Tabs */}
-        <View style={styles.tabsContainer}>
-          {tabs.map(tab => (
-            <TouchableOpacity 
-              key={tab} 
-              style={[styles.tab, activeTab === tab && styles.activeTab]}
-              onPress={() => setActiveTab(tab)}
-            >
-              <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.sectionTitle}>Ma Situation</Text>
-
-        {/* Card Grid */}
-        <View style={styles.grid}>
-          <DashboardCard
-            title="Loyer"
-            status={data?.balanceDue || 'À jour'}
-            subStatus={data?.totalArrears > 0 ? `${data.totalArrears.toLocaleString()} FCFA impayés` : (data?.recentReceipts?.[0] ? `Dernier : ${new Date(data.recentReceipts[0].paidAt).toLocaleDateString('fr-FR')}` : "Aucun paiement enregistré")}
-            icon={<CreditCard size={28} color="#059669" />}
-            backgroundColor={Colors.cardColors.mint}
-            onPress={() => {
-              if (data?.lease?.id) {
-                navigation.navigate('PaymentProcess', { 
-                  amount: data.totalArrears || data.lease.rent, 
-                  leaseId: data.lease.id,
-                  token 
-                });
-              } else {
-                Alert.alert("Information", "Aucun bail actif trouvé pour le paiement.");
-              }
-            }}
-          />
-          <DashboardCard
-            title="QAPRIL Scan"
-            status="Analyse par IA"
-            subStatus="Régelez vos factures par photo"
-            icon={<Camera size={28} color={Colors.primary} />}
-            backgroundColor={Colors.cardColors.mint}
-            onPress={() => navigation.navigate('ScanBill', { token })}
-          />
-          <DashboardCard
-            title="Quittances"
-            status={`${data?.recentReceipts?.length || 0} Disponibles`}
-            subStatus={data?.recentReceipts?.[0] ? `Dernière : ${data.recentReceipts[0].period}` : "Aucune quittance"}
-            icon={<FileText size={28} color="#D97706" />}
-            backgroundColor={Colors.cardColors.cream}
-            onPress={() => {
-              if (data?.recentReceipts?.[0]?.qrToken) {
-                const url = `https://www.qapril.ci/v/${data.recentReceipts[0].qrToken}`;
-                navigation.navigate('ReceiptView', { url });
-              } else {
-                Alert.alert("Information", "Vous n'avez pas encore de quittances certifiées.");
-              }
-            }}
-          />
-          <DashboardCard
-            title="Incidents"
-            status={`${data?.activeRequests || 0} En cours`}
-            subStatus={data?.activeRequests > 0 ? "Vos tickets en traitement" : "Aucun incident signalé"}
-            icon={<AlertCircle size={28} color="#DB2777" />}
-            backgroundColor={Colors.cardColors.rose}
-            onPress={() => navigation.navigate('Services')}
-          />
-          <DashboardCard
-            title="Mon Bail"
-            status={data?.hasLease ? "Actif" : "Inactif"}
-            subStatus={data?.lease?.ref || "NON RENSEIGNÉ"}
-            icon={<ClipboardList size={28} color="#4F46E5" />}
-            backgroundColor={Colors.cardColors.yellow}
-            onPress={() => navigation.navigate('Contract', { lease: data?.lease })}
-          />
-        </View>
-
-        <View style={{ height: 100 }} />
-      </ScrollView>
-    </SafeAreaView>
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Passport')}>
+          <BarChart3 size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Score</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Profile', { token })}>
+          <UserIcon size={22} color={Colors.qNavyMedium} />
+          <Text style={styles.bnLbl}>Profil</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
+  mainContainer: { flex: 1, backgroundColor: Colors.background },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
-  scrollContainer: { padding: 20 },
-  header: {
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 20 },
+  
+  locHeader: {
+    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 60,
+    paddingHorizontal: 20,
+    paddingBottom: 60,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: Colors.background,
-  },
-  headerIcon: {
-    padding: 8,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.03)',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: Colors.primary,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.accent,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  heroCard: {
-    backgroundColor: Colors.primary,
-    borderRadius: 32,
-    padding: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 24,
   },
-  heroContent: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  heroTitle: {
-    color: Colors.white,
-    fontSize: 24,
-    fontWeight: '800',
-    marginBottom: 8,
-  },
-  heroSubtitle: {
+  headerGreeting: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 12,
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 13,
-    lineHeight: 18,
   },
-  heroIconContainer: {
-    width: 60,
-    height: 60,
+  headerName: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 20,
+    color: Colors.white,
+    marginTop: 2,
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
+  avatarLabel: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  tabsContainer: {
-    flexDirection: 'row',
+  avatarText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 14,
+    color: Colors.white,
+  },
+  notifDot: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: Colors.qOrange,
+  },
+  
+  lhCard: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  lhAmountLbl: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  lhAmount: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 26,
+    color: Colors.white,
+    marginTop: 4,
+  },
+  lhAmountCurrency: {
+    fontSize: 14,
+    fontFamily: Typography.fontFamily.bodyMedium,
+  },
+  lhPayBtn: {
     backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 6,
-    marginBottom: 24,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
     borderRadius: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
   },
-  activeTab: {
-    backgroundColor: Colors.background,
+  lhPayBtnText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 13,
+    color: Colors.qOrange,
   },
-  tabText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.text.muted,
+
+  contentBody: {
+    paddingHorizontal: 16,
+    marginTop: -30,
   },
-  activeTabText: {
-    color: Colors.primary,
-    fontWeight: '800',
+
+  qaGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: Colors.primary,
+  qaItem: {
+    width: (width - 80) / 4,
+    alignItems: 'center',
+    gap: 6,
+  },
+  qaIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+  },
+  emoji: { fontSize: 24 },
+  qaLbl: {
+    fontFamily: Typography.fontFamily.bodyMedium,
+    fontSize: 9,
+    color: Colors.qNavy,
+    textAlign: 'center',
+  },
+
+  mcRow: {
+    flexDirection: 'row',
+    gap: 12,
     marginBottom: 16,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  scoreTeaser: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  mc: {
+    flex: 1,
     backgroundColor: Colors.white,
+    borderRadius: 18,
     padding: 16,
-    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  mcVal: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 18,
+    color: Colors.qNavy,
+    marginTop: 4,
+  },
+  mcLbl: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: Typography.fontSize.xs,
+    color: Colors.qNavyMedium,
+  },
+  mcBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  badgeGreen: { backgroundColor: Colors.qGreenLight },
+  badgeOrange: { backgroundColor: Colors.qOrangeLight },
+  mcBadgeText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 8,
+    color: Colors.qNavy,
+  },
+  emojiSmall: { fontSize: 16 },
+
+  iclCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 22,
+    padding: 20,
     marginBottom: 24,
     borderWidth: 1,
     borderColor: Colors.border,
-    elevation: 2,
   },
-  scoreTeaserInfo: { flexDirection: 'row', alignItems: 'center' },
-  scoreTeaserTitle: { fontSize: 16, fontWeight: '800', color: Colors.primary },
-  scoreTeaserSubtitle: { fontSize: 11, color: Colors.text.muted, marginTop: 2 },
-  scoreBadgeMini: { 
-    backgroundColor: Colors.primary, 
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
-    borderRadius: 12 
+  iclTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  scoreMiniText: { color: '#fff', fontSize: 13, fontWeight: '900' }
+  iclTitle: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 16,
+    color: Colors.qNavy,
+  },
+  iclGrade: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iclGradeText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 20,
+    color: Colors.white,
+  },
+  iclBarWrap: {
+    height: 10,
+    backgroundColor: Colors.qWarm,
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  iclBarFill: {
+    height: '100%',
+    backgroundColor: Colors.qOrange,
+    borderRadius: 5,
+  },
+  iclStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  iclStat: {
+    alignItems: 'center',
+  },
+  iclStatVal: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 15,
+    color: Colors.qNavy,
+  },
+  iclStatLbl: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 10,
+    color: Colors.qNavyMedium,
+  },
+
+  activTitle: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: Typography.fontSize.lg,
+    color: Colors.qNavy,
+    marginBottom: 12,
+  },
+  activItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  aiDot: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aiInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  aiTitle: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: 13,
+    color: Colors.qNavy,
+  },
+  aiSub: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 11,
+    color: Colors.qNavyMedium,
+    marginTop: 2,
+  },
+  aiAmt: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 12,
+  },
+
+  bnav: {
+    position: 'absolute',
+    bottom: 0,
+    width: width,
+    height: 80,
+    backgroundColor: Colors.white,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(26, 31, 60, 0.05)',
+  },
+  bnItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  bnLbl: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: 9,
+    color: Colors.qNavyMedium,
+  },
+  bnFabContainer: {
+    marginTop: -40,
+  },
+  bnFab: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: Colors.qOrange,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  }
 });
+

@@ -23,7 +23,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT"]
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,7 +37,8 @@
         {
           "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
