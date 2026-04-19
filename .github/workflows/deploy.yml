@@ -21,12 +21,20 @@ jobs:
     environment: production
 
     steps:
-      - name: 🧹 Safe Runner Cleanup
+      - name: 🛡️ Repair & Clean Runner Workspace
         run: |
+          # Reclaim ownership of the entire work directory
+          # This fixes "Access Denied" errors during checkout or cleanup
+          echo "🛡️ Reclaiming ownership of the workspace..."
+          sudo chown -R $USER:$USER /home/github/actions-runner/_work || true
+          sudo chmod -R 755 /home/github/actions-runner/_work || true
+          
           # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
+          echo "🧹 Clearing diagnostic telemetry..."
           [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
+          
           # Nuclear Cleanup to ensure zero contamination
-          echo "☢️ Nuking stale runner workspace to ensure zero contamination..."
+          echo "☢️ Nuking stale build artifacts..."
           rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
 
       - name: 🚚 Checkout repository
