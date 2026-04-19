@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
+import { ChampionService } from '@/lib/champion-service';
 
 export async function POST(req: Request) {
     try {
@@ -10,17 +12,26 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
         }
 
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+
+        const userId = payload.userId;
+
         // Vérification que le bien appartient au bailleur
         const property = await prisma.property.findUnique({ where: { id: propertyId } });
-        if (!property || property.ownerUserId !== token) {
+        if (!property || property.ownerUserId !== userId) {
              return NextResponse.json({ error: "Propriété invalide ou non autorisée." }, { status: 403 });
         }
+
+        const leaseCount = await prisma.lease.count({ where: { landlordId: userId } });
 
         const lease = await prisma.lease.create({
             data: {
                 propertyId,
-                tenantId,
-                landlordId: token,
+                tenantId: tenantId || null,
+                landlordId: userId,
                 leaseReference: `MOB-BAIL-${Date.now()}`,
                 durationMonths: 12,
                 leaseType: leaseType || 'RESIDENTIEL',
@@ -44,6 +55,24 @@ export async function POST(req: Request) {
                 declarative: true
             }
         });
+
+        // --- GESTION CONVERSION PROSPECT (ADD-15) ---
+        // Si c'est le 1er bail du propriétaire, on check s'il était un prospect champion
+        if (leaseCount === 0) {
+            const user = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true } });
+            if (user?.phone) {
+                const prospect = await prisma.championProspect.findFirst({
+                    where: { 
+                        telephone: user.phone,
+                        statut: 'A_RAPPELER'
+                    }
+                });
+                
+                if (prospect) {
+                    await ChampionService.convertProspect(prospect.id, userId);
+                }
+            }
+        }
 
         return NextResponse.json({ success: true, lease });
 

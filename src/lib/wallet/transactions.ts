@@ -85,6 +85,25 @@ export class WalletService {
   }
 
   /**
+   * Calcule la commission QAPRIL selon le rôle
+   * Bailleur Privé: 0% (paye à la quittance)
+   * Bailleur Pro / Agence: jusqu'à 15% (loi CCH CI)
+   */
+  static async calculateCommission(userId: string, rentAmount: number) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    });
+
+    if (user?.role === "LANDLORD_PRO" || user?.role === "AGENCY") {
+      // Pour les pros, on peut imaginer une commission de base de 10% s'il n'y a pas de mandat spécifique
+      return Math.floor(rentAmount * 0.10);
+    }
+
+    return 0; // Les particuliers ne payent pas de commission sur le loyer encaissé
+  }
+
+  /**
    * Récupérer l'historique des transactions depuis AuditLog
    */
   static async getHistory(userId: string, limit: number = 20) {
@@ -92,7 +111,7 @@ export class WalletService {
       where: {
         userId,
         module: "WALLET",
-        action: { in: ["WALLET_CREDIT", "WALLET_DEBIT", "RECEIPT_PAID"] }
+        action: { in: ["WALLET_CREDIT", "WALLET_DEBIT", "RECEIPT_PAID", "COMMISSION_DEBIT"] }
       },
       orderBy: { createdAt: "desc" },
       take: limit
@@ -105,7 +124,9 @@ export class WalletService {
         date: log.createdAt,
         type: log.action === "WALLET_CREDIT" ? "CREDIT" : "DEBIT",
         amount: data.amount || 0,
-        label: log.action === "WALLET_CREDIT" ? `Rechargement ${data.provider || ''}` : (data.action || "Paiement Quittance"),
+        label: log.action === "WALLET_CREDIT" ? `Rechargement ${data.provider || ''}` : 
+               log.action === "COMMISSION_DEBIT" ? "Commission QAPRIL" :
+               (data.action || "Paiement Quittance"),
         reference: log.entityId,
         balanceAfter: data.newBalance
       };

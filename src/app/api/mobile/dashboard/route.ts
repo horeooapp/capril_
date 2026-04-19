@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import { NextResponse } from 'next/server';
+import { getCommuneMarketReport } from '@/lib/observatory';
 
 export async function POST(req: Request) {
     try {
@@ -197,6 +198,57 @@ export async function POST(req: Request) {
                     amount: monthlyRevenue._sum.totalAmount || 0
                 });
             }
+            
+            // --- RECHERCHE STATS OBSERVATOIRE (Marché local) ---
+            let marketStats = null;
+            if (user.propertiesOwned.length > 0) {
+                const communes = user.propertiesOwned.map(p => p.commune).filter(Boolean);
+                const counts = communes.reduce((acc: any, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {});
+                const topCommune = Object.keys(counts).sort((a,b) => (counts[b] || 0) - (counts[a] || 0))[0];
+                
+                if (topCommune) {
+                    const reports = await getCommuneMarketReport(topCommune);
+                    if (reports && reports.length > 0) {
+                        const avgMarketRent = reports[0].avgRent;
+                        
+                        // Calcul du positionnement (ADD-20)
+                        const userPropertiesInCommune = user.propertiesOwned.filter(p => p.commune === topCommune);
+                        let sumUserRent = 0;
+                        let countUserUnits = 0;
+                        
+                        for (const p of userPropertiesInCommune) {
+                            if (p.typeStructure === "INDEPENDANT") {
+                                sumUserRent += p.leases?.[0]?.rentAmount || p.declaredRentFcfa || 0;
+                                countUserUnits++;
+                            } else {
+                                for (const u of (p.units || [])) {
+                                    sumUserRent += u.leases?.[0]?.rentAmount || u.declaredRentFcfa || 0;
+                                    countUserUnits++;
+                                }
+                            }
+                        }
+                        
+                        const userAvgRent = countUserUnits > 0 ? sumUserRent / countUserUnits : 0;
+                        const diffPct = avgMarketRent > 0 ? Math.round(((userAvgRent - avgMarketRent) / avgMarketRent) * 100) : 0;
+
+                        marketStats = {
+                            commune: topCommune,
+                            avgRent: avgMarketRent,
+                            trendPct: reports[0].trendPct,
+                            period: reports[0].period,
+                            userAvgRent,
+                            marketPositioning: diffPct, // Pourcentage (+ ou -) par rapport au marché
+                        };
+                    }
+                }
+            }
+
+            const totalProperties = user.propertiesOwned.length;
+            const onboarding = totalProperties === 0;
+
+            // SUGGESTION RECHARGE (ADD-07)
+            const { calculateSuggestedRecharge } = await import('@/lib/wallet/calculator');
+            const suggestedRecharge = await calculateSuggestedRecharge(userId);
 
             return NextResponse.json({
                 success: true,
@@ -205,11 +257,16 @@ export async function POST(req: Request) {
                     totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} FCFA`,
                     occupancyRate: `${occupancyRate}%`,
                     properties: propertiesMobile,
+                    totalProperties,
+                    onboarding,
                     userId: user.id,
                     userEmail: user.email,
                     fullName: fallbackName,
+                    role: user.role, // LANDLORD or LANDLORD_PRO
                     pendingRepairs: pendingRepairsCount,
-                    revenueHistory: last6Months
+                    revenueHistory: last6Months,
+                    marketStats,
+                    suggestedRecharge
                 }
             });
         }

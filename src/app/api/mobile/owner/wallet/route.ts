@@ -17,6 +17,7 @@ export async function POST(req: Request) {
         }
 
         const userId = payload.userId;
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
 
         const wallet = await prisma.userWalletConfig.findUnique({
             where: { userId }
@@ -29,16 +30,31 @@ export async function POST(req: Request) {
                 take: 20
             });
 
+            // SUGGESTION RECHARGE (ADD-07)
+            const { calculateSuggestedRecharge } = await import('@/lib/wallet/calculator');
+            const suggestedRecharge = await calculateSuggestedRecharge(userId);
+
             return NextResponse.json({ 
                 success: true, 
                 balance: wallet?.walletBalance || 0,
-                history
+                history,
+                suggestedRecharge,
+                role: user?.role
             });
         }
 
         if (action === 'WITHDRAW') {
             if (!wallet || wallet.walletBalance < amount) {
                 return NextResponse.json({ error: "Solde insuffisant pour ce retrait." }, { status: 400 });
+            }
+
+            // LIMITES DE RETRAIT (ADD-20)
+            const isPro = user?.role === 'LANDLORD_PRO';
+            const limit = isPro ? 2000000 : 500000;
+            if (amount > limit) {
+                return NextResponse.json({ 
+                    error: `Le montant dépasse votre limite de retrait autorisée (${limit.toLocaleString('fr-FR')} FCFA).` 
+                }, { status: 400 });
             }
 
             // Création de la transaction de retrait (ReversalTransaction dans l'écosystème web)

@@ -57,7 +57,11 @@ export default function DashboardScreen({ route, navigation }: any) {
             style={styles.profileIcon}
             onPress={() => navigation.navigate('Profile', { token, userProfile: data })}
           >
-            <User size={20} color={Colors.primary} />
+            {data?.role === 'LANDLORD_PRO' ? (
+               <View style={styles.proBadge}><Text style={styles.proBadgeText}>PRO</Text></View>
+            ) : (
+               <User size={20} color={Colors.primary} />
+            )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerIcon}>
             <Bell size={24} color={Colors.primary} />
@@ -72,6 +76,25 @@ export default function DashboardScreen({ route, navigation }: any) {
             <Text style={styles.badgeText}>{data?.pendingRepairs || 0} Alertes</Text>
           </View>
         </View>
+        
+        {/* ONBOARDING STATE */}
+        {data?.onboarding && (
+          <View style={styles.onboardingCard}>
+             <View style={styles.onboardingIcon}>
+               <FilePlus size={32} color={Colors.white} />
+             </View>
+             <Text style={styles.onboardingTitle}>Bienvenue sur Capril !</Text>
+             <Text style={styles.onboardingText}>
+               Commencez par ajouter votre premier bien immobilier pour activer votre dashboard et suivre vos revenus.
+             </Text>
+             <TouchableOpacity 
+               style={styles.onboardingBtn}
+               onPress={() => navigation.navigate('CreateLease')}
+             >
+               <Text style={styles.onboardingBtnText}>Démarrer maintenant</Text>
+             </TouchableOpacity>
+          </View>
+        )}
 
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Revenus Globaux (Taux d'occupation {data?.occupancyRate})</Text>
@@ -111,6 +134,37 @@ export default function DashboardScreen({ route, navigation }: any) {
             <Text style={styles.actionText}>Compta</Text>
           </TouchableOpacity>
         </View>
+        
+        {/* SECTION OBSERVATOIRE (Marché local) */}
+        {data?.marketStats && (
+          <View style={styles.observatoryContainer}>
+            <View style={styles.observatoryHeader}>
+              <Text style={styles.sectionTitle}>Analyse du Marché ({data.marketStats.commune})</Text>
+              <Activity size={18} color={Colors.primary} />
+            </View>
+            <View style={styles.observatoryCard}>
+              <View style={{flex: 1}}>
+                <Text style={styles.obsLabel}>Loyer Moyen (Zone)</Text>
+                <Text style={styles.obsValue}>{data.marketStats.avgRent.toLocaleString('fr-FR')} FCFA</Text>
+                
+                {data.marketStats.marketPositioning !== undefined && (
+                  <View style={styles.positioningRow}>
+                    <TrendingUp size={12} color={data.marketStats.marketPositioning >= 0 ? Colors.success : Colors.danger} />
+                    <Text style={[styles.positioningText, { color: data.marketStats.marketPositioning >= 0 ? Colors.success : Colors.danger }]}>
+                      {data.marketStats.marketPositioning > 0 ? `+${data.marketStats.marketPositioning}%` : `${data.marketStats.marketPositioning}%`} par rapport à vos biens
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={[styles.obsTrend, data.marketStats.trendPct >= 0 ? styles.obsTrendUp : styles.obsTrendDown]}>
+                <Text style={styles.obsTrendText}>
+                  {data.marketStats.trendPct >= 0 ? '+' : ''}{data.marketStats.trendPct}%
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.obsFooter}>Basé sur les baux certifiés de la période {data.marketStats.period}</Text>
+          </View>
+        )}
 
         <Text style={styles.sectionTitle}>Mes Biens Immobiliers</Text>
         {data?.properties?.map((prop: any) => (
@@ -195,5 +249,60 @@ const styles = StyleSheet.create({
   quickActionsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
   actionBtn: { width: '30%', backgroundColor: Colors.white, padding: 12, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: Colors.border },
   actionIcon: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  actionText: { fontSize: 11, fontWeight: '800', color: Colors.primary, textAlign: 'center' }
+  actionText: { fontSize: 11, fontWeight: '800', color: Colors.primary, textAlign: 'center' },
+  
+  // Styles Observatoire
+  observatoryContainer: { marginBottom: 32 },
+  observatoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  observatoryCard: { 
+    backgroundColor: Colors.white, 
+    padding: 18, 
+    borderRadius: 20, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginTop: 8
+  },
+  obsLabel: { fontSize: 12, color: Colors.text.muted, fontWeight: '600' },
+  obsValue: { fontSize: 20, fontWeight: '900', color: Colors.primary, marginTop: 4 },
+  obsTrend: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  obsTrendUp: { backgroundColor: 'rgba(16, 185, 129, 0.1)' },
+  obsTrendDown: { backgroundColor: 'rgba(239, 68, 68, 0.1)' },
+  obsTrendText: { fontSize: 13, fontWeight: '800', color: Colors.primary },
+  obsFooter: { fontSize: 10, color: Colors.text.muted, marginTop: 8, fontStyle: 'italic' },
+  positioningRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
+  positioningText: { fontSize: 11, fontWeight: '700' },
+  proBadge: { backgroundColor: Colors.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  proBadgeText: { color: Colors.white, fontSize: 10, fontWeight: '900' },
+
+  // Styles Onboarding
+  onboardingCard: { 
+    backgroundColor: Colors.white, 
+    padding: 24, 
+    borderRadius: 24, 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: Colors.border, 
+    marginBottom: 32,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2
+  },
+  onboardingIcon: { 
+    width: 64, 
+    height: 64, 
+    borderRadius: 32, 
+    backgroundColor: Colors.primary, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 16 
+  },
+  onboardingTitle: { fontSize: 20, fontWeight: '900', color: Colors.primary, marginBottom: 8 },
+  onboardingText: { fontSize: 14, color: Colors.text.muted, textAlign: 'center', lineHeight: 20, marginBottom: 20 },
+  onboardingBtn: { backgroundColor: Colors.cardColors.mint, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  onboardingBtnText: { color: Colors.primary, fontWeight: '800', fontSize: 14 }
 });

@@ -37,9 +37,10 @@ export default function WalletDashboard() {
     );
   }
 
-  const { solde, historique, stats, decouvertMax } = data || { solde: 0, historique: [], stats: { consoMensuelle: 0, nbBails: 0 }, decouvertMax: -1500 };
+  const { solde, historique, stats, decouvertMax, role } = data || { solde: 0, historique: [], stats: { consoMensuelle: 0, nbBails: 0 }, decouvertMax: -1500, role: 'TENANT' };
   const isOverdrawn = solde < 0;
   const isCritical = solde <= decouvertMax;
+  const isPro = role === 'LANDLORD_PRO' || role === 'AGENCY';
 
   return (
     <div className="space-y-6">
@@ -49,9 +50,14 @@ export default function WalletDashboard() {
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
                 <Wallet className="text-slate-700" size={32} /> E-Wallet
             </h1>
-            <p className="text-[13.5px] font-medium text-slate-500 mt-1">
-                Gérez votre solde QAPRIL pour l'envoi de quittances et SMS automatisés.
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+                <Badge color={isPro ? "violet" : "gray"}>
+                    {isPro ? "Compte Professionnel" : "Compte Particulier"}
+                </Badge>
+                <p className="text-[13.5px] font-medium text-slate-500">
+                    {isPro ? "Gestion des encaissements et commissions." : "Gérez votre solde pour l'envoi de quittances automated."}
+                </p>
+            </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">
             <button 

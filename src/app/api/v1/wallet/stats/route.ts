@@ -19,6 +19,7 @@ export async function GET(req: Request) {
       select: { 
         walletConfig: { select: { walletBalance: true, walletSeuilAlerte: true } },
         activePlanTier: true,
+        role: true,
         _count: {
            select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
         }
@@ -31,20 +32,27 @@ export async function GET(req: Request) {
 
     const history = await WalletService.getHistory(user.id, 10);
     
-    // Projections QAPRIL (Standard 75 FCFA/quittance)
+    // Projections QAPRIL (Standard 75 FCFA/quittance pour particuliers, 10% estimation pour pros)
     const nbBails = fullUser._count.leasesAsLandlord;
-    const consoMensuelle = nbBails * 75;
+    const isPro = fullUser.role === 'LANDLORD_PRO' || fullUser.role === 'AGENCY';
+    
+    // Estimation conso mensuelle : 
+    // Pour les particuliers : nb bails * 75 FCFA
+    // Pour les pros : nb bails * (Loyer Moyen estimé à 150k * 10%)
+    const consoMensuelle = isPro ? (nbBails * 15000) : (nbBails * 75);
+    const decouvertMax = isPro ? -5000 : -1500;
 
     return NextResponse.json({
       solde: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
       devise: 'FCFA',
+      role: fullUser.role,
       seuilAlerte: fullUser?.walletConfig?.walletSeuilAlerte || 500,
-      decouvertMax: -1500,
+      decouvertMax,
       historique: history,
       stats: {
          nbBails,
          consoMensuelle,
-         autonomieMois: (((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) > 0 ? Math.floor((((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) / (consoMensuelle || 1)) : 0
+         autonomieMois: (((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) > 0 ? Math.floor((((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) / (consoMensuelle || 1)) : (isPro ? 0 : 12)
       }
     });
 

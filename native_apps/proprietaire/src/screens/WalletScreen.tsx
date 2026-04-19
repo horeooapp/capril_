@@ -8,6 +8,8 @@ export default function WalletScreen({ route, navigation }: any) {
   const [balance, setBalance] = useState<number>(0);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<string>('');
+  const [suggested, setSuggested] = useState<any>(null);
   
   const [withdrawModal, setWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -28,6 +30,8 @@ export default function WalletScreen({ route, navigation }: any) {
         if (json.success) {
           setBalance(json.balance);
           setHistory(json.history);
+          setRole(json.role);
+          setSuggested(json.suggestedRecharge);
         }
         setLoading(false);
       })
@@ -45,6 +49,11 @@ export default function WalletScreen({ route, navigation }: any) {
     const amount = parseInt(withdrawAmount, 10);
     if (!amount || amount <= 0) return Alert.alert("Erreur", "Saisissez un montant valide.");
     if (amount > balance) return Alert.alert("Fonds insuffisants", "Le montant demandé dépasse votre solde disponible.");
+    
+    // Limits check (ADD-20)
+    const limit = role === 'LANDLORD_PRO' ? 2000000 : 500000;
+    if (amount > limit) return Alert.alert("Limite dépassée", `Votre limite de retrait est de ${limit.toLocaleString()} FCFA par transaction.`);
+
     if (!accountDetails) return Alert.alert("Erreur", "Veuillez préciser le numéro de compte ou téléphone.");
 
     setLoading(true);
@@ -121,9 +130,37 @@ export default function WalletScreen({ route, navigation }: any) {
               }}
             >
               <FileText size={18} color="#fff" />
-              <Text style={[styles.withdrawBtnText, { color: '#fff' }]}>Bilan Financier (.pdf)</Text>
+               <Text style={[styles.withdrawBtnText, { color: '#fff' }]}>Bilan Financier (.pdf)</Text>
             </TouchableOpacity>
+
+            {role === 'LANDLORD_PRO' && (
+              <View style={styles.proPill}>
+                <Text style={styles.proPillText}>COMPTE PROFESSIONNEL</Text>
+              </View>
+            )}
         </View>
+
+        {/* SUGGESTED RECHARGE (ADD-07) */}
+        {suggested && (
+          <View style={styles.suggestedContainer}>
+            <Text style={styles.sectionTitle}>Recommandation de recharge</Text>
+            <Text style={styles.suggestedSubtitle}>Basé sur vos baux actifs et les frais de quittance</Text>
+            <View style={styles.suggestedRow}>
+              <TouchableOpacity style={styles.suggestedCard}>
+                <Text style={styles.suggestedLabel}>Essentiel</Text>
+                <Text style={styles.suggestedValue}>{suggested.minimum.toLocaleString()} FCFA</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.suggestedCard, {borderColor: '#064E3B', backgroundColor: '#ecfdf5'}]}>
+                <Text style={[styles.suggestedLabel, {color: '#064E3B'}]}>Recommandé</Text>
+                <Text style={[styles.suggestedValue, {color: '#064E3B'}]}>{suggested.recommande.toLocaleString()} FCFA</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.suggestedCard}>
+                <Text style={styles.suggestedLabel}>Liberté</Text>
+                <Text style={styles.suggestedValue}>{suggested.confort.toLocaleString()} FCFA</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         <View style={styles.historySection}>
            <Text style={styles.sectionTitle}>Historique des transactions</Text>
@@ -269,5 +306,18 @@ const styles = StyleSheet.create({
   methodCard: { flex: 1, backgroundColor: '#fff', borderWidth: 2, borderColor: '#e5e7eb', borderRadius: 16, padding: 16, alignItems: 'center', gap: 8 },
   methodSelected: { borderColor: '#064E3B', backgroundColor: '#ecfdf5' },
   methodText: { fontSize: 12, fontWeight: '700', color: '#9ca3af' },
-  submitButton: { flex: 1, backgroundColor: '#064E3B', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }
+  submitButton: { flex: 1, backgroundColor: '#064E3B', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
+  
+  proPill: { 
+    position: 'absolute', top: 16, right: 16, 
+    backgroundColor: 'rgba(255,185,0,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,185,0,0.5)' 
+  },
+  proPillText: { color: '#fbbf24', fontSize: 10, fontWeight: '900' },
+  
+  suggestedContainer: { marginBottom: 32 },
+  suggestedSubtitle: { fontSize: 12, color: '#6b7280', marginBottom: 12 },
+  suggestedRow: { flexDirection: 'row', gap: 10 },
+  suggestedCard: { flex: 1, backgroundColor: '#fff', padding: 12, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', alignItems: 'center' },
+  suggestedLabel: { fontSize: 10, fontWeight: '800', color: '#9ca3af', marginBottom: 4, textTransform: 'uppercase' },
+  suggestedValue: { fontSize: 14, fontWeight: '900', color: '#111827' }
 });
