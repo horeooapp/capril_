@@ -40,12 +40,25 @@ export const Colors = {
     light: '#FFFFFF',
     danger: '#CC2222',
     success: '#0A5C43',
+    dark: '#0D1020',
   },
 
   status: {
     loue: { bg: '#E0F7EF', text: '#0A5C43' },
     impaye: { bg: '#FFF0F0', text: '#CC2222' },
     vacant: { bg: '#FFF7E6', text: '#9B6000' },
-  }
+  },
+
+  // Legacy Fallbacks
+  accent: '#1D9E75',
+  success: '#1D9E75',
+  danger: '#FF6B6B',
+  dark: '#1A1F3C',
+  cardColors: {
+    rose: '#FFF0F0',
+    mint: '#E0F7EF',
+    cream: '#FFF7E6',
+    blue: '#EAECF5'
+  },
 };
 

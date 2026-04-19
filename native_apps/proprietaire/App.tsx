@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, { useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,43 +13,44 @@ import {
   Sora_800ExtraBold 
 } from '@expo-google-fonts/sora';
 import { 
-  DM_Sans_400Regular, 
-  DM_Sans_500Medium, 
-  DM_Sans_700Bold 
+  DMSans_400Regular, 
+  DMSans_500Medium, 
+  DMSans_700Bold 
 } from '@expo-google-fonts/dm-sans';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'Sora_400Regular': Sora_400Regular,
     'Sora_500Medium': Sora_500Medium,
     'Sora_600SemiBold': Sora_600SemiBold,
     'Sora_700Bold': Sora_700Bold,
     'Sora_800ExtraBold': Sora_800ExtraBold,
-    'DMSans_400Regular': DM_Sans_400Regular,
-    'DMSans_500Medium': DM_Sans_500Medium,
-    'DMSans_700Bold': DM_Sans_700Bold,
+    'DMSans_400Regular': DMSans_400Regular,
+    'DMSans_500Medium': DMSans_500Medium,
+    'DMSans_700Bold': DMSans_700Bold,
   });
 
   useEffect(() => {
-    // Safety timeout to ensure splash hides even if fonts fail
+    // Safety timeout to ensure splash hides even if fonts fail or hang indefinitely
     const timeout = setTimeout(async () => {
-      await SplashScreen.hideAsync();
+      await SplashScreen.hideAsync().catch(() => {});
     }, 5000);
 
     return () => clearTimeout(timeout);
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
+
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
