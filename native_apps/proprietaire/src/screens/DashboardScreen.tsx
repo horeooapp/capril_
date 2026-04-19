@@ -93,7 +93,7 @@ export default function DashboardScreen({ navigation, route }: any) {
             <Text style={styles.bcTenantName}>{item.tenantName || 'Aucun locataire'}</Text>
           </View>
           <Text style={[styles.bcAmt, { color: Colors.qNavy }]}>
-            {item.rent?.toLocaleString() || item.loyer?.toLocaleString() || '0'} <Text style={{fontSize: 10}}>F</Text>
+            {item.rent?.toLocaleString() ?? item.loyer?.toLocaleString() ?? '0'} <Text style={{fontSize: 10}}>F</Text>
           </Text>
         </View>
       </TouchableOpacity>
@@ -129,15 +129,15 @@ export default function DashboardScreen({ navigation, route }: any) {
         {/* TOP STATS */}
         <View style={styles.statsGrid}>
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>{data?.stats?.total_biens || data?.properties?.length || '0'}</Text>
+            <Text style={styles.statVal}>{data?.stats?.total_biens ?? data?.properties?.length ?? 0}</Text>
             <Text style={styles.statLbl}>Biens</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>{data?.stats?.loues || data?.properties?.filter((p:any)=>p.status==='Loué').length || '0'}</Text>
+            <Text style={styles.statVal}>{data?.stats?.loues ?? data?.properties?.filter((p:any)=>p.status==='Loué').length ?? 0}</Text>
             <Text style={styles.statLbl}>Loués</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>{data?.stats?.vacants || data?.properties?.filter((p:any)=>p.status==='Vacant').length || '0'}</Text>
+            <Text style={styles.statVal}>{data?.stats?.vacants ?? data?.properties?.filter((p:any)=>p.status==='Vacant').length ?? 0}</Text>
             <Text style={styles.statLbl}>Vacant</Text>
           </View>
         </View>
@@ -161,12 +161,12 @@ export default function DashboardScreen({ navigation, route }: any) {
             </View>
             
             <Text style={styles.revAmount}>
-              {data?.total_revenue?.toLocaleString() || data?.totalRevenue?.toLocaleString() || '0'} 
-              <Text style={styles.revCurrency}> FCFA</Text>
+              {data?.total_revenue?.toLocaleString() ?? data?.totalRevenue?.toLocaleString() ?? 0} 
+            <Text style={{fontSize: 14, fontFamily: Typography.fontFamily.bodyMedium}}> FCFA</Text>
             </Text>
             
             <Text style={styles.revSub}>
-              {data?.stats?.payments_count || '0'} loyers perçus sur {data?.stats?.expected_count || '0'} attendus
+              {data?.stats?.payments_count ?? 0} loyers perçus sur {data?.stats?.expected_count ?? 0} attendus
             </Text>
 
             <View style={styles.revPills}>
@@ -175,7 +175,7 @@ export default function DashboardScreen({ navigation, route }: any) {
               </View>
               {data?.pendingRepairs > 0 && (
                 <View style={[styles.revPill, styles.revPillDanger]}>
-                  <Text style={styles.revPillText}>1 impayé</Text>
+                  <Text style={styles.revPillText}>{data.pendingRepairs} réparations</Text>
                 </View>
               )}
             </View>
@@ -195,38 +195,7 @@ export default function DashboardScreen({ navigation, route }: any) {
         </ScrollView>
       </View>
 
-      {/* FIXED BOTTOM NAV */}
-      <View style={styles.bnav}>
-        <TouchableOpacity style={styles.bnItem}>
-          <Home size={22} color={Colors.qGreen} />
-          <Text style={[styles.bnLbl, { color: Colors.qGreen }]}>Accueil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bnItem}>
-          <Building2 size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Biens</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.bnFabContainer}
-          onPress={() => navigation.navigate('CreateLease', { token })}
-        >
-          <LinearGradient
-            colors={[Colors.qGreen, Colors.qGreenDark]}
-            style={styles.bnFab}
-          >
-            <Plus size={32} color={Colors.white} />
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Accounting')}>
-          <BarChart3 size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Rapports</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Profile', { token })}>
-          <User size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Profil</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={{ height: 20 }} />
     </View>
   );
 }

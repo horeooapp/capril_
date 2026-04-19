@@ -29,7 +29,7 @@ export default function MessageScreen({ navigation, route }: any) {
   const [modalVisible, setModalVisible] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const token = route?.params?.token || 'DUMMY';
+  const token = route?.params?.token;
 
   const sendMessage = async () => {
     if (!message.trim()) return Alert.alert("Erreur", "Veuillez saisir un message.");

@@ -5,7 +5,7 @@ import { ChevronLeft, Send } from 'lucide-react-native';
 export default function MessageScreen({ route, navigation }: any) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const token = route?.params?.token || 'DUMMY';
+  const token = route?.params?.token;
 
   // We reuse the existing tenant messages endpoint but parameterize it for owner context if needed
   // For demonstration, simulating network call

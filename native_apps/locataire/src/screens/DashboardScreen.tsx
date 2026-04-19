@@ -113,7 +113,7 @@ export default function DashboardScreen({ navigation, route }: any) {
         <View style={styles.lhCard}>
           <Text style={styles.lhAmountLbl}>Loyer en cours</Text>
           <Text style={styles.lhAmount}>
-            {data?.totalArrears?.toLocaleString() || data?.lease?.rent?.toLocaleString() || '0'} 
+            {data?.totalArrears?.toLocaleString() ?? data?.lease?.rent?.toLocaleString() ?? 0} 
             <Text style={styles.lhAmountCurrency}> FCFA</Text>
           </Text>
           <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
@@ -162,7 +162,7 @@ export default function DashboardScreen({ navigation, route }: any) {
           <View style={styles.mcRow}>
             <View style={styles.mc}>
               <Text style={styles.emojiSmall}>📅</Text>
-              <Text style={styles.mcVal}>{data?.monthsPaidCount || '14'}</Text>
+              <Text style={styles.mcVal}>{data?.monthsPaidCount ?? 0}</Text>
               <Text style={styles.mcLbl}>Mois payés</Text>
               <View style={[styles.mcBadge, { backgroundColor: Colors.qGreenLight }]}>
                 <Text style={styles.mcBadgeText}>à temps</Text>
@@ -170,7 +170,7 @@ export default function DashboardScreen({ navigation, route }: any) {
             </View>
             <View style={styles.mc}>
               <Text style={styles.emojiSmall}>⭐</Text>
-              <Text style={styles.mcVal}>{data?.reliabilityScore || '720'} pts</Text>
+              <Text style={styles.mcVal}>{data?.reliabilityScore ?? 0} pts</Text>
               <Text style={styles.mcLbl}>Score ICL</Text>
               <View style={[styles.mcBadge, { backgroundColor: Colors.qOrangeLight }]}>
                 <Text style={styles.mcBadgeText}>Grade B</Text>
@@ -194,7 +194,7 @@ export default function DashboardScreen({ navigation, route }: any) {
             </View>
             <View style={styles.iclStats}>
               <View style={styles.iclStat}>
-                <Text style={styles.iclStatVal}>{data?.reliabilityScore || '72'}</Text>
+                <Text style={styles.iclStatVal}>{data?.reliabilityScore ?? 0}</Text>
                 <Text style={styles.iclStatLbl}>Score</Text>
               </View>
               <View style={styles.iclStat}>
@@ -223,50 +223,17 @@ export default function DashboardScreen({ navigation, route }: any) {
             </View>
           ))}
           
-          <View style={styles.activItem}>
-            <View style={[styles.aiDot, { backgroundColor: Colors.qOrangeLight }]}>
-              <Clock size={18} color={Colors.qOrange} />
-            </View>
-            <View style={styles.aiInfo}>
-              <Text style={styles.aiTitle}>Paiement confirmé</Text>
-              <Text style={styles.aiSub}>Orange Money · Aujourd'hui</Text>
-            </View>
-            <Text style={[styles.aiAmt, { color: Colors.qOrange }]}>DONE</Text>
-          </View>
+          {data?.recentReceipts?.length === 0 && (
+            <Text style={{textAlign: 'center', color: Colors.text.muted, marginTop: 20}}>
+               Aucune activité récente.
+            </Text>
+          )}
 
-          <View style={{ height: 100 }} />
+          <View style={{ height: 20 }} />
         </ScrollView>
       </View>
 
-      {/* FIXED BOTTOM NAV */}
-      <View style={styles.bnav}>
-        <TouchableOpacity style={styles.bnItem}>
-          <Home size={22} color={Colors.qOrange} />
-          <Text style={[styles.bnLbl, { color: Colors.qOrange }]}>Accueil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('History')}>
-          <Receipt size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Quittances</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.bnFabContainer} onPress={handlePayment}>
-          <LinearGradient
-            colors={[Colors.qOrange, Colors.qOrangeMedium]}
-            style={styles.bnFab}
-          >
-            <CreditCard size={28} color={Colors.white} />
-          </LinearGradient>
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Passport')}>
-          <BarChart3 size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Score</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bnItem} onPress={() => navigation.navigate('Profile', { token })}>
-          <UserIcon size={22} color={Colors.qNavyMedium} />
-          <Text style={styles.bnLbl}>Profil</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

@@ -80,7 +80,7 @@ export default function PaymentProcessScreen({ navigation, route }: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          token: token || 'DUMMY',
+          token: token,
           leaseId,
           amount,
           operator: selectedOperator
