@@ -3,13 +3,13 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  SafeAreaView, 
   ScrollView, 
   ActivityIndicator, 
   TouchableOpacity,
   StatusBar,
-  Alert,
-  Dimensions
+  Dimensions,
+  Platform,
+  Alert
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -18,7 +18,6 @@ import {
   Settings, 
   ClipboardList, 
   BarChart3, 
-  Plus, 
   Home, 
   User as UserIcon,
   CreditCard,
@@ -83,53 +82,54 @@ export default function DashboardScreen({ navigation, route }: any) {
 
   return (
     <View style={styles.mainContainer}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
       
-      <ScrollView 
-        style={styles.scrollView} 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      {/* FIXED HEADER */}
+      <LinearGradient
+        colors={[Colors.qOrangeDark, Colors.qOrange, Colors.qOrangeMedium]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.fixedHeader}
       >
-        {/* LOC HEADER */}
-        <LinearGradient
-          colors={[Colors.qOrangeDark, Colors.qOrange, Colors.qOrangeMedium]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.locHeader}
-        >
-          <View style={styles.headerTop}>
-            <View>
-              <Text style={styles.headerGreeting}>Bonjour 👋</Text>
-              <Text style={styles.headerName}>{data?.name || 'Locataire'}</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerSubtitle}>Bonjour 👋</Text>
+            <Text style={styles.headerTitle}>{data?.name || 'Locataire'}</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.avatarContainer}
+            onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id, userProfile: data })}
+          >
+            <View style={styles.avatarLabel}>
+              <Text style={styles.avatarTextMain}>
+                {(data?.name || 'KA').substring(0, 2).toUpperCase()}
+              </Text>
             </View>
-            <TouchableOpacity 
-              style={styles.avatarContainer}
-              onPress={() => navigation.navigate('Profile', { token, leaseId: data?.lease?.id, userProfile: data })}
-            >
-              <View style={styles.avatarLabel}>
-                <Text style={styles.avatarText}>
-                  {(data?.name || 'KA').substring(0, 2).toUpperCase()}
-                </Text>
-              </View>
-              <View style={[styles.notifDot, { backgroundColor: Colors.qGreenMedium }]} />
-            </TouchableOpacity>
-          </View>
+            <View style={[styles.onlineDot, { backgroundColor: Colors.qGreen }]} />
+          </TouchableOpacity>
+        </View>
 
-          {/* PAYMENT CARD (Floating in Header) */}
-          <View style={styles.lhCard}>
-            <Text style={styles.lhAmountLbl}>Loyer en cours</Text>
-            <Text style={styles.lhAmount}>
-              {data?.totalArrears?.toLocaleString() || data?.lease?.rent?.toLocaleString() || '0'} 
-              <Text style={styles.lhAmountCurrency}> FCFA</Text>
-            </Text>
-            <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
-              <CreditCard size={16} color={Colors.qOrange} />
-              <Text style={styles.lhPayBtnText}>Payer maintenant</Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+        {/* PAYMENT CARD (In Header) */}
+        <View style={styles.lhCard}>
+          <Text style={styles.lhAmountLbl}>Loyer en cours</Text>
+          <Text style={styles.lhAmount}>
+            {data?.totalArrears?.toLocaleString() || data?.lease?.rent?.toLocaleString() || '0'} 
+            <Text style={styles.lhAmountCurrency}> FCFA</Text>
+          </Text>
+          <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
+            <CreditCard size={16} color={Colors.qOrange} />
+            <Text style={styles.lhPayBtnText}>Payer maintenant</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-        <View style={styles.contentBody}>
+      {/* SCROLLABLE BODY */}
+      <View style={styles.scrollingContentContainer}>
+        <ScrollView 
+          style={styles.scrollView} 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           {/* QUICK ACTIONS GRID */}
           <View style={styles.qaGrid}>
             <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('History')}>
@@ -164,7 +164,7 @@ export default function DashboardScreen({ navigation, route }: any) {
               <Text style={styles.emojiSmall}>📅</Text>
               <Text style={styles.mcVal}>{data?.monthsPaidCount || '14'}</Text>
               <Text style={styles.mcLbl}>Mois payés</Text>
-              <View style={[styles.mcBadge, styles.badgeGreen]}>
+              <View style={[styles.mcBadge, { backgroundColor: Colors.qGreenLight }]}>
                 <Text style={styles.mcBadgeText}>à temps</Text>
               </View>
             </View>
@@ -172,21 +172,21 @@ export default function DashboardScreen({ navigation, route }: any) {
               <Text style={styles.emojiSmall}>⭐</Text>
               <Text style={styles.mcVal}>{data?.reliabilityScore || '720'} pts</Text>
               <Text style={styles.mcLbl}>Score ICL</Text>
-              <View style={[styles.mcBadge, styles.badgeOrange]}>
+              <View style={[styles.mcBadge, { backgroundColor: Colors.qOrangeLight }]}>
                 <Text style={styles.mcBadgeText}>Grade B</Text>
               </View>
             </View>
           </View>
 
-          {/* ICL PASSPORT CARD */}
+          {/* ICL PASSPORT CARD UPDATED */}
           <View style={styles.iclCard}>
             <View style={styles.iclTop}>
               <Text style={styles.iclTitle}>Passeport locatif</Text>
               <LinearGradient
                 colors={[Colors.qOrangeDark, Colors.qOrangeMedium]}
-                style={styles.iclGrade}
+                style={styles.iclGradeBadge}
               >
-                <Text style={styles.iclGradeText}>B</Text>
+                <Text style={styles.iclGradeBadgeText}>B</Text>
               </LinearGradient>
             </View>
             <View style={styles.iclBarWrap}>
@@ -235,10 +235,10 @@ export default function DashboardScreen({ navigation, route }: any) {
           </View>
 
           <View style={{ height: 100 }} />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
-      {/* BOTTOM NAV */}
+      {/* FIXED BOTTOM NAV */}
       <View style={styles.bnav}>
         <TouchableOpacity style={styles.bnItem}>
           <Home size={22} color={Colors.qOrange} />
@@ -274,32 +274,31 @@ export default function DashboardScreen({ navigation, route }: any) {
 const styles = StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: Colors.background },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingBottom: 20 },
   
-  locHeader: {
-    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 60,
+  fixedHeader: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 50,
     paddingHorizontal: 20,
-    paddingBottom: 60,
+    paddingBottom: 25,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+    zIndex: 10,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
+    marginTop: 10,
   },
-  headerGreeting: {
+  headerSubtitle: {
     fontFamily: Typography.fontFamily.body,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255, 255, 255, 0.7)',
   },
-  headerName: {
+  headerTitle: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 20,
+    fontSize: 22,
     color: Colors.white,
-    marginTop: 2,
   },
   avatarContainer: {
     position: 'relative',
@@ -308,18 +307,18 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  avatarText: {
+  avatarTextMain: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 14,
     color: Colors.white,
+    fontSize: 14,
   },
-  notifDot: {
+  onlineDot: {
     position: 'absolute',
     top: 2,
     right: 2,
@@ -331,16 +330,16 @@ const styles = StyleSheet.create({
   },
   
   lhCard: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   lhAmountLbl: {
     fontFamily: Typography.fontFamily.body,
     fontSize: 10,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   lhAmount: {
     fontFamily: Typography.fontFamily.heading,
@@ -368,9 +367,16 @@ const styles = StyleSheet.create({
     color: Colors.qOrange,
   },
 
-  contentBody: {
+  scrollingContentContainer: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 16,
-    marginTop: -30,
+    paddingTop: 20,
+    paddingBottom: 100,
   },
 
   qaGrid: {
@@ -434,8 +440,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: 8,
   },
-  badgeGreen: { backgroundColor: Colors.qGreenLight },
-  badgeOrange: { backgroundColor: Colors.qOrangeLight },
   mcBadgeText: {
     fontFamily: Typography.fontFamily.heading,
     fontSize: 8,
@@ -462,14 +466,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.qNavy,
   },
-  iclGrade: {
+  iclGradeBadge: {
     width: 44,
     height: 44,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iclGradeText: {
+  iclGradeBadgeText: {
     fontFamily: Typography.fontFamily.heading,
     fontSize: 20,
     color: Colors.white,
@@ -556,6 +560,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderTopWidth: 1,
     borderTopColor: 'rgba(26, 31, 60, 0.05)',
+    zIndex: 20,
   },
   bnItem: {
     alignItems: 'center',
@@ -582,4 +587,3 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   }
 });
-

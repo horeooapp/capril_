@@ -31,6 +31,15 @@ export default function App() {
     'DMSans_700Bold': DM_Sans_700Bold,
   });
 
+  useEffect(() => {
+    // Safety timeout to ensure splash hides even if fonts fail
+    const timeout = setTimeout(async () => {
+      await SplashScreen.hideAsync();
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
