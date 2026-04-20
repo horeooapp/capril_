@@ -91,6 +91,10 @@ export default function DashboardScreen({ navigation, route }: any) {
         end={{ x: 1, y: 1 }}
         style={styles.fixedHeader}
       >
+        {/* PUSH THE CIRCLES BEHIND THE HEADER CONTENT */}
+        <View style={{position: 'absolute', bottom: -40, right: -30, width: 130, height: 130, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 65}} />
+        <View style={{position: 'absolute', top: 10, left: -20, width: 80, height: 80, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 40}} />
+
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.headerSubtitle}>Bonjour 👋</Text>
@@ -105,7 +109,7 @@ export default function DashboardScreen({ navigation, route }: any) {
                 {(data?.name || 'KA').substring(0, 2).toUpperCase()}
               </Text>
             </View>
-            <View style={[styles.onlineDot, { backgroundColor: Colors.qGreen }]} />
+            <View style={[styles.onlineDot, { backgroundColor: Colors.qGreenMedium }]} />
           </TouchableOpacity>
         </View>
 
@@ -117,7 +121,7 @@ export default function DashboardScreen({ navigation, route }: any) {
             <Text style={styles.lhAmountCurrency}> FCFA</Text>
           </Text>
           <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
-            <CreditCard size={16} color={Colors.qOrange} />
+            <CreditCard size={12} color={Colors.qOrange} />
             <Text style={styles.lhPayBtnText}>Payer maintenant</Text>
           </TouchableOpacity>
         </View>
@@ -244,10 +248,10 @@ const styles = StyleSheet.create({
   
   fixedHeader: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 50,
-    paddingHorizontal: 20,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingHorizontal: 16,
+    paddingBottom: 52,
+    position: 'relative',
+    overflow: 'hidden',
     zIndex: 10,
   },
   headerTop: {
@@ -271,13 +275,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   avatarLabel: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   avatarTextMain: {
@@ -298,8 +302,8 @@ const styles = StyleSheet.create({
   
   lhCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
@@ -336,41 +340,41 @@ const styles = StyleSheet.create({
 
   scrollingContentContainer: {
     flex: 1,
+    backgroundColor: Colors.qCream,
+    marginTop: -30,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    overflow: 'hidden',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: 14,
+    paddingTop: 16,
     paddingBottom: 100,
   },
 
   qaGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   qaItem: {
-    width: (width - 80) / 4,
+    width: (width - 60) / 4,
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   qaIcon: {
-    width: 54,
-    height: 54,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
   },
-  emoji: { fontSize: 24 },
+  emoji: { fontSize: 18 },
   qaLbl: {
-    fontFamily: Typography.fontFamily.bodyMedium,
+    fontFamily: Typography.fontFamily.bodyBold,
     fontSize: 9,
     color: Colors.qNavy,
     textAlign: 'center',
@@ -378,34 +382,34 @@ const styles = StyleSheet.create({
 
   mcRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    gap: 8,
+    marginBottom: 12,
   },
   mc: {
     flex: 1,
     backgroundColor: Colors.white,
-    borderRadius: 18,
-    padding: 16,
+    borderRadius: 14,
+    padding: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(26, 31, 60, 0.06)',
   },
   mcVal: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.qNavy,
     marginTop: 4,
   },
   mcLbl: {
     fontFamily: Typography.fontFamily.body,
-    fontSize: Typography.fontSize.xs,
+    fontSize: 10,
     color: Colors.qNavyMedium,
   },
   mcBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
     alignSelf: 'flex-start',
-    marginTop: 8,
+    marginTop: 4,
   },
   mcBadgeText: {
     fontFamily: Typography.fontFamily.heading,
@@ -416,21 +420,21 @@ const styles = StyleSheet.create({
 
   iclCard: {
     backgroundColor: Colors.white,
-    borderRadius: 22,
-    padding: 20,
-    marginBottom: 24,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 8,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(26, 31, 60, 0.06)',
   },
   iclTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   iclTitle: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 16,
+    fontSize: 13,
     color: Colors.qNavy,
   },
   iclGradeBadge: {
@@ -448,14 +452,14 @@ const styles = StyleSheet.create({
   iclBarWrap: {
     height: 10,
     backgroundColor: Colors.qWarm,
-    borderRadius: 5,
+    borderRadius: 10,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   iclBarFill: {
     height: '100%',
     backgroundColor: Colors.qOrange,
-    borderRadius: 5,
+    borderRadius: 10,
   },
   iclStats: {
     flexDirection: 'row',
@@ -466,91 +470,53 @@ const styles = StyleSheet.create({
   },
   iclStatVal: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 15,
+    fontSize: 14,
     color: Colors.qNavy,
   },
   iclStatLbl: {
     fontFamily: Typography.fontFamily.body,
-    fontSize: 10,
+    fontSize: 9,
     color: Colors.qNavyMedium,
   },
 
   activTitle: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: Typography.fontSize.lg,
+    fontSize: 13,
     color: Colors.qNavy,
-    marginBottom: 12,
+    marginBottom: 10,
+    marginTop: 5,
   },
   activItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: 'rgba(26, 31, 60, 0.06)',
   },
   aiDot: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   aiInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 10,
   },
   aiTitle: {
     fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: 13,
+    fontSize: 11,
     color: Colors.qNavy,
   },
   aiSub: {
     fontFamily: Typography.fontFamily.body,
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.qNavyMedium,
     marginTop: 2,
   },
   aiAmt: {
     fontFamily: Typography.fontFamily.heading,
     fontSize: 12,
-  },
-
-  bnav: {
-    position: 'absolute',
-    bottom: 0,
-    width: width,
-    height: 80,
-    backgroundColor: Colors.white,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(26, 31, 60, 0.05)',
-    zIndex: 20,
-  },
-  bnItem: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  bnLbl: {
-    fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: 9,
-    color: Colors.qNavyMedium,
-  },
-  bnFabContainer: {
-    marginTop: -40,
-  },
-  bnFab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: Colors.qOrange,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
   }
 });

@@ -111,6 +111,8 @@ export default function DashboardScreen({ navigation, route }: any) {
         end={{ x: 1, y: 1 }}
         style={styles.fixedHeader}
       >
+        <View style={{position: 'absolute', bottom: -40, right: -30, width: 130, height: 130, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 65}} />
+        
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.headerSubtitle}>Tableau de bord</Text>
@@ -152,12 +154,15 @@ export default function DashboardScreen({ navigation, route }: any) {
         >
           {/* REVENUE CARD */}
           <LinearGradient
-            colors={[Colors.qNavy, Colors.qNavyDark]}
+            colors={[Colors.qNavy, Colors.qNavyMedium]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
             style={styles.revCard}
           >
+            <View style={{position: 'absolute', top: -20, right: -20, width: 100, height: 100, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 50}} />
+
             <View style={styles.revHeader}>
               <Text style={styles.revTitle}>Revenus · {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</Text>
-              <TrendingUp size={20} color={Colors.qGreen} />
             </View>
             
             <Text style={styles.revAmount}>
@@ -214,10 +219,10 @@ const styles = StyleSheet.create({
   
   fixedHeader: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 50,
-    paddingHorizontal: 20,
-    paddingBottom: 25,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingHorizontal: 16,
+    paddingBottom: 52,
+    position: 'relative',
+    overflow: 'hidden',
     zIndex: 10,
   },
   headerTop: {
@@ -241,13 +246,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   avatarLabel: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   avatarTextMain: {
@@ -257,11 +262,11 @@ const styles = StyleSheet.create({
   },
   onlineDot: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    top: 0,
+    right: 0,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: Colors.qCoral,
     borderWidth: 2,
     borderColor: Colors.qGreenDark,
@@ -270,20 +275,22 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 8,
+    marginTop: 12,
   },
   statBox: {
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 16,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   statVal: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.white,
   },
   statLbl: {
@@ -295,31 +302,32 @@ const styles = StyleSheet.create({
 
   scrollingContentContainer: {
     flex: 1,
+    backgroundColor: Colors.qCream,
+    marginTop: -30,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    overflow: 'hidden',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: 14,
+    paddingTop: 16,
     paddingBottom: 100,
   },
 
   revCard: {
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: Colors.qNavy,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 8,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    position: 'relative',
+    overflow: 'hidden',
   },
   revHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
   revTitle: {
     fontFamily: Typography.fontFamily.bodyMedium,
@@ -328,18 +336,19 @@ const styles = StyleSheet.create({
   },
   revAmount: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 28,
+    fontSize: 26,
     color: Colors.white,
+    marginTop: 4,
+    marginBottom: 4,
   },
   revCurrency: {
     fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: 16,
+    fontSize: 14,
   },
   revSub: {
     fontFamily: Typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.5)',
-    marginTop: 4,
   },
   revPills: {
     flexDirection: 'row',
@@ -374,119 +383,79 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: Typography.fontSize.lg,
+    fontSize: 13,
     color: Colors.qNavy,
   },
   seeAll: {
     fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: Typography.fontSize.sm,
+    fontSize: 10,
     color: Colors.qGreen,
   },
 
   bienCard: {
     backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 8,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(26, 31, 60, 0.06)',
   },
   bcTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
   },
   bcAddr: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 15,
+    fontSize: 12,
     color: Colors.qNavy,
   },
   bcType: {
     fontFamily: Typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.qNavyMedium,
-    marginTop: 2,
   },
   bcStatus: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 8,
   },
   bcStatusText: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 10,
+    fontSize: 9,
   },
   bcBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 12,
+    paddingTop: 8,
+    marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: 'rgba(26, 31, 60, 0.06)',
   },
   bcTenant: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 5,
   },
   bcAvatarSm: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bcAvatarText: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 9,
+    fontSize: 8,
   },
   bcTenantName: {
     fontFamily: Typography.fontFamily.bodyMedium,
-    fontSize: 13,
+    fontSize: 10,
     color: Colors.qNavyMedium,
   },
   bcAmt: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 14,
-  },
-
-  bnav: {
-    position: 'absolute',
-    bottom: 0,
-    width: width,
-    height: 80,
-    backgroundColor: Colors.white,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(26, 31, 60, 0.05)',
-    zIndex: 20,
-  },
-  bnItem: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  bnLbl: {
-    fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: 9,
-    color: Colors.qNavyMedium,
-  },
-  bnFabContainer: {
-    marginTop: -40,
-  },
-  bnFab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: Colors.qGreen,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    fontSize: 13,
   }
 });
