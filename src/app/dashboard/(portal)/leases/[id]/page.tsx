@@ -137,10 +137,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                             <div className="space-y-3 bg-slate-50 p-6 rounded-[16px] border border-slate-100">
                                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preneur (Locataire)</h3>
-                                <p className="text-[18px] font-black text-slate-900">{tLease.tenant?.fullName || "Non défini"}</p>
-                                <p className="text-[12px] text-slate-600 font-medium">{tLease.tenant?.email || "En attente d'inscription"}</p>
+                                <p className="text-[18px] font-black text-slate-900">{tLease?.tenant ? (tLease.tenant.fullName || (tLease.tenant.firstName + " " + (tLease.tenant.lastName||""))) : "Non défini"}</p>
+                                <p className="text-[12px] text-slate-600 font-medium">{tLease?.tenant?.email || "En attente d'inscription"}</p>
                                 <div className="pt-2">
-                                    <ReliabilityBadge score={tLease.tenant?.reliabilityScore || 750} showLabel={true} />
+                                    <ReliabilityBadge score={tLease?.tenant?.reliabilityScore || 750} showLabel={true} />
                                 </div>
                             </div>
                             {/* Property Details Column */}
@@ -203,7 +203,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     </div>
 
                     {/* Procedure Tracking (Added) */}
-                    {(tLease.procedurePhases?.length > 0 || tLease.status !== "ACTIVE") && (
+                    {(((tLease.procedurePhases?.length ?? 0) > 0) || tLease.status !== "ACTIVE") && (
                         <div className="bg-white shadow-sm rounded-[20px] overflow-hidden border border-slate-200">
                             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                                 <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-widest flex items-center">
@@ -218,7 +218,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                             <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-[12px] border border-rose-200">
                                                 {phase.phaseNumber}
                                             </div>
-                                            {idx < (tLease.procedurePhases.length - 1) && <div className="w-0.5 h-full bg-slate-200 my-1"></div>}
+                                            {idx < ((tLease.procedurePhases?.length ?? 1) - 1) && <div className="w-0.5 h-full bg-slate-200 my-1"></div>}
                                         </div>
                                         <div className="flex-1 pb-4">
                                             <p className="text-[13px] font-bold text-slate-900">{phase.name}</p>
@@ -266,7 +266,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     )}
 
                     {/* Reminders History (M-RECOUVREMENT) */}
-                    {tLease.reminders?.length > 0 && (
+                    {((tLease.reminders?.length ?? 0) > 0) && (
                         <div className="bg-white shadow-sm rounded-[20px] p-8 border border-slate-200">
                             <h2 className="text-[14px] font-black text-slate-900 mb-6 flex items-center uppercase tracking-widest">
                                 <span className="mr-2 text-slate-400">📢</span> Historique des Relances

@@ -37,11 +37,14 @@ export async function getLeaseProceduralState(leaseId: string) {
     }
 
     // Use the earliest unpaid month to determine delay
-    const earliestMonth = unpaidReceipts[0].periodMonth; // YYYY-MM
-    const [year, month] = earliestMonth.split('-').map(Number);
-    const dueDate = new Date(year, month - 1, 5); // Assuming 5th of the month
-    const today = new Date();
-    const delayDays = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+    const earliestMonth = unpaidReceipts[0].periodMonth || ""; // YYYY-MM
+    let delayDays = 0;
+    if (earliestMonth.includes('-')) {
+        const [year, month] = earliestMonth.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, 5); // Assuming 5th of the month
+        const today = new Date();
+        delayDays = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+    }
 
     return {
         active: true,
