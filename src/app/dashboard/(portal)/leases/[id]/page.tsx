@@ -62,7 +62,8 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
     // Fetch Fiscal Dossier for M17 if enabled
     const fiscalRes = showFiscal ? await getOrCreateFiscalDossier(leaseId) : { success: false, data: null }
-    const fiscalDossier = fiscalRes.success ? (fiscalRes as any).data : null
+    const rawFiscalDossier = fiscalRes.success ? (fiscalRes as any).data : null
+    const fiscalDossier = serializeObject(rawFiscalDossier)
 
     // Fetch Procedural State for Arrears
     const proceduralState = await getLeaseProceduralState(leaseId)
