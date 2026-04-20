@@ -160,7 +160,7 @@ export default async function DocumentsPage() {
                                         {rec.totalAmount.toLocaleString()} F
                                     </td>
                                     <td className="px-6 py-4 text-right flex gap-2 justify-end">
-                                        <Link href={`/dashboard/receipts/${rec.id}`} className="text-sky-600 hover:text-sky-800 font-semibold bg-sky-50 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1">
+                                        <Link href={`/receipts/${rec.id}`} className="text-sky-600 hover:text-sky-800 font-semibold bg-sky-50 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1" target="_blank" rel="noopener noreferrer">
                                             <Download size={14} /> PDF
                                         </Link>
                                     </td>
