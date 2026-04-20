@@ -1,4 +1,5 @@
 import { getLeaseById } from "@/actions/leases"
+import { serializeObject } from "@/lib/serialize"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -68,12 +69,15 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
     // EDL Feature & Data
     const showEdl = await isFeatureEnabled("M-EDL")
-    const edls = showEdl ? await getEdlsByLease(leaseId) : []
+    const rawEdls = showEdl ? await getEdlsByLease(leaseId) : []
+    const edls = serializeObject(rawEdls)
 
     // Colocation Data
-    const colocataires = await getLeaseColocataires(leaseId)
+    const rawColocataires = await getLeaseColocataires(leaseId)
+    const colocataires = serializeObject(rawColocataires)
     const currentMonth = new Date().toISOString().substring(0, 7) // "YYYY-MM"
-    const synthesis = await getMonthlySynthesis(leaseId, currentMonth)
+    const rawSynthesis = await getMonthlySynthesis(leaseId, currentMonth)
+    const synthesis = serializeObject(rawSynthesis)
 
     return (
         <div className="space-y-8 relative">

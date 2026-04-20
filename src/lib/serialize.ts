@@ -78,7 +78,7 @@ export const serializeLease = (lease: any) => {
         reliabilityScore: lease.scoreConsent ? (lease.tenant.reliabilityScores?.[0]?.score || 750) : null
     } : null;
 
-    return {
+    const serialized = {
         ...lease,
         rentAmount: Number(lease.rentAmount || 0),
         depositAmount: Number(lease.depositAmount || 0),
@@ -104,7 +104,9 @@ export const serializeLease = (lease: any) => {
         daysSinceCreation: Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)),
         isExpiringSoon: !['ACTIVE', 'TERMINATED', 'ARCHIVED'].includes(lease.status) && 
                         Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)) >= 3
-    }
+    };
+
+    return serializeObject(serialized);
 }
 
 
