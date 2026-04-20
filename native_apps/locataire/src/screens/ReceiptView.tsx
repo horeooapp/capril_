@@ -26,7 +26,7 @@ export default function ReceiptViewScreen({ navigation, route }: any) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconButton}>
           <ChevronLeft size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ma Quittance QAPRIL</Text>
+        <Text style={styles.headerTitle}>{route.params?.title || 'Ma Quittance QAPRIL'}</Text>
       </View>
       
       <WebView 

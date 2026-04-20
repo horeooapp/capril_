@@ -153,7 +153,15 @@ export default function ProfileScreen({ navigation, route }: any) {
             <ChevronRight size={20} color={Colors.text.muted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => {
+              navigation.navigate('ReceiptView', { 
+                url: `${BASE_URL.replace('/api/mobile', '')}/mon-espace-locataire/preferences?token=${token}`, 
+                title: 'Notifications' 
+              });
+            }}
+          >
              <View style={styles.settingInfo}>
               <View style={[styles.iconBox, { backgroundColor: 'rgba(249, 115, 22, 0.1)' }]}>
                 <Bell size={20} color={Colors.accent} />

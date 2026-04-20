@@ -129,7 +129,15 @@ export default function ProfileScreen({ navigation, route }: any) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Paramètres du Compte</Text>
           
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => {
+              navigation.navigate('DocumentView', { 
+                url: `https://www.qapril.ci/dashboard/profile?token=${token}`, 
+                title: 'Informations Personnelles' 
+              });
+            }}
+          >
              <View style={styles.settingInfo}>
               <View style={[styles.iconBox, { backgroundColor: 'rgba(7, 89, 133, 0.1)' }]}>
                 <User size={20} color={Colors.primary} />
@@ -142,7 +150,15 @@ export default function ProfileScreen({ navigation, route }: any) {
             <ChevronRight size={20} color={Colors.text.muted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => {
+              navigation.navigate('FeatureTeaser', {
+                featureName: 'Préférences',
+                iconName: 'Bell'
+              });
+            }}
+          >
              <View style={styles.settingInfo}>
               <View style={[styles.iconBox, { backgroundColor: 'rgba(249, 115, 22, 0.1)' }]}>
                 <Bell size={20} color={Colors.accent} />
