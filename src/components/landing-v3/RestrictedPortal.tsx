@@ -118,38 +118,21 @@ export default function RestrictedPortal() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.5 }}
-            className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-8"
+            className="w-full max-w-sm mt-8"
           >
-            {/* Locataire Card */}
-            <Link href="/mon-espace-locataire/login" className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-emerald-500/40 to-emerald-900/10 rounded-[2rem] opacity-0 group-hover:opacity-100 blur transition duration-500" />
-              <div className="relative h-full flex flex-col p-8 rounded-[2rem] bg-white/5 backdrop-blur-3xl border border-white/5 hover:border-emerald-500/30 hover:bg-white/[0.08] transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
+            {/* Admin Card */}
+            <Link href="/admin/login" className="group relative block">
+              <div className="absolute -inset-0.5 bg-gradient-to-br from-blue-500/40 to-blue-900/10 rounded-[2rem] opacity-0 group-hover:opacity-100 blur transition duration-500" />
+              <div className="relative flex flex-col items-center text-center p-8 rounded-[2rem] bg-white/5 backdrop-blur-3xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.08] transition-all duration-300">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
                   <KeyRound className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Espace Locataire</h3>
-                <p className="text-sm text-slate-400 flex-1 leading-relaxed">
-                  Consultez vos quittances et votre profil locatif sécurisé.
+                <h3 className="text-xl font-bold text-white mb-2">Administration</h3>
+                <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                  Connexion réservée au personnel habilité et aux administrateurs du système QAPRIL.
                 </p>
-                <div className="mt-6 flex items-center text-emerald-400 font-semibold text-sm group-hover:translate-x-2 transition-transform">
-                  Accéder au portail <ArrowRight className="ml-2 w-4 h-4" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Proprietaire Card */}
-            <Link href="/dashboard/login" className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-[#FF8B00]/40 to-orange-900/10 rounded-[2rem] opacity-0 group-hover:opacity-100 blur transition duration-500" />
-              <div className="relative h-full flex flex-col p-8 rounded-[2rem] bg-white/5 backdrop-blur-3xl border border-white/5 hover:border-[#FF8B00]/30 hover:bg-white/[0.08] transition-all duration-300">
-                <div className="w-12 h-12 rounded-2xl bg-[#FF8B00]/20 text-[#FF8B00] flex items-center justify-center mb-6">
-                  <Home className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Espace Propriétaire</h3>
-                <p className="text-sm text-slate-400 flex-1 leading-relaxed">
-                  Supervisez votre patrimoine et pilotez vos flux financiers.
-                </p>
-                <div className="mt-6 flex items-center text-[#FF8B00] font-semibold text-sm group-hover:translate-x-2 transition-transform">
-                  Accéder au superviseur <ArrowRight className="ml-2 w-4 h-4" />
+                <div className="flex items-center text-blue-400 font-semibold text-sm group-hover:translate-x-2 transition-transform">
+                  Accéder au terminal <ArrowRight className="ml-2 w-4 h-4" />
                 </div>
               </div>
             </Link>
