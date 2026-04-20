@@ -27,8 +27,8 @@ export async function POST(req: Request) {
                 propertiesOwned: {
                     where: { status: { not: "archived" } },
                     include: {
-                        units: { include: { leases: { where: { status: "ACTIVE" } } } },
-                        leases: { where: { status: "ACTIVE" } }
+                        units: { include: { leases: { where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] } }, include: { tenant: true } } } },
+                        leases: { where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] } }, include: { tenant: true } }
                     }
                 },
                 leasesAsTenant: {
@@ -128,15 +128,24 @@ export async function POST(req: Request) {
                 if (prop.typeStructure === "INDEPENDANT") {
                     totalUnits++;
                     const hasLease = prop.leases && prop.leases.length > 0;
+                    let tenantName = 'Aucun locataire';
                     if (hasLease) {
                         occupiedUnits++;
                         totalRevenue += prop.leases[0].rentAmount || prop.declaredRentFcfa || 0;
+                        if (prop.leases[0].tenant) {
+                            tenantName = `${prop.leases[0].tenant.firstName || ''} ${prop.leases[0].tenant.lastName || ''}`.trim() || prop.leases[0].tenant.phone || 'Locataire';
+                        } else if (prop.leases[0].tenantName) {
+                            tenantName = prop.leases[0].tenantName;
+                        } else {
+                            tenantName = 'Locataire';
+                        }
                     }
                     propertiesMobile.push({
                         id: prop.id,
                         name: prop.name || prop.propertyCode,
                         status: hasLease ? "Loué" : "Vacant",
-                        rent: hasLease ? `${prop.leases[0].rentAmount || 0} FCFA` : `${prop.declaredRentFcfa || 0} FCFA`
+                        rent: hasLease ? `${prop.leases[0].rentAmount || 0} FCFA` : `${prop.declaredRentFcfa || 0} FCFA`,
+                        tenantName
                     });
                 } else {
                     // Structure parente (Type Immeuble / Cour) - On s'intéresse aux sous-unités
@@ -144,15 +153,24 @@ export async function POST(req: Request) {
                         for (const unit of prop.units) {
                             totalUnits++;
                             const unitHasLease = unit.leases && unit.leases.length > 0;
+                            let tenantName = 'Aucun locataire';
                             if (unitHasLease) {
                                 occupiedUnits++;
                                 totalRevenue += unit.leases[0].rentAmount || unit.declaredRentFcfa || 0;
+                                if (unit.leases[0].tenant) {
+                                    tenantName = `${unit.leases[0].tenant.firstName || ''} ${unit.leases[0].tenant.lastName || ''}`.trim() || unit.leases[0].tenant.phone || 'Locataire';
+                                } else if (unit.leases[0].tenantName) {
+                                    tenantName = unit.leases[0].tenantName;
+                                } else {
+                                    tenantName = 'Locataire';
+                                }
                             }
                             propertiesMobile.push({
                                 id: unit.id,
                                 name: `${prop.name || prop.propertyCode} - ${unit.unitLabel || "Unité"}`,
                                 status: unitHasLease ? "Loué" : "Vacant",
-                                rent: unitHasLease ? `${unit.leases[0].rentAmount || 0} FCFA` : `${unit.declaredRentFcfa || 0} FCFA`
+                                rent: unitHasLease ? `${unit.leases[0].rentAmount || 0} FCFA` : `${unit.declaredRentFcfa || 0} FCFA`,
+                                tenantName
                             });
                         }
                     } else {
@@ -161,7 +179,8 @@ export async function POST(req: Request) {
                             id: prop.id,
                             name: prop.name || prop.propertyCode,
                             status: "Vide/Config",
-                            rent: "0 FCFA"
+                            rent: "0 FCFA",
+                            tenantName: 'Configuration'
                         });
                     }
                 }
