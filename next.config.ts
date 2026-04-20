@@ -20,11 +20,6 @@ const nextConfig: NextConfig = {
         destination: '/admin',
         permanent: true,
       },
-      {
-        source: '/login',
-        destination: '/',
-        permanent: false,
-      },
     ]
   },
   async headers() {
