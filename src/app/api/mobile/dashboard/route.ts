@@ -134,8 +134,8 @@ export async function POST(req: Request) {
                         totalRevenue += prop.leases[0].rentAmount || prop.declaredRentFcfa || 0;
                         if (prop.leases[0].tenant) {
                             tenantName = `${prop.leases[0].tenant.firstName || ''} ${prop.leases[0].tenant.lastName || ''}`.trim() || prop.leases[0].tenant.phone || 'Locataire';
-                        } else if (prop.leases[0].tenantName) {
-                            tenantName = prop.leases[0].tenantName;
+                        } else if ((prop.leases[0] as any).tenantName) {
+                            tenantName = (prop.leases[0] as any).tenantName;
                         } else {
                             tenantName = 'Locataire';
                         }
@@ -159,8 +159,8 @@ export async function POST(req: Request) {
                                 totalRevenue += unit.leases[0].rentAmount || unit.declaredRentFcfa || 0;
                                 if (unit.leases[0].tenant) {
                                     tenantName = `${unit.leases[0].tenant.firstName || ''} ${unit.leases[0].tenant.lastName || ''}`.trim() || unit.leases[0].tenant.phone || 'Locataire';
-                                } else if (unit.leases[0].tenantName) {
-                                    tenantName = unit.leases[0].tenantName;
+                                } else if ((unit.leases[0] as any).tenantName) {
+                                    tenantName = (unit.leases[0] as any).tenantName;
                                 } else {
                                     tenantName = 'Locataire';
                                 }
