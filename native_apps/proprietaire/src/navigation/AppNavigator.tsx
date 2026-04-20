@@ -40,9 +40,9 @@ function MainTabNavigator({ route }: any) {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} initialParams={{ token }} />
-      <Tab.Screen name="Contract" component={PropertiesScreen} initialParams={{ token }} />
-      <Tab.Screen name="Services" component={MaintenanceScreen} initialParams={{ token }} />
-      <Tab.Screen name="MenuDrawer" component={MessageScreen} initialParams={{ token }} />
+      <Tab.Screen name="PropertiesScreen" component={PropertiesScreen} initialParams={{ token }} />
+      <Tab.Screen name="Accounting" component={AccountingScreen} initialParams={{ token }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ token }} />
     </Tab.Navigator>
   );
 }
