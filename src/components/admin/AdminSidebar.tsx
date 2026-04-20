@@ -1,5 +1,5 @@
 "use client";
-import React from "react"
+import React, { useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -11,7 +11,18 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProps) {
     const pathname = usePathname()
 
+    // Fermer la sidebar sur mobile lors d'un changement de page
+    useEffect(() => {
+        document.body.classList.remove('sidebar-open');
+    }, [pathname]);
+
     return (
+        <>
+        {/* Overlay sombre pour fermer la sidebar en tapant à côté */}
+        <div 
+            className="sidebar-overlay" 
+            onClick={() => document.body.classList.remove('sidebar-open')}
+        />
         <div className="sidebar">
           <Link href="/admin" className="logo" style={{ textDecoration: 'none' }}>
             <div className="logo-mark">Q</div>
@@ -102,6 +113,7 @@ export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProp
             </div>
           </div>
         </div>
+        </>
     )
 }
 

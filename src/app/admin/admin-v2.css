@@ -348,3 +348,112 @@
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 .admin-v2 .panel{animation:fadeUp .4s ease .25s both}
+
+/* ========================================================= */
+/*                    RESPONSIVE DESIGN                      */
+/* ========================================================= */
+
+.admin-v2 .sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  /* Réduction en 2 colonnes pour les tablettes */
+  .admin-v2 .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-v2 .dash-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-v2 .bottom-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-v2 .search-bar {
+    width: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* MOBILE : Sidebar coulissante */
+  .admin-v2 .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 280px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  }
+
+  body.sidebar-open .admin-v2 .sidebar {
+    transform: translateX(0);
+  }
+
+  /* Overlay sombre derrière la sidebar */
+  .admin-v2 .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+    transition: opacity 0.3s ease;
+  }
+  body.sidebar-open .admin-v2 .sidebar-overlay {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Rendre le contenu principal pleine largeur */
+  .admin-v2 .main-content {
+    margin-left: 0 !important;
+    width: 100vw;
+  }
+
+  /* Grilles sur 1 seule colonne */
+  .admin-v2 .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-v2 .bottom-row {
+    grid-template-columns: 1fr;
+  }
+  .admin-v2 .mm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajustement de la Topbar */
+  .admin-v2 .topbar {
+    padding: 0 16px;
+    height: 60px;
+  }
+  .admin-v2 .topbar .breadcrumb {
+    display: none; /* Cacher le fil d'ariane sur très petits écrans */
+  }
+  .admin-v2 .search-bar {
+    display: none; /* Cacher la barre de recherche sur mobile */
+  }
+  
+  /* Afficher le bouton Hamburger (qui sera injecté en HTML) */
+  .admin-v2 .hamburger-btn {
+    display: flex !important;
+  }
+
+  /* Ajustements du contenu */
+  .admin-v2 .content {
+    padding: 16px;
+  }
+  .admin-v2 .page-title {
+    font-size: 22px;
+  }
+  
+  /* Scroll horizontal pour les tableaux */
+  .admin-v2 .panel {
+    overflow-x: auto;
+    padding: 16px;
+  }
+  .admin-v2 .lease-table {
+    min-width: 600px;
+  }
+}
