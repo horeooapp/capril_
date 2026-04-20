@@ -144,7 +144,10 @@ export default function QaprilLandingV2({ session }: { session: any }) {
           {session?.user ? (
             <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
           ) : (
-            <button onClick={() => { setMobileMenuOpen(false); handleLoginClick("LOCATAIRE"); }} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer' }}>Démarrer →</button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
+              <Link href="/mon-espace-locataire/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--ink)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none' }}>Connexion Locataire</Link>
+              <Link href="/dashboard/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none' }}>Espace Propriétaire →</Link>
+            </div>
           )}
         </div>
       )}

@@ -113,9 +113,9 @@ export default function BottomNav({ items }: BottomNavProps) {
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed inset-x-4 bottom-[100px] z-[90] lg:hidden focus:outline-none"
                     >
-                        <div className="bg-white/98 backdrop-blur-3xl border border-gray-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] p-8 overflow-hidden">
-                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center">Sections Additionnelles</h3>
-                            <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white/98 backdrop-blur-3xl border border-gray-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] p-8 overflow-hidden max-h-[70vh] flex flex-col">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center shrink-0">Sections Additionnelles</h3>
+                            <div className="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar pb-4 -mx-4 px-4">
                                 {moreItems.map((item, i) => (
                                     <motion.div
                                         key={item.label}
