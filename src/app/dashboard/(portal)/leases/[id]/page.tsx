@@ -137,7 +137,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
                             <div className="space-y-3 bg-slate-50 p-6 rounded-[16px] border border-slate-100">
                                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preneur (Locataire)</h3>
-                                <p className="text-[18px] font-black text-slate-900">{tLease?.tenant ? (tLease.tenant.fullName || (tLease.tenant.firstName + " " + (tLease.tenant.lastName||""))) : "Non défini"}</p>
+                                <p className="text-[18px] font-black text-slate-900">{tLease?.tenant?.fullName || "Non défini"}</p>
                                 <p className="text-[12px] text-slate-600 font-medium">{tLease?.tenant?.email || "En attente d'inscription"}</p>
                                 <div className="pt-2">
                                     <ReliabilityBadge score={tLease?.tenant?.reliabilityScore || 750} showLabel={true} />
