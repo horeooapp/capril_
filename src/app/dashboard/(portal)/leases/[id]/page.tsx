@@ -49,9 +49,19 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
     }
 
     if (!lease) {
-        notFound()
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm m-8">
+                <div className="w-16 h-16 bg-gray-50 text-gray-400 flex items-center justify-center rounded-2xl mb-4">
+                    <ShieldAlert size={32} />
+                </div>
+                <h1 className="text-2xl font-black text-gray-900 uppercase">Lease Introuvable</h1>
+                <p className="text-gray-500 mt-2 mb-6 text-sm">Le contrat avec l'ID {leaseId} n'existe pas ou a été supprimé.</p>
+                <Link href="/dashboard" className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 uppercase tracking-widest text-xs">
+                    Retour au tableau de bord
+                </Link>
+            </div>
+        )
     }
-
     const tLease = lease as unknown as Lease;
     const userId = session?.user?.id || ""
 
