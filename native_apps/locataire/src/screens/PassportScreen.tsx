@@ -26,6 +26,7 @@ import {
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import { Colors } from '../theme/colors';
+import { BASE_URL } from '../config/api';
 
 const { width } = Dimensions.get('window');
 
@@ -42,7 +43,7 @@ export default function PassportScreen({ navigation, route }: any) {
   const fetchPassport = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/tenant/passport', {
+      const res = await fetch(`${BASE_URL}/api/mobile/tenant/passport`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'GET_PASSPORT' })
@@ -63,7 +64,7 @@ export default function PassportScreen({ navigation, route }: any) {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/tenant/passport', {
+      const res = await fetch(`${BASE_URL}/api/mobile/tenant/passport`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'DOWNLOAD_PDF' })

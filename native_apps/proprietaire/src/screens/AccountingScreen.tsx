@@ -28,6 +28,7 @@ import {
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import { Colors } from '../theme/colors';
+import { BASE_URL } from '../config/api';
 import RevenueChart from '../components/charts/RevenueChart';
 
 const { width } = Dimensions.get('window');
@@ -53,7 +54,7 @@ export default function AccountingScreen({ navigation, route }: any) {
   const fetchBilan = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/owner/accounting', { // Updated with real domain if available
+      const res = await fetch(`${BASE_URL}/api/mobile/owner/accounting`, { // Updated with real domain if available
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'GET_YEARLY_BILAN', year: selectedYear })
@@ -70,7 +71,7 @@ export default function AccountingScreen({ navigation, route }: any) {
   const fetchBulkStats = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/owner/accounting', {
+      const res = await fetch(`${BASE_URL}/api/mobile/owner/accounting`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'GET_BULK_STATS', month: selectedMonth, year: selectedYear })
@@ -87,7 +88,7 @@ export default function AccountingScreen({ navigation, route }: any) {
   const handleGenerateBulk = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/owner/accounting', {
+      const res = await fetch(`${BASE_URL}/api/mobile/owner/accounting`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'EXECUTE_BULK_QUITTANCES', month: selectedMonth, year: selectedYear })
@@ -107,7 +108,7 @@ export default function AccountingScreen({ navigation, route }: any) {
   const downloadPDFBilan = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://qapril-api.com/api/mobile/owner/accounting', {
+      const res = await fetch(`${BASE_URL}/api/mobile/owner/accounting`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, action: 'GENERATE_YEARLY_PDF', year: selectedYear })
