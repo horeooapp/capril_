@@ -118,7 +118,7 @@ export async function POST(req: Request) {
         }
 
         // Si Propriétaire
-        if (role === 'OWNER') {
+        if (role === 'OWNER' || role === 'LANDLORD') {
             let totalRevenue = 0;
             let totalUnits = 0;
             let occupiedUnits = 0;
