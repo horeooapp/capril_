@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import QaprilLandingV2 from "@/components/landing-v2/QaprilLandingV2";
+import RestrictedPortal from "@/components/landing-v3/RestrictedPortal";
+import { isFeatureEnabled } from "@/lib/features";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +15,22 @@ export default async function Home() {
     console.error("[HOME] Error during initial auth fetch:", error);
   }
 
-  // Pure 100% Mockup Frontend Redesign for ALL users
-  return (
-    <>
-      <QaprilLandingV2 session={session} />
-    </>
-  );
+  // 1. Lire le bouton dans la Base de données
+  const isLandingModeActif = await isFeatureEnabled("LANDING_PAGE");
+  
+  // 2. Vérifier si un Admin est en ligne
+  const adminConnected = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
+
+  // LOGIQUE DE ROUTAGE (PORTAIL RESTREINT VS MARKETING PUBLIC)
+  if (isLandingModeActif) {
+      if (adminConnected) {
+          return <QaprilLandingV2 session={session} />; // Admin passe au travers
+      } else {
+          return <RestrictedPortal />; // Public bloqué sur le Premium Portal
+      }
+  } else {
+      // Mode restreint désactivé -> Le site est public pour tout le monde
+      return <QaprilLandingV2 session={session} />;
+  }
 }
 
