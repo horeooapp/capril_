@@ -37,7 +37,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
         startDate: string | Date;
         signedAt: string | Date | null;
         tenant: { id: string; fullName: string | null; email: string | null; phone: string | null; reliabilityScore?: number } | null;
-        property: { name: string | null; address: string; commune: string; propertyType: string };
+        property?: { name?: string | null; address?: string | null; commune?: string | null; propertyType?: string | null } | null;
         procedurePhases: any[];
         repaymentPlans: any[];
         mediation: any;
@@ -151,10 +151,10 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 )}
                                 <div className="bg-slate-50 p-6 rounded-[16px] border border-slate-100 h-full">
                                     <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Bien Immobilier Concédé</h3>
-                                    <p className="text-[14px] font-black text-slate-900 leading-tight">{tLease.property.name || tLease.property.address}</p>
-                                    <p className="text-[13px] font-medium text-slate-500 mt-1">{tLease.property.commune}</p>
+                                    <p className="text-[14px] font-black text-slate-900 leading-tight">{tLease.property?.name || tLease.property?.address || "Bien supprimé ou inconnu"}</p>
+                                    <p className="text-[13px] font-medium text-slate-500 mt-1">{tLease.property?.commune || "N/A"}</p>
                                     <span className="mt-3 inline-block px-3 py-1 bg-white text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-[6px] border border-slate-200 shadow-sm">
-                                        Type: {tLease.property.propertyType}
+                                        Type: {tLease.property?.propertyType || "N/A"}
                                     </span>
                                 </div>
                             </div>
@@ -272,7 +272,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 <span className="mr-2 text-slate-400">📢</span> Historique des Relances
                             </h2>
                             <div className="space-y-3">
-                                {tLease.reminders.map((rem: any, idx: number) => (
+                                {tLease.reminders?.map((rem: any, idx: number) => (
                                     <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-[12px] border border-slate-100">
                                         <div className="flex items-center gap-3">
                                             <AlertCircle size={16} className="text-slate-400" />
