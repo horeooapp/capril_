@@ -5,23 +5,22 @@ import { motion } from "framer-motion"
 import { Users, PieChart, Plus, CheckCircle2, ShieldAlert, Loader2, X } from "lucide-react"
 import { addColocataire } from "@/actions/coloc-actions"
 import { toast } from "sonner"
-import { ColocRole, ColocMode } from "@prisma/client"
 
 export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: { leaseId: string, colocataires: any[], synthesis: any }) {
     const [showAdd, setShowAdd] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [formData, setFormData] = useState<{
         userId: string,
-        role: ColocRole,
+        role: "PRINCIPAL" | "SECONDAIRE" | "GARANT",
         partLoyer: string,
         pctLoyer: string,
-        modePaiement: ColocMode
+        modePaiement: "INDIVIDUEL" | "GROUPE"
     }>({
         userId: "",
-        role: ColocRole.SECONDAIRE,
+        role: "SECONDAIRE",
         partLoyer: "",
         pctLoyer: "",
-        modePaiement: ColocMode.GROUPE
+        modePaiement: "GROUPE"
     })
 
     const handleAdd = async (e: React.FormEvent) => {
@@ -31,10 +30,10 @@ export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: 
             await addColocataire({
                 leaseId,
                 userId: formData.userId,
-                role: formData.role,
+                role: formData.role as any,
                 partLoyer: formData.partLoyer ? Number(formData.partLoyer) : undefined,
                 pctLoyer: formData.pctLoyer ? Number(formData.pctLoyer) : undefined,
-                modePaiement: formData.modePaiement
+                modePaiement: formData.modePaiement as any
             })
             toast.success("Colocataire ajouté avec succès. Actualisez la page pour le voir.")
             setShowAdd(false)
@@ -140,7 +139,7 @@ export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black uppercase text-qtext-light mb-1">Rôle</label>
-                                    <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value as ColocRole})} className="w-full bg-qgrey-1 border-none focus:ring-2 px-4 py-3 rounded-xl text-sm font-bold text-qnavy">
+                                    <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value as "PRINCIPAL" | "SECONDAIRE" | "GARANT"})} className="w-full bg-qgrey-1 border-none focus:ring-2 px-4 py-3 rounded-xl text-sm font-bold text-qnavy">
                                         <option value="SECONDAIRE">Secondaire</option>
                                         <option value="PRINCIPAL">Principal</option>
                                         <option value="GARANT">Garant Solidaire</option>
@@ -148,7 +147,7 @@ export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: 
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black uppercase text-qtext-light mb-1">Mode de Paiement</label>
-                                    <select value={formData.modePaiement} onChange={e => setFormData({...formData, modePaiement: e.target.value as ColocMode})} className="w-full bg-qgrey-1 border-none focus:ring-2 px-4 py-3 rounded-xl text-sm font-bold text-qnavy">
+                                    <select value={formData.modePaiement} onChange={e => setFormData({...formData, modePaiement: e.target.value as "INDIVIDUEL" | "GROUPE"})} className="w-full bg-qgrey-1 border-none focus:ring-2 px-4 py-3 rounded-xl text-sm font-bold text-qnavy">
                                         <option value="INDIVIDUEL">Individuel (Prorata)</option>
                                         <option value="GROUPE">Groupe (Unique)</option>
                                     </select>
