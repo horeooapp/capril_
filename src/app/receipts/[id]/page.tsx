@@ -69,15 +69,15 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Bailleur / Landlord</h3>
                         <div className="space-y-1">
                             <p className="text-xl font-black text-gray-900 leading-tight">
-                                {viewerRole === 'TENANT' && (lease.bailleurMasque || lease.typeGestion === 'AGREE')
+                                {viewerRole === 'TENANT' && (lease?.bailleurMasque || lease?.typeGestion === 'AGREE')
                                     ? "Bailleur QAPRIL"
-                                    : ((landlord.firstName ? landlord.firstName + " " : "") + (landlord.lastName || "") || "Identification en cours")
+                                    : (landlord ? ((landlord.firstName ? landlord.firstName + " " : "") + (landlord.lastName || "")) : "Identification en cours") || "Identification en cours"
                                 }
                             </p>
                             <p className="text-sm font-bold text-[#FF8200]">
-                                {viewerRole === 'TENANT' && (lease.bailleurMasque || lease.typeGestion === 'AGREE')
+                                {viewerRole === 'TENANT' && (lease?.bailleurMasque || lease?.typeGestion === 'AGREE')
                                     ? "Protégé"
-                                    : landlord.phone
+                                    : landlord?.phone || "N/A"
                                 }
                             </p>
                             <p className="text-xs text-gray-400 font-medium">Membre Vérifié QAPRIL</p>
@@ -87,8 +87,8 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                     <div className="text-right">
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Locataire / Tenant</h3>
                         <div className="space-y-1">
-                            <p className="text-xl font-black text-gray-900 leading-tight">{(tenant.firstName ? tenant.firstName + " " : "") + (tenant.lastName || "") || "Saisi par le bailleur"}</p>
-                            <p className="text-sm font-bold text-blue-600">{tenant.phone}</p>
+                            <p className="text-xl font-black text-gray-900 leading-tight">{tenant ? ((tenant.firstName ? tenant.firstName + " " : "") + (tenant.lastName || "")) : (lease?.tenantName || "Saisi par le bailleur") || "Saisi par le bailleur"}</p>
+                            <p className="text-sm font-bold text-blue-600">{tenant?.phone || lease?.tenantPhone || "N/A"}</p>
                             <p className="text-xs text-gray-400 font-medium tracking-tighter uppercase">Statut: En règle</p>
                         </div>
                     </div>
@@ -98,10 +98,10 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                 <div className="mb-16">
                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Désignation du Bien Immobilier</h3>
                     <div className="bg-gray-50/50 rounded-[2rem] p-8 border border-gray-100">
-                        <p className="text-2xl font-black text-gray-900 mb-2">{property.propertyCode}</p>
-                        <p className="text-lg font-bold text-gray-600">{property.addressLine1}</p>
+                        <p className="text-2xl font-black text-gray-900 mb-2">{property?.propertyCode || "Non assigné"}</p>
+                        <p className="text-lg font-bold text-gray-600">{property?.addressLine1 || property?.address || "Adresse générique"}</p>
                         <p className="text-sm text-gray-500 leading-relaxed uppercase tracking-tighter">
-                            {property.neighborhood}, {property.commune} — {property.propertyCategory}
+                            {property?.neighborhood || ""}, {property?.commune || ""} — {property?.propertyCategory || ""}
                         </p>
                     </div>
                 </div>
