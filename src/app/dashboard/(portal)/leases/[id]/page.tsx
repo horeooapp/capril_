@@ -25,6 +25,7 @@ import { InsuranceButton } from "@/components/dashboard/leases/InsuranceButton";
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
+    try {
     const session = await auth()
     const lease = await getLeaseById(leaseId) as any 
     
@@ -372,4 +373,20 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
             </div>
         </div>
     )
+    } catch (e: any) {
+        // Must re-throw Next.js router exceptions
+        if (e?.message === 'NEXT_NOT_FOUND' || e?.digest === 'NEXT_NOT_FOUND') {
+            throw e;
+        }
+        console.error("DEBUG ERROR IN PAGE:", e)
+        return (
+            <div className="p-8 bg-red-50 text-red-700 rounded-xl m-8 border border-red-200">
+                <h1 className="text-xl font-bold mb-4">CRITICAL RENDER ERROR</h1>
+                <p className="font-mono text-xs">{e?.message || "Unknown Object"}</p>
+                <pre className="mt-4 p-4 bg-red-100 rounded text-[10px] overflow-auto">
+                    {e?.stack || "No stack returned"}
+                </pre>
+            </div>
+        )
+    }
 }
