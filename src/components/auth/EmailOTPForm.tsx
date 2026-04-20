@@ -64,51 +64,52 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
 
     const theme = {
         TENANT: {
-            primaryText: "text-[#10B981]",
-            focusWithin: "group-focus-within:text-[#10B981]",
-            inputFocus: "focus:ring-[#10B981]/10 focus:border-[#10B981]",
-            btn1Bg: "from-[#10B981] to-[#059669]",
-            btn1Shadow: "shadow-[#10B981]/20",
-            accentText: "text-[#10B981]",
-            btn2Bg: "from-[#10B981] to-[#047857]",
-            btn2Shadow: "shadow-[#10B981]/20",
-            hoverText: "hover:text-[#10B981]"
+            primaryText: "text-white",
+            focusWithin: "group-focus-within:text-emerald-400",
+            inputFocus: "focus:ring-emerald-400/20 focus:border-emerald-400/50",
+            btn1Bg: "from-emerald-500 to-emerald-700",
+            btn1Shadow: "shadow-emerald-500/20",
+            accentText: "text-emerald-400",
+            btn2Bg: "from-emerald-500 to-emerald-800",
+            btn2Shadow: "shadow-emerald-500/20",
+            hoverText: "hover:text-emerald-300"
         },
         LANDLORD: {
-            primaryText: "text-slate-800",
-            focusWithin: "group-focus-within:text-amber-600",
-            inputFocus: "focus:ring-[#C55A11]/10 focus:border-amber-600",
-            btn1Bg: "from-slate-800 to-[#2c6ca7]",
-            btn1Shadow: "shadow-[#1F4E79]/20",
-            accentText: "text-amber-600",
-            btn2Bg: "from-[#C55A11] to-[#E87B2E]",
-            btn2Shadow: "shadow-[#C55A11]/20",
-            hoverText: "hover:text-slate-800"
+            primaryText: "text-white",
+            focusWithin: "group-focus-within:text-amber-500",
+            inputFocus: "focus:ring-amber-500/20 focus:border-amber-500/50",
+            btn1Bg: "from-amber-600 to-amber-800",
+            btn1Shadow: "shadow-amber-600/20",
+            accentText: "text-amber-500",
+            btn2Bg: "from-amber-600 to-orange-800",
+            btn2Shadow: "shadow-amber-600/20",
+            hoverText: "hover:text-amber-400"
         },
         ADMIN: {
-            primaryText: "text-amber-600",
-            focusWithin: "group-focus-within:text-amber-600",
-            inputFocus: "focus:ring-[#C55A11]/10 focus:border-amber-600",
-            btn1Bg: "from-[#C55A11] to-[#E87B2E]",
-            btn1Shadow: "shadow-[#C55A11]/20",
-            accentText: "text-amber-600",
-            btn2Bg: "from-[#C55A11] to-[#E87B2E]",
-            btn2Shadow: "shadow-[#C55A11]/20",
-            hoverText: "hover:text-amber-600"
+            primaryText: "text-white",
+            focusWithin: "group-focus-within:text-amber-500",
+            inputFocus: "focus:ring-amber-500/20 focus:border-amber-500/50",
+            btn1Bg: "from-amber-600 to-amber-800",
+            btn1Shadow: "shadow-amber-600/20",
+            accentText: "text-amber-500",
+            btn2Bg: "from-amber-600 to-amber-800",
+            btn2Shadow: "shadow-amber-600/20",
+            hoverText: "hover:text-amber-400"
         }
     }[role];
 
     return (
         <div className="w-full relative">
-            {/* Glassmorphism Background Card */}
-            <div className="absolute -inset-4 bg-white/40 backdrop-blur-xl rounded-[32px] border border-white/50 shadow-2xl -z-10"></div>
+            {/* Dark Glassmorphism Card */}
+            <div className="absolute -inset-6 bg-[#0B1120]/60 backdrop-blur-3xl rounded-[32px] border border-white/5 shadow-2xl shadow-black/50 -z-10"></div>
+            <div className="absolute -inset-6 rounded-[32px] border border-white/5 bg-gradient-to-br from-white/5 to-transparent pointer-events-none -z-10"></div>
             
             <div className="relative p-2">
-                <div className="mb-8">
+                <div className="mb-8 text-center pt-4">
                     <motion.h2 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className={`text-3xl font-black tracking-tight uppercase leading-none mb-3 ${theme.primaryText}`}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`text-3xl font-black tracking-tighter uppercase leading-none mb-3 ${theme.primaryText}`}
                     >
                         {title}
                     </motion.h2>
@@ -116,7 +117,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-sm text-gray-500 font-medium"
+                        className="text-xs text-gray-400 font-medium max-w-[280px] mx-auto leading-relaxed"
                     >
                         {subtitle}
                     </motion.p>
@@ -128,9 +129,9 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="bg-red-50/80 backdrop-blur-md border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold mb-6 flex items-center gap-2"
+                            className="bg-red-900/30 backdrop-blur-md border border-red-500/30 text-red-400 px-4 py-3 rounded-2xl text-xs font-bold mb-6 flex items-center gap-2"
                         >
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse outline outline-2 outline-red-500/30"></div>
                             {error}
                         </motion.div>
                     )}
@@ -148,12 +149,12 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                             className="space-y-6"
                         >
                             <div className="relative group">
-                                <label htmlFor="email" className={`block text-[10px] font-black uppercase tracking-[0.2em] mb-2 ml-1 ${theme.primaryText}`}>
+                                <label htmlFor="email" className={`block text-[10px] font-black uppercase tracking-[0.2em] mb-2 ml-1 text-gray-400 group-focus-within:text-white transition-colors`}>
                                     Identifiant Email
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className={`h-5 w-5 text-gray-400 transition-colors ${theme.focusWithin}`} />
+                                        <Mail className={`h-5 w-5 text-gray-500 transition-colors ${theme.focusWithin}`} />
                                     </div>
                                     <input
                                         id="email"
@@ -161,7 +162,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className={`block w-full pl-12 pr-4 py-4 bg-white/50 border border-gray-200/50 rounded-2xl outline-none transition-all font-bold placeholder:text-gray-300 ${theme.primaryText} ${theme.inputFocus}`}
+                                        className={`block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl outline-none transition-all font-bold placeholder:text-gray-600 text-white shadow-inner ${theme.inputFocus}`}
                                         placeholder="votre@email.com"
                                     />
                                 </div>
@@ -174,7 +175,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                     required
                                     checked={legalAgreed}
                                     onChange={(e) => setLegalAgreed(e.target.checked)}
-                                    className={`mt-1 w-4 h-4 rounded border-gray-300 text-current ${theme.inputFocus}`}
+                                    className={`mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-current ${theme.inputFocus}`}
                                 />
                                 <label htmlFor="legalAgreed" className="text-[11px] text-gray-500 font-medium leading-relaxed">
                                     En continuant, j'accepte les <Link href="/cgu" className={`font-bold hover:underline ${theme.accentText}`}>CGU</Link>, les <Link href="/mentions-legales" className={`font-bold hover:underline ${theme.accentText}`}>Mentions Légales</Link>, la <Link href="/confidentialite" className={`font-bold hover:underline ${theme.accentText}`}>Confidentialité</Link> et l'usage des <Link href="/cookies" className={`font-bold hover:underline ${theme.accentText}`}>Cookies</Link>.
@@ -186,7 +187,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                 whileTap={legalAgreed ? { scale: 0.98 } : { scale: 1 }}
                                 type="submit"
                                 disabled={isPending || !legalAgreed}
-                                className={`w-full flex items-center justify-center gap-3 py-5 bg-gradient-to-r ${theme.btn1Bg} text-white rounded-2xl shadow-xl ${theme.btn1Shadow} font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 group`}
+                                className={`w-full flex items-center justify-center gap-3 py-5 bg-gradient-to-r ${theme.btn1Bg} text-white rounded-2xl shadow-xl ${theme.btn1Shadow} font-black uppercase tracking-widest text-[10px] transition-all disabled:opacity-50 group border border-white/10`}
                             >
                                 {isPending ? (
                                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -209,7 +210,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                             className="space-y-6"
                         >
                             <div className="relative">
-                                <label htmlFor="otp" className={`block text-[10px] font-black uppercase tracking-[0.2em] mb-2 ml-1 ${theme.primaryText}`}>
+                                <label htmlFor="otp" className={`block text-[10px] font-black uppercase tracking-[0.2em] mb-2 ml-1 text-gray-400`}>
                                     Code de sécurité (6 chiffres)
                                 </label>
                                 <div className="relative">
@@ -224,7 +225,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                         autoFocus
                                         value={otp}
                                         onChange={(e) => setOtp(e.target.value)}
-                                        className={`block w-full pl-12 pr-4 py-5 bg-white/50 border border-gray-200/50 rounded-2xl outline-none transition-all font-black text-3xl tracking-[0.5em] text-center placeholder:text-gray-100 ${theme.primaryText} ${theme.inputFocus}`}
+                                        className={`block w-full pl-12 pr-4 py-5 bg-white/5 border border-white/10 rounded-2xl outline-none transition-all font-black text-3xl tracking-[0.5em] text-center placeholder:text-gray-700 text-white shadow-inner ${theme.inputFocus}`}
                                         placeholder="000000"
                                     />
                                 </div>
@@ -236,7 +237,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                     whileTap={{ scale: 0.98 }}
                                     type="submit"
                                     disabled={isPending}
-                                    className={`w-full py-5 bg-gradient-to-r ${theme.btn2Bg} text-white rounded-2xl shadow-xl ${theme.btn2Shadow} font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2`}
+                                    className={`w-full py-5 bg-gradient-to-r ${theme.btn2Bg} text-white rounded-2xl shadow-xl ${theme.btn2Shadow} font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 border border-white/10`}
                                 >
                                     {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : "Vérifier et me connecter"}
                                 </motion.button>
@@ -244,7 +245,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                 <button
                                     type="button"
                                     onClick={() => setStep('EMAIL')}
-                                    className={`w-full flex items-center justify-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest transition-colors py-2 ${theme.hoverText}`}
+                                    className={`w-full flex items-center justify-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest transition-colors py-2 hover:text-white`}
                                 >
                                     <ArrowLeft className="h-3 w-3" />
                                     Changer d'email
@@ -254,17 +255,17 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                     )}
                 </AnimatePresence>
 
-                <div className="mt-10 pt-6 border-t border-gray-100/50 flex flex-col items-center gap-4">
+                <div className="mt-10 pt-6 border-t border-white/10 flex flex-col items-center gap-4 relative z-10">
                     <Link 
                         href="/" 
-                        className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors group ${theme.primaryText} ${theme.hoverText}`}
+                        className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] transition-colors group text-gray-400 hover:text-white`}
                     >
                         <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                         Retour à l'accueil
                     </Link>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center leading-relaxed">
-                        Protocole de Sécurité QAPRIL v3.0 <br />
-                        <span className="opacity-50">Validation par email certifiée</span>
+                    <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest text-center leading-relaxed">
+                        QAPRIL v3.0 <br />
+                        <span className="opacity-50">Protocole National Certifié</span>
                     </p>
                 </div>
             </div>

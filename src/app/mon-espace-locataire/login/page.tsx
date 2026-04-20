@@ -7,75 +7,90 @@ import { motion } from "framer-motion"
 
 export default function TenantLoginPage() {
     return (
-        <div className="min-h-screen bg-[#FDFCFB] flex relative overflow-hidden">
-            {/* Soft Organic Mesh Background */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.05)_0%,transparent_40%)]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(31,78,121,0.05)_0%,transparent_40%)]"></div>
+        <div className="min-h-screen bg-[#021812] flex items-center justify-center relative overflow-hidden">
+            {/* Elegant Background Immersive Mesh */}
+            <div className="absolute inset-0 z-0 opacity-20 mix-blend-overlay">
+                <img
+                    className="h-full w-full object-cover"
+                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+                    alt="Intérieur serein"
+                />
+            </div>
             
-            <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 relative z-10">
-                <div className="mx-auto w-full max-w-sm lg:w-96">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#021812]/90 via-[#022c22]/80 to-[#064e3b]/90 pointer-events-none"></div>
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/20 blur-[120px] rounded-full animate-pulse opacity-50 mix-blend-screen pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#10B981]/20 blur-[150px] rounded-full animate-pulse animation-delay-2000 opacity-50 mix-blend-screen pointer-events-none"></div>
+
+            <div className="container mx-auto px-4 z-10 flex flex-col lg:flex-row-reverse items-center justify-center gap-12 lg:gap-32 w-full max-w-7xl">
+                
+                {/* Visual Typography Right */}
+                <div className="hidden lg:flex flex-col items-start w-full max-w-lg">
+                    <motion.div 
+                        initial={{ opacity: 0, x: 30, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                     >
-                        <Link href="/" className="flex flex-col items-start mb-12 group">
-                            <img 
-                                src="/logo.png" 
-                                alt="QAPRIL Logo" 
-                                className="h-20 w-auto group-hover:scale-105 transition-transform duration-500" 
-                            />
-                            <p className="text-[10px] font-bold text-[#10B981] uppercase tracking-[0.2em] mt-4 ml-1">Sérénité Locative</p>
-                        </Link>
+                        <div className="mb-8 inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-[18px] border border-white/10 text-[10px] font-black tracking-[0.2em] uppercase text-emerald-400 shadow-xl shadow-black/20">
+                            <Sparkles className="w-5 h-5" />
+                            Expérience Locataire Certifiée
+                        </div>
+                        <h2 className="text-6xl xl:text-7xl font-[1000] tracking-tighter leading-[0.9] mb-8 uppercase text-white">
+                            Habitez en <br />
+                            <span className="italic font-serif normal-case text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-emerald-500 text-7xl xl:text-8xl">confiance.</span>
+                        </h2>
+                        
+                        <div className="h-1 w-24 bg-gradient-to-r from-emerald-500 to-transparent mb-10 rounded-full"></div>
 
-                        <EmailOTPForm 
-                            role="TENANT"
-                            redirectPath="/mon-espace-locataire"
-                            title="Votre Habitat"
-                            subtitle="Rejoignez la communauté certifiée de Côte d'Ivoire. Connexion sécurisée."
-                        />
-
-                        <div className="mt-12 flex items-center justify-center text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                            <Link href="/auth/help" className="hover:text-[#10B981] transition-colors">Aide & Assistance</Link>
+                        <p className="text-xl text-emerald-100/70 font-light leading-relaxed mb-12">
+                            Simplifiez votre vie de locataire avec la plateforme certifiée QAPRIL. Payez vos loyers et suivez vos quittances en toute sérénité.
+                        </p>
+                        
+                        <div className="flex gap-12 bg-white/5 backdrop-blur-md p-6 rounded-[24px] border border-white/5 inline-flex shadow-2xl">
+                            <div className="flex items-center gap-4">
+                                <ShieldCheck className="w-10 h-10 text-emerald-400" />
+                                <div>
+                                    <div className="text-xl font-black text-white mb-0.5">Protocole Sûr</div>
+                                    <div className="text-[9px] uppercase tracking-[0.2em] text-emerald-400/80 font-black">Homologué National</div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
-            </div>
 
-            {/* Visual Side Panel (Serenity) */}
-            <div className="hidden lg:block relative w-0 flex-1 bg-[#10B981] overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <img
-                        className="h-full w-full object-cover scale-105 opacity-60 mix-blend-luminosity"
-                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-                        alt="Intérieur serein"
-                    />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#10B981]/90 via-[#10B981]/70 to-transparent"></div>
-                
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-24 text-white">
-                    <motion.div 
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 1.2 }}
-                        className="max-w-xl"
+                {/* Login Form Left */}
+                <div className="w-full max-w-md">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     >
-                        <div className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] font-black tracking-widest uppercase">
-                            <Sparkles className="w-4 h-4 text-orange-300" />
-                            Expérience Locataire Certifiée
+                        <Link href="/" className="flex flex-col items-center lg:items-start mb-12 group lg:hidden">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-16 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] brightness-0 invert" 
+                            />
+                            <p className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] mt-4 ml-1 drop-shadow-md">Sérénité Locative</p>
+                        </Link>
+                        <Link href="/" className="hidden lg:flex flex-col items-center mb-10 group">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-14 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] brightness-0 invert" 
+                            />
+                        </Link>
+
+                        <div className="relative z-20">
+                            <EmailOTPForm 
+                                role="TENANT"
+                                redirectPath="/mon-espace-locataire"
+                                title="Votre Habitat"
+                                subtitle="Saisissez votre email pour intégrer votre domicile sécurisé."
+                            />
                         </div>
-                        <h2 className="text-7xl font-black tracking-tighter leading-[0.85] mb-10 uppercase italic">
-                            Habitez en <br />
-                            <span className="text-white/40 not-italic">toute</span> <br/>
-                            confiance.
-                        </h2>
-                        <p className="text-2xl text-white/80 font-medium leading-relaxed mb-16">
-                            Simplifiez votre vie de locataire avec la plateforme certifiée QAPRIL. Baux, quittances et maintenance en un clic.
-                        </p>
-                        
-                        <div className="inline-flex items-center gap-3 p-5 bg-white/5 backdrop-blur-xl rounded-[28px] border border-white/10">
-                            <ShieldCheck className="w-8 h-8 text-orange-300" />
-                            <div className="text-[10px] uppercase tracking-[0.2em] font-black max-w-[120px]">Protocole de Sécurité National</div>
+
+                        <div className="mt-12 flex items-center justify-center text-[10px] font-black text-emerald-500/50 uppercase tracking-widest relative z-10 px-4">
+                            <Link href="/auth/help" className="hover:text-emerald-400 transition-colors">Aide & Assistance</Link>
                         </div>
                     </motion.div>
                 </div>
