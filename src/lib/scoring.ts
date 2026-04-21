@@ -182,3 +182,42 @@ export function getScoreBadge(score: number): 'A+' | 'A' | 'B' | 'C' | 'D' {
     return 'D'                   // Risqué
 }
 
+/**
+ * [ICL-CONSENT-01] Get tenant score with explicit consent check.
+ * To be used by Landlords/Agencies.
+ */
+export async function getUserScoreForOwner(tenantId: string, leaseId: string, viewerId: string) {
+    const lease = await prisma.lease.findUnique({
+        where: { id: leaseId },
+        select: { scoreConsent: true, tenantId: true }
+    });
+
+    if (!lease || lease.tenantId !== tenantId) {
+        throw new Error("Accès non autorisé au bail.");
+    }
+
+    if (!lease.scoreConsent) {
+        return { 
+            locked: true, 
+            message: "🔒 Score masqué (Consentement locataire requis - Règle ICL-CONSENT-01)" 
+        };
+    }
+
+    const latest = await calculateUserScore(tenantId);
+
+    // Journalization of access
+    await prisma.auditLog.create({
+        data: {
+            action: "CONSULTATION_SCORE",
+            userId: viewerId,
+            entityId: tenantId,
+            module: "SCORING",
+            newValues: {
+                details: `Consultation du score ICL du locataire ${tenantId} pour le bail ${leaseId}.`
+            }
+        }
+    });
+
+    return { ...latest, locked: false };
+}
+

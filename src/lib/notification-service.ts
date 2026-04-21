@@ -29,6 +29,10 @@ export type EventType =
   | "FISCAL_PAYE_CONFIRME"
   | "DIASPORA_SLA_ALARM"
   | "CHAMPION_RELANCE"
+  | "RCL_RESOLU_AUTO"
+  | "SANCTION_APPLIQUEE"
+  | "PROPOSITION_LOYER_REPONSE"
+  | "PROPOSITION_LOYER_EXPIREE"
 
 interface NotificationData {
   referenceId?: string
@@ -47,10 +51,16 @@ export class NotificationService {
   
   static async envoyerNotification(userId: string, event: EventType, data: NotificationData) {
     try {
-      const prefs = await (prisma as any).notificationPreference.findUnique({
-        where: { userId }
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { 
+          notificationPreference: true,
+          diasporaProfile: true 
+        }
       });
+      if (!user) return;
 
+      const prefs = user.notificationPreference as any;
       if (!prefs) {
         console.warn(`[NotificationService] Aucune préférence trouvée pour l'utilisateur ${userId}. Fallback SMS only.`);
         await this.fallbackSmsOnly(userId, event, data);
@@ -78,7 +88,14 @@ export class NotificationService {
       ];
 
       const isMandatory = MANDATORY_COMPLIANCE.includes(event);
+      const isDiaspora = !!user.diasporaProfile;
+      
       let canaux_a_traiter = isMandatory ? ["sms", "wa"] : canaux_voulus;
+
+      // Rule Diaspora: WA + Email (override SMS)
+      if (isDiaspora) {
+        canaux_a_traiter = ["wa", "email"];
+      }
 
       // Ensure duplicates are removed if preferences already included them
       canaux_a_traiter = Array.from(new Set(canaux_a_traiter));

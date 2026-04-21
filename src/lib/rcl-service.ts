@@ -1,85 +1,129 @@
 import { prisma } from "./prisma";
 import { NotificationService } from "./notification-service";
-import { calculateReliabilityScore } from "./reliability";
+import { MaintenanceService } from "./maintenance-service";
+import { addHours } from "date-fns";
 
-/**
- * RCL SERVICE - Automated Ticket Resolution (REG-2026-001 / RCL-Délai)
- * Enforces the 144h (6 days) response deadline for landlord/management.
- */
 export class RclService {
-    
-    /**
-     * Scans for open tickets over 144h old and closes them automatically in favor of the tenant.
-     */
-    static async processAutoClosures() {
-        const SIX_DAYS_AGO = new Date(Date.now() - 144 * 60 * 60 * 1000);
+  /**
+   * [P3.1] Create a new reclamation ticket with 144h countdown.
+   */
+  static async createTicket(data: {
+    leaseId: string;
+    tenantId: string;
+    typeReclamation: string;
+    description: string;
+    preuveUrl?: string;
+  }) {
+    const expirationDate = addHours(new Date(), 144);
 
-        // Find tickets still open after 144h
-        const lateTickets = await prisma.reclamationLocataire.findMany({
-            where: {
-                statut: { in: ['OUVERT', 'VU', 'EN_COURS'] },
-                createdAt: { lt: SIX_DAYS_AGO }
+    const ticket = await prisma.reclamationLocataire.create({
+      data: {
+        ...data,
+        statut: "OUVERT",
+        dateEcheance: expirationDate,
+      },
+      include: {
+        lease: {
+          include: {
+            property: {
+              include: {
+                owner: true,
+              },
             },
-            include: {
-                lease: {
-                    include: {
-                        landlord: true,
-                        tenant: true
-                    }
-                }
-            }
-        });
+          },
+        },
+      },
+    });
 
-        console.log(`[RCL-Cron] Found ${lateTickets.length} tickets over 144h.`);
-
-        for (const ticket of lateTickets) {
-            try {
-                // 1. Close ticket in favor of tenant (Statut to FERME_AUTO)
-                await prisma.reclamationLocataire.update({
-                    where: { id: ticket.id },
-                    data: {
-                        statut: 'FERME_AUTO'
-                    }
-                });
-
-                // 2. Trigger Score Recalculation (-2 pts rule)
-                await calculateReliabilityScore(ticket.lease.landlordId);
-
-                const ticketRef = `RCL-${ticket.id.slice(0, 4).toUpperCase()}`;
-
-                // 3. Notify Landlord (Sanction notification)
-                if (ticket.lease.landlord.phone) {
-                    await NotificationService.envoyerNotification(
-                        ticket.lease.landlordId,
-                        "RECLAMATION_RECUE", // Mapping to existing event for notification
-                        {
-                            payload: {
-                                smsText: `[QAPRIL] Sanction : Réclamation ${ticketRef} close automatiquement après 144h de silence. Votre score est réduit de 2 pts.`
-                            }
-                        }
-                    );
-                }
-
-                // 4. Notify Tenant (Success notification)
-                if (ticket.lease.tenant?.phone) {
-                    await NotificationService.envoyerNotification(
-                        ticket.lease.tenantId!,
-                        "RECLAMATION_RECUE",
-                        {
-                            payload: {
-                                smsText: `[QAPRIL] Règle 144h : Votre réclamation ${ticketRef} validée automatiquement en votre faveur faute de réponse du bailleur.`
-                            }
-                        }
-                    );
-                }
-
-                console.log(`[RCL-Cron] Ticket ${ticket.id} auto-closed and score updated.`);
-            } catch (err) {
-                console.error(`[RCL-Cron] Failed to close ticket ${ticket.id}:`, err);
-            }
-        }
-
-        return lateTickets.length;
+    // Handle Maintenance Link (RCL-05)
+    if (data.typeReclamation === "RCL-05") {
+      await MaintenanceService.creerTicket({
+        leaseId: data.leaseId,
+        locataireId: data.tenantId,
+        categorie: "MAI_AU", // Autre (MAI_AU)
+        description: `[RCL-05] ${data.description}`,
+        photoUrl: data.preuveUrl,
+        urgence: "NORMALE"
+      });
     }
-}
 
+    // Notify Bailleur/Manager (WA + SMS as per rule)
+    await NotificationService.envoyerNotification(
+      ticket.lease.property.ownerUserId,
+      "RECLAMATION_RECUE",
+      {
+        payload: {
+          ticketId: ticket.id,
+          type: data.typeReclamation,
+          delai: "144h",
+          bien: ticket.lease.property.name,
+        }
+      }
+    );
+
+    return ticket;
+  }
+
+  /**
+   * [P3.1] Process expired tickets (Rule RCL-144h).
+   * Automatically close in favor of tenant and sanction landlord score.
+   */
+  static async processExpirations() {
+    const now = new Date();
+
+    const expiredTickets = await prisma.reclamationLocataire.findMany({
+      where: {
+        statut: "OUVERT",
+        dateEcheance: { lte: now },
+      },
+      include: {
+        lease: {
+          include: {
+            property: true,
+            tenant: true,
+          },
+        },
+      },
+    });
+
+    const results = [];
+
+    for (const ticket of expiredTickets) {
+      // 1. Close ticket automatically
+      await prisma.reclamationLocataire.update({
+        where: { id: ticket.id },
+        data: { statut: "RESOLU_AUTO_EXPIRATION" },
+      });
+
+      // 2. Sanction landlord/manager score (-2 pts)
+      // We'll create a malus event in scoring history
+      await prisma.iclEvent.create({
+        data: {
+          userId: ticket.lease.property.ownerUserId,
+          type: "SANCTION_RCL_SILENCE",
+          points: -2,
+          description: `Sanction pour absence de réponse au ticket ${ticket.id} après 144h.`,
+        },
+      });
+
+      // 3. Notify both parties
+      // Tenant: Good news
+      await NotificationService.envoyerNotification(
+        ticket.tenantId,
+        "RCL_RESOLU_AUTO",
+        { payload: { ticketId: ticket.id } }
+      );
+
+      // Landlord: Sanction notice
+      await NotificationService.envoyerNotification(
+        ticket.lease.property.ownerUserId,
+        "SANCTION_APPLIQUEE",
+        { payload: { ticketId: ticket.id, motif: "Silence 144h", points: -2 } }
+      );
+
+      results.push(ticket.id);
+    }
+
+    return results;
+  }
+}

@@ -20,7 +20,12 @@ export interface YearlyBilanData {
     propertyName: string;
     income: number;
   }[];
+  isDiaspora?: boolean;
+  totalIncomeEur?: number;
+  netRevenueEur?: number;
 }
+
+export const EXCHANGE_RATE_EUR_FCFA = 655.957;
 
 export class BilanService {
   /**
@@ -32,7 +37,10 @@ export class BilanService {
 
     const owner = await prisma.user.findUnique({
       where: { id: ownerId },
-      include: { propertiesOwned: true }
+      include: { 
+        propertiesOwned: true,
+        diasporaProfile: true 
+      }
     });
 
     if (!owner) throw new Error("Propriétaire introuvable");
@@ -142,7 +150,10 @@ export class BilanService {
         propertyId: id,
         propertyName: val.name,
         income: val.income
-      }))
+      })),
+      isDiaspora: !!owner.diasporaProfile,
+      totalIncomeEur: owner.diasporaProfile ? totalIncome / EXCHANGE_RATE_EUR_FCFA : undefined,
+      netRevenueEur: owner.diasporaProfile ? netRevenue / EXCHANGE_RATE_EUR_FCFA : undefined
     };
   }
 
@@ -153,7 +164,12 @@ export class BilanService {
     const lease = await prisma.lease.findUnique({
       where: { id: leaseId },
       include: { 
-        property: { include: { mandates: { where: { status: "ACTIVE" } } } },
+        property: { 
+          include: { 
+            owner: { include: { diasporaProfile: true } },
+            mandates: { where: { status: "ACTIVE" } } 
+          } 
+        },
         mandatGestion: true
       }
     });
@@ -202,7 +218,8 @@ export class BilanService {
         agencyCommission,
         maintenanceCost,
         netToOwner,
-        currency: "FCFA"
+        currency: "FCFA",
+        netToOwnerEur: lease.property.owner?.diasporaProfile ? netToOwner / EXCHANGE_RATE_EUR_FCFA : undefined
     };
   }
 }
