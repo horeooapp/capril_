@@ -8,9 +8,12 @@ export default async function TenantLoginLayout({
 }) {
   const isLandingModeActif = await isFeatureEnabled("LANDING_PAGE");
   
+  // Retrait de la redirection forcée pour permettre l'accès aux portails même en mode restreint
+  /*
   if (isLandingModeActif) {
     redirect("/");
   }
+  */
 
   return <>{children}</>;
 }

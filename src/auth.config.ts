@@ -117,9 +117,11 @@ export const authConfig = {
             }
 
             // 4. PATH-BASED ACCESS CONTROL
-            const isAdmin = eligibleRoles?.includes('ADMIN') || eligibleRoles?.includes('SUPER_ADMIN');
-            const isTenant = eligibleRoles?.includes('TENANT');
-            const hasDashAccess = eligibleRoles?.some((r: string) => ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA'].includes(r));
+            const isAdmin = eligibleRoles?.some((r: string) => ['ADMIN', 'SUPER_ADMIN'].includes(r.toUpperCase()));
+            const isTenant = eligibleRoles?.some((r: string) => ['TENANT', 'LOCATAIRE'].includes(r.toUpperCase()));
+            const hasDashAccess = eligibleRoles?.some((r: string) => 
+                ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'BAILLEUR'].includes(r.toUpperCase())
+            );
 
             // Access to Dashboard (Bailleurs, Agencies, Diaspora)
             if (pathname.startsWith("/dashboard")) {

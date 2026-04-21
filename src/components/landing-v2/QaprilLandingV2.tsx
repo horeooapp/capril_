@@ -126,8 +126,18 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
         ) : (
             <div className="flex items-center gap-4">
-                <Link href="/mon-espace-locataire/login" className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full">Connexion Locataire</Link>
-                <Link href="/dashboard/login" className="nav-cta">Connexion Propriétaire</Link>
+                <button 
+                    onClick={() => handleLoginClick("LOCATAIRE")} 
+                    className="hidden sm:inline-flex px-4 py-2 text-[11px] font-black uppercase tracking-widest text-ink hover:text-ink/70 transition-colors bg-transparent border border-transparent hover:border-black/10 rounded-full cursor-none"
+                >
+                    Connexion Locataire
+                </button>
+                <button 
+                    onClick={() => handleLoginClick("BAILLEUR")} 
+                    className="nav-cta"
+                >
+                    Connexion Propriétaire
+                </button>
             </div>
         )}
         <button className="nav-hamburger" aria-label="Menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -145,8 +155,18 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
-              <Link href="/mon-espace-locataire/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--ink)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none' }}>Connexion Locataire</Link>
-              <Link href="/dashboard/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none' }}>Espace Propriétaire →</Link>
+              <button 
+                  onClick={() => { setMobileMenuOpen(false); handleLoginClick("LOCATAIRE"); }} 
+                  style={{ color: 'var(--ink)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none', background: 'none', border: 'none', textAlign: 'center', cursor: 'none' }}
+              >
+                  Connexion Locataire
+              </button>
+              <button 
+                  onClick={() => { setMobileMenuOpen(false); handleLoginClick("BAILLEUR"); }} 
+                  style={{ color: 'var(--mango)', fontSize: '20px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none', background: 'none', border: 'none', textAlign: 'center', cursor: 'none' }}
+              >
+                  Espace Propriétaire →
+              </button>
             </div>
           )}
         </div>
