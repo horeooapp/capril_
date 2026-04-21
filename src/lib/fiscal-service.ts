@@ -117,7 +117,7 @@ export class FiscalService {
 
     if (!dossier) throw new Error("Dossier fiscal non trouvé");
 
-    const transactionId = `FISCAL-${fiscalId}-${Date.now()}`;
+    const transactionId = `FISCAL_${fiscalId}_${Date.now()}`;
     const paymentUrl = `https://checkout.cinetpay.com/pay/${transactionId}`;
 
     await prisma.fiscalDossier.update({

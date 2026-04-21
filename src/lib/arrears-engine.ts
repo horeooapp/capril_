@@ -76,3 +76,84 @@ export async function transitionArrearsPhase(leaseId: string, targetPhase: strin
         return phase;
     });
 }
+
+/**
+ * [ESC-01] Discover unpaid rents and trigger J3/J7/J15 escalations
+ */
+export async function discoverAndEscalateArrears() {
+    const now = new Date();
+    const currentDay = now.getDate();
+    
+    // 1. Get all pending or partial syntheses for current or past months
+    const pendingSyntheses = await prisma.monthlyRentSynthesis.findMany({
+        where: {
+            status: { in: ["EN_ATTENTE", "PARTIAL", "IMPAYE"] }
+        },
+        include: {
+            lease: {
+                include: { tenant: true }
+            }
+        }
+    });
+
+    let escalations = 0;
+
+    for (const synthesis of pendingSyntheses) {
+        const lease = synthesis.lease;
+        if (!lease.tenantId || !lease.tenant) continue;
+
+        // Calculate delay based on synthesis month and lease.paymentDay
+        const [year, month] = synthesis.month.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, lease.paymentDay || 5);
+        const delayDays = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (delayDays <= 0) continue;
+
+        // Escalation Logic
+        const { NotificationService } = await import("./notification-service");
+
+        // J3: Soft Reminder
+        if (delayDays === 3 && lease.seuilJ3) {
+            await NotificationService.envoyerNotification(lease.tenantId, "IMPAYE_J3", {
+                payload: {
+                    smsText: `[QAPRIL] Rappel amical : Votre loyer de ${synthesis.month} est en attente (J+3). Merci de régulariser.`,
+                    parameters: [lease.tenant.firstName || "Locataire", synthesis.month]
+                }
+            });
+            escalations++;
+        }
+
+        // J7: Firm Reminder + State Update
+        if (delayDays === 7 && lease.seuilJ7) {
+            await prisma.monthlyRentSynthesis.update({
+                where: { id: synthesis.id },
+                data: { status: "IMPAYE" }
+            });
+            await NotificationService.envoyerNotification(lease.tenantId, "IMPAYE_J7", {
+                payload: {
+                    smsText: `[QAPRIL] Alerte retard : Votre loyer de ${synthesis.month} n'a pas été reçu (J+7). Des pénalités peuvent s'appliquer.`,
+                    parameters: [lease.tenant.firstName || "Locataire", synthesis.month]
+                }
+            });
+            escalations++;
+        }
+
+        // J15: Procedural Escalation
+        if (delayDays === 15 && lease.seuilJ15) {
+            await transitionArrearsPhase(lease.id, "MISE_EN_DEMEURE");
+            await prisma.lease.update({
+                where: { id: lease.id },
+                data: { status: "MISE_EN_DEMEURE" }
+            });
+            await NotificationService.envoyerNotification(lease.tenantId, "IMPAYE_J15", {
+                payload: {
+                    smsText: `[QAPRIL] Mise en demeure : Défaut de paiement constaté (J+15). Votre dossier est transmis au service contentieux.`,
+                    parameters: [lease.tenant.firstName || "Locataire", synthesis.month]
+                }
+            });
+            escalations++;
+        }
+    }
+
+    return escalations;
+}

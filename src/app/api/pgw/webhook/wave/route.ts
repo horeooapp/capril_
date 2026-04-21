@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { logAction } from "@/actions/audit";
 import { Decimal } from "@prisma/client/runtime/library";
 import crypto from "crypto";
+import { PaymentGateway } from "@/lib/pgw/gateway";
 
 /**
  * PGW-WEBHOOK: Réception des notifications Wave
@@ -35,15 +36,8 @@ export async function POST(req: Request) {
     const paymentId = body.client_reference; // On a passé payment.id lors de l'initiation
 
     if (eventType === "checkout.session.completed") {
-      // 2. Mettre à jour la transaction en DB
-      const payment = await (prisma as any).paymentPgw.update({
-        where: { id: paymentId },
-        data: {
-          statut: "CONFIRMEE",
-          refOperateur: checkoutSessionId,
-          updatedAt: new Date(),
-        },
-      });
+      // 2. Mettre à jour la transaction et déclencher les services (Synthèse, Quittance, etc.)
+      const payment = await PaymentGateway.confirmPayment(paymentId, checkoutSessionId);
 
       // --- ADD-05: M-TVA Ventilation ---
       const montantTtc = new Decimal(payment.montant);

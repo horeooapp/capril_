@@ -152,10 +152,21 @@ export async function calculateUserScore(userId: string) {
     }
 
     score = Math.min(1000, punctuality + stability + kyc);
+    const badge = getScoreBadge(score);
+
+    // PERSISTENCE - Save the recalculated score to the history
+    await prisma.reliabilityScore.create({
+        data: {
+            userId,
+            score,
+            grade: badge,
+            breakdown: { punctuality, stability, kyc }
+        }
+    });
 
     return {
         score,
-        badge: getScoreBadge(score),
+        badge,
         breakdown: { punctuality, stability, kyc },
         tauxPaiement12m: quittances.length > 0 
             ? Math.round((quittances.filter(q => String(q.status).toLowerCase() === 'paid').length / quittances.length) * 100) 

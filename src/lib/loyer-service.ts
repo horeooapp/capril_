@@ -99,4 +99,34 @@ export class LoyerService {
     console.log(`[MRL-01] Suspended ${expiredPropositions.count} expired rent propositions.`);
     return expiredPropositions.count;
   }
+
+  /**
+   * Part 1.1: Initialize the first monthly rent synthesis for a new lease.
+   */
+  static async initLeaseSynthesis(leaseId: string) {
+    const lease = await prisma.lease.findUnique({
+      where: { id: leaseId },
+    });
+
+    if (!lease) throw new Error("Lease not found");
+
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+
+    return await prisma.monthlyRentSynthesis.upsert({
+      where: {
+        leaseId_month: {
+          leaseId,
+          month: monthKey,
+        },
+      },
+      update: {},
+      create: {
+        leaseId,
+        month: monthKey,
+        totalExpected: lease.rentAmount + (lease.chargesAmount || 0),
+        status: "EN_ATTENTE",
+      },
+    });
+  }
 }

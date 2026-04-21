@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logAction } from "@/actions/audit";
+import { PaymentGateway } from "@/lib/pgw/gateway";
 
 /**
  * PGW-WEBHOOK: Réception des notifications Orange Money WebPay
@@ -24,14 +25,10 @@ export async function POST(req: Request) {
     const { status, txntoken, notif_token } = body;
 
     if (status === "SUCCESS" || status === "SUCCESSFUL") {
-      const payment = await (prisma as any).paymentPgw.update({
-        where: { id: txntoken || body.order_id },
-        data: {
-          statut: "CONFIRMEE",
-          refOperateur: notif_token || body.pay_token,
-          updatedAt: new Date(),
-        },
-      });
+      const paymentId = txntoken || body.order_id;
+      const operatorRef = notif_token || body.pay_token;
+      
+      const payment = await PaymentGateway.confirmPayment(paymentId, operatorRef);
 
       if (payment) {
         await logAction({

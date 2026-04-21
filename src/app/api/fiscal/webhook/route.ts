@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
         }
 
         const { transaction_id, status } = payload
+        const txIdLower = transaction_id?.toLowerCase() || ""
 
-        if (!transaction_id?.startsWith("fiscal_")) {
+        if (!txIdLower.startsWith("fiscal_")) {
             return NextResponse.json({ message: "Not a fiscal transaction" })
         }
 

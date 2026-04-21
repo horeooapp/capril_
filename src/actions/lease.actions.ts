@@ -17,6 +17,8 @@ import { serializeLease } from "@/lib/serialize";
 import { evaluateTransactionRisk } from "@/lib/m-guard";
 import { sendSMS } from "@/lib/sms";
 import { generateProofHash } from "@/lib/proof";
+import { LoyerService } from "@/lib/loyer-service";
+import { FiscalService } from "@/lib/fiscal-service";
 
 // --- [CORE] Baux Standard ---
 
@@ -382,6 +384,23 @@ export async function signLease(leaseId: string, otp: string) {
         });
         await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });
         
+        // --- [ORCHESTRATION] P1 Transitions ---
+        try {
+            // 1. Initialise la synthèse de loyer du mois en cours
+            await LoyerService.initLeaseSynthesis(leaseId);
+            
+            // 2. Initialise le dossier fiscal (DGI)
+            if (lease.typeBail === TypeBail.ECRIT) {
+                await FiscalService.getOrCreateDossier(leaseId);
+            }
+            
+            // 3. Notification aux parties
+            await sendSMS(lease.tenant.phone || "", `Félicitations ! Votre bail QAPRIL est actif. Votre quittance du mois sera disponible bientôt.`);
+        } catch (orchestrationError) {
+            console.error("[ORCHESTRATION_ERROR] Post-signature logic failed:", orchestrationError);
+            // On ne bloque pas la signature si le câblage échoue, mais on log
+        }
+
         revalidatePath(`/dashboard/leases/${leaseId}`);
         return { success: true };
     } catch (error: any) {
