@@ -218,5 +218,49 @@ export class FiscalService {
       }
     });
   }
+
+  /**
+   * [P4.4] Simulates different tax regimes for a landlord.
+   * Compares Revenu Foncier (standard) vs BIC (professional/simplified).
+   */
+  static async simulateTaxRegimes(ownerId: string, year: number) {
+    const { BilanService } = await import("./bilan-service");
+    const bilan = await BilanService.aggregateYearlyData(ownerId, year);
+
+    // 1. Regime: Revenu Foncier (Impôt sur le Revenu Foncier - IRF)
+    // Standard: 7.5% to 10% on gross income depending on property type
+    const foncierTax = bilan.totalIncome * 0.10; 
+    const foncierNet = bilan.totalIncome - foncierTax - bilan.totalMaintenance;
+
+    // 2. Regime: BIC (Bénéfices Industriels et Commerciaux)
+    // Simplified: 30% flat deduction for charges, then taxed at ~15-20%
+    // Or Real: (Income - Real Expenses) * tax rate
+    const bicDeduction = bilan.totalIncome * 0.30;
+    const bicTaxableBase = Math.max(0, bilan.totalIncome - bicDeduction);
+    const bicTax = bicTaxableBase * 0.20; // 20% flat simulation
+    const bicNet = bilan.totalIncome - bicTax - bilan.totalMaintenance;
+
+    return {
+      year,
+      grossIncome: bilan.totalIncome,
+      realExpenses: bilan.totalMaintenance + bilan.totalUtilities,
+      regimes: [
+        {
+          name: "Revenu Foncier (Standard)",
+          taxAmount: Math.round(foncierTax),
+          netAfterTax: Math.round(foncierNet),
+          efficiency: Math.round((foncierNet / bilan.totalIncome) * 100),
+          isRecommended: foncierNet >= bicNet
+        },
+        {
+          name: "BIC (Simplifié)",
+          taxAmount: Math.round(bicTax),
+          netAfterTax: Math.round(bicNet),
+          efficiency: Math.round((bicNet / bilan.totalIncome) * 100),
+          isRecommended: bicNet > foncierNet
+        }
+      ]
+    };
+  }
 }
 
