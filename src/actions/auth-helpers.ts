@@ -130,3 +130,52 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
     
     return lease
 }
+
+/**
+ * Verifies if the user (as an Agency Agent) has an active mandate for a property.
+ */
+export async function ensureMandateAccess(propertyId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+    const userRole = session.user.role as Role;
+
+    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return true;
+
+    const mandate = await prisma.mandate.findFirst({
+        where: {
+            propertyId,
+            agentUserId: userId,
+            status: "ACTIVE"
+        }
+    });
+
+    if (!mandate) {
+        throw new Error("Accès refusé : Aucun mandat actif trouvé pour cette propriété.");
+    }
+
+    return mandate;
+}
+
+/**
+ * [P5.3] Strict check for Agency-wide access.
+ */
+export async function ensureAgencyPortfolioAccess(agencyId: string) {
+    const session = await ensureAuthenticated();
+    const userId = session.user.id;
+    const userRole = session.user.role as Role;
+
+    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return true;
+
+    // Verify if the user is the agency owner or an authorized agent
+    if (userId !== agencyId) {
+        const isAgent = await prisma.user.findFirst({
+            where: {
+                id: userId,
+                role: Role.NON_CERTIFIED_AGENT,
+                agencyConfig: { path: ["managerId"], equals: agencyId }
+            }
+        });
+        if (!isAgent) throw new Error("Accès refusé au portefeuille de cette agence.");
+    }
+    return true;
+}

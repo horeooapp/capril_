@@ -33,6 +33,7 @@ export type EventType =
   | "SANCTION_APPLIQUEE"
   | "PROPOSITION_LOYER_REPONSE"
   | "PROPOSITION_LOYER_EXPIREE"
+  | "BIENVENUE_QAPRIL"
 
 interface NotificationData {
   referenceId?: string

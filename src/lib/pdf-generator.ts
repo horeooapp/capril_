@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import QRCode from 'qrcode';
@@ -28,12 +28,18 @@ export async function generateReceiptPDF(receiptData: {
   
   const { width, height } = page.getSize();
   
-  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
-    page.drawText(text, { x, y, size, font: optFont, color });
+  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0), rotate = 0) => {
+    page.drawText(text, { x, y, size, font: optFont, color, rotate: degrees(rotate) });
   };
 
+  // Watermark
+  drawText('CERTIFIÉ PAR QAPRIL', width / 2 - 100, height / 2, fontBold, 40, rgb(0.95, 0.95, 0.95), 45);
+
+  // Header Styling
+  page.drawRectangle({ x: 0, y: height - 5, width: width, height: 5, color: rgb(0.02, 0.1, 0.3) });
+  
   // Header QAPRIL
-  drawText('QAPRIL', 50, height - 70, fontBold, 28, rgb(0.1, 0.1, 0.1));
+  drawText('QAPRIL', 50, height - 70, fontBold, 28, rgb(0.02, 0.1, 0.3));
   drawText('Quittancement Autonome & Plateforme des Ressources Immobilières', 50, height - 90, font, 10, rgb(0.4, 0.4, 0.4));
   
   // Title
@@ -121,9 +127,12 @@ export async function generatePassportPDF(data: {
     const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
     const { width, height } = page.getSize();
     
-    const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
-        page.drawText(text, { x, y, size, font: optFont, color });
+    const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0), rotate = 0) => {
+        page.drawText(text, { x, y, size, font: optFont, color, rotate: degrees(rotate) });
     };
+
+    // Watermark
+    drawText('DOCUMENT CERTIFIÉ', width / 2 - 150, height / 2 - 100, fontBold, 60, rgb(0.97, 0.97, 0.97), 45);
 
     const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
         page.drawRectangle({ x, y, width: w, height: h, color });

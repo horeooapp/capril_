@@ -192,3 +192,76 @@ export async function generateYearlyBilanPDF(data: YearlyBilanData): Promise<Buf
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
 }
+
+import { BenchmarkResult } from './market-service';
+
+/**
+ * P-MARKET-01 : Rapport de Positionnement Marché
+ */
+export async function generateMarketBenchmarkPDF(data: BenchmarkResult): Promise<Buffer> {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([595.28, 841.89]);
+  
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const { width, height } = page.getSize();
+  
+  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
+    page.drawText(text, { x, y, size, font: optFont, color });
+  };
+
+  const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
+    page.drawRectangle({ x, y, width: w, height: h, color });
+  };
+
+  // --- HEADER ---
+  drawRect(0, height - 120, width, 120, rgb(0.1, 0.1, 0.1));
+  drawText('QAPRIL OBSERVATORY', 50, height - 70, fontBold, 24, rgb(1, 1, 1));
+  drawText('ANALYSE DE POSITIONNEMENT MARCHÉ', 50, height - 90, font, 12, rgb(0.8, 0.8, 0.8));
+
+  // --- PROPERTY INFO ---
+  let currentY = height - 160;
+  drawText('BIEN ANALYSÉ :', 50, currentY, fontBold, 10, rgb(0.5, 0.5, 0.5));
+  drawText(data.propertyName, 50, currentY - 20, fontBold, 14);
+  currentY -= 60;
+
+  // --- BENCHMARK BOXES ---
+  const boxW = 220;
+  const boxH = 100;
+
+  // Current vs Market
+  drawRect(50, currentY - boxH, boxW, boxH, rgb(0.98, 0.98, 1));
+  drawText('LOYER ACTUEL', 65, currentY - 25, fontBold, 9);
+  drawText(`${data.currentRent.toLocaleString()} F`, 65, currentY - 70, fontBold, 24, rgb(0.2, 0.2, 0.2));
+
+  drawRect(width - 50 - boxW, currentY - boxH, boxW, boxH, rgb(0.95, 1, 0.95));
+  drawText('MOYENNE DU MARCHÉ', width - 50 - boxW + 15, currentY - 25, fontBold, 9);
+  drawText(`${data.marketAvg.toLocaleString()} F`, width - 50 - boxW + 15, currentY - 70, fontBold, 24, rgb(0, 0.5, 0));
+
+  currentY -= 140;
+
+  // --- GAP ANALYSIS ---
+  const gapColor = data.gapPct > 0 ? rgb(0, 0.6, 0) : rgb(0.8, 0, 0);
+  drawText('ANALYSE DE L\'ÉCART (GAP)', 50, currentY, fontBold, 12);
+  currentY -= 30;
+  
+  drawRect(50, currentY - 60, width - 100, 60, rgb(0.98, 0.98, 0.98));
+  drawText(`Écart constaté : ${data.gapPct}%`, 70, currentY - 35, fontBold, 18, gapColor);
+  
+  if (data.potentialGain && data.potentialGain > 0) {
+    drawText(`Gain potentiel mensuel : +${data.potentialGain.toLocaleString()} FCFA`, 300, currentY - 35, fontBold, 12, rgb(0, 0.5, 0));
+  }
+
+  currentY -= 100;
+
+  // --- RECOMMENDATION ---
+  drawRect(50, currentY - 80, width - 100, 80, rgb(0.02, 0.1, 0.3));
+  drawText('RECOMMANDATION QAPRIL', 70, currentY - 30, fontBold, 10, rgb(0.8, 0.9, 1));
+  drawText(data.recommendation === "AUGMENTER" ? "OPPORTUNITÉ DE RÉVISION À LA HAUSSE" : "MAINTIEN DU LOYER CONSEILLÉ", 70, currentY - 60, fontBold, 16, rgb(1, 1, 1));
+
+  // --- FOOTER ---
+  drawText('Données issues de l\'Observatoire QAPRIL - Basé sur un échantillon de biens similaires dans la même commune.', 50, 50, font, 8, rgb(0.5, 0.5, 0.5));
+
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes);
+}
