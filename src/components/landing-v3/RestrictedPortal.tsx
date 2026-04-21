@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Lock, ArrowRight, Home, Building2, ShieldAlert } from "lucide-react";
 import { choisirTypeConnexion, type TypeConnexion } from "@/actions/auth.actions";
 
@@ -11,7 +11,7 @@ export default function RestrictedPortal() {
     await choisirTypeConnexion(type);
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -21,7 +21,7 @@ export default function RestrictedPortal() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
