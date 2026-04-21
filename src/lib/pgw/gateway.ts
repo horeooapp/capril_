@@ -100,6 +100,10 @@ export class PaymentGateway {
       receiptType: "RENT",
     });
 
+    // 4. [P2.5] Commissions Champions
+    const { ChampionService } = await import("../champion-service");
+    await ChampionService.processChampionRentCommission(payment.leaseId, payment.montant);
+
     return updatedPayment;
   }
 }

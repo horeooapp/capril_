@@ -245,4 +245,36 @@ export class ChampionService {
 
     return { success: true, paymentUrl };
   }
+
+  /**
+   * [P2.5] Process commission for a rent payment.
+   */
+  static async processChampionRentCommission(leaseId: string, rentAmount: number) {
+    const lease = await prisma.lease.findUnique({
+      where: { id: leaseId },
+      select: { landlordId: true }
+    });
+
+    if (!lease) return;
+
+    // Check if landlord was recruited by a champion
+    const prospect = await prisma.championProspect.findFirst({
+      where: { userIdInscrit: lease.landlordId },
+      include: { champion: true }
+    });
+
+    if (prospect && prospect.champion) {
+      // Logic: 1% of rent or fixed amount
+      const commissionAmount = Math.round(rentAmount * 0.01); 
+      
+      await this.addCommission(
+        prospect.championId, 
+        CommType.BAIL_FORMEL, 
+        leaseId, 
+        commissionAmount
+      );
+
+      console.log(`[ChampionService] Commission of ${commissionAmount} FCFA awarded to champion ${prospect.championId}`);
+    }
+  }
 }

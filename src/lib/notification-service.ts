@@ -84,11 +84,16 @@ export class NotificationService {
 
       let au_moins_un_succes = false;
 
+      let waEchoue = false;
+
       for (const canalStr of canaux_a_traiter) {
         if (canalStr === "wa") {
-          // Force WhatsApp number if mandatory, even if waActif is false in prefs
           const ok = await this.envoyerWhatsApp(prefs.waNumero, event, data, userId);
-          if (ok) au_moins_un_succes = true;
+          if (ok) {
+            au_moins_un_succes = true;
+          } else {
+            waEchoue = true;
+          }
         }
         if (canalStr === "email" && prefs.emailActif && (prefs.emailVerifie || isMandatory)) {
           const ok = await this.envoyerEmail(prefs.emailAdresse, event, data, userId);
@@ -102,6 +107,13 @@ export class NotificationService {
           const ok = await this.envoyerPush(userId, event, data);
           if (ok) au_moins_un_succes = true;
         }
+      }
+
+      // [P2.3] Logique de repli : Si WA a échoué et que le SMS n'était pas déjà envoyé
+      if (waEchoue && !canaux_a_traiter.includes("sms")) {
+          console.info(`[NotificationService] Fallback WhatsApp -> SMS pour ${userId}`);
+          const ok = await this.envoyerSMS(userId, event, data);
+          if (ok) au_moins_un_succes = true;
       }
 
       if (!au_moins_un_succes && CRITIQUES.includes(event)) {

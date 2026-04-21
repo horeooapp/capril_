@@ -144,5 +144,66 @@ export class BilanService {
         income: val.income
       }))
     };
+    };
+  }
+
+  /**
+   * [P2.5] Génère le Compte Rendu de Gestion (CRG) mensuel pour un mandat d'agence.
+   */
+  static async generateMonthlyCRG(leaseId: string, month: string) {
+    const lease = await prisma.lease.findUnique({
+      where: { id: leaseId },
+      include: { 
+        property: { include: { mandates: { where: { status: "ACTIVE" } } } },
+        mandatGestion: true
+      }
+    });
+
+    if (!lease) throw new Error("Bail introuvable");
+
+    const synthesis = await prisma.monthlyRentSynthesis.findUnique({
+      where: { leaseId_month: { leaseId, month } }
+    });
+
+    if (!synthesis) throw new Error("Synthèse mensuelle introuvable");
+
+    // 1. Revenus collectés
+    const grossIncome = synthesis.amountCollected;
+
+    // 2. Commission Agence (depuis le mandat ou mandatGestion)
+    const mandate = lease.property.mandates[0] || lease.mandatGestion;
+    let agencyCommission = 0;
+    if (mandate) {
+        const pct = (mandate as any).commissionPct || 10; // 10% par défaut
+        agencyCommission = Math.round(grossIncome * (pct / 100));
+    }
+
+    // 3. Autres frais (Maintenance du mois)
+    const [year, monthNum] = month.split('-').map(Number);
+    const startDate = new Date(year, monthNum - 1, 1);
+    const endDate = new Date(year, monthNum, 0);
+
+    const maintenance = await prisma.ticketMaintenance.aggregate({
+        where: {
+            leaseId,
+            statut: "CLOTURE",
+            dateResolution: { gte: startDate, lte: endDate }
+        },
+        _sum: { coutFinal: true }
+    });
+
+    const maintenanceCost = maintenance._sum.coutFinal || 0;
+
+    // 4. Calcul Net
+    const netToOwner = grossIncome - agencyCommission - maintenanceCost;
+
+    return {
+        month,
+        grossIncome,
+        agencyCommission,
+        maintenanceCost,
+        netToOwner,
+        currency: "FCFA"
+    };
   }
 }

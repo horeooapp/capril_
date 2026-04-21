@@ -128,5 +128,36 @@ export class LoyerService {
         status: "EN_ATTENTE",
       },
     });
+    });
+  }
+
+  /**
+   * Part 2.4: Get payment breakdown for colocation.
+   */
+  static async getColocationBreakdown(leaseId: string, month: string) {
+    const colocs = await prisma.colocataire.findMany({
+      where: { leaseId, status: "ACTIF" },
+      include: { user: { select: { firstName: true, lastName: true, phone: true } } }
+    });
+
+    const payments = await prisma.paymentPgw.findMany({
+      where: {
+        leaseId,
+        moisConcerne: new Date(month + "-01"), // Approximate conversion
+        statut: "CONFIRMEE"
+      }
+    });
+
+    return colocs.map(coloc => {
+      const colocPayments = payments.filter(p => p.payeurId === coloc.userId);
+      const paid = colocPayments.reduce((sum, p) => sum + p.montant, 0);
+      return {
+        userId: coloc.userId,
+        name: `${coloc.user.firstName} ${coloc.user.lastName}`,
+        expected: coloc.partLoyer || 0,
+        paid,
+        isFullyPaid: paid >= (coloc.partLoyer || 0)
+      };
+    });
   }
 }

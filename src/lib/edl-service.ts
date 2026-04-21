@@ -84,4 +84,41 @@ export class EdlService {
       },
     });
   }
+
+  /**
+   * Compare Entrance and Exit inventory to calculate suggested retention.
+   */
+  static async compareInventory(leaseId: string) {
+    const inspections = await prisma.inspection.findMany({
+      where: { leaseId, status: "TERMINEE" },
+      orderBy: { date: 'asc' }
+    });
+
+    const entry = inspections.find(i => i.type === "ENTRY");
+    const exit = inspections.find(i => i.type === "EXIT");
+
+    if (!entry || !exit) {
+      throw new Error("Les deux états des lieux (entrée et sortie) doivent être terminés pour la comparaison.");
+    }
+
+    const lease = await prisma.lease.findUnique({
+      where: { id: leaseId },
+      select: { depositAmount: true }
+    });
+
+    const entryScore = entry.generalScore || 100;
+    const exitScore = exit.generalScore || 100;
+    const degradationPercent = Math.max(0, entryScore - exitScore);
+
+    // Suggest retention based on degradation percentage
+    const suggestedRetention = Math.round((lease?.depositAmount || 0) * (degradationPercent / 100));
+
+    return {
+      entryScore,
+      exitScore,
+      degradationPercent,
+      suggestedRetention,
+      isDegraded: degradationPercent > 5 // Threshold for 'normal wear and tear'
+    };
+  }
 }

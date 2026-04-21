@@ -19,6 +19,7 @@ import { sendSMS } from "@/lib/sms";
 import { generateProofHash } from "@/lib/proof";
 import { LoyerService } from "@/lib/loyer-service";
 import { FiscalService } from "@/lib/fiscal-service";
+import { NotificationService } from "@/lib/notification-service";
 
 // --- [CORE] Baux Standard ---
 
@@ -201,10 +202,32 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         }
 
         if (reponse === "NON") {
-            await prisma.bailDeclaratif.update({
+            const updatedBdq = await prisma.bailDeclaratif.update({
                 where: { id: bdqId },
                 data: { statut: BdqStatut.CONTESTE, confirmationLocataire: false, motifRefus: motif, confirmationAt: new Date() }
             });
+
+            // --- [ORCHESTRATION P2.1] Déclenchement de la Médiation ---
+            try {
+                await prisma.mediation.create({
+                    data: {
+                        bdqId: bdqId,
+                        subject: `Contestation BDQ - ${bdq.nomLocataireDeclare}`,
+                        status: "OPEN"
+                    }
+                });
+
+                // Notification au Bailleur
+                await NotificationService.envoyerNotification(bdq.bailleurId, "BDQ_CONTESTE", {
+                    payload: {
+                        smsText: `QAPRIL : Votre déclaration pour ${bdq.nomLocataireDeclare} a été contestée. Une médiation a été ouverte.`,
+                        parameters: [bdq.nomLocataireDeclare, motif || "Non spécifié"]
+                    }
+                });
+            } catch (mediationError) {
+                console.error("[MEDIATION_ERROR] Failed to open automated mediation:", mediationError);
+            }
+
             return { success: true, status: "CONTESTE" };
         }
 
