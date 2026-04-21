@@ -30,7 +30,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
-import { confirmBDQFromDashboard } from "@/actions/bdq"
+import { confirmBDQFromDashboard } from "@/actions/lease.actions"
 
 // Badge component defined outside to avoid ReferenceError in early returns
 const Badge = ({ label, color, bg, size = 10 }: any) => (

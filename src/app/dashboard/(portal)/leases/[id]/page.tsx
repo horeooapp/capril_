@@ -1,4 +1,4 @@
-import { getLeaseById } from "@/actions/leases"
+import { getLeaseById } from "@/actions/lease.actions"
 import { serializeObject } from "@/lib/serialize"
 import { ReliabilityBadge } from "@/components/ReliabilityBadge"
 import Link from "next/link"

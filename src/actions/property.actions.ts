@@ -1,248 +1,363 @@
 "use server";
-// QAPRIL - property.actions.ts - Gestion des biens avec hierarchie
-// Inclut : unitLabel (optionnel INDEPENDANT, obligatoire sinon)
-//          typeStructure : INDEPENDANT|COUR_COMMUNE|IMMEUBLE|RESIDENCE
-//          parentPropertyId : obligatoire si pas INDEPENDANT
+// QAPRIL - property.actions.ts - Gestion consolidée des biens
+// Fusionne : properties.ts, property-actions.ts et property.actions.ts
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { Role } from "@prisma/client";
+import { serializeProperty, serializeLease } from "@/lib/serialize";
+import { ensureAuthenticated, ensurePropertyAccess } from "./auth-helpers";
+import { generatePropertyCode as generatePropertyCodeLegacy } from "@/lib/property";
+import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } from "@/lib/property-utils";
 
-export type TypeStructure =
-  "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
+export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
-// Creer un bien (independant ou enfant)
-export async function creerBien(data: {
-  ownerUserId:      string;
-  typeStructure:    TypeStructure;
-  unitLabel?:       string;   // optionnel si INDEPENDANT
-  parentPropertyId?: string;  // obligatoire si pas INDEPENDANT
-  commune:          string;
-  address:          string;
-  propertyType:     string;
-  declaredRentFcfa?: number;
-  superficieM2?:         number;
-  name?:            string;
-}) {
-  // Validation hierarchie
-  if (data.typeStructure !== "INDEPENDANT") {
-    if (!data.unitLabel?.trim()) {
-      throw new Error(`unitLabel obligatoire pour ${data.typeStructure}`);
-    }
-    if (!data.parentPropertyId) {
-      throw new Error(`parentPropertyId obligatoire pour ${data.typeStructure}`);
-    }
-    // Verifier que le parent existe et est du bon type
-    const parent = await prisma.property.findUnique({
-      where: { id: data.parentPropertyId }
-    });
-    if (!parent) throw new Error("Structure parente introuvable");
-  }
+const COMMUNE_CODES: Record<string, string> = {
+  "Cocody":       "COC",
+  "Yopougon":     "YOP",
+  "Abobo":        "ABO",
+  "Adjame":       "ADJ",
+  "Marcory":      "MAR",
+  "Treichville":  "TRE",
+  "Plateau":      "PLT",
+  "Koumassi":     "KOU",
+  "Anyama":       "ANY",
+  "Bingerville":  "BIN",
+};
 
-  // Validation C-06 : unicite unitLabel insensible a la casse
-  if (data.typeStructure !== "INDEPENDANT" && data.unitLabel && data.parentPropertyId) {
-    const unitesExistantes = await prisma.property.findMany({
-      where: {
-        parentPropertyId: data.parentPropertyId,
-        unitLabel: { not: null }
-      },
-      select: { unitLabel: true }
-    });
+const TYPE_PREFIXES: Record<TypeStructure, string> = {
+  "INDEPENDANT":  "IND",
+  "COUR_COMMUNE": "COU",
+  "IMMEUBLE":     "IMM",
+  "RESIDENCE":    "RES",
+};
 
-    const labelNormalise = data.unitLabel.trim().toLowerCase();
-    const doublon = unitesExistantes.find(
-      u => u.unitLabel?.trim().toLowerCase() === labelNormalise
-    );
-
-    if (doublon) {
-      throw new Error(
-        `Une unite "${doublon.unitLabel}" existe deja dans cette structure. ` +
-        `Chaque unite doit avoir un nom unique (insensible a la casse).`
-      );
-    }
-  }
-
-  // Normalisation : stocker toujours en format standard
-  // "apt 2b" → "Apt 2B" (premiere lettre majuscule de chaque mot)
-  const unitLabelNormalise = data.unitLabel
-    ?.trim()
-    .replace(/\w\S*/g, txt =>
-      txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
-    );
-
-  // Reference auto - format HAB-ABJ-COM-NNNNN[-UNIT]
-  const count = await prisma.property.count({
-    where: { ownerUserId: data.ownerUserId }
-  });
-  const communeCode = data.commune.slice(0,3).toUpperCase();
-  const num = String(count + 1).padStart(5, "0");
-  const unitSuffix = document ? unitLabelNormalise
-    ? "-" + unitLabelNormalise.replace(/[^a-zA-Z0-9]/g,"").toUpperCase().slice(0,4)
-    : "" : "";
-  const propertyCode = `HAB-ABJ-${communeCode}-${num}${unitSuffix}`;
-
-  const bien = await prisma.property.create({
-    data: {
-      propertyCode,
-      ownerUserId:      data.ownerUserId,
-      propertyType:     data.propertyType,
-      commune:          data.commune,
-      address:          data.address,
-      name:             data.name,
-      unitLabel:        unitLabelNormalise,
-      typeStructure:    data.typeStructure,
-      parentPropertyId: data.parentPropertyId,
-      declaredRentFcfa: data.declaredRentFcfa,
-      superficieM2:          data.superficieM2,
-      status:           "draft",
-    }
-  });
-
-  revalidatePath("/dashboard");
-  return { success: true, bien };
-}
-
-// Adresse complete pour quittances et baux - RG-BAIL-ADRESSE
-export async function formaterAdresseBien(bien: {
-  unitLabel?: string | null;
-  address: string;
-  commune: string;
-  parentProperty?: { name?: string | null; address: string } | null;
-}): Promise<string> {
-  const parts: string[] = [];
-  if (bien.parentProperty?.name) parts.push(bien.parentProperty.name);
-  if (bien.unitLabel) parts.push(bien.unitLabel);
-  parts.push(bien.address);
-  parts.push(bien.commune);
-  return parts.join(" · ");
-}
-// Exemples :
-// "Imm. Les Palmiers · Apt 2B · Cocody Riviera 3 · Cocody"
-// "Cour Kone · Porte 3 · Rue 12 · Abobo"
-// "Studio du bas · Rue des Jardins · Marcory" (independant nomme)
-// "Rue des Jardins · Marcory" (independant sans nom)
-
-// Biens d'un bailleur avec leurs enfants
-export async function getBiensPortefeuille(ownerUserId: string) {
-  return prisma.property.findMany({
-    where: {
-      ownerUserId,
-      parentPropertyId: null, // uniquement les parents et independants
-      status: { not: "archived" }
-    },
-    include: {
-      units: {
-        include: {
-          leases: {
-            where: { status: { not: "ARCHIVED" } },
-            include: { tenant: { select: { firstName: true, lastName: true } } },
-            take: 1
-          }
-        }
-      },
-      leases: {
-        where: { status: { not: "ARCHIVED" } },
-        include: { tenant: { select: { firstName: true, lastName: true } } },
-        take: 1
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
-}
-
-// Verifier si un bail peut etre cree sur ce bien
-export async function peutCreerBail(propertyId: string): Promise<{
-  ok: boolean; raison?: string
-}> {
-  const bien = await prisma.property.findUnique({
-    where: { id: propertyId },
-    include: { units: { include: { leases: {
-      where: { status: { not: "ARCHIVED" } }
-    }}}}
-  });
-  if (!bien) return { ok: false, raison: "Bien introuvable" };
-
-  // Un parent avec des enfants ayant des baux actifs ne peut pas
-  // recevoir un bail direct (sauf COUR_ENTIERE)
-  const enfantsActifs = bien.units.filter(
-    u => u.leases.length > 0
-  ).length;
-  if (enfantsActifs > 0) {
-    return { ok: false, raison:
-      `${enfantsActifs} unite(s) ont des baux actifs. ` +
-      `Bail direct impossible sauf type COUR_ENTIERE.`
-    };
-  }
-  return { ok: true };
-}
-
-// Retrait de bien (soft delete & notifications)
-export async function retirerProperty(propertyId: string) {
-    const session = await auth()
-    if (!session?.user?.id) throw new Error("Non autorisé.")
-
+/**
+ * [PRP-01] Liste les propriétés accessibles à l'utilisateur
+ */
+export async function getProperties() {
     try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } });
+        const managerId = (fullUser?.agencyConfig as any)?.managerId;
+
+        const orConditions: any[] = [
+            { ownerUserId: userId },
+            { managedByUserId: userId },
+            { leases: { some: { landlordId: userId } } },
+            { accessRoles: { some: { userId: userId, statut: "ACTIF" } } }
+        ];
+
+        if (managerId) {
+            orConditions.push({ managedByUserId: managerId });
+            orConditions.push({ leases: { some: { agentId: managerId } } });
+            orConditions.push({ accessRoles: { some: { userId: managerId, statut: "ACTIF" } } });
+        }
+
+        const dbProperties = await prisma.property.findMany({
+            where: { OR: orConditions },
+            include: {
+                units: {
+                    include: {
+                        leases: {
+                            include: {
+                                tenant: { select: { firstName: true, lastName: true, phone: true } }
+                            }
+                        }
+                    }
+                },
+                parentProperty: true,
+                leases: {
+                    include: {
+                        tenant: { select: { firstName: true, lastName: true, phone: true } },
+                        receipts: { orderBy: { paidAt: 'desc' }, take: 10 },
+                        cdcDeposits: true,
+                        reclamations: { where: { statut: { in: ['OUVERT', 'EN_COURS'] } } },
+                        dossiersLitige: { where: { statut: { in: ['GENERE', 'TRANSMIS_CACI', 'MEDIATION_EN_COURS'] } } }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return dbProperties.map(serializeProperty);
+    } catch (error) {
+        console.error("[ACTION] getProperties error:", error);
+        return [];
+    }
+}
+
+/**
+ * [PRP-02] Créé un bien avec support de la hiérarchie et bulk creation
+ */
+export async function creerBien(data: {
+  ownerUserId?:      string;
+  typeStructure:     TypeStructure;
+  name?:             string;
+  unitLabel?:        string;
+  parentPropertyId?: string;
+  commune:           string;
+  address:           string;
+  propertyType:      string;
+  declaredRentFcfa?: number;
+  superficieM2?:     number;
+  nbUnits?:          number;
+  unitRent?:         number;
+  leaseType?:        'residential' | 'commercial';
+}) {
+  try {
+    const session = await ensureAuthenticated();
+    const ownerUserId = data.ownerUserId || session.user.id;
+    const { typeStructure, unitLabel, parentPropertyId, nbUnits, unitRent } = data;
+
+    // Checks PRO/AGENCY
+    const isPro = ['AGENCY', 'LANDLORD_PRO'].includes(session.user.role as any);
+    const userKyc = await prisma.user.findUnique({ where: { id: ownerUserId }, select: { kycLevel: true } });
+    if (isPro && (userKyc?.kycLevel || 0) < 4) throw new Error("KYC niveau 4 requis pour les comptes PRO.");
+    if (!isPro && (userKyc?.kycLevel || 0) < 2) throw new Error("KYC niveau 2 requis pour enregistrer des biens.");
+
+    return await prisma.$transaction(async (tx) => {
+      // 1. Validation hiérarchie
+      if (typeStructure !== "INDEPENDANT") {
+        if (!unitLabel?.trim() && parentPropertyId) throw new Error(`Nom de l'unité obligatoire pour un bien enfant`);
+        if (!parentPropertyId && !["COUR_COMMUNE", "IMMEUBLE", "RESIDENCE"].includes(typeStructure)) throw new Error(`Structure parente obligatoire`);
+      }
+
+      // 2. Unicité du label au sein d'une structure
+      if (unitLabel && parentPropertyId) {
+        const existant = await tx.property.findFirst({
+           where: { parentPropertyId, unitLabel: { mode: 'insensitive', equals: unitLabel.trim() } }
+        });
+        if (existant) throw new Error(`L'unite "${unitLabel}" existe deja.`);
+      }
+
+      // 3. Récupération héritage parent
+      let inheritedData: any = {};
+      let parentRef: string | undefined;
+      if (parentPropertyId) {
+        const parent = await tx.property.findUnique({ where: { id: parentPropertyId } });
+        if (!parent) throw new Error("Parent introuvable");
+        parentRef = parent.propertyCode;
+        inheritedData = {
+          commune: parent.commune,
+          address: parent.address,
+          city: parent.city,
+          leaseType: parent.leaseType,
+          managedByUserId: parent.managedByUserId,
+          managementMode: parent.managementMode,
+        };
+      }
+
+      // 4. Génération du code
+      const seq = await tx.property.count({ where: { commune: data.commune || inheritedData.commune } });
+      const propertyCode = generatePropertyCode((data.leaseType || inheritedData.leaseType || 'residential') as any, data.commune || inheritedData.commune, seq + 1);
+
+      // 5. Création
+      const bien = await tx.property.create({
+        data: {
+          propertyCode,
+          ownerUserId,
+          typeStructure,
+          name:             data.name || (parentPropertyId && unitLabel ? `${inheritedData.name || ''} - ${unitLabel}` : data.name),
+          unitLabel:        unitLabel ? unitLabel.trim() : undefined,
+          parentPropertyId: data.parentPropertyId,
+          commune:          data.commune || inheritedData.commune,
+          address:          data.address || inheritedData.address,
+          leaseType:        data.leaseType || inheritedData.leaseType || "residential",
+          propertyType:     data.propertyType,
+          declaredRentFcfa: data.declaredRentFcfa || (nbUnits && unitRent ? nbUnits * unitRent : undefined),
+          superficieM2:     data.superficieM2,
+          status:           "active"
+        }
+      });
+
+      // 6. Bulk creation si nécessaire
+      if (nbUnits && nbUnits > 0 && typeStructure !== 'INDEPENDANT') {
+        const prefix = typeStructure === 'IMMEUBLE' ? 'Apt' : 'Porte';
+        for (let i = 1; i <= nbUnits; i++) {
+           const childLabel = `${prefix} ${i}`;
+           await tx.property.create({
+             data: {
+               propertyCode: `${propertyCode}-${childLabel.replace(/\s/g, '').toUpperCase()}`,
+               ownerUserId,
+               typeStructure,
+               name: `${bien.name} - ${childLabel}`,
+               unitLabel: childLabel,
+               parentPropertyId: bien.id,
+               commune: bien.commune,
+               address: bien.address,
+               leaseType: bien.leaseType,
+               propertyType: typeStructure === 'IMMEUBLE' ? 'APARTMENT' : 'ROOM',
+               declaredRentFcfa: unitRent,
+               status: "active"
+             }
+           });
+        }
+      }
+
+      revalidatePath("/dashboard/properties");
+      return { success: true, bien: serializeProperty(bien) };
+    });
+  } catch (error: any) {
+    console.error("[créerBien Error]:", error);
+    return { error: error.message || "Erreur lors de la création." };
+  }
+}
+
+/**
+ * [PRP-03] Récupère un bien par son ID
+ */
+export async function getPropertyById(id: string) {
+    try {
+        await ensurePropertyAccess(id);
+        const property = await prisma.property.findUnique({
+            where: { id },
+            include: { leases: { include: { tenant: { select: { firstName: true, lastName: true, phone: true } } } } }
+        });
+        return property ? serializeProperty(property) : null;
+    } catch (error) {
+        console.error("[ACTION] getPropertyById error:", error);
+        return null;
+    }
+}
+
+/**
+ * [PRP-04] Récupère le passeport complet d'un bien
+ */
+export async function getPropertyPassport(id: string) {
+    try {
+        await ensurePropertyAccess(id);
+        const property = await prisma.property.findUnique({
+            where: { id },
+            include: {
+                leases: {
+                    include: {
+                        tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } }
+                    },
+                    orderBy: { startDate: 'desc' }
+                },
+                maintenanceRecords: true,
+                technicalDocuments: true
+            }
+        });
+
+        if (!property) return null;
+
+        const serialized = serializeProperty(property);
+        return {
+            ...serialized,
+            addressLine1: property.address, // UI compatibility
+            type: property.propertyType, // UI compatibility
+            surface: property.superficieM2, // UI compatibility
+        };
+    } catch (error) {
+        console.error("[ACTION] getPropertyPassport error:", error);
+        return null;
+    }
+}
+
+/**
+ * [PRP-05] Validation ANAH / Agent
+ */
+export async function validateProperty(propertyId: string, checklist: PropertyValidationChecklist, action: 'approve' | 'reject') {
+    try {
+        const session = await ensureAuthenticated();
+        if (!([Role.ADMIN, Role.SUPER_ADMIN, Role.ANAH_AGENT] as Role[]).includes(session.user.role as Role)) throw new Error("Non autorisé.");
+
+        const isApproved = action === 'approve';
+        await prisma.$transaction(async (tx) => {
+            const property = await tx.property.update({
+                where: { id: propertyId },
+                data: {
+                    status: isApproved ? 'active' : 'rejected',
+                    verifiedAt: isApproved ? new Date() : null,
+                    verifiedByUserId: session.user.id,
+                    documents: checklist as any
+                }
+            });
+
+            if (isApproved) {
+                await tx.passport.create({
+                    data: {
+                        propertyId: property.id,
+                        content: { initialState: "verified", validationChecklist: checklist, activationDate: new Date().toISOString() }
+                    }
+                });
+            }
+        });
+
+        revalidatePath("/admin/properties");
+        return { success: true };
+    } catch (error) {
+        console.error("Erreur validation bien:", error);
+        return { error: "Erreur lors de la validation." };
+    }
+}
+
+/**
+ * [PRP-06] Retrait d'un bien (Soft Delete + Notifications)
+ */
+export async function retirerProperty(propertyId: string) {
+    try {
+        const session = await ensureAuthenticated();
         const result = await prisma.$transaction(async (tx) => {
             const property = await tx.property.findUnique({
                 where: { id: propertyId },
                 include: {
-                    leases: {
-                        where: { status: 'ACTIVE' },
-                        select: { tenantId: true, tenant: { select: { phone: true, firstName: true, lastName: true } } }
-                    },
-                    mandates: {
-                        where: { status: 'ACTIVE' },
-                        select: { agentUserId: true, agent: { select: { phone: true, firstName: true, lastName: true } } }
-                    }
+                    leases: { where: { status: 'ACTIVE' }, include: { tenant: { select: { phone: true } } } },
+                    mandates: { where: { status: 'ACTIVE' }, include: { agent: { select: { phone: true } } } }
                 }
-            })
+            });
 
-            if (!property) throw new Error("Bien non trouvé.")
-            if (property.ownerUserId !== session.user.id) throw new Error("Propriétaire non autorisé.")
+            if (!property) throw new Error("Bien non trouvé.");
+            if (property.ownerUserId !== session.user.id) throw new Error("Non autorisé.");
 
-            await tx.property.update({
-                where: { id: propertyId },
-                data: { status: 'archived' }
-            })
+            await tx.property.update({ where: { id: propertyId }, data: { status: 'archived' } });
 
-            let locsNotified = 0
             for (const lease of property.leases) {
-                if (lease.tenantId && (lease.tenant as any).phone) {
+                if (lease.tenantId) {
                     await tx.notification.create({
-                        data: {
-                            userId: lease.tenantId,
-                            channel: 'SMS',
-                            title: 'Retrait de bien',
-                            content: `QAPRIL : Le bien ${property.name || property.propertyCode} a été retiré du portefeuille par son bailleur.`
-                        }
-                    })
-                    locsNotified++
+                        data: { userId: lease.tenantId, channel: 'SMS', title: 'Retrait de bien', content: `QAPRIL : Le bien ${property.propertyCode} a été retiré.` }
+                    });
                 }
             }
 
-            let agenceNotified = false
-            for (const mandat of property.mandates) {
-                if (mandat.agentUserId && (mandat.agent as any).phone) {
-                    await tx.notification.create({
-                        data: {
-                            userId: mandat.agentUserId,
-                            channel: 'SMS',
-                            title: 'Mandat suspendu',
-                            content: `QAPRIL : Le propriétaire a retiré le bien ${property.propertyCode}. Votre mandat est résilié immédiatement.`
-                        }
-                    })
-                    agenceNotified = true
-                }
-            }
+            return { success: true };
+        });
 
-            return { archived: true, locatairesNotifies: locsNotified, agenceNotifiee: agenceNotified }
-        })
-
-        revalidatePath("/dashboard")
-        return { success: true, ...result }
-
+        revalidatePath("/dashboard/properties");
+        return result;
     } catch (error) {
-        console.error("Erreur retrait bien:", error)
-        return { error: "Erreur lors du retrait du bien." }
+        console.error("Erreur retrait bien:", error);
+        return { error: "Erreur lors du retrait." };
     }
+}
+
+export async function formaterAdresseBien(bien: any): Promise<string> {
+  const parts: string[] = [];
+  if (bien.parentProperty?.name) parts.push(bien.parentProperty.name);
+  if (bien.unitLabel) parts.push(bien.unitLabel);
+  else if (bien.name) parts.push(bien.name);
+  parts.push(bien.address);
+  parts.push(bien.commune);
+  return parts.join(" · ");
+}
+
+export async function getBiensPortefeuille(ownerUserId: string) {
+  return prisma.property.findMany({
+    where: { ownerUserId, parentPropertyId: null, status: { not: "archived" } },
+    include: { units: true, leases: true },
+    orderBy: { createdAt: "desc" }
+  });
+}
+
+export async function getMyParentStructures() {
+  const session = await ensureAuthenticated();
+  return prisma.property.findMany({
+    where: { ownerUserId: session.user.id, typeStructure: { in: ["COUR_COMMUNE", "IMMEUBLE", "RESIDENCE"] }, status: { not: "archived" } },
+    select: { id: true, name: true, typeStructure: true, propertyCode: true, commune: true, address: true },
+    orderBy: { createdAt: "desc" }
+  });
 }

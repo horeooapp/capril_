@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { creerBien, getMyParentStructures, TypeStructure } from "@/actions/properties"
+import { creerBien, getMyParentStructures, TypeStructure } from "@/actions/property.actions"
 
 export default function NewPropertyClient() {
     const router = useRouter()

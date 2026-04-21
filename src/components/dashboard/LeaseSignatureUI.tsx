@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { requestSignatureOTP, signLease } from '@/actions/leases'
+import { requestSignatureOTP, signLease } from '@/actions/lease.actions'
 import { ShieldCheck, Send, CheckCircle2, Printer } from 'lucide-react'
 import PrintableLeaseContract from './PrintableLeaseContract'
 

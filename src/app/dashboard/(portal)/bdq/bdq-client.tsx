@@ -3,7 +3,7 @@
 import React from "react"
 import { Bot, MessageCircle, CheckCircle2, Search, SmartphoneNfc, Plus, Zap, MessageSquareWarning, RefreshCw, BarChart4, X, Loader2 } from "lucide-react"
 import { toast } from "sonner";
-import { createBDQ } from "@/actions/bdq";
+import { createBDQ } from "@/actions/lease.actions";
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { Badge } from "@/components/dashboard/ui/Badge"

@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import SignaturePad from "./SignaturePad";
 import OtpVerification from "./OtpVerification";
-import { initiateSignature } from "@/actions/signature-actions";
+import { initiateSignature } from "@/actions/lease.actions";
 
 interface SignatureFlowProps {
   documentId: string;

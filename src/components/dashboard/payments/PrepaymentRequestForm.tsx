@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar, CreditCard, ClipboardList, Send, CheckCircle2, AlertCircle } from "lucide-react"
 import { requestPrepayment } from "@/actions/prepayment-actions"
-import { getTenantLeases } from "@/actions/leases"
+import { getTenantLeases } from "@/actions/lease.actions"
 
 export default function PrepaymentRequestForm() {
     const [leases, setLeases] = useState<any[]>([])

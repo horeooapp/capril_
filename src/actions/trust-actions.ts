@@ -1,4 +1,4 @@
-﻿"use server"
+"use server"
 
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
@@ -21,7 +21,7 @@ export async function getVaultCautions() {
 
 export async function transferToVault(cautionId: string) {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisÃ©" }
+    if (!session?.user?.id) return { error: "Non autorisé" }
 
     try {
         const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -44,15 +44,15 @@ export async function transferToVault(cautionId: string) {
         revalidatePath("/dashboard/trust")
         return { success: true }
     } catch (e) {
-        return { error: "Erreur technique lors du transfert vers la Caisse des DÃ©pÃ´ts." }
+        return { error: "Erreur technique lors du transfert vers la Caisse des Dépôts." }
     }
 }
 
 export async function generateTrustAudit() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autoris�" }
     await logAction({ action: "GENERATE_TRUST_AUDIT", module: "TRUST_VAULT", entityId: session.user.id })
     const cautions = await prisma.vaultCaution.count()
-    if (cautions === 0) return { success: true, message: "Audit généré: Aucune caution au registre." }
-    return { success: true, message: "Audit généré : 100% de fiabilité cryptographique certifiée." }
+    if (cautions === 0) return { success: true, message: "Audit g�n�r�: Aucune caution au registre." }
+    return { success: true, message: "Audit g�n�r� : 100% de fiabilit� cryptographique certifi�e." }
 }

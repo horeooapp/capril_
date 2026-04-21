@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { createReceipt, updateReceipt, getActiveLeasesForSelect } from "@/actions/receipts"
+import { createReceipt, updateReceipt, getActiveLeasesForSelect } from "@/actions/receipt.actions"
 import { toast } from "sonner"
 import { X, Calculator, Calendar, CreditCard, FileText } from "lucide-react"
 
@@ -68,9 +68,9 @@ export default function ManualReceiptModal({
                     periodMonth: periodStr,
                     rentAmount: amountFcfa,
                     chargesAmount,
-                    paymentChannel,
-                    paymentReference,
-                    receiptType
+                    paymentMethod: paymentChannel,
+                    paymentRef: paymentReference,
+                    isDeposit: receiptType === "DEPOSIT"
                 })
             }
 

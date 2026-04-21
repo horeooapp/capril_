@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { requestPrepayment, getPrepaymentRequests } from "@/actions/prepayment-actions"
-import { getTenantLeases as getLocataireLeases } from "@/actions/leases"
+import { getTenantLeases as getLocataireLeases } from "@/actions/lease.actions"
 import { toast } from "sonner"
 import { CalendarDays, CheckCircle2, ChevronLeft, Loader2, CreditCard, Clock } from "lucide-react"
 import Link from "next/link"

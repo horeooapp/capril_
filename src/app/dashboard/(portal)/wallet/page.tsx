@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react"
-import { getWalletProfile, updateWalletPreferences, processRechargeLink } from "@/actions/wallet-actions"
+import { getWalletProfile, updateWalletPreferences, processRechargeLink } from "@/actions/wallet.actions"
 import { toast } from "sonner"
 import RechargeDrawer from "@/components/dashboard/owner/RechargeDrawer"
 import Link from "next/link"

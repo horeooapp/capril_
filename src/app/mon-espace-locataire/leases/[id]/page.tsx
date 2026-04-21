@@ -1,7 +1,7 @@
 import { toast } from "sonner";
  
 import { auth } from "@/auth"
-import { getLeaseById } from "@/actions/leases"
+import { getLeaseById } from "@/actions/lease.actions"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import ProtectedLogo from "@/components/ProtectedLogo"

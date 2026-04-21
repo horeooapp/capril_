@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { ShieldCheck, Calendar, MapPin, User, FileText, Hash, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
-import { getBDQByToken } from "@/actions/bdq"
+import { getBDQByToken } from "@/actions/lease.actions"
 import Image from "next/image"
 
 export default async function VerifyBDQPage({ params }: { params: Promise<{ token: string }> }) {

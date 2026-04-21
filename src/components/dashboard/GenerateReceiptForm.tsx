@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createReceipt } from "@/actions/receipts"
+import { createReceipt } from "@/actions/receipt.actions"
 import CinetPayCheckout from "@/components/payment/CinetPayCheckout"
 
 export default function GenerateReceiptForm({ 
@@ -33,18 +33,18 @@ export default function GenerateReceiptForm({
         setIsPending(true)
 
         try {
-            const result = await (createReceipt as any)({
+            const result = await createReceipt({
                 leaseId,
                 periodMonth: periodStr,
                 rentAmount: amountFcfa,
                 chargesAmount: 0,
-                paymentChannel: paymentChannel,
-                paymentReference: paymentReference,
-                receiptType: receiptType
+                paymentMethod: paymentChannel,
+                paymentRef: paymentReference,
+                isDeposit: receiptType === "DEPOSIT"
             })
 
             if (result.error) {
-                setError(result.message || result.error)
+                setError(result.error)
                 setIsPending(false)
                 return
             }

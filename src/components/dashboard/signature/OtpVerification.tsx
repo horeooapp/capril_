@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ShieldCheck, MessageSquare, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { validateSignature } from "@/actions/signature-actions";
+import { validateSignature } from "@/actions/lease.actions";
 
 interface OtpVerificationProps {
   signatureId: string;

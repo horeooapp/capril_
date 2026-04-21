@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import { getProperties } from "@/actions/properties"
+import { getProperties } from "@/actions/property.actions"
 import { getCurrentUser } from "@/actions/users"
 import DashboardOverviewClient from "./overview-client"
 import RegularizationAlert from "@/components/dashboard/RegularizationAlert"
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
         (activeRole === "DIASPORA" || user.diasporaAbonnement) ? getDiasporaDashboard() : null,
         (activeRole === "INTERMEDIARY" || user.profileType === "INTERMEDIARY") ? getIntermediaireDashboardData() : null,
         (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole) || user.role === "AGENCY") ? getAgencyDashboardData() : null,
-        activeRole === "TENANT" ? getProperties().then(props => props[0]?.leases?.[0]) : null, 
+        activeRole === "TENANT" ? getProperties().then((props: any[]) => props[0]?.leases?.[0]) : null, 
         [], // Always provide an array for receipts to avoid null mismatch
         getDashboardAggregates(user.id, activeRole)
     ])

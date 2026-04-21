@@ -1,4 +1,4 @@
-import { getReceiptsForTenant } from "@/actions/receipts"
+import { getReceiptsForTenant } from "@/actions/receipt.actions"
 import { getTenantDashboard } from "@/actions/tenant-actions"
 import { redirect } from "next/navigation"
 import ReceiptsContent from "./ReceiptsContent"

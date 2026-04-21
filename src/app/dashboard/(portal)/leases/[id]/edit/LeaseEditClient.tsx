@@ -3,8 +3,8 @@
 import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { ShieldAlert, AlertTriangle, ArrowLeft, Save, Plus, X } from "lucide-react"
-import { updateLeaseDraft } from "@/actions/leases-edit"
-import { getProperties } from "@/actions/properties"
+import { updateLeaseDraft } from "@/actions/lease.actions"
+import { getProperties } from "@/actions/property.actions"
 
 enum TypeBail {
     ECRIT = "ECRIT",

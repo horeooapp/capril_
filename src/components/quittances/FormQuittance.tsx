@@ -37,9 +37,13 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
         paymentMethod: mode,
         paidAt: new Date()
       });
-      setResult({ receiptRef: res.receipt.receiptRef, sha256: res.sha256 });
-      setVue("confirm");
-      onSuccess?.(res.receipt.receiptRef);
+      if (res.success && res.receipt) {
+        setResult({ receiptRef: res.receipt.receiptRef || "", sha256: res.sha256 || "" });
+        setVue("confirm");
+        onSuccess?.(res.receipt.receiptRef || "");
+      } else {
+        toast.error(res.error || "Erreur lors de la génération");
+      }
     } catch (e: any) {
       alert(e.message);
     } finally { setLoading(false); }

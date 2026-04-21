@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react"
 import { FileText, Search, Download, Calculator, Plus, AlertTriangle, Send } from "lucide-react"
 import { toast } from "sonner";
-import { generateNextMonthReceipts, exportDgiFile, dispatchDigitalDelivery } from "@/actions/receipt-actions"
+import { generateNextMonthReceipts, exportDgiFile, dispatchDigitalDelivery } from "@/actions/receipt.actions"
 import ManualReceiptModal from "@/components/dashboard/ManualReceiptModal"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { StatCard } from "@/components/dashboard/ui/StatCard"

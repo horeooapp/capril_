@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/jwt";
-import { payReceipt } from "@/actions/receipts";
+import { payReceipt } from "@/actions/receipt.actions";
 
 export async function POST(req: Request) {
   try {

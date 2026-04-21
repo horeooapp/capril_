@@ -9,6 +9,8 @@ interface RawLease {
 
 interface RawReceipt {
   id: string;
+  receiptRef?: string;
+  receiptHash?: string | null;
   amount?: bigint | number;
   rentAmount?: bigint | number;
   chargesAmount?: bigint | number;

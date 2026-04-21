@@ -1,5 +1,5 @@
  
-import { getPropertyPassport } from "@/actions/properties"
+import { getPropertyPassport } from "@/actions/property.actions"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 

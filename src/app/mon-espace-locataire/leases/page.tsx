@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getTenantLeases } from "@/actions/leases"
+import { getTenantLeases } from "@/actions/lease.actions"
 import Link from "next/link"
 import { motion, Variants } from "framer-motion"
 import { toast } from "sonner"

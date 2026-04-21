@@ -2,7 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getReceiptById } from "@/actions/receipts"
+import { getReceiptById } from "@/actions/receipt.actions"
 import { notFound } from "next/navigation"
 import { QRCodeSVG } from "qrcode.react"
 import Image from "next/image"

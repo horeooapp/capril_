@@ -1,4 +1,4 @@
-import { getPropertyById } from "@/actions/properties"
+import { getPropertyById } from "@/actions/property.actions"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { notFound } from "next/navigation"

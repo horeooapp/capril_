@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { createLease } from "@/actions/leases";
+import { createLease } from "@/actions/lease.actions";
 
 export async function POST(req: Request) {
   const session = await auth();

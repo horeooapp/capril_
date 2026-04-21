@@ -3,9 +3,9 @@
 import { useState, useEffect, useTransition, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { createLease } from "@/actions/leases"
-import { createBDQ } from "@/actions/bdq"
-import { getProperties } from "@/actions/properties"
+import { createLease } from "@/actions/lease.actions"
+import { createBDQ } from "@/actions/lease.actions"
+import { getProperties } from "@/actions/property.actions"
 import { searchLocataireByPhonePartial } from "@/actions/search-locataire"
 import AgentBailDeclaratif from "@/components/AgentBailDeclaratif"
 

@@ -1,4 +1,4 @@
-import { getLeaseById } from "@/actions/leases"
+import { getLeaseById } from "@/actions/lease.actions"
 import { notFound } from "next/navigation"
 import LeaseEditClient from "./LeaseEditClient"
 

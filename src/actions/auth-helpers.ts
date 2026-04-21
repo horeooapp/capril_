@@ -43,15 +43,14 @@ export async function ensurePropertyAccess(propertyId: string) {
     const userId = session.user.id
     const userRole = session.user.role as Role
 
-    // Admins always have access
-    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return
-
     const property = await prisma.property.findUnique({
-        where: { id: propertyId },
-        select: { ownerUserId: true, managedByUserId: true }
+        where: { id: propertyId }
     })
 
     if (!property) throw new Error("Propriété non trouvée.")
+
+    // Admins always have access
+    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return property
 
     const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
     const managerId = (fullUser?.agencyConfig as any)?.managerId
@@ -74,6 +73,7 @@ export async function ensurePropertyAccess(propertyId: string) {
             throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.")
         }
     }
+    return property
 }
 
 /**
@@ -84,7 +84,14 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
     const userId = session.user.id
     const userRole = session.user.role as Role
 
-    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return
+    if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) {
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            include: { property: true }
+        })
+        if (!lease) throw new Error("Bail non trouvé.")
+        return lease
+    }
 
     if (allowedRoles && !allowedRoles.includes(userRole)) {
         throw new Error(`Accès refusé pour le rôle ${userRole}.`)
@@ -92,7 +99,7 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
 
     const lease = await prisma.lease.findUnique({
         where: { id: leaseId },
-        select: { landlordId: true, tenantId: true, agentId: true, propertyId: true }
+        include: { property: true }
     })
 
     if (!lease) throw new Error("Bail non trouvé.")
@@ -107,7 +114,6 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
         (managerId && lease.agentId === managerId)
 
     if (!isParticipant) {
-        // Fallback to check if they have access to the property via PropertyAccess
         const pAccess = await prisma.propertyAccess.findFirst({
             where: { 
                 propertyId: lease.propertyId, 

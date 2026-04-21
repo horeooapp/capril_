@@ -1,8 +1,11 @@
 "use server";
-// QAPRIL — Wallet ADD-07 v3 · Deep Links · Rechargement Auto
+// QAPRIL — Wallet Consolidation (ADD-07 v3 · Deep Links · Rechargement Auto)
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { logAction } from "./audit";
+import { calculateSuggestedRecharge } from "@/lib/wallet/calculator";
 
 const SEUIL_DEFAUT = Number(process.env.QAPRIL_WALLET_SEUIL_DEFAUT ?? 1000);
 const PRIX_Q       = Number(process.env.QAPRIL_QUITTANCE_PRIX_FCFA ?? 90);
@@ -17,7 +20,9 @@ const DEEPLINKS: Record<string, string> = {
   DEFAULT:`https://qapril.ci/recharger?montant={amt}&op={op}&ref={ref}`,
 };
 
-// ── Calcul montant suggéré ────────────────────────────────
+/**
+ * [WDL-01] Calcul montant suggéré
+ */
 export async function calculerMontantRecharge(
   userId:  string,
   option:  "MINIMUM" | "RECOMMANDE" | "CONFORT" = "RECOMMANDE"
@@ -37,7 +42,9 @@ export async function calculerMontantRecharge(
   return nbBails > 50 ? 20000 : 5000; // CONFORT
 }
 
-// ── Générer deep link ─────────────────────────────────────
+/**
+ * [WDL-02] Générer deep link
+ */
 export async function genererDeepLink(
   userId: string,
   operateur: "WAVE" | "ORANGE" | "MTN" | "MOOV",
@@ -51,7 +58,9 @@ export async function genererDeepLink(
   return { url, ref };
 }
 
-// ── Déclencheur 1 : Alerte solde bas ─────────────────────
+/**
+ * [WDL-03] Alerte solde bas
+ */
 export async function checkAndAlertSoldeBas(userId: string) {
   const user = await prisma.user.findUnique({
     where:  { id: userId },
@@ -66,7 +75,6 @@ export async function checkAndAlertSoldeBas(userId: string) {
       (user?.walletConfig?.walletOperateurPrefere as any) ?? "WAVE",
       montant
     );
-    // Logger le lien dans wallet_recharge_links
     await prisma.walletRechargeLink.create({
       data: {
         userId, declencheur: "SOLDE_BAS",
@@ -85,12 +93,16 @@ export async function checkAndAlertSoldeBas(userId: string) {
   return { alerte: false };
 }
 
-// ── Lire config rappel ───────────────────────────────────
+/**
+ * [WDL-04] Lire config rappel
+ */
 export async function getWalletConfig(userId: string) {
   return prisma.walletRechargeConfig.findUnique({ where: { userId } });
 }
 
-// ── Sauvegarder config rappel ────────────────────────────
+/**
+ * [WDL-05] Sauvegarder config rappel
+ */
 export async function updateWalletConfig(userId: string, data: {
   rappelActif?:       boolean;
   jourDuMois?:        number;
@@ -105,7 +117,105 @@ export async function updateWalletConfig(userId: string, data: {
   });
 }
 
-// ── Historique des liens envoyés ─────────────────────────
+/**
+ * [WDL-06] Récupère le profil complet du wallet pour l'UI (fusionné)
+ */
+export async function getWalletProfile() {
+    try {
+        const session = await auth();
+        if (!session || !session.user || !session.user.id) return null;
+
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            include: {
+                walletConfig: true,
+                walletRechargeConfig: true,
+                walletRechargeLinks: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 5
+                },
+                _count: {
+                    select: { leasesAsLandlord: { where: { status: 'ACTIVE' } } }
+                }
+            }
+        });
+
+        if (!user) return null;
+
+        const suggestions = await calculateSuggestedRecharge(user.id);
+
+        return {
+            balance: user?.walletConfig?.walletBalance || 0,
+            operateur: user?.walletRechargeConfig?.operateurPrefere || "WAVE",
+            canal: user?.walletRechargeConfig?.canalPrefere || "WHATSAPP",
+            seuil: user?.walletRechargeConfig?.montantFixe || 500,
+            rappel: user.walletRechargeConfig,
+            recentLinks: user.walletRechargeLinks,
+            suggestions,
+            nbBails: user._count.leasesAsLandlord
+        };
+    } catch (error) {
+        console.error("[GET_WALLET_PROFILE_ERROR]", error);
+        return null;
+    }
+}
+
+/**
+ * [WDL-07] Met à jour les préférences de recharge auto
+ */
+export async function updateWalletPreferences(data: {
+    operateur?: string,
+    canal?: string,
+    seuil?: number,
+    rappelActif?: boolean,
+    rappelJour?: number
+}) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) return { error: "Non autorisé" };
+
+    try {
+        await prisma.walletRechargeConfig.upsert({
+            where: { userId: session.user.id },
+            update: {
+                operateurPrefere: data.operateur,
+                canalPrefere: data.canal,
+                montantFixe: data.seuil,
+                rappelActif: data.rappelActif,
+                jourDuMois: data.rappelJour
+            },
+            create: {
+                userId: session.user.id,
+                operateurPrefere: data.operateur || "WAVE",
+                canalPrefere: data.canal || "WHATSAPP",
+                montantFixe: data.seuil,
+                rappelActif: data.rappelActif || false,
+                jourDuMois: data.rappelJour || 1
+            }
+        });
+
+        revalidatePath("/dashboard/wallet");
+        return { success: true };
+    } catch (e) {
+        console.error("[WALLET PREFS] Erreur:", e);
+        return { error: "Erreur lors de la mise à jour des préférences" };
+    }
+}
+
+/**
+ * [WDL-08] Process recharge link
+ */
+export async function processRechargeLink(amount: number, operator: string) {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Non autorisé");
+    
+    const { url, ref } = await genererDeepLink(session.user.id, operator as any, amount);
+    
+    return { url, ref };
+}
+
+/**
+ * [WDL-09] Historique des liens envoyés
+ */
 export async function getRechargeLinks(userId: string, limit = 20) {
   return prisma.walletRechargeLink.findMany({
     where:   { userId },
@@ -114,7 +224,9 @@ export async function getRechargeLinks(userId: string, limit = 20) {
   });
 }
 
-// ── Marquer un lien comme cliqué ────────────────────────
+/**
+ * [WDL-10] Marquer un lien comme cliqué
+ */
 export async function markLinkClicked(linkId: string) {
   return prisma.walletRechargeLink.update({
     where: { id: linkId },

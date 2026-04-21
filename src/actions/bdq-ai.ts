@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { BdqConvStatut, BdqStatut, Role } from "@prisma/client"
 import { revalidatePath } from "next/cache"
-import { createBDQ } from "./bdq"
+import { createBDQ } from "./lease.actions"
 import { Prisma } from "@prisma/client"
 import { sendSMS } from "@/lib/sms"
 

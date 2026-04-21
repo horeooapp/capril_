@@ -1,6 +1,6 @@
  
 import { auth } from "@/auth"
-import { getLeaseById } from "@/actions/leases"
+import { getLeaseById } from "@/actions/lease.actions"
 import { notFound } from "next/navigation"
 import SignatureFlow from "@/components/dashboard/signature/SignatureFlow"
 

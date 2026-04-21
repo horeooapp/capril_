@@ -18,7 +18,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Badge } from './Badge';
-import { createBDQ } from "@/actions/bdq";
+import { createBDQ } from "@/actions/lease.actions";
 
 const steps = [
   { id: 1, label: "Locataire", icon: <UserPlus size={20} /> },
