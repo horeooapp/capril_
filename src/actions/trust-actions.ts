@@ -50,9 +50,9 @@ export async function transferToVault(cautionId: string) {
 
 export async function generateTrustAudit() {
     const session = await auth()
-    if (!session?.user?.id) return { error: "Non autorisé" }
+    if (!session?.user?.id) return { error: "Non autorisÃ©" }
     await logAction({ action: "GENERATE_TRUST_AUDIT", module: "TRUST_VAULT", entityId: session.user.id })
     const cautions = await prisma.vaultCaution.count()
-    if (cautions === 0) return { success: true, message: "Audit généré: Aucune caution au registre." }
-    return { success: true, message: "Audit généré : 100% de fiabilité cryptographique certifiée." }
+    if (cautions === 0) return { success: true, message: "Audit gÃ©nÃ©rÃ©: Aucune caution au registre." }
+    return { success: true, message: "Audit gÃ©nÃ©rÃ© : 100% de fiabilitÃ© cryptographique certifiÃ©e." }
 }
