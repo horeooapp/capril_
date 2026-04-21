@@ -393,7 +393,10 @@ export async function requestSignatureOTP(leaseId: string) {
 export async function signLease(leaseId: string, otp: string) {
     try {
         const session = await ensureAuthenticated();
-        const lease = await prisma.lease.findUnique({ where: { id: leaseId } });
+        const lease = await prisma.lease.findUnique({ 
+            where: { id: leaseId },
+            include: { tenant: true }
+        });
         if (!lease || (lease as any).signingOtp !== otp) throw new Error("Code OTP invalide.");
 
         await prisma.lease.update({
@@ -418,7 +421,7 @@ export async function signLease(leaseId: string, otp: string) {
             }
             
             // 3. Notification aux parties
-            await sendSMS(lease.tenant.phone || "", `Félicitations ! Votre bail QAPRIL est actif. Votre quittance du mois sera disponible bientôt.`);
+            await sendSMS(lease.tenant?.phone || "", `Félicitations ! Votre bail QAPRIL est actif. Votre quittance du mois sera disponible bientôt.`);
         } catch (orchestrationError) {
             console.error("[ORCHESTRATION_ERROR] Post-signature logic failed:", orchestrationError);
             // On ne bloque pas la signature si le câblage échoue, mais on log

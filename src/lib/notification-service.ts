@@ -4,6 +4,10 @@ export type EventType =
   | "QUITTANCE_GENEREE"
   | "PAIEMENT_RECU"
   | "IMPAYE_DETECTE"
+  | "BDQ_CONTESTE"
+  | "IMPAYE_J3"
+  | "IMPAYE_J7"
+  | "IMPAYE_J15"
   | "RAPPEL_ECHEANCE"
   | "BAIL_CONFIRME"
   | "RAPPORT_MENSUEL"
@@ -64,6 +68,9 @@ export class NotificationService {
         'QUITTANCE_GENEREE', 
         'PAIEMENT_RECU', 
         'IMPAYE_DETECTE', 
+        'IMPAYE_J3',
+        'IMPAYE_J7',
+        'IMPAYE_J15',
         'RAPPEL_ECHEANCE', 
         'RECLAMATION_RECUE', 
         'TICKET_MAINTENANCE_RESOLU',
@@ -76,7 +83,7 @@ export class NotificationService {
       // Ensure duplicates are removed if preferences already included them
       canaux_a_traiter = Array.from(new Set(canaux_a_traiter));
 
-      const CRITIQUES = ['QUITTANCE_GENEREE', 'PAIEMENT_RECU', 'IMPAYE_DETECTE'];
+      const CRITIQUES = ['QUITTANCE_GENEREE', 'PAIEMENT_RECU', 'IMPAYE_DETECTE', 'IMPAYE_J3', 'IMPAYE_J7', 'IMPAYE_J15'];
       if (hors_plage && !CRITIQUES.includes(event) && !isMandatory) {
          console.info(`[NotificationService] Événement non critique hors plage horaire.`);
          return;

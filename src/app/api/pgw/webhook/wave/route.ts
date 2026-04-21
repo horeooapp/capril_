@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       await (prisma as any).tvaTransaction.create({
         data: {
           paymentId: paymentId,
-          serviceType: payment.motif || "LOYER",
+          serviceType: "LOYER",
           montantHt,
           tauxTva: 18.00,
           montantTva,

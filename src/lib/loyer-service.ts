@@ -128,7 +128,6 @@ export class LoyerService {
         status: "EN_ATTENTE",
       },
     });
-    });
   }
 
   /**

@@ -144,7 +144,6 @@ export class BilanService {
         income: val.income
       }))
     };
-    };
   }
 
   /**

@@ -33,8 +33,6 @@ export async function GET(request: Request) {
         period: periodMonth 
     }, { status: 200 });
 
-    return NextResponse.json({ success: true, count: detectedCount, period: periodMonth }, { status: 200 });
-
   } catch (error: any) {
     console.error("[Cron Impayés] Erreur globale:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
