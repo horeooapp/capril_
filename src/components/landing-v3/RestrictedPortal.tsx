@@ -3,9 +3,33 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Lock, ArrowRight, Home, KeyRound } from "lucide-react";
+import { Lock, ArrowRight, Home, Building2, ShieldAlert } from "lucide-react";
+import { choisirTypeConnexion, type TypeConnexion } from "@/actions/auth.actions";
 
 export default function RestrictedPortal() {
+  const handleLoginClick = async (type: TypeConnexion) => {
+    await choisirTypeConnexion(type);
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#060D1A] flex flex-col relative overflow-hidden font-sans selection:bg-mango/30 selection:text-white">
       {/* Dynamic Background Elements */}
