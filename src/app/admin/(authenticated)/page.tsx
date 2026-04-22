@@ -376,19 +376,19 @@ export default async function AdminDashboardOverview() {
                                 {recentReceipts.length === 0 && (
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
-                                <div className="mm-card mtn-card mt-2 col-span-2">
+                                <div className="mm-card mtn-card mt-2 col-span-2" style={{ background: 'var(--ci-nuit)', color: '#fff' }}>
                                     <div className="mm-op">TRESOR/CDC</div>
-                                    <div className="mm-amount text-white">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
+                                    <div className="mm-amount">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
                                     <div className="mm-sub">Fonds Consignés Global</div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="ci-map" title="Carte simplifiée CI">
+                        <div className="ci-map" title="Carte simplifiée CI" style={{ background: 'var(--ci-nuit3)', border: '1px solid var(--border)' }}>
                             <div className="ci-map-inner">
-                                <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', opacity: 0.1 }}>
-                                    <path d="M100,20 C140,20 180,60 180,100 C180,140 140,180 100,180 C60,180 20,140 20,100 C20,60 60,20 100,20 Z" fill="currentColor" stroke="none" />
-                                    <path d="M80,60 L120,40 L160,80 L140,140 L70,160 L40,100 Z" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+                                <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', opacity: 0.15 }}>
+                                    <path d="M100,20 C140,20 180,60 180,100 C180,140 140,180 100,180 C60,180 20,140 20,100 C20,60 60,20 100,20 Z" fill="var(--text-main)" stroke="none" />
+                                    <path d="M80,60 L120,40 L160,80 L140,140 L70,160 L40,100 Z" fill="none" stroke="var(--text-main)" strokeWidth="2" strokeDasharray="4 4" />
                                 </svg>
                                 {/* Abidjan Ping */}
                                 <div className="map-dot" style={{ bottom: '30%', right: '40%', background: 'var(--ci-vert)' }}></div>
@@ -408,10 +408,10 @@ export default async function AdminDashboardOverview() {
                             </div>
                             <div className="activity-list">
                                 {safeData.recentAuditLogs?.slice(0, 4).map((log: any) => (
-                                    <div className="activity-item" key={log.id}>
-                                        <div className="act-icon vert"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                                    <div className="activity-item" key={log.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                        <div className="act-icon vert" style={{ background: 'var(--ci-vert-pale)' }}><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                                         <div>
-                                            <div className="act-text">{log.action || 'Événement système'}</div>
+                                            <div className="act-text" style={{ fontWeight: 500 }}>{log.action || 'Événement système'}</div>
                                             <div className="act-time">{new Date(log.createdAt).toLocaleTimeString()} - {(log.user?.firstName || 'Système')}</div>
                                         </div>
                                     </div>
@@ -438,7 +438,7 @@ export default async function AdminDashboardOverview() {
                             <h2 className="panel-title">Reversements DGI</h2>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
-                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,102,0,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-orange)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--ci-orange-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-orange)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
                             <div>
@@ -453,7 +453,7 @@ export default async function AdminDashboardOverview() {
                             <h2 className="panel-title">M-GUARD & Fraudes</h2>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
-                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(244,196,48,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-or)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--ci-or-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-or)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/><path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                             </div>
                             <div>
@@ -468,7 +468,7 @@ export default async function AdminDashboardOverview() {
                             <h2 className="panel-title">SMS Déclarations</h2>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
-                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(0,154,61,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-vert)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--ci-vert-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ci-vert)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
                             <div>
