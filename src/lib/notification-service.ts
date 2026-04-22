@@ -34,6 +34,8 @@ export type EventType =
   | "PROPOSITION_LOYER_REPONSE"
   | "PROPOSITION_LOYER_EXPIREE"
   | "BIENVENUE_QAPRIL"
+  | "ALERTE_CHURN_CRITIQUE"
+  | "ALERTE_RISQUE_IMPAYE"
 
 interface NotificationData {
   referenceId?: string

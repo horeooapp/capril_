@@ -22,15 +22,12 @@ export function AgencyPortalDashboardV2({
 }) {
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
 
-  // Compute mock / realistic stats
-  const totalBiens = properties.length;
-  const totalUnites = properties.reduce((acc, p) => acc + (p.unitNumber ? 1 : (p.unites?.length || 1)), 0);
-  const leasedUnites = properties.reduce((acc, p) => acc + (p.leases?.filter((l: any) => l.status !== "TERMINATED").length || 0), 0);
-  const dispRate = totalUnites > 0 ? Math.round((leasedUnites / totalUnites) * 100) : 0;
-  
-  const pendingCands = candidatures.filter(c => c.status === "PENDING" || c.status === "VERIFIED").length;
-
+  // Real data from aggregates
   const walletBalance = aggregates?.walletBalance || 0;
+  const totalBiens = aggregates?.activeLeasesCount || properties.length;
+  const dispRate = aggregates?.occupancyRate || 0;
+  const pendingCands = candidatures.filter(c => c.status === "PENDING" || c.status === "VERIFIED").length;
+  const totalPortfolioValue = aggregates?.totalPortfolioValue || 0;
 
   return (
     <div className="space-y-6">
@@ -61,24 +58,24 @@ export function AgencyPortalDashboardV2({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <StatCard 
-                label="Mandats actifs" 
+                label="Baux actifs" 
                 value={totalBiens.toString()} 
-                sub={`${totalUnites} unités gérées`} 
+                sub={`Portefeuille : ${fmt(totalPortfolioValue)} ₣ / mois`} 
             />
             <StatCard 
-                label="Disponibilité" 
+                label="Occupation" 
                 value={`${dispRate}%`} 
-                sub={`${leasedUnites} occupés sur ${totalUnites}`} 
+                sub="Basé sur les lots actifs" 
             />
             <StatCard 
                 label="Candidatures" 
                 value={candidatures.length.toString()} 
-                sub={`${pendingCands} en validation`} 
+                sub={`${pendingCands} en attente`} 
             />
             <StatCard 
-                label="Commissions (Est.)" 
+                label="Wallet Agence" 
                 value={`${fmt(walletBalance)} ₣`} 
-                sub={`à reverser : ${fmt(walletBalance)} ₣`} 
+                sub={`Commissions & Provision`} 
                 trend="up" 
             />
           </div>

@@ -44,6 +44,10 @@ export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
     // Parallel data extraction for extreme performance
+    const now = new Date();
+    const firstDayCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
     const [
         totalUsers,
         verifiedUsers,
@@ -91,7 +95,10 @@ export default async function AdminDashboardOverview() {
         totalLitiges,
         activePromos,
         landingFlag,
-        marketIntelligence
+        marketIntelligence,
+        leasesCurrentMonth,
+        leasesLastMonth,
+        monthlyTrendRes
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -121,8 +128,8 @@ export default async function AdminDashboardOverview() {
         prisma.featureFlag.count().catch(() => 0),
         (prisma as any).smsDeclaration.count().catch(() => 0),
         (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
-        Promise.resolve(0),
-        Promise.resolve(0),
+        prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0), // Managers
+        prisma.user.count({ where: { role: "NON_CERTIFIED_AGENT" } }).catch(() => 0), // Agents
         (prisma as any).locataireProfilPublic.count().catch(() => 0),
         (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
         (prisma as any).consultationProfil.count().catch(() => 0),
@@ -141,14 +148,40 @@ export default async function AdminDashboardOverview() {
         (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
         prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
         getNationalMarketComparison().catch(() => ({ success: false, data: null })),
+        // Metrics pour Deltas
+        prisma.lease.count({ where: { createdAt: { gte: firstDayCurrentMonth } } }).catch(() => 0),
+        prisma.lease.count({ where: { createdAt: { gte: firstDayLastMonth, lt: firstDayCurrentMonth } } }).catch(() => 0),
+        // Trend financier (6 derniers mois)
+        prisma.receipt.groupBy({
+            by: ['periodMonth'],
+            _sum: { totalAmount: true },
+            where: { status: "paid" },
+            orderBy: { periodMonth: 'desc' },
+            take: 6
+        }).catch(() => [])
     ]);
     
-    // Fetch recent items for UI displays
+    // Process trends
+    const monthLabels = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUN", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
+    const currentTrend = [...monthlyTrendRes].reverse().map(m => {
+        const monthNum = parseInt(m.periodMonth.split('-')[1]);
+        return {
+            label: monthLabels[monthNum - 1],
+            amount: Number(m._sum.totalAmount || 0)
+        };
+    });
+    const maxTrendAmount = Math.max(...currentTrend.map(t => t.amount), 1);
+
+    // Fetch recent items with detail check
     const recentLeases = await prisma.lease.findMany({
         where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
         take: 4,
         orderBy: { createdAt: 'desc' },
-        include: { tenant: true, property: { select: { propertyCode: true, commune: true } } }
+        include: { 
+            tenant: true, 
+            property: { select: { propertyCode: true, commune: true } },
+            receipts: { where: { status: "pending" }, take: 1 } // Check for debt
+        }
     }).catch(() => []);
 
     const recentReceipts = await prisma.receipt.findMany({
@@ -157,19 +190,9 @@ export default async function AdminDashboardOverview() {
         orderBy: { createdAt: 'desc' }
     }).catch(() => []);
     
-    // Check for missing tables
-    const isDbIncomplete = [
-        totalPaymentsRes, 
-        totalReversals, 
-        fraudAlerts, 
-        totalBdqs, 
-        totalSmsDeclarations,
-        totalMonthlyReports
-    ].some(v => v === -1);
-    
     // Formatting data
     const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
-    const isLandingEnabled = landingFlag ? (landingFlag as any).enabled : true;
+    const leaseDelta = leasesCurrentMonth - leasesLastMonth;
 
     const safeData = {
         totalDgi: Number(totalDgiRes?._sum?.totalDgi || 0),
@@ -189,7 +212,7 @@ export default async function AdminDashboardOverview() {
         totalLeases,
         totalCertificates,
         totalPayments,
-        tvaCollectee: Math.floor(totalPayments * 0.18), // M-TVA 18% logic
+        tvaCollectee: Math.floor(totalPayments * 0.18),
         totalReversals,
         fraudAlerts,
         totalBdqs,
@@ -208,8 +231,6 @@ export default async function AdminDashboardOverview() {
         activeInvitations,
         totalConsultations,
         matchRate,
-        newProspects: totalUsers > 0 ? await prisma.user.count({ where: { createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 30)) } } }) : 0,
-        mandateSuccessRate: totalMandates > 0 ? Math.round((totalMandates / (totalMandates + (totalMandatesDraft || 0))) * 100) : 0,
         totalEdls,
         certifiedEdls,
         totalMonthlyReports,
@@ -217,7 +238,6 @@ export default async function AdminDashboardOverview() {
         totalWalletClicks,
         totalWalletConversions,
         activeWalletConfigs,
-        walletConversionRate: totalWalletLinks > 0 ? Math.round((totalWalletConversions / totalWalletLinks) * 100) : 0,
         totalReclamations,
         totalLitiges,
         activePromos
@@ -241,28 +261,32 @@ export default async function AdminDashboardOverview() {
                         <div className="kpi-glow"></div>
                         <div className="kpi-label">Volume Encaissements</div>
                         <div className="kpi-val">{safeData.totalPayments.toLocaleString()} F</div>
-                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Stable</div>
+                        <div className="kpi-delta up"><ArrowUpRight className="w-3 h-3" /> {safeData.totalPayments > 0 ? "Actif" : "Initial"}</div>
                     </div>
                     
                     <div className="kpi-card vert">
                         <div className="kpi-glow"></div>
                         <div className="kpi-label">Baux Actifs</div>
                         <div className="kpi-val">{safeData.totalLeases}</div>
-                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> +12 ce mois</div>
+                        <div className={`kpi-delta ${leaseDelta >= 0 ? 'up' : 'down'}`}>
+                            {leaseDelta >= 0 ? "+" : ""}{leaseDelta} ce mois
+                        </div>
                     </div>
                     
                     <div className="kpi-card or">
                         <div className="kpi-glow"></div>
                         <div className="kpi-label">Médiation & Litiges</div>
                         <div className="kpi-val">{safeData.activeMediations}</div>
-                        <div className="kpi-delta down"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1.5V8.5M5 8.5L8.5 5M5 8.5L1.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Haute Vigilance</div>
+                        <div className="kpi-delta text-yellow-500">
+                            {safeData.activeMediations > 5 ? "Haute Vigilance" : "Sous Contrôle"}
+                        </div>
                     </div>
                     
                     <div className="kpi-card gris">
                         <div className="kpi-glow"></div>
                         <div className="kpi-label">Taux Certification KYC</div>
                         <div className="kpi-val">{safeData.kycAutoRate}%</div>
-                        <div className="kpi-delta up"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8.5V1.5M5 1.5L1.5 5M5 1.5L8.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> QAPRIL IA</div>
+                        <div className="kpi-delta up">QAPRIL IA Opti</div>
                     </div>
                 </div>
 
@@ -274,34 +298,42 @@ export default async function AdminDashboardOverview() {
                     <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="panel-header">
                             <h2 className="panel-title">Tendance Loyers (6 Mois)</h2>
-                            <div className="panel-action">Voir le rapport</div>
+                            <div className="panel-action">Détail financier</div>
                         </div>
                         <div className="chart-bars" style={{ flex: 1, marginBottom: '24px' }}>
-                            <div className="bar-col"><div className="bar orange" style={{height: '35%'}}></div><div className="bar-label">NOV</div></div>
-                            <div className="bar-col"><div className="bar vert" style={{height: '45%'}}></div><div className="bar-label">DEC</div></div>
-                            <div className="bar-col"><div className="bar or" style={{height: '75%'}}></div><div className="bar-label">JAN</div></div>
-                            <div className="bar-col"><div className="bar vert" style={{height: '60%'}}></div><div className="bar-label">FEV</div></div>
-                            <div className="bar-col"><div className="bar orange" style={{height: '50%'}}></div><div className="bar-label">MAR</div></div>
-                            <div className="bar-col"><div className="bar vert" style={{height: '90%'}}></div><div className="bar-label" style={{color: 'var(--text-main)', fontWeight: 700}}>AVR</div></div>
+                            {currentTrend.map((t, idx) => (
+                                <div key={idx} className="bar-col">
+                                    <div 
+                                        className={`bar ${idx % 2 === 0 ? 'orange' : 'vert'}`} 
+                                        style={{ height: `${(t.amount / maxTrendAmount) * 90 + 5}%` }}
+                                        title={`${t.amount.toLocaleString()} F`}
+                                    ></div>
+                                    <div className="bar-label" style={idx === currentTrend.length - 1 ? { color: 'var(--text-main)', fontWeight: 700 } : {}}>{t.label}</div>
+                                </div>
+                            ))}
+                            {currentTrend.length === 0 && (
+                                <div className="text-center w-full text-gray-500 py-10">Initialisation des données financières...</div>
+                            )}
                         </div>
 
                         <div className="panel-header" style={{ marginTop: 'auto' }}>
                             <h2 className="panel-title">Surveillance Baux Actifs</h2>
-                            <div className="panel-action">Filtrer</div>
+                            <div className="panel-action">Tous les baux</div>
                         </div>
                         <table className="lease-table">
                             <thead>
                                 <tr>
                                     <th>Locataire</th>
                                     <th>Localisation</th>
-                                    <th>Montant</th>
-                                    <th>Statut Actuel</th>
+                                    <th>Loyer Brut</th>
+                                    <th>Statut de Paiement</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {recentLeases.map(lease => {
                                     const tInitials = ((lease.tenant as any)?.firstName?.charAt(0) || lease.tenant?.email?.charAt(0) || "?").toUpperCase() + ((lease.tenant as any)?.lastName?.charAt(0) || "").toUpperCase();
                                     const tName = (lease.tenant as any)?.firstName ? `${(lease.tenant as any).firstName} ${(lease.tenant as any).lastName || ''}` : lease.tenant?.phone || lease.tenant?.email || 'Inconnu';
+                                    const isLate = lease.receipts.length > 0;
                                     return (
                                     <tr key={lease.id}>
                                         <td>
@@ -312,11 +344,16 @@ export default async function AdminDashboardOverview() {
                                         </td>
                                         <td><div className="t-loc truncate">{lease.property?.commune || 'Inconnue'}</div></td>
                                         <td><div className="t-name">{(lease.rentAmount + lease.chargesAmount).toLocaleString()} F</div></td>
-                                        <td><div className="pill pill-active"><div className="pill-dot"></div>À jour</div></td>
+                                        <td>
+                                            <div className={`pill ${isLate ? 'pill-late' : 'pill-active'}`}>
+                                                <div className="pill-dot"></div>
+                                                {isLate ? 'Retard' : 'À jour'}
+                                            </div>
+                                        </td>
                                     </tr>
                                 )})}
                                 {recentLeases.length === 0 && (
-                                    <tr><td colSpan={4} className="text-center text-gray-500 py-4">Aucun bail récent.</td></tr>
+                                    <tr><td colSpan={4} className="text-center text-gray-500 py-4">Aucun bail actif détecté.</td></tr>
                                 )}
                             </tbody>
                         </table>

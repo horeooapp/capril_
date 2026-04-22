@@ -24,14 +24,12 @@ export default async function DashboardPage() {
     // [FIX DÉFINITIF] Prioritize DB preference (capaciteActive) over Session because cookie updates can lag behind UI.
     const activeRole = (user as any).capaciteActive || (session.user as any).chosenRole || user.role;
 
-    const [properties, reports, diasporaData, intermData, agencyData, tenantBail, tenantReceipts, dashboardAggregates] = await Promise.all([
+    const [properties, reports, diasporaData, intermData, agencyData, dashboardAggregates] = await Promise.all([
         getProperties() as Promise<any[]>,
         getMonthlyReports(user.id),
         (activeRole === "DIASPORA" || user.diasporaAbonnement) ? getDiasporaDashboard() : null,
         (activeRole === "INTERMEDIARY" || user.profileType === "INTERMEDIARY") ? getIntermediaireDashboardData() : null,
         (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole) || user.role === "AGENCY") ? getAgencyDashboardData() : null,
-        activeRole === "TENANT" ? getProperties().then((props: any[]) => props[0]?.leases?.[0]) : null, 
-        [], // Always provide an array for receipts to avoid null mismatch
         getDashboardAggregates(user.id, activeRole)
     ])
 
@@ -48,7 +46,6 @@ export default async function DashboardPage() {
             diasporaData={diasporaData?.success ? (diasporaData.data as DiasporaDashboardData) : null}
             intermData={intermData?.success ? intermData.data : null}
             agencyData={agencyData?.success ? agencyData.data : null}
-            tenantData={{ bail: tenantBail, receipts: tenantReceipts }}
             aggregates={dashboardAggregates}
         />
     )

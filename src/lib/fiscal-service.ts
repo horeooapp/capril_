@@ -2,6 +2,23 @@ import { prisma } from "@/lib/prisma";
 import { differenceInMonths, addDays } from "date-fns";
 import { PDFDocument } from "pdf-lib";
 
+export interface TaxSimulation {
+  exercice: number;
+  grossIncome: number;
+  regimeOptimal: "FONCIER" | "BIC";
+  economiePotentielle: number;
+  foncier: {
+    impotEstime: number;
+    abattement: number;
+    netApresImpot: number;
+  };
+  bic: {
+    impotEstime: number;
+    abattement: number;
+    netApresImpot: number;
+  };
+}
+
 export class FiscalService {
   /**
    * Récupère ou crée un dossier fiscal pour un bail.
@@ -223,43 +240,37 @@ export class FiscalService {
    * [P4.4] Simulates different tax regimes for a landlord.
    * Compares Revenu Foncier (standard) vs BIC (professional/simplified).
    */
-  static async simulateTaxRegimes(ownerId: string, year: number) {
+  static async simulateTaxRegimes(ownerId: string, year: number): Promise<TaxSimulation> {
     const { BilanService } = await import("./bilan-service");
     const bilan = await BilanService.aggregateYearlyData(ownerId, year);
 
-    // 1. Regime: Revenu Foncier (Impôt sur le Revenu Foncier - IRF)
-    // Standard: 7.5% to 10% on gross income depending on property type
+    // 1. Regime: Revenu Foncier (Standard)
     const foncierTax = bilan.totalIncome * 0.10; 
     const foncierNet = bilan.totalIncome - foncierTax - bilan.totalMaintenance;
 
-    // 2. Regime: BIC (Bénéfices Industriels et Commerciaux)
-    // Simplified: 30% flat deduction for charges, then taxed at ~15-20%
-    // Or Real: (Income - Real Expenses) * tax rate
+    // 2. Regime: BIC (Simplified)
     const bicDeduction = bilan.totalIncome * 0.30;
     const bicTaxableBase = Math.max(0, bilan.totalIncome - bicDeduction);
-    const bicTax = bicTaxableBase * 0.20; // 20% flat simulation
+    const bicTax = bicTaxableBase * 0.20; 
     const bicNet = bilan.totalIncome - bicTax - bilan.totalMaintenance;
 
+    const economie = Math.abs(foncierTax - bicTax);
+
     return {
-      year,
+      exercice: year,
       grossIncome: bilan.totalIncome,
-      realExpenses: bilan.totalMaintenance + bilan.totalUtilities,
-      regimes: [
-        {
-          name: "Revenu Foncier (Standard)",
-          taxAmount: Math.round(foncierTax),
-          netAfterTax: Math.round(foncierNet),
-          efficiency: Math.round((foncierNet / bilan.totalIncome) * 100),
-          isRecommended: foncierNet >= bicNet
-        },
-        {
-          name: "BIC (Simplifié)",
-          taxAmount: Math.round(bicTax),
-          netAfterTax: Math.round(bicNet),
-          efficiency: Math.round((bicNet / bilan.totalIncome) * 100),
-          isRecommended: bicNet > foncierNet
-        }
-      ]
+      regimeOptimal: bicNet > foncierNet ? "BIC" : "FONCIER",
+      economiePotentielle: Math.round(economie),
+      foncier: {
+        impotEstime: Math.round(foncierTax),
+        abattement: 0, // Simplified foncier usually doesn't have fixed abattement in this model
+        netApresImpot: Math.round(foncierNet)
+      },
+      bic: {
+        impotEstime: Math.round(bicTax),
+        abattement: Math.round(bicDeduction),
+        netApresImpot: Math.round(bicNet)
+      }
     };
   }
 }

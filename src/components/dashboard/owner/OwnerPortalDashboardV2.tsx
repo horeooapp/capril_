@@ -70,21 +70,21 @@ export function OwnerPortalDashboardV2({
       {/* STATS RAPIDES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-            label="Biens totaux" 
-            value={stats.total.toString()} 
-            sub={`${stats.loues} loués · ${stats.vacants} vacants`} 
+            label="Biens actifs" 
+            value={(aggregates?.activeLeasesCount || 0).toString()} 
+            sub={`Occupation : ${aggregates?.occupancyRate || 0}%`} 
         />
         <StatCard 
-            label="Loyers du mois (Attendu)" 
-            value={`${fmt(stats.totalLoyers)} ₣`} 
-            sub={`Encaissé : ${fmt(stats.encaisse)} ₣`} 
-            trend={stats.encaisse > 0 ? "up" : undefined} 
+            label="Loyer Mensuel (Portefeuille)" 
+            value={`${fmt(aggregates?.totalPortfolioValue || 0)} ₣`} 
+            sub="Revenu brut estimé" 
+            trend="up" 
         />
         <StatCard 
-            label="Impayés actifs" 
-            value={stats.impayesN.toString()} 
-            sub={stats.impayesN > 0 ? "Retards enregistrés" : "Aucun impayé"} 
-            trend={stats.impayesN > 0 ? "down" : undefined} 
+            label="Alertes actives" 
+            value={(aggregates?.pendingReclamationsCount || 0).toString()} 
+            sub="Réclamations & Litiges" 
+            trend={(aggregates?.pendingReclamationsCount || 0) > 0 ? "down" : undefined} 
         />
         <StatCard 
             label="Wallet QAPRIL" 
