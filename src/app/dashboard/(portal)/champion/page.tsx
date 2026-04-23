@@ -1,34 +1,28 @@
-
-
-import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
-import ChampionDashboardClient from "./champion-client"
+import ChampionClient from "./champion-client"
+import { redirect } from "next/navigation"
 
-export default async function ChampionDashboardPage() {
-    const session = await auth()
-    if (!session?.user?.id) return null
+export const dynamic = "force-dynamic"
 
-    // Load or create champion profile
-    let profile = await prisma.championProfile.findUnique({
-        where: { userId: session.user.id },
-        include: { prospects: true }
-    })
-
-    if (!profile) {
-        profile = await prisma.championProfile.create({
-            data: {
-                userId: session.user.id,
-                statut: "ACTIF",
-                zonePrincipale: "Abidjan"
-            },
-            include: { prospects: true }
-        })
+export default async function ChampionPage() {
+    const session = await auth();
+    if (!session?.user) {
+        redirect("/dashboard/login");
     }
 
-    const leaderboard = [
-        { rank: 1, name: "Kobenan Valery", points: 245000 },
-        { rank: 2, name: (session.user as any).firstName + ' ' + ((session.user as any).lastName || ''), points: Number(profile.totalCommissionsFcfa) }
-    ]
+    // Mock Champion data for the UI
+    const mockChampionData = {
+        isChampion: true,
+        codeChampion: "QAPRIL-CHMP-042",
+        totalInscriptions: 14,
+        totalCommissionsFcfa: 75000,
+        objectifMensuel: 30,
+        recentProspects: [
+            { id: "PRO-1", nom: "Koné Salif", type: "LOCATAIRE", date: "2026-04-20", statut: "CONVERTI", commission: 5000 },
+            { id: "PRO-2", nom: "Bamba Immobilier", type: "PROPRIETAIRE", date: "2026-04-21", statut: "EN_ATTENTE", commission: 0 },
+            { id: "PRO-3", nom: "Yao Marie", type: "LOCATAIRE", date: "2026-04-22", statut: "CONVERTI", commission: 5000 }
+        ]
+    };
 
-    return <ChampionDashboardClient user={session.user} profile={profile} leaderboard={leaderboard} />
+    return <ChampionClient data={mockChampionData} />
 }

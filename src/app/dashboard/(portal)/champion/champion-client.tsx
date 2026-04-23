@@ -1,201 +1,187 @@
 "use client"
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Plus, Users, TrendingUp, 
-  Wallet, Trophy, Phone, 
-  MessageCircle, MessageSquare, 
-  Info, ChevronRight, X,
-  Search, Filter, MapPin
-} from "lucide-react";
-import { addProspect } from "@/actions/champion-actions";
-import ChampionRecoveryDashboard from "@/components/dashboard/champion/ChampionRecoveryDashboard";
-import { toast } from "sonner";
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Trophy, Copy, CheckCircle2, TrendingUp, Users, Target, ArrowRight, Wallet, UserPlus, Gift, Link } from "lucide-react"
+import { toast } from "sonner"
 
-export default function ChampionDashboardClient({ 
-  user, 
-  profile, 
-  leaderboard 
-}: { 
-  user: any, 
-  profile: any, 
-  leaderboard: any[] 
-}) {
-  const [activeTab, setActiveTab] = useState<"growth" | "recovery">("growth");
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function ChampionClient({ data }: { data: any }) {
+    const [copied, setCopied] = useState(false)
 
-  const stats = [
-    { label: "Gains Validés", value: Number(profile?.totalCommissionsFcfa || 0), icon: Wallet, color: "text-emerald-600 bg-emerald-50", isCurrency: true },
-    { label: "Prospects", value: profile?.prospects?.length || 0, icon: Users, color: "text-blue-600 bg-blue-50" },
-    { label: "Rang Zone", value: "#2", icon: Trophy, color: "text-orange-600 bg-orange-50" }, // Mocked rank
-  ];
-
-  const handleAddProspect = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      nom: formData.get("nom") as string,
-      telephone: formData.get("telephone") as string,
-      quartier: formData.get("quartier") as string,
-      nbLogementsEstime: formData.get("nbLogements") as string,
-    };
-
-    const res = await addProspect(profile.id, data);
-    if (res.success) {
-      setShowAddForm(false);
+    const handleCopyCode = () => {
+        navigator.clipboard.writeText(`https://qapril.ci/join?ref=${data.codeChampion}`)
+        setCopied(true)
+        toast.success("Lien d'affiliation copié ! Partagez-le pour gagner des commissions.")
+        setTimeout(() => setCopied(false), 3000)
     }
-    setIsSubmitting(false);
-  };
 
-  return (
-    <div className="space-y-8 pb-20 max-w-4xl mx-auto">
-      {/* Header Mobile First */}
-      <div className="flex items-center justify-between p-4 bg-white rounded-[2rem] shadow-sm border border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center border border-orange-200">
-            <Trophy size={20} className="text-orange-600" />
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Champion QAPRIL</p>
-            <h1 className="text-xl font-black text-slate-800 tracking-tighter uppercase">{(user.firstName ? user.firstName + " " : "") + (user.lastName || "")}</h1>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-           <button 
-             onClick={() => setActiveTab("growth")}
-             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "growth" ? "bg-slate-800 text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
-           >
-             Croissance
-           </button>
-           <button 
-             onClick={() => setActiveTab("recovery")}
-             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "recovery" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
-           >
-             Recouvrement
-           </button>
-        </div>
-        {activeTab === "growth" && (
-          <button 
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-orange-900/20 active:scale-95 transition-transform"
-          >
-            <Plus size={16} />
-            <span className="hidden md:inline">Nouveau Prospect</span>
-          </button>
-        )}
-      </div>
-
-      {activeTab === "recovery" ? (
-        <ChampionRecoveryDashboard />
-      ) : (
-        <>
-          {/* Quick Stats Slider (Mobile) / Grid (Desktop) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
-        {stats.map((stat, i) => (
-          <div key={i} className="glass-card-premium p-6 rounded-3xl border border-white/50 bg-white/40 shadow-xl flex items-center gap-4">
-             <div className={`w-12 h-12 ${stat.color} rounded-2xl flex items-center justify-center`}>
-                <stat.icon size={24} />
-             </div>
-             <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-                <p className="text-xl font-black text-slate-800">
-                  {stat.isCurrency ? `${stat.value.toLocaleString()} FCFA` : stat.value}
-                </p>
-             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* Prospects List */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-4">
-             <h2 className="text-lg font-black text-slate-800 uppercase tracking-tighter italic">Mes Prospects</h2>
-             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{profile?.prospects?.length || 0} Total</span>
-          </div>
-          
-          <div className="space-y-3">
-            {profile?.prospects?.map((prospect: any) => (
-              <div key={prospect.id} className="p-5 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-                 <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400">
-                          <Users size={18} />
-                       </div>
-                       <div>
-                          <p className="font-black text-gray-900 leading-none">{prospect.nom}</p>
-                          <p className="text-[10px] font-medium text-gray-500 mt-1 flex items-center gap-1">
-                             <MapPin size={10} /> {prospect.quartier || "Quartier non défini"}
-                          </p>
-                       </div>
+    if (!data.isChampion) {
+        return (
+            <div className="flex items-center justify-center min-h-[70vh]">
+                <div className="text-center space-y-6 max-w-lg">
+                    <div className="w-24 h-24 bg-amber-100 text-amber-500 rounded-[2rem] flex items-center justify-center mx-auto shadow-inner">
+                        <Trophy size={48} />
                     </div>
-                    <span className={`px-2 py-1 text-[8px] font-black uppercase rounded ${prospect.statut === "A_RAPPELER" ? "bg-orange-50 text-orange-600" : "bg-emerald-50 text-emerald-600"}`}>
-                       {prospect.statut.replace('_', ' ')}
-                    </span>
-                 </div>
-                 
-                 <div className="flex items-center gap-2 mt-4 ml-1">
-                    <a href={`tel:${prospect.telephone}`} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"><Phone size={14} /></a>
-                    <a href={`https://wa.me/${prospect.telephone}`} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100"><MessageCircle size={14} /></a>
-                    <button onClick={(e) => { e.preventDefault(); toast.loading("Redirection en cours...", {id:"r"}); setTimeout(()=>toast.success("Ouverture du dossier du prospect...", {id:"r"}), 500); }} className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-gray-100 transition-colors">
-                       Voir Détails <ChevronRight size={12} />
+                    <div>
+                        <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">Devenez Champion.</h2>
+                        <p className="text-slate-500 mt-2 font-medium">Recommandez QAPRIL à des propriétaires et des locataires, et gagnez des commissions récurrentes sur chaque transaction !</p>
+                    </div>
+                    <button className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-slate-800 transition-all flex items-center gap-3 justify-center w-full">
+                        Rejoindre le programme <ArrowRight size={18} />
                     </button>
-                 </div>
-              </div>
-            ))}
-            {(!profile?.prospects || profile.prospects.length === 0) && (
-              <div className="text-center py-10 opacity-40">
-                <Users size={32} className="mx-auto mb-2" />
-                <p className="text-xs font-black uppercase tracking-widest">Aucun prospect enregistré</p>
-              </div>
-            )}
-          </div>
+                </div>
+            </div>
+        )
+    }
+
+    const progressPercentage = Math.min((data.totalInscriptions / data.objectifMensuel) * 100, 100)
+
+    return (
+        <div className="space-y-8 pb-32">
+            {/* HERO GAMIFICATION */}
+            <div className="relative glass-panel rounded-[2.5rem] p-8 md:p-12 overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none"></div>
+                
+                <div className="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-start md:items-center">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-amber-400">
+                            <Trophy size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Programme Partenaire</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
+                            Champion <span className="text-amber-500">Gold.</span>
+                        </h1>
+                        <p className="text-slate-400 max-w-md text-sm font-medium leading-relaxed">
+                            Faites grandir la communauté QAPRIL. Chaque propriétaire ou locataire que vous invitez vous rapporte des commissions directes.
+                        </p>
+                    </div>
+                    
+                    <div className="bg-white/10 p-6 rounded-[2rem] border border-white/10 backdrop-blur-md w-full md:w-auto shrink-0 space-y-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Votre Lien Unique</p>
+                        <div className="flex items-center gap-3 bg-slate-900/50 p-2 rounded-2xl border border-slate-700/50">
+                            <div className="px-4 py-2 font-mono text-sm font-bold text-amber-400 select-all truncate max-w-[200px]">
+                                qapril.ci/join?ref={data.codeChampion}
+                            </div>
+                            <button 
+                                onClick={handleCopyCode}
+                                className={`p-3 rounded-xl transition-all ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                            >
+                                {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* STATS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="glass-panel p-6 rounded-[2rem] bg-white border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                        <Wallet size={28} />
+                    </div>
+                    <div>
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Gains Générés</h3>
+                        <div className="flex items-end gap-1">
+                            <p className="text-3xl font-black text-slate-800">{data.totalCommissionsFcfa.toLocaleString()}</p>
+                            <span className="text-xs text-gray-400 font-bold mb-1.5">FCFA</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="glass-panel p-6 rounded-[2rem] bg-white border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0">
+                        <Users size={28} />
+                    </div>
+                    <div>
+                        <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Réseau Actif</h3>
+                        <div className="flex items-end gap-1">
+                            <p className="text-3xl font-black text-slate-800">{data.totalInscriptions}</p>
+                            <span className="text-xs text-gray-400 font-bold mb-1.5">Filleuls</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="glass-panel p-6 rounded-[2rem] bg-amber-500 border border-amber-600 shadow-lg text-white space-y-3 relative overflow-hidden">
+                    <div className="absolute right-0 bottom-0 opacity-20"><Target size={120} className="-mr-6 -mb-6" /></div>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-100">Objectif du mois</h3>
+                            <span className="text-xs font-bold bg-amber-600 px-2 py-0.5 rounded-full">{data.totalInscriptions} / {data.objectifMensuel}</span>
+                        </div>
+                        <div className="w-full bg-amber-700/30 rounded-full h-3 mb-1 overflow-hidden backdrop-blur-sm">
+                            <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPercentage}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="bg-white h-full rounded-full"
+                            ></motion.div>
+                        </div>
+                        <p className="text-[10px] font-bold text-amber-100">Plus que {data.objectifMensuel - data.totalInscriptions} pour débloquer le palier Platinum !</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* LISTE DES PROSPECTS */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Activité de votre réseau</h3>
+                    <button className="text-[10px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-1 hover:text-amber-600 transition-colors">
+                        Voir tout <ArrowRight size={12} />
+                    </button>
+                </div>
+                
+                <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-gray-100 bg-gray-50/50">
+                                    <th className="p-5 font-black text-[10px] uppercase tracking-widest text-slate-500">Contact</th>
+                                    <th className="p-5 font-black text-[10px] uppercase tracking-widest text-slate-500">Date</th>
+                                    <th className="p-5 font-black text-[10px] uppercase tracking-widest text-slate-500">Statut</th>
+                                    <th className="p-5 font-black text-[10px] uppercase tracking-widest text-slate-500 text-right">Commission</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 text-sm">
+                                {data.recentProspects.map((prospect: any) => (
+                                    <tr key={prospect.id} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="p-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
+                                                    {prospect.type === 'LOCATAIRE' ? <UserPlus size={18} /> : <Gift size={18} />}
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-slate-800">{prospect.nom}</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{prospect.type}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-5 text-gray-500 font-medium">
+                                            {prospect.date}
+                                        </td>
+                                        <td className="p-5">
+                                            {prospect.statut === 'CONVERTI' ? (
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                                                    <CheckCircle2 size={12} /> Converti
+                                                </div>
+                                            ) : (
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                                                    <TrendingUp size={12} /> En discussion
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-5 text-right font-black text-slate-800">
+                                            {prospect.commission > 0 ? (
+                                                <span className="text-emerald-500">+{prospect.commission.toLocaleString()} FCFA</span>
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        {/* Leaderboard & Stats */}
-        <div className="space-y-6">
-           <div className="glass-panel p-8 rounded-[2.5rem] bg-indigo-900 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-400 blur-[80px] opacity-20" />
-              <h2 className="text-xl font-black uppercase tracking-tighter italic mb-6">Leaderboard {profile?.zonePrincipale}</h2>
-              <div className="space-y-4">
-                 {leaderboard?.map((l: any) => (
-                   <div key={l.rank} className="flex items-center justify-between p-3 bg-white/5 rounded-2xl border border-white/10">
-                      <div className="flex items-center gap-3">
-                         <span className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black ${l.rank === 1 ? "bg-yellow-500 text-black" : "bg-white/10"}`}>{l.rank}</span>
-                         <span className="text-xs font-black uppercase truncate max-w-[120px]">{l.name}</span>
-                      </div>
-                      <span className="text-[12px] font-black text-indigo-300">{l.points.toLocaleString()} pts</span>
-                   </div>
-                 ))}
-                 {!leaderboard?.length && <p className="text-xs italic text-indigo-300">Classement en cours...</p>}
-              </div>
-           </div>
-
-           <div className="p-8 bg-emerald-950 text-white rounded-[2.5rem] border border-emerald-900">
-              <h3 className="text-lg font-black uppercase tracking-tighter mb-4 flex items-center gap-2">
-                 <TrendingUp size={20} className="text-emerald-400" /> Objectif Mensuel
-              </h3>
-              <div className="flex items-end justify-between mb-2">
-                 <p className="text-xs font-medium text-emerald-300">Progression Inscriptions</p>
-                 <span className="text-[10px] font-black text-emerald-400 uppercase">7 / {profile?.objectifMensuel || 30}</span>
-              </div>
-              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                 <div className="h-full bg-emerald-500 w-[23%]" />
-              </div>
-              <p className="text-[9px] text-emerald-400 mt-4 leading-relaxed font-medium uppercase tracking-[0.1em]">
-                Plus que 23 inscriptions pour débloquer le bonus de volume de 50.000 FCFA.
-              </p>
-           </div>
-        </div>
-      </div>
-
-        </>
-      )}
-    </div>
-  );
+    )
 }
