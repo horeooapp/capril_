@@ -1,213 +1,188 @@
 "use client"
 
-import React, { useState, useTransition } from "react"
-import { Globe, ArrowRightLeft, CreditCard, Landmark, Plane, ShieldCheck, Mail, MapPin, ChevronRight, Activity, TrendingUp } from "lucide-react"
-import { toast } from "sonner";
-import { linkStripeAccount, generateTaxCertificate } from "@/actions/diaspora-actions"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Globe, Plane, ShieldCheck, Camera, Headphones, FileText, ArrowRight, MessageCircle, MapPin, Check, FileSignature, X } from "lucide-react"
 
-export default function DiasporaHubClient({ initialTransactions }: { initialTransactions: any[] }) {
-    const [transactions] = useState(initialTransactions)
-    const [isPending, startTransition] = useTransition()
+export default function DiasporaClient({ data }: { data: any }) {
+    const [isSubscribed, setIsSubscribed] = useState(data.isSubscribed)
 
-    const handleStripe = () => {
-        startTransition(async () => {
-            const promise = linkStripeAccount()
-            toast.promise(promise, {
-                loading: "Redirection vers Stripe Connect...",
-                success: "Passerelle Stripe associée avec succès.",
-                error: "Erreur de connexion."
-            })
-        })
-    }
+    if (!isSubscribed) {
+        return (
+            <div className="space-y-12 pb-32">
+                {/* HERO LANDING */}
+                <div className="relative glass-panel rounded-[3rem] p-8 md:p-16 overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl text-center">
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-amber-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+                    
+                    <div className="relative z-10 max-w-3xl mx-auto space-y-6">
+                        <div className="w-20 h-20 bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center mx-auto shadow-inner border border-amber-500/30">
+                            <Globe size={40} />
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase italic">
+                            QAPRIL <span className="text-amber-500">Diaspora.</span>
+                        </h1>
+                        <p className="text-slate-300 text-lg md:text-xl font-medium leading-relaxed">
+                            Investissez en Côte d'Ivoire. Nous gérons absolument tout sur place. 
+                            De la recherche du locataire à l'inspection vidéo de votre bien.
+                        </p>
+                    </div>
+                </div>
 
-    const handleTax = () => {
-        startTransition(async () => {
-            const promise = generateTaxCertificate()
-            toast.promise(promise, {
-                loading: "Génération de l'attestation CDI...",
-                success: "Attestation fiscale prête. Téléchargement lancé.",
-                error: "Erreur de génération."
-            })
-        })
+                {/* BENEFITS */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="glass-panel p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-4 hover:shadow-xl transition-shadow group">
+                        <div className="w-14 h-14 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <ShieldCheck size={28} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800">Recouvrement Garanti</h3>
+                        <p className="text-slate-500 text-sm font-medium">Loyer sécurisé. Nous gérons la facturation, les rappels et les procédures contentieuses à Abidjan pour vous.</p>
+                    </div>
+                    <div className="glass-panel p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-4 hover:shadow-xl transition-shadow group">
+                        <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Camera size={28} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800">Inspections Vidéo</h3>
+                        <p className="text-slate-500 text-sm font-medium">États des lieux et maintenance filmés par nos agents agréés. Voyez l'état de votre bien depuis votre smartphone.</p>
+                    </div>
+                    <div className="glass-panel p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-4 hover:shadow-xl transition-shadow group">
+                        <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <FileSignature size={28} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800">Fiscalité & DGI</h3>
+                        <p className="text-slate-500 text-sm font-medium">Déclarations fiscales, paiement des impôts fonciers, tout est traité légalement en votre nom.</p>
+                    </div>
+                </div>
+
+                {/* PRICING */}
+                <div className="bg-slate-50 rounded-[3rem] p-8 md:p-16 border border-slate-200 text-center">
+                    <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase mb-12">Nos Forfaits Gestion</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        {/* Plan Classique */}
+                        <div className="bg-white p-8 rounded-[2rem] border border-gray-200 shadow-sm flex flex-col items-center">
+                            <h3 className="text-xl font-black text-slate-800 uppercase tracking-widest mb-2">Sérénité</h3>
+                            <div className="text-4xl font-black text-slate-900 mb-6">8% <span className="text-sm text-slate-400">/loyer encaissé</span></div>
+                            <ul className="space-y-4 text-left w-full mb-8 text-sm font-bold text-slate-600">
+                                <li className="flex items-center gap-2"><Check size={16} className="text-emerald-500" /> Collecte des loyers</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-emerald-500" /> Rapport financier mensuel</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-emerald-500" /> Support WhatsApp standard</li>
+                                <li className="flex items-center gap-2 text-slate-400"><X size={16} /> Inspections vidéo trimestrielles</li>
+                                <li className="flex items-center gap-2 text-slate-400"><X size={16} /> Gestion fiscale DGI</li>
+                            </ul>
+                            <button className="w-full py-4 mt-auto bg-slate-100 text-slate-800 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">
+                                Choisir Sérénité
+                            </button>
+                        </div>
+                        
+                        {/* Plan VIP */}
+                        <div className="bg-slate-900 p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex flex-col items-center relative overflow-hidden transform md:-translate-y-4">
+                            <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                            <h3 className="text-xl font-black text-white uppercase tracking-widest mb-2 mt-4">VIP Diaspora</h3>
+                            <div className="text-4xl font-black text-amber-500 mb-6">12% <span className="text-sm text-slate-400">/loyer encaissé</span></div>
+                            <ul className="space-y-4 text-left w-full mb-8 text-sm font-bold text-slate-300">
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Collecte & Recouvrement VIP</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Rapport financier détaillé</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Gestionnaire Dédié 24/7</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Inspections vidéo trimestrielles</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Gestion fiscale DGI incluse</li>
+                                <li className="flex items-center gap-2"><Check size={16} className="text-amber-500" /> Représentation juridique</li>
+                            </ul>
+                            <button 
+                                onClick={() => setIsSubscribed(true)}
+                                className="w-full py-4 mt-auto bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-black uppercase tracking-widest shadow-lg hover:shadow-orange-500/25 transition-all"
+                            >
+                                Activer VIP
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
-        <div className="space-y-6 relative">
-            {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div>
-                     <div className="mb-2 bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-[6px] inline-flex items-center gap-2 shadow-sm">
-                        <Globe size={12} /> Expatriation & Diaspora
+        <div className="space-y-8 pb-32">
+            {/* HERO DASHBOARD VIP */}
+            <div className="relative glass-panel rounded-[2.5rem] p-8 md:p-12 overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
+                
+                <div className="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-start md:items-center">
+                    <div className="space-y-4 flex-1">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-amber-400">
+                            <Globe size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Abonnement VIP Actif</span>
+                        </div>
+                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">
+                            Espace <span className="text-amber-500">Diaspora.</span>
+                        </h1>
+                        <div className="flex flex-wrap gap-4 pt-2">
+                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-800/50 px-3 py-2 rounded-lg">
+                                <Plane size={14} className="text-sky-400" /> Résidence : {data.profile.paysResidence}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-800/50 px-3 py-2 rounded-lg">
+                                <MapPin size={14} className="text-emerald-400" /> Contact CI : {data.profile.diasporaContactPerson}
+                            </div>
+                        </div>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
-                         Passerelle Internationale
-                    </h1>
-                    <p className="text-[13.5px] font-medium text-slate-500 mt-1">
-                        Gérez vos actifs en Côte d'Ivoire. Encaissez en FCFA, connectez Stripe, suivez en Devise.
-                    </p>
-                </div>
-                <div className="flex gap-3">
-                    <button onClick={() => {
-                        const res = window.prompt("Entrez le code IBAN de votre compte local :");
-                        if(res) toast.success('Coordonnées bancaires ajoutées et vérifiées.');
-                    }} className="bg-white border text-blue-600 border-slate-200 px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
-                        <Landmark size={16} /> RIB Ivoirien (SGCI)
-                    </button>
-                    <button 
-                        onClick={handleStripe}
-                        disabled={isPending}
-                        className="bg-[#635BFF] text-white px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-[#4d45d8] transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
-                        <CreditCard size={16} /> Linker Stripe
-                    </button>
-                </div>
-            </div>
-
-            {/* Dashboard KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {/* Currency FX Box */}
-                 <div className="bg-slate-900 border border-slate-800 p-8 rounded-[24px] shadow-sm flex items-center gap-4 relative overflow-hidden text-white">
-                    <ArrowRightLeft className="absolute -right-4 -bottom-4 text-slate-800 opacity-50" size={120} />
-                    <div className="bg-blue-500/20 p-4 rounded-[12px] backdrop-blur-sm relative z-10 border border-blue-500/30">
-                        <Globe className="text-blue-400" size={24} />
-                    </div>
-                    <div className="relative z-10">
-                        <p className="text-[11px] font-bold text-blue-400 uppercase tracking-widest mb-1 shadow-sm">Total Patrimoine (Estim.)</p>
-                        <p className="text-4xl font-black text-white">41.1k <span className="text-[13px] text-slate-400 font-bold">€ EUR</span></p>
-                        <p className="text-[11px] font-medium text-slate-400 mt-1">≈ 27,000,000 FCFA</p>
-                    </div>
-                </div>
-
-                <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div className="bg-[#635BFF]/10 p-4 rounded-[12px] border border-[#635BFF]/20">
-                        <CreditCard className="text-[#635BFF]" size={24} />
-                    </div>
-                    <div>
-                        <p className="text-[11px] font-bold text-[#635BFF] uppercase tracking-widest mb-1">Passerelle Active</p>
-                        <p className="text-xl font-black text-slate-900 flex items-center gap-2">Stripe Connect <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-[4px] border border-emerald-200 inline-flex items-center gap-1"><ShieldCheck size={10}/> Vérifié</span></p>
-                        <p className="text-[11px] font-medium text-slate-500 mt-1">Accepte Visa, Mastercard, Amex</p>
-                    </div>
-                </div>
-
-                <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm flex items-center gap-4 group hover:border-blue-200 transition-colors">
-                    <div className="bg-blue-50 p-4 rounded-[12px] border border-blue-100 group-hover:bg-blue-100 transition-colors">
-                        <Plane className="text-blue-600" size={24} />
-                    </div>
-                    <div>
-                        <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest mb-1">Fiscalité Non-Résident</p>
-                        <p className="text-xl font-black text-slate-900">Déclarer impôts CI</p>
-                         <button 
-                            onClick={handleTax}
-                            disabled={isPending}
-                            className="text-[11px] font-bold text-blue-600 mt-1 flex items-center gap-1 hover:underline disabled:opacity-50">
-                            Générer attestation CDI <ChevronRight size={12}/>
-                         </button>
+                    
+                    {/* CONCIERGERIE WIDGET */}
+                    <div className="bg-white p-6 rounded-[2rem] shadow-xl w-full md:w-[320px] shrink-0 border border-slate-100 flex flex-col items-center text-center">
+                        <img src={data.manager.photo} alt={data.manager.name} className="w-16 h-16 rounded-full border-4 border-amber-100 mb-3" />
+                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">{data.manager.name}</h3>
+                        <p className="text-[10px] font-bold text-slate-400 mb-4">{data.manager.role}</p>
+                        <a 
+                            href={`https://wa.me/${data.manager.phone.replace('+', '')}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="w-full py-3 bg-emerald-500 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-md hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <MessageCircle size={16} /> Discuter sur WhatsApp
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-6">
-                 {/* Transaction Table */}
-                 <div className="flex-1 space-y-6">
-                    <div className="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-sm">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                                <Activity size={18} className="text-[#635BFF]"/> Compte de Clearing (EUR/XOF)
-                            </h2>
-                        </div>
-                        
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse min-w-[650px]">
-                                <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-200">
-                                        <th className="p-5 font-bold text-[10px] uppercase tracking-widest text-slate-500">Transaction</th>
-                                        <th className="p-5 font-bold text-[10px] uppercase tracking-widest text-slate-500">Devise Source (FCFA)</th>
-                                        <th className="p-5 font-bold text-[10px] uppercase tracking-widest text-slate-500">Conversion (EUR)</th>
-                                        <th className="p-5 font-bold text-[10px] uppercase tracking-widest text-slate-500">Réseau</th>
-                                        <th className="p-5 font-bold text-[10px] uppercase tracking-widest text-slate-500 text-right">Statut Clearing</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transactions.map((tx) => {
-                                        const isCredit = tx.type === 'CREDIT'
-                                        const amountFcfa = isCredit ? tx.amount : -tx.amount
-                                        const amountEur = parseFloat((amountFcfa / 655.957).toFixed(2))
-
-                                        return (
-                                        <tr key={tx.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group">
-                                            <td className="p-5">
-                                                <p className="font-bold text-[13px] text-slate-900">{isCredit ? 'Paiement Loyer' : 'Frais Agence'}</p>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{new Date(tx.createdAt).toLocaleDateString()} • {tx.id.substring(0,8)}</p>
-                                            </td>
-                                            <td className="p-5">
-                                                <p className={`font-black text-[14px] ${isCredit ? 'text-emerald-600' : 'text-slate-700'}`}>
-                                                    {isCredit ? '+' : ''}{amountFcfa.toLocaleString()} <span className="text-[10px] font-bold text-slate-400">FCFA</span>
-                                                </p>
-                                            </td>
-                                            <td className="p-5">
-                                                <p className={`font-black text-[14px] ${isCredit ? 'text-blue-600' : 'text-slate-600'}`}>
-                                                     {isCredit ? '+' : ''}{amountEur.toLocaleString()} <span className="text-[10px] font-bold text-slate-400">&euro;</span>
-                                                </p>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 whitespace-nowrap overflow-hidden text-ellipsis bg-slate-50 px-2 py-0.5 rounded-[4px] inline-block">FX RATE: 655.957</p>
-                                            </td>
-                                            <td className="p-5">
-                                                <div className="flex items-center gap-2">
-                                                     {tx.id.includes('STRIPE') ? <CreditCard size={14} className="text-[#635BFF]" /> : <Landmark size={14} className="text-slate-500" />}
-                                                    <span className="font-bold text-[12px] text-slate-700">{tx.id.includes('STRIPE') ? 'Stripe' : 'Virement'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="p-5 text-right">
-                                                {tx.status === 'COMPLETED' ? (
-                                                    <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold uppercase tracking-widest rounded-[6px]">
-                                                        Cleared
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 border border-amber-200 text-[9px] font-bold uppercase tracking-widest rounded-[6px]">
-                                                        SWIFT PENDING
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    )})}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                 </div>
-
-                 {/* Configuration Panel */}
-                  <div className="w-full lg:w-[350px] shrink-0 animate-in slide-in-from-right-8 duration-500">
-                    <div className="bg-white rounded-[24px] border border-slate-200 p-8 shadow-sm lg:sticky lg:top-8">
-                        <h3 className="text-[14px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-                            <MapPin className="text-blue-600" size={18} /> Profil Non-Résident
+            {/* DASHBOARD SECTIONS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* RAPPORTS MENSUELS */}
+                <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">
+                            <FileText size={20} className="text-amber-500" /> Rapports Financiers
                         </h3>
-
-                        <div className="space-y-4">
-                             <div className="p-4 bg-slate-50 rounded-[12px] border border-slate-200">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1 block">Pays de Résidence</label>
-                                <p className="font-bold text-[13px] text-slate-700 flex items-center gap-2">🇫🇷 France (Europe)</p>
-                             </div>
-
-                             <div className="p-4 bg-slate-50 rounded-[12px] border border-slate-200">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1 block">Réseau d'Alerte Préféré</label>
-                                <p className="font-bold text-[13px] text-emerald-600 flex items-center gap-2">WhatsApp (+33 6 ** ** ** **)</p>
-                             </div>
-
-                             <div className="p-4 bg-[#635BFF]/5 rounded-[12px] border border-[#635BFF]/20">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-[#635BFF] mb-1 block">Stripe Express Account</label>
-                                <p className="font-mono text-[12px] font-bold text-slate-700 mb-3 bg-white px-2 py-1 rounded-[6px] border border-[#635BFF]/10 inline-block">acct_1OuXXXXXXXiY</p>
-                                <button onClick={() => window.open('https://dashboard.stripe.com', '_blank')} className="w-full bg-white border border-[#635BFF] text-[#635BFF] px-4 py-2 rounded-[8px] font-bold text-[11px] uppercase tracking-widest hover:bg-[#635BFF] hover:text-white transition-colors text-center">
-                                    Voir Dashboard Stripe
-                                </button>
-                             </div>
-
-                             <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-[12px]">
-                                <p className="text-[11px] font-bold uppercase text-orange-700 mb-1 flex items-center gap-2"><TrendingUp size={12}/> Impôts Fonciers (CI)</p>
-                                <p className="text-[12px] font-medium text-orange-800/80 leading-relaxed">
-                                    En tant que résident fiscal étranger, une retenue à la source s'applique sur vos revenus fonciers rapatriés.
-                                </p>
-                             </div>
-                        </div>
                     </div>
+                    <div className="space-y-4">
+                        {data.reports.map((report: any) => (
+                            <div key={report.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-300 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-amber-500 shadow-sm">
+                                        <FileText size={18} />
+                                    </div>
+                                    <div>
+                                        <p className="font-black text-slate-800 text-sm">{report.month}</p>
+                                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{report.status}</p>
+                                    </div>
+                                </div>
+                                <button className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
+                                    <ArrowRight size={16} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* DEMANDES D'INSPECTION */}
+                <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center space-y-4 border-dashed">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                        <Camera size={28} />
+                    </div>
+                    <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">Inspections Vidéo</h3>
+                    <p className="text-sm font-medium text-slate-500 max-w-sm">
+                        Demandez à votre gestionnaire de filmer une visite détaillée de l'un de vos biens à Abidjan.
+                    </p>
+                    <button className="px-6 py-3 bg-amber-50 text-amber-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-100 transition-colors mt-4">
+                        Demander une visite
+                    </button>
                 </div>
             </div>
         </div>
