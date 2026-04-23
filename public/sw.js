@@ -1,24 +1,41 @@
-const CACHE_NAME = 'qapril-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/manifest.webmanifest',
-  '/icon-192x192.png',
-  '/icon-512x512.png'
-];
+self.addEventListener('push', function(event) {
+    if (event.data) {
+        const data = JSON.parse(event.data.text());
+        const options = {
+            body: data.body,
+            icon: data.icon || '/icon-192x192.png',
+            badge: '/badge-72x72.png',
+            data: data.data || {},
+            vibrate: [100, 50, 100],
+            actions: [
+                { action: 'open', title: 'Ouvrir QAPRIL' },
+                { action: 'close', title: 'Fermer' }
+            ]
+        };
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-  );
+        event.waitUntil(
+            self.registration.showNotification(data.title, options)
+        );
+    }
 });
 
-self.addEventListener('fetch', (event) => {
-  // Simple cache-first for static assets, network-first for others
-  if (event.request.mode === 'navigate' || event.request.destination === 'image' || event.request.destination === 'font') {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
-    );
-  }
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    
+    if (event.action === 'open' || !event.action) {
+        const urlToOpen = event.notification.data.url || '/admin';
+        event.waitUntil(
+            clients.matchAll({ type: 'window' }).then(windowClients => {
+                for (var i = 0; i < windowClients.length; i++) {
+                    var client = windowClients[i];
+                    if (client.url === urlToOpen && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
+        );
+    }
 });

@@ -8,6 +8,7 @@ import AdminHeader from "@/components/admin/AdminHeader"
 import AdminSidebar from "@/components/admin/AdminSidebar"
 import { unstable_noStore as noStore } from 'next/cache';
 import { isRoleGloballyActive } from "@/lib/role-lock"
+import PushRegistration from "@/components/admin/PushRegistration"
 
 export default async function AdminLayout({
     children,
@@ -56,6 +57,8 @@ export default async function AdminLayout({
                 </div>
             </div>
             
+            <PushRegistration />
+
             <style dangerouslySetInnerHTML={{__html: `
               body {
                 background: var(--ci-nuit) !important;

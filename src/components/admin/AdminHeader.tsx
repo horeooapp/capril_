@@ -2,6 +2,7 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import NotificationCenter from "./NotificationCenter"
 
 interface AdminHeaderProps {
     session: any
@@ -35,10 +36,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
             </div>
             
             <div className="topbar-right">
-                <div className="top-btn" title="Notifications">
-                    <div className="notif-dot"></div>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1a4 4 0 014 4v2.5l1 1.5H2L3 7.5V5a4 4 0 014-4zM5.5 11a1.5 1.5 0 003 0" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>
-                </div>
+                <NotificationCenter />
                 
                 <div className="top-btn" onClick={onLogout} title="Déconnexion (Rapide)" style={{ cursor: 'pointer' }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M6 14H3a2 2 0 01-2-2V4a2 2 0 012-2h3M10 11l4-3-4-3M14 8H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>

@@ -245,27 +245,58 @@ export class NotificationService {
       if (!user?.pushToken) return false;
 
       const title = "QAPRIL App";
-      const body = data.payload?.smsText || "Nouvelle notification importante sur votre espace QAPRIL.";
+      const body = data.payload?.smsText || data.payload?.title || "Nouvelle notification importante sur votre espace QAPRIL.";
 
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Accept-encoding': 'gzip, deflate',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          to: user.pushToken,
-          sound: 'default',
-          title: title,
-          body: body,
-          data: { event, referenceId: data.referenceId },
-        }),
-      });
+      // Case 1: Expo Push Token (Mobile)
+      if (user.pushToken.startsWith('ExponentPushToken') || user.pushToken.startsWith('token:')) {
+        const response = await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: user.pushToken,
+            sound: 'default',
+            title: title,
+            body: body,
+            data: { event, referenceId: data.referenceId },
+          }),
+        });
+        const resData = await response.json();
+        await this.logNotification(userId, "PUSH", event, data.templateId, response.ok ? "ENVOYE" : "ECHEC");
+        return response.ok;
+      } 
+      
+      // Case 2: Web Push Subscription (JSON String)
+      else if (user.pushToken.includes('"endpoint"')) {
+        try {
+          const webpush = (await import("web-push")).default;
+          // Note: VAPID keys should be in .env
+          webpush.setVapidDetails(
+            'mailto:admin@qapril.com',
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+            process.env.VAPID_PRIVATE_KEY || ''
+          );
 
-      const resData = await response.json();
-      await this.logNotification(userId, "PUSH", event, data.templateId, response.ok ? "ENVOYE" : "ECHEC");
-      return response.ok;
+          const subscription = JSON.parse(user.pushToken);
+          await webpush.sendNotification(subscription, JSON.stringify({
+            title,
+            body,
+            icon: '/icon-192x192.png',
+            data: { url: '/admin' }
+          }));
+
+          await this.logNotification(userId, "PUSH", event, data.templateId, "ENVOYE");
+          return true;
+        } catch (webError) {
+          console.error("[NotificationService] WebPush failed", webError);
+          return false;
+        }
+      }
+
+      return false;
     } catch (e) {
       console.error("[NotificationService] Push failed", e);
       return false;
@@ -276,7 +307,26 @@ export class NotificationService {
     await this.envoyerSMS(userId, event, data);
   }
 
-  private static async logNotification(userId: string, canal: any, event: string, templateId?: string, statut: any = "ENVOYE") {
+  static async getNotifications(userId: string, limit: number = 20) {
+    return prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: limit
+    });
+  }
+
+  static async logNotification(userId: string, canal: any, event: string, templateId?: string, statut: any = "ENVOYE") {
+    // Also create a real Notification record for UI display
+    await prisma.notification.create({
+      data: {
+        userId,
+        title: `Alerte ${event.replace(/_/g, ' ')}`,
+        content: `Nouvelle notification de type ${event}`,
+        status: statut === "ECHEC" ? "failed" : "sent",
+        read: false
+      }
+    });
+
     await (prisma as any).notificationLog.create({
       data: {
         userId,
