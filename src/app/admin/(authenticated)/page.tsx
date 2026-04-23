@@ -22,7 +22,11 @@ import {
     ClipboardCheck,
     Wallet,
     RefreshCw,
-    ExternalLink
+    ExternalLink,
+    Lock,
+    Key,
+    Globe,
+    Wifi
 } from "lucide-react"
 import Link from "next/link"
 import LandingToggle from "@/components/admin/LandingToggle"
@@ -98,7 +102,13 @@ export default async function AdminDashboardOverview() {
         marketIntelligence,
         leasesCurrentMonth,
         leasesLastMonth,
-        monthlyTrendRes
+        monthlyTrendRes,
+        passeportRes,
+        vaultRes,
+        championsRes,
+        diasporaRes,
+        abonnementsRes,
+        signalementsRes
     ] = await Promise.all([
         prisma.user.count().catch(() => 0),
         prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -158,7 +168,13 @@ export default async function AdminDashboardOverview() {
             where: { status: "paid" },
             orderBy: { periodMonth: 'desc' },
             take: 6
-        }).catch(() => [])
+        }).catch(() => []),
+        (prisma as any).passeportLocatif.count().catch(() => 0),
+        (prisma as any).vaultCaution.aggregate({ _sum: { montant: true }, where: { status: "CONSIGNEE" } }).catch(() => null),
+        (prisma as any).championProfile.count().catch(() => 0),
+        (prisma as any).userDiasporaProfile.count().catch(() => 0),
+        (prisma as any).abonnementOperateur.count().catch(() => 0),
+        (prisma as any).signalementLocataire.count({ where: { statut: { in: ['ENVOYE', 'EN_COURS'] } } }).catch(() => 0)
     ]);
     
     // Process trends
@@ -242,7 +258,13 @@ export default async function AdminDashboardOverview() {
         activeWalletConfigs,
         totalReclamations,
         totalLitiges,
-        activePromos
+        activePromos,
+        totalPasseports: passeportRes,
+        totalVaultAmount: Number(vaultRes?._sum?.montant || 0),
+        totalChampions: championsRes,
+        totalDiaspora: diasporaRes,
+        totalAbonnements: abonnementsRes,
+        activeSignalements: signalementsRes
     }
 
     try {
@@ -444,6 +466,44 @@ export default async function AdminDashboardOverview() {
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="panel" style={{ marginTop: '20px', marginBottom: '20px' }}>
+                    <div className="panel-header">
+                        <h2 className="panel-title">Nouveaux Modules (Adoption V1.1)</h2>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg mb-2"><Lock size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.totalVaultAmount.toLocaleString()} F</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Vault Consigné</div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg mb-2"><Key size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.totalPasseports}</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Passeports Générés</div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-amber-100 text-amber-600 rounded-lg mb-2"><Trophy size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.totalChampions}</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Champions Actifs</div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg mb-2"><Globe size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.totalDiaspora}</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Diaspora VIP</div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-orange-100 text-orange-600 rounded-lg mb-2"><Wifi size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.totalAbonnements}</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Abonnements Actifs</div>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
+                            <div className="p-2 bg-red-100 text-red-600 rounded-lg mb-2"><AlertTriangle size={20}/></div>
+                            <div className="text-xl font-black text-gray-900">{safeData.activeSignalements}</div>
+                            <div className="text-[10px] uppercase text-gray-500 font-bold">Signalements Actifs</div>
                         </div>
                     </div>
                 </div>
