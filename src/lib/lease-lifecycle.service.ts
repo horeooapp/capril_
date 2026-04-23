@@ -66,12 +66,12 @@ export class LeaseLifecycleService {
             data: {
                 userId: userId,
                 action: "LEASE_STATUS_TRANSITION",
-                targetId: leaseId,
-                targetType: "LEASE",
-                details: JSON.stringify({
-                    from: currentStatus,
-                    to: newStatus,
-                    reason: reason || "Transition automatique"
+                entityId: leaseId,
+                module: "LEASE",
+                oldValues: JSON.stringify({ status: currentStatus }),
+                newValues: JSON.stringify({ 
+                    status: newStatus, 
+                    reason: reason || "Transition automatique" 
                 })
             }
         });
