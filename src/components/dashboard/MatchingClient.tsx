@@ -187,8 +187,8 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                             <span className="font-black text-slate-800">{Number(searchResult.revenuFourchette || 0).toLocaleString()} FCFA</span>
                                         </div>
                                         <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
-                                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Grade QAPRIL</span>
-                                            <span className="font-black text-emerald-600 block">Grade {searchResult.scoreBadge}</span>
+                                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Score ICL</span>
+                                            <span className="font-black text-emerald-600 block">{searchResult.scoreActuel} pts (Grade {searchResult.scoreBadge})</span>
                                         </div>
                                     </div>
                                 </div>
@@ -294,8 +294,8 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                             <span className="font-black text-gray-700 text-xs">{profil.communes?.join(', ') || 'Peu importe'}</span>
                                         </div>
                                         <div className="flex justify-between items-center bg-emerald-50 p-2 rounded-lg">
-                                            <span className="text-xs font-bold text-emerald-600">Grade QAPRIL</span>
-                                            <span className="font-black text-emerald-700">Niveau {profil.kycNiveau}</span>
+                                            <span className="text-xs font-bold text-emerald-600">Score ICL</span>
+                                            <span className="font-black text-emerald-700">{profil.scoreActuel} pts (Grade {profil.scoreBadge})</span>
                                         </div>
                                     </div>
 

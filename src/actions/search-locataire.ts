@@ -35,7 +35,8 @@ export async function findLocataireByPhone(phone: string) {
                 }
             },
             include: {
-                profilPublic: true
+                profilPublic: true,
+                locataireProfile: true
             }
         })
 
@@ -65,7 +66,8 @@ export async function findLocataireByPhone(phone: string) {
             statutPro: profil.statutPro,
             revenuFourchette: profil.revenuFourchette,
             communesSouhaitees: (profil.communesSouhaitees as string[]) || [],
-            scoreBadge: 'B' // Par défaut si aucun calcul
+            scoreBadge: (user as any).locataireProfile?.scoreBadge || 'D',
+            scoreActuel: (user as any).locataireProfile?.scoreActuel || 0
         }
     } catch (error) {
         console.error("Error finding locataire by phone:", error)
@@ -121,7 +123,8 @@ export async function searchLocataires(filters: {
                 user: {
                     select: {
                         firstName: true, lastName: true,
-                        kycLevel: true
+                        kycLevel: true,
+                        locataireProfile: true
                     }
                 }
             },
@@ -142,7 +145,9 @@ export async function searchLocataires(filters: {
                 statutPro: profil.statutPro,
                 communes: (profil.communesSouhaitees as string[]) || [],
                 budget: profil.budgetMaxFcfa,
-                nbConsultations: profil.nbConsultationsProfil
+                nbConsultations: profil.nbConsultationsProfil,
+                scoreActuel: profil.user?.locataireProfile?.scoreActuel || 0,
+                scoreBadge: profil.user?.locataireProfile?.scoreBadge || 'D'
             }
         })
     } catch (error) {
