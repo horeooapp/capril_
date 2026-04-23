@@ -110,7 +110,7 @@ export function AgencyPortalDashboardV2({
                       { label: "Déclarer Incident", icon: <ShieldCheck size={16} />, href: "/dashboard/disputes/new" },
                       { label: "Générer CRG", icon: <ClipboardList size={16} />, href: "/dashboard/reports" },
                  ].map((action, i) => (
-                     <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 border border-slate-200 rounded-[10px] hover:border-slate-300 hover:bg-slate-100 text-slate-600 transition-all">
+                     <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-200 rounded-[10px] hover:border-sky-500 hover:bg-sky-50 text-slate-600 hover:text-sky-700 transition-all">
                          {action.icon}
                          <span className="text-[11px] font-semibold text-center">{action.label}</span>
                      </Link>

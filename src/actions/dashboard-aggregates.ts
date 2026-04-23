@@ -39,19 +39,21 @@ export async function getDashboardAggregates(userId: string, role: string): Prom
         };
     }
 
-    // 1. Calculate Wallet Balance
-    const walletTransactions = await prisma.walletTransaction.findMany({
-        where: { userId: userId, status: "COMPLETED" }
-    });
-
-    const walletBalance = walletTransactions.reduce((acc, curr) => {
-        if (["CREDIT", "RECHARGE", "REVERSEMENT"].includes(curr.type)) return acc + curr.amount;
-        if (["DEBIT", "WITHDRAWAL", "PAYMENT"].includes(curr.type)) return acc - curr.amount;
-        return acc;
-    }, 0);
+    // 1. Calculate Wallet Balance using Prisma aggregations
+    const [creditSum, debitSum] = await Promise.all([
+        prisma.walletTransaction.aggregate({
+            _sum: { amount: true },
+            where: { userId: userId, status: "COMPLETED", type: { in: ["CREDIT", "RECHARGE", "REVERSEMENT"] } }
+        }),
+        prisma.walletTransaction.aggregate({
+            _sum: { amount: true },
+            where: { userId: userId, status: "COMPLETED", type: { in: ["DEBIT", "WITHDRAWAL", "PAYMENT"] } }
+        })
+    ]);
+    const walletBalance = (creditSum._sum.amount || 0) - (debitSum._sum.amount || 0);
 
     // 2. Fetch Operational Metrics
-    const [totalUnits, occupiedUnits, activeLeasesCount, pendingReclamationsCount] = await Promise.all([
+    const [totalUnits, occupiedUnits, activeLeasesCount, pendingReclamationsCount, leaseAggregates] = await Promise.all([
         prisma.property.count({ where: propertyCondition }),
         prisma.property.count({ where: { ...propertyCondition, status: "active", leases: { some: { status: "ACTIVE" } } } }),
         prisma.lease.count({ where: { property: propertyCondition, status: "ACTIVE" } }),
@@ -60,14 +62,14 @@ export async function getDashboardAggregates(userId: string, role: string): Prom
                 lease: { property: propertyCondition },
                 statut: { in: ["OUVERT", "EN_COURS"] }
             } 
+        }),
+        prisma.lease.aggregate({
+            _sum: { rentAmount: true, chargesAmount: true },
+            where: { property: propertyCondition, status: "ACTIVE" }
         })
     ]);
 
-    const activeLeases = await prisma.lease.findMany({
-        where: { property: propertyCondition, status: "ACTIVE" },
-        select: { rentAmount: true, chargesAmount: true }
-    });
-    const totalPortfolioValue = activeLeases.reduce((sum, l) => sum + l.rentAmount + l.chargesAmount, 0);
+    const totalPortfolioValue = (leaseAggregates._sum.rentAmount || 0) + (leaseAggregates._sum.chargesAmount || 0);
     const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
     // 3. Fetch Recent Receipts
