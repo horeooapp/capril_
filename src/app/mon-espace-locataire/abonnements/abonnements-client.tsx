@@ -13,6 +13,8 @@ export default function AbonnementsClient({ lease, abonnements: initialAbs }: { 
 
     const operateurs = [
         { id: "ORANGE", name: "Orange CI", desc: "Fibre Optique & Box 4G", icon: <Wifi size={24} />, color: "text-orange-500", bg: "bg-orange-50" },
+        { id: "MTN", name: "MTN CI", desc: "Box Internet 4G/5G", icon: <Wifi size={24} />, color: "text-yellow-500", bg: "bg-yellow-50" },
+        { id: "MOOV", name: "Moov Africa", desc: "Internet Box", icon: <Wifi size={24} />, color: "text-sky-600", bg: "bg-sky-50" },
         { id: "CIE", name: "CIE", desc: "Abonnement Électricité", icon: <Zap size={24} />, color: "text-amber-500", bg: "bg-amber-50" },
         { id: "SODECI", name: "SODECI", desc: "Raccordement Eau", icon: <Droplets size={24} />, color: "text-blue-500", bg: "bg-blue-50" },
         { id: "CANAL_PLUS", name: "Canal+", desc: "Bouquet TV", icon: <MonitorPlay size={24} />, color: "text-black", bg: "bg-gray-100" },
