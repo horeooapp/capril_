@@ -16,7 +16,12 @@ import {
     Key,
     Briefcase,
     Building,
-    FileCheck
+    FileCheck,
+    Wifi,
+    Lock,
+    Trophy,
+    Globe,
+    Zap
 } from "lucide-react"
 
 export default function ManualOfficielContent() {
@@ -49,9 +54,9 @@ export default function ManualOfficielContent() {
                         <img src="/logo.png" alt="QAPRIL" className="h-20 w-auto rounded-3xl shadow-xl border-4 border-white" />
                         <div className="hidden md:block h-16 w-px bg-gray-200"></div>
                         <div className="flex flex-col">
-                            <span className="text-sm font-black uppercase tracking-[0.4em] text-ivoire-dark/80">Manuel d&apos;utilisation v1.0</span>
+                            <span className="text-sm font-black uppercase tracking-[0.4em] text-ivoire-dark/80">Manuel d&apos;utilisation v1.1</span>
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
-                                Mars 2026 • Validé
+                                Avril 2026 • Validé
                             </span>
                         </div>
                     </div>
@@ -73,7 +78,7 @@ export default function ManualOfficielContent() {
                         </div>
                         <div className="flex items-center gap-3 bg-ivoire-dark/5 border border-ivoire-dark/10 rounded-2xl px-5 py-3 text-ivoire-dark">
                              <ShieldCheck size={20} />
-                             <span className="text-[11px] font-black uppercase tracking-widest">Manuel Officiel</span>
+                             <span className="text-[11px] font-black uppercase tracking-widest">Manuel Officiel v1.1</span>
                         </div>
                         <button 
                             onClick={() => window.print()}
@@ -97,13 +102,13 @@ export default function ManualOfficielContent() {
                             {[
                                 { id: "section-1", title: "1. Qu'est-ce que QAPRIL ?", icon: <Info size={16} /> },
                                 { id: "section-2", title: "2. S'inscrire sur QAPRIL", icon: <CheckCircle size={16} /> },
-                                { id: "section-3", title: "3. Guide du Propriétaire", icon: <Home size={16} /> },
-                                { id: "section-4", title: "4. Guide du Locataire", icon: <Key size={16} /> },
-                                { id: "section-5", title: "5. Guide de l'Agent", icon: <Briefcase size={16} /> },
-                                { id: "section-6", title: "6. Guide de l'Agence", icon: <Building size={16} /> },
-                                { id: "section-7", title: "7. Les Quittances", icon: <FileText size={16} /> },
-                                { id: "section-8", title: "8. Module M17 DGI", icon: <FileCheck size={16} /> },
-                                { id: "section-9", title: "9. Questions Fréquentes", icon: <HelpCircle size={16} /> },
+                                { id: "section-3", title: "3. Guide Propriétaire & Vault", icon: <Home size={16} /> },
+                                { id: "section-4", title: "4. Guide Locataire & Passeport", icon: <Key size={16} /> },
+                                { id: "section-5", title: "5. Abonnements & Utilités", icon: <Wifi size={16} /> },
+                                { id: "section-6", title: "6. Agences & Agents", icon: <Building size={16} /> },
+                                { id: "section-7", title: "7. Le Portail Diaspora", icon: <Globe size={16} /> },
+                                { id: "section-8", title: "8. Programme Champions", icon: <Trophy size={16} /> },
+                                { id: "section-9", title: "9. Paiement Autonome", icon: <Zap size={16} /> },
                                 { id: "section-10", title: "10. Glossaire", icon: <BookOpen size={16} /> }
                             ].map((item) => (
                                 <button
@@ -132,7 +137,7 @@ export default function ManualOfficielContent() {
                     <div id="section-1" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">1. Qu&apos;est-ce que QAPRIL ?</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
-                            <p className="print:text-black">QAPRIL est une application numérique qui permet aux propriétaires et locataires de gestion leurs locations de façon simple, sécurisée et officielle en Côte d&apos;Ivoire.</p>
+                            <p className="print:text-black">QAPRIL est une application numérique Fintech qui permet aux propriétaires et locataires de gérer leurs locations de façon simple, sécurisée et autonome en Côte d&apos;Ivoire.</p>
                             
                             <div>
                                 <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4 print:mt-4 print:text-lg text-black">1.1 Ce que QAPRIL fait pour vous</h3>
@@ -147,67 +152,18 @@ export default function ManualOfficielContent() {
                                         <tbody>
                                             <tr className="bg-white border-b">
                                                 <td className="px-6 py-4 font-bold text-gray-900">Propriétaire bailleur</td>
-                                                <td className="px-6 py-4">Enregistrer vos locataires · Générer des quittances officielles automatiques · Suivre vos paiements · Gérer vos cours communes et appartements</td>
+                                                <td className="px-6 py-4">Sécuriser les cautions (Vault) · Générer des quittances automatiques par Mobile Money · Gérer les incidents de la maison</td>
                                             </tr>
                                             <tr className="bg-gray-50 border-b">
                                                 <td className="px-6 py-4 font-bold text-gray-900">Locataire</td>
-                                                <td className="px-6 py-4">Recevoir votre quittance par SMS après chaque paiement · Consulter votre historique · Construire un dossier de crédit · Prouver votre domicile</td>
+                                                <td className="px-6 py-4">Bâtir un Passeport Locatif (Score ICL) · S'abonner à Orange/MTN/Moov/Canal+ · Signaler des pannes en un clic</td>
                                             </tr>
                                             <tr className="bg-white border-b">
-                                                <td className="px-6 py-4 font-bold text-gray-900">Agent immobilier</td>
-                                                <td className="px-6 py-4">Gérer les biens de vos clients · Enregistrer des baux · Suivre les paiements · Déclencher les relances automatiquement</td>
-                                            </tr>
-                                            <tr className="bg-gray-50">
-                                                <td className="px-6 py-4 font-bold text-gray-900">Responsable d&apos;agence</td>
-                                                <td className="px-6 py-4">Piloter tout votre portefeuille · Tableau de bord complet · Rapports automatiques · Gestion des équipes terrain</td>
+                                                <td className="px-6 py-4 font-bold text-gray-900">Investisseur Diaspora</td>
+                                                <td className="px-6 py-4">Déléguer la gestion en formule VIP · Obtenir des inspections vidéo · Suivre les rapports financiers mensuels</td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-
-                            <div className="print:break-inside-avoid">
-                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4 print:mt-6 print:text-lg">1.2 Les canaux d&apos;accès</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-2">
-                                    <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
-                                        <div className="font-bold text-gray-900 mb-1">📱 Application Android</div>
-                                        <p className="text-sm">Télécharger QAPRIL sur Google Play Store · Chercher &apos;QAPRIL CI&apos;</p>
-                                        <div className="mt-2 text-xs font-bold text-ivoire-dark uppercase">Propriétaires · Agents · Agences</div>
-                                    </div>
-                                    <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
-                                        <div className="font-bold text-gray-900 mb-1">💻 Site Web</div>
-                                        <p className="text-sm">Ouvrir qapril.ci dans votre navigateur</p>
-                                        <div className="mt-2 text-xs font-bold text-ivoire-dark uppercase">Tous les profils</div>
-                                    </div>
-                                    <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
-                                        <div className="font-bold text-gray-900 mb-1">💬 WhatsApp</div>
-                                        <p className="text-sm">Enregistrer le numéro QAPRIL et envoyer un message</p>
-                                        <div className="mt-2 text-xs font-bold text-ivoire-dark uppercase">Propriétaires (création rapide)</div>
-                                    </div>
-                                    <div className="p-5 border border-gray-100 rounded-2xl bg-white shadow-sm">
-                                        <div className="font-bold text-gray-900 mb-1">📞 USSD *144#</div>
-                                        <p className="text-sm">Composer *144*PSDP# depuis n&apos;importe quel téléphone</p>
-                                        <div className="mt-2 text-xs font-bold text-ivoire-dark uppercase">Locataires</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="print:break-inside-avoid bg-ivoire-dark/5 p-8 rounded-3xl border border-ivoire-dark/10 mt-8">
-                                <h3 className="text-xl font-black text-ivoire-dark mb-4 uppercase tracking-tight flex items-center gap-2">
-                                    <ShieldCheck size={24} /> 1.3 Protections Locatives (Loi 2019)
-                                </h3>
-                                <p className="text-sm font-bold text-ivoire-dark/80 leading-relaxed mb-6">
-                                    QAPRIL est conçu pour faire respecter la loi n°2019-576 du 26 juin 2019 relative au bail à usage d&apos;habitation en Côte d&apos;Ivoire.
-                                </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-medium">
-                                    <div className="space-y-2">
-                                        <p className="text-gray-900 font-extrabold uppercase text-[11px] tracking-widest">Caution & Avance (Art. 12)</p>
-                                        <p className="text-sm text-gray-600">Le total de la caution et des loyers d&apos;avance ne peut excéder **3 mois**. Les quittances QAPRIL vous permettent de prouver ces versements.</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="text-gray-900 font-extrabold uppercase text-[11px] tracking-widest">Délai de Préavis (Art. 39)</p>
-                                        <p className="text-sm text-gray-600">Que ce soit pour le locataire ou le bailleur, le délai de préavis est de **1 mois** minimum. QAPRIL automatise l&apos;envoi de l&apos;Avis Électronique certifié.</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -222,244 +178,110 @@ export default function ManualOfficielContent() {
                             <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                                     <CheckCircle size={20} className="text-ivoire-dark" />
-                                    2.1 Inscription depuis l&apos;application Android
+                                    2.1 Inscription Mobile ou Web
                                 </h3>
                                 <ul className="space-y-3 font-medium text-sm">
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 1. Ouvrez l&apos;application QAPRIL sur votre téléphone Android</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 2. Appuyez sur &apos;Créer un compte&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 3. Entrez votre numéro de téléphone Orange, MTN, Wave ou Moov (10 chiffres)</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 4. Vous recevez un code SMS à 6 chiffres — entrez-le dans l&apos;application</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 5. Choisissez votre profil : Propriétaire · Locataire · Agent · Agence</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 6. Entrez votre nom et prénom complets</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 7. Appuyez sur &apos;Valider&apos; — votre compte est créé</li>
+                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 1. Entrez votre numéro de téléphone (10 chiffres)</li>
+                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 2. Recevez et entrez le code SMS (OTP)</li>
+                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-0.5" size={18} /> 3. Remplissez le KYC (Pièce d'identité) pour activer la certification des quittances</li>
                                 </ul>
-                                <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm font-medium flex gap-3 items-start print:border print:border-blue-200">
-                                    <Info className="shrink-0 mt-0.5" size={18} />
-                                    <p>Astuce : Vous n&apos;avez pas besoin de mot de passe — QAPRIL utilise votre numéro de téléphone et un code SMS pour vous identifier. C&apos;est plus simple et plus sécurisé.</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4">2.2 Compléter votre profil KYC</h3>
-                                <p className="mb-4 text-sm">Pour bénéficier de toutes les fonctionnalités — notamment émettre des quittances officielles — vous devez compléter votre identité.</p>
-                                <div className="space-y-3">
-                                    <div className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-100 rounded-2xl bg-white shrink-0">
-                                        <div className="font-bold text-gray-900 w-1/3">Photo CNI / ID</div>
-                                        <div className="text-sm w-1/2">CNI · Passeport · Carte de résident · Attestation</div>
-                                        <div className="text-xs font-bold text-ivoire-dark uppercase w-1/3 sm:text-right">Émettre quittances</div>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-100 rounded-2xl bg-white shrink-0">
-                                        <div className="font-bold text-gray-900 w-1/3">Selfie avec ID</div>
-                                        <div className="text-sm w-1/2">Selfie avec pièce visible</div>
-                                        <div className="text-xs font-bold text-ivoire-dark uppercase w-1/3 sm:text-right">Vérification identité</div>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row gap-4 p-4 border border-gray-100 rounded-2xl bg-white shrink-0">
-                                        <div className="font-bold text-gray-900 w-1/3">Téléphone actif CI</div>
-                                        <div className="text-sm w-1/2">Format : 07 XX XX XX XX</div>
-                                        <div className="text-xs font-bold text-ivoire-dark uppercase w-1/3 sm:text-right">Obligatoire tous services</div>
-                                    </div>
-                                </div>
-                                <p className="mt-4 text-sm italic">Le KYC (vérification d&apos;identité) est progressif. Vous pouvez commencer à utiliser QAPRIL avec le minimum, et compléter votre profil plus tard...</p>
                             </div>
                         </div>
                     </div>
 
                     {/* SECTION 3 */}
                     <div id="section-3" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">3. Guide du Propriétaire Bailleur</h2>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">3. Guide du Propriétaire & Vault Caution</h2>
                         <div className="space-y-10 text-gray-600 print:text-black">
+                            
                             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.1 Ajouter un logement</h3>
-                                <ul className="space-y-2 text-sm font-medium">
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Dans le menu principal, appuyez sur &apos;Mes biens&apos; puis &apos;Ajouter un logement&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Choisissez le type : Chambre · Appartement · Studio · Villa · Local commercial</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Entrez l&apos;adresse ou décrivez le logement (ex : &apos;Chambre 3 · Cour Bamba · Niangon&apos;)</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 4. Entrez le loyer mensuel en FCFA</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 5. Appuyez sur &apos;Enregistrer&apos;</li>
-                                </ul>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.2 Enregistrer un locataire — Bail formel</h3>
-                                <p className="text-sm mb-4 leading-relaxed">Un bail formel est un contrat écrit entre vous et votre locataire. C&apos;est la forme la plus protectrice — elle permet d&apos;enregistrer le bail à la DGI et de démarrer les quittances officielles.</p>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.1 Le Séquestre (Vault Caution)</h3>
+                                <p className="text-sm mb-4 leading-relaxed">Fini les litiges de fin de bail. QAPRIL dispose d'un coffre numérique adossé à la CDC-CI pour sécuriser les cautions.</p>
                                 <ul className="space-y-2 text-sm font-medium mb-6">
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Allez dans &apos;Mes biens&apos; · Sélectionnez le logement concerné</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Appuyez sur &apos;Ajouter un locataire&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Entrez le nom complet et le numéro de téléphone du locataire</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 4. Entrez le montant du loyer mensuel</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 5. Choisissez la date d&apos;entrée et la durée du bail</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 6. QAPRIL génère le bail automatiquement — appuyez sur &apos;Faire signer&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 7. Le locataire reçoit un SMS pour signer électroniquement</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 8. Une fois signé des deux côtés : votre bail QAPRIL est actif</li>
+                                    <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> Allez dans <strong>Vault Caution</strong></li>
+                                    <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> Cliquez sur <strong>Consigner</strong> pour bloquer l'argent perçu du locataire.</li>
+                                    <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> Le locataire reçoit une preuve de consignation hachée.</li>
+                                    <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> À son départ, un clic sur <strong>Restituer</strong> libère l'argent sur son Wave/MoMo.</li>
                                 </ul>
-                                <div className="overflow-x-auto rounded-xl border border-gray-100">
-                                    <table className="min-w-full text-xs text-left text-gray-600">
-                                        <thead className="bg-gray-50 font-bold uppercase text-gray-700">
-                                            <tr>
-                                                <th className="px-4 py-3 border-b">Tranche de loyer</th>
-                                                <th className="px-4 py-3 border-b">Frais d&apos;enregistrement bail</th>
-                                                <th className="px-4 py-3 border-b">Frais de renouvellement</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr className="bg-green-50/50 border-b"><td className="px-4 py-3 font-bold">Bail Déclaratif (cours communes)</td><td className="px-4 py-3 font-black text-green-600">GRATUIT</td><td className="px-4 py-3 font-black text-green-600">GRATUIT</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">Moins de 50 000 FCFA/mois</td><td className="px-4 py-3">3 000 FCFA TTC</td><td className="px-4 py-3">1 500 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">50 001 – 150 000 FCFA/mois</td><td className="px-4 py-3">5 000 FCFA TTC</td><td className="px-4 py-3">2 500 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">150 001 – 400 000 FCFA/mois</td><td className="px-4 py-3">8 000 FCFA TTC</td><td className="px-4 py-3">4 000 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">400 001 – 1 000 000 FCFA/mois</td><td className="px-4 py-3">15 000 FCFA TTC</td><td className="px-4 py-3">7 500 FCFA TTC</td></tr>
-                                            <tr><td className="px-4 py-3">Plus de 1 000 000 FCFA/mois</td><td className="px-4 py-3">25 000 FCFA TTC</td><td className="px-4 py-3">12 500 FCFA TTC</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
                             </div>
 
                             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.3 Enregistrer un locataire — Bail Déclaratif BDQ</h3>
-                                <div className="p-4 bg-yellow-50 text-yellow-800 rounded-xl text-sm font-medium mb-4 flex gap-3">
-                                    <Info className="shrink-0 mt-0.5" size={18} />
-                                    <p>⚠️ Le Bail Déclaratif est GRATUIT toujours. Il protège vos deux intérêts mais ne remplace pas un bail signé complet. QAPRIL vous proposera de le formaliser après 3 mois si vous le souhaitez.</p>
-                                </div>
-                                <h4 className="font-bold text-gray-900 mt-6 mb-2">Option A — Via l&apos;application</h4>
-                                <ul className="space-y-2 text-sm font-medium">
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Allez dans &apos;Mes biens&apos; · Sélectionnez le logement · Appuyez sur &apos;Bail Déclaratif&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Entrez le nom du locataire et son téléphone</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Entrez le montant du loyer et la date d&apos;entrée approximative</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 4. QAPRIL envoie un SMS au locataire pour qu&apos;il confirme</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 5. Dès sa réponse OUI : votre BDQ est créé — quittances activées automatiquement</li>
-                                </ul>
-                                <h4 className="font-bold text-gray-900 mt-6 mb-2">Option B — Via WhatsApp (plus simple pour les cours communes)</h4>
-                                <p className="text-sm">Envoyez un message au numéro WhatsApp QAPRIL. L&apos;assistant répond en français et vous guide en 5 questions.</p>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.5 Le Wallet QAPRIL</h3>
-                                <p className="text-sm mb-4">Votre portefeuille interne pour payer les frais de service (quittances, enregistrement) sans transfert Mobile Money à chaque fois.</p>
-                                <ul className="space-y-2 text-sm font-medium mb-6">
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Dans le menu, appuyez sur &apos;Mon Wallet&apos; et &apos;Recharger&apos;</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Choisissez le montant (min 1 000 FCFA) et votre réseau (Wave, Orange, etc.)</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Confirmez le paiement sur votre téléphone</li>
-                                </ul>
-                                <div className="p-4 bg-green-50 text-green-800 rounded-xl text-sm font-medium flex gap-3">
-                                    <CheckCircle className="shrink-0 mt-0.5" size={18} />
-                                    <p>✅ Conseil : rechargez 5 000 FCFA une fois par trimestre pour couvrir vos quittances sans y penser. QAPRIL vous alerte par SMS quand votre Wallet est bas.</p>
-                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">3.2 Répartition des factures (CIE/SODECI)</h3>
+                                <p className="text-sm">Pour les cours communes, QAPRIL calcule la quote-part de chaque locataire en fonction des Millièmes, de la superficie ou d'un forfait.</p>
                             </div>
                         </div>
                     </div>
 
                     {/* SECTION 4 */}
                     <div id="section-4" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">4. Guide du Locataire</h2>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">4. Guide du Locataire & Passeport</h2>
                         <div className="space-y-8 text-gray-600 text-sm leading-relaxed print:text-black">
-                            <p className="text-lg font-medium text-gray-900">En tant que locataire, QAPRIL est entièrement GRATUIT. Vous ne payez rien pour recevoir vos quittances ou consulter votre historique.</p>
+                            
                             <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
-                                <h3 className="text-lg font-bold text-gray-900 mb-3 text-ivoire-dark">4.1 Recevoir votre quittance</h3>
-                                <p>Vous n&apos;avez rien à faire. Quand votre propriétaire enregistre votre paiement, vous recevez automatiquement votre quittance par SMS avec un lien vers le PDF certifié.</p>
-                                <div className="mt-4 p-4 bg-blue-50 text-blue-800 rounded-xl font-medium flex gap-3">
-                                    <Info className="shrink-0 mt-0.5" size={18} />
-                                    <p>Astuce : Gardez vos SMS QAPRIL. Ils constituent une preuve légale de vos paiements. En cas de litige, le SMS fait foi.</p>
+                                <h3 className="text-lg font-bold text-gray-900 mb-3 text-ivoire-dark">4.1 Le Passeport Locatif</h3>
+                                <p>C'est votre CV Immobilier (Indice de Confiance Locative). Plus vous payez vos loyers à l'heure, plus votre <strong>Score ICL</strong> monte. Vous pouvez générer un passeport PDF avec un QR Code pour prouver à un futur bailleur que vous êtes fiable.</p>
+                            </div>
+
+                            <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
+                                <h3 className="text-lg font-bold text-gray-900 mb-3 text-ivoire-dark">4.2 Signalements d'Incidents</h3>
+                                <p>Un robinet fuit ? Ne harcelez plus votre propriétaire sur WhatsApp. Allez dans <strong>Signalements</strong>, prenez 2 photos, indiquez le niveau d'urgence (Normal, Urgent, Très Urgent). Le propriétaire reçoit une carte d'incident et la transmet à son plombier.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECTION 5 */}
+                    <div id="section-5" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">5. Abonnements Internet & Utilités</h2>
+                        <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
+                            <p className="print:text-black">QAPRIL connecte directement la maison aux opérateurs nationaux. Fini les files d'attente en agence.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="p-6 bg-white border border-gray-100 rounded-xl">
+                                    <div className="font-bold text-orange-500 mb-2 flex items-center gap-2"><Wifi size={18}/> Orange Fibre / MTN / Moov</div>
+                                    <p className="text-sm">Demandez votre box internet au moment de l'emménagement. Le contrat de bail numérique sert de justificatif de domicile.</p>
                                 </div>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
-                                <h3 className="text-lg font-bold text-gray-900 mb-3 text-ivoire-dark">4.2 Consulter son historique sans internet (USSD)</h3>
-                                <ul className="space-y-2 font-medium">
-                                    <li>Depuis tout téléphone, composez : <strong>*144*PSDP#</strong> puis Appel</li>
-                                    <li>1 pour voir si vous devez un loyer</li>
-                                    <li>2 pour voir vos 5 dernières quittances</li>
-                                    <li>3 pour signaler un problème</li>
-                                </ul>
-                            </div>
-                            <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
-                                <h3 className="text-lg font-bold text-gray-900 mb-3 text-ivoire-dark">4.3 Votre score locatif QAPRIL</h3>
-                                <p className="mb-4">Après 6 mois de paiements réguliers dans QAPRIL, vous construisez un score de fiabilité locative qui vous ouvre des portes (crédits, etc.).</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="p-4 bg-white border border-gray-100 rounded-xl"><div className="font-bold text-green-600">A — Excellent (800–1000)</div>Crédit bancaire sans garantie jusqu&apos;à 500K.</div>
-                                    <div className="p-4 bg-white border border-gray-100 rounded-xl"><div className="font-bold text-blue-600">B — Bon (600–799)</div>Crédit avec garantie partielle.</div>
-                                    <div className="p-4 bg-white border border-gray-100 rounded-xl"><div className="font-bold text-orange-500">C — Moyen (400–599)</div>Certificat de domicile QAPRIL.</div>
-                                    <div className="p-4 bg-white border border-gray-100 rounded-xl"><div className="font-bold text-gray-500">D — En construction (&lt;400)</div>Continuez à payer régulièrement.</div>
+                                <div className="p-6 bg-white border border-gray-100 rounded-xl">
+                                    <div className="font-bold text-blue-600 mb-2 flex items-center gap-2"><Zap size={18}/> CIE / SODECI / Canal+</div>
+                                    <p className="text-sm">Transfert d'abonnement ou demande de nouveau compteur sans vous déplacer.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* SECTIONS 5, 6 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:block print:space-y-8">
-                        <div id="section-5" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
-                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
-                                <Briefcase className="text-ivoire-dark print:hidden"/> 5. Guide Agent
-                            </h2>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">L&apos;application Android Agent fonctionne offline. Saisissez baux et confirmations terrain, tout se synchronise dès que le réseau revient.</p>
-                            <p className="text-sm text-gray-600 font-bold mb-2">Commissions Agent :</p>
-                            <ul className="text-sm text-gray-600 space-y-1 ml-4 border-l-2 border-ivoire-dark/30 pl-3">
-                                <li>Enregistrement bail : 1 000 FCFA</li>
-                                <li>Confirmation BDQ : 250 FCFA</li>
-                                <li>Formalisation BDQ : 500 FCFA</li>
-                            </ul>
-                        </div>
-                        <div id="section-6" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
-                            <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
-                                <Building className="text-ivoire-dark print:hidden"/> 6. Guide Agence
-                            </h2>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">Des abonnements adaptés à votre taille, de gratuit à PRO (15 000 FCFA/mois) avec quittances illimitées.</p>
-                            <p className="text-sm text-gray-600 leading-relaxed">Possibilité de migrer vos données existantes via un tableau Excel QAPRIL (gratuit pour membres CDAIM).</p>
-                        </div>
+                    {/* SECTION 6 */}
+                    <div id="section-6" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">6. Agences & Agents</h2>
+                        <p className="text-gray-600 mb-6">Les agences immobilières bénéficient du mode <strong>Syndic de Copropriété</strong>, permettant d'agréger plusieurs propriétaires, de voter des budgets et de gérer les millièmes.</p>
                     </div>
 
                     {/* SECTION 7 */}
-                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
-                            <FileText className="text-ivoire-dark print:hidden" size={32} /> 7. Réception des Quittances &amp; Notifications
-                        </h2>
-                        <div className="space-y-6 print:text-black">
-                            <p className="text-gray-600 leading-relaxed print:text-black">Une quittance QAPRIL est un document numérique certifié, impossible à falsifier grâce à un code de vérification SHA-256.</p>
-                            <h3 className="text-xl font-bold text-gray-900 mt-8 mb-4">Canaux de Communication (Architecture Multi-Canal)</h3>
-                            <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
-                                <table className="min-w-full text-sm text-left text-gray-600">
-                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 font-black">
-                                        <tr>
-                                            <th className="px-6 py-4 border-b">Canal</th>
-                                            <th className="px-6 py-4 border-b">Comment activer</th>
-                                            <th className="px-6 py-4 border-b">Gratuité</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr className="bg-white border-b"><td className="px-6 py-4 font-bold text-gray-900">📱 SMS</td><td className="px-6 py-4">Automatique dès l&apos;inscription</td><td className="px-6 py-4 font-bold text-green-600">✓ Toujours</td></tr>
-                                        <tr className="bg-gray-50 border-b"><td className="px-6 py-4 font-bold text-gray-900">💬 WhatsApp</td><td className="px-6 py-4">Paramètres → Notifications → WhatsApp</td><td className="px-6 py-4 font-bold text-green-600">✓ Toujours</td></tr>
-                                        <tr className="bg-white border-b"><td className="px-6 py-4 font-bold text-gray-900">✉️ Email</td><td className="px-6 py-4">Paramètres → Notifications → Email</td><td className="px-6 py-4 text-xs">✓ Si abonnement Pro+</td></tr>
-                                        <tr className="bg-gray-50"><td className="px-6 py-4 font-bold text-gray-900">🔔 Push</td><td className="px-6 py-4">Autoriser lors de l&apos;installation</td><td className="px-6 py-4 font-bold text-green-600">✓ Toujours</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">7. Le Portail Diaspora</h2>
+                        <div className="p-6 bg-ivoire-dark/5 border border-ivoire-dark/20 rounded-2xl">
+                            <h3 className="font-bold text-ivoire-dark mb-2">Formule "Sérénité" ou "VIP"</h3>
+                            <p className="text-sm text-gray-700">Pour les Ivoiriens de la diaspora, QAPRIL assigne un gestionnaire terrain en Côte d'Ivoire. Vous avez accès à un tableau de bord VIP avec : rapports financiers mensuels automatisés, demande d'inspection vidéo des biens, et messagerie WhatsApp prioritaire.</p>
                         </div>
                     </div>
 
                     {/* SECTION 8 */}
-                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
-                            <FileCheck className="text-ivoire-dark print:hidden" size={32} /> 8. Module M17 DGI
-                        </h2>
-                        <p className="text-gray-600 leading-relaxed print:text-black">Enregistrement de votre bail à la Direction Générale des Impôts. Facultatif mais recommandé. Le paiement des frais DGI et des frais de service QAPRIL (ex: 3000 FCFA pour loyer &lt; 50k) est intégré, le récépissé est obtenu en 48-72h.</p>
+                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">8. Le Programme Champions (Affiliation)</h2>
+                        <p className="text-gray-600 mb-4">Gagnez de l'argent en recommandant QAPRIL.</p>
+                        <ul className="space-y-2 text-sm text-gray-600 font-medium">
+                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> Obtenez votre lien de parrainage unique.</li>
+                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> <strong>3 000 FCFA</strong> par propriétaire actif.</li>
+                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> Retraits instantanés de vos gains sur Wave/Orange Money.</li>
+                        </ul>
                     </div>
 
                     {/* SECTION 9 */}
-                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
-                            <HelpCircle className="text-ivoire-dark print:hidden" size={32} /> 9. Questions Fréquentes
-                        </h2>
-                        <div className="space-y-6 print:space-y-4">
-                            {[
-                                { q: "Est-ce que QAPRIL est légal ?", a: "Oui. Conforme à la loi n°2019-576 du 26 juin 2019. Les quittances sont valables devant les tribunaux." },
-                                { q: "Le locataire doit-il payer ?", a: "Non, réception, historique et score sont entièrement gratuits pour le locataire." },
-                                { q: "Si le locataire n'a pas de smartphone ?", a: "Il est alerté par SMS basique et peut utiliser l'USSD *144*PSDP#." },
-                                { q: "Que se passe-t-il si mon Wallet QAPRIL est vide ?", a: "QAPRIL émet vos quittances en mode crédit jusqu'à -1500 FCFA, puis suspend les émissions." },
-                                { q: "Le BDQ a-t-il la même valeur qu'un bail signé ?", a: "Non. Le Bail Déclaratif QAPRIL a valeur de commencement de preuve, opposable en médiation mais moins fort qu'un bail complet." },
-                            ].map((faq, i) => (
-                                <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                                    <h4 className="font-bold text-gray-900 text-lg mb-2">{faq.q}</h4>
-                                    <p className="text-gray-600 text-sm">{faq.a}</p>
-                                </div>
-                            ))}
-                        </div>
+                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">9. Paiement Autonome (Open Banking)</h2>
+                        <p className="text-gray-600 mb-4">Le <strong>cerveau Fintech</strong> de QAPRIL.</p>
+                        <p className="text-sm text-gray-600 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                            Le locataire paie son loyer depuis son application <strong>Wave CI</strong> ou <strong>Orange Money</strong>. 
+                            Instantanément, QAPRIL capte le paiement (Webhook API), marque la quittance comme PAYÉE, génère un sceau cryptographique SHA-256, déduit la commission, crédite le Wallet du propriétaire, et augmente le score de confiance du locataire. 
+                            <strong>Le tout en 1 seconde, sans aucune intervention humaine.</strong>
+                        </p>
                     </div>
 
                     {/* SECTION 10 */}
@@ -467,12 +289,12 @@ export default function ManualOfficielContent() {
                         <h2 className="text-3xl font-black tracking-tighter mb-8 uppercase print:text-2xl print:text-gray-900 print:mb-4">10. Glossaire Exclusif</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2 print:text-black">
                             {[
-                                { t: "BDQ", d: "Bail Déclaratif QAPRIL. Créé en 5 min sans contrat écrit. Gratuit." },
-                                { t: "Wallet QAPRIL", d: "Porte-monnaie interne (rechargeable via mobile money)." },
-                                { t: "KYC", d: "Know Your Customer - vérification d'identité via photo." },
-                                { t: "Score Locatif", d: "Note (0-1000) mesurant la fiabilité de paiement d'un locataire." },
-                                { t: "CLN", d: "Certificat Locatif Numérique - attestation de domicile QAPRIL." },
-                                { t: "SHA-256", d: "Code de sécurité cryptographique garantissant l'intégrité d'une quittance." },
+                                { t: "Webhook", d: "Pont numérique qui connecte QAPRIL à Wave/Orange Money pour l'automatisation." },
+                                { t: "Passeport Locatif", d: "CV Immobilier du locataire. Prouve sa fiabilité." },
+                                { t: "Vault", d: "Le coffre-fort numérique de séquestration des cautions locatives." },
+                                { t: "ICL", d: "Indice de Confiance Locative (Score de 0 à 1000)." },
+                                { t: "Diaspora VIP", d: "Service de gestion locative avec inspection vidéo à distance." },
+                                { t: "SHA-256", d: "Code de sécurité cryptographique garantissant l'intégrité absolue d'une quittance." },
                             ].map((item, i) => (
                                 <div key={i} className="border-b border-white/20 pb-4 print:border-gray-200 print:break-inside-avoid">
                                     <h4 className="font-bold mb-1 text-white print:text-gray-900">{item.t}</h4>
@@ -486,7 +308,7 @@ export default function ManualOfficielContent() {
             </div>
 
             <div className="mt-20 text-center text-gray-400 text-xs font-medium uppercase tracking-[0.2em]">
-                QAPRIL — Manuel d&apos;utilisation v1.0 — Mars 2026<br />
+                QAPRIL — Manuel d&apos;utilisation v1.1 — Avril 2026<br />
                 support.qapril.ci · Abidjan, Côte d&apos;Ivoire
             </div>
         </div>
