@@ -26,26 +26,32 @@ export default function NotificationCenter({ variant = 'default' }: { variant?: 
     }
 
     useEffect(() => {
-        let isMounted = true
+        let isMounted = true;
         
-        const init = async () => {
-            if (isMounted) {
-                await fetchNotifications()
+        // Use native EventSource for SSE
+        const eventSource = new EventSource('/api/v1/notifications/stream');
+
+        eventSource.onmessage = (event) => {
+            if (!isMounted) return;
+            try {
+                const data = JSON.parse(event.data) as Notification[];
+                setNotifications(data);
+                setUnreadCount(data.filter((n) => !n.read).length);
+            } catch (err) {
+                console.error("Erreur de parsing SSE", err);
             }
-        }
-        
-        init()
-        
-        // Poll every 30 seconds for new notifications
-        const interval = setInterval(() => {
-            if (isMounted) fetchNotifications()
-        }, 30000)
-        
+        };
+
+        eventSource.onerror = (error) => {
+            console.error("SSE Error:", error);
+            // EventSource attempts to reconnect automatically
+        };
+
         return () => {
-            isMounted = false
-            clearInterval(interval)
-        }
-    }, [])
+            isMounted = false;
+            eventSource.close();
+        };
+    }, []);
 
     const handleMarkAsRead = async (id: string) => {
         await markAsRead(id)
