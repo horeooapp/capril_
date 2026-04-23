@@ -26,8 +26,8 @@ import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
 import BottomNav from "@/components/BottomNav"
 import { signOut, SessionProvider } from "next-auth/react"
-
 import AppSidebar from "@/components/dashboard/AppSidebar"
+import PushRegistration from "@/components/admin/PushRegistration"
 
 export default function DashboardLayoutClient({
     children,
@@ -174,7 +174,10 @@ export default function DashboardLayoutClient({
                     </div>
                 )}
             </div>
+            
+            <PushRegistration />
         </div>
         </SessionProvider>
     )
 }
+

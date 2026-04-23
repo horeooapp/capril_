@@ -22,7 +22,7 @@ export default function NotificationCenter({ variant = 'default' }: { variant?: 
     const fetchNotifications = async () => {
         const data = await getNotifications() as unknown as Notification[]
         setNotifications(data)
-        setUnreadCount(data.filter((n: Notification) => n.status !== 'sent').length)
+        setUnreadCount(data.filter((n: Notification) => !n.read).length)
     }
 
     useEffect(() => {
