@@ -179,6 +179,7 @@ export default async function AdminDashboardOverview() {
         orderBy: { createdAt: 'desc' },
         include: { 
             tenant: true, 
+            landlord: true,
             property: { select: { propertyCode: true, commune: true } },
             receipts: { where: { status: "pending" }, take: 1 } // Check for debt
         }
@@ -187,7 +188,8 @@ export default async function AdminDashboardOverview() {
     const recentReceipts = await prisma.receipt.findMany({
         where: { status: { in: ['paid', 'PAID', 'Paid'] } },
         take: 3,
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        include: { lease: { include: { tenant: true, landlord: true } } }
     }).catch(() => []);
     
     // Formatting data
@@ -324,6 +326,7 @@ export default async function AdminDashboardOverview() {
                             <thead>
                                 <tr>
                                     <th>Locataire</th>
+                                    <th>Propriétaire</th>
                                     <th>Localisation</th>
                                     <th>Loyer Brut</th>
                                     <th>Statut de Paiement</th>
@@ -333,13 +336,23 @@ export default async function AdminDashboardOverview() {
                                 {recentLeases.map(lease => {
                                     const tInitials = ((lease.tenant as any)?.firstName?.charAt(0) || lease.tenant?.email?.charAt(0) || "?").toUpperCase() + ((lease.tenant as any)?.lastName?.charAt(0) || "").toUpperCase();
                                     const tName = (lease.tenant as any)?.firstName ? `${(lease.tenant as any).firstName} ${(lease.tenant as any).lastName || ''}` : lease.tenant?.phone || lease.tenant?.email || 'Inconnu';
+                                    
+                                    const lInitials = ((lease.landlord as any)?.firstName?.charAt(0) || lease.landlord?.email?.charAt(0) || "?").toUpperCase() + ((lease.landlord as any)?.lastName?.charAt(0) || "").toUpperCase();
+                                    const lName = (lease.landlord as any)?.firstName ? `${(lease.landlord as any).firstName} ${(lease.landlord as any).lastName || ''}` : lease.landlord?.phone || lease.landlord?.email || 'Inconnu';
+                                    
                                     const isLate = lease.receipts.length > 0;
                                     return (
                                     <tr key={lease.id}>
                                         <td>
                                             <div className="tenant-cell">
                                                 <div className="t-avatar" style={{backgroundColor: 'var(--ci-nuit2)'}}>{tInitials}</div>
-                                                <div className="t-name text-[11px] truncate">{tName}</div>
+                                                <div className="t-name text-[11px] truncate max-w-[120px]">{tName}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div className="tenant-cell">
+                                                <div className="t-avatar" style={{backgroundColor: 'var(--ci-or-pale)', color: 'var(--ci-or)'}}>{lInitials}</div>
+                                                <div className="t-name text-[11px] truncate max-w-[120px]">{lName}</div>
                                             </div>
                                         </td>
                                         <td><div className="t-loc truncate">{lease.property?.commune || 'Inconnue'}</div></td>
@@ -353,7 +366,7 @@ export default async function AdminDashboardOverview() {
                                     </tr>
                                 )})}
                                 {recentLeases.length === 0 && (
-                                    <tr><td colSpan={4} className="text-center text-gray-500 py-4">Aucun bail actif détecté.</td></tr>
+                                    <tr><td colSpan={5} className="text-center text-gray-500 py-4">Aucun bail actif détecté.</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -366,13 +379,18 @@ export default async function AdminDashboardOverview() {
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B949E" strokeWidth="1.5"/><path d="M8 5v3l2 2" stroke="#8B949E" strokeWidth="1.5" strokeLinecap="round"/></svg>
                             </div>
                             <div className="mm-grid">
-                                {recentReceipts.map((rec, idx) => (
+                                {recentReceipts.map((rec: any, idx) => {
+                                    const tName = rec.lease?.tenant?.lastName ? `${rec.lease.tenant.firstName} ${rec.lease.tenant.lastName}` : 'Locataire Inconnu';
+                                    const lName = rec.lease?.landlord?.lastName ? `${rec.lease.landlord.firstName} ${rec.lease.landlord.lastName}` : 'Propriétaire Inconnu';
+                                    return (
                                     <div key={rec.id} className="mm-card mtn-card" style={{ borderColor: 'var(--ci-orange)' }}>
-                                        <div className="mm-op">Reçu #{idx+1}</div>
+                                        <div className="mm-op truncate text-[10px]" title={`De: ${tName}\nÀ: ${lName}`}>
+                                            <span style={{color: 'var(--text-main)'}}>{tName.split(' ')[0]}</span> <span style={{opacity: 0.5}}>→</span> <span style={{color: 'var(--ci-or)'}}>{lName.split(' ')[0]}</span>
+                                        </div>
                                         <div className="mm-amount">{(rec as any).totalAmount.toLocaleString()} F</div>
                                         <div className="mm-sub capitalize">{(rec as any).periodMonth}</div>
                                     </div>
-                                ))}
+                                )})}
                                 {recentReceipts.length === 0 && (
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
