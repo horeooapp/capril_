@@ -13,6 +13,11 @@ export default async function AdminPropertiesPage() {
         include: {
             owner: { select: { firstName: true, lastName: true, phone: true, email: true } },
             manager: { select: { firstName: true, lastName: true, legalEntity: { select: { companyName: true } } } },
+            leases: { 
+                where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE", "MISE_EN_DEMEURE"] } },
+                take: 1, 
+                include: { tenant: { select: { firstName: true, lastName: true, email: true, phone: true } } } 
+            },
             _count: { select: { leases: true } }
         }
     })
@@ -45,6 +50,7 @@ export default async function AdminPropertiesPage() {
                             <tr>
                                 <th>Référence / Nom</th>
                                 <th>Propriétaire</th>
+                                <th>Occupant(s)</th>
                                 <th>Localisation</th>
                                 <th>Occupation</th>
                                 <th>Gestionnaire</th>
@@ -74,6 +80,13 @@ export default async function AdminPropertiesPage() {
                                         <div className="t-name">{ownerName}</div>
                                     </td>
                                     <td>
+                                        <div className="t-name">
+                                            {hasLeases && prop.leases?.length > 0 
+                                                ? `${prop.leases[0].tenant?.firstName || ''} ${prop.leases[0].tenant?.lastName || ''}`.trim() || prop.leases[0].tenant?.phone || 'Anonyme'
+                                                : <span className="text-gray-600">—</span>}
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div className="t-name text-gray-400 truncate max-w-[200px]">{prop.commune}</div>
                                         <div className="t-loc text-[10px] truncate max-w-[200px]">{prop.address}</div>
                                     </td>
@@ -94,7 +107,7 @@ export default async function AdminPropertiesPage() {
                             
                             {properties.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="text-center py-8 text-gray-500">
+                                    <td colSpan={6} className="text-center py-8 text-gray-500">
                                         Aucun bien immobilier enregistré.
                                     </td>
                                 </tr>
