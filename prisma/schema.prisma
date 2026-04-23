@@ -227,6 +227,9 @@ enum RepartitionModel {
 enum UtilityType {
   CIE
   SODECI
+  ORANGE
+  MTN
+  CANAL_PLUS
 }
 
 enum UtilityStatus {
@@ -709,6 +712,8 @@ model User {
   automationSettings AutomationSettings?
   emailVerificationTokens EmailVerificationToken[]
 
+  abonnementsOperateurs AbonnementOperateur[]
+
   @@index([phone])
   @@index([role])
   @@map("users")
@@ -1089,6 +1094,8 @@ model Lease {
   colocPayments             ColocPayment[]
 
   @@index([status, createdAt])
+  abonnementsOperateurs AbonnementOperateur[]
+
   @@index([propertyId])
   @@index([tenantId])
   @@map("leases")
@@ -3654,4 +3661,47 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([token])
   @@map("email_verification_tokens")
+}
+
+// ADD-17 : TUNNEL D'ABONNEMENT OPERATEURS (N1, N2, N3)
+// ═══════════════════════════════════════════════════════
+enum OperateurDossierStatus {
+  BROUILLON
+  DOSSIER_GENERE
+  SOUMIS_API
+  EN_ATTENTE_VALIDATION
+  ACTIF
+  REJETE
+}
+
+enum OperateurNiveau {
+  N1 // PDF pré-rempli + SMS manuel
+  N2 // API B2B partielle (validation manuelle)
+  N3 // API Provisioning complète
+}
+
+model AbonnementOperateur {
+  id               String                 @id @default(uuid())
+  locataireId      String                 @map("locataire_id")
+  leaseId          String                 @map("lease_id")
+  operateur        UtilityType
+  niveauIntegration OperateurNiveau        @default(N1) @map("niveau_integration")
+  statut           OperateurDossierStatus @default(BROUILLON)
+  
+  // Documents
+  dossierPdfUrl    String?                @map("dossier_pdf_url")
+  cniUrl           String?                @map("cni_url")
+  contratBailUrl   String?                @map("contrat_bail_url")
+  
+  // Suivi
+  referenceDossier String?                @map("reference_dossier")
+  numeroAbonnement String?                @map("numero_abonnement")
+  
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  tenant           User                   @relation(fields: [locataireId], references: [id])
+  lease            Lease                  @relation(fields: [leaseId], references: [id])
+
+  @@map("abonnements_operateurs")
 }
