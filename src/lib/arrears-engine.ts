@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { LeaseLifecycleService } from "./lease-lifecycle.service";
 
 export const ARREARS_PHASE_CONFIG = {
     PHASE_1_AMIABLE: { day: 5, label: "Relance Amiable (SMS/Push)" },
@@ -129,6 +130,11 @@ export async function discoverAndEscalateArrears() {
                 where: { id: synthesis.id },
                 data: { status: "IMPAYE" }
             });
+            try {
+                await LeaseLifecycleService.transitionLease(lease.id, "LOYER_IMPAYE", "SYSTEM_CRON", "Alerte retard (J+7)");
+            } catch (e) {
+                console.error(`[ArrearsEngine] Impossible de transitionner le bail ${lease.id} en LOYER_IMPAYE:`, e);
+            }
             await NotificationService.envoyerNotification(lease.tenantId, "IMPAYE_J7", {
                 payload: {
                     smsText: `[QAPRIL] Alerte retard : Votre loyer de ${synthesis.month} n'a pas été reçu (J+7). Des pénalités peuvent s'appliquer.`,
@@ -141,10 +147,11 @@ export async function discoverAndEscalateArrears() {
         // J15: Procedural Escalation
         if (delayDays === 15 && lease.seuilJ15) {
             await transitionArrearsPhase(lease.id, "MISE_EN_DEMEURE");
-            await prisma.lease.update({
-                where: { id: lease.id },
-                data: { status: "MISE_EN_DEMEURE" }
-            });
+            try {
+                await LeaseLifecycleService.transitionLease(lease.id, "MISE_EN_DEMEURE", "SYSTEM_CRON", "Escalade contentieuse (J+15)");
+            } catch (e) {
+                console.error(`[ArrearsEngine] Impossible de transitionner le bail ${lease.id} en MISE_EN_DEMEURE:`, e);
+            }
             await NotificationService.envoyerNotification(lease.tenantId, "IMPAYE_J15", {
                 payload: {
                     smsText: `[QAPRIL] Mise en demeure : Défaut de paiement constaté (J+15). Votre dossier est transmis au service contentieux.`,

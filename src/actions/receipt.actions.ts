@@ -11,6 +11,7 @@ import { Role, Prisma } from "@prisma/client";
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers";
 import { writeAuditLog } from "@/lib/audit";
 import { serializeReceipt } from "@/lib/serialize";
+import { LeaseLifecycleService } from "@/lib/lease-lifecycle.service";
 
 const PRIX_QUITTANCE = Number(process.env.QAPRIL_QUITTANCE_PRIX_FCFA ?? 90);
 
@@ -76,6 +77,19 @@ export async function createReceipt(data: {
 
         await writeAuditLog({ userId: session.user.id, action: "RECEIPT_CREATED", module: "RECEIPT", entityId: receipt.id });
 
+        // Intégration de la State Machine : Si le bail était en impayé et que la quittance est émise (payée),
+        // on tente de régulariser le statut du bail.
+        const currentLease = await prisma.lease.findUnique({ where: { id: data.leaseId } });
+        if (currentLease && ["LOYER_IMPAYE", "MISE_EN_DEMEURE", "CLEMENCE_EN_COURS"].includes(currentLease.status)) {
+            // Vérifier s'il reste d'autres impayés
+            const pendingReceipts = await prisma.receipt.count({
+                where: { leaseId: data.leaseId, status: "PENDING" }
+            });
+            if (pendingReceipts === 0) {
+                await LeaseLifecycleService.transitionLease(data.leaseId, "ACTIVE", session.user.id, "Régularisation suite à l'émission de la quittance");
+            }
+        }
+
         revalidatePath(`/dashboard/leases/${data.leaseId}`);
         revalidatePath("/dashboard/receipts");
 
@@ -139,6 +153,18 @@ export async function payReceipt(receiptId: string, channel: string = "WAVE_CI")
         });
 
         await writeAuditLog({ userId: session.user.id, action: "RECEIPT_PAID", module: "RECEIPT", entityId: receiptId });
+
+        // Intégration de la State Machine : Régularisation du bail si plus d'impayés
+        const currentLease = await prisma.lease.findUnique({ where: { id: receipt.leaseId } });
+        if (currentLease && ["LOYER_IMPAYE", "MISE_EN_DEMEURE", "CLEMENCE_EN_COURS"].includes(currentLease.status)) {
+            const pendingReceipts = await prisma.receipt.count({
+                where: { leaseId: receipt.leaseId, status: "PENDING" }
+            });
+            if (pendingReceipts === 0) {
+                await LeaseLifecycleService.transitionLease(receipt.leaseId, "ACTIVE", session.user.id, "Paiement en ligne complété");
+            }
+        }
+
         revalidatePath("/dashboard/receipts");
         return { success: true };
     } catch (error: any) {
