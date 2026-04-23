@@ -71,6 +71,8 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 { href: "/dashboard/bdq", label: "Baux Déclaratifs", icon: <SmartphoneNfc size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/mediation", label: "Médiations", icon: <MessageSquareWarning size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/crm", label: "Leads CRM", icon: <BarChartHorizontal size={18} />, id: "READ_DASHBOARD" },
+                { href: "/dashboard/utilities", label: "Factures CIE/SODECI", icon: <Zap size={18} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/vault", label: "Vault Caution", icon: <ShieldAlert size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/trust", label: "Régularisation", icon: <ShieldAlert size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={18} />, id: "SETTINGS" },
                 { href: "/dashboard/observatory", label: "Observatoire", icon: <LineChart size={18} />, id: "READ_DASHBOARD" },
@@ -105,13 +107,15 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             { href: "/dashboard/charges", label: "Régul. Charges", icon: <Calculator size={18} /> },
             { href: "/dashboard/import", label: "Outils d'Import", icon: <HardDriveUpload size={18} /> },
             { href: "/dashboard/reports", label: "Rapports", icon: <FileText size={18} /> },
+            { href: "/dashboard/utilities", label: "Factures CIE/SODECI", icon: <Zap size={18} /> },
+            { href: "/dashboard/vault", label: "Vault Caution", icon: <ShieldAlert size={18} /> },
             { href: "/dashboard/profile", label: "Profil", icon: <User size={18} /> },
             { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
             { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> },
             { href: "/dashboard/icl", label: "Indice ICL", icon: <Star size={18} /> },
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-            ...(role === 'CHAMPION' ? [{ href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} /> }] : []),
-            ...(diasporaAbonnement || role === 'DIASPORA' ? [{ href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> }] : []),
+            { href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} />, badge: "Bientôt" },
+            { href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} />, badge: "Bientôt" },
             { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={18} /> },
         ]
 
@@ -166,18 +170,24 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 </Link>
             </div>
 
-            {/* Nav */}
             <nav className="flex-1 overflow-y-auto px-2 py-3 no-scrollbar space-y-0.5">
-                {navLinks.map((item) => {
+                {navLinks.map((item: any) => {
                     const isActive = pathname === item.href
                     return (
                         <Link 
                             key={item.href} 
                             href={item.href}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[7px] text-[12.5px] transition-colors ${getLinkClasses(isActive)}`}
+                            className={`w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-[7px] text-[12.5px] transition-colors ${getLinkClasses(isActive)}`}
                         >
-                            <span className="opacity-90">{item.icon}</span>
-                            <span className="flex-1 leading-none">{item.label}</span>
+                            <div className="flex items-center gap-2.5 flex-1 overflow-hidden">
+                                <span className="opacity-90 shrink-0">{item.icon}</span>
+                                <span className="flex-1 leading-none truncate">{item.label}</span>
+                            </div>
+                            {item.badge && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 text-[8px] font-bold uppercase tracking-wider shrink-0">
+                                    {item.badge}
+                                </span>
+                            )}
                         </Link>
                     )
                 })}
