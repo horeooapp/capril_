@@ -136,12 +136,28 @@ export default function SuccessionDashboardClient({ initialSuccessions, activeLe
                                                 </div>
                                             </td>
                                             <td className="p-5">
-                                                {s.status === 'TRANSFERT_LEGAL' && (
+                                                {s.statutTransition === 'TRANSITION' && s.dateFinTransition && new Date(s.dateFinTransition) < new Date() && (
+                                                    <div className="flex flex-col items-start gap-1">
+                                                        <span className="inline-flex items-center gap-1.5 justify-center bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded shadow-sm">
+                                                            <AlertCircle size={12}/> Délai Expiré
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-rose-400">Fin: {new Date(s.dateFinTransition).toLocaleDateString()}</span>
+                                                    </div>
+                                                )}
+                                                {s.statutTransition === 'TRANSITION' && s.dateFinTransition && new Date(s.dateFinTransition) >= new Date() && (
+                                                    <div className="flex flex-col items-start gap-1">
+                                                        <span className="inline-flex items-center gap-1.5 justify-center bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded shadow-sm">
+                                                            <ArrowRightLeft size={12}/> Transition En Cours
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-slate-400">Jusqu'au {new Date(s.dateFinTransition).toLocaleDateString()}</span>
+                                                    </div>
+                                                )}
+                                                {s.statutTransition !== 'TRANSITION' && s.status === 'TRANSFERT_LEGAL' && (
                                                     <span className="inline-flex items-center gap-1.5 justify-center bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded shadow-sm">
                                                         <ShieldCheck size={12}/> Acte Scellé
                                                     </span>
                                                 )}
-                                                {s.status === 'EN_ATTENTE_ATTESTATION' && (
+                                                {s.statutTransition !== 'TRANSITION' && s.status === 'EN_ATTENTE_ATTESTATION' && (
                                                     <span className="inline-flex items-center gap-1.5 justify-center bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded">
                                                         Attestation Requise
                                                     </span>

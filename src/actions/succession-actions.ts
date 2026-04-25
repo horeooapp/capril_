@@ -24,6 +24,8 @@ export async function getSuccessions() {
             propertyInfo: s.lease?.property?.propertyCode,
             notaire: 'Liquidateur désigné',
             createdAt: s.dateDeces,
+            dateFinTransition: s.dateFinTransition,
+            statutTransition: s.statut,
             status: 'TRANSFERT_LEGAL'
         }))
     } catch {
@@ -53,19 +55,44 @@ export async function createSuccession(formData: FormData) {
         if (!lease) {
             return { error: "Bail introuvable." }
         }
+        if (!lease.tenantId) {
+            return { error: "Bail sans locataire associé." }
+        }
+
+        const parsedDateDeces = new Date(dateDeces);
+        
+        // Calcul du délai légal de transition (J+30)
+        const dateFinTransition = new Date(parsedDateDeces);
+        dateFinTransition.setDate(dateFinTransition.getDate() + 30);
 
         const dataPayload: any = {
             leaseId,
             tenantId: lease.tenantId,
-            dateDeces: new Date(dateDeces),
+            dateDeces: parsedDateDeces,
             beneficiaireExtNom,
             declarantType,
-            declarantPhone
+            declarantPhone,
+            dateFinTransition,
+            statut: "TRANSITION"
         }
 
-        await prisma.successionLocataire.create({
-            data: dataPayload
-        })
+        await prisma.$transaction(async (tx) => {
+            // 1. Créer le dossier de succession
+            await tx.successionLocataire.create({
+                data: dataPayload
+            });
+
+            // 2. Mettre à jour le locataire existant avec les infos de l'ayant-droit
+            await tx.user.update({
+                where: { id: lease.tenantId as string },
+                data: {
+                    beneficiaireNom: beneficiaireExtNom,
+                    beneficiaireLien: declarantType,
+                    beneficiairePhone: declarantPhone,
+                    beneficiaireDesignationAt: new Date()
+                }
+            });
+        });
 
         await logAction({
             action: "CREATE_SUCCESSION_DOSSIER",

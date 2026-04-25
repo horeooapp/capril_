@@ -698,10 +698,10 @@ model User {
   prospectsConvertis  ChampionProspect[] @relation("ProspectConverti")
 
   // ADD-16 Succession Locataire
-  // beneficiaireNom      String? @map("beneficiaire_nom")
-  // beneficiaireLien     String? @map("beneficiaire_lien")
-  // beneficiairePhone    String? @map("beneficiaire_phone")
-  // beneficiaireDesignationAt DateTime? @map("beneficiaire_designation_at")
+  beneficiaireNom      String? @map("beneficiaire_nom")
+  beneficiaireLien     String? @map("beneficiaire_lien")
+  beneficiairePhone    String? @map("beneficiaire_phone")
+  beneficiaireDesignationAt DateTime? @map("beneficiaire_designation_at")
 
   // ADD-17 & 18 Relations
   messagesBailEnvoyes   MessagerieBail[]
