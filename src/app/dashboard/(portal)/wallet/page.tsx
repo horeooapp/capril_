@@ -111,13 +111,13 @@ export default function WalletPage() {
           </p>
         </div>
 
-        <div className="glass-panel p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-[#2c6aa5] text-white shadow-2xl relative overflow-hidden min-w-[320px]">
+        <div className="p-8 rounded-[2.5rem] bg-[#1A3557] text-white shadow-2xl relative overflow-hidden min-w-[320px] border border-white/10">
           <div className="relative z-10 space-y-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">
               Solde Actuel
             </span>
-            <div className="text-5xl font-black tracking-tighter">
-              {profile?.balance?.toLocaleString() || 0} <span className="text-lg opacity-60">FCFA</span>
+            <div className="text-5xl font-black tracking-tighter text-white">
+              {profile?.balance?.toLocaleString() || 0} <span className="text-lg text-white/60">FCFA</span>
             </div>
             {profile?.balance < 0 && (
               <div className="mt-4 flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded-full w-fit border border-red-400/50 shadow-lg">
