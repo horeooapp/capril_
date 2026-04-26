@@ -49,24 +49,24 @@ export function CollaboratorActionsDropdown({ collaboratorId, status, inviteToke
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-qgrey-400 hover:text-qnavy hover:bg-qnavy-pale rounded-lg transition-colors"
+                className="p-2 text-qgrey-4 hover:text-qnavy hover:bg-qnavy-pale rounded-lg transition-colors"
                 disabled={isPending}
             >
                 <MoreVertical size={18} />
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-qgrey-2 shadow-[0_8px_30px_rgb(0,0,0,0.08)] z-50 overflow-hidden py-2 font-sans">
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-qgrey-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-50 py-2 font-sans overflow-visible">
                     
                     {status === "INVITED" && inviteToken && (
                         <button 
                             onClick={handleCopyInvite}
-                            className="w-full px-4 py-3 flex items-center gap-3 text-sm font-medium text-qtext hover:bg-qgrey-50 transition-colors text-left"
+                            className="w-full px-4 py-3 flex items-center gap-3 text-sm font-medium text-qtext hover:bg-qgrey-1 transition-colors text-left"
                         >
                             {copied ? (
                                 <><CheckCircle2 size={16} className="text-green-500" /> Lien copié !</>
                             ) : (
-                                <><Copy size={16} className="text-qgrey-400" /> Copier le lien d'invitation</>
+                                <><Copy size={16} className="text-qgrey-3" /> Copier le lien d'invitation</>
                             )}
                         </button>
                     )}

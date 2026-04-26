@@ -84,7 +84,7 @@ export function CollaboratorInvitationModal() {
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-200">
                         <button 
                             onClick={resetAndClose}
-                            className="absolute top-6 right-6 p-2 text-qgrey-400 hover:text-qnavy hover:bg-qgrey-50 rounded-full transition-colors"
+                            className="absolute top-6 right-6 p-2 text-qgrey-4 hover:text-qnavy hover:bg-qgrey-1 rounded-full transition-colors"
                         >
                             <X size={20} />
                         </button>
@@ -126,14 +126,14 @@ export function CollaboratorInvitationModal() {
                         )}
                         
                         <div className="space-y-2">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-qgrey-400 pl-2">Email du collaborateur</label>
+                            <label className="text-[10px] uppercase font-black tracking-widest text-qgrey-4 pl-2">Email du collaborateur</label>
                             <input 
                                 required
                                 type="email"
                                 value={formData.email}
                                 onChange={e => setFormData({...formData, email: e.target.value})}
                                 placeholder="ex: jean@monagence.com"
-                                className="w-full bg-qgrey-50 border border-qgrey-2 rounded-2xl p-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none"
+                                className="w-full bg-qgrey-1 border border-qgrey-2 rounded-2xl p-4 font-bold text-qnavy focus:ring-2 focus:ring-qorange/30 outline-none"
                             />
                         </div>
 
@@ -150,12 +150,12 @@ export function CollaboratorInvitationModal() {
                                             key={key}
                                             onClick={() => setFormData({...formData, poste: key})}
                                             className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                                                isSelected ? "border-qorange bg-orange-50/50 shadow-sm" : "border-qgrey-2 bg-white hover:border-qgrey-300"
+                                                isSelected ? "border-qorange bg-orange-50/50 shadow-sm" : "border-qgrey-2 bg-white hover:border-qgrey-3"
                                             }`}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <div className={`mt-1 w-5 h-5 rounded-full flex justify-center items-center shrink-0 border-2 transition-colors ${
-                                                    isSelected ? "bg-qorange border-qorange text-white" : "border-qgrey-400 bg-transparent"
+                                                    isSelected ? "bg-qorange border-qorange text-white" : "border-qgrey-4 bg-transparent"
                                                 }`}>
                                                     {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                                                 </div>
@@ -163,7 +163,7 @@ export function CollaboratorInvitationModal() {
                                                     <span className={`block text-sm font-black uppercase tracking-wider ${isSelected ? "text-qorange" : "text-qnavy"}`}>
                                                         {data.label}
                                                     </span>
-                                                    <p className={`text-xs mt-1 ${isSelected ? "text-orange-800/70" : "text-qgrey-400"}`}>
+                                                    <p className={`text-xs mt-1 ${isSelected ? "text-orange-800/70" : "text-qgrey-4"}`}>
                                                         {data.description}
                                                     </p>
                                                 </div>
@@ -177,7 +177,7 @@ export function CollaboratorInvitationModal() {
                         <button 
                             disabled={isPending}
                             type="submit" 
-                            className="w-full bg-qnavy hover:bg-qnavy-dark disabled:bg-qgrey-300 text-white rounded-xl py-4 flex justify-center font-black uppercase text-sm tracking-wider shadow-lg transition-colors"
+                            className="w-full bg-qnavy hover:bg-qnavy-dark disabled:bg-qgrey-3 text-white rounded-xl py-4 flex justify-center font-black uppercase text-sm tracking-wider shadow-lg transition-colors"
                         >
                             {isPending ? "Génération..." : "Générer le lien d'accès"}
                         </button>
