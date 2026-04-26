@@ -120,9 +120,9 @@ export default function WalletPage() {
               {profile?.balance?.toLocaleString() || 0} <span className="text-lg opacity-60">FCFA</span>
             </div>
             {profile?.balance < 0 && (
-              <div className="mt-4 flex items-center gap-2 px-3 py-1 bg-red-400/20 backdrop-blur rounded-full w-fit border border-red-400/30">
-                <ShieldCheck size={14} className="text-red-200" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-red-100">Mode Crédit Actif (-1 500 max)</span>
+              <div className="mt-4 flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded-full w-fit border border-red-400/50 shadow-lg">
+                <ShieldCheck size={14} className="text-white" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Mode Crédit Actif (-1 500 max)</span>
               </div>
             )}
           </div>
