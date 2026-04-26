@@ -1,0 +1,49 @@
+# ──────────────────────────────────────────────
+#  QAPRIL — robots.txt
+#  https://www.qapril.ci/robots.txt
+# ──────────────────────────────────────────────
+
+# Accès général autorisé
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /cdn-cgi/
+Disallow: /private/
+
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /assets/
+
+# Bing
+User-agent: bingbot
+Allow: /
+Crawl-delay: 2
+
+# Yandex
+User-agent: YandexBot
+Crawl-delay: 5
+
+# Bots non désirés
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Sitemap
+Sitemap: https://www.qapril.ci/sitemap.xml

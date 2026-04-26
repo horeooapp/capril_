@@ -1,30 +1,34 @@
 {
-  "name": "QAPRIL - Registre Locatif",
+  "name": "QAPRIL — Gestion Immobilière",
   "short_name": "QAPRIL",
-  "description": "Plateforme nationale de gestion des loyers et d'émission de quittances certifiées.",
+  "description": "Simplifiez la gestion de vos biens immobiliers avec QAPRIL",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FCB10F",
   "theme_color": "#FCB10F",
-  "background_color": "#000000",
-  "orientation": "portrait",
+  "lang": "fr",
+  "scope": "/",
+  "categories": ["business", "productivity", "finance"],
   "icons": [
+    { "src": "/assets/icons/icon-48.webp",  "sizes": "48x48",   "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-72.webp",  "sizes": "72x72",   "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-96.webp",  "sizes": "96x96",   "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-128.webp", "sizes": "128x128", "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-192.webp", "sizes": "192x192", "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-256.webp", "sizes": "256x256", "type": "image/webp", "purpose": "maskable any" },
+    { "src": "/assets/icons/icon-512.webp", "sizes": "512x512", "type": "image/webp", "purpose": "maskable any" }
+  ],
+  "shortcuts": [
     {
-      "src": "assets/icons/icon-48.webp",
-      "type": "image/webp",
-      "sizes": "48x48",
-      "purpose": "any"
+      "name": "Mon tableau de bord",
+      "url": "/dashboard",
+      "icons": [{ "src": "/assets/icons/icon-96.webp", "sizes": "96x96", "type": "image/webp" }]
     },
     {
-      "src": "assets/icons/icon-192.webp",
-      "type": "image/webp",
-      "sizes": "192x192",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icons/icon-512.webp",
-      "type": "image/webp",
-      "sizes": "512x512",
-      "purpose": "any"
+      "name": "Mes propriétés",
+      "url": "/dashboard/properties",
+      "icons": [{ "src": "/assets/icons/icon-96.webp", "sizes": "96x96", "type": "image/webp" }]
     }
   ]
 }

@@ -5,14 +5,16 @@ import "./globals.css";
 import "./landing-v2.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 import CookieConsent from "@/components/CookieConsent";
+import SEOInit from "@/components/SEOInit";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.qapril.ci"),
   title: {
-    default: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
+    default: "QAPRIL — Gestion Immobilière Intelligente",
     template: "%s | QAPRIL"
   },
-  description: "La plateforme nationale officielle pour la gestion et la certification des quittances de loyer en Côte d'Ivoire. Sécurisation des baux immobiliers et des cautions avec la CDC-CI.",
-  keywords: ["registre locatif", "immobilier Côte d'Ivoire", "quittance de loyer numérique", "location Abidjan", "gestion immobilière", "CDC-CI", "QAPRIL", "bail certifié"],
+  description: "QAPRIL simplifie la gestion immobilière : propriétaires, locataires, agents. Administration, suivi des loyers et contrats en un seul endroit.",
+  keywords: ["gestion immobilière", "logiciel immobilier", "gestion locative", "propriétaire", "locataire", "Côte d'Ivoire", "Abidjan", "CDC-CI", "QAPRIL", "bail certifié"],
   authors: [{ name: "QAPRIL Infrastructure" }],
   creator: "QAPRIL",
   publisher: "QAPRIL",
@@ -26,20 +28,20 @@ export const metadata: Metadata = {
     locale: "fr_CI",
     url: "https://www.qapril.ci",
     siteName: "QAPRIL",
-    title: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
-    description: "Normalisation et sécurisation du marché locatif en Côte d'Ivoire. Certifiez vos baux et quittances.",
+    title: "QAPRIL — Gestion Immobilière Intelligente",
+    description: "La plateforme nationale officielle pour la gestion et la certification des quittances de loyer en Côte d'Ivoire. Sécurisation des baux immobiliers et des cautions.",
     images: [
       {
         url: "/images/og-main.png",
         width: 1200,
         height: 630,
-        alt: "QAPRIL - Infrastructure Nationale",
+        alt: "QAPRIL — Gestion Immobilière",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QAPRIL - Quittancement autonome plateforme de ressource immobilière locative",
+    title: "QAPRIL — Gestion Immobilière Intelligente",
     description: "Sécurisation intégrale des transactions locatives en Côte d'Ivoire.",
     images: ["/images/og-main.png"],
     creator: "@qapril_ci",
@@ -73,6 +75,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="antialiased font-sans flex flex-col min-h-screen">
+        <SEOInit />
         <MobileRuntimeDirector />
         {children}
         <Toaster position="bottom-right" richColors />

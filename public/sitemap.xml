@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- ────────────────────────────────────────────
+       QAPRIL — Sitemap XML
+       Domaine : https://www.qapril.ci
+       Généré  : 2026-04-26
+       ──────────────────────────────────────────── -->
+
+  <url>
+    <loc>https://www.qapril.ci/</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr"      href="https://www.qapril.ci/"/>
+    <xhtml:link rel="alternate" hreflang="fr-ci"   href="https://www.qapril.ci/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/"/>
+    <image:image>
+      <image:loc>https://www.qapril.ci/assets/og-cover.jpg</image:loc>
+      <image:title>QAPRIL — Gestion Immobilière Intelligente</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://www.qapril.ci/features</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.qapril.ci/features"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/features"/>
+  </url>
+
+  <url>
+    <loc>https://www.qapril.ci/pricing</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.qapril.ci/pricing"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/pricing"/>
+  </url>
+
+  <url>
+    <loc>https://www.qapril.ci/about</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.qapril.ci/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/about"/>
+  </url>
+
+  <url>
+    <loc>https://www.qapril.ci/contact</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.qapril.ci/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/contact"/>
+  </url>
+
+  <url>
+    <loc>https://www.qapril.ci/blog</loc>
+    <lastmod>2026-04-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.qapril.ci/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.qapril.ci/blog"/>
+  </url>
+
+</urlset>
