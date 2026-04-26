@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useTransition } from "react"
-import { MoreVertical, Copy, ShieldOff, Trash2, CheckCircle2 } from "lucide-react"
-import { removeCollaborator } from "@/actions/agency-team-actions"
+import { MoreVertical, Copy, ShieldOff, Trash2, CheckCircle2, ShieldCheck } from "lucide-react"
+import { removeCollaborator, reactivateCollaborator, deleteCollaborator } from "@/actions/agency-team-actions"
 import { useRouter } from "next/navigation"
 
 interface Props {
@@ -41,6 +41,22 @@ export function CollaboratorActionsDropdown({ collaboratorId, status, inviteToke
 
         startTransition(async () => {
             await removeCollaborator(collaboratorId)
+            router.refresh()
+        })
+    }
+
+    const handleReactivate = () => {
+        startTransition(async () => {
+            await reactivateCollaborator(collaboratorId)
+            router.refresh()
+        })
+    }
+
+    const handleDelete = () => {
+        if (!confirm("Voulez-vous vraiment supprimer définitivement ce collaborateur de votre équipe ?")) return
+
+        startTransition(async () => {
+            await deleteCollaborator(collaboratorId)
             router.refresh()
         })
     }
@@ -87,10 +103,24 @@ export function CollaboratorActionsDropdown({ collaboratorId, status, inviteToke
                     )}
 
                     {status === "SUSPENDED" && (
-                         <div className="px-4 py-3 text-xs text-slate-400 italic">
-                             Aucune action disponible
-                         </div>
+                        <button 
+                            onClick={handleReactivate}
+                            disabled={isPending}
+                            className="w-full px-4 py-3 flex items-center gap-3 text-sm font-bold text-emerald-600 hover:bg-emerald-50 transition-colors text-left"
+                        >
+                            <ShieldCheck size={16} /> 
+                            {isPending ? "Réactivation..." : "Réactiver l'accès"}
+                        </button>
                     )}
+
+                    <button 
+                        onClick={handleDelete}
+                        disabled={isPending}
+                        className="w-full px-4 py-3 flex items-center gap-3 text-sm font-bold text-slate-500 hover:bg-slate-100 transition-colors text-left border-t border-slate-50 mt-1"
+                    >
+                        <Trash2 size={16} /> 
+                        {isPending ? "Suppression..." : "Supprimer membre"}
+                    </button>
                 </div>
             )}
         </div>

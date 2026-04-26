@@ -181,6 +181,75 @@ export async function removeCollaborator(collaboratorId: string) {
     }
 }
 
+export async function reactivateCollaborator(collaboratorId: string) {
+    try {
+        const manager = await authorizeAgencyManager()
+
+        const collab = await prisma.user.findUnique({
+            where: { id: collaboratorId }
+        })
+
+        if (!collab) throw new Error("Collaborateur introuvable.")
+
+        const conf = (collab as any).agencyConfig
+        if (conf?.managerId !== manager.id) {
+            throw new Error("Action non autorisée sur cet utilisateur.")
+        }
+
+        await (prisma.user as any).update({
+            where: { id: collaboratorId },
+            data: { 
+                status: "active",
+                agencyConfig: {
+                    ...conf,
+                    status: "ACTIVE"
+                }
+            }
+        })
+
+        return { success: true, message: "L'accès du collaborateur a été réactivé." }
+    } catch (e: any) {
+        return { success: false, error: e.message }
+    }
+}
+
+export async function deleteCollaborator(collaboratorId: string) {
+    try {
+        const manager = await authorizeAgencyManager()
+
+        const collab = await prisma.user.findUnique({
+            where: { id: collaboratorId }
+        })
+
+        if (!collab) throw new Error("Collaborateur introuvable.")
+
+        const conf = (collab as any).agencyConfig
+        if (conf?.managerId !== manager.id) {
+            throw new Error("Action non autorisée sur cet utilisateur.")
+        }
+
+        // Si le collaborateur n'a jamais été actif (invité seulement), on peut le supprimer totalement.
+        // Sinon, on retire juste son lien avec l'agence.
+        if (conf.status === "INVITED") {
+             await prisma.user.delete({
+                where: { id: collaboratorId }
+            })
+        } else {
+            await (prisma.user as any).update({
+                where: { id: collaboratorId },
+                data: { 
+                    agencyConfig: null,
+                    role: "USER" // Reset role or handle accordingly
+                }
+            })
+        }
+
+        return { success: true, message: "Le collaborateur a été retiré de l'équipe." }
+    } catch (e: any) {
+        return { success: false, error: e.message }
+    }
+}
+
 export async function validateInvitationToken(token: string) {
     if (!token) throw new Error("Lien introuvable.")
 
