@@ -1,7 +1,0 @@
-src/actions/diaspora-actions.ts(109,9): error TS2353: Object literal may only specify known properties, and 'biensConcernes' does not exist in type 'Without<MandatGestionCreateInput, MandatGestionUncheckedCreateInput> & MandatGestionUncheckedCreateInput'.
-src/actions/factures.actions.ts(27,7): error TS2322: Type 'Date' is not assignable to type 'string'.
-src/actions/intermediaire-actions.ts(19,13): error TS2353: Object literal may only specify known properties, and 'biensConcernes' does not exist in type 'MandatGestionWhereInput'.
-src/actions/signalement.actions.ts(35,7): error TS2322: Type 'string' is not assignable to type 'MaintenanceCategory'.
-src/actions/signalement.actions.ts(92,7): error TS2322: Type 'string' is not assignable to type 'MaintenanceStatus | EnumMaintenanceStatusFieldUpdateOperationsInput | undefined'.
-src/app/api/v1/baux/[id]/mrl/route.ts(44,9): error TS2322: Type '"MRL-01"' is not assignable to type 'MaintenanceCategory'.
-src/app/api/v1/utilities/ocr/route.ts(50,21): error TS2322: Type 'string' is not assignable to type 'UtilityType'.

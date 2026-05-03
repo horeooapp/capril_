@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "mobile:sync:locataire": "cd mobile_apps/locataire && npx cap sync",
-    "mobile:sync:proprietaire": "cd mobile_apps/proprietaire && npx cap sync",
+    "mobile:sync:locataire": "cd native_apps/locataire && npx cap sync",
+    "mobile:sync:proprietaire": "cd native_apps/proprietaire && npx cap sync",
     "mobile:build:locataire": "npm run build && npm run mobile:sync:locataire",
     "mobile:build:proprietaire": "npm run build && npm run mobile:sync:proprietaire"
   },
