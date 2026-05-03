@@ -5,7 +5,7 @@ import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { serializeReceipt } from "@/lib/serialize"
 import { createAndNotifyReceipt } from "@/lib/receipt"
-import crypto from "node:crypto"
+import crypto from "crypto"
 
 /**
  * PHASE 3 — RÈGLE ABSOLUE N°2 : Guard NestJS OBLIGATOIRE (RBAC)

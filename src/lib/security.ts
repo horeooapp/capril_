@@ -71,7 +71,7 @@ export async function checkWebhookSignature(
     signature: string,
     secret: string
 ): Promise<boolean> {
-    const { createHmac } = await import("node:crypto");
+    const { createHmac } = await import("crypto");
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
     return expected === signature;
 }

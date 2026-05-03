@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import crypto from "node:crypto"
+import crypto from "crypto"
 import { cinetpay } from "@/lib/cinetpay"
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
 import { Role } from "@prisma/client"

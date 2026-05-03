@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import crypto from "node:crypto";
+import crypto from "crypto";
 
 /**
  * Part 9.1: Generate Standardized Receipt Reference

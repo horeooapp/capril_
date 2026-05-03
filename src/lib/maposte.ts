@@ -1,6 +1,6 @@
  
 import { prisma } from "./prisma";
-import { createHash } from "node:crypto";
+import { createHash } from "crypto";
 
 export const DELIVERY_STATUSES = {
     SUBMITTED: "submitted",         // Request sent to MaPoste API

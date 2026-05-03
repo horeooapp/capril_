@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
-import crypto from "node:crypto"
+import crypto from "crypto"
 import { ProfilInterm } from "@prisma/client"
 
 export async function createMandatGestion(data: {

@@ -1,7 +1,7 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
-import crypto from "node:crypto"
+import crypto from "crypto"
 import { calculateUserScore } from "@/lib/scoring"
 import { revalidatePath } from "next/cache"
 
