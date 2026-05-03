@@ -1,58 +1,48 @@
 import Redis from 'ioredis';
 
-import fs from 'fs';
-import path from 'path';
+// Edge-compatible In-memory store for MockRedis
+const memoryStore = new Map<string, { value: string, expiry: number }>();
 
-// Mock simple pour le développement ou les cas où Redis est HS, sauvegardé sur disque.
 class MockRedis {
-    private filePath = path.join(process.cwd(), '.redis-mock.json');
     status = 'mock';
 
-    private loadStore(): Record<string, { value: string, expiry: number }> {
-        try {
-            if (fs.existsSync(this.filePath)) {
-                return JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
-            }
-        } catch (e) {
-            console.error('[MockRedis] Error loading file:', e);
-        }
-        return {};
-    }
-
-    private saveStore(store: Record<string, { value: string, expiry: number }>) {
-        try {
-            fs.writeFileSync(this.filePath, JSON.stringify(store), 'utf-8');
-        } catch (e) {
-            console.error('[MockRedis] Error saving file:', e);
-        }
-    }
-
     async set(key: string, value: string, mode?: string, duration?: number) {
-        const store = this.loadStore();
         const expiry = Date.now() + (duration ? duration * 1000 : 3600000);
-        store[key] = { value, expiry };
-        this.saveStore(store);
+        memoryStore.set(key, { value, expiry });
         return 'OK';
     }
 
     async get(key: string) {
-        const store = this.loadStore();
-        const item = store[key];
+        const item = memoryStore.get(key);
         if (!item || item.expiry < Date.now()) {
-            if (item) {
-                delete store[key];
-                this.saveStore(store);
-            }
+            if (item) memoryStore.delete(key);
             return null;
         }
         return item.value;
     }
 
+    async incr(key: string): Promise<number> {
+        const item = memoryStore.get(key);
+        let val = 0;
+        if (item && item.expiry >= Date.now()) {
+            val = parseInt(item.value) || 0;
+        }
+        val++;
+        memoryStore.set(key, { value: val.toString(), expiry: Date.now() + 60000 });
+        return val;
+    }
+
+    async expire(key: string, seconds: number) {
+        const item = memoryStore.get(key);
+        if (item) {
+            item.expiry = Date.now() + (seconds * 1000);
+            return 1;
+        }
+        return 0;
+    }
+
     async del(key: string) {
-        const store = this.loadStore();
-        delete store[key];
-        this.saveStore(store);
-        return 1;
+        return memoryStore.delete(key) ? 1 : 0;
     }
 }
 
