@@ -1,2 +1,0 @@
-﻿-- CreateEnum
-CREATE TYPE "InspectionStatus" AS ENUM ('PLANIFIEE', 'EN_COURS', 'TERMINEE', 'ANNULE

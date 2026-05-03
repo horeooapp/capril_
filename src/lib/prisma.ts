@@ -12,9 +12,11 @@ export const prismaClientSingleton = () => {
   }
 
   if (dbUrl && !dbUrl.startsWith("postgresql://") && !dbUrl.startsWith("postgres://")) {
-    console.error("❌ CRITICAL DATABASE CONFIGURATION ERROR");
-    console.error(`Invalid protocol detected: "${dbUrl.split(":")[0]}//".`);
-    console.error("The production application requires a PostgreSQL connection string.");
+    const errorMsg = `❌ CRITICAL DATABASE CONFIGURATION ERROR: Invalid protocol detected: "${dbUrl.split(":")[0]}//". The production application requires a PostgreSQL connection string.`;
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(errorMsg);
+    }
+    console.error(errorMsg);
     if (dbUrl.startsWith("file:")) {
       console.error("⚠️ SQLITE GHOST DETECTED! 'file:' protocol found in environment.");
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -19,21 +19,21 @@ export default function ProfileScreen({ navigation, route }: any) {
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
 
-  useEffect(() => {
-    checkBiometrics();
-    loadBiometricPreference();
-  }, []);
-
-  const checkBiometrics = async () => {
+  const checkBiometrics = useCallback(async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
     const enrolled = await LocalAuthentication.isEnrolledAsync();
     setHasBiometrics(compatible && enrolled);
-  };
+  }, []);
 
-  const loadBiometricPreference = async () => {
+  const loadBiometricPreference = useCallback(async () => {
     const val = await AsyncStorage.getItem('biometric_enabled');
     setIsBiometricEnabled(val === 'true');
-  };
+  }, []);
+
+  useEffect(() => {
+    checkBiometrics();
+    loadBiometricPreference();
+  }, [checkBiometrics, loadBiometricPreference]);
 
   const toggleBiometrics = async (value: boolean) => {
     if (value) {

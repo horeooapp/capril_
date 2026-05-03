@@ -119,11 +119,26 @@ export async function POST(req: Request) {
 
         // Si Propriétaire
         if (role === 'OWNER' || role === 'LANDLORD') {
+            // 1. Parallelize independent data fetching
+            const [pendingRepairsCount, suggestedRecharge] = await Promise.all([
+                prisma.ticketMaintenance.count({
+                    where: { 
+                        logement: { ownerUserId: userId },
+                        statut: 'EN_ATTENTE' 
+                    }
+                }),
+                (async () => {
+                    const { calculateSuggestedRecharge } = await import('@/lib/wallet/calculator');
+                    return calculateSuggestedRecharge(userId);
+                })()
+            ]);
+
             let totalRevenue = 0;
             let totalUnits = 0;
             let occupiedUnits = 0;
             const propertiesMobile: any[] = [];
 
+            // Process properties (could be further optimized but keeping logic similar for now)
             for (const prop of user.propertiesOwned) {
                 if (prop.typeStructure === "INDEPENDANT") {
                     totalUnits++;
@@ -148,7 +163,6 @@ export async function POST(req: Request) {
                         tenantName
                     });
                 } else {
-                    // Structure parente (Type Immeuble / Cour) - On s'intéresse aux sous-unités
                     if (prop.units && prop.units.length > 0) {
                         for (const unit of prop.units) {
                             totalUnits++;
@@ -174,7 +188,6 @@ export async function POST(req: Request) {
                             });
                         }
                     } else {
-                        // Cas rare : Immeuble principal créé mais aucune unité dedans
                         propertiesMobile.push({
                             id: prop.id,
                             name: prop.name || prop.propertyCode,
@@ -188,37 +201,39 @@ export async function POST(req: Request) {
 
             const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
-            const pendingRepairsCount = await prisma.ticketMaintenance.count({
-                where: { logementId: { in: propertiesMobile.map(p => p.id) }, statut: 'EN_ATTENTE' }
-            });
-
-            // --- CALCUL HISTORIQUE REVENU (6 MOIS) ---
+            // --- CALCUL HISTORIQUE REVENU (Optimized) ---
             const last6Months: any[] = [];
             const now = new Date();
+            const monthsToFetch: string[] = [];
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const monthName = d.toLocaleString('fr-FR', { month: 'short' }).toUpperCase();
-                const monthNum = d.getMonth() + 1;
-                const yearNum = d.getFullYear();
+                const period = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                monthsToFetch.push(period);
+            }
 
-                const monthlyRevenue = await prisma.receipt.aggregate({
-                    where: {
-                        lease: {
-                            property: { ownerUserId: userId }
-                        },
-                        periodMonth: `${yearNum}-${String(monthNum).padStart(2, '0')}`,
-                        status: { in: ["PAID", "ENCAISSE", "SUCCESS"] }
+            const revenues = await prisma.receipt.groupBy({
+                by: ['periodMonth'],
+                where: {
+                    lease: {
+                        property: { ownerUserId: userId }
                     },
-                    _sum: { totalAmount: true }
-                });
+                    periodMonth: { in: monthsToFetch },
+                    status: { in: ["PAID", "ENCAISSE", "SUCCESS"] }
+                },
+                _sum: { totalAmount: true }
+            });
 
+            monthsToFetch.forEach(month => {
+                const d = new Date(month + "-01");
+                const monthName = d.toLocaleString('fr-FR', { month: 'short' }).toUpperCase();
+                const rev = revenues.find(r => r.periodMonth === month);
                 last6Months.push({
                     month: monthName,
-                    amount: monthlyRevenue._sum.totalAmount || 0
+                    amount: rev?._sum.totalAmount || 0
                 });
-            }
+            });
             
-            // --- RECHERCHE STATS OBSERVATOIRE (Marché local) ---
+            // --- RECHERCHE STATS OBSERVATOIRE ---
             let marketStats = null;
             if (user.propertiesOwned.length > 0) {
                 const communes = user.propertiesOwned.map(p => p.commune).filter(Boolean);
@@ -229,8 +244,6 @@ export async function POST(req: Request) {
                     const reports = await getCommuneMarketReport(topCommune);
                     if (reports && reports.length > 0) {
                         const avgMarketRent = reports[0].avgRent;
-                        
-                        // Calcul du positionnement (ADD-20)
                         const userPropertiesInCommune = user.propertiesOwned.filter(p => p.commune === topCommune);
                         let sumUserRent = 0;
                         let countUserUnits = 0;
@@ -256,7 +269,7 @@ export async function POST(req: Request) {
                             trendPct: reports[0].trendPct,
                             period: reports[0].period,
                             userAvgRent,
-                            marketPositioning: diffPct, // Pourcentage (+ ou -) par rapport au marché
+                            marketPositioning: diffPct,
                         };
                     }
                 }
@@ -264,10 +277,6 @@ export async function POST(req: Request) {
 
             const totalProperties = user.propertiesOwned.length;
             const onboarding = totalProperties === 0;
-
-            // SUGGESTION RECHARGE (ADD-07)
-            const { calculateSuggestedRecharge } = await import('@/lib/wallet/calculator');
-            const suggestedRecharge = await calculateSuggestedRecharge(userId);
 
             return NextResponse.json({
                 success: true,
@@ -281,7 +290,7 @@ export async function POST(req: Request) {
                     userId: user.id,
                     userEmail: user.email,
                     fullName: fallbackName,
-                    role: user.role, // LANDLORD or LANDLORD_PRO
+                    role: user.role,
                     pendingRepairs: pendingRepairsCount,
                     revenueHistory: last6Months,
                     marketStats,
@@ -293,7 +302,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Rôle invalide" }, { status: 400 });
 
     } catch (error: any) {
-        console.error("Erreur Mobile Dashboard:", error);
-        return NextResponse.json({ error: "Erreur serveur : " + error.message }, { status: 500 });
+        console.error("Erreur Mobile Dashboard:", error?.message || error);
+        return NextResponse.json({ error: "Erreur serveur interne" }, { status: 500 });
     }
 }
