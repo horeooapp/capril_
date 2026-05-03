@@ -13,6 +13,7 @@ class CustomAuthError extends CredentialsSignin {
 
 import { authConfig } from "./auth.config"
 import { redis } from "@/lib/redis"
+import { writeAuditLog } from "@/lib/audit"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -57,6 +58,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const isValid = storedOtp === otp;
 
                 if (!isValid) {
+                    await writeAuditLog({
+                        action: "LOGIN_FAILED_OTP",
+                        module: "AUTH",
+                        newValues: { email, requestedRole }
+                    });
                     throw new CustomAuthError("invalid_otp");
                 }
 
@@ -81,6 +87,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     });
 
                     if (user) {
+                        await writeAuditLog({
+                            userId: user.id,
+                            action: "LOGIN_SUCCESS",
+                            module: "AUTH",
+                            newValues: { email, role: user.role }
+                        });
                         // KICK-OUT IF SUSPENDED OR BANNED (God Mode Control)
                         if (user.status === "BANNED" || user.status === "SUSPENDED") {
                              throw new CustomAuthError("account_suspended");

@@ -3,6 +3,7 @@ import { authConfig } from "./auth.config"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { redis } from "./lib/redis"
+import { checkRateLimit } from "./lib/security"
 
 const { auth } = NextAuth(authConfig)
 
@@ -10,28 +11,20 @@ export default auth(async (req) => {
     const ip = req.headers.get("x-forwarded-for")?.split(',')[0] || "anonymous";
     const path = req.nextUrl.pathname;
 
-    // 1. Rate Limiting for API and Dashboard (ADD-SCALABILITY)
+    // 1. General Rate Limiting for API and Dashboard (ADD-SCALABILITY)
     if (path.startsWith("/api") || path.startsWith("/dashboard")) {
-        try {
-            if (redis && typeof redis.get === 'function') {
-                const limit = 100; // 100 requests
-                const windowSize = 60; // 60 seconds
-                const key = `ratelimit:${ip}`;
-                
-                const currentCount = await redis.get(key);
-                if (currentCount && parseInt(currentCount) >= limit) {
-                    return new NextResponse("Too Many Requests", { status: 429 });
-                }
+        const withinLimit = await checkRateLimit(`gen:${ip}`, 100, 60); // 100 per min
+        if (!withinLimit) {
+            return new NextResponse("Too Many Requests", { status: 429 });
+        }
+    }
 
-                if (!currentCount) {
-                    await redis.set(key, "1", "EX", windowSize);
-                } else {
-                    await redis.incr(key);
-                }
-            }
-        } catch (e) {
-            console.error("[Middleware] Rate limiting error:", e);
-            // On laisse passer en cas d'erreur Redis pour éviter de bloquer tout le monde
+    // 2. Strict Brute-Force Protection for Auth (ADD-SECURITY)
+    if (path.startsWith("/api/auth") || path.startsWith("/api/mobile/login") || path.includes("/otp")) {
+        const withinAuthLimit = await checkRateLimit(`auth:${ip}`, 5, 300); // 5 attempts per 5 minutes
+        if (!withinAuthLimit) {
+            console.warn(`[SECURITY] Potential brute-force detected from IP: ${ip} on path: ${path}`);
+            return new NextResponse("Security Lock: Too Many Attempts", { status: 429 });
         }
     }
 

@@ -1,40 +1,50 @@
+import { redis } from "./redis";
+
 /**
  * Part 23.3: Security Hardening Utilities
  * Rate limiting, input sanitization, and security headers.
  */
 
 /**
- * Simple in-memory rate limiter (per IP per minute).
- * In production, replace with Redis-based solution.
+ * Distributed rate limiter using Redis.
+ * Ensures consistent protection across multiple server instances.
  */
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-export function checkRateLimit(key: string, maxRequests = 10, windowMs = 60_000): boolean {
-    const now = Date.now();
-    const entry = rateLimitStore.get(key);
-
-    if (!entry || now > entry.resetAt) {
-        rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
-        return true; // Within limit
+export async function checkRateLimit(key: string, maxRequests = 10, windowSec = 60): Promise<boolean> {
+    if (!redis || redis.status === 'mock') {
+        // Fallback simple pour le dev
+        return true; 
     }
 
-    if (entry.count >= maxRequests) return false; // Rate limit exceeded
-
-    entry.count++;
-    return true;
+    try {
+        const fullKey = `qapril:ratelimit:${key}`;
+        const current = await redis.incr(fullKey);
+        
+        if (current === 1) {
+            await redis.expire(fullKey, windowSec);
+        }
+        
+        return current <= maxRequests;
+    } catch (e) {
+        console.error("[Security] Rate limit check failed:", e);
+        return true; // Fail open to avoid blocking users on Redis failure
+    }
 }
 
 /**
  * Sanitize user-provided strings to prevent XSS / SQL injection vectors.
  * Works as a first-pass defence; always parameterize DB queries.
  */
-export function sanitizeInput(input: string, maxLength = 500): string {
+export function sanitizeInput(input: string, maxLength = 1000): string {
+    if (!input) return "";
     return input
         .trim()
         .substring(0, maxLength)
-        .replace(/[<>]/g, '')               // Strip bare HTML brackets
-        .replace(/javascript:/gi, '')       // Strip JS injection prefix
-        .replace(/on\w+="[^"]*"/gi, '');    // Strip inline event handlers
+        .replace(/[<>]/g, '')                               // Strip < >
+        .replace(/javascript:/gi, '')                       // Strip javascript:
+        .replace(/on\w+="[^"]*"/gi, '')                     // Strip onEvent
+        .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, '') // Strip <script> blocks
+        .replace(/expression\((.|\n)*\)/gi, '')             // Strip CSS expression
+        .replace(/vbscript:/gi, '');                        // Strip vbscript:
 }
 
 /**
