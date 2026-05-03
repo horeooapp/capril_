@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { redis } from "./redis";
 
 /**
  * QAPRIL Feature Toggle Service
@@ -67,40 +68,60 @@ const CACHE_TTL = 30000; // 30 sec
 
 export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
   const now = Date.now();
+  const REDIS_KEY = "qapril:feature_flags";
   
-  if (!featuresCache || (now - lastFetch) > CACHE_TTL) {
-    try {
-      // 1. Tenter la nouvelle table FeatureFlag
-      let flags: any[] = [];
-      if ((prisma as any).featureFlag) {
-        flags = await (prisma as any).featureFlag.findMany();
-      }
-      
-      if (flags && flags.length > 0) {
-        featuresCache = flags.reduce((acc: any, flag: any) => {
-          acc[flag.id] = flag.enabled;
-          return acc;
-        }, {});
-      }
-      
-      // 2. Fusionner avec l'ancien système systemConfig (feature_flags key)
-      const config = await (prisma as any).systemConfig.findUnique({
-        where: { key: "feature_flags" }
-      });
-      if (config?.value) {
-        const oldFlags = config.value as Record<string, boolean>;
-        featuresCache = { ...oldFlags, ...(featuresCache || {}) };
-      }
-
-      if (!featuresCache) featuresCache = {};
-      lastFetch = now;
-    } catch (error) {
-      console.error("[Features] Erreur chargement :", error);
-      return true;
-    }
+  // 1. Try local memory cache first (ultra-fast)
+  if (featuresCache && (now - lastFetch) <= CACHE_TTL) {
+    return featuresCache?.[key as string] ?? true;
   }
 
-  return featuresCache?.[key as string] ?? true;
+  try {
+    // 2. Try Redis (Distributed cache)
+    if (redis && redis.status !== 'mock') {
+      const cached = await redis.get(REDIS_KEY);
+      if (cached) {
+        featuresCache = JSON.parse(cached);
+        lastFetch = now;
+        return featuresCache?.[key as string] ?? true;
+      }
+    }
+
+    // 3. Database Fallback
+    console.log(`[Features] Cache miss for ${key}, fetching from DB...`);
+    let flags: any[] = [];
+    if ((prisma as any).featureFlag) {
+      flags = await (prisma as any).featureFlag.findMany();
+    }
+    
+    let newCache: Record<string, boolean> = {};
+    if (flags && flags.length > 0) {
+      newCache = flags.reduce((acc: any, flag: any) => {
+        acc[flag.id] = flag.enabled;
+        return acc;
+      }, {});
+    }
+    
+    const config = await (prisma as any).systemConfig.findUnique({
+      where: { key: "feature_flags" }
+    });
+    if (config?.value) {
+      const oldFlags = config.value as Record<string, boolean>;
+      newCache = { ...oldFlags, ...newCache };
+    }
+
+    featuresCache = newCache;
+    lastFetch = now;
+
+    // 4. Update Redis
+    if (redis && redis.status !== 'mock') {
+      await redis.set(REDIS_KEY, JSON.stringify(newCache), "EX", 60); // 60s global TTL
+    }
+
+    return featuresCache?.[key as string] ?? true;
+  } catch (error) {
+    console.error("[Features] Erreur chargement :", error);
+    return featuresCache?.[key as string] ?? true;
+  }
 }
 
 /**

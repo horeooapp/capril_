@@ -4,7 +4,7 @@ import QaprilLandingV2 from "@/components/landing-v2/QaprilLandingV2";
 import RestrictedPortal from "@/components/landing-v3/RestrictedPortal";
 import { isFeatureEnabled } from "@/lib/features";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // Cache the landing page structure for 1 minute
 
 export default async function Home() {
   let session = null;

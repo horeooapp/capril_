@@ -22,6 +22,10 @@ export const prismaClientSingleton = () => {
     }
   }
 
+  if (process.env.NODE_ENV === "production" && dbUrl && !dbUrl.includes("connection_limit=")) {
+    console.warn("⚠️ SCALABILITY WARNING: DATABASE_URL does not specify 'connection_limit'. For 10,000+ concurrent users, please use a connection pooler (like PgBouncer) and set ?connection_limit=20 in the URL.");
+  }
+
   return new PrismaClient({
     datasources: {
       db: {
