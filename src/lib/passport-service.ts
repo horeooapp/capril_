@@ -43,7 +43,7 @@ export class PasseportService {
     const count = await prisma.passeportLocatif.count();
     const refPasseport = `PAS-${new Date().getFullYear()}-${(count + 1).toString().padStart(5, '0')}`;
     
-    const passportHash = generateProofHash({
+    const passportHash = await generateProofHash({
         refPasseport,
         userId,
         score: scoreResult.score,

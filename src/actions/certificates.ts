@@ -59,7 +59,7 @@ export async function generateRentalCertificate(leaseId: string): Promise<Rental
         timestamp: new Date().toISOString()
     }
 
-    const verificationHash = generateProofHash(certificateData)
+    const verificationHash = await generateProofHash(certificateData)
 
     return {
         certificateId: `CERT-${lease.id.substring(0, 8).toUpperCase()}`,

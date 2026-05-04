@@ -44,7 +44,7 @@ export async function createMandate(data: {
         }
     }
 
-    const proofHash = generateProofHash({
+    const proofHash = await generateProofHash({
         propertyId: data.propertyId,
         agentId: agentId,
         type: data.type,

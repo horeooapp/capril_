@@ -53,7 +53,7 @@ export async function createAndNotifyReceipt(data: {
 
     // 2. Reference & Hash
     const receiptRef = await generateReceiptRef();
-    const documentHash = generateProofHash({
+    const documentHash = await generateProofHash({
         receiptRef,
         leaseId: data.leaseId,
         totalAmount: data.rentAmount + data.chargesAmount,

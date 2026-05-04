@@ -102,7 +102,7 @@ export async function createLease(data: {
 
         // 6. Security Hash
         const leaseRef = await generateLeaseRef(data.leaseType);
-        const sha256 = generateProofHash({ leaseRef, propertyId: data.propertyId, landlordId: ownerId, rent: data.rentAmount });
+        const sha256 = await generateProofHash({ leaseRef, propertyId: data.propertyId, landlordId: ownerId, rent: data.rentAmount });
 
         // 7. DB Save
         const lease = await prisma.lease.create({
@@ -232,7 +232,7 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         }
 
         // Success: CONFIRME
-        const finalHash = generateProofHash({ ...bdq, confirmedAt: new Date().toISOString() });
+        const finalHash = await generateProofHash({ ...bdq, confirmedAt: new Date().toISOString() });
         const qrToken = `QAPRIL-BDQ-${bdq.id.substring(0, 8).toUpperCase()}`;
 
         let tenant = await prisma.user.findUnique({ where: { phone: bdq.telephoneLocataire } });
@@ -319,7 +319,7 @@ export async function createBDQ(data: any) {
             data.telephoneLocataire = normalizedPhone;
         }
 
-        const hash = generateProofHash({ bailleurId, nom: data.nomLocataire, tel: data.telephoneLocataire, date: new Date().toISOString() });
+        const hash = await generateProofHash({ bailleurId, nom: data.nomLocataire, tel: data.telephoneLocataire, date: new Date().toISOString() });
 
         const bdq = await prisma.bailDeclaratif.create({
             data: {

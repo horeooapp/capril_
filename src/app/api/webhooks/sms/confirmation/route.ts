@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
             // Génération Quittance (Version simplifiée car pas de session pour Wallet)
             const receiptRef = await generateReceiptRef()
-            const documentHash = generateProofHash({
+            const documentHash = await generateProofHash({
                 receiptRef,
                 leaseId: declaration.leaseId,
                 totalAmount: amount,

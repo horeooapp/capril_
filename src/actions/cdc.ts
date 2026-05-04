@@ -26,7 +26,7 @@ export async function initiateCDCDeposit(data: {
     if (!lease) throw new Error("Bail introuvable")
 
     // Generate Verification Hash
-    const proofHash = generateProofHash({
+    const proofHash = await generateProofHash({
         leaseId: data.leaseId,
         initiator: data.initiator,
         amount: data.amount,
