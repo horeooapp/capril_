@@ -151,7 +151,16 @@ export default async function OwnerProfilePage() {
                     </SectionCard>
 
                     <SectionCard title="Abonnement">
-                       <SubscriptionManager currentPlan="PREMIUM AGREE" />
+                        {(() => {
+                            const tierMap: any = {
+                                'LOCATAIRE': 'LOCATAIRE',
+                                'ESSENTIEL': 'PROPRIÉTAIRE',
+                                'PRO': 'AGENCE INTERMÉDIAIRE',
+                                'PREMIUM': 'DIASPORA VIP',
+                                'INSTITUTIONNEL': 'DIASPORA VIP'
+                            };
+                            return <SubscriptionManager currentPlan={tierMap[user?.activePlanTier || 'ESSENTIEL'] || 'PROPRIÉTAIRE'} />;
+                        })()}
                     </SectionCard>
 
                     {/* Zone de Danger */}

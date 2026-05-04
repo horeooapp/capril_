@@ -17,7 +17,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
             if (res.error) {
                 toast.error(res.error)
             } else {
-                toast.success('Félicitations, vous êtes passé(e) en Premium Agency !')
+                toast.success('Félicitations, votre abonnement a été mis à jour !')
             }
         })
     }
@@ -53,12 +53,13 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  {/* Free Tier */}
                  <div className={`bg-white border ${currentTier === 'ESSENTIEL' || currentTier === 'LOCATAIRE' ? 'border-emerald-500 border-2' : 'border-slate-200'} rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative`}>
                      {(currentTier === 'ESSENTIEL' || currentTier === 'LOCATAIRE') && <div className="absolute -top-4 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Plan Actuel</div>}
-                     <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Essential</h3>
+                     <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Propriétaire</h3>
                      <div className="text-4xl font-black text-slate-900 mb-6">0 <span className="text-[13.5px] text-slate-500 font-bold">FCFA / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-600">
                          <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Jusqu'à 10 baux</p>
-                         <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Quittances PDF basiques</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Quittances PDF certifiées</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Facturation par quittance générée</p>
                          <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Support email</p>
                      </div>
                      
@@ -68,19 +69,19 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  </div>
 
                  {/* Premium Tier */}
-                 <div className={`bg-gradient-to-br from-slate-800 to-slate-900 border ${currentTier === 'PREMIUM' ? 'border-emerald-500 border-2' : 'border-slate-700'} rounded-[16px] p-8 shadow-lg flex flex-col items-center text-center relative transform md:-translate-y-4`}>
+                 <div className={`bg-gradient-to-br from-slate-800 to-slate-900 border ${currentTier === 'PRO' ? 'border-emerald-500 border-2' : 'border-slate-700'} rounded-[16px] p-8 shadow-lg flex flex-col items-center text-center relative transform md:-translate-y-4`}>
                      <div className="absolute -top-4 bg-amber-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Recommandé</div>
-                     <h3 className="text-[15px] font-black text-sky-400 uppercase tracking-widest mb-2">Premium Agency</h3>
-                     <div className="text-4xl font-black text-white mb-6">45k <span className="text-[13.5px] text-slate-400 font-bold">FCFA / mois</span></div>
+                     <h3 className="text-[15px] font-black text-sky-400 uppercase tracking-widest mb-2">Agence Intermédiaire</h3>
+                     <div className="text-4xl font-black text-white mb-6">0 <span className="text-[13.5px] text-slate-400 font-bold">FCFA / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-300">
                          <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Baux illimités</p>
                          <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Automatisations & CRM inclus</p>
-                         <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Quittances certifiées avec Wallet Mobile Money</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Facturation par quittance générée</p>
                          <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Comptabilité & Rapprochement Bancaire</p>
                      </div>
                      
-                     {currentTier === 'PREMIUM' ? (
+                     {currentTier === 'PRO' ? (
                           <div className="w-full mt-auto bg-emerald-500 text-white px-6 py-3 rounded-[10px] font-bold text-[11px] uppercase tracking-widest shadow-sm flex items-center justify-center gap-2">
                             <BadgeCheck size={16} /> Plan Actuel
                           </div>
@@ -95,23 +96,23 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  </div>
 
                  {/* Enterprise Tier */}
-                 <div className={`bg-white border text-slate-900 ${currentTier === 'INSTITUTIONNEL' ? 'border-emerald-500 border-2' : 'border-slate-200'} rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative`}>
-                     {currentTier === 'INSTITUTIONNEL' && <div className="absolute -top-4 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Plan Actuel</div>}
-                     <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Enterprise</h3>
-                     <div className="text-4xl font-black text-slate-900 mb-6">Sur Devis</div>
+                 <div className={`bg-white border text-slate-900 ${currentTier === 'PREMIUM' ? 'border-emerald-500 border-2' : 'border-slate-200'} rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative`}>
+                     {currentTier === 'PREMIUM' && <div className="absolute -top-4 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Plan Actuel</div>}
+                     <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Diaspora VIP</h3>
+                     <div className="text-4xl font-black text-slate-900 mb-6">2 500 <span className="text-[13.5px] text-slate-500 font-bold">FCFA / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-600">
-                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Multi-Agences (Réseaux franchise)</p>
-                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Instance BDD Dédiée</p>
-                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Gestion Indivision / Syndic</p>
-                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> API Access pour ERP Externe</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Tableau de bord VIP</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Rapports financiers mensuels</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Inspections vidéo à distance</p>
+                         <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Gestionnaire terrain dédié</p>
                      </div>
                      
                      <button 
-                         disabled={isPending || currentTier === 'INSTITUTIONNEL'}
+                         disabled={isPending || currentTier === 'PREMIUM'}
                          onClick={handleEnterprise}
                          className="w-full mt-auto bg-white border-2 border-slate-800 text-slate-800 px-6 py-3 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:bg-slate-800 hover:text-white transition-colors disabled:opacity-50">
-                         {currentTier === 'INSTITUTIONNEL' ? 'Déjà Actif' : 'Contacter Ventes'}
+                         {currentTier === 'PREMIUM' ? 'Déjà Actif' : 'Activer Diaspora'}
                      </button>
                  </div>
             </div>

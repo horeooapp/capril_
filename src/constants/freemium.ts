@@ -12,22 +12,22 @@ export const FREEMIUM_CONFIG = {
     ESSENTIEL: {
         maxUnits: 3,
         features: ["BASIC_CRM", "PAYMENT_NOTIFS", "VAT_REPORTING"],
-        price: 5000 // Mensuel
+        price: 0 // Facturation par quittance
     },
     PRO: {
         maxUnits: 20,
         features: ["ADVANCED_CRM", "BULK_RECEIPTS", "ACCOUNTING_EXPORT", "M-BAIL-VERBAL"],
-        price: 15000
+        price: 0 // Facturation par quittance
     },
     PREMIUM: {
         maxUnits: 100,
         features: ["PRIORITY_SUPPORT", "API_ACCESS", "M-FRAUDE-KYC", "M-DIASPORA"],
-        price: 50000
+        price: 2500 // Diaspora
     },
     INSTITUTIONNEL: {
         maxUnits: 999999,
         features: ["WHITE_LABEL", "MULTI_ACCOUNT", "CUSTOM_WORKFLOWS", "AUDIT_LOG_FULL"],
-        price: 250000
+        price: 0 // Facturation par quittance
     }
 }
 

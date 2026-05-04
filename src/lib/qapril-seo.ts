@@ -22,8 +22,8 @@ export const QAPRIL_SEO_CONFIG = {
   pages: {
     home: {
       title:       "QAPRIL — Gestion Immobilière Intelligente",
-      description: "QAPRIL simplifie la gestion immobilière : propriétaires, locataires, agents. Administration, suivi des loyers et contrats en un seul endroit.",
-      keywords:    "gestion immobilière, logiciel immobilier, gestion locative, propriétaire, locataire, Côte d'Ivoire, Abidjan, CDC-CI",
+      description: "QAPRIL simplifie la gestion immobilière : locataires, propriétaires, agences et diaspora. Administration, suivi des loyers et contrats en un seul endroit.",
+      keywords:    "gestion immobilière, logiciel immobilier, gestion locative, propriétaire, locataire, diaspora, agence immobilière, Côte d'Ivoire, Abidjan, CDC-CI",
       canonical:   "https://www.qapril.ci/",
     },
     register: {
@@ -40,9 +40,9 @@ export const QAPRIL_SEO_CONFIG = {
       noindex:     true,
     },
     pricing: {
-      title:       "Tarifs QAPRIL — Offres & Abonnements",
-      description: "Découvrez les offres QAPRIL adaptées à chaque profil : propriétaire, agence ou promoteur. Essai gratuit disponible.",
-      keywords:    "tarifs, prix, abonnement, offre immobilière",
+      title:       "Tarifs QAPRIL — Offres & Facturation",
+      description: "Découvrez les offres QAPRIL adaptées à chaque profil : locataire, propriétaire, agence intermédiaire ou diaspora. Facturation par quittance générée.",
+      keywords:    "tarifs, prix, abonnement, offre immobilière, quittance, diaspora",
       canonical:   "https://www.qapril.ci/pricing",
     },
     features: {

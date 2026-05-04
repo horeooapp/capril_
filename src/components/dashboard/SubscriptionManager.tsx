@@ -14,9 +14,9 @@ export const SubscriptionManager: React.FC<Props> = ({ currentPlan }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const plans = [
-    { name: "ESSENTIEL", price: "Libre", desc: "Gestion de base, sans mandat", color: "text-slate-500", bg: "bg-slate-50" },
-    { name: "PREMIUM AGREE", price: "15,000 FCFA/mois", desc: "Gestion locative avec mandats exclusifs", color: "text-amber-600", bg: "bg-orange-50" },
-    { name: "INSTITUTIONNEL", price: "Sur mesure", desc: "API, volume massif, support dédié", color: "text-indigo-600", bg: "bg-indigo-50" }
+    { name: "PROPRIÉTAIRE", price: "Libre", desc: "Facturation par quittance générée", color: "text-slate-500", bg: "bg-slate-50" },
+    { name: "AGENCE INTERMÉDIAIRE", price: "Libre", desc: "Facturation par quittance générée", color: "text-amber-600", bg: "bg-orange-50" },
+    { name: "DIASPORA VIP", price: "2 500 FCFA/mois", desc: "Tableau de bord VIP, rapports et inspection", color: "text-indigo-600", bg: "bg-indigo-50" }
   ];
 
   const handleSwitchPlan = (planName: string) => {

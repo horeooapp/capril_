@@ -472,8 +472,8 @@ export default function QaprilLandingV2({ session }: { session: any }) {
           <div className="users-tabs">
             <button className={`user-tab ${activeTab === 'tenant' ? 'active' : ''}`} onClick={() => setActiveTab('tenant')}>🧑 Locataire</button>
             <button className={`user-tab ${activeTab === 'landlord' ? 'active' : ''}`} onClick={() => setActiveTab('landlord')}>🏠 Propriétaire</button>
-            <button className={`user-tab ${activeTab === 'agency' ? 'active' : ''}`} onClick={() => setActiveTab('agency')}>🏢 Agence</button>
-            <button className={`user-tab ${activeTab === 'agent' ? 'active' : ''}`} onClick={() => setActiveTab('agent')}>🤝 Agent NC</button>
+            <button className={`user-tab ${activeTab === 'agency' ? 'active' : ''}`} onClick={() => setActiveTab('agency')}>🏢 Agence Int.</button>
+            <button className={`user-tab ${activeTab === 'diaspora' ? 'active' : ''}`} onClick={() => setActiveTab('diaspora')}>🌍 Diaspora</button>
             <button className={`user-tab ${activeTab === 'champion' ? 'active' : ''}`} onClick={() => setActiveTab('champion')}>⭐ Champion</button>
           </div>
 
@@ -574,29 +574,28 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             </div>
           </div>
 
-          {/* AGENT NC */}
-          <div className={`users-content ${activeTab === 'agent' ? 'show' : ''}`} id="uc-agent">
+          {/* DIASPORA */}
+          <div className={`users-content ${activeTab === 'diaspora' ? 'show' : ''}`} id="uc-diaspora">
             <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--coral-l)', color: 'var(--coral)', marginBottom: '14px' }}>🤝 Agent Non Certifié</div>
-              <h3>Régularisez et développez votre activité</h3>
-              <p>Déclarez vos baux existants via SMS, lancez votre dossier de régularisation ANAH et obtenez votre agrément en quelques semaines.</p>
+              <div className="section-eyebrow" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)', marginBottom: '14px' }}>🌍 Diaspora Ivoirienne</div>
+              <h3>Gérez vos biens depuis l'étranger</h3>
+              <p>Un tableau de bord VIP pour suivre vos investissements en Côte d'Ivoire. Gestionnaire terrain dédié et rapports financiers mensuels.</p>
               <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--coral-l)' }}>📱</div><span className="benefit-text">Baux déclaratifs par SMS (BDQ)</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>📋</div><span className="benefit-text">Suivi régularisation ANAH en ligne</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>🏠</div><span className="benefit-text">Gestion biens en attente d'agrément</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>🎓</div><span className="benefit-text">Formation ANAH intégrée</span></div>
+                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>📱</div><span className="benefit-text">Tableau de bord VIP & Rapports mensuels</span></div>
+                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>🎥</div><span className="benefit-text">Demande d'inspection vidéo des biens</span></div>
+                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>🤝</div><span className="benefit-text">Gestionnaire terrain dédié en Côte d'Ivoire</span></div>
+                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>💬</div><span className="benefit-text">Assistance WhatsApp prioritaire</span></div>
               </div>
             </div>
             <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,var(--coral),#E91E63)', padding: '20px' }}>
-                <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Régularisation</div>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '28px', fontWeight: 800, color: 'white' }}>En cours · Étape 2/3</div>
-                <div style={{ background: 'rgba(255,255,255,.2)', height: '6px', borderRadius: '3px', marginTop: '12px' }}><div style={{ width: '66%', height: '100%', background: 'white', borderRadius: '3px' }}></div></div>
+              <div style={{ background: 'linear-gradient(135deg,var(--sky),var(--teal))', padding: '20px' }}>
+                <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Statut Diaspora VIP</div>
+                <div style={{ fontFamily: 'var(--f-display)', fontSize: '28px', fontWeight: 800, color: 'white' }}>Connecté · Paris, FR</div>
+                <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px', marginTop: '10px', display: 'inline-block' }}>Gestionnaire : Kouassi N.</div>
               </div>
               <div className="user-visual-inner" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ background: 'var(--lime-l)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}><div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--lime-d)', display: 'grid', placeItems: 'center', color: 'white', fontSize: '12px' }}>✓</div><span style={{ fontSize: '13px', color: 'var(--lime-d)', fontWeight: 500 }}>Dossier soumis</span></div>
-                <div style={{ background: 'var(--mango-l)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}><div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--mango)', display: 'grid', placeItems: 'center', color: 'white', fontSize: '12px' }}>⟳</div><span style={{ fontSize: '13px', color: 'var(--mango-d)', fontWeight: 500 }}>Examen ANAH en cours</span></div>
-                <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}><div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#E8DDD0', display: 'grid', placeItems: 'center', color: 'var(--ink3)', fontSize: '12px' }}>3</div><span style={{ fontSize: '13px', color: 'var(--ink3)' }}>Agrément délivré · estimé 15 mai</span></div>
+                <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Dernier rapport financier</span><span style={{ color: 'var(--teal)', fontWeight: 700 }}>PDF</span></div>
+                <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Inspection vidéo</span><span style={{ color: 'var(--mango-d)', fontWeight: 700 }}>Planifiée</span></div>
               </div>
             </div>
           </div>
@@ -698,11 +697,11 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             </div>
 
             <div className="price-card reveal reveal-d1">
-              <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>ESSENTIEL</div>
+              <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>PROPRIÉTAIRE</div>
               <div className="price-icon">🏠</div>
-              <div className="price-name">Essentiel</div>
-              <div className="price-amount">2 500</div>
-              <div className="price-period">FCFA / mois · par bien</div>
+              <div className="price-name">Propriétaire</div>
+              <div className="price-amount">Par quittance</div>
+              <div className="price-period">Facturation à l'acte généré</div>
               <div className="price-divider"></div>
               <div className="price-features">
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion baux</div>
@@ -711,41 +710,41 @@ export default function QaprilLandingV2({ session }: { session: any }) {
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Enregistrement DGI</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Caution CDC-CI</div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Essayer 30 jours gratuit</button>
+              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Essayer gratuitement</button>
             </div>
 
             <div className="price-card featured reveal reveal-d2">
-              <div className="price-badge">⭐ PLUS POPULAIRE</div>
+              <div className="price-badge">⭐ AGENCE INTERMÉDIAIRE</div>
               <div className="price-icon">🏢</div>
-              <div className="price-name">Pro</div>
-              <div className="price-amount">8 000</div>
-              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>FCFA / mois · illimité</div>
+              <div className="price-name">Agence Inter.</div>
+              <div className="price-amount">Par quittance</div>
+              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>Facturation à l'acte généré</div>
               <div className="price-divider"></div>
               <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Essentiel</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Propriétaire</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Mandats de gestion</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> CRG automatiques</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Agent IA bail déclaratif</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Biens illimités</div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Commencer avec Pro →</button>
+              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Commencer maintenant</button>
             </div>
 
             <div className="price-card reveal reveal-d3">
-              <div className="price-badge" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>INSTITUTIONNEL</div>
-              <div className="price-icon">🏛</div>
-              <div className="price-name">Institutionnel</div>
-              <div className="price-amount">Sur devis</div>
-              <div className="price-period">SCI · Foncières · Syndics</div>
+              <div className="price-badge" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>DIASPORA VIP</div>
+              <div className="price-icon">🌍</div>
+              <div className="price-name">Diaspora</div>
+              <div className="price-amount">2 500</div>
+              <div className="price-period">FCFA / mois · complet</div>
               <div className="price-divider"></div>
               <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Pro</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Multi-entités légales</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> API dédiée</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Onboarding dédié</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> SLA premium</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Tableau de bord VIP</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Rapports financiers</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Inspection vidéo</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> WhatsApp prioritaire</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestionnaire terrain</div>
               </div>
-              <button className="price-cta" onClick={() => handleLoginClick("ADMIN")}>Contacter l'équipe</button>
+              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Activer Pack Diaspora</button>
             </div>
           </div>
         </div>
