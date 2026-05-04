@@ -1,5 +1,5 @@
 /* ── CSS DÉDIÉ UNIQUEMENT À LA NOUVELLE LANDING PAGE ── */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@400;500;600;700;800&display=swap');
 
 .landing-v2-wrapper {
   --mango:    #FF8B00;
@@ -24,8 +24,8 @@
   --white:    #FFFFFF;
   --cream:    #FFFBF5;
   --cream2:   #FFF5E8;
-  --f-display:'Syne', sans-serif;
-  --f-body:   'Plus Jakarta Sans', sans-serif;
+  --f-display:'Outfit', sans-serif;
+  --f-body:   'Outfit', 'Plus Jakarta Sans', sans-serif;
   
   font-family: var(--f-body);
   background: var(--cream);
@@ -188,8 +188,9 @@
 .landing-v2-wrapper h1 .accent-mango { color: var(--mango); }
 .landing-v2-wrapper h1 .accent-sky { color: var(--sky-d); }
 .landing-v2-wrapper .hero-desc {
-  font-size: 17px; line-height: 1.7; color: var(--ink3);
-  max-width: 480px; margin-bottom: 36px; font-weight: 400;
+  font-size: 18px; line-height: 1.8; color: var(--ink3);
+  max-width: 520px; margin-bottom: 40px; font-weight: 400;
+  letter-spacing: -0.01em;
 }
 .landing-v2-wrapper .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .landing-v2-wrapper .btn-hero {
@@ -343,8 +344,9 @@
   line-height: 1.1; margin-bottom: 18px;
 }
 .landing-v2-wrapper .section-desc {
-  font-size: 17px; line-height: 1.7; color: var(--ink3);
-  max-width: 520px;
+  font-size: 18px; line-height: 1.8; color: var(--ink3);
+  max-width: 600px;
+  letter-spacing: -0.01em;
 }
 
 /* ── STATS BAND ── */
