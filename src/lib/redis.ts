@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+
 
 // Edge-compatible In-memory store for MockRedis
 const memoryStore = new Map<string, { value: string, expiry: number }>();
@@ -52,16 +52,24 @@ const redisGlobal = global as typeof globalThis & {
     redis: any;
 };
 
-if (redisGlobal.redis && typeof redisGlobal.redis.loadStore === 'function') {
+if (redisGlobal.redis) {
     redis = redisGlobal.redis;
 } else {
+    const isEdge = process.env.NEXT_RUNTIME === 'edge';
     const useMock = process.env.ENABLE_REDIS_MOCK === 'true';
 
-    if (useMock) {
-        console.log('[Redis] Using Mock implementation (Development Mode) - File Backed');
+    if (useMock || isEdge || !process.env.REDIS_URL) {
+        if (isEdge) {
+            console.log('[Redis] Edge Runtime detected - Using In-memory Mock');
+        } else if (useMock) {
+            console.log('[Redis] Mock enabled - Using In-memory Mock');
+        } else {
+            console.warn('[Redis] No REDIS_URL - Defaulting to In-memory Mock');
+        }
         redis = new MockRedis();
         redisGlobal.redis = redis;
-    } else if (process.env.REDIS_URL) {
+    } else {
+        // Node.js runtime with REDIS_URL
         try {
             const redisOptions = {
                 maxRetriesPerRequest: 1,
@@ -70,23 +78,25 @@ if (redisGlobal.redis && typeof redisGlobal.redis.loadStore === 'function') {
                 tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
             };
 
-            const client = new Redis(process.env.REDIS_URL, redisOptions);
-            client.on('error', (err) => {
-                console.error('[Redis] Connection Error:', err.message);
+            // Use dynamic import to avoid Edge bundling issues
+            import('ioredis').then((RedisModule) => {
+                const Redis = RedisModule.default;
+                const client = new Redis(process.env.REDIS_URL!, redisOptions);
+                client.on('error', (err: any) => {
+                    console.error('[Redis] Connection Error:', err.message);
+                });
+                redis = client;
+                redisGlobal.redis = redis;
+            }).catch(e => {
+                console.error('[Redis] Failed to dynamic import ioredis:', e);
+                redis = new MockRedis();
+                redisGlobal.redis = redis;
             });
-            redis = client;
-            redisGlobal.redis = redis;
         } catch (e) {
-            console.error('[Redis] Failed to initialize client:', e);
-            // Fallback unique if definitely nothing else
+            console.error('[Redis] Failed to initialize Redis branch:', e);
             redis = new MockRedis();
             redisGlobal.redis = redis;
         }
-    } else {
-        // No URL and Mock not explicitly enabled? Default to mock to avoid crash
-        console.warn('[Redis] No REDIS_URL found and Mock not explicitly enabled. Defaulting to Mock.');
-        redis = new MockRedis();
-        redisGlobal.redis = redis;
     }
 }
 

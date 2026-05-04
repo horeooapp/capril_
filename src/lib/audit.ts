@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { headers } from "next/headers";
-import { auth } from "@/auth";
+import { chainAuditHash } from "./proof";
 
 export type AuditModule =
     | 'AUTH' | 'KYC' | 'LEASE' | 'PAYMENT' | 'RECEIPT'
@@ -9,13 +9,11 @@ export type AuditModule =
 export type AuditActionInput = {
     userId?: string;
     action: string;
-    module: string; // Made it string to be more flexible while keeping type safety for known ones
+    module: string;
     entityId?: string;
     oldValues?: Record<string, any>;
     newValues?: Record<string, any>;
 };
-
-import { chainAuditHash } from "./proof";
 
 /**
  * Part 23.1: Write an audit log entry
@@ -23,6 +21,7 @@ import { chainAuditHash } from "./proof";
  */
 export async function writeAuditLog(input: AuditActionInput): Promise<void> {
     try {
+        const { auth } = await import("@/auth");
         const session = await auth();
         const userId = input.userId || session?.user?.id;
 
@@ -37,7 +36,7 @@ export async function writeAuditLog(input: AuditActionInput): Promise<void> {
             orderBy: { createdAt: 'desc' }
         });
 
-        const proofHash = chainAuditHash(lastLog?.proofHash || null, {
+        const proofHash = await chainAuditHash(lastLog?.proofHash || null, {
             userId: userId,
             action: input.action,
             module: input.module,
