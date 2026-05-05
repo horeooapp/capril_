@@ -395,3 +395,9 @@ jobs:
         if: failure()
         run: |
           echo "❌ Deployment failed. Check logs above."
+
+      - name: 🧹 Fix permissions for next run
+        if: always()
+        run: |
+          echo "🛡️ Restoring ownership for the next run..."
+          sudo chown -R $USER:$USER ${{ github.workspace }} /home/github/actions-runner/_work || true
