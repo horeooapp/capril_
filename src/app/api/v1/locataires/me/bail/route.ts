@@ -49,7 +49,7 @@ export async function GET(req: Request) {
         retard: serialized.status === 'LOYER_IMPAYE' ? 1 : 0,
         typeGestion: serialized.typeGestion || 'directe',
         agence: (serialized.agent?.firstName ? serialized.agent.firstName + " " : "") + (serialized.agent?.lastName || "") || null,
-        bailleurNom: (serialized.landlord?.firstName ? serialized.landlord.firstName + " " : "") + (serialized.landlord?.lastName || ""),
+        bailleurNom: serialized.landlord?.fullName || 'Propriétaire [Nom non renseigné]',
         bailleurCode: serialized.landlord?.walletConfig?.landlordCode,
         bailleurMasque: !!serialized.bailleurMasque
       });

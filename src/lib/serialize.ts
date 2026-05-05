@@ -55,13 +55,21 @@ export const serializeLease = (lease: any) => {
     if (!lease) return null
     
     // MM-04b: Identity Masking logic
-    const shouldMask = lease.bailleurMasque || 
-                       (lease.typeGestion && lease.typeGestion.toLowerCase() === 'agreee') ||
+    const isAgreee = lease.typeGestion && lease.typeGestion.toLowerCase() === 'agreee';
+    const shouldMask = lease.bailleurMasque || isAgreee || 
                        (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
+
+    let maskedName = lease.landlord?.walletConfig?.landlordCode || "BAI-CODE-PENDING";
+    if (isAgreee && lease.agent) {
+        const agenceName = lease.agent.legalEntity?.companyName || 
+                           ((lease.agent.firstName ? lease.agent.firstName + " " : "") + (lease.agent.lastName || "")).trim() || 
+                           "Agence Agréée";
+        maskedName = `${maskedName} - ${agenceName}`;
+    }
 
     const landlordData = lease.landlord ? {
         fullName: shouldMask 
-            ? (lease.landlord.walletConfig?.landlordCode || "BAI-CODE-PENDING") 
+            ? maskedName 
             : ((lease.landlord.firstName || lease.landlord.lastName) 
                 ? ((lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "")).trim()
                 : (lease.landlord.phone || "Propriétaire [Nom non renseigné]")),
