@@ -111,7 +111,7 @@ export default function LoginPage() {
                 className="mt-20 text-center relative z-10"
             >
                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4">
-                    Certifié par l'État de Côte d'Ivoire & QAPRIL v3.0
+                    QAPRIL v3.0
                 </p>
                 <div className="inline-flex h-1 w-12 bg-white/10 rounded-full"></div>
             </motion.div>
