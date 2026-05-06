@@ -197,9 +197,36 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
             
             <style dangerouslySetInnerHTML={{__html: `
                 @media print {
-                    @page { margin: 10mm; size: A4; }
-                    body { background: white !important; }
-                    .printable-receipt { border: none !important; shadow: none !important; }
+                    @page { 
+                        margin: 0; 
+                        size: A4;
+                    }
+                    body { 
+                        background: white !important;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .min-h-screen {
+                        padding: 0 !important;
+                        background: white !important;
+                    }
+                    .printable-receipt { 
+                        border: none !important; 
+                        box-shadow: none !important;
+                        width: 210mm !important;
+                        height: 297mm !important;
+                        padding: 20mm !important;
+                        margin: 0 !important;
+                        border-radius: 0 !important;
+                    }
+                    .print\\:hidden {
+                        display: none !important;
+                    }
+                    /* Ensure colors print correctly */
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
                 }
             `}} />
         </div>

@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { drawStandardHeader, drawStandardFooter, COLORS, drawSectionTitle, drawInfoBox } from './pdf-branding';
 
 interface ReportData {
   ownerName: string;
@@ -29,82 +30,51 @@ export async function generateMonthlyReportPDF(data: ReportData): Promise<Buffer
   
   const { width, height } = page.getSize();
   
-  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
-    page.drawText(text, { x, y, size, font: optFont, color });
-  };
+  // 1. Header
+  await drawStandardHeader(page, pdfDoc, 'Rapport Mensuel de Gestion', `Période : ${data.period}`);
 
-  const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
-    page.drawRectangle({ x, y, width: w, height: h, color });
-  };
-
-  // --- HEADER ---
-  drawRect(0, height - 120, width, 120, rgb(0.05, 0.07, 0.1)); // Dark background
-  drawText('QAPRIL', 50, height - 60, fontBold, 32, rgb(1, 1, 1));
-  drawText('TECHNOLOGIES SA', 50, height - 80, font, 10, rgb(0.8, 0.8, 0.8));
-  
-  drawText('RAPPORT MENSUEL DE GESTION', width - 280, height - 65, fontBold, 14, rgb(1, 1, 1));
-  drawText(`Période : ${data.period}`, width - 280, height - 85, font, 12, rgb(0.6, 0.7, 1));
-
-  // --- CLIENT INFO ---
-  let currentY = height - 160;
-  drawText('BAILLEUR :', 50, currentY, fontBold, 10, rgb(0.5, 0.5, 0.5));
-  drawText(data.ownerName.toUpperCase(), 120, currentY, fontBold, 12);
+  // 2. Metrics Summary
+  let currentY = height - 150;
+  drawSectionTitle(page, fontBold, 'Indicateurs clés du mois', currentY);
   currentY -= 40;
 
-  // --- KEY METRICS BOXES ---
-  const boxW = 160;
-  const boxH = 80;
-  
-  // Box 1: Taux Recouvrement
-  drawRect(50, currentY - boxH, boxW, boxH, rgb(0.98, 0.98, 1));
-  drawText('TAUX DE RECOUVREMENT', 65, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.metrics.tauxRecouvrement}%`, 65, currentY - 60, fontBold, 24, rgb(0.3, 0.4, 0.9));
+  const colW = (width - 130) / 3;
+  drawInfoBox(page, 50, currentY, colW, 60, 'Recouvrement', `${data.metrics.tauxRecouvrement}%`, fontBold, font, COLORS.SUCCESS);
+  drawInfoBox(page, 65 + colW, currentY, colW, 60, 'Total Encaissé', `${data.metrics.totalEncaisse.toLocaleString()} F`, fontBold, font);
+  drawInfoBox(page, 80 + (colW * 2), currentY, colW, 60, 'Impayés', `${data.metrics.nbImpayes} Cas`, fontBold, font, COLORS.DANGER);
+  currentY -= 100;
 
-  // Box 2: Total Encaissé
-  drawRect(width / 2 - boxW / 2, currentY - boxH, boxW, boxH, rgb(0.98, 1, 0.98));
-  drawText('TOTAL ENCAISSÉ', width / 2 - boxW / 2 + 15, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.metrics.totalEncaisse.toLocaleString()} FCFA`, width / 2 - boxW / 2 + 15, currentY - 60, fontBold, 18, rgb(0, 0.5, 0));
-
-  // Box 3: Impayés
-  drawRect(width - 50 - boxW, currentY - boxH, boxW, boxH, rgb(1, 0.98, 0.98));
-  drawText('ALERTE IMPAYÉS', width - 50 - boxW + 15, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.metrics.nbImpayes} CAS`, width - 50 - boxW + 15, currentY - 60, fontBold, 20, rgb(0.8, 0.2, 0.2));
-
-  currentY -= 120;
-
-  // --- DETAILS TABLE ---
-  drawText('DÉTAIL DES ENCAISSEMENTS PAR BIEN', 50, currentY, fontBold, 12);
-  currentY -= 10;
-  page.drawLine({ start: { x: 50, y: currentY }, end: { x: width - 50, y: currentY }, thickness: 1, color: rgb(0.9, 0.9, 0.9) });
+  // 3. Details Table
+  drawSectionTitle(page, fontBold, 'Détail des encaissements par bien', currentY);
   currentY -= 25;
 
-  // Headers
-  drawText('ADRESSE DU BIEN', 55, currentY, fontBold, 9, rgb(0.5, 0.5, 0.5));
-  drawText('STATUT', 350, currentY, fontBold, 9, rgb(0.5, 0.5, 0.5));
-  drawText('LOYER NET', 480, currentY, fontBold, 9, rgb(0.5, 0.5, 0.5));
-  currentY -= 15;
+  // Table Headers
+  page.drawRectangle({ x: 50, y: currentY - 20, width: width - 100, height: 20, color: COLORS.NAVY });
+  page.drawText('ADRESSE DU BIEN', { x: 60, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
+  page.drawText('STATUT', { x: 350, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
+  page.drawText('MONTANT (FCFA)', { x: width - 150, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
+  currentY -= 40;
 
   data.details.forEach((item, idx) => {
-    if (currentY < 100) return; // Basic pagination skip for summary
+    if (currentY < 120) return; // Simple pagination guard
     
-    // Row background
-    if (idx % 2 === 0) drawRect(50, currentY - 20, width - 100, 25, rgb(0.98, 0.98, 0.98));
+    // Stripe
+    if (idx % 2 === 0) {
+        page.drawRectangle({ x: 50, y: currentY - 10, width: width - 100, height: 20, color: COLORS.LIGHT_GRAY });
+    }
     
-    drawText(item.address.substring(0, 45), 55, currentY - 12, font, 9);
+    page.drawText(item.address.substring(0, 45), { x: 60, y: currentY, size: 9, font });
     
-    const statusCol = item.status === "paid" ? rgb(0, 0.6, 0) : rgb(0.8, 0.3, 0);
-    drawText(item.status.toUpperCase(), 350, currentY - 12, fontBold, 8, statusCol);
+    const statusColor = item.status === "paid" ? COLORS.SUCCESS : COLORS.DANGER;
+    page.drawText(item.status.toUpperCase(), { x: 350, y: currentY, size: 8, font: fontBold, color: statusColor });
     
-    drawText(`${item.amount.toLocaleString()} FCFA`, 480, currentY - 12, font, 10);
+    page.drawText(`${item.amount.toLocaleString()}`, { x: width - 150, y: currentY, size: 10, font });
     
-    currentY -= 25;
+    currentY -= 20;
   });
 
-  // --- FOOTER ---
-  const footerY = 50;
-  page.drawLine({ start: { x: 50, y: footerY + 20 }, end: { x: width - 50, y: footerY + 20 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
-  drawText('Document généré automatiquement par QAPRIL. Certifié conforme aux transactions de la plateforme.', 50, footerY, font, 8, rgb(0.5, 0.5, 0.5));
-  drawText(`Hash de Sécurité: ${Math.random().toString(36).substring(7).toUpperCase()}`, width - 200, footerY, font, 8, rgb(0.7, 0.7, 0.7));
+  // 4. Footer
+  drawStandardFooter(page, pdfDoc);
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
@@ -121,73 +91,46 @@ export async function generateYearlyBilanPDF(data: YearlyBilanData): Promise<Buf
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const { width, height } = page.getSize();
   
-  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
-    page.drawText(text, { x, y, size, font: optFont, color });
-  };
+  // 1. Header
+  await drawStandardHeader(page, pdfDoc, 'Bilan Financier Annuel', `Exercice Fiscal : ${data.year}`);
 
-  const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
-    page.drawRectangle({ x, y, width: w, height: h, color });
-  };
-
-  // --- HEADER ---
-  drawRect(0, height - 140, width, 140, rgb(0.02, 0.05, 0.1));
-  drawText('QAPRIL', 50, height - 60, fontBold, 36, rgb(1, 1, 1));
-  drawText('BILAN FINANCIER ANNUEL', width - 260, height - 65, fontBold, 14, rgb(1, 1, 1));
-  drawText(`Exercice Fiscal : ${data.year}`, width - 260, height - 85, font, 12, rgb(1, 0.8, 0.3));
-
-  // --- CLIENT ---
-  let currentY = height - 180;
-  drawText('BAILLEUR :', 50, currentY, fontBold, 10, rgb(0.5, 0.5, 0.5));
-  drawText(data.ownerName.toUpperCase(), 120, currentY, fontBold, 14);
-
-  // --- METRICS ---
+  // 2. Client & Summary
+  let currentY = height - 150;
+  page.drawText('DÉTENTEUR DU COMPTE :', { x: 50, y: currentY, size: 8, font: fontBold, color: COLORS.SLATE });
+  page.drawText(data.ownerName.toUpperCase(), { x: 170, y: currentY, size: 12, font: fontBold, color: COLORS.NAVY });
   currentY -= 60;
-  const boxW = 160;
-  const boxH = 90;
 
-  // Revenue Brut
-  drawRect(50, currentY - boxH, boxW, boxH, rgb(0.98, 1, 0.98));
-  drawText('REVENU BRUT GLOBAL', 65, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.totalIncome.toLocaleString()} F`, 65, currentY - 60, fontBold, 18, rgb(0, 0.5, 0));
-
-  // Maintenance
-  drawRect(width / 2 - boxW / 2, currentY - boxH, boxW, boxH, rgb(1, 0.98, 0.98));
-  drawText('CHARGES MAINTENANCE', width / 2 - boxW / 2 + 15, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.totalMaintenance.toLocaleString()} F`, width / 2 - boxW / 2 + 15, currentY - 60, fontBold, 18, rgb(0.8, 0.2, 0.2));
-
-  // AIRSI (7.5%)
-  drawRect(width - 50 - boxW, currentY - boxH, boxW, boxH, rgb(1, 1, 0.95));
-  drawText('IMPÔT AIRSI ESTIMÉ (7.5%)', width - 50 - boxW + 15, currentY - 25, fontBold, 8, rgb(0.4, 0.4, 0.4));
-  drawText(`${data.estimatedTaxAirsi.toLocaleString()} F`, width - 50 - boxW + 15, currentY - 60, fontBold, 18, rgb(0.6, 0.4, 0));
-
-  // --- FINAL RESULT ---
-  currentY -= 130;
-  drawRect(50, currentY - 60, width - 100, 60, rgb(0, 0.2, 0.4));
-  drawText('RÉSULTAT NET APRÈS CHARGES ET FISCALITÉ', 70, currentY - 22, fontBold, 10, rgb(0.8, 0.9, 1));
-  drawText(`${data.finalResult.toLocaleString()} FCFA`, width - 250, currentY - 45, fontBold, 24, rgb(1, 1, 1));
-
-  // --- PERFORMANCE PAR BIEN ---
+  const colW = (width - 130) / 3;
+  drawInfoBox(page, 50, currentY, colW, 70, 'Revenu Brut', `${data.totalIncome.toLocaleString()} F`, fontBold, font, COLORS.SUCCESS);
+  drawInfoBox(page, 65 + colW, currentY, colW, 70, 'Charges', `${data.totalMaintenance.toLocaleString()} F`, fontBold, font, COLORS.DANGER);
+  drawInfoBox(page, 80 + (colW * 2), currentY, colW, 70, 'AIRSI Estimé', `${data.estimatedTaxAirsi.toLocaleString()} F`, fontBold, font, COLORS.MANGO);
   currentY -= 110;
-  drawText('REVENUS PAR PROPRIÉTÉ', 50, currentY, fontBold, 12);
+
+  // 3. Final Result Banner
+  page.drawRectangle({ x: 50, y: currentY - 50, width: width - 100, height: 50, color: COLORS.NAVY });
+  page.drawText('RÉSULTAT NET APRÈS CHARGES ET FISCALITÉ', { x: 70, y: currentY - 20, size: 9, font: fontBold, color: rgb(0.8, 0.9, 1) });
+  page.drawText(`${data.finalResult.toLocaleString()} FCFA`, { x: width - 250, y: currentY - 40, size: 22, font: fontBold, color: COLORS.WHITE });
+  currentY -= 100;
+
+  // 4. Performance per Property
+  drawSectionTitle(page, fontBold, 'Performance détaillée par propriété', currentY);
   currentY -= 30;
 
   // Header
-  drawRect(50, currentY - 20, width - 100, 25, rgb(0.92, 0.94, 0.98));
-  drawText('DÉSIGNATION DU BIEN', 60, currentY - 12, fontBold, 9);
-  drawText('ENCAISSEMENT ANNUEL', width - 200, currentY - 12, fontBold, 9);
-  currentY -= 25;
+  page.drawRectangle({ x: 50, y: currentY - 15, width: width - 100, height: 20, color: COLORS.LIGHT_GRAY });
+  page.drawText('DÉSIGNATION DU BIEN', { x: 60, y: currentY - 9, size: 8, font: fontBold });
+  page.drawText('ENCAISSEMENT ANNUEL (FCFA)', { x: width - 200, y: currentY - 9, size: 8, font: fontBold });
+  currentY -= 30;
 
   data.propertyBreakdown.forEach((p, idx) => {
-    if (idx % 2 === 0) drawRect(50, currentY - 20, width - 100, 25, rgb(0.98, 0.98, 0.98));
-    drawText(p.propertyName, 60, currentY - 12, font, 10);
-    drawText(`${p.income.toLocaleString()} F`, width - 200, currentY - 12, fontBold, 10);
-    currentY -= 25;
+    if (idx % 2 === 0) page.drawRectangle({ x: 50, y: currentY - 10, width: width - 100, height: 20, color: rgb(0.98, 0.98, 0.98) });
+    page.drawText(p.propertyName, { x: 60, y: currentY, size: 10, font });
+    page.drawText(`${p.income.toLocaleString()}`, { x: width - 200, y: currentY, size: 10, font: fontBold });
+    currentY -= 20;
   });
 
-  // --- FOOTER ---
-  const footerY = 50;
-  drawText('Ce rapport est une synthèse fiscale indicative basée sur les flux transitant par la plateforme QAPRIL.', 50, footerY + 20, font, 8, rgb(0.5, 0.5, 0.5));
-  drawText('QAPRIL TECHNOLOGIES - LE FUTUR DE L\'IMMOBILIER SEREIN.', 50, footerY, fontBold, 9, rgb(0.1, 0.3, 0.5));
+  // 5. Footer
+  drawStandardFooter(page, pdfDoc);
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
@@ -206,61 +149,41 @@ export async function generateMarketBenchmarkPDF(data: BenchmarkResult): Promise
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const { width, height } = page.getSize();
   
-  const drawText = (text: string, x: number, y: number, optFont = font, size = 12, color = rgb(0,0,0)) => {
-    page.drawText(text, { x, y, size, font: optFont, color });
-  };
+  // 1. Header
+  await drawStandardHeader(page, pdfDoc, 'Analyse de Positionnement Marché', 'QAPRIL OBSERVATORY');
 
-  const drawRect = (x: number, y: number, w: number, h: number, color = rgb(0.95, 0.95, 0.95)) => {
-    page.drawRectangle({ x, y, width: w, height: h, color });
-  };
-
-  // --- HEADER ---
-  drawRect(0, height - 120, width, 120, rgb(0.1, 0.1, 0.1));
-  drawText('QAPRIL OBSERVATORY', 50, height - 70, fontBold, 24, rgb(1, 1, 1));
-  drawText('ANALYSE DE POSITIONNEMENT MARCHÉ', 50, height - 90, font, 12, rgb(0.8, 0.8, 0.8));
-
-  // --- PROPERTY INFO ---
-  let currentY = height - 160;
-  drawText('BIEN ANALYSÉ :', 50, currentY, fontBold, 10, rgb(0.5, 0.5, 0.5));
-  drawText(data.propertyName, 50, currentY - 20, fontBold, 14);
+  // 2. Property Info
+  let currentY = height - 150;
+  page.drawText('BIEN ANALYSÉ :', { x: 50, y: currentY, size: 8, font: fontBold, color: COLORS.SLATE });
+  page.drawText(data.propertyName, { x: 50, y: currentY - 20, size: 14, font: fontBold, color: COLORS.NAVY });
   currentY -= 60;
 
-  // --- BENCHMARK BOXES ---
-  const boxW = 220;
-  const boxH = 100;
+  // 3. Comparison Boxes
+  const boxW = (width - 120) / 2;
+  drawInfoBox(page, 50, currentY - 80, boxW, 80, 'Loyer Actuel', `${data.currentRent.toLocaleString()} F`, fontBold, font);
+  drawInfoBox(page, 70 + boxW, currentY - 80, boxW, 80, 'Moyenne Marché', `${data.marketAvg.toLocaleString()} F`, fontBold, font, COLORS.SUCCESS);
+  currentY -= 120;
 
-  // Current vs Market
-  drawRect(50, currentY - boxH, boxW, boxH, rgb(0.98, 0.98, 1));
-  drawText('LOYER ACTUEL', 65, currentY - 25, fontBold, 9);
-  drawText(`${data.currentRent.toLocaleString()} F`, 65, currentY - 70, fontBold, 24, rgb(0.2, 0.2, 0.2));
-
-  drawRect(width - 50 - boxW, currentY - boxH, boxW, boxH, rgb(0.95, 1, 0.95));
-  drawText('MOYENNE DU MARCHÉ', width - 50 - boxW + 15, currentY - 25, fontBold, 9);
-  drawText(`${data.marketAvg.toLocaleString()} F`, width - 50 - boxW + 15, currentY - 70, fontBold, 24, rgb(0, 0.5, 0));
-
-  currentY -= 140;
-
-  // --- GAP ANALYSIS ---
-  const gapColor = data.gapPct > 0 ? rgb(0, 0.6, 0) : rgb(0.8, 0, 0);
-  drawText('ANALYSE DE L\'ÉCART (GAP)', 50, currentY, fontBold, 12);
+  // 4. Gap Analysis
+  const gapColor = data.gapPct > 0 ? COLORS.SUCCESS : COLORS.DANGER;
+  drawSectionTitle(page, fontBold, 'Analyse de l\'écart (GAP)', currentY);
   currentY -= 30;
   
-  drawRect(50, currentY - 60, width - 100, 60, rgb(0.98, 0.98, 0.98));
-  drawText(`Écart constaté : ${data.gapPct}%`, 70, currentY - 35, fontBold, 18, gapColor);
+  page.drawRectangle({ x: 50, y: currentY - 60, width: width - 100, height: 60, color: COLORS.LIGHT_GRAY });
+  page.drawText(`Écart constaté : ${data.gapPct}%`, { x: 70, y: currentY - 35, size: 18, font: fontBold, color: gapColor });
   
   if (data.potentialGain && data.potentialGain > 0) {
-    drawText(`Gain potentiel mensuel : +${data.potentialGain.toLocaleString()} FCFA`, 300, currentY - 35, fontBold, 12, rgb(0, 0.5, 0));
+    page.drawText(`Gain mensuel potentiel : +${data.potentialGain.toLocaleString()} F`, { x: width - 280, y: currentY - 35, size: 11, font: fontBold, color: COLORS.SUCCESS });
   }
-
   currentY -= 100;
 
-  // --- RECOMMENDATION ---
-  drawRect(50, currentY - 80, width - 100, 80, rgb(0.02, 0.1, 0.3));
-  drawText('RECOMMANDATION QAPRIL', 70, currentY - 30, fontBold, 10, rgb(0.8, 0.9, 1));
-  drawText(data.recommendation === "AUGMENTER" ? "OPPORTUNITÉ DE RÉVISION À LA HAUSSE" : "MAINTIEN DU LOYER CONSEILLÉ", 70, currentY - 60, fontBold, 16, rgb(1, 1, 1));
+  // 5. Recommendation
+  page.drawRectangle({ x: 50, y: currentY - 80, width: width - 100, height: 80, color: COLORS.NAVY });
+  page.drawText('RECOMMANDATION STRATÉGIQUE QAPRIL', { x: 70, y: currentY - 30, size: 9, font: fontBold, color: rgb(0.8, 0.9, 1) });
+  page.drawText(data.recommendation === "AUGMENTER" ? "OPPORTUNITÉ DE RÉVISION À LA HAUSSE" : "MAINTIEN DU LOYER CONSEILLÉ", { x: 70, y: currentY - 60, size: 16, font: fontBold, color: COLORS.WHITE });
 
-  // --- FOOTER ---
-  drawText('Données issues de l\'Observatoire QAPRIL - Basé sur un échantillon de biens similaires dans la même commune.', 50, 50, font, 8, rgb(0.5, 0.5, 0.5));
+  // 6. Footer
+  drawStandardFooter(page, pdfDoc);
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);

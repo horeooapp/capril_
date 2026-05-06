@@ -35,12 +35,52 @@ export default function AdminManualPage() {
             <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white/60 border border-white/80 shadow-xl backdrop-blur-md mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
                 <style dangerouslySetInnerHTML={{__html: `
                     @media print {
-                        @page { margin: 2cm; }
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
-                        /* Force page breaks before major sections */
-                        h2 { page-break-before: always; break-before: page; margin-top: 0 !important; }
-                        /* Except the first one */
-                        #section-1 h2 { page-break-before: avoid; break-before: auto; }
+                        @page { 
+                            margin: 15mm; 
+                            size: A4;
+                            @bottom-right {
+                                content: counter(page);
+                            }
+                        }
+                        body { 
+                            -webkit-print-color-adjust: exact !important; 
+                            print-color-adjust: exact !important; 
+                            background: white !important; 
+                            color: black !important;
+                            font-size: 11pt;
+                        }
+                        /* Hide non-essential elements */
+                        .print\\:hidden, .print-hidden { display: none !important; }
+                        
+                        /* Layout adjustments */
+                        .max-w-7xl { max-width: 100% !important; margin: 0 !important; width: 100% !important; }
+                        .rounded-\\[2\\.5rem\\], .rounded-3xl, .rounded-2xl { border-radius: 0 !important; }
+                        .shadow-xl, .shadow-lg, .shadow-sm { box-shadow: none !important; }
+                        .border { border: none !important; }
+                        .backdrop-blur-md { backdrop-filter: none !important; }
+                        
+                        /* Typography & Sections */
+                        h1 { font-size: 28pt !important; margin-bottom: 20pt !important; color: #051937 !important; }
+                        h2 { 
+                            page-break-before: always; 
+                            break-before: page; 
+                            margin-top: 30pt !important; 
+                            color: #051937 !important;
+                            border-bottom: 2pt solid #FF8B00 !important;
+                            padding-bottom: 5pt !important;
+                        }
+                        h3 { color: #051937 !important; margin-top: 20pt !important; }
+                        
+                        /* Tables */
+                        table { width: 100% !important; border-collapse: collapse !important; margin: 15pt 0 !important; }
+                        th, td { border: 0.5pt solid #ddd !important; padding: 8pt !important; }
+                        th { background-color: #f8f9fa !important; }
+
+                        /* Prevent breaking elements */
+                        .print\\:break-inside-avoid { page-break-inside: avoid; break-inside: avoid; }
+                        
+                        /* Force visible logo */
+                        img { max-height: 50pt !important; }
                     }
                 `}} />
                 
