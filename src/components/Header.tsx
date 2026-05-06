@@ -27,8 +27,8 @@ export default function Header() {
           <Link href="/contact" className="nav-link">Contact</Link>
         </div>
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/mon-espace-locataire/login" className="nav-link" style={{ fontWeight: 700, opacity: 0.7 }}>Connexion Locataire</Link>
-          <Link href="/dashboard/login" className="nav-cta">Espace Propriétaire</Link>
+          <Link href="/mon-espace-locataire/login" className="nav-link !font-bold opacity-70 hover:opacity-100">Connexion Locataire</Link>
+          <Link href="/dashboard/login" className="nav-cta">Connexion Propriétaire</Link>
         </div>
         <button className="nav-hamburger">
           <span></span><span></span><span></span>
