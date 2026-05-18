@@ -158,7 +158,7 @@ export async function generatePassportPDF(data: {
     const badgeColors: any = { 'A+': COLORS.MANGO, 'A': COLORS.SUCCESS, 'B': rgb(0.2, 0.4, 0.8) };
     const badgeColor = badgeColors[data.badge] || COLORS.SLATE;
     
-    page.drawCircle({ x: width - 130, y: currentY - 70, radius: 50, color: badgeColor });
+    page.drawCircle({ x: width - 130, y: currentY - 70, size: 50, color: badgeColor });
     page.drawText(data.badge, { 
         x: width - 130 - (data.badge.length > 1 ? 25 : 15), 
         y: currentY - 85, 
