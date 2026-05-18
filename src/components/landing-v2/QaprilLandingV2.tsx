@@ -125,7 +125,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
         {session?.user ? (
             <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
         ) : (
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
                 <button 
                     onClick={() => handleLoginClick("LOCATAIRE")} 
                     className="nav-link !font-bold !text-ink opacity-70 hover:opacity-100"
@@ -155,20 +155,15 @@ export default function QaprilLandingV2({ session }: { session: any }) {
           {session?.user ? (
             <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', width: '100%' }}>
-              <button 
-                  onClick={() => { setMobileMenuOpen(false); handleLoginClick("LOCATAIRE"); }} 
-                  style={{ color: 'var(--ink)', fontSize: '18px', fontWeight: 700, fontFamily: 'var(--f-display)', textDecoration: 'none', background: 'none', border: 'none', textAlign: 'center', cursor: 'none', opacity: 0.8 }}
-              >
-                  Connexion Locataire
-              </button>
-              <button 
-                  onClick={() => { setMobileMenuOpen(false); handleLoginClick("BAILLEUR"); }} 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', width: '100%', alignItems: 'center' }}>
+              <Link 
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
                   className="nav-cta"
-                  style={{ textAlign: 'center', width: 'fit-content', margin: '0 auto' }}
+                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', textDecoration: 'none' }}
               >
-                  Connexion Propriétaire
-              </button>
+                  Connexion
+              </Link>
             </div>
           )}
         </div>
