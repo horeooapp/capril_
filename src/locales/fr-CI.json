@@ -1,0 +1,784 @@
+{
+  "_meta": {
+    "langue": "Français ivoirien",
+    "application": "QAPRIL",
+    "version": "1.0.0",
+    "description": "Fichier de traductions adapté au contexte locatif ivoirien (Côte d'Ivoire)",
+    "derniereMiseAJour": "2026-05-18"
+  },
+
+  "roles": {
+    "SUPER_ADMIN": "Super Administrateur",
+    "ADMIN": "Administrateur",
+    "ANAH_AGENT": "Agent DGFIP",
+    "CDC_AGENT": "Agent CDC-CI",
+    "LANDLORD": "Propriétaire",
+    "LANDLORD_PRO": "Propriétaire Pro",
+    "AGENCY": "Agence immobilière",
+    "TENANT": "Locataire",
+    "NON_CERTIFIED_AGENT": "Intermédiaire non agréé",
+    "CHAMPION": "Ambassadeur"
+  },
+
+  "profileType": {
+    "LANDLORD": "Propriétaire",
+    "CERTIFIED_AGENCY": "Agence agréée",
+    "NON_CERTIFIED_AGENCY": "Agence non agréée",
+    "INTERMEDIARY": "Intermédiaire",
+    "DIASPORA": "Diaspora",
+    "TENANT": "Locataire"
+  },
+
+  "planTier": {
+    "LOCATAIRE": "Locataire",
+    "ESSENTIEL": "Essentiel",
+    "PRO": "Pro",
+    "PREMIUM": "Premium",
+    "INSTITUTIONNEL": "Institutionnel"
+  },
+
+  "planStatus": {
+    "PROPOSED": "Proposé",
+    "ACCEPTED": "Accepté",
+    "REJECTED": "Refusé",
+    "BROKEN": "Rompu",
+    "COMPLETED": "Terminé"
+  },
+
+  "leaseStatus": {
+    "DRAFT": "Brouillon",
+    "PENDING_SIGNATURE": "En attente de signature",
+    "PENDING_CONFIRMATION": "En attente de confirmation",
+    "PENDING_DEPOSIT": "En attente de caution",
+    "ACTIVE": "En cours",
+    "ACTIVE_DECLARATIF": "En cours (déclaratif)",
+    "LOYER_IMPAYE": "Loyer impayé",
+    "MISE_EN_DEMEURE": "Mise en demeure",
+    "CLEMENCE_EN_COURS": "Arrangement à l'amiable en cours",
+    "REPRISE_PROCEDURE": "Procédure relancée",
+    "DEMANDE_RESILIATION": "Demande de résiliation",
+    "TERMINATED": "Résilié",
+    "CANCELLED": "Annulé",
+    "ARCHIVED": "Archivé"
+  },
+
+  "typeBail": {
+    "ECRIT": "Bail écrit",
+    "DECLARATIF_BDQ": "Bail déclaratif",
+    "DECLARATIF_EN_COURS_FORMALISATION": "Déclaratif en cours de formalisation"
+  },
+
+  "cdcDepositStatus": {
+    "AWAITING_PAYMENT": "En attente de versement",
+    "PENDING": "En cours de traitement",
+    "CONSIGNED": "Caution consignée",
+    "RETURN_REQUESTED": "Restitution demandée",
+    "RETURNED": "Caution restituée",
+    "FORFEITED": "Caution retenue"
+  },
+
+  "cdcDepositInitiator": {
+    "OWNER": "Propriétaire",
+    "AGENCY": "Agence",
+    "ADMIN": "Administrateur"
+  },
+
+  "loyerStatut": {
+    "EN_ATTENTE": "En attente",
+    "PARTIEL": "Paiement partiel",
+    "COMPLET": "Payé",
+    "EXCEDENT": "Avance de loyer",
+    "IMPAYE": "Impayé"
+  },
+
+  "fiscalStatus": {
+    "EN_ATTENTE_DECLARATION": "En attente de declaration",
+    "NOTIFIE": "Notifié",
+    "EN_COURS_PAIEMENT": "Paiement en cours",
+    "PAYE_CONFIRME": "Payé et confirmé",
+    "ENREGISTRE": "Enregistré à la DGI",
+    "ECHEC_PAIEMENT": "Échec du paiement",
+    "PAIEMENT_PARTIEL": "Paiement partiel",
+    "DECLARATION_EN_RETARD": "Déclaration en retard",
+    "IGNORE_PAR_BAILLEUR": "Non traité par le propriétaire",
+    "RENOUVELE": "Renouvelé"
+  },
+
+  "maintenanceStatus": {
+    "EN_ATTENTE": "En attente",
+    "PRIS_EN_CHARGE": "Pris en charge",
+    "RESOLU": "Résolu",
+    "CONTESTE": "Contesté",
+    "LITIGE": "En litige",
+    "CLOTURE": "Clôturé"
+  },
+
+  "maintenanceCategory": {
+    "MAI_EL": "Électricité",
+    "MAI_EA": "Eau / Plomberie",
+    "MAI_TO": "Toiture",
+    "MAI_SE": "Serrurerie",
+    "MAI_SA": "Sanitaires",
+    "MAI_PC": "Peinture & Carrelage",
+    "MAI_AU": "Autres travaux",
+    "MAI_DI": "Divers"
+  },
+
+  "mediationStatus": {
+    "OPEN": "Ouverte",
+    "IN_PROGRESS": "En cours",
+    "RESOLVED": "Résolue",
+    "CLOSED": "Clôturée",
+    "CANCELLED": "Annulée"
+  },
+
+  "disputeStatus": {
+    "OPEN": "Ouverte",
+    "WAITING_RESPONSE": "En attente de réponse",
+    "IN_MEDIATION": "En médiation",
+    "RESOLVED": "Résolue",
+    "ESCALATED": "Escaladée",
+    "CLOSED": "Clôturée"
+  },
+
+  "insuranceStatus": {
+    "ACTIVE": "Active",
+    "CANCELLED": "Résiliée",
+    "EXPIRED": "Expirée"
+  },
+
+  "insuranceClaimStatus": {
+    "OPEN": "Ouverte",
+    "PROCESSING": "En cours de traitement",
+    "RESOLVED": "Résolue",
+    "REJECTED": "Rejetée"
+  },
+
+  "mandateType": {
+    "EXCLUSIVE": "Mandat exclusif",
+    "SIMPLE": "Mandat simple",
+    "CO_EXCLUSIVE": "Mandat co-exclusif",
+    "DIRECT": "Mandat direct"
+  },
+
+  "mandateStatus": {
+    "ACTIVE": "Actif",
+    "SUSPENDED": "Suspendu",
+    "CANCELLED": "Annulé",
+    "EXPIRED": "Expiré",
+    "DRAFT": "Brouillon"
+  },
+
+  "managementMode": {
+    "AGENCY": "Gestion par agence",
+    "DIRECT": "Gestion directe",
+    "MIXED": "Gestion mixte"
+  },
+
+  "paymentCanal": {
+    "ORANGE": "Orange Money",
+    "MTN": "MTN Mobile Money",
+    "WAVE": "Wave",
+    "MOOV": "Moov Money",
+    "CINETPAY_M17": "CinetPay",
+    "SMS_DECLARATIF": "Déclaration par SMS",
+    "SMS": "SMS",
+    "WHATSAPP": "WhatsApp",
+    "EMAIL": "E-mail",
+    "PUSH": "Notification push",
+    "APP_CHAT": "Messagerie in-app"
+  },
+
+  "paymentPgwStatus": {
+    "INITIEE": "Initiée",
+    "EN_ATTENTE_PAIEMENT": "En attente de paiement",
+    "CONFIRMEE": "Confirmée",
+    "ECHEC": "Échec",
+    "EXPIREE": "Expirée",
+    "DECLAREE": "Déclarée"
+  },
+
+  "utilityType": {
+    "CIE": "CIE (Électricité)",
+    "SODECI": "SODECI (Eau)",
+    "ORANGE": "Orange",
+    "MTN": "MTN",
+    "MOOV": "Moov",
+    "CANAL_PLUS": "Canal+"
+  },
+
+  "utilityStatus": {
+    "EN_COURS": "En cours",
+    "PAYEE": "Payée",
+    "EN_RETARD": "En retard",
+    "PARTIELLE": "Partielle",
+    "EN_ATTENTE": "En attente"
+  },
+
+  "utilityMode": {
+    "INDIVIDUEL_LOCATAIRE": "Compteur individuel (locataire)",
+    "PARTAGE_PROPRIO": "Compteur partagé (propriétaire)",
+    "INDIVIDUEL_PROPRIO": "Compteur individuel (propriétaire)",
+    "MIXTE": "Mode mixte",
+    "NON_APPLICABLE": "Non applicable"
+  },
+
+  "repartitionModel": {
+    "PRORATA_CHAMBRE": "Au prorata des chambres",
+    "FORFAIT_FIXE": "Forfait fixe",
+    "USAGE_DECLARE": "Selon usage déclaré"
+  },
+
+  "prepaymentRequestStatus": {
+    "PENDING": "En attente",
+    "APPROVED": "Approuvée",
+    "REJECTED": "Refusée",
+    "COMPLETED": "Effectuée",
+    "CANCELLED": "Annulée"
+  },
+
+  "inspectionStatus": {
+    "PLANIFIEE": "Planifiée",
+    "EN_COURS": "En cours",
+    "TERMINEE": "Terminée",
+    "ANNULEE": "Annulée"
+  },
+
+  "inspectionType": {
+    "ENTRY": "État des lieux d'entrée",
+    "EXIT": "État des lieux de sortie"
+  },
+
+  "roomStatus": {
+    "EXCELLENT": "Excellent état",
+    "GOOD": "Bon état",
+    "FAIR": "État passable",
+    "POOR": "Mauvais état"
+  },
+
+  "edlType": {
+    "ENTREE": "État des lieux d'entrée",
+    "SORTIE": "État des lieux de sortie"
+  },
+
+  "edlStatut": {
+    "EN_COURS": "En cours de rédaction",
+    "SOUMIS_LOCATAIRE": "Soumis au locataire",
+    "CONFIRME": "Confirmé",
+    "CONTESTE": "Contesté",
+    "CERTIFIE": "Certifié"
+  },
+
+  "sigDoc": {
+    "BAIL": "Contrat de bail",
+    "BAIL_COMMERCIAL": "Bail commercial",
+    "MANDAT": "Mandat de gestion",
+    "EDL": "État des lieux",
+    "ACCORD_MEDIATION": "Accord de médiation",
+    "AVENANT": "Avenant au bail"
+  },
+
+  "sigStatut": {
+    "EN_ATTENTE": "En attente de signature",
+    "SIGNE": "Signé",
+    "REFUSE": "Refusé",
+    "EXPIRE": "Expiré"
+  },
+
+  "bdqStatut": {
+    "PENDING_LOCATAIRE": "En attente du locataire",
+    "CONFIRME": "Confirmé",
+    "CONFIRME_AGENT": "Confirmé par l'agent",
+    "CONFIRME_MEDIATION": "Confirmé en médiation",
+    "DECLARATIF_SANS_REPONSE": "Déclaratif sans réponse",
+    "DECLARATIF_UNILATERAL": "Déclaratif unilatéral",
+    "CONTESTE": "Contesté",
+    "FORMALISE": "Formalisé",
+    "ARCHIVE": "Archivé"
+  },
+
+  "bdqConvStatut": {
+    "EN_COURS": "En cours",
+    "EN_PAUSE": "En pause",
+    "COMPLETE": "Complété",
+    "ABANDONNE": "Abandonné",
+    "EXPIRE": "Expiré"
+  },
+
+  "candStatut": {
+    "SOUMISE": "Soumise",
+    "EN_ETUDE": "En cours d'étude",
+    "ACCEPTEE": "Acceptée",
+    "REFUSEE": "Refusée",
+    "CONVERTIE_LOCATAIRE": "Convertie en location"
+  },
+
+  "chargeType": {
+    "EAU": "Eau",
+    "ELECTRICITE_COMMUNE": "Électricité commune",
+    "GARDIENNAGE": "Gardiennage",
+    "NETTOYAGE": "Nettoyage",
+    "TOM": "Taxe d'ordures ménagères",
+    "AUTRE": "Autre"
+  },
+
+  "agendaType": {
+    "VISITE": "Visite du logement",
+    "EDL_ENTREE": "État des lieux d'entrée",
+    "EDL_SORTIE": "État des lieux de sortie",
+    "REMISE_CLES": "Remise des clés",
+    "REUNION_PROPRIO": "Réunion propriétaire",
+    "TRAVAUX": "Travaux",
+    "ECHEANCE_BAIL": "Échéance du bail",
+    "AUTRE": "Autre événement"
+  },
+
+  "legalType": {
+    "PRE_NOTICE": "Pré-avis",
+    "COMMAND_TO_PAY": "Commandement à payer",
+    "TERMINATION_NOTICE": "Avis de résiliation",
+    "EVICTION_ORDER": "Ordonnance d'expulsion"
+  },
+
+  "reminderType": {
+    "D_MINUS_5": "Rappel J-5",
+    "D_DAY": "Rappel le jour J",
+    "D_PLUS_5": "Rappel J+5",
+    "LEGAL_NOTICE": "Mise en demeure"
+  },
+
+  "notifCanal": {
+    "WHATSAPP": "WhatsApp",
+    "SMS": "SMS",
+    "EMAIL": "E-mail",
+    "PUSH": "Notification push"
+  },
+
+  "notifStatut": {
+    "EN_ATTENTE": "En attente",
+    "ENVOYE": "Envoyée",
+    "LIVRE": "Livrée",
+    "LU": "Lue",
+    "ECHEC": "Échec d'envoi",
+    "ANNULE": "Annulée"
+  },
+
+  "signalCatEnum": {
+    "FUITE_EAU": "Fuite d'eau",
+    "ELECTRICITE": "Problème électrique",
+    "PORTE_SERRURE": "Porte / Serrure",
+    "NUISANCE": "Nuisance",
+    "DEGRADATION": "Dégradation",
+    "AUTRE": "Autre problème"
+  },
+
+  "signalStatutEnum": {
+    "ENVOYE": "Signalement envoyé",
+    "VU_PROPRIO": "Vu par le propriétaire",
+    "EN_COURS": "En cours de traitement",
+    "RESOLU": "Résolu",
+    "NON_RESOLU_FERME": "Non résolu — Clôturé"
+  },
+
+  "preavisStatutEnum": {
+    "EMIS": "Préavis émis",
+    "ACCUSE": "Accusé de réception",
+    "ETAT_LIEUX_PLANIFIE": "État des lieux planifié",
+    "CLOS": "Clôturé"
+  },
+
+  "cautionDestEnum": {
+    "PROPRIETAIRE": "Versée au propriétaire",
+    "CDC_CI": "Consignée à la CDC-CI",
+    "AUTRE": "Autre destination"
+  },
+
+  "colocRole": {
+    "PRINCIPAL": "Locataire principal",
+    "SECONDAIRE": "Colocataire"
+  },
+
+  "colocMode": {
+    "GROUPE": "Bail groupé",
+    "INDIVIDUEL": "Bail individuel",
+    "LIBRE": "Arrangement libre"
+  },
+
+  "terrainUsage": {
+    "PARKING_VEHICULES": "Parking véhicules",
+    "PARKING_CAMIONS": "Parking poids lourds",
+    "COMMERCE_TEMPORAIRE": "Commerce temporaire",
+    "STOCKAGE": "Stockage",
+    "AGRICULTURE": "Usage agricole",
+    "EVENEMENTIEL": "Événementiel",
+    "INDUSTRIEL": "Usage industriel",
+    "AUTRE": "Autre usage"
+  },
+
+  "periodicite": {
+    "JOURNALIER": "Quotidien",
+    "HEBDOMADAIRE": "Hebdomadaire",
+    "MENSUEL": "Mensuel",
+    "TRIMESTRIEL": "Trimestriel",
+    "SEMESTRIEL": "Semestriel",
+    "ANNUEL": "Annuel",
+    "FORFAIT": "Forfait"
+  },
+
+  "visibEnum": {
+    "INVISIBLE": "Masqué",
+    "INVITATION_PROPRIO": "Sur invitation du propriétaire",
+    "INVITATION_AGENCE": "Sur invitation de l'agence",
+    "TOUS": "Visible par tous"
+  },
+
+  "invitStatutEnum": {
+    "ENVOYEE": "Invitation envoyée",
+    "VUE": "Invitation consultée",
+    "ACCEPTEE": "Invitation acceptée",
+    "REFUSEE": "Invitation refusée",
+    "EXPIREE": "Invitation expirée",
+    "ANNULEE": "Invitation annulée"
+  },
+
+  "declencheurEnum": {
+    "SOLDE_BAS": "Solde insuffisant",
+    "FIN_DE_MOIS": "Fin de mois",
+    "CREDIT_GENERE": "Crédit généré",
+    "RAPPEL_MENSUEL": "Rappel mensuel",
+    "MANUEL": "Déclenchement manuel"
+  },
+
+  "migrationStatus": {
+    "UPLOADE": "Fichier importé",
+    "EN_ANALYSE": "En cours d'analyse",
+    "RAPPORT_GENERE": "Rapport généré",
+    "COMMITE": "Migration validée",
+    "ERREUR": "Erreur de migration"
+  },
+
+  "operateurDossierStatus": {
+    "BROUILLON": "Brouillon",
+    "DOSSIER_GENERE": "Dossier généré",
+    "SOUMIS_API": "Soumis à l'opérateur",
+    "EN_ATTENTE_VALIDATION": "En attente de validation",
+    "ACTIF": "Actif",
+    "REJETE": "Rejeté"
+  },
+
+  "operateurNiveau": {
+    "N1": "Niveau 1 — Dossier PDF",
+    "N2": "Niveau 2 — API partielle",
+    "N3": "Niveau 3 — API complète"
+  },
+
+  "commissionStatut": {
+    "EN_ATTENTE": "En attente",
+    "VALIDE": "Validée",
+    "PAYE": "Payée",
+    "ANNULE": "Annulée"
+  },
+
+  "regStatut": {
+    "EN_COURS": "Régularisation en cours",
+    "PROLONGE_RECEPISSE": "Prolongé — Récépissé",
+    "PROLONGE_FORMATION": "Prolongé — Formation",
+    "REGULARISE": "Régularisé",
+    "BASCULE": "Basculé"
+  },
+
+  "prospectStatut": {
+    "A_RAPPELER": "À rappeler",
+    "EN_DISCUSSION": "En discussion",
+    "INSCRIT": "Inscrit",
+    "PAS_INTERESSE": "Pas intéressé",
+    "PERDU": "Perdu"
+  },
+
+  "promoType": {
+    "MOIS_GRATUITS": "Mois offerts",
+    "REMISE_POURCENTAGE": "Remise en pourcentage",
+    "REMISE_MONTANT": "Remise en montant",
+    "PRIX_FIXE": "Prix fixe",
+    "ESSAI_ETENDU": "Période d'essai prolongée"
+  },
+
+  "negocieType": {
+    "ABONNEMENT_DEROGATOIRE": "Abonnement dérogatoire",
+    "QUITTANCE_DEROGATOIRE": "Quittance dérogatoire",
+    "ENREGISTREMENT_DEROGATOIRE": "Enregistrement dérogatoire"
+  },
+
+  "bienRole": {
+    "OWNER": "Propriétaire",
+    "INTERMEDIAIRE": "Intermédiaire",
+    "AGENCE": "Agence",
+    "FIELD_AGENT": "Agent de terrain"
+  },
+
+  "profilInterm": {
+    "PARENT_AMI": "Parent ou ami",
+    "NOTAIRE": "Notaire",
+    "HUISSIER": "Huissier de justice",
+    "AVOCAT": "Avocat"
+  },
+
+  "commType": {
+    "BAIL_FORMEL": "Bail formel",
+    "BDQ_CONFIRME": "Déclaratif confirmé",
+    "FORMALISATION": "Formalisation",
+    "RECRUTEMENT": "Recrutement",
+    "BONUS": "Bonus"
+  },
+
+  "typePropriete": {
+    "IMMEUBLE": "Immeuble",
+    "COUR": "Cour commune",
+    "RESIDENCE": "Résidence"
+  },
+
+  "propertyType": {
+    "apartment": "Appartement",
+    "house": "Maison",
+    "studio": "Studio",
+    "villa": "Villa",
+    "room": "Chambre",
+    "commercial": "Local commercial"
+  },
+
+  "propertyStatus": {
+    "draft": "Brouillon",
+    "pending_verification": "En attente de vérification",
+    "active": "Disponible",
+    "rented": "Loué",
+    "suspended": "Suspendu",
+    "rejected": "Rejeté",
+    "archived": "Archivé"
+  },
+
+  "kycStatus": {
+    "pending": "En attente de vérification",
+    "verified": "Vérifié",
+    "under_review": "En cours d'examen",
+    "expired": "Expiré",
+    "rejected": "Rejeté"
+  },
+
+  "userStatus": {
+    "active": "Actif",
+    "suspended": "Suspendu",
+    "inactive": "Inactif"
+  },
+
+  "docType": {
+    "CNI_CI": "Carte Nationale d'Identité (CI)",
+    "PASS_CI": "Passeport ivoirien",
+    "RCCM": "Registre du Commerce (RCCM)",
+    "NIF": "Numéro d'Identification Fiscal (NIF)",
+    "ATTESTATION": "Attestation",
+    "AUTRE": "Autre document"
+  },
+
+  "ui": {
+    "navigation": {
+      "tableau_de_bord": "Tableau de bord",
+      "mes_biens": "Mes biens",
+      "mes_baux": "Mes baux",
+      "mes_locataires": "Mes locataires",
+      "mes_paiements": "Mes paiements",
+      "mes_documents": "Mes documents",
+      "messagerie": "Messagerie",
+      "agenda": "Agenda",
+      "parametres": "Paramètres",
+      "mon_profil": "Mon profil",
+      "deconnexion": "Se déconnecter"
+    },
+
+    "actions": {
+      "ajouter": "Ajouter",
+      "modifier": "Modifier",
+      "supprimer": "Supprimer",
+      "annuler": "Annuler",
+      "confirmer": "Confirmer",
+      "enregistrer": "Enregistrer",
+      "telecharger": "Télécharger",
+      "partager": "Partager",
+      "voir_details": "Voir les détails",
+      "voir_plus": "Voir plus",
+      "fermer": "Fermer",
+      "suivant": "Suivant",
+      "precedent": "Précédent",
+      "terminer": "Terminer",
+      "rechercher": "Rechercher",
+      "filtrer": "Filtrer",
+      "exporter": "Exporter",
+      "imprimer": "Imprimer",
+      "signer": "Signer",
+      "valider": "Valider",
+      "refuser": "Refuser",
+      "relancer": "Relancer",
+      "payer": "Payer",
+      "envoyer": "Envoyer"
+    },
+
+    "termes_immobilier": {
+      "loyer": "Loyer",
+      "loyer_mensuel": "Loyer mensuel",
+      "loyer_annuel": "Loyer annuel",
+      "caution": "Caution",
+      "avance_loyer": "Avance sur loyer",
+      "charges": "Charges",
+      "quittance": "Reçu de loyer",
+      "bail": "Contrat de bail",
+      "etat_des_lieux": "État des lieux",
+      "constat_de_lieux": "Constat de lieux",
+      "preavis": "Délai de préavis",
+      "resiliation": "Résiliation du bail",
+      "expulsion": "Expulsion",
+      "mise_en_demeure": "Mise en demeure",
+      "commandement_payer": "Commandement à payer",
+      "arriere_loyer": "Arriéré de loyer",
+      "trop_percu": "Trop-perçu",
+      "remboursement_caution": "Restitution de caution",
+      "caution_retenue": "Caution retenue",
+      "bailleur": "Propriétaire",
+      "proprio": "Proprio",
+      "locataire": "Locataire",
+      "colocataire": "Colocataire",
+      "garant": "Caution personnelle",
+      "agence": "Agence immobilière",
+      "gestionnaire": "Gestionnaire",
+      "intermediaire": "Intermédiaire",
+      "mandat_gestion": "Mandat de gestion",
+      "bien": "Logement",
+      "logement": "Logement",
+      "appartement": "Appartement",
+      "villa": "Villa",
+      "chambre": "Chambre",
+      "studio": "Studio",
+      "cour_commune": "Cour commune",
+      "residence": "Résidence",
+      "commune": "Commune",
+      "quartier": "Quartier",
+      "superficie": "Superficie (m²)",
+      "pieces": "Pièces",
+      "chambres": "Chambres",
+      "enregistrement_dgi": "Enregistrement à la DGI",
+      "droits_enregistrement": "Droits d'enregistrement",
+      "frais_timbre": "Frais de timbre",
+      "preemption": "Droit de préemption",
+      "mise_en_vente": "Mise en vente"
+    },
+
+    "notifications": {
+      "loyer_attendu": "Rappel : votre loyer du mois de {{mois}} est attendu avant le {{date}}.",
+      "loyer_recu": "Votre paiement de {{montant}} FCFA pour le mois de {{mois}} a bien été reçu.",
+      "loyer_impaye": "Votre loyer du mois de {{mois}} n'a pas encore été reçu.",
+      "caution_consignee": "Votre caution de {{montant}} FCFA a bien été consignée à la CDC-CI.",
+      "caution_restituee": "Votre caution de {{montant}} FCFA vous a été restituée.",
+      "bail_signe": "Le bail a été signé avec succès. Bienvenue dans votre nouveau logement !",
+      "bail_expire_bientot": "Attention : votre bail arrive à terme dans {{jours}} jours.",
+      "etat_lieux_planifie": "Votre état des lieux est prévu le {{date}} à {{heure}}.",
+      "document_valide": "Votre document a été vérifié et validé.",
+      "document_rejete": "Votre document a été rejeté. Motif : {{motif}}.",
+      "mise_en_demeure": "Une mise en demeure vous a été adressée. Veuillez régulariser votre situation.",
+      "arrangement_amiable": "Un arrangement à l'amiable est en cours. Veuillez contacter votre propriétaire.",
+      "ticket_maintenance_recu": "Votre signalement a bien été transmis au propriétaire.",
+      "ticket_maintenance_resolu": "Votre signalement a été marqué comme résolu.",
+      "preavis_accuse": "Votre préavis a bien été reçu et accusé.",
+      "invitation_bail": "Vous avez reçu une invitation pour un bail au {{adresse}}.",
+      "candidature_acceptee": "Votre candidature pour le logement au {{adresse}} a été acceptée !",
+      "candidature_refusee": "Votre candidature pour le logement au {{adresse}} n'a pas été retenue.",
+      "solde_insuffisant": "Votre solde est insuffisant. Veuillez recharger votre compte.",
+      "abonnement_expire": "Votre abonnement {{plan}} expire le {{date}}. Renouvelez-le pour continuer à bénéficier de vos avantages."
+    },
+
+    "erreurs": {
+      "champ_obligatoire": "Ce champ est obligatoire.",
+      "format_telephone": "Veuillez entrer un numéro de téléphone ivoirien valide (ex : +225 07 00 00 00 00).",
+      "format_email": "Veuillez entrer une adresse e-mail valide.",
+      "montant_invalide": "Le montant saisi n'est pas valide.",
+      "document_requis": "Veuillez joindre le document demandé.",
+      "erreur_paiement": "Le paiement a échoué. Veuillez réessayer ou choisir un autre moyen de paiement.",
+      "session_expiree": "Votre session a expiré. Veuillez vous reconnecter.",
+      "acces_refuse": "Vous n'avez pas les droits nécessaires pour effectuer cette action.",
+      "erreur_serveur": "Une erreur est survenue. Veuillez réessayer dans quelques instants."
+    },
+
+    "onboarding": {
+      "bienvenue": "Bienvenue sur QAPRIL !",
+      "profil_proprietaire": "Je suis propriétaire",
+      "profil_locataire": "Je suis locataire",
+      "profil_agence": "Je représente une agence",
+      "profil_intermediaire": "Je suis intermédiaire",
+      "etape_identite": "Vérification d'identité",
+      "etape_bien": "Mon logement",
+      "etape_bail": "Mon bail",
+      "etape_paiement": "Moyen de paiement préféré",
+      "kyc_instruction": "Pour valider votre compte, veuillez fournir une pièce d'identité valide (CNI ou passeport ivoirien).",
+      "numero_cni": "Numéro de la CNI",
+      "numero_passeport": "Numéro de passeport",
+      "selfie_requis": "Prenez un selfie pour confirmer votre identité."
+    },
+
+    "wallet": {
+      "solde": "Solde disponible",
+      "recharger": "Recharger mon compte",
+      "historique": "Historique des transactions",
+      "credit": "Crédit",
+      "debit": "Débit",
+      "seuil_alerte": "Seuil d'alerte",
+      "operateur_prefere": "Opérateur préféré",
+      "canal_alerte": "Canal d'alerte préféré"
+    },
+
+    "diaspora": {
+      "titre": "Mon espace Diaspora",
+      "abonnement": "Abonnement Diaspora",
+      "pays_residence": "Pays de résidence",
+      "devise": "Devise",
+      "fuseau_horaire": "Fuseau horaire",
+      "rapport_mensuel": "Rapport mensuel par e-mail",
+      "whatsapp_contact": "WhatsApp de contact"
+    },
+
+    "syndic": {
+      "titre": "Gestion de résidence",
+      "residence": "Nom de la résidence",
+      "total_lots": "Nombre de lots",
+      "tresorerie": "Trésorerie",
+      "assemblee_generale": "État de l'assemblée générale"
+    },
+
+    "succession": {
+      "titre": "Succession immobilière",
+      "defunt": "Nom du défunt",
+      "reclamant": "Nom du réclamant",
+      "lien": "Lien de parenté",
+      "bien_concerne": "Bien concerné",
+      "notaire": "Notaire",
+      "statut_attestation": "En attente d'attestation"
+    },
+
+    "caution_caci": {
+      "titre": "Caution CACI",
+      "locataire": "Locataire",
+      "bien": "Logement concerné",
+      "montant": "Montant",
+      "statut_transfert": "À transférer",
+      "date_consignation": "Date de consignation"
+    },
+
+    "rapport_gerance": {
+      "titre": "Compte rendu de gérance",
+      "proprietaire": "Propriétaire",
+      "periode": "Période",
+      "nb_biens": "Nombre de biens",
+      "loyers_bruts": "Loyers bruts",
+      "honoraires_agence": "Honoraires de gestion",
+      "tva": "TVA",
+      "travaux": "Frais de travaux",
+      "reversement_net": "Reversement net"
+    }
+  }
+}
