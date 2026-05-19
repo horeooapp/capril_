@@ -78,7 +78,7 @@ export default function DashboardLayoutClient({
 
     return (
         <SessionProvider session={session}>
-        <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-bodoni">
             
             {/* Sidebar Desktop */}
             {session?.user && (

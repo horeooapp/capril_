@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
 .admin-v2 {
   --ci-orange:#FF6600;
@@ -20,8 +20,8 @@
   --text-muted:#64748B;
   --border:#E2E8F0;
   --bg-main:#F8FAFC;
-  --font-head:'Syne',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --font-head:'Bodoni Moda','Libre Bodoni',Bodoni,serif;
+  --font-body:'Bodoni Moda','Libre Bodoni',Bodoni,serif;
 
   background:var(--bg-main);
   color:var(--text-main);

@@ -46,6 +46,7 @@ const config: Config = {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["Geist Mono", "monospace"],
+        bodoni: ['"Bodoni Moda"', '"Libre Bodoni"', "Bodoni", "serif"],
       },
     },
   },

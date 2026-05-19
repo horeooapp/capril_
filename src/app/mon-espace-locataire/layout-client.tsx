@@ -25,7 +25,7 @@ export default function LocataireLayoutClient({
     const activeRole = dbActiveRole || session?.user?.role;
     return (
         <SessionProvider session={session}>
-            <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden">
+            <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden font-bodoni">
             {/* Mesh Background */}
             <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
             <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>

@@ -150,7 +150,7 @@ function ChooseRoleContent() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden font-bodoni">
             {/* Immersive Background Decor */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <motion.div 
@@ -320,9 +320,9 @@ function ChooseRoleContent() {
             </div>
             
             <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap');
                 body {
-                    font-family: 'Outfit', sans-serif;
+                    font-family: 'Bodoni Moda', 'Libre Bodoni', Bodoni, serif;
                 }
             `}</style>
         </div>
