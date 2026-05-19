@@ -120,7 +120,7 @@ export function TenantPortalDashboard({
 
   return (
     <div style={{fontFamily:"'DM Sans','Segoe UI',sans-serif",background:T.bg,minHeight:"100vh",display:"flex",justifyContent:"center",padding:"20px 16px"}}>
-      <div style={{width:390,background:T.white,borderRadius:36,boxShadow:`0 20px 70px ${T.navy}22`,overflow:"hidden",position:"relative",border:`1px solid ${T.grey2}`,minHeight:844}}>
+      <div style={{width:"100%",maxWidth:400,background:T.white,borderRadius:36,boxShadow:`0 20px 70px ${T.navy}22`,overflow:"hidden",position:"relative",border:`1px solid ${T.grey2}`,minHeight:844}}>
 
         {/* STATUS */}
         <div style={{background:T.navyDark,padding:"12px 24px 0",display:"flex",justifyContent:"space-between"}}>
