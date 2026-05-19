@@ -7,7 +7,7 @@ import Link from "next/link"
 import EmailOTPForm from "./EmailOTPForm"
 import AdminLoginForm from "./AdminLoginForm"
 
-type ProfileTab = 'tenant' | 'landlord' | 'admin'
+type ProfileTab = 'tenant' | 'landlord'
 
 interface UnifiedLoginPageProps {
     initialTab?: ProfileTab
@@ -36,16 +36,6 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             activeBg: "bg-amber-500/20 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]",
             inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
             indicator: "bg-amber-500"
-        },
-        {
-            id: 'admin' as ProfileTab,
-            label: "Administration",
-            icon: ShieldAlert,
-            color: "from-orange-600 to-red-700",
-            textColor: "text-orange-500",
-            activeBg: "bg-orange-500/20 border-orange-500/50 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]",
-            inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
-            indicator: "bg-orange-500"
         }
     ]
 
@@ -67,15 +57,6 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             tagText: "Accès Distingué & Sécurisé",
             tagIconColor: "text-amber-500",
             badgeColor: "text-amber-500"
-        },
-        admin: {
-            bg: "bg-[#020617]",
-            gradient: "from-[#020617]/90 via-[#0B1120]/80 to-[#0f172a]/90",
-            glow1: "bg-blue-900/30 blur-[150px]",
-            glow2: "bg-orange-600/20 blur-[150px]",
-            tagText: "Console Sécurisée v3.5",
-            tagIconColor: "text-orange-500",
-            badgeColor: "text-orange-500"
         }
     }
 
@@ -165,30 +146,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                 />
                             )}
 
-                            {activeTab === 'admin' && (
-                                <div className="bg-[#0B1120]/60 backdrop-blur-3xl border border-white/5 rounded-[32px] p-6 md:p-8 shadow-2xl relative">
-                                    <AdminLoginForm 
-                                        redirectPath="/admin"
-                                        title="Administration"
-                                        subtitle="Accès certifié réservé aux instances régulatrices."
-                                    />
-                                    
-                                    <div className="mt-8 grid grid-cols-3 gap-2 pt-6 border-t border-white/5">
-                                        <div className="flex flex-col items-center p-3 bg-white/5 rounded-xl border border-white/5 text-center">
-                                            <Server className="w-3.5 h-3.5 text-gray-400 mb-1" />
-                                            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">SRV-1472</span>
-                                        </div>
-                                        <div className="flex flex-col items-center p-3 bg-white/5 rounded-xl border border-white/5 text-center">
-                                            <Fingerprint className="w-3.5 h-3.5 text-emerald-400 mb-1" />
-                                            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Bio-Auth</span>
-                                        </div>
-                                        <div className="flex flex-col items-center p-3 bg-white/5 rounded-xl border border-white/5 text-center">
-                                            <Lock className="w-3.5 h-3.5 text-amber-500 mb-1" />
-                                            <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Chiffré</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+
                         </motion.div>
                     </AnimatePresence>
                 </div>
