@@ -107,9 +107,8 @@ export default function ManualOfficielContent() {
                                 { id: "section-5", title: "5. Abonnements & Utilités", icon: <Wifi size={16} /> },
                                 { id: "section-6", title: "6. Agences & Agents", icon: <Building size={16} /> },
                                 { id: "section-7", title: "7. Le Portail Diaspora", icon: <Globe size={16} /> },
-                                { id: "section-8", title: "8. Programme Champions", icon: <Trophy size={16} /> },
-                                { id: "section-9", title: "9. Paiement Autonome", icon: <Zap size={16} /> },
-                                { id: "section-10", title: "10. Glossaire", icon: <BookOpen size={16} /> }
+                                { id: "section-8", title: "8. Paiement Autonome", icon: <Zap size={16} /> },
+                                { id: "section-9", title: "9. Glossaire", icon: <BookOpen size={16} /> }
                             ].map((item) => (
                                 <button
                                     key={item.id}
@@ -264,18 +263,7 @@ export default function ManualOfficielContent() {
 
                     {/* SECTION 8 */}
                     <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">8. Le Programme Champions (Affiliation)</h2>
-                        <p className="text-gray-600 mb-4">Gagnez de l'argent en recommandant QAPRIL.</p>
-                        <ul className="space-y-2 text-sm text-gray-600 font-medium">
-                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> Obtenez votre lien de parrainage unique.</li>
-                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> <strong>3 000 FCFA</strong> par propriétaire actif.</li>
-                            <li className="flex gap-2"><Trophy className="text-amber-500" size={18}/> Retraits instantanés de vos gains sur Wave/Orange Money.</li>
-                        </ul>
-                    </div>
-
-                    {/* SECTION 9 */}
-                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">9. Paiement Autonome (Open Banking)</h2>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">8. Paiement Autonome (Open Banking)</h2>
                         <p className="text-gray-600 mb-4">Le <strong>cerveau Fintech</strong> de QAPRIL.</p>
                         <p className="text-sm text-gray-600 bg-gray-50 p-6 rounded-2xl border border-gray-100">
                             Le locataire paie son loyer depuis son application <strong>Wave CI</strong> ou <strong>Orange Money</strong>. 
@@ -284,9 +272,9 @@ export default function ManualOfficielContent() {
                         </p>
                     </div>
 
-                    {/* SECTION 10 */}
-                    <div id="section-10" className="bg-ivoire-dark text-white p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:text-black print:p-0 print:m-0">
-                        <h2 className="text-3xl font-black tracking-tighter mb-8 uppercase print:text-2xl print:text-gray-900 print:mb-4">10. Glossaire Exclusif</h2>
+                    {/* SECTION 9 */}
+                    <div id="section-9" className="bg-ivoire-dark text-white p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:text-black print:p-0 print:m-0">
+                        <h2 className="text-3xl font-black tracking-tighter mb-8 uppercase print:text-2xl print:text-gray-900 print:mb-4">9. Glossaire Exclusif</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2 print:text-black">
                             {[
                                 { t: "Webhook", d: "Pont numérique qui connecte QAPRIL à Wave/Orange Money pour l'automatisation." },

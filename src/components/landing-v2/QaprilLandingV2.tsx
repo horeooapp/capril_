@@ -471,7 +471,6 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <button className={`user-tab ${activeTab === 'landlord' ? 'active' : ''}`} onClick={() => setActiveTab('landlord')}>🏠 Propriétaire</button>
             <button className={`user-tab ${activeTab === 'agency' ? 'active' : ''}`} onClick={() => setActiveTab('agency')}>🏢 Agence Int.</button>
             <button className={`user-tab ${activeTab === 'diaspora' ? 'active' : ''}`} onClick={() => setActiveTab('diaspora')}>🌍 Diaspora</button>
-            <button className={`user-tab ${activeTab === 'champion' ? 'active' : ''}`} onClick={() => setActiveTab('champion')}>⭐ Champion</button>
           </div>
 
           {/* LOCATAIRE */}
@@ -593,35 +592,6 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="user-visual-inner" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Dernier rapport financier</span><span style={{ color: 'var(--teal)', fontWeight: 700 }}>PDF</span></div>
                 <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Inspection vidéo</span><span style={{ color: 'var(--mango-d)', fontWeight: 700 }}>Planifiée</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* CHAMPION */}
-          <div className={`users-content ${activeTab === 'champion' ? 'show' : ''}`} id="uc-champion">
-            <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--lime-l)', color: 'var(--lime-d)', marginBottom: '14px' }}>⭐ Champion QAPRIL</div>
-              <h3>Gagnez de l'argent en faisant grandir QAPRIL</h3>
-              <p>Recrutez des propriétaires et locataires, formalisez des baux, et percevez des commissions attractives. Plus vous agissez, plus vous gagnez.</p>
-              <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>💵</div><span className="benefit-text">Jusqu'à 15 000 FCFA par bail formalisé</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>👥</div><span className="benefit-text">Bonus de recrutement de filleuls</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>🎯</div><span className="benefit-text">Objectifs mensuels avec bonus</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>📱</div><span className="benefit-text">CRM prospects intégré</span></div>
-              </div>
-            </div>
-            <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,#F9A825,var(--lime))', padding: '20px' }}>
-                <div style={{ color: 'rgba(0,0,0,.5)', fontSize: '12px', marginBottom: '4px' }}>Commissions · Yao Thierry ⭐</div>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '36px', fontWeight: 800, color: 'white' }}>340 000 FCFA</div>
-                <div style={{ color: 'rgba(255,255,255,.8)', fontSize: '13px', marginTop: '4px' }}>cumulé 2025 · +18% vs 2024</div>
-              </div>
-              <div className="user-visual-inner">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{ background: 'white', borderRadius: '12px', padding: '12px', boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--lime-d)' }}>43%</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>Taux conversion</div></div>
-                  <div style={{ background: 'white', borderRadius: '12px', padding: '12px', boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--mango)' }}>L3</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>Niveau atteint</div></div>
-                </div>
-                <div style={{ background: 'var(--lime-l)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}><span style={{ fontSize: '13px', color: 'var(--lime-d)', fontWeight: 600 }}>🎯 Objectif mai : 6/10 conversions</span></div>
               </div>
             </div>
           </div>
@@ -840,8 +810,6 @@ export default function QaprilLandingV2({ session }: { session: any }) {
                 <a href="#users" onClick={() => setActiveTab('tenant')} className="footer-link">Locataires</a>
                 <a href="#users" onClick={() => setActiveTab('landlord')} className="footer-link">Propriétaires</a>
                 <a href="#users" onClick={() => setActiveTab('agency')} className="footer-link">Agences immobilières</a>
-                <a href="#users" onClick={() => setActiveTab('agent')} className="footer-link">Agents NC</a>
-                <a href="#users" onClick={() => setActiveTab('champion')} className="footer-link">Devenir Champion</a>
               </div>
             </div>
             <div className="footer-col">

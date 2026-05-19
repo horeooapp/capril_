@@ -151,14 +151,6 @@ const modules = [
         href: "/admin/observatory" 
     },
     { 
-        id: "M-CHAMPION", 
-        name: "Gamification", 
-        description: "Leaderboard B2B des agents selon le recouvrement effectif.", 
-        icon: Trophy, 
-        status: "active", 
-        href: "/admin/champions" 
-    },
-    { 
         id: "M-REPORTS", 
         name: "Rapports Consol.", 
         description: "Console centrale des exports financiers et tableaux de bord.", 

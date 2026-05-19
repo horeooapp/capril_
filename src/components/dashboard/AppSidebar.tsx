@@ -15,7 +15,7 @@ import {
 import RoleSwitcher from "./RoleSwitcher"
 
 interface AppSidebarProps {
-    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'CHAMPION' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
+    role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
     onLogout: () => void | Promise<void>
     userName?: string | null
     themeId?: 'emerald' | 'amber' | 'sky' | 'violet' | 'slate' | 'rose'
@@ -116,7 +116,6 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> },
             { href: "/dashboard/icl", label: "Indice ICL", icon: <Star size={18} /> },
             { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-            { href: "/dashboard/champion", label: "Champions", icon: <Trophy size={18} />, badge: "Bientôt" },
             { href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} />, badge: "Bientôt" },
             { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={18} /> },
         ]
@@ -130,7 +129,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
         if (role === 'TENANT') return "LOCATAIRE"
         if (role === 'DIASPORA') return "DIASPORA"
         if (role === 'INTERMEDIARY') return "INTERMÉDIAIRE"
-        if (role === 'CHAMPION') return "CHAMPION"
+
         if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) return "AGENCE CERTIFIÉE"
         if (['NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role)) return "GESTIONNAIRE"
         return "PROPRIÉTAIRE"
