@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
     return (
         <>
             {/* Version Web PC - Intacte */}
-            <div className="hidden md:block min-h-screen bg-[#020617] relative overflow-hidden">
+            <div className="block min-h-screen bg-[#020617] relative overflow-hidden">
                 {/* Cybernetic Background Grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_90%)] pointer-events-none z-0"></div>
                 
@@ -75,11 +75,6 @@ export default function AdminLoginPage() {
                         </motion.p>
                     </div>
                 </div>
-            </div>
-
-            {/* Version Web Mobile Exclusive - Nouveau design unifié */}
-            <div className="block md:hidden w-full min-h-screen">
-                <UnifiedLoginPage initialTab="admin" />
             </div>
         </>
     )
