@@ -178,28 +178,6 @@ async function main() {
     ]
   });
 
-  // 7. CHAMPION: Alpha
-  const champion = await prisma.user.upsert({
-    where: { email: 'alpha.champion@qapril.ci' },
-    update: { role: 'CHAMPION' },
-    create: {
-      email: 'alpha.champion@qapril.ci',
-      fullName: 'Alpha le Champion',
-      role: 'CHAMPION',
-      phone: '+225 07 00 11 22 33',
-      onboardingComplete: true
-    }
-  });
-
-  await prisma.championProfile.upsert({
-    where: { userId: champion.id },
-    update: {},
-    create: {
-      userId: champion.id,
-      zonePrincipale: 'Cocody',
-      objectifMensuel: 50
-    }
-  });
 
   // 8. UNPAID LEASE (Direct Management for Kouassi)
   const tenant2 = await prisma.user.upsert({
@@ -250,7 +228,7 @@ async function main() {
 
   console.log('--- SEEDING COMPLETED ---');
   console.log('Landlord: kouassi@qapril.ci (Balance: 125,000 FCFA)');
-  console.log('Champion: alpha.champion@qapril.ci');
+
   console.log('Arrears created for: mira@qapril.ci (250,000 FCFA x 2)');
 }
 

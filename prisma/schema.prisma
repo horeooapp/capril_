@@ -17,7 +17,6 @@ enum Role {
   AGENCY
   TENANT
   NON_CERTIFIED_AGENT
-  CHAMPION
 }
 
 enum CDCDepositStatus {
@@ -505,21 +504,6 @@ enum EdlStatut {
   CERTIFIE
 }
 
-enum ProspectStatut {
-  A_RAPPELER
-  EN_DISCUSSION
-  INSCRIT
-  PAS_INTERESSE
-  PERDU
-}
-
-enum CommType {
-  BAIL_FORMEL
-  BDQ_CONFIRME
-  FORMALISATION
-  RECRUTEMENT
-  BONUS
-}
 
 enum ProfileType {
   LANDLORD
@@ -690,12 +674,9 @@ model User {
   reclamations        ReclamationLocataire[] @relation("TenantReclamations")
   iclEvents           IclEvent[]
 
-  // ADD-15 Rapports & Champions
+  // ADD-15 Rapports
   redactedEdls        EtatsDesLieux[]    @relation("RedacteurEdl")
   rapportsMensuels    RapportMensuel[]
-  championProfile     ChampionProfile?
-  supervisedChampions ChampionProfile[]  @relation("SuperviseurChampions")
-  prospectsConvertis  ChampionProspect[] @relation("ProspectConverti")
 
   // ADD-16 Succession Locataire
   beneficiaireNom      String? @map("beneficiaire_nom")
@@ -3227,67 +3208,6 @@ model RapportMensuel {
   @@map("rapports_mensuels")
 }
 
-model ChampionProfile {
-  id                   String   @id @default(uuid()) @map("champion_id")
-  userId               String   @unique @map("user_id")
-  user                 User     @relation(fields: [userId], references: [id])
-  zonePrincipale       String   @map("zone_principale")
-  zonesSecondaires     String[] @map("zones_secondaires")
-  superviseurId        String?  @map("superviseur_id")
-  superviseur          User?    @relation("SuperviseurChampions", fields: [superviseurId], references: [id])
-  statut               String   @default("ACTIF") // ACTIF | SUSPENDU | INACTIF
-  dateDebut            DateTime @default(now()) @map("date_debut")
-  objectifMensuel      Int      @default(30) @map("objectif_mensuel")
-  totalInscriptions    Int      @default(0) @map("total_inscriptions")
-  totalCommissionsFcfa Float    @default(0) @map("total_commissions_fcfa")
-
-  prospects   ChampionProspect[]
-  commissions ChampionCommission[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("champions_profiles")
-}
-
-model ChampionProspect {
-  id                 String          @id @default(uuid()) @map("prospect_id")
-  championId         String          @map("champion_id")
-  champion           ChampionProfile @relation(fields: [championId], references: [id])
-  nom                String
-  telephone          String?
-  quartier           String?
-  nbLogementsEstime  String?         @map("nb_logements_estime")
-  argumentCle        String?         @map("argument_cle")
-  statut             ProspectStatut  @default(A_RAPPELER)
-  dateDernierContact DateTime?       @map("date_dernier_contact")
-  dateRappelPrevu    DateTime?       @map("date_rappel_prevu")
-  note               String?
-  userIdInscrit      String?         @map("user_id_inscrit")
-  userInscrit        User?           @relation("ProspectConverti", fields: [userIdInscrit], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("champions_prospects")
-}
-
-model ChampionCommission {
-  id           String           @id @default(uuid()) @map("commission_id")
-  championId   String           @map("champion_id")
-  champion     ChampionProfile  @relation(fields: [championId], references: [id])
-  typeAction   String           @map("type_action")
-  referenceId  String?          @map("reference_id")
-  montantFcfa  Float            @map("montant_fcfa")
-  statut       CommissionStatut @default(EN_ATTENTE) // EN_ATTENTE | VALIDE | PAYE | ANNULE
-  valideAt     DateTime?        @map("valide_at")
-  payeAt       DateTime?        @map("paye_at")
-  modePaiement String?          @map("mode_paiement")
-  createdAt    DateTime         @default(now()) @map("created_at")
-  updatedAt    DateTime         @updatedAt @map("updated_at")
-
-  @@map("champions_commissions")
-}
-
 model WalletRechargeLink {
   id             String          @id @default(uuid()) @map("link_id")
   userId         String          @map("user_id")
@@ -3535,13 +3455,6 @@ model WalletTransaction {
   @@index([userId])
   @@index([createdAt])
   @@map("wallet_transactions")
-}
-
-enum CommissionStatut {
-  EN_ATTENTE
-  VALIDE
-  PAYE
-  ANNULE
 }
 
 model MandatGestionBien {

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
-import { ChampionService } from '@/lib/champion-service';
 
 export async function POST(req: Request) {
     try {
@@ -56,23 +55,7 @@ export async function POST(req: Request) {
             }
         });
 
-        // --- GESTION CONVERSION PROSPECT (ADD-15) ---
-        // Si c'est le 1er bail du propriétaire, on check s'il était un prospect champion
-        if (leaseCount === 0) {
-            const user = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true } });
-            if (user?.phone) {
-                const prospect = await prisma.championProspect.findFirst({
-                    where: { 
-                        telephone: user.phone,
-                        statut: 'A_RAPPELER'
-                    }
-                });
-                
-                if (prospect) {
-                    await ChampionService.convertProspect(prospect.id, userId);
-                }
-            }
-        }
+
 
         return NextResponse.json({ success: true, lease });
 
