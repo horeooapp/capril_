@@ -1,11 +1,13 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useTransition } from "react"
 import Link from "next/link"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
-import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, ChevronRight, FileSignature, Users, BarChart3 } from "lucide-react"
+import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, ChevronRight, FileSignature, Users, BarChart3, Store, ToggleLeft, ToggleRight } from "lucide-react"
+import { toast } from "sonner"
+import { togglePropertyMarketplaceStatus } from "@/actions/marketplace-actions"
 
 export function OwnerPortalDashboardV2({ 
   user, 
@@ -18,6 +20,7 @@ export function OwnerPortalDashboardV2({
   activeRole?: string,
   aggregates?: any
 }) {
+  const [isPending, startTransition] = useTransition();
   const fmt = (n: number) => (n || 0).toLocaleString("fr-FR");
 
   const entities = useMemo(() => {
@@ -32,8 +35,10 @@ export function OwnerPortalDashboardV2({
           unites: []
         };
       }
+      const isOnline = p.annonces?.some((a: any) => a.statut === "ACTIVE") || false;
       acc[key].unites.push({
         ...p, 
+        isOnline,
         label: p.name || `Unité ${p.unitNumber || ''}`,
         statut: p.status === "active" ? "occupé" : "vacant",
         paiement: p.leases?.[0]?.statutFiscal === "A_JOUR" ? "À jour" : p.leases?.[0]?.statutFiscal === "EN_RETARD" ? "Impayé" : "—",
@@ -63,6 +68,17 @@ export function OwnerPortalDashboardV2({
   }, [aggregates]);
 
   const walletBalance = aggregates?.walletBalance || 0;
+
+  const handleToggleMarketplace = (propertyId: string, newState: boolean, name: string) => {
+    startTransition(async () => {
+      const res = await togglePropertyMarketplaceStatus(propertyId, newState);
+      if (res.success) {
+        toast.success(newState ? `"${name}" a été publié sur la Marketplace.` : `"${name}" a été retiré de la Marketplace.`);
+      } else {
+        toast.error(res.error || "Erreur lors de la mise à jour.");
+      }
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -155,6 +171,61 @@ export function OwnerPortalDashboardV2({
           </div>
         </SectionCard>
       </div>
+
+      {/* MARKETPLACE PUBLISHING MANAGEMENT */}
+      <SectionCard title="Gestion de la Marketplace (Mise en location)">
+        <div className="px-4 pt-1 text-xs font-semibold text-slate-500">Publiez ou retirez vos biens du store locatif public en un clic</div>
+        <div className="overflow-x-auto mt-2">
+          <table className="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr className="border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50/50">
+                <th className="p-3.5">Bien Immobilier</th>
+                <th className="p-3.5">Loyer Demandé</th>
+                <th className="p-3.5">Statut Occupation</th>
+                <th className="p-3.5">Visibilité Marketplace</th>
+                <th className="p-3.5 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entities.flatMap((e: any) => e.unites).map((u: any, i: number) => (
+                <tr key={u.id || i} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                  <td className="p-3.5 font-bold text-xs text-slate-900">{u.name || u.label}</td>
+                  <td className="p-3.5 font-semibold text-xs text-slate-700">{fmt(u.loyer)} FCFA</td>
+                  <td className="p-3.5">
+                    <Badge color={u.statut === "occupé" ? "green" : "gray"}>
+                      {u.statut === "occupé" ? "Loué" : "Vacant"}
+                    </Badge>
+                  </td>
+                  <td className="p-3.5">
+                    <Badge color={u.isOnline ? "purple" : "amber"}>
+                      {u.isOnline ? "En Ligne (Store)" : "Hors Ligne"}
+                    </Badge>
+                  </td>
+                  <td className="p-3.5 text-right">
+                    <button
+                      disabled={isPending}
+                      onClick={() => handleToggleMarketplace(u.id.replace('E-', ''), !u.isOnline, u.name || u.label)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                        u.isOnline 
+                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200" 
+                          : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                      }`}
+                    >
+                      {u.isOnline ? <ToggleRight size={18} className="text-rose-500"/> : <ToggleLeft size={18} className="text-slate-400"/>}
+                      {u.isOnline ? "Retirer" : "Mettre en ligne"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {entities.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-xs text-slate-400 py-6 text-center">Aucun bien disponible pour la mise en ligne.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
 
       <SectionCard title="Alertes & Actions Requises" action="Tout archiver">
          {activeAlerts.length === 0 ? (

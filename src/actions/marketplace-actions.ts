@@ -117,3 +117,90 @@ export async function createAnnonce(data: { logementId: string, titre: string, d
         return { error: "Erreur technique lors de la création." }
     }
 }
+
+export async function togglePropertyMarketplaceStatus(propertyId: string, isOnline: boolean) {
+    const session = await auth()
+    if (!session?.user?.id) return { error: "Non autorisé" }
+
+    try {
+        const property = await prisma.property.findUnique({
+            where: { id: propertyId },
+            include: { annonces: true, leases: true }
+        })
+
+        if (!property) return { error: "Propriété introuvable" }
+
+        if (isOnline) {
+            const existingAnnonce = property.annonces?.[0]
+            if (existingAnnonce) {
+                await prisma.annonce.update({
+                    where: { id: existingAnnonce.id },
+                    data: { statut: "ACTIVE", publieeAt: new Date() }
+                })
+            } else {
+                await prisma.annonce.create({
+                    data: {
+                        logementId: property.id,
+                        agenceId: session.user.id,
+                        titre: property.name || `Logement ${property.propertyType || ''} à ${property.commune || 'Abidjan'}`.trim(),
+                        description: `Superbe logement idéalement situé à ${property.commune || 'Abidjan'} avec ${property.rooms || 2} pièces.`,
+                        loyerDemande: property.declaredRentFcfa || (property.leases?.[0]?.rentAmount ? Number(property.leases[0].rentAmount) : 150000),
+                        statut: "ACTIVE",
+                        publieeAt: new Date()
+                    }
+                })
+            }
+        } else {
+            await prisma.annonce.updateMany({
+                where: { logementId: propertyId },
+                data: { statut: "SUSPENDUE" }
+            })
+        }
+
+        revalidatePath("/dashboard/properties")
+        revalidatePath("/dashboard")
+        revalidatePath("/mon-espace-locataire/marketplace")
+        return { success: true }
+    } catch (e: any) {
+        console.error("Error togglePropertyMarketplaceStatus:", e)
+        return { error: "Erreur technique lors de la mise à jour." }
+    }
+}
+
+export async function getPublicMarketplaceAnnonces(filters?: { commune?: string, minPrice?: number, maxPrice?: number }) {
+    try {
+        const whereClause: any = {
+            statut: "ACTIVE"
+        }
+
+        if (filters?.commune && filters.commune !== "Toutes") {
+            whereClause.logement = { ...whereClause.logement, commune: { contains: filters.commune } }
+        }
+
+        if (filters?.minPrice || filters?.maxPrice) {
+            whereClause.loyerDemande = {}
+            if (filters.minPrice) whereClause.loyerDemande.gte = filters.minPrice
+            if (filters.maxPrice) whereClause.loyerDemande.lte = filters.maxPrice
+        }
+
+        const data = await prisma.annonce.findMany({
+            where: whereClause,
+            include: { 
+                logement: {
+                    include: {
+                        images: true
+                    }
+                },
+                agence: {
+                    select: { firstName: true, lastName: true, phone: true, email: true }
+                }
+            },
+            orderBy: { publieeAt: 'desc' }
+        })
+
+        return data
+    } catch (e) {
+        console.error("Error getPublicMarketplaceAnnonces:", e)
+        return []
+    }
+}

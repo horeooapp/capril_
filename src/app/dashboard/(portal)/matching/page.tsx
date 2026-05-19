@@ -1,7 +1,10 @@
 import MatchingDashboardClient from "./matching-client"
-import { getPendingCandidatures } from "@/actions/matching-actions"
+import { getPendingCandidatures, getAcceptedCandidatures } from "@/actions/matching-actions"
 
 export default async function MatchingDashboardPage() {
-    const candidatures = await getPendingCandidatures()
-    return <MatchingDashboardClient candidatures={candidatures} />
+    const [candidatures, acceptedCandidatures] = await Promise.all([
+        getPendingCandidatures(),
+        getAcceptedCandidatures()
+    ])
+    return <MatchingDashboardClient candidatures={candidatures} acceptedCandidatures={acceptedCandidatures} />
 }

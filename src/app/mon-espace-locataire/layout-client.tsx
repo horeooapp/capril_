@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake, Store } from "lucide-react"
 
 import { SessionProvider } from "next-auth/react"
 
@@ -60,6 +60,7 @@ export default function LocataireLayoutClient({
                     {session && (
                         <BottomNav items={[
                             { href: "/mon-espace-locataire", label: "Accueil", icon: <Home size={24} /> },
+                            { href: "/mon-espace-locataire/marketplace", label: "Marketplace", icon: <Store size={24} /> },
                             { href: "/mon-espace-locataire/leases", label: "Bail", icon: <FileText size={20} /> },
                             { href: "/mon-espace-locataire/receipts", label: "Loyers", icon: <Receipt size={24} /> },
                             { href: "/mon-espace-locataire/cie-sodeci", label: "Factures", icon: <Zap size={24} /> },

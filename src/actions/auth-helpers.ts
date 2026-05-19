@@ -52,8 +52,19 @@ export async function ensurePropertyAccess(propertyId: string) {
     // Admins always have access
     if (userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN) return property
 
-    const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
-    const managerId = (fullUser?.agencyConfig as any)?.managerId
+    const fullUser = await prisma.user.findUnique({ 
+        where: { id: userId }, 
+        select: { agencyConfig: true, capaciteActive: true, role: true } 
+    });
+    const managerId = (fullUser?.agencyConfig as any)?.managerId;
+    const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role;
+
+    if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
+        if (property.ownerUserId !== userId) {
+            throw new Error("Accès refusé : vous n'êtes pas le propriétaire de ce bien.");
+        }
+        return property;
+    }
 
     const hasAccess = property.ownerUserId === userId || 
                       property.managedByUserId === userId || 
@@ -68,12 +79,12 @@ export async function ensurePropertyAccess(propertyId: string) {
                     managerId ? { userId: managerId, statut: "ACTIF" } : {}
                 ].filter(c => Object.keys(c).length > 0)
             }
-        })
+        });
         if (!pAccess) {
-            throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.")
+            throw new Error("Accès refusé : Vous n'êtes ni le propriétaire ni le gestionnaire de cette propriété.");
         }
     }
-    return property
+    return property;
 }
 
 /**

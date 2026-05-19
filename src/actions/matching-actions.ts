@@ -10,22 +10,84 @@ export async function getPendingCandidatures() {
     if (!session?.user?.id) return []
 
     try {
+        const fullUser = await prisma.user.findUnique({ 
+            where: { id: session.user.id }, 
+            select: { capaciteActive: true, role: true } 
+        })
+        const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role
+
+        let logementCondition: any = {}
+        if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
+            logementCondition = { ownerUserId: session.user.id }
+        } else {
+            logementCondition = {
+                OR: [
+                    { ownerUserId: session.user.id },
+                    { managedByUserId: session.user.id }
+                ]
+            }
+        }
+
         const candidatures = await prisma.candidature.findMany({
             where: {
                 statut: "SOUMISE",
-                logement: {
-                    managedByUserId: session.user.id
-                }
+                logement: logementCondition
             },
             include: {
                 logement: true,
                 candidat: {
                     include: {
-                        locataireProfile: true
+                        locataireProfile: true,
+                        reliabilityScores: true
                     }
                 }
             },
             orderBy: { scoreQapril: 'desc' }
+        })
+        return candidatures
+    } catch {
+        return []
+    }
+}
+
+export async function getAcceptedCandidatures() {
+    const session = await auth()
+    if (!session?.user?.id) return []
+
+    try {
+        const fullUser = await prisma.user.findUnique({ 
+            where: { id: session.user.id }, 
+            select: { capaciteActive: true, role: true } 
+        })
+        const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role
+
+        let logementCondition: any = {}
+        if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
+            logementCondition = { ownerUserId: session.user.id }
+        } else {
+            logementCondition = {
+                OR: [
+                    { ownerUserId: session.user.id },
+                    { managedByUserId: session.user.id }
+                ]
+            }
+        }
+
+        const candidatures = await prisma.candidature.findMany({
+            where: {
+                statut: "ACCEPTE",
+                logement: logementCondition
+            },
+            include: {
+                logement: true,
+                candidat: {
+                    include: {
+                        locataireProfile: true,
+                        reliabilityScores: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
         })
         return candidatures
     } catch {

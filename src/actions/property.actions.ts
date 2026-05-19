@@ -40,27 +40,39 @@ export async function getProperties() {
         const session = await ensureAuthenticated();
         const userId = session.user.id;
 
-        const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } });
+        const fullUser = await prisma.user.findUnique({ 
+            where: { id: userId }, 
+            select: { agencyConfig: true, capaciteActive: true, role: true } 
+        });
         const managerId = (fullUser?.agencyConfig as any)?.managerId;
+        const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role;
 
-        const orConditions: any[] = [
-            { ownerUserId: userId },
-            { managedByUserId: userId },
-            { leases: { some: { landlordId: userId } } },
-            { accessRoles: { some: { userId: userId, statut: "ACTIF" } } }
-        ];
+        let whereCondition: any;
+        if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
+            whereCondition = { ownerUserId: userId };
+        } else {
+            const orConditions: any[] = [
+                { ownerUserId: userId },
+                { managedByUserId: userId },
+                { leases: { some: { landlordId: userId } } },
+                { accessRoles: { some: { userId: userId, statut: "ACTIF" } } }
+            ];
 
-        if (managerId) {
-            orConditions.push({ managedByUserId: managerId });
-            orConditions.push({ leases: { some: { agentId: managerId } } });
-            orConditions.push({ accessRoles: { some: { userId: managerId, statut: "ACTIF" } } });
+            if (managerId) {
+                orConditions.push({ managedByUserId: managerId });
+                orConditions.push({ leases: { some: { agentId: managerId } } });
+                orConditions.push({ accessRoles: { some: { userId: managerId, statut: "ACTIF" } } });
+            }
+            whereCondition = { OR: orConditions };
         }
 
         const dbProperties = await prisma.property.findMany({
-            where: { OR: orConditions },
+            where: whereCondition,
             include: {
+                annonces: true,
                 units: {
                     include: {
+                        annonces: true,
                         leases: {
                             include: {
                                 tenant: { select: { firstName: true, lastName: true, phone: true } }

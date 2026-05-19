@@ -31,7 +31,9 @@ export async function getDashboardAggregates(userId: string, role: string): Prom
 
             // Determines properties scope based on role logic
             let propertyCondition = {};
-            if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) {
+            if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(role)) {
+                propertyCondition = { ownerUserId: userId };
+            } else if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) {
                 propertyCondition = { managedByUserId: userId };
             } else {
                 propertyCondition = {
