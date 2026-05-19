@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
 import DiasporaClient from "./diaspora-client"
 import { redirect } from "next/navigation"
 
@@ -10,22 +11,28 @@ export default async function DiasporaPage() {
         redirect("/dashboard/login");
     }
 
-    // Mock UserDiasporaProfile data
+    
+    const profile = await prisma.userDiasporaProfile.findUnique({
+        where: { userId: session.user.id }
+    });
+
+    const isSubscribed = !!profile?.diasporaAbonnement;
+
     const mockDiasporaData = {
-        isSubscribed: false, // Set to false to show the subscription landing page
+        isSubscribed: isSubscribed,
         profile: {
-            planSubscription: null,
+            planSubscription: profile?.diasporaAbonnement ? "PREMIUM" : null,
             diasporaContactPerson: "Koné Salif (Oncle)",
             diasporaContactPhone: "+2250700000000",
             diasporaWhatsapp: "+33600000000",
-            paysResidence: "France",
+            paysResidence: profile?.paysResidence || "France",
             fuseauHoraire: "Europe/Paris",
             emailRapportMensuel: session.user.email
         },
-        reports: [
+        reports: isSubscribed ? [
             { id: "REP-04-2026", month: "Avril 2026", status: "DISPONIBLE", url: "#" },
             { id: "REP-03-2026", month: "Mars 2026", status: "DISPONIBLE", url: "#" }
-        ],
+        ] : [],
         manager: {
             name: "Marie-Claire Bamba",
             role: "Gestionnaire Senior QAPRIL",

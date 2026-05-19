@@ -87,8 +87,31 @@ export async function simulateSepaVirement(amount: number, desc?: string) {
     return { success: false, error: "Virement SEPA non disponible dans cette version.", message: "" };
 }
 
-export async function subscribeToDiaspora(formData: any) {
-    return { success: false, error: "Service de souscription non disponible." };
+export async function subscribeToDiaspora(userId: string) {
+    try {
+        await prisma.userDiasporaProfile.upsert({
+            where: { userId },
+            update: { diasporaAbonnement: true },
+            create: {
+                userId,
+                diasporaAbonnement: true,
+                paysResidence: "France",
+                diasporaStripeId: ""
+            }
+        });
+        
+        await logAction({
+            action: "SUBSCRIBE",
+            module: "DIASPORA",
+            entityId: userId
+        });
+
+        revalidatePath("/dashboard/diaspora");
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (e: any) {
+        return { success: false, error: e.message || "Service de souscription non disponible." };
+    }
 }
 
 export async function getDiasporaDashboard() {

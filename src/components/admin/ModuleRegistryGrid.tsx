@@ -123,7 +123,7 @@ const modules = [
         name: "Pack Diaspora", 
         description: "Services premium et supervision des mandats internationaux.", 
         icon: Globe, 
-        status: "beta", 
+        status: "active", 
         href: "/admin/diaspora" 
     },
     { 
