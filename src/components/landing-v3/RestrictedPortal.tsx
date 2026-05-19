@@ -13,7 +13,7 @@ export default function RestrictedPortal() {
 
 
   return (
-    <div className="min-h-screen bg-[#060D1A] flex flex-col relative overflow-hidden font-sans selection:bg-mango/30 selection:text-white">
+    <div className="min-h-screen bg-[#060D1A] flex flex-col relative overflow-hidden font-bodoni selection:bg-mango/30 selection:text-white">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {/* Glow Emerald */}
@@ -101,7 +101,7 @@ export default function RestrictedPortal() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.1]"
-              style={{ fontFamily: '"Outfit", sans-serif' }}
+              style={{ fontFamily: '"Bodoni Moda", "Libre Bodoni", Bodoni, serif' }}
             >
               L'excellence<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8B00] to-yellow-400 font-serif italic font-medium pr-2">

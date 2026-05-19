@@ -106,7 +106,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
   const dashUrl = isAdmin ? "/admin" : (session?.user?.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard");
 
   return (
-    <div className="landing-v2-wrapper font-sans text-ink bg-cream pb-0">
+    <div className="landing-v2-wrapper font-bodoni text-ink bg-cream pb-0">
       <div className="custom-cursor" ref={cursorRef}></div>
       <div className="custom-cursor-ring" ref={ringRef}></div>
       <div className="noise-overlay"></div>
@@ -170,7 +170,7 @@ export default function QaprilLandingV2({ session }: { session: any }) {
       )}
 
       <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap');
       `}} />
 
       {/* ═══ HERO ═══ */}
@@ -207,8 +207,8 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="hero-badge-dot"></div>
               <span>4 800+ utilisateurs actifs</span>
             </div>
-            <h1 style={{ fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif', fontWeight: 900, letterSpacing: '-0.04em' }}>
-              La gestion<br/>locative <span className="accent-mango" style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: 700, paddingRight: '8px', letterSpacing: '-0.02em' }}>enfin</span><br/><span className="accent-sky">simple</span> & digitale
+            <h1 style={{ fontFamily: 'var(--f-display)', fontWeight: 900, letterSpacing: '-0.04em' }}>
+              La gestion<br/>locative <span className="accent-mango" style={{ fontStyle: 'italic', fontWeight: 700, paddingRight: '8px', letterSpacing: '-0.02em' }}>enfin</span><br/><span className="accent-sky">simple</span> & digitale
             </h1>
             <p className="hero-desc">QAPRIL connecte locataires, propriétaires et agences immobilières sur une seule plateforme. Payez votre loyer, gérez vos biens, formalisez vos baux — tout en quelques clics.</p>
             <div className="hero-actions">
