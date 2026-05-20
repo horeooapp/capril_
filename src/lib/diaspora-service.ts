@@ -73,7 +73,7 @@ export class DiasporaService {
       nbActions: actions.length,
       lastActionAt: actions[0]?.createdAt || mandate.createdAt,
       slaStatus: actions.length > 0 ? "RESPECTÉ" : "ALERTE",
-      delaiMoyenHeures: 14, // Simulé
+      delaiMoyenHeures: 0, 
     };
   }
 
@@ -172,10 +172,7 @@ export class DiasporaService {
         slaConfig: 24,
         slaReel: 14
       })),
-      mobileMoney: [
-        { id: "MM-01", provider: "Orange", phone: "+225 07 11 22 33", solde: 320000, active: true },
-        { id: "MM-02", provider: "Wave", phone: "+225 05 44 55 66", solde: 150000, active: true }
-      ],
+      mobileMoney: [], 
       virements: user.propertiesOwned.flatMap(p => p.leases.flatMap(l => l.receipts.map(r => ({
         id: `VIR-${r.id.slice(0,8)}`,
         bien: p.name || p.address || "Propriété",
@@ -186,14 +183,12 @@ export class DiasporaService {
         reference: `RECEP-${r.id.slice(0,8)}`,
         ref: `RECEP-${r.id.slice(0,8)}`,
         date: r.createdAt.toLocaleDateString('fr-FR'),
-        type: "Virement SEPA"
+        type: "Virement"
       })))),
-      webhooks: [
-        { date: new Date().toLocaleString('fr-FR'), op: "Orange Money", emetteur: "+225 07 11 22 33", montant: 320000, bien: "Villa 7", statut: "Quittance émise", ref: "QIT-2026-0341" }
-      ],
+      webhooks: [],
       settings: {
-        iban: user.diasporaProfile?.diasporaStripeId || "FR76 3000 4000 0300 0000 0000 147",
-        banque: "Société Générale",
+        iban: user.diasporaProfile?.diasporaStripeId || "",
+        banque: "Banque de résidence",
         pays: user.diasporaProfile?.paysResidence || "France",
         fuseau: (user.diasporaProfile?.fuseauHoraire || "Africa/Abidjan") || "Europe/Paris",
         devise: currency,

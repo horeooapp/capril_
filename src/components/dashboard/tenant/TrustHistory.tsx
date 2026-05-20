@@ -17,15 +17,10 @@ import {
 } from 'lucide-react';
 import { Badge } from '../agency/Badge';
 
-const mockAccessLogs = [
-  { id: 1, entity: "Agence Akwaba Immobilière", date: "2026-03-22 14:15", action: "Visualisation Score", status: "authorized" },
-  { id: 2, entity: "M. Bakayoko (Bailleur)", date: "2026-03-20 09:30", action: "Demande de Dossier", status: "expired" },
-  { id: 3, entity: "Groupe Convergence", date: "2026-03-18 16:45", action: "Audit ICL", status: "revoked" },
-  { id: 4, entity: "Cabinet Conseil QAPRIL", date: "2026-03-01 11:00", action: "Certification Annuelle", status: "authorized" }
-];
+const demoAccessLogs: any[] = [];
 
 export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
-  const [logs, setLogs] = useState(mockAccessLogs);
+  const [logs, setLogs] = useState(demoAccessLogs);
 
   const revokeAccess = (id: number) => {
     setLogs(logs.map(l => l.id === id ? { ...l, status: 'revoked' } : l));

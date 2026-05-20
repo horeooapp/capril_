@@ -65,7 +65,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             Scannez votre première facture pour activer votre dashboard énergétique et comparer votre consommation avec la moyenne nationale.
           </p>
           <div className="pt-4">
-            <UploadFactureOCR leaseId={leaseId || "LOCATAIRE_SESSION_MOCK"} />
+            <UploadFactureOCR leaseId={leaseId || ""} />
           </div>
         </div>
       </div>
@@ -134,7 +134,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Mois en cours (Estimé)</div>
             <div className="flex items-end gap-2">
                <span className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tighter">
-                  {activeProvider === 'cie' ? "355" : "19.5"}
+                   {hasData ? filteredData[0].val : "0"}
                </span>
                <span className="text-lg font-black text-slate-400 uppercase mb-1">{unit}</span>
             </div>
@@ -147,7 +147,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
          <motion.div variants={itemVariants} className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Coût Prévisionnel</div>
             <div className="flex items-end gap-2">
-               <span className="text-3xl sm:text-4xl font-black text-amber-600 tracking-tighter">27 450</span>
+                <span className="text-3xl sm:text-4xl font-black text-amber-600 tracking-tighter">{hasData ? filteredData[0].cost.toLocaleString() : "0"}</span>
                <span className="text-lg font-black text-slate-400 uppercase mb-1">FCFA</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-[10px] font-bold text-green-600">
@@ -167,7 +167,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                </div>
                <div>
                   <div className="text-lg font-black uppercase tracking-tighter leading-none">Paiement Requis.</div>
-                  <div className="text-[9px] font-black uppercase text-orange-400 mt-1">Echéance : 05 Avril 2026</div>
+                   <div className="text-[9px] font-black uppercase text-orange-400 mt-1">Dernière facture importée</div>
                </div>
             </div>
          </motion.div>
@@ -223,7 +223,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
 
       {/* OCR Scanner Section */}
       <div className="mt-8 mb-8">
-        <UploadFactureOCR leaseId={leaseId || "LOCATAIRE_SESSION_MOCK"} />
+        <UploadFactureOCR leaseId={leaseId || ""} />
       </div>
 
       {/* Invoice List */}

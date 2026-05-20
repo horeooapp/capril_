@@ -35,10 +35,6 @@ export class CinetPayService {
         this.siteId = process.env.CINETPAY_SITE_ID || "";
         this.apiKey = process.env.CINETPAY_API_KEY || "";
         this.isTest = process.env.NEXT_PUBLIC_PAYMENT_MODE === "test" || !this.siteId || !this.apiKey;
-
-        if (this.isTest) {
-            console.log("[CINETPAY] Running in TEST MODE (Simulated)");
-        }
     }
 
     /**
@@ -46,14 +42,6 @@ export class CinetPayService {
      * Returns the payment token and checkout URL
      */
     async initializePayment(data: CinetPayPaymentData) {
-        if (this.isTest) {
-            console.log("[CINETPAY_TEST] Initializing mock payment for:", data.transaction_id);
-            return {
-                success: true,
-                payment_token: "mock_token_" + Math.random().toString(36).substring(7),
-                payment_url: `/dashboard/payments/simulate?tid=${data.transaction_id}&amount=${data.amount}`
-            };
-        }
         try {
             const payload = {
                 apikey: this.apiKey,
@@ -95,16 +83,6 @@ export class CinetPayService {
      * Step 2: Verify Payment Status
      */
     async verifyPayment(transactionId: string) {
-        if (this.isTest) {
-            return {
-                success: true,
-                status: "ACCEPTED",
-                amount: 0,
-                currency: "XOF",
-                operator_id: "SIM_OP_" + Math.random().toString(36).substring(7),
-                payment_method: "MOCK_PAY"
-            };
-        }
         try {
             const payload = {
                 apikey: this.apiKey,

@@ -10,8 +10,8 @@ import { redis } from "./redis";
  * Ensures consistent protection across multiple server instances.
  */
 export async function checkRateLimit(key: string, maxRequests = 10, windowSec = 60): Promise<boolean> {
-    if (!redis || redis.status === 'mock') {
-        // Fallback simple pour le dev
+    if (!redis) {
+        // Fallback simple si Redis indisponible
         return true; 
     }
 

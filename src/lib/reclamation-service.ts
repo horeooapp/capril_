@@ -42,7 +42,7 @@ export class ReclamationService {
     });
 
     // TODO: Notify Landlord via WhatsApp/Email (ADD-09 integration)
-    console.log(`[SMS-MOCK] => Landlord of lease ${data.leaseId} notified via WhatsApp regarding Reclamation ${reclamation.id}`);
+    // Landlord notification to be implemented.
 
     return reclamation;
   }

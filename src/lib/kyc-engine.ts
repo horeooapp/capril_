@@ -16,40 +16,20 @@ export interface KYCDocumentAnalysis {
 }
 
 export async function analyzeIdentityDocument(s3Key: string): Promise<KYCDocumentAnalysis> {
-    // In a real scenario, this would call an OCR/IA API (Google Cloud Vision, AWS Textract)
-    // Here we simulate the AI analysis with predictable outcomes for demonstration
-    
-    // Simulate latency
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Logic to be implemented with real OCR API
 
-    const isFraud = s3Key.toLowerCase().includes("fraud") || s3Key.toLowerCase().includes("fake")
-    const isFail = s3Key.toLowerCase().includes("blur") || s3Key.toLowerCase().includes("fail")
-
-    if (isFraud || isFail) {
-        return {
-            isValid: false,
-            confidence: isFraud ? 0.32 : 0.55,
-            extractedData: {
-                fullName: isFraud ? "DOSSIER SUSPECT" : "NOM ILLISIBLE",
-                docNumber: "XXXXXXXXXXX"
-            },
-            flags: isFraud 
-                ? ["TENTATIVE_FRAUDE", "MRZ_NON_CONFORME", "PIXEL_ANOMALY"]
-                : ["IMAGE_FLOU", "BASSE_RESOLUTION", "CHAMPS_MANQUANTS"]
-        }
-    }
-
-    // Default Success Simulation
+    // Default state when no fraud/blur detected.
+    // Real OCR/IA extraction to be implemented.
     return {
         isValid: true,
-        confidence: 0.99,
+        confidence: 0.0,
         extractedData: {
-            fullName: "Amah Koné",
-            docNumber: "CI" + Math.floor(Math.random() * 1000000000),
-            expiryDate: "2032-06-15",
-            nationality: "CIV"
+            fullName: "",
+            docNumber: "",
+            expiryDate: "",
+            nationality: ""
         },
-        flags: []
+        flags: ["PENDING_HUMAN_VERIFICATION"]
     }
 }
 

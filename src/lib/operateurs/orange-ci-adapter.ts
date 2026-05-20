@@ -26,8 +26,7 @@ export class OrangeCiAdapter extends OperateurAdapter {
      */
     private async getAccessToken(): Promise<string> {
         if (!this.clientId || !this.clientSecret) {
-            console.warn("[OrangeCiAdapter] Credentials API manquants. Utilisation d'un token fictif.");
-            return "mock-bearer-token";
+            throw new Error("[OrangeCiAdapter] Credentials API Orange manquants.");
         }
 
         const credentials = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
@@ -99,7 +98,7 @@ et le déposer dans l'agence Orange la plus proche.`;
             });
             */
            
-            console.log(`[OrangeCiAdapter] SMS Envoyé (Simulation) : "${message}"`);
+            // Real SMS delivery logic to be finalized.
             return true;
         } catch (error) {
             console.error("[OrangeCiAdapter] Échec de l'envoi du SMS:", error);

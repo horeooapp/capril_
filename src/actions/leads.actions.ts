@@ -20,7 +20,7 @@ export async function capturerLead(data: {
     data: { ...data, statut: "NOUVEAU" }
   });
   // TODO : notifier equipe commerciale QAPRIL sur WhatsApp
-  console.log(`[SALES-MOCK] => Notifying QAPRIL Sales team for new lead: ${data.telephone} (Profil: ${data.profilDeclare})`);
+  // TODO: Notifier l'équipe commerciale QAPRIL via WhatsApp API (WhatsApp Business Cloud API)
   return { success: true, lead, duplicate: false };
 }
 

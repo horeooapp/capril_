@@ -27,7 +27,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
   const [selectedTypes, setSelectedTypes] = useState<string[]>(["WATER", "ELEC"]);
 
   const totalCollected = provision * 12;
-  const totalExpenses = 485000; // Mock real expenses
+  const totalExpenses = 0; 
   const delta = totalCollected - totalExpenses;
 
   return (

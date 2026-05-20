@@ -118,12 +118,12 @@ export async function POST(req: Request) {
              return NextResponse.json({ error: "L'IA n'a pas pu identifier le montant. Votre facture est peut-être floue. Veuillez utiliser la saisie manuelle." }, { status: 400 });
         }
         
-        const mockInvoiceUrl = `/uploads/${typeUtility.toLowerCase()}-${Date.now()}.pdf`;
+        const invoiceUrl = `/uploads/${typeUtility.toLowerCase()}-${Date.now()}.pdf`;
 
         let facture = null;
 
         // 3. Optionnel : Si leaseId est fourni, pré-créer la facture
-        if (leaseId && leaseId !== "LOCATAIRE_SESSION_MOCK") {
+        if (leaseId) {
             facture = await prisma.factureUtility.create({
                 data: {
                     leaseId,
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
                     statut: "EN_COURS",
                     source: `OCR_${method}` as any,
                     modeUtilities: "INDIVIDUEL_LOCATAIRE" as any,
-                    invoiceUrl: mockInvoiceUrl
+                    invoiceUrl: invoiceUrl
                 }
             });
         }
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
                 amount: extractedAmount,
                 dueDate: dueDate.toISOString(),
                 confidence: confidence,
-                invoiceUrl: mockInvoiceUrl,
+                invoiceUrl: invoiceUrl,
                 factureId: facture?.id
             }
         });

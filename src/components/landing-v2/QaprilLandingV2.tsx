@@ -239,26 +239,26 @@ export default function QaprilLandingV2({ session }: { session: any }) {
             <div className="deco-ring deco-ring-2"></div>
             <div className="deco-dot-grid"></div>
             <div className="hero-phone-wrap">
-              <div className="hero-mockup">
-                <div className="mock-status">
-                  <div className="mock-logo">QAPRIL</div>
-                  <div className="mock-avatar">KA</div>
+              <div className="hero-demo-ui">
+                <div className="demo-status">
+                  <div className="demo-logo">QAPRIL</div>
+                  <div className="demo-avatar">KA</div>
                 </div>
-                <div className="mock-body">
-                  <div className="mock-greet">Bonjour 👋</div>
-                  <div className="mock-name">Konan Adjoa</div>
-                  <div className="mock-pay-card">
-                    <div className="mock-pay-label">Loyer mai 2025 dû</div>
-                    <div className="mock-pay-amount">85 000 FCFA</div>
-                    <div className="mock-pay-btn">Payer maintenant →</div>
+                <div className="demo-body">
+                  <div className="demo-greet">Bonjour 👋</div>
+                  <div className="demo-name">Utilisateur QAPRIL</div>
+                  <div className="demo-pay-card">
+                    <div className="demo-pay-label">Loyer en cours</div>
+                    <div className="demo-pay-amount">--- FCFA</div>
+                    <div className="demo-pay-btn">Payer maintenant →</div>
                   </div>
-                  <div className="mock-stats">
-                    <div className="mock-stat"><div className="mock-stat-val">14</div><div className="mock-stat-lbl">Mois payés</div></div>
-                    <div className="mock-stat"><div className="mock-stat-val" style={{ color: 'var(--lime-d)' }}>72 pts</div><div className="mock-stat-lbl">Score ICL</div></div>
+                  <div className="demo-stats">
+                    <div className="demo-stat"><div className="demo-stat-val">--</div><div className="demo-stat-lbl">Mois payés</div></div>
+                    <div className="demo-stat"><div className="demo-stat-val" style={{ color: 'var(--lime-d)' }}>-- pts</div><div className="demo-stat-lbl">Score ICL</div></div>
                   </div>
-                  <div className="mock-notif">
-                    <div className="mock-notif-icon" style={{ background: 'var(--teal)' }}>✓</div>
-                    <div className="mock-notif-text"><strong>Quittance avril reçue</strong><br/>REC-2025-04-0089 · PDF</div>
+                  <div className="demo-notif">
+                    <div className="demo-notif-icon" style={{ background: 'var(--teal)' }}>✓</div>
+                    <div className="demo-notif-text"><strong>Notification système</strong><br/>Nouvelle mise à jour disponible</div>
                   </div>
                 </div>
               </div>

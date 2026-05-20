@@ -18,28 +18,25 @@ export default async function DiasporaPage() {
 
     const isSubscribed = !!profile?.diasporaAbonnement;
 
-    const mockDiasporaData = {
+    const diasporaData = {
         isSubscribed: isSubscribed,
         profile: {
             planSubscription: profile?.diasporaAbonnement ? "PREMIUM" : null,
-            diasporaContactPerson: "Koné Salif (Oncle)",
-            diasporaContactPhone: "+2250700000000",
-            diasporaWhatsapp: "+33600000000",
-            paysResidence: profile?.paysResidence || "France",
-            fuseauHoraire: "Europe/Paris",
-            emailRapportMensuel: session.user.email
+            diasporaContactPerson: "Non renseigné",
+            diasporaContactPhone: "Non renseigné",
+            diasporaWhatsapp: profile?.diasporaWhatsapp || "Non renseigné",
+            paysResidence: profile?.paysResidence || "Inconnu",
+            fuseauHoraire: profile?.fuseauHoraire || "Africa/Abidjan",
+            emailRapportMensuel: profile?.emailRapportMensuel || session.user.email
         },
-        reports: isSubscribed ? [
-            { id: "REP-04-2026", month: "Avril 2026", status: "DISPONIBLE", url: "#" },
-            { id: "REP-03-2026", month: "Mars 2026", status: "DISPONIBLE", url: "#" }
-        ] : [],
+        reports: [], // To be implemented with real reports storage
         manager: {
-            name: "Marie-Claire Bamba",
-            role: "Gestionnaire Senior QAPRIL",
+            name: "Service Client QAPRIL",
+            role: "Dédié Diaspora",
             phone: "+2250500000001",
-            photo: "https://i.pravatar.cc/150?u=marie"
+            photo: "/images/avatars/manager-diaspora.png"
         }
     };
 
-    return <DiasporaClient data={mockDiasporaData} />
+    return <DiasporaClient data={diasporaData} />
 }

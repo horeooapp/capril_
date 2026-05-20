@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
 import VaultClient from "./vault-client"
 import { redirect } from "next/navigation"
 
@@ -10,40 +11,38 @@ export default async function VaultPage() {
         redirect("/dashboard/login");
     }
 
-    // Mock VaultCaution data
-    const mockVaultData = {
-        totalSecuredFcfa: 4500000,
-        totalPendingFcfa: 750000,
-        cautions: [
-            {
-                id: "VAULT-001",
-                locataire: "Kouadio Jean",
-                bien: "Appartement 3 Pièces - Riviera Palmeraie",
-                montant: 400000,
-                status: "CONSIGNEE",
-                hash: "0x8f2a...391c",
-                dateConsignation: "2025-10-12"
-            },
-            {
-                id: "VAULT-002",
-                locataire: "Bamba Ali",
-                bien: "Studio - Angré",
-                montant: 150000,
-                status: "A_TRANSFERER",
-                hash: null,
-                dateConsignation: null
-            },
-            {
-                id: "VAULT-003",
-                locataire: "Société SGE",
-                bien: "Villa Duplex - Cocody",
-                montant: 3950000,
-                status: "CONSIGNEE",
-                hash: "0x3a1f...9b22",
-                dateConsignation: "2026-01-05"
+    // Fetch real Vault/CDC data
+    const properties = await prisma.property.findMany({
+        where: { ownerUserId: session.user.id },
+        include: {
+            leases: {
+                include: {
+                    tenant: true,
+                    cdcDeposits: true
+                }
             }
-        ]
+        }
+    });
+
+    const allDeposits = properties.flatMap(p => 
+        p.leases.flatMap(l => 
+            l.cdcDeposits.map((d: any) => ({
+                id: d.id,
+                locataire: `${l.tenant?.firstName} ${l.tenant?.lastName}`,
+                bien: p.name,
+                montant: d.amount,
+                status: d.status,
+                hash: d.proofHash,
+                dateConsignation: d.consignedAt ? d.consignedAt.toISOString() : null
+            }))
+        )
+    );
+
+    const vaultData = {
+        totalSecuredFcfa: allDeposits.reduce((sum: number, d: any) => sum + (d.status === 'CONSIGNED' ? d.montant : 0), 0),
+        totalPendingFcfa: allDeposits.reduce((sum: number, d: any) => sum + (d.status === 'PENDING' || d.status === 'AWAITING_PAYMENT' ? d.montant : 0), 0),
+        cautions: allDeposits
     };
 
-    return <VaultClient data={mockVaultData} />
+    return <VaultClient data={vaultData} />
 }

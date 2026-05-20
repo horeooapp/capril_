@@ -154,27 +154,6 @@ const RCL = [
    travaux:true, types:["Fuite d'eau / plomberie","Électricité défectueuse","Peinture / humidité / moisissures","Menuiserie (portes, fenêtres)","Climatisation / ventilation","Nuisibles / désinsectisation","Autre"]},
 ];
 
-const TICKET_ACTIF_MOCK = {
-  id:"TKT-002",code:"RCL-02",label:"Loyer Mars 2026 payé — quittance manquante",
-  date:"20/03/2026 · 10h23",heures:38,echeance:"26/03/2026 · 10h23",montant:150000,
-  timeline:[
-    {h:"20/03 · 10h23",evt:"Ticket soumis par le locataire",icon:"📋",c:T.textLight},
-    {h:"20/03 · 10h24",evt:"Bailleur notifié — SMS + WhatsApp + Dashboard QAPRIL",icon:"📲",c:T.teal},
-    {h:"20/03 · 10h24",evt:"Délai 144h démarré — expiration le 26/03 à 10h23",icon:"⏳",c:T.orange},
-  ],
-};
-const TICKET_RESOLU_MOCK = {
-  id:"TKT-001",code:"RCL-02",label:"Paiement encaissé sans quittance",
-  date:"15/02/2026",statut:"Résolu",color:T.green,montant:150000,delai:"144h",
-  resolution:"Bailleur a répondu dans le délai · Quittance QIT-2026-0155 émise",
-  timeline:[
-    {h:"15/02 · 10h23",evt:"Ticket soumis",icon:"📋",c:T.textLight},
-    {h:"15/02 · 10h24",evt:"Bailleur notifié — SMS + WhatsApp + Dashboard",icon:"📲",c:T.teal},
-    {h:"15/02 · 16h45",evt:"Bailleur a confirmé le paiement",icon:"✅",c:T.green},
-    {h:"15/02 · 16h47",evt:"Quittance QIT-2026-0155 certifiée SHA-256 émise",icon:"🧾",c:T.green},
-    {h:"15/02 · 16h47",evt:"Ticket fermé en faveur du locataire",icon:"🔒",c:T.green},
-  ],
-};
 
 const TABS=[{id:"dash",icon:"🏠",label:"Accueil"},{id:"bail",icon:"📋",label:"Mon bail"},{id:"quitt",icon:"🧾",label:"Quittances"},{id:"util",icon:"⚡",label:"CIE/SODECI"},{id:"manual",icon:"📖",label:"Manuel"},{id:"droits",icon:"⚖️",label:"Mes droits"},{id:"profil",icon:"👤",label:"Profil"}];
 

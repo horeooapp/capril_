@@ -16,14 +16,10 @@ import {
 } from 'lucide-react';
 import { Badge } from './Badge';
 
-const mockRclTickets = [
-  { id: 1, property: "Résidence Azur A12", tenant: "M. Kouassi", hoursLeft: 24, status: "critical", amount: "+15,000 FCFA" },
-  { id: 2, property: "Villa Cocody 04", tenant: "Mme. Traoré", hoursLeft: 98, status: "warning", amount: "+25,000 FCFA" },
-  { id: 3, property: "Appartement Plateau", tenant: "M. Diop", hoursLeft: 130, status: "safe", amount: "+10,000 FCFA" }
-];
+const demoRclTickets: any[] = [];
 
 export const RclMonitor: React.FC = () => {
-  const [tickets, setTickets] = useState(mockRclTickets);
+  const [tickets, setTickets] = useState(demoRclTickets);
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [globalThreshold, setGlobalThreshold] = useState(144);
 

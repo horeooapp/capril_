@@ -89,6 +89,7 @@ export default function LocatairePortalWrapper() {
 
   // Prepare abos mapping defensively
   const apiAbos = data.abos || {};
+  const currentMonth = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   const abos = [
     {
       id: 'cie',
@@ -99,10 +100,10 @@ export default function LocatairePortalWrapper() {
       bg: '#FFF3E0',
       compteur: data.bail.cie || 'N/A',
       montant: apiAbos.cieAmount || 0,
-      statut: 'Payée',
-      mois: 'Mars 2026',
-      mode: 'Orange Money',
-      hist: [24, 27.5, 26, 28.5, null]
+      statut: apiAbos.cieAmount > 0 ? 'Payée' : 'Aucune facture',
+      mois: currentMonth,
+      mode: 'Mobile Money',
+      hist: apiAbos.cieHist || []
     },
     {
       id: 'sodeci',
@@ -113,10 +114,10 @@ export default function LocatairePortalWrapper() {
       bg: '#E0F4F9',
       compteur: data.bail.sodeci || 'N/A',
       montant: apiAbos.sodeciAmount || 0,
-      statut: 'Payée',
-      mois: 'Mars 2026',
-      mode: 'Wave',
-      hist: [8.1, 8.6, 8.8, 9.2, null]
+      statut: apiAbos.sodeciAmount > 0 ? 'Payée' : 'Aucune facture',
+      mois: currentMonth,
+      mode: 'Mobile Money',
+      hist: apiAbos.sodeciHist || []
     }
   ];
 

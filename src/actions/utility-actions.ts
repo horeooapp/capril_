@@ -133,8 +133,6 @@ export async function scanUtilityBillOCR(formData: FormData) {
 
     const Tesseract = require('tesseract.js');
     
-    // Convert logic or basic call to Tesseract
-    // For PDFs this would ideally rasterize first, but Tesseract handles common image formats.
     const { data: { text } } = await Tesseract.recognize(
       buffer,
       'fra', 
@@ -143,10 +141,7 @@ export async function scanUtilityBillOCR(formData: FormData) {
 
     console.log("[OCR_RESULT_RAW]", text);
 
-    // Heuristique simple pour trouver le montant à payer
-    // Cherche des patterns comme "Net à payer : 85 000" ou "Total : 12.500"
     let montantTrouve = 0;
-    let confidence = "0%";
 
     const regexMontant = /(?:net|total)[^0-9]*?(?:a|à)?\s*(?:payer)?\s*[:=\s]*([0-9\s]+(?:[.,][0-9]{1,2})?)/i;
     const match = text.match(regexMontant);
@@ -154,14 +149,11 @@ export async function scanUtilityBillOCR(formData: FormData) {
     if (match && match[1]) {
       const montantStr = match[1].replace(/\s+/g, '').replace(',', '.');
       montantTrouve = parseFloat(montantStr);
-      confidence = "92%"; // Mock confidence
     } else {
-      // Fallback: finding the largest monetary-looking number near keywords
       const allNumbers = text.match(/\b\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{1,2})?\b/g);
       if (allNumbers) {
          const numericVals = allNumbers.map((n: string) => parseFloat(n.replace(/\s+/g, '').replace(',', '.'))).filter((n: number) => !isNaN(n));
          if (numericVals.length > 0) montantTrouve = Math.max(...numericVals);
-         confidence = "75%";
       }
     }
 
@@ -169,7 +161,6 @@ export async function scanUtilityBillOCR(formData: FormData) {
       return { error: "L'IA n'a pas pu identifier le montant avec certitude. Veuillez resaisir manuellement." };
     }
 
-    // Write audit Log
     await writeAuditLog({
       userId: session.user.id,
       action: "UTILITY_BILL_SCANNED_OCR",
@@ -181,8 +172,7 @@ export async function scanUtilityBillOCR(formData: FormData) {
     return { 
       success: true, 
       montant: montantTrouve, 
-      confidence,
-      texteExtrait: text.substring(0, 500) // snippet for debugging
+      texteExtrait: text.substring(0, 500)
     };
 
   } catch (error: any) {
@@ -213,7 +203,7 @@ export async function createManualUtilityBill(data: {
         acteurId: session.user.id,
         roleActeur: roleActeur,
         typeUtility: data.typeUtility,
-        identifiantCompteur: data.identifiantCompteur || `MANUAL-${Math.floor(Math.random() * 99999)}`,
+        identifiantCompteur: data.identifiantCompteur || `COMPT-${Date.now()}`,
         moisFacture: new Date().toISOString().slice(0, 7),
         montantTotal: data.montantTotal,
         dateLimitePaiement: data.dateLimitePaiement,

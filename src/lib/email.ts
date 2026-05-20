@@ -20,11 +20,10 @@ export async function sendEmail({
   subject: string;
   html: string;
   attachments?: any[];
-}): Promise<{ success: boolean; provider?: string; data?: any; error?: any; mock?: boolean }> {
+}): Promise<{ success: boolean; provider?: string; data?: any; error?: any }> {
   console.log(`[Email] Attempting to send to ${to}: ${subject}`);
   
   const from = process.env.EMAIL_FROM || "noreply@qapril.net";
-  const useMock = process.env.ENABLE_EMAIL_MOCK === 'true';
   const resend = getResend();
   const smtpUrl = process.env.EMAIL_SERVER;
 
@@ -37,7 +36,7 @@ export async function sendEmail({
   };
 
   // 1. Try Resend if configured
-  if (resend && !useMock) {
+  if (resend) {
     try {
       console.log(`[Email] Trying Resend provider (10s timeout)...`);
       const result = await withTimeout(resend.emails.send({
@@ -62,7 +61,7 @@ export async function sendEmail({
   }
 
   // 2. Fallback to SMTP if configured
-  if (smtpUrl && !useMock) {
+  if (smtpUrl) {
     try {
       console.log(`[Email] Fallback to SMTP provider (10s timeout)...`);
       
@@ -103,12 +102,7 @@ export async function sendEmail({
     }
   }
 
-  // 3. Final Fallback to MOCK/LOG (only in dev/test or if explicitly enabled)
-  if (useMock || (!resend && !smtpUrl)) {
-    console.warn(`[Email] All providers unavailable or Mock Enabled. Logging to console.`);
-    console.log(`[Email] MOCK DELIVERY to ${to}: ${subject}`);
-    return { success: true, mock: true };
-  }
+  // No more fallbacks
 
   return { success: false, error: "No email provider available or configured" };
 }

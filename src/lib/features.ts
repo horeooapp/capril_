@@ -77,7 +77,7 @@ export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
 
   try {
     // 2. Try Redis (Distributed cache)
-    if (redis && redis.status !== 'mock') {
+    if (redis) {
       const cached = await redis.get(REDIS_KEY);
       if (cached) {
         featuresCache = JSON.parse(cached);
@@ -113,7 +113,7 @@ export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
     lastFetch = now;
 
     // 4. Update Redis
-    if (redis && redis.status !== 'mock') {
+    if (redis) {
       await redis.set(REDIS_KEY, JSON.stringify(newCache), "EX", 60); // 60s global TTL
     }
 

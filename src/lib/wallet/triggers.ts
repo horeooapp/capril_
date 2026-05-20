@@ -160,8 +160,8 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
   if (user?.walletRechargeConfig?.canalPrefere === "SMS") {
     await sendSMS(user.phone || "", message);
   } else {
-    // Par défaut WhatsApp (Mock implementation for now)
-    console.log(`[WHATSAPP 2026] Envoyer à ${user.phone}: ${message}`);
+    // WhatsApp: see TODO above for WhatsApp Business Cloud API integration
+    // TODO: Envoyer via WhatsApp Business Cloud API - à implémenter
   }
   
   // 4. Mettre à jour les stats de rappel

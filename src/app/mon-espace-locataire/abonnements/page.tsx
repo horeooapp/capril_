@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
 import { getTenantDashboard } from "@/actions/tenant-actions"
 import AbonnementsClient from "./abonnements-client"
 import { redirect } from "next/navigation"
@@ -17,15 +18,11 @@ export default async function TenantAbonnementsPage() {
         redirect("/mon-espace-locataire");
     }
 
-    // Mocking existing subscriptions for demo
-    const mockAbonnements = [
-        {
-            id: "DOS-94182",
-            operateur: "ORANGE",
-            statut: "DOSSIER_GENERE", // BROUILLON, DOSSIER_GENERE, ACTIF
-            date: "2026-04-22"
-        }
-    ];
+    // Fetch real subscriptions from DB
+    const abonnements = await prisma.abonnementOperateur.findMany({
+        where: { leaseId: dashboard.lease.id },
+        orderBy: { createdAt: "desc" }
+    });
 
-    return <AbonnementsClient lease={dashboard.lease} abonnements={mockAbonnements} />
+    return <AbonnementsClient lease={dashboard.lease} abonnements={abonnements} />
 }

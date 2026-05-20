@@ -14,28 +14,11 @@ export class UtilityService {
    * Tunnel Mobile Money (UTL-02)
    */
   static async consulterFacture(identifiant: string, type: any): Promise<BillInfo | null> {
-    const operators = ["ORANGE", "MTN", "MOOV", "WAVE"];
-    for (const op of operators) {
-      try {
-        const info = await this.mockApiConsultation(op, identifiant, type);
-        if (info) return info;
-      } catch (e) {
-        console.warn(`[UTILITY_TUNNEL] ${op} failed:`, e);
-      }
-    }
+    // Note: Real operator integration should be implemented here.
+    // For now, returning null since mock has been removed.
     return null;
   }
 
-  private static async mockApiConsultation(operator: string, identifiant: string, type: any): Promise<BillInfo | null> {
-    if (identifiant.endsWith("000")) return null; 
-    return {
-      identifiantCompteur: identifiant,
-      moisFacture: new Date(),
-      montantTotal: 15000 + Math.floor(Math.random() * 20000),
-      dateLimitePaiement: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-      source: `API_${operator}`,
-    };
-  }
 
   /**
    * Création et Répartition de facture (UTL-04)

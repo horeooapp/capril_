@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
 import { getProperties } from "@/actions/property.actions"
 import UtilitiesClient from "./utilities-client"
 import { redirect } from "next/navigation"
@@ -15,21 +16,36 @@ export default async function UtilitiesPage() {
     // Filter properties that have units (Cour commune, Immeuble, Residence)
     const multiUnitProps = properties.filter((p: any) => p.typeStructure !== "INDEPENDANT");
 
-    // Fetch existing factures (Placeholder for now, will implement DB fetch later)
-    const mockFactures = [
-        {
-            id: "FAC-001",
-            type: "CIE",
-            montantGlobal: 45000,
-            mois: "Avril 2026",
-            property: { name: "Cour Commune Riviera" },
-            status: "EN_ATTENTE", // EN_ATTENTE, REPARTIE, PAYEE
-            repartitions: [
-                { locataireName: "Koné Kassoum", montant: 15000, status: "PAYEE" },
-                { locataireName: "Bamba Ali", montant: 30000, status: "EN_ATTENTE" }
-            ]
-        }
-    ];
+    // Fetch real factures
+    const propertyIds = multiUnitProps.map((p: any) => p.id);
+    const factures = await prisma.factureUtility.findMany({
+        where: { lease: { propertyId: { in: propertyIds } } },
+        include: {
+            lease: {
+                include: {
+                    tenant: true,
+                    repartitionsUtilities: {
+                        include: { locataire: true }
+                    }
+                }
+            }
+        },
+        orderBy: { createdAt: "desc" }
+    });
 
-    return <UtilitiesClient properties={multiUnitProps} initialFactures={mockFactures} />
+    const initialFactures = factures.map((f: any) => ({
+        id: f.id,
+        type: f.typeUtility,
+        montantGlobal: f.montantTotal,
+        mois: f.moisFacture, // moisFacture is String in schema
+        property: { name: f.lease.property?.name || "N/A" },
+        status: f.statut || "EN_COURS",
+        repartitions: f.repartitionsUtilities?.map((r: any) => ({
+            locataireName: `${r.locataire?.firstName} ${r.locataire?.lastName}`,
+            montant: r.montantQuotePart,
+            status: r.statutPaiement
+        })) || []
+    }));
+
+    return <UtilitiesClient properties={multiUnitProps} initialFactures={initialFactures} />
 }

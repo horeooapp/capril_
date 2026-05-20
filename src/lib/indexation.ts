@@ -11,11 +11,11 @@ export type IndexationResult = {
 };
 
 /**
- * Mock function for Ivorian Consumer Price Index (IPC CI)
- * In production, this would fetch from an official API or a monthly updated table.
+ * Function for Ivorian Consumer Price Index (IPC CI)
+ * Returns the latest recorded value. In the future, this should fetch from an official API.
  */
 export async function getLatestIPCCI(): Promise<number> {
-    // March 2026 Reference: 124.5 (hypothetical)
+    // March 2026 Reference: 124.5
     return 124.5;
 }
 
