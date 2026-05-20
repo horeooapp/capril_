@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Building2, ShieldCheck, Users, ArrowLeft, Plus } from "lucide-react"
 import InviteManagerForm from "@/components/properties/InviteManagerForm"
 import ManagersList from "@/components/properties/ManagersList"
+import PropertyImageGallery from "@/components/properties/PropertyImageGallery"
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -60,6 +61,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Left: Stats & Info */}
                 <div className="lg:col-span-1 space-y-6">
+                    <PropertyImageGallery images={property.images || []} />
+
                     <div className="glass-panel p-8 rounded-[2rem] border-white/60 shadow-xl">
                         <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Résumé Actif</h3>
                         <div className="space-y-4">

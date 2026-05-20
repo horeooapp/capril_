@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { Image as ImageIcon, X, Upload, Home, Building2, MapPin } from "lucide-react"
 import { creerBien, getMyParentStructures, TypeStructure } from "@/actions/property.actions"
 
 export default function NewPropertyClient() {
@@ -19,6 +20,36 @@ export default function NewPropertyClient() {
     const [selectedParentId, setSelectedParentId] = useState<string>("")
     const [isLoadingParents, setIsLoadingParents] = useState(false)
 
+    // Image Upload State
+    const [images, setImages] = useState<File[]>([])
+    const [previews, setPreviews] = useState<string[]>([])
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || [])
+        if (images.length + files.length > 5) {
+            setError("Le nombre maximum d'images est de 5.")
+            return
+        }
+
+        const newImages = [...images, ...files]
+        setImages(newImages)
+
+        const newPreviews = files.map(file => URL.createObjectURL(file))
+        setPreviews([...previews, ...newPreviews])
+        setError("")
+    }
+
+    const removeImage = (index: number) => {
+        const newImages = [...images]
+        newImages.splice(index, 1)
+        setImages(newImages)
+
+        const newPreviews = [...previews]
+        URL.revokeObjectURL(newPreviews[index])
+        newPreviews.splice(index, 1)
+        setPreviews(newPreviews)
+    }
+
     useEffect(() => {
         if (structureCategory === 'ENFANT') {
             setIsLoadingParents(true)
@@ -34,44 +65,11 @@ export default function NewPropertyClient() {
         setError("")
 
         const formData = new FormData(e.currentTarget)
-        const name = formData.get("name") as string
-        const unitLabel = formData.get("unitLabel") as string
-        const parentId = structureCategory === 'ENFANT' ? (formData.get("parentPropertyId") as string) : undefined
-
-        // Determine correct typeStructure
-        let finalTypeStructure: TypeStructure = 'INDEPENDANT';
-        if (structureCategory === 'PARENT') {
-            finalTypeStructure = formData.get("parentType") as TypeStructure;
-        } else if (structureCategory === 'ENFANT') {
-            // Find parent and inherit its typeStructure, or define ENFANT structure
-            // Wait, "typeStructure" in creerBien represents the CURRENT property's structure.
-            // If it's an infant, the user prompt states the ENFANT ALSO has typeStructure?
-            // "Type selectionne : Appartement (enfant imm) -> parentType = IMMEUBLE".
-            // Actually, for an enfant, typeStructure in DB is IMMEUBLE, but it has a parent.
-            // "TypeStructure: INDEPENDANT | COUR_COMMUNE | IMMEUBLE | RESIDENCE"
-            // If I create an Apt in an IMMEUBLE, the apt is also an IMMEUBLE but with parentPropertyId != null.
-            const parent = parents.find(p => p.id === parentId);
-            finalTypeStructure = parent?.typeStructure || 'INDEPENDANT';
-        }
-
-        const data = {
-            typeStructure: finalTypeStructure,
-            name: structureCategory !== 'ENFANT' ? name : undefined,
-            unitLabel: structureCategory === 'ENFANT' ? unitLabel : undefined,
-            parentPropertyId: parentId,
-            commune: formData.get("commune") as string,
-            address: formData.get("addressLine1") as string,
-            propertyType: (formData.get("propertyType") as string) || (finalTypeStructure === 'INDEPENDANT' ? 'STUDIO' : 'APARTMENT'),
-            declaredRentFcfa: parseInt(formData.get("rent") as string) || undefined,
-            superficieM2: parseFloat(formData.get("area") as string) || undefined,
-
-            // Bulk Creation Fields
-            nbUnits: structureCategory === 'PARENT' ? (parseInt(formData.get("nbUnits") as string) || 0) : 0,
-            unitRent: structureCategory === 'PARENT' ? (parseInt(formData.get("unitRent") as string) || 0) : 0,
-        }
+        // Add images to formData
+        images.forEach(img => formData.append("images", img))
 
         startTransition(async () => {
-            const result: any = await creerBien(data as any)
+            const result: any = await creerBien(formData)
             if (result?.error) {
                 setError(result.error)
             } else {
@@ -265,6 +263,48 @@ export default function NewPropertyClient() {
                                     </div>
                                 </>
                             )}
+                        </div>
+
+                        {/* --- PHOTO UPLOAD --- */}
+                        <div className="space-y-4">
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider">
+                                Photos du bien (Max 5)
+                            </label>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {previews.map((preview, index) => (
+                                    <div key={index} className="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm group">
+                                        <img src={preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeImage(index)}
+                                            title="Supprimer l'image"
+                                            className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full text-red-500 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                        {index === 0 && (
+                                            <div className="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[8px] font-black uppercase tracking-widest py-1.5 text-center">
+                                                Photo principale
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {images.length < 5 && (
+                                    <label className="aspect-square border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#FF8200] hover:bg-orange-50/30 transition-all text-gray-400 hover:text-orange-600 group">
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            multiple 
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
+                                        <Upload size={24} className="group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Ajouter</span>
+                                    </label>
+                                )}
+                            </div>
                         </div>
 
                         <div className="pt-6">

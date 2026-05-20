@@ -101,28 +101,32 @@ export async function getProperties() {
     }
 }
 
-/**
- * [PRP-02] Créé un bien avec support de la hiérarchie et bulk creation
- */
-export async function creerBien(data: {
-  ownerUserId?:      string;
-  typeStructure:     TypeStructure;
-  name?:             string;
-  unitLabel?:        string;
-  parentPropertyId?: string;
-  commune:           string;
-  address:           string;
-  propertyType:      string;
-  declaredRentFcfa?: number;
-  superficieM2?:     number;
-  nbUnits?:          number;
-  unitRent?:         number;
-  leaseType?:        'residential' | 'commercial';
-}) {
+import { savePhysicalFile } from "@/lib/storage";
+
+export async function creerBien(formData: FormData) {
   try {
     const session = await ensureAuthenticated();
-    const ownerUserId = data.ownerUserId || session.user.id;
+    const ownerUserId = (formData.get("ownerUserId") as string) || session.user.id;
+    
+    const data = {
+        typeStructure: formData.get("typeStructure") as TypeStructure,
+        name: formData.get("name") as string,
+        unitLabel: formData.get("unitLabel") as string,
+        parentPropertyId: formData.get("parentPropertyId") as string,
+        commune: formData.get("commune") as string,
+        address: formData.get("addressLine1") as string || formData.get("address") as string,
+        propertyType: formData.get("propertyType") as string,
+        declaredRentFcfa: parseInt(formData.get("rent") as string) || 0,
+        superficieM2: parseFloat(formData.get("area") as string) || undefined,
+        nbUnits: parseInt(formData.get("nbUnits") as string) || 0,
+        unitRent: parseInt(formData.get("unitRent") as string) || 0,
+        leaseType: (formData.get("leaseType") as any) || "residential",
+    }
+
     const { typeStructure, unitLabel, parentPropertyId, nbUnits, unitRent } = data;
+    
+    // Get images from formData
+    const imageFiles = formData.getAll("images") as File[];
 
     // Checks PRO/AGENCY
     const isPro = ['AGENCY', 'LANDLORD_PRO'].includes(session.user.role as any);
@@ -179,11 +183,32 @@ export async function creerBien(data: {
           address:          data.address || inheritedData.address,
           leaseType:        data.leaseType || inheritedData.leaseType || "residential",
           propertyType:     data.propertyType,
-          declaredRentFcfa: data.declaredRentFcfa || (nbUnits && unitRent ? nbUnits * unitRent : undefined),
+          declaredRentFcfa: data.declaredRentFcfa,
           superficieM2:     data.superficieM2,
           status:           "active"
         }
       });
+
+      // 5b. Gestion des images
+      if (imageFiles && imageFiles.length > 0) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          if (file && file.size > 0) {
+            try {
+              const url = await savePhysicalFile(file, "properties");
+              await tx.propertyImage.create({
+                data: {
+                  propertyId: bien.id,
+                  s3Key: url,
+                  isMain: i === 0
+                }
+              });
+            } catch (err) {
+              console.error("Failed to save image:", err);
+            }
+          }
+        }
+      }
 
       // 6. Bulk creation si nécessaire
       if (nbUnits && nbUnits > 0 && typeStructure !== 'INDEPENDANT') {
@@ -226,7 +251,10 @@ export async function getPropertyById(id: string) {
         await ensurePropertyAccess(id);
         const property = await prisma.property.findUnique({
             where: { id },
-            include: { leases: { include: { tenant: { select: { firstName: true, lastName: true, phone: true } } } } }
+            include: { 
+                images: true,
+                leases: { include: { tenant: { select: { firstName: true, lastName: true, phone: true } } } } 
+            }
         });
         return property ? serializeProperty(property) : null;
     } catch (error) {
