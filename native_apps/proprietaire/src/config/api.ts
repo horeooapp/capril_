@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://www.qapril.ci';
+export const BASE_URL = 'https://www.qapril.net';
 
 export const API_ENDPOINTS = {
   BASE_URL,

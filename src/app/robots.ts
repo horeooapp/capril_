@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/dashboard/', '/mon-espace-locataire/'],
     },
-    sitemap: 'https://www.qapril.ci/sitemap.xml',
+    sitemap: 'https://www.qapril.net/sitemap.xml',
   }
 }

@@ -3,7 +3,7 @@
  * L'adresse IP doit correspondre à l'IP locale de votre machine (ipconfig)
  * port par défaut : 3000
  */
-export const BASE_URL = 'https://www.qapril.ci';
+export const BASE_URL = 'https://www.qapril.net';
 
 export const API_ENDPOINTS = {
   BASE_URL,

@@ -90,7 +90,7 @@ export async function generateReceiptPDF(receiptData: {
 
   // QR CODE
   if (receiptData.qrToken) {
-    const validationUrl = `https://qapril.ci/v/${receiptData.qrToken}`;
+    const validationUrl = `https://www.qapril.net/v/${receiptData.qrToken}`;
     const qrCodeDataUrl = await QRCode.toDataURL(validationUrl, { margin: 1, width: 200 });
     const qrImage = await pdfDoc.embedPng(qrCodeDataUrl);
     
@@ -185,7 +185,7 @@ export async function generatePassportPDF(data: {
     currentY -= 100;
 
     // 5. Verification
-    const qrUrl = `https://qapril.ci/p/${data.refPasseport}`;
+    const qrUrl = `https://www.qapril.net/p/${data.refPasseport}`;
     const qrDataUrl = await QRCode.toDataURL(qrUrl, { width: 150 });
     const qrImage = await pdfDoc.embedPng(qrDataUrl);
     page.drawImage(qrImage, { x: width - 170, y: currentY - 50, width: 120, height: 120 });

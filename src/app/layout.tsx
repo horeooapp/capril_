@@ -8,7 +8,7 @@ import CookieConsent from "@/components/CookieConsent";
 import SEOInit from "@/components/SEOInit";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.qapril.ci"),
+  metadataBase: new URL("https://www.qapril.net"),
   title: {
     default: "QAPRIL — Gestion Immobilière Intelligente",
     template: "%s | QAPRIL"
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_CI",
-    url: "https://www.qapril.ci",
+    url: "https://www.qapril.net",
     siteName: "QAPRIL",
     title: "QAPRIL — Gestion Immobilière Intelligente",
     description: "La plateforme nationale officielle pour la gestion et la certification des quittances de loyer en Côte d'Ivoire. Sécurisation des baux immobiliers et des cautions.",
@@ -86,8 +86,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "QAPRIL",
-              "url": "https://www.qapril.ci",
-              "logo": "https://www.qapril.ci/logo.png",
+              "url": "https://www.qapril.net",
+              "logo": "https://www.qapril.net/logo.png",
               "sameAs": [
                 "https://twitter.com/qapril_ci",
                 "https://www.linkedin.com/company/qapril"

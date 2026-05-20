@@ -2,21 +2,21 @@
  * ============================================================
  *  QAPRIL — Script de Référencement SEO (TypeScript)
  *  Version : 1.0.0
- *  Domaine  : https://www.qapril.ci
+ *  Domaine  : https://www.qapril.net
  * ============================================================
  */
 
 export const QAPRIL_SEO_CONFIG = {
   site: {
     name:        "QAPRIL",
-    domain:      "https://www.qapril.ci",
+    domain:      "https://www.qapril.net",
     locale:      "fr_CI",
     localeAlt:   ["fr_FR", "fr_BF", "fr_SN"],
     themeColor:  "#FCB10F",
     twitterHandle: "@qapril_ci",
     fbAppId:     "",
-    logo:        "https://www.qapril.ci/logo.png",
-    ogImage:     "https://www.qapril.ci/images/og-main.png",
+    logo:        "https://www.qapril.net/logo.png",
+    ogImage:     "https://www.qapril.net/images/og-main.png",
   },
 
   pages: {
@@ -24,32 +24,32 @@ export const QAPRIL_SEO_CONFIG = {
       title:       "QAPRIL — Gestion Immobilière Intelligente",
       description: "QAPRIL simplifie la gestion immobilière : locataires, propriétaires, agences et diaspora. Administration, suivi des loyers et contrats en un seul endroit.",
       keywords:    "gestion immobilière, logiciel immobilier, gestion locative, propriétaire, locataire, diaspora, agence immobilière, Côte d'Ivoire, Abidjan, CDC-CI",
-      canonical:   "https://www.qapril.ci/",
+      canonical:   "https://www.qapril.net/",
     },
     register: {
       title:       "Créer un compte QAPRIL — Démarrez gratuitement",
       description: "Créez votre compte QAPRIL et commencez à gérer vos propriétés immobilières dès aujourd'hui. Inscription rapide, sans engagement.",
       keywords:    "créer compte, inscription, gestion immobilière gratuite",
-      canonical:   "https://www.qapril.ci/register",
+      canonical:   "https://www.qapril.net/register",
       noindex:     true,
     },
     login: {
       title:       "Connexion — QAPRIL",
       description: "Accédez à votre tableau de bord QAPRIL pour gérer vos biens immobiliers.",
-      canonical:   "https://www.qapril.ci/login",
+      canonical:   "https://www.qapril.net/login",
       noindex:     true,
     },
     pricing: {
       title:       "Tarifs QAPRIL — Offres & Facturation",
       description: "Découvrez les offres QAPRIL adaptées à chaque profil : locataire, propriétaire, agence intermédiaire ou diaspora. Facturation par quittance générée.",
       keywords:    "tarifs, prix, abonnement, offre immobilière, quittance, diaspora",
-      canonical:   "https://www.qapril.ci/pricing",
+      canonical:   "https://www.qapril.net/pricing",
     },
     features: {
       title:       "Fonctionnalités — QAPRIL Gestion Immobilière",
       description: "Gestion des loyers, contrats de bail, suivi des locataires, état des lieux digital et bien plus. Tout ce dont vous avez besoin.",
       keywords:    "fonctionnalités, loyer, bail, état des lieux, gestion locative",
-      canonical:   "https://www.qapril.ci/features",
+      canonical:   "https://www.qapril.net/features",
     },
   },
 };

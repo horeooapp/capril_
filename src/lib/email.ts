@@ -114,7 +114,7 @@ export async function sendEmail({
 }
 
 export function wrapInPremiumTemplate(content: string, title?: string) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.net";
   
   return `
     <!DOCTYPE html>
@@ -172,7 +172,7 @@ export function wrapInPremiumTemplate(content: string, title?: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.ci"}/auth/reset-password?token=${token}`;
+  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "https://www.qapril.net"}/auth/reset-password?token=${token}`;
   
   const content = `
     <p style="margin: 0 0 20px 0;">Vous avez initié une demande de réinitialisation des accès pour votre compte certifié <strong>QAPRIL</strong>.</p>
@@ -181,7 +181,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       <a href="${resetLink}" style="background-color: #1B3A6B; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; display: inline-block;">Réinitialiser l'accès</a>
     </div>
     <div style="background-color: #FFF4E5; border-left: 4px solid #FF8200; padding: 16px; margin-top: 32px; border-radius: 0 8px 8px 0;">
-      <p style="margin: 0; font-size: 13px; color: #5A3A00;"><strong>Alerte :</strong> Si vous n'avez pas demandé cette réinitialisation, votre compte pourrait être ciblé. Veuillez le signaler immédiatement à <em>fraude@qapril.ci</em>.</p>
+      <p style="margin: 0; font-size: 13px; color: #5A3A00;"><strong>Alerte :</strong> Si vous n'avez pas demandé cette réinitialisation, votre compte pourrait être ciblé. Veuillez le signaler immédiatement à <em>fraude@qapril.net</em>.</p>
     </div>
   `;
 

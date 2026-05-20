@@ -65,7 +65,7 @@ export async function POST(req: Request) {
                 data: {
                     status: "PAYE",
                     hash: securityHash,
-                    url: `https://qapril.ci/receipts/${receipt.id}/pdf?hash=${securityHash.substring(0, 8)}` // Simulate PDF generation
+                    url: `https://www.qapril.net/receipts/${receipt.id}/pdf?hash=${securityHash.substring(0, 8)}` // Simulate PDF generation
                 }
             });
 

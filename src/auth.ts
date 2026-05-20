@@ -304,7 +304,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     // 3. SuperAdmin Logic
                     let role = user.role;
-                    if (email === "admin@qapril.ci") {
+                    if (email === "admin@qapril.ci" || email === "admin@qapril.net") {
                         role = "SUPER_ADMIN";
                         if (user.role !== "SUPER_ADMIN") {
                             await prisma.user.update({
