@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { savePhysicalFile } from "@/lib/storage";
 
 export async function POST(req: Request) {
     const session = await auth();
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
         let extractedAmount = 0;
         let dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 15); // Default fallback
+        let billingMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
         let confidence = 0.5;
         let method = "TESSERACT";
 
@@ -52,7 +54,7 @@ export async function POST(req: Request) {
                                         type: "image",
                                         source: {
                                             type: "base64",
-                                            media_type: mediaType.includes('pdf') ? 'image/jpeg' : mediaType, // Claude doesn't support PDF directly in Vision yet, but we'll try or fallback
+                                            media_type: mediaType.includes('pdf') ? 'image/jpeg' : mediaType,
                                             data: base64Image
                                         }
                                     },
@@ -62,8 +64,9 @@ export async function POST(req: Request) {
                                         Donne moi uniquement un JSON avec : 
                                         - "amount": le montant TOTAL NET À PAYER (nombre entier)
                                         - "dueDate": la date limite de paiement au format YYYY-MM-DD
+                                        - "billingMonth": le mois de facturation au format YYYY-MM (ex: 2024-05)
                                         - "confidence": ton niveau de certitude (0 à 1)
-                                        Si tu ne trouves pas, mets 0 pour amount.`
+                                        Si tu ne trouves pas un champ, mets une valeur par défaut cohérente.`
                                     }
                                 ]
                             }
@@ -79,6 +82,7 @@ export async function POST(req: Request) {
                         const parsed = JSON.parse(jsonMatch[0]);
                         extractedAmount = parsed.amount || 0;
                         if (parsed.dueDate) dueDate = new Date(parsed.dueDate);
+                        if (parsed.billingMonth) billingMonth = parsed.billingMonth;
                         confidence = parsed.confidence || 0.8;
                         method = "CLAUDE_35_VISION";
                     }
@@ -90,6 +94,13 @@ export async function POST(req: Request) {
 
         // 2. Fallback to Tesseract if AI failed or no key
         if (extractedAmount <= 0) {
+            // Tesseract doesn't support PDF
+            if (mediaType.includes('pdf')) {
+                return NextResponse.json({ 
+                    error: "Le format PDF n'est supporté que par l'analyse IA. Comme l'IA est indisponible, veuillez utiliser une photo (JPG/PNG) ou la saisie manuelle." 
+                }, { status: 400 });
+            }
+
             const Tesseract = await import('tesseract.js');
             const { data: { text } } = await Tesseract.default.recognize(buffer, 'fra', { logger: () => {} });
             
@@ -118,20 +129,40 @@ export async function POST(req: Request) {
              return NextResponse.json({ error: "L'IA n'a pas pu identifier le montant. Votre facture est peut-être floue. Veuillez utiliser la saisie manuelle." }, { status: 400 });
         }
         
-        const invoiceUrl = `/uploads/${typeUtility.toLowerCase()}-${Date.now()}.pdf`;
+        let invoiceUrl = "";
+        try {
+            invoiceUrl = await savePhysicalFile(file, "utilities");
+        } catch (storageErr) {
+            console.error("Storage Error:", storageErr);
+            // On continue quand même si l'OCR a réussi, mais l'URL sera vide
+        }
 
         let facture = null;
 
         // 3. Optionnel : Si leaseId est fourni, pré-créer la facture
         if (leaseId) {
-            facture = await prisma.factureUtility.create({
-                data: {
+            // Utiliser upsert pour éviter les violations de contrainte d'unicité sur [leaseId, moisFacture, typeUtility]
+            facture = await prisma.factureUtility.upsert({
+                where: {
+                    leaseId_moisFacture_typeUtility: {
+                        leaseId,
+                        moisFacture: billingMonth,
+                        typeUtility: typeUtility as any
+                    }
+                },
+                update: {
+                    montantTotal: extractedAmount,
+                    dateLimitePaiement: dueDate,
+                    invoiceUrl: invoiceUrl,
+                    source: `OCR_UPDATE_${method}`
+                },
+                create: {
                     leaseId,
                     acteurId: session.user.id,
                     roleActeur: session.user.role === 'TENANT' ? 'LOCATAIRE' : 'PROPRIO',
                     typeUtility: typeUtility as any,
                     identifiantCompteur: `COMPT-OCR-${Math.floor(Math.random() * 99999)}`,
-                    moisFacture: new Date().toISOString().slice(0, 7),
+                    moisFacture: billingMonth,
                     montantTotal: extractedAmount,
                     dateLimitePaiement: dueDate,
                     statut: "EN_COURS",
