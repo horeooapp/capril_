@@ -9,7 +9,7 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
     const [file, setFile] = useState<File | null>(null)
     const [type, setType] = useState<"CIE" | "SODECI" | null>(null)
     const [isScanning, setIsScanning] = useState(false)
-    const [result, setResult] = useState<{ amount: number, dueDate: string, fractureId: string } | null>(null)
+    const [result, setResult] = useState<{ amount: number, dueDate: string, factureId: string } | null>(null)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
     
@@ -32,18 +32,38 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
         formData.append("leaseId", leaseId)
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
             const res = await fetch("/api/v1/utilities/ocr", {
                 method: "POST",
-                body: formData
+                body: formData,
+                signal: controller.signal
             })
             
-            const data = await res.json()
-            if (!data.success) throw new Error(data.error)
+            clearTimeout(timeoutId);
 
+            if (!res.ok) {
+                const text = await res.text();
+                let errMsg = "Erreur serveur";
+                try {
+                    const json = JSON.parse(text);
+                    errMsg = json.error || errMsg;
+                } catch (e) {
+                    errMsg = `Erreur (${res.status}): ${text.substring(0, 50)}...`;
+                }
+                throw new Error(errMsg);
+            }
+
+            const data = await res.json()
             setResult(data.data)
             router.refresh()
         } catch (err: any) {
-            setError(err.message || "Impossible d'analyser la facture.")
+            if (err.name === 'AbortError') {
+                setError("Le délai d'attente est dépassé (60s). L'analyse est peut-être trop complexe ou le serveur est surchargé. Veuillez utiliser la saisie manuelle.")
+            } else {
+                setError(err.message || "Impossible d'analyser la facture.")
+            }
         } finally {
             setIsScanning(false)
         }
@@ -69,7 +89,7 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
             setResult({
                 amount: parseFloat(manualAmount),
                 dueDate: new Date(manualDate).toISOString(),
-                fractureId: res.fractureId!
+                factureId: res.factureId!
             })
             router.refresh()
         } catch (err: any) {

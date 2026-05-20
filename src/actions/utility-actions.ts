@@ -223,7 +223,7 @@ export async function createManualUtilityBill(data: {
       newValues: { amount: data.montantTotal, type: data.typeUtility }
     });
 
-    return { success: true, fractureId: facture.id };
+    return { success: true, factureId: facture.id };
   } catch (error: any) {
     console.error("Erreur Saisie Manuelle:", error);
     return { error: error.message || "Erreur inconnue." };
