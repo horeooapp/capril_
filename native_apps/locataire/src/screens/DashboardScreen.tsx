@@ -249,16 +249,18 @@ const styles = StyleSheet.create({
   fixedHeader: {
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 50,
     paddingHorizontal: 16,
-    paddingBottom: 52,
+    paddingBottom: 25,
     position: 'relative',
     overflow: 'hidden',
     zIndex: 10,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
     marginTop: 10,
   },
   headerSubtitle: {
@@ -314,9 +316,9 @@ const styles = StyleSheet.create({
   },
   lhAmount: {
     fontFamily: Typography.fontFamily.heading,
-    fontSize: 26,
+    fontSize: 22,
     color: Colors.white,
-    marginTop: 4,
+    marginTop: 0,
   },
   lhAmountCurrency: {
     fontSize: 14,
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
   lhPayBtn: {
     backgroundColor: Colors.white,
     borderRadius: 12,
-    paddingVertical: 10,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -341,7 +343,7 @@ const styles = StyleSheet.create({
   scrollingContentContainer: {
     flex: 1,
     backgroundColor: Colors.qCream,
-    marginTop: -30,
+    marginTop: 0,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     overflow: 'hidden',
@@ -358,7 +360,8 @@ const styles = StyleSheet.create({
   qaGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 24,
+    marginTop: 20,
   },
   qaItem: {
     width: (width - 60) / 4,
@@ -366,16 +369,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   qaIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 58,
+    height: 58,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emoji: { fontSize: 18 },
+  emoji: { fontSize: 26 },
   qaLbl: {
     fontFamily: Typography.fontFamily.bodyBold,
-    fontSize: 9,
+    fontSize: 11,
     color: Colors.qNavy,
     textAlign: 'center',
   },

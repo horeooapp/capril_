@@ -185,7 +185,7 @@ export default function ProfileScreen({ navigation, route }: any) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  container: { padding: 24 },
+  container: { padding: 24, paddingBottom: 160 },
   header: { alignItems: 'center', marginBottom: 32 },
   avatarContainer: { 
     width: 80, 
@@ -240,9 +240,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     gap: 10, 
     paddingVertical: 20,
-    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderRadius: 20,
-    marginTop: 10
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.2)'
   },
   logoutText: { color: Colors.danger, fontSize: 16, fontWeight: '800' },
   versionText: { textAlign: 'center', marginTop: 32, fontSize: 11, color: Colors.text.muted, fontWeight: '600' }
