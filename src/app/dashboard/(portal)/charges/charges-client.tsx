@@ -26,7 +26,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
     const [manualAmount, setManualAmount] = useState<number | "">("")
     
     const [isScanning, setIsScanning] = useState(false)
-    const [scanResult, setScanResult] = useState<{montant: number, confidence: string} | null>(null)
+    const [scanResult, setScanResult] = useState<{montant: number} | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +52,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
             const response = await promise
             
             if (response.success && response.montant) {
-                setScanResult({ montant: response.montant, confidence: response.confidence || "100%" })
+                setScanResult({ montant: response.montant })
                 setSimAmount(response.montant)
             } else {
                 toast.error(response.error || "Impossible de déterminer le montant.")
@@ -407,7 +407,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
 
                                         {scanResult && (
                                             <div className="bg-emerald-50 p-4 rounded-[12px] border border-emerald-200">
-                                                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Lecture OCR Complète (Confiance: {scanResult.confidence})</p>
+                                                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Lecture OCR Complète</p>
                                                 <p className="text-2xl font-black text-emerald-700">{scanResult.montant.toLocaleString()} <span className="text-[12px] opacity-80">FCFA</span></p>
                                             </div>
                                         )}
