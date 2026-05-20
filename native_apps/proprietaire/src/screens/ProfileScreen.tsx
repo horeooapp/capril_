@@ -9,15 +9,17 @@ import {
   Alert,
   ScrollView
 } from 'react-native';
-import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail, Building } from 'lucide-react-native';
+import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail, Building, MessageSquare } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Colors } from '../theme/colors';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function ProfileScreen({ navigation, route }: any) {
   const { token, userProfile } = route.params || {};
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [hasBiometrics, setHasBiometrics] = useState(false);
+  const [isChatOnline, setIsChatOnline] = useState(userProfile?.isChatOnline ?? true);
 
   const checkBiometrics = useCallback(async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -56,6 +58,21 @@ export default function ProfileScreen({ navigation, route }: any) {
       await AsyncStorage.removeItem('biometric_enabled');
       await AsyncStorage.removeItem('saved_token_proprio');
       setIsBiometricEnabled(false);
+    }
+  };
+
+  const toggleChatStatus = async (value: boolean) => {
+    setIsChatOnline(value);
+    try {
+      await fetch(API_ENDPOINTS.MESSAGES, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action: 'TOGGLE_ONLINE', isOnline: value })
+      });
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Impossible de mettre à jour votre statut.");
+      setIsChatOnline(!value);
     }
   };
 
@@ -107,6 +124,24 @@ export default function ProfileScreen({ navigation, route }: any) {
             <Switch 
               value={isBiometricEnabled} 
               onValueChange={toggleBiometrics}
+              trackColor={{ false: '#cbd5e1', true: Colors.success }}
+              thumbColor={Colors.white}
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(7, 89, 133, 0.1)' }]}>
+                <MessageSquare size={20} color={Colors.primary} />
+              </View>
+              <View>
+                <Text style={styles.settingLabel}>Statut du Chat</Text>
+                <Text style={styles.settingSub}>{isChatOnline ? 'En ligne' : 'Hors ligne'}</Text>
+              </View>
+            </View>
+            <Switch 
+              value={isChatOnline} 
+              onValueChange={toggleChatStatus}
               trackColor={{ false: '#cbd5e1', true: Colors.success }}
               thumbColor={Colors.white}
             />

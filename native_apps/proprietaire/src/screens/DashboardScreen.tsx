@@ -124,7 +124,7 @@ export default function DashboardScreen({ navigation, route }: any) {
                 {(data?.name || 'OI').substring(0, 2).toUpperCase()}
               </Text>
             </View>
-            <View style={styles.onlineDot} />
+            <View style={[styles.onlineDot, { backgroundColor: data?.isChatOnline ? '#4ADE80' : Colors.qCoral }]} />
           </TouchableOpacity>
         </View>
 

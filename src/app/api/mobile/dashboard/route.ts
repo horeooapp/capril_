@@ -111,7 +111,13 @@ export async function POST(req: Request) {
                         address: activeLease.property.address,
                         rent: activeLease.rentAmount,
                         charges: activeLease.chargesAmount,
-                        status: activeLease.status
+                        status: activeLease.status,
+                        documentUrl: activeLease.documentUrl,
+                        landlord: {
+                            name: activeLease.landlord.firstName + ' ' + activeLease.landlord.lastName,
+                            phone: activeLease.landlord.phone,
+                            isOnline: activeLease.landlord.isChatOnline
+                        }
                     }
                 }
             });
@@ -287,14 +293,17 @@ export async function POST(req: Request) {
                     properties: propertiesMobile,
                     totalProperties,
                     onboarding,
-                    userId: user.id,
-                    userEmail: user.email,
-                    fullName: fallbackName,
+                    name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+                    email: user.email,
+                    phone: user.phone,
                     role: user.role,
-                    pendingRepairs: pendingRepairsCount,
-                    revenueHistory: last6Months,
-                    marketStats,
-                    suggestedRecharge
+                    isChatOnline: user.isChatOnline,
+                    stats: {
+                        pendingRepairs: pendingRepairsCount,
+                        revenueHistory: last6Months,
+                        marketStats,
+                        suggestedRecharge
+                    }
                 }
             });
         }

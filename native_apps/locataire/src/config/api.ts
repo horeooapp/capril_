@@ -9,8 +9,10 @@ export const API_ENDPOINTS = {
   BASE_URL,
   AUTH: `${BASE_URL}/api/mobile/auth`,
   DASHBOARD: `${BASE_URL}/api/mobile/dashboard`,
+  MARKETPLACE: `${BASE_URL}/api/mobile/marketplace`,
+  MESSAGES: `${BASE_URL}/api/mobile/messages`,
+  TENANT_MESSAGES: `${BASE_URL}/api/mobile/tenant/messages`,
   PAY_RENT: `${BASE_URL}/api/mobile/pay-rent`,
   TICKETS: `${BASE_URL}/api/mobile/tenant/tickets`,
   EMERGENCY_CONTACTS: `${BASE_URL}/api/mobile/tenant/emergency-contacts`,
-  MESSAGES: `${BASE_URL}/api/mobile/tenant/messages`,
 };

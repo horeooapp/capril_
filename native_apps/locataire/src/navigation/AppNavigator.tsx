@@ -18,6 +18,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import ScanBillScreen from '../screens/ScanBillScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PassportScreen from '../screens/PassportScreen';
+import MarketplaceScreen from '../screens/MarketplaceScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,6 +104,12 @@ function DrawerNavigator({ route }: any) {
         options={{ title: 'Mon Passeport' }}
       />
       <Drawer.Screen 
+        name="Marketplace" 
+        component={MarketplaceScreen} 
+        initialParams={{ token }}
+        options={{ title: 'Marketplace' }}
+      />
+      <Drawer.Screen 
         name="Profile" 
         component={ProfileScreen} 
         initialParams={{ token }}
@@ -122,6 +129,8 @@ export default function AppNavigator() {
       <Stack.Screen name="ReceiptView" component={ReceiptViewScreen} />
       <Stack.Screen name="ScanBill" component={ScanBillScreen} />
       <Stack.Screen name="Passport" component={PassportScreen} />
+      <Stack.Screen name="Marketplace" component={MarketplaceScreen} />
+      <Stack.Screen name="Chat" component={MessageScreen} />
     </Stack.Navigator>
   );
 }

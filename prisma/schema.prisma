@@ -536,6 +536,7 @@ model User {
   password           String?
   isCertified        Boolean      @default(false) @map("is_certified")
   onboardingComplete Boolean      @default(false) @map("onboarding_complete")
+  isChatOnline       Boolean      @default(true) @map("is_chat_online")
 
   // Capacite active en cours de session (C-AUTH-01)
   capaciteActive String? @default("PROPRIETAIRE") @map("capacite_active")

@@ -22,7 +22,13 @@ import {
   User as UserIcon,
   CreditCard,
   CheckCircle,
-  Clock
+  Clock,
+  MessageSquare, 
+  MapPin, 
+  Download, 
+  ArrowRight,
+  TrendingUp,
+  Store
 } from 'lucide-react-native';
 import { Colors } from '../theme/colors';
 import { Typography } from '../theme/typography';
@@ -80,6 +86,15 @@ export default function DashboardScreen({ navigation, route }: any) {
     }
   };
 
+  const renderQuickAction = (label: string, emoji: string, onPress: () => void) => (
+    <TouchableOpacity style={styles.qaItem} onPress={onPress}>
+      <View style={[styles.qaIcon, { backgroundColor: Colors.qOrangeLight }]}>
+        <Text style={styles.emoji}>{emoji}</Text>
+      </View>
+      <Text style={styles.qaLbl}>{label}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.mainContainer}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
@@ -136,31 +151,38 @@ export default function DashboardScreen({ navigation, route }: any) {
         >
           {/* QUICK ACTIONS GRID */}
           <View style={styles.qaGrid}>
-            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('History')}>
-              <View style={[styles.qaIcon, { backgroundColor: Colors.qOrangeLight }]}>
-                <Text style={styles.emoji}>🧾</Text>
-              </View>
-              <Text style={styles.qaLbl}>Quittances</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Services')}>
-              <View style={[styles.qaIcon, { backgroundColor: Colors.qGreenLight }]}>
-                <Text style={styles.emoji}>🔧</Text>
-              </View>
-              <Text style={styles.qaLbl}>Maintenance</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Contract', { lease: data?.lease })}>
-              <View style={[styles.qaIcon, { backgroundColor: Colors.qNavyLight }]}>
-                <Text style={styles.emoji}>📋</Text>
-              </View>
-              <Text style={styles.qaLbl}>Mon bail</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.qaItem} onPress={() => navigation.navigate('Passport')}>
-              <View style={[styles.qaIcon, { backgroundColor: Colors.qAmberLight }]}>
-                <Text style={styles.emoji}>📊</Text>
-              </View>
-              <Text style={styles.qaLbl}>Score ICL</Text>
-            </TouchableOpacity>
+            {renderQuickAction('Quittance', '📄', () => navigation.navigate('History'))}
+            {renderQuickAction('Maintenance', '🛠️', () => navigation.navigate('Services'))}
+            {renderQuickAction('Mon Bail', '🏠', () => navigation.navigate('Contract', { lease: data?.lease }))}
+            {renderQuickAction('Marketplace', '🛒', () => navigation.navigate('Marketplace'))}
           </View>
+
+          {/* LANDLORD INFO CARD */}
+          {data?.lease?.landlord && (
+            <View style={styles.landlordCard}>
+              <View style={styles.lcHeader}>
+                <Text style={styles.lcTitle}>Mon Propriétaire</Text>
+                <View style={[styles.onlineBadge, { backgroundColor: data.lease.landlord.isOnline ? '#4ADE80' : '#94A3B8' }]}>
+                  <Text style={styles.onlineText}>{data.lease.landlord.isOnline ? 'En ligne' : 'Hors ligne'}</Text>
+                </View>
+              </View>
+              <View style={styles.lcBody}>
+                <View style={styles.lcAvatar}>
+                  <Text style={styles.lcAvatarText}>{data.lease.landlord.name.substring(0, 2).toUpperCase()}</Text>
+                </View>
+                <View style={styles.lcInfo}>
+                  <Text style={styles.lcName}>{data.lease.landlord.name}</Text>
+                  <Text style={styles.lcPhone}>{data.lease.landlord.phone}</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.lcChatBtn}
+                  onPress={() => navigation.navigate('Chat', { leaseId: data.lease.id })}
+                >
+                  <MessageSquare size={20} color={Colors.white} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* STATS ROW */}
           <View style={styles.mcRow}>
@@ -361,7 +383,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 24,
-    marginTop: 20,
   },
   qaItem: {
     width: (width - 60) / 4,
