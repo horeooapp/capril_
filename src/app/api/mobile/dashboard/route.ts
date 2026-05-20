@@ -52,6 +52,7 @@ export async function POST(req: Request) {
                 },
                 include: {
                     property: true,
+                    landlord: true,
                     arrears: {
                         where: { status: { in: ["unpaid", "UNPAID"] } }
                     },
@@ -112,7 +113,7 @@ export async function POST(req: Request) {
                         rent: activeLease.rentAmount,
                         charges: activeLease.chargesAmount,
                         status: activeLease.status,
-                        documentUrl: activeLease.documentUrl,
+                        documentUrl: null,
                         landlord: {
                             name: activeLease.landlord.firstName + ' ' + activeLease.landlord.lastName,
                             phone: activeLease.landlord.phone,
