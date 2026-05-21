@@ -696,6 +696,7 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
 
   abonnementsOperateurs AbonnementOperateur[]
+  vaultCautions         VaultCaution[]
 
   @@index([phone])
   @@index([role])
@@ -888,6 +889,7 @@ model Property {
   // La contrainte est active en base via le CREATE UNIQUE INDEX
   MandateHistory MandateHistory[]
   mandatsGestion MandatGestionBien[]
+  vaultCautions  VaultCaution[]
 
   @@index([ownerUserId])
   @@index([commune])

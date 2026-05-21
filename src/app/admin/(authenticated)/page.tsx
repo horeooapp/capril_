@@ -126,7 +126,7 @@ export default async function AdminDashboardOverview() {
             prisma.landLeaseInfo.count().catch(() => 0),
             prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
             prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
-            prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "paid" } }).catch(() => null),
+            prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "PAID" } }).catch(() => null),
             ((prisma as any).reversalTransaction?.count?.() || Promise.resolve(0)).catch(() => 0),
             prisma.user.count({ where: { fraudProfile: { fraudScore: { gt: 50 } } } }).catch(() => 0),
             ((prisma as any).bailDeclaratif?.count?.() || Promise.resolve(0)).catch(() => 0),
@@ -166,7 +166,7 @@ export default async function AdminDashboardOverview() {
             prisma.receipt.groupBy({
                 by: ['periodMonth'],
                 _sum: { totalAmount: true },
-                where: { status: "paid" },
+                where: { status: "PAID" },
                 orderBy: { periodMonth: 'desc' },
                 take: 6
             }).catch(() => []),
@@ -206,7 +206,7 @@ export default async function AdminDashboardOverview() {
         }).catch(() => []);
 
         const recentReceipts = await prisma.receipt.findMany({
-            where: { status: { in: ['paid', 'PAID', 'Paid'] } },
+            where: { status: "PAID" },
             take: 3,
             orderBy: { createdAt: 'desc' },
             include: { lease: { include: { tenant: true, landlord: true } } }

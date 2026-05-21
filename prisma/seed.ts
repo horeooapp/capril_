@@ -73,7 +73,7 @@ async function main() {
             commune: 'Cocody',
             propertyType: 'apartment',
             ownerUserId: landlord.id,
-            status: 'active'
+            status: 'ACTIVE'
         }
     })
 
@@ -107,7 +107,7 @@ async function main() {
                 chargesAmount: 15000,
                 totalAmount: 165000,
                 paymentMethod: 'MOBILE_MONEY',
-                status: 'paid',
+                status: 'PAID',
                 paidAt: new Date('2024-01-05')
             }
         })
