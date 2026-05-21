@@ -47,227 +47,230 @@ import { getNationalMarketComparison } from "@/actions/observatory-national"
 export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardOverview() {
-    // Parallel data extraction for extreme performance
+    // Parallel data extraction for extreme performance with global safety
     const now = new Date();
     const firstDayCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-    const [
-        totalUsers,
-        verifiedUsers,
-        totalDgiRes,
-        cdcAmountRes,
-        activeMediations,
-        overdueStats,
-        totalTenants,
-        totalLandlords,
-        totalAgencies,
-        totalProperties,
-        totalMandates,
-        totalColocs,
-        totalLandLeases,
-        totalLeases,
-        totalCertificates,
-        totalPaymentsRes,
-        totalReversals,
-        fraudAlerts,
-        totalBdqs,
-        confirmedBdqs,
-        totalAiConv,
-        totalAiCostRes,
-        recentAuditLogs,
-        documentsUnderReview,
-        activeModules,
-        totalModules,
-        totalSmsDeclarations,
-        confirmedSmsDeclarations,
-        totalManagers,
-        totalAgents,
-        totalPublicProfiles,
-        activeInvitations,
-        totalConsultations,
-        matchRate,
-        totalEdls,
-        certifiedEdls,
-        totalMonthlyReports,
-        totalMandatesDraft,
-        totalWalletLinks,
-        totalWalletClicks,
-        totalWalletConversions,
-        activeWalletConfigs,
-        totalReclamations,
-        totalLitiges,
-        activePromos,
-        landingFlag,
-        marketIntelligence,
-        leasesCurrentMonth,
-        leasesLastMonth,
-        monthlyTrendRes,
-        passeportRes,
-        vaultRes,
-        championsRes,
-        diasporaRes,
-        abonnementsRes,
-        signalementsRes
-    ] = await Promise.all([
-        prisma.user.count().catch(() => 0),
-        prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
-        prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null),
-        prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null),
-        prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
-        getOverdueStats().catch(() => ({ count: 0, totalAmount: 0 })),
-        prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
-        prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
-        prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
-        prisma.property.count().catch(() => 0),
-        prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        prisma.colocataire.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        prisma.landLeaseInfo.count().catch(() => 0),
-        prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
-        prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
-        prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "paid" } }).catch(() => null),
-        (prisma as any).reversalTransaction.count().catch(() => 0),
-        prisma.user.count({ where: { fraudProfile: { fraudScore: { gt: 50 } } } }).catch(() => 0),
-        (prisma as any).bailDeclaratif.count().catch(() => 0),
-        (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
-        (prisma as any).bdqConversationState.count().catch(() => 0),
-        (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null),
-        prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' }, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
-        prisma.identityDocument.findMany({ where: { status: "pending" }, take: 5, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
-        prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
-        prisma.featureFlag.count().catch(() => 0),
-        (prisma as any).smsDeclaration.count().catch(() => 0),
-        (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
-        prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0), // Managers
-        prisma.user.count({ where: { role: "NON_CERTIFIED_AGENT" } }).catch(() => 0), // Agents
-        (prisma as any).locataireProfilPublic.count().catch(() => 0),
-        (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
-        (prisma as any).consultationProfil.count().catch(() => 0),
-        (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
-        prisma.inspection.count().catch(() => 0),
-        prisma.inspection.count({ where: { status: "TERMINEE" } }).catch(() => 0),
-        prisma.rapportMensuel.count().catch(() => 0),
-        prisma.mandate.count({ where: { status: "DRAFT" } }).catch(() => 0),
-        (prisma as any).walletRechargeLink.count().catch(() => 0),
-        (prisma as any).walletRechargeLink.count({ where: { clique: true } }).catch(() => 0),
-        (prisma as any).walletRechargeLink.count({ where: { rechargeEffectuee: true } }).catch(() => 0),
-        (prisma as any).walletRechargeConfig.count({ where: { rappelActif: true } }).catch(() => 0),
-        // Nouveaux indicateurs ADD-16
-        (prisma as any).reclamationLocataire.count().catch(() => 0),
-        (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
-        (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
-        prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
-        getNationalMarketComparison().catch(() => ({ success: false, data: null })),
-        // Metrics pour Deltas
-        prisma.lease.count({ where: { createdAt: { gte: firstDayCurrentMonth } } }).catch(() => 0),
-        prisma.lease.count({ where: { createdAt: { gte: firstDayLastMonth, lt: firstDayCurrentMonth } } }).catch(() => 0),
-        // Trend financier (6 derniers mois)
-        prisma.receipt.groupBy({
-            by: ['periodMonth'],
-            _sum: { totalAmount: true },
-            where: { status: "paid" },
-            orderBy: { periodMonth: 'desc' },
-            take: 6
-        }).catch(() => []),
-        (prisma as any).passeportLocatif.count().catch(() => 0),
-        (prisma as any).vaultCaution.aggregate({ _sum: { montant: true }, where: { status: "CONSIGNEE" } }).catch(() => null),
-        (prisma as any).championProfile.count().catch(() => 0),
-        (prisma as any).userDiasporaProfile.count().catch(() => 0),
-        (prisma as any).abonnementOperateur.count().catch(() => 0),
-        (prisma as any).signalementLocataire.count({ where: { statut: { in: ['ENVOYE', 'EN_COURS'] } } }).catch(() => 0)
-    ]);
-    
-    // Process trends
-    const monthLabels = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUN", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
-    const currentTrend = [...monthlyTrendRes].reverse().map(m => {
-        const monthNum = parseInt(m.periodMonth.split('-')[1]);
-        return {
-            label: monthLabels[monthNum - 1],
-            amount: Number(m._sum.totalAmount || 0)
-        };
-    });
-    const maxTrendAmount = Math.max(...currentTrend.map(t => t.amount), 1);
-
-    // Fetch recent items with detail check
-    const recentLeases = await prisma.lease.findMany({
-        where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
-        take: 4,
-        orderBy: { createdAt: 'desc' },
-        include: { 
-            tenant: true, 
-            landlord: true,
-            property: { select: { propertyCode: true, commune: true } },
-            receipts: { where: { status: "pending" }, take: 1 } // Check for debt
-        }
-    }).catch(() => []);
-
-    const recentReceipts = await prisma.receipt.findMany({
-        where: { status: { in: ['paid', 'PAID', 'Paid'] } },
-        take: 3,
-        orderBy: { createdAt: 'desc' },
-        include: { lease: { include: { tenant: true, landlord: true } } }
-    }).catch(() => []);
-    
-    // Formatting data
-    const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
-    const leaseDelta = leasesCurrentMonth - leasesLastMonth;
-
-    const safeData = {
-        totalDgi: Number(totalDgiRes?._sum?.totalDgi || 0),
-        cdcAmount: Number(cdcAmountRes?._sum?.amount || 0),
-        activeMediations,
-        kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0,
-        overdueStats,
-        totalUsers,
-        totalTenants,
-        totalLandlords,
-        totalAgencies,
-        totalProperties,
-        totalMandates,
-        totalMandatesDraft,
-        totalColocs,
-        totalLandLeases,
-        totalLeases,
-        totalCertificates,
-        totalPayments,
-        tvaCollectee: Math.floor(totalPayments * 0.18),
-        totalReversals,
-        fraudAlerts,
-        totalBdqs,
-        confirmedBdqs,
-        totalAiConv,
-        totalAiCost: Number(totalAiCostRes?._sum?.coutEstimeFcfa || 0),
-        recentAuditLogs,
-        documentsUnderReview,
-        activeModules,
-        totalModules,
-        totalSmsDeclarations,
-        confirmedSmsDeclarations,
-        totalManagers,
-        totalAgents,
-        totalPublicProfiles,
-        activeInvitations,
-        totalConsultations,
-        matchRate,
-        totalEdls,
-        certifiedEdls,
-        totalMonthlyReports,
-        totalWalletLinks,
-        totalWalletClicks,
-        totalWalletConversions,
-        activeWalletConfigs,
-        totalReclamations,
-        totalLitiges,
-        activePromos,
-        totalPasseports: passeportRes,
-        totalVaultAmount: Number(vaultRes?._sum?.montant || 0),
-        totalChampions: championsRes,
-        totalDiaspora: diasporaRes,
-        totalAbonnements: abonnementsRes,
-        activeSignalements: signalementsRes
-    }
-
     try {
+        const [
+            totalUsers,
+            verifiedUsers,
+            totalDgiRes,
+            cdcAmountRes,
+            activeMediations,
+            overdueStats,
+            totalTenants,
+            totalLandlords,
+            totalAgencies,
+            totalProperties,
+            totalMandates,
+            totalColocs,
+            totalLandLeases,
+            totalLeases,
+            totalCertificates,
+            totalPaymentsRes,
+            totalReversals,
+            fraudAlerts,
+            totalBdqs,
+            confirmedBdqs,
+            totalAiConv,
+            totalAiCostRes,
+            recentAuditLogs,
+            documentsUnderReview,
+            activeModules,
+            totalModules,
+            totalSmsDeclarations,
+            confirmedSmsDeclarations,
+            totalManagers,
+            totalAgents,
+            totalPublicProfiles,
+            activeInvitations,
+            totalConsultations,
+            matchRate,
+            totalEdls,
+            certifiedEdls,
+            totalMonthlyReports,
+            totalMandatesDraft,
+            totalWalletLinks,
+            totalWalletClicks,
+            totalWalletConversions,
+            activeWalletConfigs,
+            totalReclamations,
+            totalLitiges,
+            activePromos,
+            landingFlag,
+            marketIntelligence,
+            leasesCurrentMonth,
+            leasesLastMonth,
+            monthlyTrendRes,
+            passeportRes,
+            vaultRes,
+            championsRes,
+            diasporaRes,
+            abonnementsRes,
+            signalementsRes
+        ] = await Promise.all([
+            prisma.user.count().catch(() => 0),
+            prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
+            prisma.fiscalDossier.aggregate({ _sum: { totalDgi: true } }).catch(() => null),
+            prisma.cDCDeposit.aggregate({ _sum: { amount: true } }).catch(() => null),
+            prisma.dispute.count({ where: { status: 'OPEN' } }).catch(() => 0),
+            getOverdueStats().catch(() => ({ count: 0, totalAmount: 0 })),
+            prisma.user.count({ where: { role: "TENANT" } }).catch(() => 0),
+            prisma.user.count({ where: { role: { in: ["LANDLORD", "LANDLORD_PRO"] } } }).catch(() => 0),
+            prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0),
+            prisma.property.count().catch(() => 0),
+            prisma.mandate.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+            prisma.colocataire.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+            prisma.landLeaseInfo.count().catch(() => 0),
+            prisma.lease.count({ where: { status: "ACTIVE" } }).catch(() => 0),
+            prisma.certificate.count({ where: { status: "valid" } }).catch(() => 0),
+            prisma.receipt.aggregate({ _sum: { totalAmount: true }, where: { status: "paid" } }).catch(() => null),
+            (prisma as any).reversalTransaction.count().catch(() => 0),
+            prisma.user.count({ where: { fraudProfile: { fraudScore: { gt: 50 } } } }).catch(() => 0),
+            (prisma as any).bailDeclaratif.count().catch(() => 0),
+            (prisma as any).bailDeclaratif.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+            (prisma as any).bdqConversationState.count().catch(() => 0),
+            (prisma as any).bdqConversationState.aggregate({ _sum: { coutEstimeFcfa: true } }).catch(() => null),
+            prisma.auditLog.findMany({ take: 10, orderBy: { createdAt: 'desc' }, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
+            prisma.identityDocument.findMany({ where: { status: "pending" }, take: 5, include: { user: { select: { firstName: true, lastName: true } } } }).catch(() => []),
+            prisma.featureFlag.count({ where: { enabled: true } }).catch(() => 0),
+            prisma.featureFlag.count().catch(() => 0),
+            (prisma as any).smsDeclaration.count().catch(() => 0),
+            (prisma as any).smsDeclaration.count({ where: { statut: "CONFIRME" } }).catch(() => 0),
+            prisma.user.count({ where: { role: "AGENCY" } }).catch(() => 0), // Managers
+            prisma.user.count({ where: { role: "NON_CERTIFIED_AGENT" } }).catch(() => 0), // Agents
+            (prisma as any).locataireProfilPublic.count().catch(() => 0),
+            (prisma as any).invitationBail.count({ where: { statut: "ENVOYEE" } }).catch(() => 0),
+            (prisma as any).consultationProfil.count().catch(() => 0),
+            (prisma as any).invitationBail.count({ where: { statut: "ACCEPTEE" } }).catch(() => 0),
+            prisma.inspection.count().catch(() => 0),
+            prisma.inspection.count({ where: { status: "TERMINEE" } }).catch(() => 0),
+            prisma.rapportMensuel.count().catch(() => 0),
+            prisma.mandate.count({ where: { status: "DRAFT" } }).catch(() => 0),
+            (prisma as any).walletRechargeLink.count().catch(() => 0),
+            (prisma as any).walletRechargeLink.count({ where: { clique: true } }).catch(() => 0),
+            (prisma as any).walletRechargeLink.count({ where: { rechargeEffectuee: true } }).catch(() => 0),
+            (prisma as any).walletRechargeConfig.count({ where: { rappelActif: true } }).catch(() => 0),
+            // Nouveaux indicateurs ADD-16
+            (prisma as any).reclamationLocataire.count().catch(() => 0),
+            (prisma as any).dossierLitigeCertifie.count().catch(() => 0),
+            (prisma as any).codePromo.count({ where: { actif: true } }).catch(() => -1),
+            prisma.featureFlag.findUnique({ where: { id: "LANDING_PAGE" } }).catch(() => null),
+            getNationalMarketComparison().catch(() => ({ success: false, data: null })),
+            // Metrics pour Deltas
+            prisma.lease.count({ where: { createdAt: { gte: firstDayCurrentMonth } } }).catch(() => 0),
+            prisma.lease.count({ where: { createdAt: { gte: firstDayLastMonth, lt: firstDayCurrentMonth } } }).catch(() => 0),
+            // Trend financier (6 derniers mois)
+            prisma.receipt.groupBy({
+                by: ['periodMonth'],
+                _sum: { totalAmount: true },
+                where: { status: "paid" },
+                orderBy: { periodMonth: 'desc' },
+                take: 6
+            }).catch(() => []),
+            (prisma as any).passeportLocatif.count().catch(() => 0),
+            (prisma as any).vaultCaution.aggregate({ _sum: { montant: true }, where: { status: "CONSIGNEE" } }).catch(() => null),
+            (prisma as any).championProfile.count().catch(() => 0),
+            (prisma as any).userDiasporaProfile.count().catch(() => 0),
+            (prisma as any).abonnementOperateur.count().catch(() => 0),
+            (prisma as any).signalementLocataire.count({ where: { statut: { in: ['ENVOYE', 'EN_COURS'] } } }).catch(() => 0)
+        ]);
+        
+        // Process trends with safety guards
+        const monthLabels = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUN", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
+        const trendSource = Array.isArray(monthlyTrendRes) ? monthlyTrendRes : [];
+        const currentTrend = [...trendSource].reverse().map(m => {
+            const periodStr = m.periodMonth || "";
+            const parts = periodStr.split('-');
+            const monthNum = parts.length > 1 ? parseInt(parts[1]) : 0;
+            return {
+                label: (monthNum > 0 && monthNum <= 12) ? monthLabels[monthNum - 1] : "N/A",
+                amount: Number(m._sum?.totalAmount || 0)
+            };
+        });
+        const maxTrendAmount = Math.max(...currentTrend.map(t => t.amount), 1);
+
+        // Fetch recent items with detail check
+        const recentLeases = await prisma.lease.findMany({
+            where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
+            take: 4,
+            orderBy: { createdAt: 'desc' },
+            include: { 
+                tenant: true, 
+                landlord: true,
+                property: { select: { propertyCode: true, commune: true } },
+                receipts: { where: { status: "pending" }, take: 1 } // Check for debt
+            }
+        }).catch(() => []);
+
+        const recentReceipts = await prisma.receipt.findMany({
+            where: { status: { in: ['paid', 'PAID', 'Paid'] } },
+            take: 3,
+            orderBy: { createdAt: 'desc' },
+            include: { lease: { include: { tenant: true, landlord: true } } }
+        }).catch(() => []);
+        
+        // Formatting data
+        const totalPayments = Number(totalPaymentsRes?._sum?.totalAmount || 0);
+        const leaseDelta = (leasesCurrentMonth || 0) - (leasesLastMonth || 0);
+
+        const safeData = {
+            totalDgi: Number(totalDgiRes?._sum?.totalDgi || 0),
+            cdcAmount: Number(cdcAmountRes?._sum?.amount || 0),
+            activeMediations: activeMediations || 0,
+            kycAutoRate: totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0,
+            overdueStats: overdueStats || { count: 0, totalAmount: 0 },
+            totalUsers: totalUsers || 0,
+            totalTenants: totalTenants || 0,
+            totalLandlords: totalLandlords || 0,
+            totalAgencies: totalAgencies || 0,
+            totalProperties: totalProperties || 0,
+            totalMandates: totalMandates || 0,
+            totalMandatesDraft: totalMandatesDraft || 0,
+            totalColocs: totalColocs || 0,
+            totalLandLeases: totalLandLeases || 0,
+            totalLeases: totalLeases || 0,
+            totalCertificates: totalCertificates || 0,
+            totalPayments,
+            tvaCollectee: Math.floor(totalPayments * 0.18),
+            totalReversals: totalReversals || 0,
+            fraudAlerts: fraudAlerts || 0,
+            totalBdqs: totalBdqs || 0,
+            confirmedBdqs: confirmedBdqs || 0,
+            totalAiConv: totalAiConv || 0,
+            totalAiCost: Number(totalAiCostRes?._sum?.coutEstimeFcfa || 0),
+            recentAuditLogs,
+            documentsUnderReview,
+            activeModules: activeModules || 0,
+            totalModules: totalModules || 0,
+            totalSmsDeclarations: totalSmsDeclarations || 0,
+            confirmedSmsDeclarations: confirmedSmsDeclarations || 0,
+            totalManagers: totalManagers || 0,
+            totalAgents: totalAgents || 0,
+            totalPublicProfiles: totalPublicProfiles || 0,
+            activeInvitations: activeInvitations || 0,
+            totalConsultations: totalConsultations || 0,
+            matchRate: matchRate || 0,
+            totalEdls: totalEdls || 0,
+            certifiedEdls: certifiedEdls || 0,
+            totalMonthlyReports: totalMonthlyReports || 0,
+            totalWalletLinks: totalWalletLinks || 0,
+            totalWalletClicks: totalWalletClicks || 0,
+            totalWalletConversions: totalWalletConversions || 0,
+            activeWalletConfigs: activeWalletConfigs || 0,
+            totalReclamations: totalReclamations || 0,
+            totalLitiges: totalLitiges || 0,
+            activePromos: activePromos || 0,
+            totalPasseports: passeportRes || 0,
+            totalVaultAmount: Number(vaultRes?._sum?.montant || 0),
+            totalChampions: championsRes || 0,
+            totalDiaspora: diasporaRes || 0,
+            totalAbonnements: abonnementsRes || 0,
+            activeSignalements: signalementsRes || 0
+        }
+
         return (
             <>
                 <div className="page-header">
