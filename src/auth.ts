@@ -104,10 +104,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             const newConfig = { ...conf, status: "ACTIVE", inviteToken: null };
                             await (prisma.user as any).update({
                                 where: { id: user.id },
-                                data: { agencyConfig: newConfig, status: "active" }
+                                data: { agencyConfig: newConfig, status: "ACTIVE" }
                             });
                             (user as any).agencyConfig = newConfig;
-                            user.status = "active";
+                            user.status = "ACTIVE";
                         }
 
                         // ROLE DETECTION & ENFORCEMENT
@@ -206,7 +206,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             email: user.email,
                             phone: user.phone,
                             role: user.role,
-                            status: user.status,
+                            status: user.status as any,
                             fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,

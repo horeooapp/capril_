@@ -51,7 +51,7 @@ export async function processCsvImport(csvContent: string) {
                     address: "Adresse importée",
                     city: "Abidjan",
                     declaredRentFcfa: loyer,
-                    status: "active",
+                    status: "ACTIVE",
                     managedByUserId: session.user.id
                 }
             });

@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
             data: {
                 password: hashedPassword,
                 role: "SUPER_ADMIN",
-                status: "active"
+                status: "ACTIVE"
             }
         });
     } else {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
                 firstName: "Administrateur de Secours",
                 password: hashedPassword,
                 role: "SUPER_ADMIN",
-                status: "active"
+                status: "ACTIVE"
             }
         });
     }

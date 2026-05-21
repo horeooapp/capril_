@@ -28,7 +28,7 @@ export async function processWalletTriggers() {
   // 2. Traiter les utilisateurs actifs
   const users = await prisma.user.findMany({
     where: {
-      status: "active",
+      status: "ACTIVE",
       leasesAsLandlord: { some: { status: "ACTIVE" } }
     },
     include: {

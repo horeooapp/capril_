@@ -199,7 +199,7 @@ export async function reactivateCollaborator(collaboratorId: string) {
         await (prisma.user as any).update({
             where: { id: collaboratorId },
             data: { 
-                status: "active",
+                status: "ACTIVE",
                 agencyConfig: {
                     ...conf,
                     status: "ACTIVE"
@@ -285,7 +285,7 @@ export async function acceptInvite(token: string, fullName: string) {
                 fullName: fullName,
                 lastName: fullName,
                 agencyConfig: newConfig,
-                status: "active"
+                status: "ACTIVE"
             }
         })
 

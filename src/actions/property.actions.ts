@@ -228,7 +228,7 @@ export async function creerBien(formData: FormData) {
                leaseType: bien.leaseType,
                propertyType: typeStructure === 'IMMEUBLE' ? 'APARTMENT' : 'ROOM',
                declaredRentFcfa: unitRent,
-               status: "active"
+               status: "ACTIVE"
              }
            });
         }

@@ -532,7 +532,7 @@ model User {
   profileType        ProfileType? @map("profile_type")
   kycLevel           Int          @default(0) @map("kyc_level") // 0-4
   kycStatus          String       @default("pending") @map("kyc_status") // pending|verified|under_review|expired|rejected
-  status             String       @default("active") // active|suspended|inactive
+  status             UserStatus   @default(ACTIVE) // active|suspended|inactive
   password           String?
   isCertified        Boolean      @default(false) @map("is_certified")
   onboardingComplete Boolean      @default(false) @map("onboarding_complete")
@@ -3509,16 +3509,22 @@ model Succession {
 // TRUST VAULT (Cautions CACI)
 // ═══════════════════════════════════════════════════════
 model VaultCaution {
-  id               String   @id @default(uuid())
-  tenantName       String   @map("tenant_name")
-  propertyInfo     String   @map("property_info")
+  id               String      @id @default(uuid())
+  tenantId         String?     @map("tenant_id")
+  tenant           User?       @relation(fields: [tenantId], references: [id])
+  propertyId       String?     @map("property_id")
+  property         Property?   @relation(fields: [propertyId], references: [id])
+  tenantName       String      @map("tenant_name") // Fallback / Cache
+  propertyInfo     String      @map("property_info") // Fallback / Cache
   amount           Int
   hash             String
-  status           String   @default("A_TRANSFERER")
-  dateConsignation String?  @map("date_consignation")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  status           VaultStatus @default(A_TRANSFERER)
+  dateConsignation String?     @map("date_consignation")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
 
+  @@index([tenantId])
+  @@index([propertyId])
   @@map("vault_cautions")
 }
 
@@ -3619,4 +3625,18 @@ model AbonnementOperateur {
   lease            Lease                  @relation(fields: [leaseId], references: [id])
 
   @@map("abonnements_operateurs")
+}
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+  BANNED
+  PENDING_PROFILE
+}
+
+enum VaultStatus {
+  A_TRANSFERER
+  CONSIGNEE
+  TERMINE
+  RESTITUEE
 }
