@@ -54,7 +54,7 @@ export const QAPRIL_SEO_CONFIG = {
   },
 };
 
-export function qaprilInjectMeta(pageKey: string) {
+export function qaprilInjectMeta(pageKey: string, sanitizedPathname: string = "/") {
   if (typeof document === 'undefined') return;
 
   const cfg = QAPRIL_SEO_CONFIG;
@@ -102,7 +102,7 @@ export function qaprilInjectMeta(pageKey: string) {
       el.setAttribute("hreflang", code);
       document.head.appendChild(el);
     }
-    el.setAttribute("href", `${site.domain}/${code}${window.location.pathname}`);
+    el.setAttribute("href", `${site.domain}/${code}${sanitizedPathname}`);
   });
 
   setMeta("og:type",        pageKey === "home" ? "website" : "article", "property");
@@ -186,14 +186,16 @@ export function qaprilUpdateSEO(pathname: string) {
     "/features":       "features",
   };
   const pageKey = map[pathname] || map[pathname.replace(/\/$/, "")] || "home";
-  qaprilInjectMeta(pageKey);
+  qaprilInjectMeta(pageKey, pathname);
   qaprilInjectSchema(pageKey);
 }
 
 export function qaprilSEOInit(options: { gtmId?: string, verbose?: boolean } = {}) {
   if (typeof window === 'undefined') return;
   
-  qaprilUpdateSEO(window.location.pathname);
+  // Normalisation du chemin pour éviter les doubles slashes (protection client-side)
+  const safePathname = window.location.pathname.replace(/\/+/g, "/");
+  qaprilUpdateSEO(safePathname);
 
   if (options.gtmId) {
     console.log(`[QAPRIL SEO] GTM initialization requested: ${options.gtmId}`);

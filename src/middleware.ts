@@ -11,6 +11,14 @@ export default auth(async (req) => {
     const ip = req.headers.get("x-forwarded-for")?.split(',')[0] || "anonymous";
     const path = req.nextUrl.pathname;
 
+    // 0. URL Normalization (Prevent double slashes)
+    if (path.includes("//")) {
+        const normalizedPath = path.replace(/\/+/g, "/");
+        const url = req.nextUrl.clone();
+        url.pathname = normalizedPath;
+        return NextResponse.redirect(url, 301);
+    }
+
     // 1. General Rate Limiting for API and Dashboard (ADD-SCALABILITY)
     if (path.startsWith("/api") || path.startsWith("/dashboard")) {
         const withinLimit = await checkRateLimit(`gen:${ip}`, 100, 60); // 100 per min
