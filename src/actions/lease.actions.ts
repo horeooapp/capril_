@@ -80,7 +80,7 @@ export async function createLease(data: {
             let tenant = await prisma.user.findUnique({ where: { phone: normalized } });
             if (!tenant) {
                 tenant = await prisma.user.create({
-                    data: { phone: normalized, role: Role.TENANT, status: 'pending' }
+                    data: { phone: normalized, role: Role.TENANT, status: 'PENDING' }
                 });
             }
             tenantId = tenant.id;
@@ -238,7 +238,7 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
         let tenant = await prisma.user.findUnique({ where: { phone: bdq.telephoneLocataire } });
         if (!tenant) {
             tenant = await prisma.user.create({
-                data: { phone: bdq.telephoneLocataire, firstName: bdq.nomLocataireDeclare, role: Role.TENANT, status: 'pending' }
+                data: { phone: bdq.telephoneLocataire, firstName: bdq.nomLocataireDeclare, role: Role.TENANT, status: 'PENDING' }
             });
         }
 

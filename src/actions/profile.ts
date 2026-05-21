@@ -305,7 +305,7 @@ export async function deleteUserAccount() {
             where: { id: userId },
             data: {
                 deletedAt: new Date(),
-                status: 'inactive'
+                status: 'INACTIVE'
             }
         });
 

@@ -258,7 +258,7 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
             data: {
                 ...userData,
                 password: hashedPassword,
-                status: 'active',
+                status: 'ACTIVE',
                 isCertified: true,
                 kycLevel: 4,
                 kycStatus: 'verified'

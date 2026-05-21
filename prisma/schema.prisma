@@ -3634,6 +3634,8 @@ enum UserStatus {
   INACTIVE
   BANNED
   PENDING_PROFILE
+  PENDING
+  INVITED
 }
 
 enum VaultStatus {

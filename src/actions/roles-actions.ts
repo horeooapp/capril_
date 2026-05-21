@@ -44,7 +44,7 @@ export async function inviteManager(propertyId: string, phone: string, role: Bie
                 data: {
                     phone,
                     role: "TENANT", 
-                    status: "invited"
+                    status: "INVITED"
                 }
             })
         }

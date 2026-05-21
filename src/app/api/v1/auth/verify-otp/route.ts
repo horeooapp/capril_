@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         data: {
           phone,
           role: 'TENANT',
-          status: 'active',
+          status: 'ACTIVE',
           kycLevel: 1,
           kycStatus: 'verified' // Level 1 (Phone) is verified by OTP
         }

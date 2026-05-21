@@ -62,7 +62,7 @@ export async function creerBailDeclaratif(
         firstName: data.tenantFullName.split(' ')[0] || '',
         lastName: data.tenantFullName.split(' ').slice(1).join(' ') || '',
         role:     "TENANT",
-        status:   "active",
+        status:   "ACTIVE",
         onboardingComplete: false,
       }
     })
@@ -83,7 +83,7 @@ export async function creerBailDeclaratif(
         commune:       data.commune,
         address:       data.address,
         propertyType:  "Appartement",
-        status:        "active"
+        status:        "ACTIVE"
       }
     })
     propertyId = property.id

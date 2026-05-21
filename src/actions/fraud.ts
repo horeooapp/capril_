@@ -84,7 +84,7 @@ export async function addToBlacklist(data: {
             for (const u of usersToSuspend) {
                 await prisma.user.update({
                     where: { id: u.id },
-                    data: { status: "suspended" }
+                    data: { status: "SUSPENDED" }
                 })
                 await prisma.userFraudProfile.upsert({
                     where: { userId: u.id },
