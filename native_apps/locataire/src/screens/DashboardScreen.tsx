@@ -83,13 +83,17 @@ export default function DashboardScreen({ navigation, route }: any) {
 
   const handlePayment = () => {
     if (data?.lease?.id) {
-      navigation.navigate('PaymentProcess', { 
-        amount: data.totalArrears || data.lease.rent, 
-        leaseId: data.lease.id,
-        token 
-      });
+      if (data.lease.status === 'ACTIVE' || data.lease.status === 'LOYER_IMPAYE') {
+        navigation.navigate('PaymentProcess', { 
+          amount: data.totalArrears || data.lease.rent, 
+          leaseId: data.lease.id,
+          token 
+        });
+      } else {
+        Alert.alert("Action Requise", `Votre bail est en attente (${data.lease.status}). Veuillez finaliser la signature pour activer le paiement.`);
+      }
     } else {
-      Alert.alert("Information", "Aucun bail actif trouvé pour le paiement.");
+      Alert.alert("Information", "Aucun bail trouvé. Veuillez contacter votre propriétaire pour formaliser votre occupation.");
     }
   };
 
@@ -137,14 +141,23 @@ export default function DashboardScreen({ navigation, route }: any) {
 
         {/* PAYMENT CARD (In Header) */}
         <View style={styles.lhCard}>
-          <Text style={styles.lhAmountLbl}>Loyer en cours</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 4}}>
+             <Text style={styles.lhAmountLbl}>Loyer de base</Text>
+             {data?.totalArrears > 0 && (
+               <View style={{backgroundColor: '#FECACA', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12}}>
+                  <Text style={{color: '#B91C1C', fontSize: 10, fontWeight: 'bold'}}>+{data.totalArrears.toLocaleString()} Arriérés</Text>
+               </View>
+             )}
+          </View>
           <Text style={styles.lhAmount}>
-            {data?.totalArrears?.toLocaleString() ?? data?.lease?.rent?.toLocaleString() ?? 0} 
-            <Text style={styles.lhAmountCurrency}> FCFA</Text>
+            {(data?.lease?.rent || 0).toLocaleString()} 
+            <Text style={styles.lhAmountCurrency}> FCFA / mois</Text>
           </Text>
           <TouchableOpacity style={styles.lhPayBtn} onPress={handlePayment}>
             <CreditCard size={12} color={Colors.qOrange} />
-            <Text style={styles.lhPayBtnText}>Payer maintenant</Text>
+            <Text style={styles.lhPayBtnText}>
+              {data?.totalArrears > 0 ? `Payer ${data.totalArrears.toLocaleString()} FCFA` : 'Payer le loyer'}
+            </Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -159,11 +172,11 @@ export default function DashboardScreen({ navigation, route }: any) {
           {/* QUICK ACTIONS GRID */}
           <View style={styles.qaGrid}>
             {renderQuickAction('Quittance', '📄', () => {
-              if (data?.lease?.qrToken) {
-                const url = `${API_ENDPOINTS.BASE_URL}/v/${data.lease.qrToken}`;
+              if (data?.latestReceiptToken) {
+                const url = `${API_ENDPOINTS.BASE_URL}/v/${data.latestReceiptToken}`;
                 navigation.navigate('ReceiptView', { url, token });
               } else {
-                Alert.alert("Information", "Aucune quittance disponible.");
+                Alert.alert("Information", "Aucune quittance disponible pour le moment.");
               }
             })}
             {renderQuickAction('Maintenance', '🛠️', () => navigation.navigate('Services', { token, leaseId: data?.lease?.id }))}

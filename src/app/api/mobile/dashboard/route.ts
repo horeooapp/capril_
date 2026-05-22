@@ -49,7 +49,7 @@ export async function POST(req: Request) {
             const activeLease = await prisma.lease.findFirst({
                 where: {
                     tenantId: userId,
-                    status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF"] }
+                    status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_CONFIRMATION"] }
                 },
                 include: {
                     property: true,
@@ -118,6 +118,7 @@ export async function POST(req: Request) {
                     userId: user.id,
                     userEmail: user.email,
                     fullName: fallbackName,
+                    latestReceiptToken: activeLease.receipts[0]?.qrToken || null,
                     lease: {
                         id: activeLease.id,
                         ref: activeLease.leaseReference,
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
                         rent: activeLease.rentAmount,
                         charges: activeLease.chargesAmount,
                         status: activeLease.status,
-                        documentUrl: null,
+                        documentUrl: `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/mobile/leases/${activeLease.id}/pdf`,
                         landlord: {
                             name: activeLease.landlord.firstName + ' ' + activeLease.landlord.lastName,
                             phone: activeLease.landlord.phone,

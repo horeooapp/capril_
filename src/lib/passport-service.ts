@@ -76,9 +76,9 @@ export class PasseportService {
     const passport = await this.getOrCreatePassport(userId);
 
     return {
-        score: scoreResult.score,
-        badge: scoreResult.badge,
-        tauxPaiement: scoreResult.tauxPaiement12m,
+        score: scoreResult.score ?? 500,
+        badge: scoreResult.badge ?? 'C',
+        tauxPaiement: scoreResult.tauxPaiement12m ?? 100,
         refPasseport: passport.refPasseport,
         lastUpdated: passport.createdAt
     };

@@ -91,17 +91,14 @@ export default function ContractScreen({ navigation, route }: any) {
   };
 
   const handleDownloadPDF = () => {
-    Alert.alert(
-      "Téléchargement",
-      "Le contrat de bail PDF va être téléchargé sur votre appareil.",
-      [
-        { text: "Annuler", style: "cancel" },
-        { text: "OK", onPress: () => {
-          if (lease?.documentUrl) Linking.openURL(lease.documentUrl);
-          else Alert.alert("Non disponible", "Aucun PDF associé à ce bail en base de données.");
-        }}
-      ]
-    );
+    if (lease?.documentUrl) {
+      Linking.openURL(lease.documentUrl);
+    } else if (lease?.id) {
+       const dynamicUrl = `${API_ENDPOINTS.BASE_URL}/api/mobile/leases/${lease.id}/pdf`;
+       Linking.openURL(dynamicUrl);
+    } else {
+      Alert.alert("Erreur", "URL du document non disponible.");
+    }
   };
 
   return (

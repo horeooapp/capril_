@@ -204,3 +204,103 @@ export async function generatePassportPDF(data: {
     return Buffer.from(pdfBytes);
 }
 
+
+/**
+ * PHASE 3 : CONTRAT DE BAIL CERTIFIÉ
+ */
+export async function generateLeasePDF(data: {
+    leaseRef: string;
+    landlord: any;
+    tenant: any;
+    property: any;
+    rentAmount: number;
+    depositAmount: number;
+    avanceAmount: number;
+    startDate: Date;
+    durationMonths: number;
+    paymentDay: number;
+    signedAt?: Date;
+    qrToken?: string;
+    sha256Hash?: string;
+}): Promise<Buffer> {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]);
+    
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontMono = await pdfDoc.embedFont(StandardFonts.Courier);
+    const { width, height } = page.getSize();
+    
+    // 1. Header
+    await drawStandardHeader(page, pdfDoc, "CONTRAT DE BAIL À USAGE D'HABITATION", `Réf: ${data.leaseRef}`);
+
+    let currentY = height - 150;
+
+    // Introduction text
+    page.drawText("Loi N°2019-576 du 26 juin 2019 instituant le Code de la Construction et de l'Habitat", {
+        x: 50, y: currentY, size: 8, font: fontBold, color: COLORS.SLATE
+    });
+    currentY -= 30;
+
+    // Parties
+    drawSectionTitle(page, fontBold, 'ENTRE LES SOUSSIGNÉS', currentY);
+    currentY -= 30;
+
+    // Landlord
+    const landlordName = (data.landlord.firstName + ' ' + (data.landlord.lastName || '')).trim();
+    page.drawText(`BAILLEUR : ${landlordName}`, { x: 50, y: currentY, size: 12, font: fontBold, color: COLORS.NAVY });
+    currentY -= 15;
+    page.drawText(`Tél: ${data.landlord.phone || 'Non renseigné'} | Email: ${data.landlord.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
+    currentY -= 25;
+
+    // Tenant
+    const tenantName = (data.tenant.firstName + ' ' + (data.tenant.lastName || '')).trim();
+    page.drawText(`LOCATAIRE : ${tenantName}`, { x: 50, y: currentY, size: 12, font: fontBold, color: COLORS.NAVY });
+    currentY -= 15;
+    page.drawText(`Tél: ${data.tenant.phone || 'Non renseigné'} | Email: ${data.tenant.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
+    currentY -= 35;
+
+    // Property
+    drawSectionTitle(page, fontBold, 'DÉSIGNATION DU BIEN', currentY);
+    currentY -= 20;
+    page.drawText(data.property.name || 'Logement QAPRIL', { x: 50, y: currentY, size: 11, font: fontBold });
+    currentY -= 15;
+    page.drawText(data.property.address || 'Adresse non spécifiée', { x: 50, y: currentY, size: 10, font });
+    currentY -= 40;
+
+    // Financials
+    drawSectionTitle(page, fontBold, 'CONDITIONS FINANCIÈRES', currentY);
+    currentY -= 25;
+    page.drawText(`LOYER MENSUEL : ${data.rentAmount.toLocaleString()} FCFA`, { x: 50, y: currentY, size: 11, font: fontBold });
+    currentY -= 15;
+    page.drawText(`CHARGES : 0 FCFA (Incluses)`, { x: 50, y: currentY, size: 10, font });
+    currentY -= 15;
+    page.drawText(`DÉPÔT DE GARANTIE : ${data.depositAmount.toLocaleString()} FCFA`, { x: 50, y: currentY, size: 10, font });
+    currentY -= 40;
+
+    // Signature Status
+    if (data.signedAt) {
+        page.drawRectangle({ x: 50, y: currentY - 50, width: width - 250, height: 60, color: rgb(0.9, 0.95, 0.9) });
+        page.drawText('CONTRAT SIGNÉ ÉLECTRONIQUEMENT', { x: 60, y: currentY - 20, size: 10, font: fontBold, color: COLORS.SUCCESS });
+        page.drawText(`Le ${format(data.signedAt, 'dd/MM/yyyy HH:mm', { locale: fr })} via QAPRIL M-SIGN`, { x: 60, y: currentY - 35, size: 9, font });
+    } else {
+        page.drawText('EN ATTENTE DE SIGNATURE', { x: 50, y: currentY, size: 12, font: fontBold, color: rgb(0.8, 0.4, 0) });
+    }
+
+    // QR Code for verification
+    const valUrl = `https://www.qapril.net/v/${data.qrToken || data.leaseRef}`;
+    const qrData = await QRCode.toDataURL(valUrl, { width: 150 });
+    const qrImg = await pdfDoc.embedPng(qrData);
+    page.drawImage(qrImg, { x: width - 150, y: currentY - 140, width: 100, height: 100 });
+    page.drawText('SCANNEZ POUR VÉRIFIER', { x: width - 155, y: currentY - 150, size: 7, font: fontBold, color: COLORS.SLATE });
+
+    // Hash Security
+    if (data.sha256Hash) {
+        page.drawText(`CERTIFICATION DIGITALE (SHA-256) :`, { x: 50, y: 105, size: 7, font: fontBold, color: COLORS.SLATE });
+        page.drawText(data.sha256Hash, { x: 50, y: 95, size: 7, font: fontMono, color: COLORS.SLATE });
+    }
+
+    drawStandardFooter(page, pdfDoc);
+    const bytes = await pdfDoc.save();
+    return Buffer.from(bytes);
+}

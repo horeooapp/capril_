@@ -50,7 +50,7 @@ export default function DashboardScreen({ navigation, route }: any) {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [API_DASHBOARD, token, navigation]);
 
   if (loading) {
     return (
@@ -232,11 +232,10 @@ const styles = StyleSheet.create({
   },
   
   fixedHeader: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 50,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 10 : 60,
     paddingHorizontal: 16,
     paddingBottom: 52,
     position: 'relative',
-    overflow: 'hidden',
     zIndex: 10,
   },
   headerTop: {
@@ -244,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-    marginTop: 10,
+    marginTop: 14,
   },
   headerSubtitle: {
     fontFamily: Typography.fontFamily.body,
@@ -260,14 +259,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   avatarLabel: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   avatarTextMain: {
     fontFamily: Typography.fontFamily.heading,
@@ -276,12 +275,12 @@ const styles = StyleSheet.create({
   },
   onlineDot: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: Colors.qCoral,
+    top: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#4ADE80',
     borderWidth: 2,
     borderColor: Colors.qGreenDark,
   },
