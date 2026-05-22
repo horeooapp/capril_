@@ -370,7 +370,7 @@ export default async function AdminDashboardOverview() {
                                     <tr key={lease.id}>
                                         <td>
                                             <div className="tenant-cell">
-                                                <div className="t-avatar" style={{backgroundColor: 'var(--ci-nuit2)'}}>{tInitials}</div>
+                                                <div className="t-avatar" style={{backgroundColor: 'var(--ci-vert-pale)', color: 'var(--ci-vert)'}}>{tInitials}</div>
                                                 <div className="t-name text-[11px] truncate max-w-[120px]">{tName}</div>
                                             </div>
                                         </td>
@@ -408,7 +408,7 @@ export default async function AdminDashboardOverview() {
                                     const tName = rec.lease?.tenant?.lastName ? `${rec.lease.tenant.firstName} ${rec.lease.tenant.lastName}` : 'Locataire Inconnu';
                                     const lName = rec.lease?.landlord?.lastName ? `${rec.lease.landlord.firstName} ${rec.lease.landlord.lastName}` : 'Propriétaire Inconnu';
                                     return (
-                                    <div key={rec.id} className="mm-card mtn-card" style={{ borderColor: 'var(--ci-orange)' }}>
+                                    <div key={rec.id} className="mm-card mtn-card" style={{ borderColor: 'var(--ci-orange)', background: 'rgba(255,255,255,0.6)' }}>
                                         <div className="mm-op truncate text-[10px]" title={`De: ${tName}\nÀ: ${lName}`}>
                                             <span style={{color: 'var(--text-main)'}}>{tName.split(' ')[0]}</span> <span style={{opacity: 0.5}}>→</span> <span style={{color: 'var(--ci-or)'}}>{lName.split(' ')[0]}</span>
                                         </div>
@@ -419,10 +419,10 @@ export default async function AdminDashboardOverview() {
                                 {recentReceipts.length === 0 && (
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
-                                <div className="mm-card mtn-card mt-2 col-span-2" style={{ background: 'var(--ci-nuit)', color: '#fff' }}>
+                                <div className="mm-card mtn-card mt-2 col-span-2" style={{ background: 'linear-gradient(135deg, var(--ci-nuit), #3b82f6)', color: '#fff' }}>
                                     <div className="mm-op">TRESOR/CDC</div>
                                     <div className="mm-amount">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
-                                    <div className="mm-sub">Fonds Consignés Global</div>
+                                    <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Fonds Consignés Global</div>
                                 </div>
                             </div>
                         </div>
