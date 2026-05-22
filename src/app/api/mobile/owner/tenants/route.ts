@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             };
         }));
 
-        return NextResponse.json({ success: true, tenants });
+        return NextResponse.json({ success: true, tenants, ownerId: userId });
 
     } catch (error: any) {
         console.error("Erreur API Tenants Mobile:", error);

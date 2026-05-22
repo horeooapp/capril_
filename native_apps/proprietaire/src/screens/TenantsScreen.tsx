@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, TouchableOpacity, Linking, TextInput } from 'react-native';
-import { ChevronLeft, Users, Phone, MapPin, AlertCircle, Search, Award } from 'lucide-react-native';
+import { ChevronLeft, Users, Phone, MessageSquare, MapPin, AlertCircle, Search, Award } from 'lucide-react-native';
 import { API_ENDPOINTS } from '../config/api';
 
 export default function TenantsScreen({ route, navigation }: any) {
   const token = route.params?.token;
   const [tenants, setTenants] = useState<any[]>([]);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -24,14 +25,17 @@ export default function TenantsScreen({ route, navigation }: any) {
     })
       .then(res => res.json())
       .then(json => {
-        if (json.success) setTenants(json.tenants);
+        if (json.success) {
+          setTenants(json.tenants);
+          setOwnerId(json.ownerId);
+        }
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [API_TENANTS, token]);
 
   const makeCall = (phone: string) => {
     Linking.openURL(`tel:${phone.replace(/\s/g, '')}`);
@@ -99,9 +103,22 @@ export default function TenantsScreen({ route, navigation }: any) {
                      </View>
                      <Text style={styles.scoreTiny}>{t.reliability?.score} pts</Text>
                   </View>
-                  <TouchableOpacity onPress={() => makeCall(t.phone)} style={styles.phoneBtn}>
-                     <Phone size={16} color="#064E3B" />
-                  </TouchableOpacity>
+                  <View style={styles.actionRow}>
+                    <TouchableOpacity 
+                      onPress={() => navigation.navigate('Message', { 
+                        token, 
+                        leaseId: t.leaseId, 
+                        userId: ownerId, 
+                        tenantName: t.name 
+                      })} 
+                      style={[styles.actionBtn, { backgroundColor: '#eff6ff' }]}
+                    >
+                      <MessageSquare size={16} color="#1d4ed8" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => makeCall(t.phone)} style={styles.phoneBtn}>
+                      <Phone size={16} color="#064E3B" />
+                    </TouchableOpacity>
+                  </View>
                </View>
 
                <View style={styles.divider} />
@@ -148,6 +165,8 @@ const styles = StyleSheet.create({
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   address: { fontSize: 12, color: '#6b7280' },
   phoneBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#ecfdf5', justifyContent: 'center', alignItems: 'center' },
+  actionRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  actionBtn: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
   divider: { height: 1, backgroundColor: '#f3f4f6', marginVertical: 12 },
   footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   rentLabel: { fontSize: 13, color: '#4b5563' },

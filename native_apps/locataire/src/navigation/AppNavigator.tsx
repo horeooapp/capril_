@@ -7,7 +7,6 @@ import { LogOut } from 'lucide-react-native';
 
 import AuthScreen from '../screens/AuthScreen';
 import DashboardScreen from '../screens/DashboardScreen';
-import EmergencyServicesScreen from '../screens/EmergencyServicesScreen';
 import ContractScreen from '../screens/ContractScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PaymentProcessScreen from '../screens/PaymentProcessScreen';
@@ -19,6 +18,8 @@ import ScanBillScreen from '../screens/ScanBillScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PassportScreen from '../screens/PassportScreen';
 import MarketplaceScreen from '../screens/MarketplaceScreen';
+import MaintenanceScreen from '../screens/MaintenanceScreen';
+import EmergencyServicesScreen from '../screens/EmergencyServicesScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -131,6 +132,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Passport" component={PassportScreen} />
       <Stack.Screen name="Marketplace" component={MarketplaceScreen} />
       <Stack.Screen name="Chat" component={MessageScreen} />
+      <Stack.Screen name="Services" component={MaintenanceScreen} />
+      <Stack.Screen name="Emergency" component={EmergencyServicesScreen} />
     </Stack.Navigator>
   );
 }

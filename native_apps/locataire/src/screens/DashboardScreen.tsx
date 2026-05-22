@@ -11,6 +11,7 @@ import {
   Platform,
   Alert
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
   Bell, 
@@ -38,6 +39,7 @@ const { width } = Dimensions.get('window');
 
 export default function DashboardScreen({ navigation, route }: any) {
   const { token } = route.params || {};
+  const isFocused = useIsFocused();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,7 +53,12 @@ export default function DashboardScreen({ navigation, route }: any) {
     })
       .then(res => res.json())
       .then(json => {
-        setData(json.data);
+        // Enforce data consistency for the mobile UI
+        const mappedData = {
+          ...json.data,
+          name: json.data.fullName || json.data.name || 'Locataire'
+        };
+        setData(mappedData);
         setLoading(false);
       })
       .catch(err => {
@@ -64,7 +71,7 @@ export default function DashboardScreen({ navigation, route }: any) {
         registerForPushNotificationsAsync(token);
       });
     }
-  }, []);
+  }, [API_DASHBOARD, token, isFocused]);
 
   if (loading) {
     return (
@@ -151,10 +158,17 @@ export default function DashboardScreen({ navigation, route }: any) {
         >
           {/* QUICK ACTIONS GRID */}
           <View style={styles.qaGrid}>
-            {renderQuickAction('Quittance', '📄', () => navigation.navigate('History'))}
-            {renderQuickAction('Maintenance', '🛠️', () => navigation.navigate('Services'))}
-            {renderQuickAction('Mon Bail', '🏠', () => navigation.navigate('Contract', { lease: data?.lease }))}
-            {renderQuickAction('Marketplace', '🛒', () => navigation.navigate('Marketplace'))}
+            {renderQuickAction('Quittance', '📄', () => {
+              if (data?.lease?.qrToken) {
+                const url = `${API_ENDPOINTS.BASE_URL}/v/${data.lease.qrToken}`;
+                navigation.navigate('ReceiptView', { url, token });
+              } else {
+                Alert.alert("Information", "Aucune quittance disponible.");
+              }
+            })}
+            {renderQuickAction('Maintenance', '🛠️', () => navigation.navigate('Services', { token, leaseId: data?.lease?.id }))}
+            {renderQuickAction('Mon Bail', '🏠', () => navigation.navigate('Contract', { lease: data?.lease, token }))}
+            {renderQuickAction('Marketplace', '🛒', () => navigation.navigate('Marketplace', { token }))}
           </View>
 
           {/* LANDLORD INFO CARD */}
@@ -176,7 +190,7 @@ export default function DashboardScreen({ navigation, route }: any) {
                 </View>
                 <TouchableOpacity 
                   style={styles.lcChatBtn}
-                  onPress={() => navigation.navigate('Chat', { leaseId: data.lease.id })}
+                  onPress={() => navigation.navigate('Chat', { leaseId: data.lease.id, token, userId: data.userId })}
                 >
                   <MessageSquare size={20} color={Colors.white} />
                 </TouchableOpacity>
@@ -388,6 +402,75 @@ const styles = StyleSheet.create({
     width: (width - 60) / 4,
     alignItems: 'center',
     gap: 4,
+  },
+
+  landlordCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(26, 31, 60, 0.06)',
+  },
+  lcHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  lcTitle: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 13,
+    color: Colors.qNavy,
+  },
+  onlineBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  onlineText: {
+    fontFamily: Typography.fontFamily.bodyBold,
+    fontSize: 9,
+    color: Colors.white,
+  },
+  lcBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lcAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: Colors.qWarm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  lcAvatarText: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 18,
+    color: Colors.qNavy,
+  },
+  lcInfo: {
+    flex: 1,
+  },
+  lcName: {
+    fontFamily: Typography.fontFamily.heading,
+    fontSize: 14,
+    color: Colors.qNavy,
+  },
+  lcPhone: {
+    fontFamily: Typography.fontFamily.body,
+    fontSize: 11,
+    color: Colors.qNavyMedium,
+  },
+  lcChatBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.qOrange,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   qaIcon: {
     width: 58,

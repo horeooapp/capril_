@@ -19,7 +19,8 @@ import {
   User, 
   TrendingUp, 
   CheckCircle,
-  Clock
+  Clock,
+  MessageCircle
 } from 'lucide-react-native';
 import { Colors } from '../theme/colors';
 import { Typography } from '../theme/typography';
@@ -91,6 +92,19 @@ export default function DashboardScreen({ navigation, route }: any) {
               </Text>
             </View>
             <Text style={styles.bcTenantName}>{item.tenantName || 'Aucun locataire'}</Text>
+            {item.leaseId && (
+              <TouchableOpacity 
+                style={styles.bcChatBtn} 
+                onPress={() => navigation.navigate('Message', { 
+                  token, 
+                  leaseId: item.leaseId, 
+                  userId: data.userId, 
+                  tenantName: item.tenantName 
+                })}
+              >
+                <MessageCircle size={14} color={Colors.qGreen} />
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={[styles.bcAmt, { color: Colors.qNavy }]}>
             {item.rent?.toLocaleString() ?? item.loyer?.toLocaleString() ?? '0'} <Text style={{fontSize: 10}}>F</Text>
@@ -457,5 +471,11 @@ const styles = StyleSheet.create({
   bcAmt: {
     fontFamily: Typography.fontFamily.heading,
     fontSize: 13,
+  },
+  bcChatBtn: {
+    marginLeft: 8,
+    padding: 4,
+    backgroundColor: Colors.qGreenLight,
+    borderRadius: 6,
   }
 });

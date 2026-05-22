@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -17,14 +17,22 @@ import { Typography } from '../theme/typography';
 import { API_ENDPOINTS } from '../config/api';
 
 export default function MessageScreen({ navigation, route }: any) {
-  const { token, leaseId } = route.params || {};
+  const { token, leaseId, userId } = route.params || {};
   const [messages, setMessages] = useState<any[]>([]);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  const fetchMessages = () => {
+  const markAsRead = useCallback((messageIds: string[]) => {
+    fetch(API_ENDPOINTS.MESSAGES, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, action: 'READ', leaseId, messageIds })
+    });
+  }, [token, leaseId]);
+
+  const fetchMessages = useCallback(() => {
     fetch(API_ENDPOINTS.MESSAGES, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -36,7 +44,7 @@ export default function MessageScreen({ navigation, route }: any) {
           setMessages(json.data);
           // Mark unread as read
           const unreadIds = json.data
-            .filter((m: any) => m.statut !== 'LU' && m.expediteurId !== token)
+            .filter((m: any) => m.statut !== 'LU' && m.expediteurId !== userId)
             .map((m: any) => m.id);
           if (unreadIds.length > 0) {
             markAsRead(unreadIds);
@@ -48,21 +56,13 @@ export default function MessageScreen({ navigation, route }: any) {
         console.error(err);
         setLoading(false);
       });
-  };
-
-  const markAsRead = (messageIds: string[]) => {
-    fetch(API_ENDPOINTS.MESSAGES, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, action: 'READ', leaseId, messageIds })
-    });
-  };
+  }, [token, leaseId, userId, markAsRead]);
 
   useEffect(() => {
     fetchMessages();
     const interval = setInterval(fetchMessages, 5000); // Poll every 5s
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchMessages]);
 
   const sendMessage = () => {
     if (!content.trim() || sending) return;
@@ -85,7 +85,7 @@ export default function MessageScreen({ navigation, route }: any) {
   };
 
   const renderMessage = ({ item }: { item: any }) => {
-    const isMine = item.expediteurId === token;
+    const isMine = item.expediteurId === userId;
     return (
       <View style={[styles.bubbleWrapper, isMine ? styles.myWrapper : styles.theirWrapper]}>
         <View style={[styles.bubble, isMine ? styles.myBubble : styles.theirBubble]}>

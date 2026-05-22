@@ -1,16 +1,25 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMobileToken } from '@/lib/mobile-auth';
 
 export async function POST(request: Request) {
     try {
-        const { token, action, leaseId, content, isOnline } = await request.json();
+        const body = await request.json();
+        const { token, action, leaseId, content, isOnline } = body;
 
         if (!token) {
-            return NextResponse.json({ success: false, error: 'Token requis' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Token requis' }, { status: 401 });
         }
 
-        const user = await prisma.user.findFirst({
-            where: { id: token }
+        const payload = await verifyMobileToken(token);
+        if (!payload) {
+            return NextResponse.json({ success: false, error: 'Non autorisé. Jeton invalide.' }, { status: 401 });
+        }
+
+        const userId = payload.userId;
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
         });
 
         if (!user) {
@@ -26,12 +35,15 @@ export async function POST(request: Request) {
         }
 
         if (action === 'READ') {
-            const { messageIds } = await request.json();
+            const { messageIds } = body;
+            if (!messageIds || !Array.isArray(messageIds)) {
+                return NextResponse.json({ success: false, error: 'messageIds requis' }, { status: 400 });
+            }
             await prisma.messagerieBail.updateMany({
                 where: {
                     id: { in: messageIds },
                     leaseId: leaseId,
-                    expediteurId: { not: user.id } // Ne pas marquer ses propres messages comme lus
+                    expediteurId: { not: user.id }
                 },
                 data: {
                     statut: 'LU',
@@ -63,7 +75,7 @@ export async function POST(request: Request) {
                 data: {
                     leaseId,
                     expediteurId: user.id,
-                    roleExpediteur: user.role === 'LANDLORD' ? 'PROPRIO' : 'LOCATAIRE',
+                    roleExpediteur: user.role === 'LANDLORD' || user.role === 'LANDLORD_PRO' ? 'PROPRIO' : 'LOCATAIRE',
                     contenu: content,
                     statut: 'ENVOYE'
                 },

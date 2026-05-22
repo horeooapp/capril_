@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import { NextResponse } from 'next/server';
 import { getCommuneMarketReport } from '@/lib/observatory';
+import { PasseportService } from '@/lib/passport-service';
 
 export async function POST(req: Request) {
     try {
@@ -81,6 +82,16 @@ export async function POST(req: Request) {
             const totalArrears = activeLease.arrears.reduce((sum, arr) => sum + Number(arr.amount || 0), 0);
             const nextDueDate = activeLease.paymentDay ? `Le ${activeLease.paymentDay} du mois` : "Non spécifié";
 
+            // Données de fiabilité du Passeport Locatif
+            const passport = await PasseportService.getOrCreatePassport(userId);
+            const reliabilityScore = passport.scoreGlobal || 0;
+            const monthsPaidCount = await prisma.receipt.count({
+                where: {
+                    leaseId: activeLease.id,
+                    status: { in: ["PAID", "ENCAISSE", "SUCCESS"] }
+                }
+            });
+
             // Vrais requêtes de maintenance
             const activeRequestsCount = await prisma.ticketMaintenance.count({
                 where: { logementId: activeLease.propertyId, statut: { in: ['EN_ATTENTE', 'PRIS_EN_CHARGE'] } }
@@ -102,6 +113,8 @@ export async function POST(req: Request) {
                     })),
                     activeRequests: activeRequestsCount,
                     hasLease: true,
+                    reliabilityScore,
+                    monthsPaidCount,
                     userId: user.id,
                     userEmail: user.email,
                     fullName: fallbackName,
@@ -167,7 +180,9 @@ export async function POST(req: Request) {
                         name: prop.name || prop.propertyCode,
                         status: hasLease ? "Loué" : "Vacant",
                         rent: hasLease ? `${prop.leases[0].rentAmount || 0} FCFA` : `${prop.declaredRentFcfa || 0} FCFA`,
-                        tenantName
+                        tenantName,
+                        tenantId: hasLease ? prop.leases[0].tenantId : null,
+                        leaseId: hasLease ? prop.leases[0].id : null
                     });
                 } else {
                     if (prop.units && prop.units.length > 0) {
@@ -191,7 +206,9 @@ export async function POST(req: Request) {
                                 name: `${prop.name || prop.propertyCode} - ${unit.unitLabel || "Unité"}`,
                                 status: unitHasLease ? "Loué" : "Vacant",
                                 rent: unitHasLease ? `${unit.leases[0].rentAmount || 0} FCFA` : `${unit.declaredRentFcfa || 0} FCFA`,
-                                tenantName
+                                tenantName,
+                                tenantId: unitHasLease ? unit.leases[0].tenantId : null,
+                                leaseId: unitHasLease ? unit.leases[0].id : null
                             });
                         }
                     } else {
@@ -288,6 +305,7 @@ export async function POST(req: Request) {
             return NextResponse.json({
                 success: true,
                 data: {
+                    userId: user.id,
                     greeting: `Bonjour, ${fallbackName}`,
                     totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} FCFA`,
                     occupancyRate: `${occupancyRate}%`,
