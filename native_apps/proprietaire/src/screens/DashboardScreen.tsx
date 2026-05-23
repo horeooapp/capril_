@@ -233,7 +233,8 @@ const styles = StyleSheet.create({
   
   fixedHeader: {
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 10 : 60,
-    paddingHorizontal: 16,
+    paddingLeft: 16,
+    paddingRight: 20,
     paddingBottom: 52,
     position: 'relative',
     zIndex: 10,
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
+    padding: 4,
   },
   avatarLabel: {
     width: 42,

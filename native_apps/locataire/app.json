@@ -12,6 +12,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#E8601A"
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/380035ec-a5b8-429b-9864-f4fc6646a77c"
+    },
     "ios": {
       "supportsTablet": true
     },

@@ -8,7 +8,8 @@ import {
   Image, 
   ActivityIndicator, 
   Alert,
-  ScrollView
+  ScrollView,
+  TextInput
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, FileText, CheckCircle2, AlertCircle, ArrowLeft, RefreshCw, CreditCard } from 'lucide-react-native';
@@ -20,6 +21,8 @@ export default function ScanBillScreen({ navigation, route }: any) {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [isManualMode, setIsManualMode] = useState(false);
+  const [manualAmount, setManualAmount] = useState('');
 
   const pickImage = async (useCamera = false) => {
     let result;
@@ -87,6 +90,18 @@ export default function ScanBillScreen({ navigation, route }: any) {
       amount: result.amount, 
       token,
       source: 'SCAN_IA'
+    });
+  };
+  
+  const handleManualSubmit = () => {
+    const amount = parseInt(manualAmount.replace(/[^0-9]/g, ''));
+    if (isNaN(amount) || amount <= 0) {
+      return Alert.alert("Erreur", "Veuillez saisir un montant valide.");
+    }
+    navigation.navigate('PaymentProcess', { 
+      amount: amount, 
+      token,
+      source: 'MANUAL_ENTRY'
     });
   };
 
@@ -162,11 +177,45 @@ export default function ScanBillScreen({ navigation, route }: any) {
               <View style={[styles.statusBox, styles.errorBox]}>
                 <AlertCircle size={30} color={Colors.danger} />
                 <Text style={styles.errorText}>L'IA n'a pas pu lire cette facture.</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={() => setImage(null)}>
-                  <Text style={styles.retryButtonText}>Réessayer</Text>
+                
+                <TouchableOpacity style={styles.payButton} onPress={() => setIsManualMode(true)}>
+                   <Text style={[styles.payButtonText, { fontSize: 14 }]}>Saisir le montant manuellement</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.retryButton} onPress={() => { setImage(null); setIsManualMode(false); }}>
+                  <RefreshCw size={16} color={Colors.text.muted} />
+                  <Text style={styles.retryButtonText}>Réessayer la photo</Text>
                 </TouchableOpacity>
               </View>
             )}
+          </View>
+        )}
+
+        {isManualMode && (
+          <View style={styles.manualContainer}>
+            <Text style={styles.manualTitle}>Saisie Manuelle</Text>
+            <Text style={styles.manualSub}>Entrez le montant total net à payer indiqué sur votre facture.</Text>
+            
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.manualInput}
+                placeholder="Montant en FCFA"
+                keyboardType="numeric"
+                value={manualAmount}
+                onChangeText={setManualAmount}
+                autoFocus
+              />
+              <Text style={styles.currencyLabel}>FCFA</Text>
+            </View>
+
+            <TouchableOpacity style={styles.payButton} onPress={handleManualSubmit}>
+               <CreditCard size={20} color={Colors.white} />
+               <Text style={styles.payButtonText}>Valider et Payer</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.retryButton} onPress={() => setIsManualMode(false)}>
+               <Text style={styles.retryButtonText}>Annuler</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
@@ -268,5 +317,40 @@ const styles = StyleSheet.create({
   retryButton: { marginTop: 20, flexDirection: 'row', alignItems: 'center', gap: 8 },
   retryButtonText: { color: Colors.text.muted, fontSize: 14, fontWeight: '600' },
   errorBox: { borderColor: Colors.danger, borderWidth: 1 },
-  errorText: { marginTop: 16, fontSize: 14, color: Colors.danger, fontWeight: '700', textAlign: 'center' }
+  errorText: { marginTop: 16, fontSize: 14, color: Colors.danger, fontWeight: '700', textAlign: 'center', marginBottom: 20 },
+  manualContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 24,
+    padding: 24,
+    marginTop: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10
+  },
+  manualTitle: { fontSize: 18, fontWeight: '900', color: Colors.primary, marginBottom: 8 },
+  manualSub: { fontSize: 13, color: Colors.text.muted, marginBottom: 20 },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#e2e8f0'
+  },
+  manualInput: {
+    flex: 1,
+    height: 60,
+    fontSize: 20,
+    fontWeight: '800',
+    color: Colors.primary
+  },
+  currencyLabel: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: Colors.text.muted
+  }
 });
