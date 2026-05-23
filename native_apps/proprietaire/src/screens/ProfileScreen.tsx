@@ -9,9 +9,10 @@ import {
   Alert,
   ScrollView
 } from 'react-native';
-import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail, Building, MessageSquare } from 'lucide-react-native';
+import { User, Shield, Bell, LogOut, ChevronRight, Fingerprint, Lock, Mail, Building, MessageSquare, RefreshCw } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Updates from 'expo-updates';
 import { Colors } from '../theme/colors';
 import { API_ENDPOINTS } from '../config/api';
 
@@ -73,6 +74,32 @@ export default function ProfileScreen({ navigation, route }: any) {
       console.error(error);
       Alert.alert("Erreur", "Impossible de mettre à jour votre statut.");
       setIsChatOnline(!value);
+    }
+  };
+
+  const onFetchUpdateAsync = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Alert.alert(
+          "Mise à jour disponible", 
+          "Une nouvelle version de l'espace Propriétaire est prête. Souhaitez-vous l'installer maintenant ?",
+          [
+            { text: "Plus tard", style: "cancel" },
+            { 
+              text: "Installer", 
+              onPress: async () => {
+                await Updates.fetchUpdateAsync();
+                await Updates.reloadAsync();
+              } 
+            }
+          ]
+        );
+      } else {
+        Alert.alert("Application à jour", "Vous utilisez déjà la dernière version de l'espace Propriétaire.");
+      }
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de vérifier les mises à jour pour le moment.");
     }
   };
 
@@ -201,6 +228,19 @@ export default function ProfileScreen({ navigation, route }: any) {
               <View>
                 <Text style={styles.settingLabel}>Préférences de Notifications</Text>
                 <Text style={styles.settingSub}>Alertes loyers et messages</Text>
+              </View>
+            </View>
+            <ChevronRight size={20} color={Colors.text.muted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingRow} onPress={onFetchUpdateAsync}>
+             <View style={styles.settingInfo}>
+              <View style={[styles.iconBox, { backgroundColor: 'rgba(51, 65, 85, 0.1)' }]}>
+                <RefreshCw size={20} color="#334155" />
+              </View>
+              <View>
+                <Text style={styles.settingLabel}>Mise à jour logicielle</Text>
+                <Text style={styles.settingSub}>Vérifier les nouvelles versions</Text>
               </View>
             </View>
             <ChevronRight size={20} color={Colors.text.muted} />
