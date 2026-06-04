@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useCallback } from 'react';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Updates from 'expo-updates';
 import { 
   useFonts, 
   Sora_400Regular, 
@@ -39,6 +40,39 @@ export default function App() {
     }, 5000);
 
     return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    async function checkAutomaticUpdates() {
+      if (__DEV__) return;
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          Alert.alert(
+            "Mise à jour installée",
+            "Une nouvelle mise à jour de l'application a été installée. L'application va redémarrer pour l'appliquer.",
+            [
+              { 
+                text: "Redémarrer", 
+                onPress: async () => {
+                  await Updates.reloadAsync();
+                } 
+              }
+            ],
+            { cancelable: false }
+          );
+        }
+      } catch (error) {
+        console.warn("Erreur de mise à jour automatique :", error);
+      }
+    }
+
+    const delayTimer = setTimeout(() => {
+      checkAutomaticUpdates();
+    }, 2000);
+
+    return () => clearTimeout(delayTimer);
   }, []);
 
   const onLayoutRootView = useCallback(async () => {

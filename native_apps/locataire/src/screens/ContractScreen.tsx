@@ -11,7 +11,8 @@ import {
   Linking,
   Modal,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from 'react-native';
 import { Colors } from '../theme/colors';
 import SignaturePad from '../components/SignaturePad';
@@ -27,15 +28,45 @@ import {
 import { API_ENDPOINTS } from '../config/api';
 
 export default function ContractScreen({ navigation, route }: any) {
-  const lease = route.params?.lease;
   const token = route.params?.token;
+  const [leaseData, setLeaseData] = useState<any>(route.params?.lease || null);
+  const [tenantName, setTenantName] = useState<string>("");
+  const [tenantEmail, setTenantEmail] = useState<string>("");
   const [showSignModal, setShowSignModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [signatureId, setSignatureId] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      setFetching(true);
+      fetch(API_ENDPOINTS.DASHBOARD, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, role: 'TENANT' })
+      })
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && json.data) {
+            if (json.data.lease) {
+              setLeaseData(json.data.lease);
+            }
+            setTenantName(json.data.fullName || json.data.name || 'Locataire');
+            setTenantEmail(json.data.userEmail || '');
+          }
+          setFetching(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setFetching(false);
+        });
+    }
+  }, [token]);
 
   const handleInitiateSignature = async (base64Signature: string) => {
+    if (!leaseData?.id) return;
     setLoading(true);
     try {
       const response = await fetch(`${API_ENDPOINTS.BASE_URL}/api/mobile/leases/signature/initiate`, {
@@ -43,7 +74,7 @@ export default function ContractScreen({ navigation, route }: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           token, 
-          leaseId: lease.id,
+          leaseId: leaseData.id,
           documentType: "BAIL"
         })
       });
@@ -91,15 +122,37 @@ export default function ContractScreen({ navigation, route }: any) {
   };
 
   const handleDownloadPDF = () => {
-    if (lease?.documentUrl) {
-      Linking.openURL(lease.documentUrl);
-    } else if (lease?.id) {
-       const dynamicUrl = `${API_ENDPOINTS.BASE_URL}/api/mobile/leases/${lease.id}/pdf`;
-       Linking.openURL(dynamicUrl);
+    let pdfUrl = "";
+    if (leaseData?.documentUrl) {
+      pdfUrl = leaseData.documentUrl;
+    } else if (leaseData?.id) {
+       pdfUrl = `${API_ENDPOINTS.BASE_URL}/api/mobile/leases/${leaseData.id}/pdf`;
+    }
+
+    if (pdfUrl) {
+      // Pour Android, react-native-webview a besoin du Google Docs Viewer pour afficher un PDF en-app
+      const finalUrl = Platform.OS === 'android'
+        ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`
+        : pdfUrl;
+      
+      navigation.navigate('ReceiptView', {
+        url: finalUrl,
+        title: "Mon Contrat de Bail"
+      });
     } else {
       Alert.alert("Erreur", "URL du document non disponible.");
     }
   };
+
+  if (fetching && !leaseData) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -133,32 +186,63 @@ export default function ContractScreen({ navigation, route }: any) {
               <View style={styles.infoCol}>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>RÉF Bail:</Text>
-                  <Text style={styles.value}>{lease?.ref || "NON RENSEIGNÉ"}</Text>
+                  <Text style={styles.value}>{leaseData?.ref || "NON RENSEIGNÉ"}</Text>
                 </View>
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Logement:</Text>
-                  <Text style={styles.value}>{lease?.propertyName || "NON RENSEIGNÉ"}</Text>
+                  <Text style={styles.value}>{leaseData?.propertyName || "NON RENSEIGNÉ"}</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.infoRow}>
                   <Text style={styles.label}>Loyer:</Text>
-                  <Text style={styles.value}>{lease?.rent?.toLocaleString() || "0"} FCFA</Text>
+                  <Text style={styles.value}>{leaseData?.rent?.toLocaleString() || "0"} FCFA</Text>
                 </View>
                 <View style={styles.infoRow}>
                    <Text style={styles.label}>Charges:</Text>
-                   <Text style={styles.value}>{lease?.charges?.toLocaleString() || "0"} FCFA</Text>
+                   <Text style={styles.value}>{leaseData?.charges?.toLocaleString() || "0"} FCFA</Text>
                 </View>
                 <View style={styles.infoRow}>
                    <Text style={styles.label}>Statut:</Text>
-                   <Text style={[styles.value, { color: lease?.status === 'ACTIVE' ? '#059669' : '#D97706' }]}>
-                     {lease?.status === 'ACTIVE' ? 'EN COURS' : (lease?.status || "INACTIF")}
+                   <Text style={[styles.value, { color: leaseData?.status === 'ACTIVE' ? '#059669' : '#D97706' }]}>
+                     {leaseData?.status === 'ACTIVE' ? 'EN COURS' : (leaseData?.status || "INACTIF")}
                    </Text>
                 </View>
               </View>
             </View>
           </View>
           <View style={styles.cardFooter}>
-            <Text style={styles.countryText}>ADRESSE : {lease?.address || "NON SPÉCIFIÉE"}</Text>
+            <Text style={styles.countryText}>ADRESSE : {leaseData?.address || "NON SPÉCIFIÉE"}</Text>
+          </View>
+        </View>
+
+        {/* Parties au Contrat Section */}
+        <View style={styles.partiesCard}>
+          <Text style={styles.partiesTitle}>PARTIES AU CONTRAT</Text>
+          
+          {/* Locataire */}
+          <View style={styles.partyRow}>
+            <View style={styles.partyAvatar}>
+              <Text style={styles.partyAvatarText}>LO</Text>
+            </View>
+            <View style={styles.partyInfo}>
+              <Text style={styles.partyRole}>LOCATAIRE</Text>
+              <Text style={styles.partyName}>{tenantName || "Non renseigné"}</Text>
+              {tenantEmail ? <Text style={styles.partyContact}>{tenantEmail}</Text> : null}
+            </View>
+          </View>
+
+          <View style={styles.partyDivider} />
+
+          {/* Bailleur */}
+          <View style={styles.partyRow}>
+            <View style={styles.partyAvatar}>
+              <Text style={styles.partyAvatarText}>BA</Text>
+            </View>
+            <View style={styles.partyInfo}>
+              <Text style={styles.partyRole}>BAILLEUR / GESTIONNAIRE</Text>
+              <Text style={styles.partyName}>{leaseData?.landlord?.name || "NON SPÉCIFIÉ"}</Text>
+              {leaseData?.landlord?.phone ? <Text style={styles.partyContact}>{leaseData.landlord.phone}</Text> : null}
+            </View>
           </View>
         </View>
 
@@ -180,8 +264,8 @@ export default function ContractScreen({ navigation, route }: any) {
           <TouchableOpacity 
             style={styles.actionItem}
             onPress={() => navigation.navigate('PaymentProcess', { 
-              amount: lease?.rent + (lease?.charges || 0), 
-              leaseId: lease?.id 
+              amount: (leaseData?.rent || 0) + (leaseData?.charges || 0), 
+              leaseId: leaseData?.id 
             })}
           >
             <View style={styles.actionIconContainer}>
@@ -192,8 +276,8 @@ export default function ContractScreen({ navigation, route }: any) {
           <TouchableOpacity 
             style={styles.actionItem}
             onPress={() => {
-              if (lease?.qrToken) {
-                const url = `${API_ENDPOINTS.BASE_URL}/v/${lease.qrToken}`;
+              if (leaseData?.qrToken) {
+                const url = `${API_ENDPOINTS.BASE_URL}/v/${leaseData.qrToken}`;
                 navigation.navigate('ReceiptView', { url });
               } else {
                 Alert.alert("Information", "Aucune quittance certifiée disponible pour ce bail pour l'instant.");
@@ -226,7 +310,7 @@ export default function ContractScreen({ navigation, route }: any) {
         </ScrollView>
 
         {/* Signature Section for Pending Contracts */}
-        {(lease?.status === 'PENDING_SIGNATURE' || lease?.status === 'DRAFT') && (
+        {(leaseData?.status === 'PENDING_SIGNATURE' || leaseData?.status === 'DRAFT') && (
           <View style={styles.signSection}>
             <View style={styles.signNotice}>
               <Text style={styles.signNoticeTitle}>Action Requise</Text>
@@ -643,5 +727,68 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.primary,
     letterSpacing: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+  },
+  partiesCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 24,
+    padding: 20,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  partiesTitle: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: Colors.primary,
+    letterSpacing: 1,
+    marginBottom: 16,
+  },
+  partyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  partyAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: Colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  partyAvatarText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: Colors.primary,
+  },
+  partyInfo: {
+    flex: 1,
+  },
+  partyRole: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: Colors.text.muted,
+    marginBottom: 2,
+  },
+  partyName: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: Colors.primary,
+  },
+  partyContact: {
+    fontSize: 11,
+    color: Colors.text.muted,
+    marginTop: 2,
+  },
+  partyDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: 12,
   }
 });
