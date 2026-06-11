@@ -90,7 +90,7 @@ export class RiskAnalysisService {
         select: { tenantId: true }
     });
 
-    const uniqueTenants = Array.from(new Set(activeLeases.map(l => l.tenantId).filter((id): id is string => !!id)));
+    const uniqueTenants = Array.from(new Set(activeLeases.map(l => l.tenantId).filter((id): id is string => !!id))) as string[];
     
     const results = await Promise.all(
         uniqueTenants.map(id => this.analyzeTenantRisk(id))
