@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client"
+import { withTwentySync } from "./twenty/prisma-extension"
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+const globalForPrisma = globalThis as unknown as { prisma: any }
 
 export const prismaClientSingleton = () => {
   const dbUrl = process.env.DATABASE_URL;
@@ -26,17 +27,20 @@ export const prismaClientSingleton = () => {
     console.warn("⚠️ SCALABILITY WARNING: DATABASE_URL does not specify 'connection_limit'. For 10,000+ concurrent users, please use a connection pooler (like PgBouncer) and set ?connection_limit=20 in the URL.");
   }
 
-  return new PrismaClient({
+  const client = new PrismaClient({
     datasources: {
       db: {
         url: dbUrl,
       },
     },
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  })
+  });
+
+  return client.$extends(withTwentySync());
 }
 
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+
