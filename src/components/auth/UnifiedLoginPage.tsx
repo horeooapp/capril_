@@ -7,7 +7,7 @@ import Link from "next/link"
 import EmailOTPForm from "./EmailOTPForm"
 import AdminLoginForm from "./AdminLoginForm"
 
-type ProfileTab = 'tenant' | 'landlord'
+type ProfileTab = 'tenant' | 'landlord' | 'admin'
 
 interface UnifiedLoginPageProps {
     initialTab?: ProfileTab
@@ -36,6 +36,16 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             activeBg: "bg-amber-500/20 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]",
             inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
             indicator: "bg-amber-500"
+        },
+        {
+            id: 'admin' as ProfileTab,
+            label: "Administration",
+            icon: ShieldAlert,
+            color: "from-[#C55A11] to-[#E87B2E]",
+            textColor: "text-[#E87B2E]",
+            activeBg: "bg-[#C55A11]/20 border-[#C55A11]/50 text-white shadow-[0_0_20px_rgba(197,90,17,0.3)]",
+            inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
+            indicator: "bg-[#C55A11]"
         }
     ]
 
@@ -57,6 +67,15 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             tagText: "Accès Distingué & Sécurisé",
             tagIconColor: "text-amber-500",
             badgeColor: "text-amber-500"
+        },
+        admin: {
+            bg: "bg-[#020617]",
+            gradient: "from-[#020617]/90 via-[#0B1120]/80 to-[#1e293b]/90",
+            glow1: "bg-[#C55A11]/20 blur-[150px]",
+            glow2: "bg-blue-600/20 blur-[150px]",
+            tagText: "Console d'Administration",
+            tagIconColor: "text-[#C55A11]",
+            badgeColor: "text-[#C55A11]"
         }
     }
 
@@ -143,6 +162,14 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                     redirectPath="/dashboard"
                                     title="Espace Patrimoine"
                                     subtitle="Saisissez votre email pour gérer et superviser vos investissements."
+                                />
+                            )}
+                            
+                            {activeTab === 'admin' && (
+                                <AdminLoginForm 
+                                    redirectPath="/admin"
+                                    title="Authentification"
+                                    subtitle="Console d'Administration Centrale (Certifiée)"
                                 />
                             )}
 

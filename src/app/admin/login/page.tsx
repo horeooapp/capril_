@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
     return (
         <>
             {/* Version Web PC - Intacte */}
-            <div className="block min-h-screen bg-[#020617] relative overflow-hidden">
+            <div className="hidden md:block min-h-screen bg-[#020617] relative overflow-hidden">
                 {/* Cybernetic Background Grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_90%)] pointer-events-none z-0"></div>
                 
@@ -21,8 +21,8 @@ export default function AdminLoginPage() {
                 <div className="min-h-screen flex items-center justify-center relative z-10 w-full px-4">
                     <div className="w-full max-w-lg">
                         <motion.div
-                            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
                             className="bg-[#0B1120]/60 backdrop-blur-3xl border border-white/5 rounded-[40px] p-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden"
                         >
@@ -75,6 +75,11 @@ export default function AdminLoginPage() {
                         </motion.p>
                     </div>
                 </div>
+            </div>
+
+            {/* Version Web Mobile Exlusive - Nouveau design unifié */}
+            <div className="block md:hidden w-full min-h-screen">
+                <UnifiedLoginPage initialTab="admin" />
             </div>
         </>
     )
