@@ -11,7 +11,7 @@ export async function GET(request: Request) {
         }
 
         const properties = await prisma.property.findMany({
-            where: { landlordId: user.userId },
+            where: { ownerUserId: user.userId },
             include: {
                 leases: {
                     where: { status: 'ACTIVE' }

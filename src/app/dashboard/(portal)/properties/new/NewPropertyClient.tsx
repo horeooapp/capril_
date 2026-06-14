@@ -68,6 +68,13 @@ export default function NewPropertyClient() {
         // Add images to formData
         images.forEach(img => formData.append("images", img))
 
+        // Set typeStructure correctly based on selected category
+        if (structureCategory === 'PARENT') {
+            formData.append("typeStructure", formData.get("parentType") as string);
+        } else {
+            formData.append("typeStructure", "INDEPENDANT");
+        }
+
         startTransition(async () => {
             const result: any = await creerBien(formData)
             if (result?.error) {

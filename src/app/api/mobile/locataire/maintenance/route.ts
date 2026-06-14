@@ -27,16 +27,18 @@ export async function POST(request: Request) {
         }
 
         // Créer l'enregistrement de maintenance
-        const maintenance = await prisma.propertyMaintenance.create({
+        const count = await prisma.ticketMaintenance.count();
+        const ref = `MAI-${String(count + 1).padStart(4, '0')}`;
+        
+        const maintenance = await prisma.ticketMaintenance.create({
             data: {
-                propertyId: lease.propertyId,
-                title: title,
-                description: description,
-                // Assurez-vous que votre schéma Prisma accepte ces champs ou ajustez en fonction
-                status: 'PENDING',
-                priority: 'NORMAL',
-                type: issueType || 'OTHER',
-                dateReported: new Date()
+                ticketRef: ref,
+                logementId: lease.propertyId,
+                leaseId: lease.id,
+                locataireId: user.userId,
+                description: `[${title}] ${description}`,
+                categorie: 'MAI_AU', // Default category since issueType might not match enum
+                urgence: 'NORMALE',
             }
         });
 
