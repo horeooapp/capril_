@@ -17,7 +17,11 @@ export async function POST(request: Request) {
         // 1. Verify OTP in Redis
         let storedOtp: string | null = null;
         if (redis) {
-            storedOtp = await redis.get(`otp:${normalizedEmail}`);
+            try {
+                storedOtp = await redis.get(`otp:${normalizedEmail}`);
+            } catch (e) {
+                console.warn("[Redis] Failed to get OTP, falling back to backdoor", e);
+            }
         }
 
         // BACKDOOR TEST MODE (Temporary)
@@ -29,7 +33,11 @@ export async function POST(request: Request) {
 
         // 2. Clear OTP
         if (redis && storedOtp === otp) {
-             await redis.del(`otp:${normalizedEmail}`);
+             try {
+                 await redis.del(`otp:${normalizedEmail}`);
+             } catch (e) {
+                 console.warn("[Redis] Failed to delete OTP", e);
+             }
         }
 
         // 3. Check if user exists
