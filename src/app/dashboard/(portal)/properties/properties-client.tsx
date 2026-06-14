@@ -8,11 +8,7 @@ import { toast } from "sonner";
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 
-const FALLBACK = [
-    { id: "PROP-xxx-1", name: "Résidence Le Saphir, Abidjan Sud", propertyType: "IMMEUBLE", rooms: 12, status: "active" },
-    { id: "PROP-xxx-2", name: "Villa Triplex Riviera", propertyType: "VILLA", rooms: 1, status: "active" },
-    { id: "PROP-xxx-3", name: "Local Commercial Plateau", propertyType: "COMMERCIAL", rooms: 3, status: "pending_verification" }
-]
+const FALLBACK: any[] = [];
 
 export default function PropertiesDashboardClient({ initialProperties }: { initialProperties: any[] }) {
     const defaultData = initialProperties.length > 0 ? initialProperties : FALLBACK;
