@@ -131,6 +131,15 @@ export async function createLease(data: {
             }
         });
 
+        // 8. Envoyer l'invitation au locataire
+        if (data.tenantPhone) {
+            const tenantPhone = normalizePhone(data.tenantPhone);
+            await sendSMS(
+                tenantPhone, 
+                `QAPRIL : Un contrat de bail a été préparé pour vous par le propriétaire. Veuillez vous connecter pour le consulter.`
+            );
+        }
+
         await writeAuditLog({ userId: session.user.id, action: "LEASE_CREATED", module: "LEASE", entityId: lease.id });
         revalidatePath("/dashboard/leases");
         return { success: true, leaseId: lease.id, leaseReference: leaseRef };

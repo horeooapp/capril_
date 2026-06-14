@@ -20,17 +20,18 @@ export async function GET(request: Request) {
             return NextResponse.json({ receipts: [] });
         }
 
-        // Récupérer les paiements/quittances
-        // Remplacer par RentReceipt si le modèle existe avec cette exactitude.
-        // Ici on suppose une table RentPayment ou RentReceipt
-        // Comme `RentReceipt` ou `RentPayment` n'est pas clair, on utilise une requête sécurisée.
-        // On mock si la table manque, mais idéalement on fetch de Prisma.
-        
-        // Simulé pour l'instant si les modèles n'existent pas encore
-        const receipts = [
-            { id: '1', date: '2026-05-01', amount: lease.rentAmount || 250000, status: 'PAID', period: 'Mai 2026' },
-            { id: '2', date: '2026-04-01', amount: lease.rentAmount || 250000, status: 'PAID', period: 'Avril 2026' }
-        ];
+        const dbReceipts = await prisma.receipt.findMany({
+            where: { leaseId: lease.id },
+            orderBy: { periodMonth: 'desc' }
+        });
+
+        const receipts = dbReceipts.map(r => ({
+            id: r.id,
+            date: r.paidAt?.toISOString().substring(0, 10) || '',
+            amount: r.totalAmount,
+            status: r.status === 'paid' || r.status === 'PAID' ? 'PAID' : 'PENDING',
+            period: r.moisConcerne || r.periodMonth
+        }));
 
         return NextResponse.json({
             receipts: receipts,

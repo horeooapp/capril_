@@ -14,11 +14,20 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { propertyId, tenantEmail, rentAmount, durationMonths } = body;
+        const { propertyId, tenantEmail, rentAmount, durationMonths, depositAmount, avanceLoyer } = body;
 
         if (!propertyId || !tenantEmail || !rentAmount) {
-            return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
+            return NextResponse.json({ error: "Tous les champs obligatoires sont requis" }, { status: 400 });
         }
+
+        const rentNum = parseFloat(rentAmount);
+        // Capping caution (deposit) and advance to 2 months maximum
+        const maxLimit = rentNum * 2;
+        const requestedDeposit = depositAmount ? parseFloat(depositAmount) : maxLimit;
+        const requestedAdvance = avanceLoyer ? parseFloat(avanceLoyer) : maxLimit;
+
+        const finalDeposit = Math.min(requestedDeposit, maxLimit);
+        const finalAdvance = Math.min(requestedAdvance, maxLimit);
 
         // Trouver le locataire par email
         const tenant = await prisma.user.findUnique({
@@ -58,8 +67,8 @@ export async function POST(request: Request) {
 
         page.drawText('CONDITIONS FINANCIÈRES :', { x: 50, y: height - 320, size: 14, font: boldFont });
         page.drawText(`Loyer mensuel : ${rentAmount} FCFA`, { x: 50, y: height - 340, size: 12, font });
-        page.drawText(`Dépôt de garantie (Caution) : ${parseFloat(rentAmount) * 2} FCFA (2 mois max)`, { x: 50, y: height - 360, size: 12, font });
-        page.drawText(`Avance sur loyer : ${parseFloat(rentAmount) * 2} FCFA (2 mois max)`, { x: 50, y: height - 380, size: 12, font });
+        page.drawText(`Dépôt de garantie (Caution) : ${finalDeposit} FCFA (Max 2 mois)`, { x: 50, y: height - 360, size: 12, font });
+        page.drawText(`Avance sur loyer : ${finalAdvance} FCFA (Max 2 mois)`, { x: 50, y: height - 380, size: 12, font });
 
         page.drawText('SIGNATURES', { x: 50, y: height - 440, size: 14, font: boldFont });
         page.drawText('Le Propriétaire', { x: 50, y: height - 480, size: 12, font });
@@ -86,9 +95,9 @@ export async function POST(request: Request) {
                 propertyId,
                 landlordId: user.userId,
                 tenantId: tenant.id,
-                rentAmount: parseFloat(rentAmount),
-                depositAmount: parseFloat(rentAmount) * 2,
-                avanceLoyer: parseFloat(rentAmount) * 2,
+                rentAmount: rentNum,
+                depositAmount: finalDeposit,
+                avanceLoyer: finalAdvance,
                 startDate: new Date(),
                 durationMonths: durationMonths ? parseInt(durationMonths) : 12,
                 status: 'ACTIVE',

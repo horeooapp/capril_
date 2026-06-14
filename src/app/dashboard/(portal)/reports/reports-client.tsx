@@ -68,12 +68,12 @@ export default function ReportsDashboardClient({ initialReports }: { initialRepo
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard 
                     label="Mois en cours" 
-                    value="Avril 2026" 
+                    value={reports[0]?.period || new Date().toLocaleString('fr-FR', { month: 'long', year: 'numeric' })} 
                     sub="Clôture IA disponible" 
                 />
                 <StatCard 
                     label="Chiffre d'Affaire" 
-                    value="1,150,000 FCFA" 
+                    value={`${reports.reduce((acc: number, c: any) => acc + c.totalGross, 0).toLocaleString()} FCFA`} 
                     sub="Loyer Brut Global" 
                 />
                 <StatCard 

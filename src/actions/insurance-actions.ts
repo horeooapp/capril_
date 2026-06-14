@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache"
 
 export async function generateInsuranceContract(leaseId: string) {
     try {
-        // Mocking the generation and attaching an insurance policy to the lease
+        // Génération d'une police d'assurance liée au bail et enregistrement en base de données.
         await prisma.insurance.create({
             data: {
                 leaseId,

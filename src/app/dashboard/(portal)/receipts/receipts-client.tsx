@@ -9,16 +9,8 @@ import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 
-// Fallback statique si DB vide
-const FALLBACK = [
-    { id: "Q-2026-04-001", leaseId: "BAIL-2026-001", periodMonth: "2026-04", totalAmount: 1500000, status: "PAID" },
-    { id: "Q-2026-04-002", leaseId: "BAIL-2026-002", periodMonth: "2026-04", totalAmount: 250000, status: "PENDING" },
-    { id: "Q-2026-03-002", leaseId: "BAIL-2026-002", periodMonth: "2026-03", totalAmount: 250000, status: "OVERDUE" }
-]
-
 export default function ReceiptsDashboardClient({ initialReceipts }: { initialReceipts: any[] }) {
-    const defaultData = initialReceipts.length > 0 ? initialReceipts : FALLBACK
-    const [receipts] = useState<any[]>(defaultData)
+    const [receipts] = useState<any[]>(initialReceipts)
     const [isPending, startTransition] = useTransition()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedReceipt, setSelectedReceipt] = useState<any>(null)
@@ -72,10 +64,13 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
         })
     }
 
-    // Calculs KPI mockup
-    const encaiss = receipts.filter(r => r.status === 'PAID').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
-    const pending = receipts.filter(r => r.status === 'PENDING').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
-    const overdue = receipts.filter(r => r.status === 'OVERDUE').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
+    // Calculs KPI
+    const encaiss = receipts.filter(r => r.status === 'PAID' || r.status === 'paid' || r.status === 'PAYE').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
+    const pending = receipts.filter(r => r.status === 'PENDING' || r.status === 'pending' || r.status === 'EN_ATTENTE').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
+    const overdue = receipts.filter(r => r.status === 'OVERDUE' || r.status === 'overdue' || r.status === 'IMPAYE').reduce((acc, r) => acc + (r.totalAmount || 0), 0)
+    
+    const totalDue = encaiss + pending + overdue;
+    const recoveryRate = totalDue > 0 ? Math.round((encaiss / totalDue) * 100) : 0;
     
     return (
         <div className="space-y-6">
@@ -112,9 +107,9 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                  <StatCard 
                      label="Taux Recouvrement" 
-                     value="82%" 
+                     value={`${recoveryRate}%`} 
                      sub="Objectif 90%" 
-                     trend="up" 
+                     trend={recoveryRate >= 90 ? "up" : "down"} 
                  />
                  <StatCard 
                      label="Encaissé (Mois)" 

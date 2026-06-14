@@ -68,18 +68,19 @@ export default async function AdminPropertiesPage() {
                                 <tr key={prop.id}>
                                     <td>
                                         <div className="tenant-cell">
-                                            <div className="t-avatar overflow-hidden" style={{ backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
+                                            <div className="overflow-hidden rounded-lg flex-shrink-0 flex items-center justify-center border border-slate-200" style={{ width: '64px', height: '64px', backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
                                                 {prop.images && prop.images.length > 0 ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img src={prop.images[0].s3Key} alt="" className="w-full h-full object-cover" />
                                                 ) : prop.propertyType === 'RESIDENCE' || prop.propertyType === 'IMMEUBLE' ? (
-                                                    <Building2 size={16} />
+                                                    <Building2 size={24} />
                                                 ) : (
-                                                    <Home size={16} />
+                                                    <Home size={24} />
                                                 )}
                                             </div>
-                                            <div>
-                                                <div className="t-name font-mono text-[11px]">{prop.propertyCode}</div>
-                                                <div className="t-loc text-[10px] text-gray-500">{prop.name || prop.propertyType}</div>
+                                            <div className="ml-2">
+                                                <div className="t-name font-mono text-[11px] mb-1">{prop.propertyCode}</div>
+                                                <div className="t-loc text-[11px] text-gray-500 font-semibold">{prop.name || prop.propertyType}</div>
                                             </div>
                                         </div>
                                     </td>

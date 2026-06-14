@@ -49,6 +49,31 @@ export default async function LeasesDashboardPage() {
         
         // 3. Serialize
         leases = leases.map(l => serializeLease(l)) as any;
+
+        // 4. Fetch BDQ (Bail Declaratif) waiting for confirmation
+        const bdqs = await prisma.bailDeclaratif.findMany({
+            where: {
+                bailleurId: userId,
+                statut: { not: "REJETE_PAR_LOCATAIRE" }
+            },
+            include: {
+                property: { select: { name: true, address: true, propertyCode: true, unitLabel: true } }
+            },
+            orderBy: { createdAt: "desc" }
+        });
+
+        const mappedBdqs = bdqs.map(b => ({
+            id: b.id,
+            leaseReference: `BDQ-${b.id.substring(0,8)}`,
+            leaseType: "VERBAL (BDQ)",
+            tenant: { firstName: b.prenomLocataireDeclare || "", lastName: b.nomLocataireDeclare || b.telephoneLocataire },
+            rentAmount: Number(b.loyerDeclareMensuel || 0),
+            status: b.statut === "PENDING_LOCATAIRE" ? "PENDING_CONFIRMATION" : b.statut,
+            daysSinceCreation: Math.floor((new Date().getTime() - new Date(b.createdAt).getTime()) / (1000 * 3600 * 24)),
+            isExpiringSoon: b.statut === "PENDING_LOCATAIRE",
+        }));
+
+        leases = [...mappedBdqs, ...leases];
     }
 
     return <LeasesDashboardClient initialLeases={leases} />;

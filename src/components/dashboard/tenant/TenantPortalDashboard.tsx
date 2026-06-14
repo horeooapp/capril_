@@ -167,25 +167,20 @@ export function TenantPortalDashboard({
           {/* ══ ACCUEIL ══ */}
           {tab==="dash"&&(
             <div>
-              {/* alerte SLA RCL (MM-03) */}
+              {/* alerte maintenance / ticket */}
               {TICKET_ACTIF && (
-                <div style={{margin:"14px 16px 0",background:TICKET_ACTIF.favorLocataire?T.greenPale:T.orangePale,border:`1.5px solid ${TICKET_ACTIF.favorLocataire?T.green:T.orange}40`,borderRadius:14,padding:14}}>
+                <div style={{margin:"14px 16px 0",background:T.orangePale,border:`1.5px solid ${T.orange}40`,borderRadius:14,padding:14}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                    <div style={{fontSize:11,fontWeight:800,color:TICKET_ACTIF.favorLocataire?T.green:T.orange}}>{TICKET_ACTIF.favorLocataire?"✓ Résolution en votre faveur":"⏳ Arbitrage QAPRIL en cours"}</div>
-                    <Badge label={TICKET_ACTIF.code || "RCL"} color={T.white} bg={TICKET_ACTIF.favorLocataire?T.green:T.orange} size={8}/>
+                    <div style={{fontSize:11,fontWeight:800,color:T.orange}}>⏳ En attente de prise en charge</div>
+                    <Badge label={TICKET_ACTIF.ticketRef || "MAI"} color={T.white} bg={T.orange} size={8}/>
                   </div>
-                  <div style={{fontSize:12,fontWeight:700,color:T.text,marginBottom:8}}>{TICKET_ACTIF.sujet}</div>
-                  {!TICKET_ACTIF.favorLocataire && (
-                    <>
-                      <div style={{height:5,background:T.white,borderRadius:3,overflow:"hidden",marginBottom:6}}>
-                        <div style={{height:"100%",width:`${TICKET_ACTIF.pourcentageTemps}%`,background:T.orange}}/>
-                      </div>
-                      <div style={{fontSize:10,color:T.textMid}}>Délai de réponse bailleur : <span style={{fontWeight:800}}>{Math.floor(TICKET_ACTIF.heuresRestantes)}h</span> restantes</div>
-                    </>
-                  )}
-                  {TICKET_ACTIF.favorLocataire && (
-                    <div style={{fontSize:10,color:T.green,fontWeight:700}}>Règle MM-03 : Délai 144h dépassé. La demande est validée par défaut.</div>
-                  )}
+                  <div style={{fontSize:12,fontWeight:700,color:T.text,marginBottom:8}}>{TICKET_ACTIF.categorie || "Maintenance"}</div>
+                  <div style={{fontSize:10,color:T.textMid,marginBottom:8}}>{TICKET_ACTIF.description || ""}</div>
+                  
+                  <div style={{height:5,background:T.white,borderRadius:3,overflow:"hidden",marginBottom:6}}>
+                    <div style={{height:"100%",width:`50%`,background:T.orange}}/>
+                  </div>
+                  <div style={{fontSize:10,color:T.textMid}}>Soumis le : <span style={{fontWeight:800}}>{new Date(TICKET_ACTIF.dateSignalement || TICKET_ACTIF.createdAt || new Date()).toLocaleDateString('fr-FR')}</span></div>
                 </div>
               )}
 

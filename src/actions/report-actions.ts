@@ -47,18 +47,15 @@ export async function getGlobalFinancialReport() {
         const reports = await prisma.financialReport.findMany();
         
         const financials = {
-            rentReceived: reports.reduce((acc, r) => acc + r.totalGross, 0) || 1150000,
-            agencyFees: reports.reduce((acc, r) => acc + r.agencyFee, 0) || 115000,
-            qaprilFees: 15000,
-            tva: reports.reduce((acc, r) => acc + r.tva, 0) || 20700,
-            netToLandlords: reports.reduce((acc, r) => acc + r.netPayout, 0) || 999300
+            rentReceived: reports.reduce((acc, r) => acc + r.totalGross, 0),
+            agencyFees: reports.reduce((acc, r) => acc + r.agencyFee, 0),
+            qaprilFees: 0, // A calculer si besoin
+            tva: reports.reduce((acc, r) => acc + r.tva, 0),
+            netToLandlords: reports.reduce((acc, r) => acc + r.netPayout, 0)
         };
 
         const performance = [
-            { month: "Jan", amount: 1000000 },
-            { month: "Fev", amount: 1100000 },
-            { month: "Mar", amount: 1050000 },
-            { month: "Apr", amount: 1150000 }
+            // Données réelles nécessaires ou tableau vide
         ];
 
         return { success: true, data: { financials, performance } };

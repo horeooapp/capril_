@@ -28,16 +28,28 @@ export async function GET(request: Request) {
             });
         }
 
-        // Simuler la logique métier du loyer du mois courant (ou l'extraire de vos modèles)
-        // Pour l'instant, on utilise le montant de base du bail.
         const currentRentAmount = lease.rentAmount || 0;
         const propertyName = lease.property?.name || 'Votre logement';
+
+        // Check if there is a receipt for the current month
+        const currentMonthStr = new Date().toISOString().substring(0, 7); // YYYY-MM
+        const currentReceipt = await prisma.receipt.findFirst({
+            where: {
+                leaseId: lease.id,
+                periodMonth: currentMonthStr
+            }
+        });
+        
+        let rentStatus = 'PENDING';
+        if (currentReceipt) {
+            rentStatus = currentReceipt.status === 'paid' || currentReceipt.status === 'PAID' ? 'PAID' : 'PENDING';
+        }
 
         return NextResponse.json({
             hasLease: true,
             propertyName: propertyName,
             currentRentAmount: currentRentAmount,
-            rentStatus: 'PENDING', // MOCK: Devrait être vérifié dans RentPayment/RentReceipt
+            rentStatus: rentStatus,
             currency: 'FCFA'
         });
 
