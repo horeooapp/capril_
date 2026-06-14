@@ -13,9 +13,7 @@
       "backgroundColor": "#1D9E75"
     },
     "scheme": "qaprilproprietaire",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959"
     },
