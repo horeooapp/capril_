@@ -9,7 +9,8 @@ export async function POST(request: Request) {
         if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
         const body = await request.json();
-        let { leaseId, role } = body;
+        let { leaseId } = body;
+        const { role } = body;
 
         if (!leaseId) {
             const activeLease = await prisma.lease.findFirst({
