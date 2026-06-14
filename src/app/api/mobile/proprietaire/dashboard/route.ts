@@ -47,11 +47,31 @@ export async function GET(request: Request) {
         const occupancyRate = Math.round((occupiedCount / totalProperties) * 100);
         const vacantProperties = totalProperties - occupiedCount;
 
+        const pendingLeasesCount = await prisma.bailDeclaratif.count({
+            where: {
+                bailleurId: user.userId,
+                statut: 'PENDING_LOCATAIRE'
+            }
+        });
+
+        const incidentsCount = await prisma.reclamationLocataire.count({
+            where: {
+                lease: {
+                    property: {
+                        landlordId: user.userId
+                    }
+                },
+                statut: { in: ['OUVERT', 'EN_COURS'] }
+            }
+        });
+
         return NextResponse.json({
             totalProperties,
             occupancyRate,
             monthlyRevenue: expectedRevenue,
             vacantProperties,
+            pendingLeasesCount,
+            incidentsCount,
             currency: 'FCFA'
         });
 

@@ -45,12 +45,46 @@ export async function GET(request: Request) {
             rentStatus = currentReceipt.status === 'paid' || currentReceipt.status === 'PAID' ? 'PAID' : 'PENDING';
         }
 
+        // Fetch recent receipts
+        const recentReceipts = await prisma.receipt.findMany({
+            where: { leaseId: lease.id },
+            orderBy: { createdAt: 'desc' },
+            take: 3,
+            select: {
+                id: true,
+                periodMonth: true,
+                status: true,
+                amount: true
+            }
+        });
+
+        // Count open maintenance requests
+        const openMaintenanceCount = await prisma.reclamationLocataire.count({
+            where: {
+                tenantId: user.userId,
+                statut: { in: ['OUVERT', 'EN_COURS'] }
+            }
+        });
+
+        // Calculate next payment date (typically 5th of next month)
+        const now = new Date();
+        let nextPaymentDate = new Date(now.getFullYear(), now.getMonth() + 1, 5);
+        if (now.getDate() > 5) {
+            // If we are past the 5th, the next payment is next month
+        } else {
+            // If we are before the 5th, the next payment is this month
+            nextPaymentDate = new Date(now.getFullYear(), now.getMonth(), 5);
+        }
+
         return NextResponse.json({
             hasLease: true,
             propertyName: propertyName,
             currentRentAmount: currentRentAmount,
             rentStatus: rentStatus,
-            currency: 'FCFA'
+            currency: 'FCFA',
+            recentReceipts: recentReceipts,
+            openMaintenanceCount: openMaintenanceCount,
+            nextPaymentDate: nextPaymentDate.toISOString(),
         });
 
     } catch (error: any) {

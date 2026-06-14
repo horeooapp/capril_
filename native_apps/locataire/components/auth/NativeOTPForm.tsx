@@ -4,6 +4,7 @@ import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { Mail, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 interface NativeOTPFormProps {
     role: 'TENANT' | 'LANDLORD' | 'ADMIN';
@@ -17,6 +18,33 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
     const [otp, setOtp] = useState('');
     const [isPending, setIsPending] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        checkBiometricAuth();
+    }, []);
+
+    const checkBiometricAuth = async () => {
+        try {
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) return;
+
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+            if (hasHardware && isEnrolled) {
+                const result = await LocalAuthentication.authenticateAsync({
+                    promptMessage: 'Authentifiez-vous pour continuer',
+                    fallbackLabel: 'Utiliser le mot de passe',
+                });
+
+                if (result.success) {
+                    router.replace('/(tabs)');
+                }
+            }
+        } catch (e) {
+            console.error("Erreur biométrique", e);
+        }
+    };
 
     const theme = {
         TENANT: {
