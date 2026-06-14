@@ -1,32 +1,46 @@
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT, jwtVerify } from 'jose';
+import { NextResponse } from 'next/server';
 
-const getSecret = () => {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("CRITICAL: AUTH_SECRET environment variable is missing in production.");
+const getJwtSecretKey = () => {
+    const secret = process.env.AUTH_SECRET;
+    if (!secret || secret.length === 0) {
+        throw new Error('La variable d\'environnement AUTH_SECRET n\'est pas définie.');
     }
-    console.warn("⚠️ AUTH_SECRET is missing. Using a weak default key for development.");
-    return new TextEncoder().encode("qapril-default-secret-key-dev-only");
-  }
-  return new TextEncoder().encode(secret);
+    return new TextEncoder().encode(secret);
 };
 
-const SECRET = getSecret();
-
-export async function signMobileToken(userId: string, email: string, role: string) {
-  return await new SignJWT({ userId, email, role })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("30d") // Long expiration for mobile UX
-    .sign(SECRET);
+export async function signMobileToken(payload: { userId: string; email: string; role: string }) {
+    try {
+        const token = await new SignJWT(payload)
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('30d') // Jeton valide 30 jours sur mobile
+            .sign(getJwtSecretKey());
+        return token;
+    } catch (error) {
+        console.error("Erreur de signature JWT:", error);
+        throw new Error("Impossible de générer le jeton.");
+    }
 }
 
 export async function verifyMobileToken(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, SECRET);
-    return payload as { userId: string; email: string; role: string };
-  } catch (error) {
-    return null;
-  }
+    try {
+        const { payload } = await jwtVerify(token, getJwtSecretKey());
+        return payload as { userId: string; email: string; role: string };
+    } catch (error) {
+        return null;
+    }
+}
+
+// Helper pour les routes API
+export async function authenticateMobileRequest(request: Request) {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return null;
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = await verifyMobileToken(token);
+    
+    return decoded;
 }
