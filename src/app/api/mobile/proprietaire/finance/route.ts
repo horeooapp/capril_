@@ -13,28 +13,38 @@ export async function GET(request: Request) {
         // Pour la démo, on simule des transactions financières récentes basées sur le fait que le propriétaire a des biens
         // Idéalement on fetch de la table RentPayment
         
-        const properties = await prisma.property.findMany({
-            where: { landlordId: user.userId },
-            include: { leases: { where: { status: 'ACTIVE' } } }
+        const receipts = await prisma.receipt.findMany({
+            where: {
+                lease: {
+                    property: {
+                        landlordId: user.userId
+                    }
+                },
+                status: 'paid'
+            },
+            include: {
+                lease: {
+                    include: {
+                        property: true
+                    }
+                }
+            },
+            orderBy: {
+                paidAt: 'desc'
+            },
+            take: 20
         });
 
-        const transactions = [];
-        let totalReceived = 0;
+        const transactions = receipts.map((receipt, index) => ({
+            id: receipt.id,
+            date: receipt.paidAt?.toISOString() || receipt.createdAt?.toISOString(),
+            amount: receipt.totalAmount || receipt.rentAmount,
+            property: receipt.lease.property?.name || 'Bien',
+            type: 'INCOME',
+            status: 'COMPLETED'
+        }));
 
-        properties.forEach((prop, index) => {
-            if (prop.leases && prop.leases.length > 0) {
-                const rent = prop.leases[0].rentAmount || 0;
-                totalReceived += rent;
-                transactions.push({
-                    id: `txn-${index}`,
-                    date: new Date().toISOString(),
-                    amount: rent,
-                    property: prop.name || 'Bien',
-                    type: 'INCOME',
-                    status: 'COMPLETED'
-                });
-            }
-        });
+        const totalReceived = transactions.reduce((acc, txn) => acc + txn.amount, 0);
 
         return NextResponse.json({
             transactions: transactions,

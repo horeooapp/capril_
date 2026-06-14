@@ -147,34 +147,25 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                 <div className="space-y-4">
                     <div className="p-6 bg-slate-800 rounded-[12px] text-white relative shadow-sm overflow-hidden">
                         <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
-                        <h3 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Valeur Parc (Est.)</h3>
-                        <p className="text-3xl font-black tracking-tight mt-1">1.2B <span className="text-sm font-medium text-slate-300">FCFA</span></p>
+                        <h3 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Revenu Mensuel (Est.)</h3>
+                        <p className="text-3xl font-black tracking-tight mt-1">{(properties.reduce((acc, p) => acc + (p.declaredRentFcfa || 0), 0) || 0).toLocaleString()} <span className="text-sm font-medium text-slate-300">FCFA</span></p>
                         
                         <div className="mt-8">
                             <p className="text-[11px] font-medium text-slate-300 flex justify-between">
                                 Occupation globale
-                                <span className="text-emerald-400 font-bold">92%</span>
+                                <span className="text-emerald-400 font-bold">
+                                    {properties.length > 0 ? Math.round((properties.filter(p => p.status === 'active' || p.leases?.length > 0).length / properties.length) * 100) : 0}%
+                                </span>
                             </p>
                             <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
-                                <div className="bg-emerald-400 h-full rounded-full" style={{width: `92%`}}></div>
+                                <div className="bg-emerald-400 h-full rounded-full" style={{width: `${properties.length > 0 ? Math.round((properties.filter(p => p.status === 'active' || p.leases?.length > 0).length / properties.length) * 100) : 0}%`}}></div>
                             </div>
                         </div>
                     </div>
 
                     <SectionCard title="Interventions requises">
-                        <div className="flex items-start gap-3 p-3 bg-rose-50 border border-rose-100 rounded-[8px] mb-2">
-                            <div className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0"></div>
-                            <div>
-                                <p className="text-[12.5px] font-semibold text-rose-900">Ascenseur - Tour Ivoire</p>
-                                <p className="text-[11px] text-rose-700 mt-0.5">Certificat de sécurité manquant.</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-100 rounded-[8px]">
-                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
-                            <div>
-                                <p className="text-[12.5px] font-semibold text-amber-900">Toiture - Villa Riviera</p>
-                                <p className="text-[11px] text-amber-700 mt-0.5">Inspection prévue ce mois.</p>
-                            </div>
+                        <div className="p-4 text-center text-[12px] text-slate-400">
+                            Aucune intervention technique en cours sur vos biens.
                         </div>
                     </SectionCard>
                 </div>
