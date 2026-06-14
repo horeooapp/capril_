@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import * as Updates from 'expo-updates';
 import { useState, useEffect } from 'react';
 import Constants from 'expo-constants';
+import { fetchWithAuth } from '../../lib/api';
 
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000/api/mobile';
 
@@ -20,14 +21,7 @@ export default function ProfileScreen() {
 
     const fetchUserProfile = async () => {
         try {
-            const token = await SecureStore.getItemAsync('userToken');
-            if (!token) return;
-
-            const res = await fetch(`${API_URL}/auth/me`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const res = await fetchWithAuth('/auth/me');
 
             if (res.ok) {
                 const data = await res.json();
