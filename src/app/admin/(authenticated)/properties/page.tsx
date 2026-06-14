@@ -18,7 +18,8 @@ export default async function AdminPropertiesPage() {
                 take: 1, 
                 include: { tenant: { select: { firstName: true, lastName: true, email: true, phone: true } } } 
             },
-            _count: { select: { leases: true } }
+            _count: { select: { leases: true } },
+            images: { take: 1, orderBy: { isMain: 'desc' } }
         }
     })
 
@@ -67,8 +68,14 @@ export default async function AdminPropertiesPage() {
                                 <tr key={prop.id}>
                                     <td>
                                         <div className="tenant-cell">
-                                            <div className="t-avatar" style={{ backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
-                                                {prop.propertyType === 'RESIDENCE' || prop.propertyType === 'IMMEUBLE' ? <Building2 size={16} /> : <Home size={16} />}
+                                            <div className="t-avatar overflow-hidden" style={{ backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
+                                                {prop.images && prop.images.length > 0 ? (
+                                                    <img src={prop.images[0].s3Key} alt="" className="w-full h-full object-cover" />
+                                                ) : prop.propertyType === 'RESIDENCE' || prop.propertyType === 'IMMEUBLE' ? (
+                                                    <Building2 size={16} />
+                                                ) : (
+                                                    <Home size={16} />
+                                                )}
                                             </div>
                                             <div>
                                                 <div className="t-name font-mono text-[11px]">{prop.propertyCode}</div>
