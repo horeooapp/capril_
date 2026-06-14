@@ -103,7 +103,11 @@ export async function POST(req: Request) {
             ]);
 
             // Sécurité : Génération d'un vrai JWT signé
-            const realToken = await signMobileToken(user.id, user.email || '', role || user.role || 'TENANT');
+            const realToken = await signMobileToken({
+                userId: user.id, 
+                email: user.email || '', 
+                role: role || user.role || 'TENANT'
+            });
 
             return NextResponse.json({ 
                 success: true, 

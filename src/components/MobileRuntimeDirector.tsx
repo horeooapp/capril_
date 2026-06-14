@@ -11,11 +11,13 @@ export default function MobileRuntimeDirector() {
         // Chargement dynamique pour éviter les erreurs SSR (Server-Side Rendering)
         const checkAppId = async () => {
             try {
+                // @ts-ignore
                 const { Capacitor } = await import('@capacitor/core')
                 
                 // Si ce n'est pas une application native iOS/Android, on ne fait rien.
                 if (!Capacitor.isNativePlatform()) return
 
+                // @ts-ignore
                 const { App } = await import('@capacitor/app')
                 const info = await App.getInfo()
                 
