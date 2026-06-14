@@ -15,6 +15,13 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
     const [modalOpen, setModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
+    // Calcul des statistiques réelles
+    const totalCIE = factures.filter(f => f.type === 'CIE' && f.status !== 'PAYE').reduce((acc, f) => acc + f.montantGlobal, 0)
+    const totalSODECI = factures.filter(f => f.type === 'SODECI' && f.status !== 'PAYE').reduce((acc, f) => acc + f.montantGlobal, 0)
+    const expectedTotal = factures.reduce((acc, f) => acc + f.montantGlobal, 0)
+    const paidTotal = factures.reduce((acc, f) => acc + (f.repartitions || []).filter((r: any) => r.status === 'PAYEE').reduce((rAcc: number, r: any) => rAcc + r.montant, 0), 0)
+    const recouvrement = expectedTotal > 0 ? Math.round((paidTotal / expectedTotal) * 100) : 0
+
     // Form State
     const [formData, setFormData] = useState({
         propertyId: "",
@@ -32,24 +39,10 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
         setLoading(true)
         // Simulation d'une action serveur
         setTimeout(() => {
-            const prop = properties.find(p => p.id === formData.propertyId)
-            const newFacture = {
-                id: `FAC-${Math.floor(Math.random() * 1000)}`,
-                type: formData.type,
-                montantGlobal: parseInt(formData.montantGlobal),
-                mois: formData.mois,
-                property: { name: prop?.name || "Propriété inconnue" },
-                status: "REPARTIE",
-                repartitions: [
-                    { locataireName: "Locataire 1", montant: parseInt(formData.montantGlobal) * 0.4, status: "EN_ATTENTE" },
-                    { locataireName: "Locataire 2", montant: parseInt(formData.montantGlobal) * 0.6, status: "EN_ATTENTE" }
-                ]
-            }
-            setFactures([newFacture, ...factures])
+            toast.info("Enregistrement de facture en cours de développement.")
             setModalOpen(false)
             setLoading(false)
-            toast.success("Facture enregistrée et répartie avec succès !")
-        }, 1500)
+        }, 1000)
     }
 
     return (
@@ -91,7 +84,7 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                     </div>
                     <div>
                         <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Factures CIE en cours</h3>
-                        <p className="text-2xl font-black text-slate-800">45,000 <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
+                        <p className="text-2xl font-black text-slate-800">{totalCIE.toLocaleString()} <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
                     </div>
                 </div>
                 <div className="glass-panel p-6 rounded-[1.5rem] bg-white border border-gray-100 shadow-sm flex items-center gap-4">
@@ -100,14 +93,14 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                     </div>
                     <div>
                         <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Factures SODECI en cours</h3>
-                        <p className="text-2xl font-black text-slate-800">0 <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
+                        <p className="text-2xl font-black text-slate-800">{totalSODECI.toLocaleString()} <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
                     </div>
                 </div>
                 <div className="glass-panel p-6 rounded-[1.5rem] bg-slate-900 border border-slate-800 shadow-xl flex items-center gap-4 text-white relative overflow-hidden">
                     <div className="absolute right-0 bottom-0 opacity-10"><PieChart size={100} className="-mr-6 -mb-6" /></div>
                     <div className="relative z-10">
                         <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Taux de recouvrement</h3>
-                        <p className="text-3xl font-black">68%</p>
+                        <p className="text-3xl font-black">{recouvrement}%</p>
                         <p className="text-xs text-emerald-400 font-medium mt-1 flex items-center gap-1"><Check size={12}/> Ce mois-ci</p>
                     </div>
                 </div>

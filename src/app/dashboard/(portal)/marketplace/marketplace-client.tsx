@@ -9,16 +9,8 @@ import { SectionCard } from "@/components/dashboard/ui/SectionCard";
 import { StatCard } from "@/components/dashboard/ui/StatCard";
 import { Badge } from "@/components/dashboard/ui/Badge";
 
-// Fallback statique si DB vide
-const FALLBACK = [
-    { id: "MKT-01", titre: "Studio Haut Standing", logement: { city: "Riviera Palmeraie" }, loyerDemande: 250000, statut: "ACTIVE", nbVisites: 1240 },
-    { id: "MKT-02", titre: "Bureau Open Space", logement: { city: "Plateau" }, loyerDemande: 1500000, statut: "ACTIVE", nbVisites: 342 },
-    { id: "MKT-03", titre: "Villa Triplex", logement: { city: "Riviera 3" }, loyerDemande: 2000000, statut: "BROUILLON", nbVisites: 0 }
-]
-
 export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }: { initialAnnonces: any[], agencyId: string }) {
-    const defaultData = initialAnnonces.length > 0 ? initialAnnonces : FALLBACK
-    const [listings, setListings] = useState<any[]>(defaultData)
+    const [listings, setListings] = useState<any[]>(initialAnnonces)
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
@@ -29,13 +21,6 @@ export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }
         if (currentStatus === "ACTIVE") return toast.info("Cette annonce est déjà en ligne.");
 
         startTransition(async () => {
-             // Si c'est un mock (id MKT-xxx), on fait juste une fausse maj :
-             if (id.startsWith('MKT-')) {
-                 toast.success("Annonce publiée sur QAPRIL Store avec succès.")
-                 setListings(prev => prev.map(l => l.id === id ? { ...l, statut: "ACTIVE" } : l))
-                 return
-             }
-             
              const res = await publishAnnonce(id)
              if (res.error) toast.error(res.error)
              else {
@@ -131,14 +116,21 @@ export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }
                                             </button>
                                         ) : (
                                             <button 
-                                                onClick={(e) => { e.stopPropagation(); toast.success("Ouverture de l'éditeur d'annonce..."); }}
+                                                onClick={(e) => { e.stopPropagation(); router.push(l.propertyId ? `/dashboard/properties/${l.propertyId}` : "/dashboard/marketplace/new"); }}
                                                 className="text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200 px-4 py-2.5 rounded-[8px] flex items-center justify-center w-full bg-white shadow-sm">
-                                                Gérer
+                                                Gérer le Bien
                                             </button>
                                         )}
                                     </td>
                                 </tr>
                             ))}
+                            {listings.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="p-12 text-center text-slate-500 text-[13px] font-medium">
+                                        Aucune annonce pour le moment.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
