@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#E8601A"
     },
+    "scheme": "qaprillocataire",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -44,7 +45,8 @@
           "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-router"
     ],
     "extra": {
       "eas": {
