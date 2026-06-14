@@ -4,6 +4,7 @@ import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
+import { sendSMS } from '@/lib/sms';
 
 export async function POST(request: Request) {
     try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { propertyId, tenantEmail, rentAmount } = body;
+        const { propertyId, tenantEmail, rentAmount, durationMonths } = body;
 
         if (!propertyId || !tenantEmail || !rentAmount) {
             return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
@@ -57,21 +58,23 @@ export async function POST(request: Request) {
 
         page.drawText('CONDITIONS FINANCIÈRES :', { x: 50, y: height - 320, size: 14, font: boldFont });
         page.drawText(`Loyer mensuel : ${rentAmount} FCFA`, { x: 50, y: height - 340, size: 12, font });
-        page.drawText(`Dépôt de garantie : ${parseFloat(rentAmount) * 2} FCFA`, { x: 50, y: height - 360, size: 12, font });
+        page.drawText(`Dépôt de garantie (Caution) : ${parseFloat(rentAmount) * 2} FCFA (2 mois max)`, { x: 50, y: height - 360, size: 12, font });
+        page.drawText(`Avance sur loyer : ${parseFloat(rentAmount) * 2} FCFA (2 mois max)`, { x: 50, y: height - 380, size: 12, font });
 
-        page.drawText('SIGNATURES', { x: 50, y: height - 420, size: 14, font: boldFont });
-        page.drawText('Le Propriétaire', { x: 50, y: height - 460, size: 12, font });
-        page.drawText('Le Locataire', { x: 400, y: height - 460, size: 12, font });
+        page.drawText('SIGNATURES', { x: 50, y: height - 440, size: 14, font: boldFont });
+        page.drawText('Le Propriétaire', { x: 50, y: height - 480, size: 12, font });
+        page.drawText('Le Locataire', { x: 400, y: height - 480, size: 12, font });
 
         const pdfBytes = await pdfDoc.save();
         
         // Sauvegarder sur le disque (public/leases/)
         const fileName = `bail_${Date.now()}.pdf`;
-        const filePath = path.join(process.cwd(), 'public', 'leases', fileName);
+        const leasesDir = path.join(process.cwd(), 'public', 'leases');
+        if (!fs.existsSync(leasesDir)) fs.mkdirSync(leasesDir, { recursive: true });
+        const filePath = path.join(leasesDir, fileName);
         fs.writeFileSync(filePath, pdfBytes);
 
         // URL publique du PDF
-        // On récupère le host depuis la requête
         const host = request.headers.get('host') || 'localhost:3000';
         const protocol = request.url.startsWith('https') ? 'https' : 'http';
         const fileUrl = `${protocol}://${host}/leases/${fileName}`;
@@ -79,15 +82,27 @@ export async function POST(request: Request) {
         // 2. Créer le bail dans la DB
         const newLease = await prisma.lease.create({
             data: {
+                leaseReference: `BAIL-${Date.now().toString().slice(-6)}`,
                 propertyId,
+                landlordId: user.userId,
                 tenantId: tenant.id,
                 rentAmount: parseFloat(rentAmount),
                 depositAmount: parseFloat(rentAmount) * 2,
+                avanceLoyer: parseFloat(rentAmount) * 2,
                 startDate: new Date(),
+                durationMonths: durationMonths ? parseInt(durationMonths) : 12,
                 status: 'ACTIVE',
                 qrCodeUrl: fileUrl // On sauvegarde l'URL du PDF généré ici
             }
         });
+
+        // 3. Envoyer le SMS d'invitation au locataire
+        if (tenant.phone) {
+            await sendSMS(
+                tenant.phone, 
+                `QAPRIL : Votre bail pour ${property.name || 'votre nouveau logement'} a été créé. Connectez-vous à l'application locataire pour le consulter.`
+            );
+        }
 
         return NextResponse.json({ 
             success: true, 
