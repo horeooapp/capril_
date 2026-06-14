@@ -54,7 +54,7 @@ export default async function LeasesDashboardPage() {
         const bdqs = await prisma.bailDeclaratif.findMany({
             where: {
                 bailleurId: userId,
-                statut: { not: "REJETE_PAR_LOCATAIRE" }
+                statut: { notIn: ["ARCHIVE", "FORMALISE", "CONTESTE"] }
             },
             include: {
                 property: { select: { name: true, address: true, propertyCode: true, unitLabel: true } }
