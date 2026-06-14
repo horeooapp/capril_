@@ -36,8 +36,8 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
         }
     }[role];
 
-    // MOCK API URL - Replace with actual URL
-    const API_URL = 'http://10.0.2.2:3000'; // Android Emulator localhost
+    // Utilisation de l'URL d'API configurée globalement (gère Prod et Dev)
+    const API_URL = require('../../lib/api').API_URL;
 
     const handleRequestOTP = async () => {
         if (!email) {
@@ -47,7 +47,7 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
         setIsPending(true);
         try {
-            const response = await fetch(`${API_URL}/api/mobile/auth/request-otp`, {
+            const response = await fetch(`${API_URL}/auth/request-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -75,7 +75,7 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
         setIsPending(true);
         try {
-            const response = await fetch(`${API_URL}/api/mobile/auth/verify-otp`, {
+            const response = await fetch(`${API_URL}/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp, role })
