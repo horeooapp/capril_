@@ -85,7 +85,12 @@ export async function getAvailableProperties() {
     try {
         const props = await prisma.property.findMany({
             where: { 
-                ownerUserId: session.user.id,
+                OR: [
+                    { ownerUserId: session.user.id },
+                    { managedByUserId: session.user.id },
+                    { accessRoles: { some: { userId: session.user.id, statut: "ACTIF" } } }
+                ],
+                status: { not: "archived" },
                 leases: {
                     none: {
                         status: { in: ['ACTIVE', 'LOYER_IMPAYE', 'PENDING_SIGNATURE', 'DRAFT', 'PENDING_CONFIRMATION', 'ACTIVE_DECLARATIF'] }
@@ -94,7 +99,8 @@ export async function getAvailableProperties() {
             }
         })
         return props
-    } catch {
+    } catch (e) {
+        console.error("Error getAvailableProperties:", e)
         return []
     }
 }
