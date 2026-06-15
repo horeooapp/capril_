@@ -21,9 +21,26 @@ export async function GET(request: Request) {
             }
         });
 
+        // Fetch pending lease (BailDeclaratif) for the tenant
+        const pendingLease = await prisma.bailDeclaratif.findFirst({
+            where: {
+                locataireId: user.userId,
+                statut: 'PENDING_LOCATAIRE'
+            },
+            include: {
+                property: true
+            }
+        });
+
         if (!lease) {
             return NextResponse.json({
                 hasLease: false,
+                pendingLease: pendingLease ? {
+                    id: pendingLease.id,
+                    propertyName: pendingLease.property?.name || 'Logement',
+                    rentAmount: pendingLease.montantLoyer,
+                    status: pendingLease.statut
+                } : null,
                 message: "Aucun bail actif trouvé."
             });
         }

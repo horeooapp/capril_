@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import { useRouter } from 'expo-router';
-import { FileDown, CalendarClock, AlertCircle, CheckCircle2, Wallet, PenTool } from 'lucide-react-native';
+import { FileDown, CalendarClock, AlertCircle, CheckCircle2, Wallet, PenTool, FileSignature } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DashboardScreen() {
@@ -120,6 +120,21 @@ export default function DashboardScreen() {
                             </View>
                         </View>
                     </>
+                ) : data?.pendingLease ? (
+                    <View style={[styles.card, { borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)' }]}>
+                        <Text style={[styles.cardTitle, { color: '#fcd34d' }]}>Nouveau Bail en Attente</Text>
+                        <Text style={[styles.amount, { fontSize: 24, marginBottom: 12 }]}>Signature requise</Text>
+                        <Text style={{ color: '#d1d5db', marginBottom: 20, fontSize: 14, lineHeight: 20 }}>
+                            Un contrat pour "{data.pendingLease.propertyName}" ({data.pendingLease.rentAmount} FCFA/mois) attend votre validation.
+                        </Text>
+                        <Pressable 
+                            style={[styles.leaseButton, { backgroundColor: '#f59e0b', borderColor: '#d97706', marginBottom: 0 }]} 
+                            onPress={() => router.push('/(tabs)/leases' as any)}
+                        >
+                            <FileSignature color="#fff" size={20} />
+                            <Text style={[styles.leaseButtonText, { color: '#fff' }]}>Examiner le contrat</Text>
+                        </Pressable>
+                    </View>
                 ) : (
                     <View style={styles.card}>
                         <Text style={styles.cardTitle}>Information</Text>
