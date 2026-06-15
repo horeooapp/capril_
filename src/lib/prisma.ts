@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { withTwentySync } from "./twenty/prisma-extension"
+import { withPhoneNormalization } from "./prisma-phone-extension"
 
 const globalForPrisma = globalThis as unknown as { prisma: any }
 
@@ -36,9 +37,8 @@ export const prismaClientSingleton = () => {
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
-  return client.$extends(withTwentySync());
+  return client.$extends(withTwentySync()).$extends(withPhoneNormalization());
 }
-
 
 export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
 
