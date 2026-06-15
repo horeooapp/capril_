@@ -32,3 +32,7 @@ export function normalizePhone(phone: string | null | undefined, defaultPrefix: 
 
     return cleaned;
 }
+export function isNormalized(phone: string | null | undefined): boolean {
+    if (!phone) return true;
+    return phone === normalizePhone(phone);
+}
