@@ -115,7 +115,7 @@ export async function creerBien(formData: FormData) {
         parentPropertyId: formData.get("parentPropertyId") as string,
         commune: formData.get("commune") as string,
         address: formData.get("addressLine1") as string || formData.get("address") as string,
-        propertyType: formData.get("propertyType") as string,
+        propertyType: (formData.get("propertyType") as string) || "BUILDING",
         declaredRentFcfa: parseInt(formData.get("rent") as string) || 0,
         superficieM2: parseFloat(formData.get("area") as string) || undefined,
         nbUnits: parseInt(formData.get("nbUnits") as string) || 0,
