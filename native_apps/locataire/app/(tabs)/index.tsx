@@ -3,12 +3,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import { useRouter } from 'expo-router';
-import { FileDown, CalendarClock, AlertCircle, CheckCircle2, Wallet, PenTool, FileSignature } from 'lucide-react-native';
+import { FileDown, CalendarClock, AlertCircle, CheckCircle2, Wallet, PenTool, FileSignature, Bell } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DashboardScreen() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [unreadCount, setUnreadCount] = useState(0);
     const router = useRouter();
 
     useEffect(() => {
@@ -33,6 +34,22 @@ export default function DashboardScreen() {
         };
 
         loadDashboard();
+    }, []);
+
+    useEffect(() => {
+        const loadNotifications = async () => {
+            try {
+                const response = await fetchWithAuth('/locataire/notifications');
+                const json = await response.json();
+                if (response.ok) {
+                    setUnreadCount(json.unreadCount || 0);
+                }
+            } catch (e) {
+                console.error("Failed to load notifications:", e);
+            }
+        };
+
+        loadNotifications();
     }, []);
 
     const handleDownloadLease = async () => {
@@ -71,10 +88,23 @@ export default function DashboardScreen() {
 
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.header}>
-                    <Text style={styles.greeting}>Bonjour 👋</Text>
-                    <Text style={styles.subtitle}>
-                        {data?.hasLease ? data.propertyName : "Bienvenue sur votre espace"}
-                    </Text>
+                    <View>
+                        <Text style={styles.greeting}>Bonjour 👋</Text>
+                        <Text style={styles.subtitle}>
+                            {data?.hasLease ? data.propertyName : "Bienvenue sur votre espace"}
+                        </Text>
+                    </View>
+                    <Pressable 
+                        style={styles.notificationBtn} 
+                        onPress={() => router.push('/notifications' as any)}
+                    >
+                        <Bell color="#fff" size={24} />
+                        {unreadCount > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                            </View>
+                        )}
+                    </Pressable>
                 </View>
 
                 {data?.hasLease ? (
@@ -178,9 +208,39 @@ const styles = StyleSheet.create({
     glow1: { top: -100, right: -50, backgroundColor: '#10B981' },
     glow2: { bottom: -100, left: -50, backgroundColor: '#059669' },
     scroll: { padding: 20 },
-    header: { marginBottom: 30 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
     greeting: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: -0.5 },
     subtitle: { fontSize: 16, color: '#a7f3d0', marginTop: 4, fontWeight: '500' },
+    
+    notificationBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#ef4444',
+        borderRadius: 10,
+        minWidth: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 4,
+        borderWidth: 2,
+        borderColor: '#021812',
+    },
+    badgeText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
     
     card: { 
         borderRadius: 24, 
