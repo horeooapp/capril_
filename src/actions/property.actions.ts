@@ -173,7 +173,9 @@ export async function creerBien(formData: FormData) {
       // 5. Création
       const bien = await tx.property.create({
         data: {
-          propertyCode,
+          propertyCode: (parentPropertyId && unitLabel && parentRef) 
+            ? `${parentRef}-${unitLabel.replace(/\s/g, '').toUpperCase()}` 
+            : propertyCode,
           ownerUserId,
           typeStructure,
           name:             data.name || (parentPropertyId && unitLabel ? `${inheritedData.name || ''} - ${unitLabel}` : data.name),
