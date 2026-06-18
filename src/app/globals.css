@@ -298,3 +298,25 @@ input:not([type="checkbox"]):not([type="radio"]) {
   scrollbar-width: none;
 }
 
+/* --- CAPACITOR NATIVE APP STYLES --- */
+body.is-native-app {
+  /* Safe areas pour éviter l'encoche et la barre de statut */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  
+  /* Comportements natifs */
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Autoriser la sélection et le scroll normal dans les champs de texte */
+body.is-native-app input, 
+body.is-native-app textarea, 
+body.is-native-app [contenteditable] {
+  -webkit-user-select: auto;
+  user-select: auto;
+}

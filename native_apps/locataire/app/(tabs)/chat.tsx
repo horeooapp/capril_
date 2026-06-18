@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
@@ -71,18 +71,18 @@ export default function ChatScreen() {
         const isMe = item.roleExpediteur === 'LOCATAIRE';
         
         return (
-            <View style={[styles.messageWrapper, isMe ? styles.messageWrapperMe : styles.messageWrapperOther]}>
-                <View style={[styles.messageBubble, isMe ? styles.messageBubbleMe : styles.messageBubbleOther]}>
-                    <Text style={styles.messageText}>{item.contenu}</Text>
-                    <View style={styles.messageFooter}>
-                        <Text style={styles.messageTime}>
+            <View className={`flex-row mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <View className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${isMe ? 'bg-qgreen rounded-br-sm' : 'bg-white border border-qgrey-2 rounded-bl-sm'}`}>
+                    <Text className={`text-base ${isMe ? 'text-white' : 'text-qnavy'}`}>{item.contenu}</Text>
+                    <View className="flex-row items-center justify-end mt-1 gap-1">
+                        <Text className={`text-[10px] ${isMe ? 'text-white/80' : 'text-qtext-light'}`}>
                             {new Date(item.dateEnvoi).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
                         {isMe && (
                             item.statut === 'LU' ? (
-                                <CheckCheck size={14} color="#3b82f6" style={styles.statusIcon} />
+                                <CheckCheck size={14} color="#FFF" className="ml-0.5" />
                             ) : (
-                                <Check size={14} color="#9ca3af" style={styles.statusIcon} />
+                                <Check size={14} color="#FFF" opacity={0.7} className="ml-0.5" />
                             )
                         )}
                     </View>
@@ -93,43 +93,43 @@ export default function ChatScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView style={[styles.container, styles.center]}>
-                <ActivityIndicator size="large" color="#10B981" />
+            <SafeAreaView className="flex-1 bg-background justify-center items-center">
+                <ActivityIndicator size="large" color="#00C896" />
             </SafeAreaView>
         );
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Propriétaire</Text>
-                <Text style={styles.subtitle}>En ligne</Text>
+        <SafeAreaView className="flex-1 bg-background">
+            <View className="p-5 border-b border-qgrey-2 bg-white/90">
+                <Text className="text-xl font-bold text-qnavy">Propriétaire</Text>
+                <Text className="text-xs text-qgreen font-medium mt-0.5">En ligne</Text>
             </View>
 
             <KeyboardAvoidingView 
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={styles.keyboardView}
+                className="flex-1"
             >
                 <FlatList
                     ref={flatListRef}
                     data={messages}
                     keyExtractor={(item) => item.id}
                     renderItem={renderMessage}
-                    contentContainerStyle={styles.list}
+                    contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
 
-                <View style={styles.inputContainer}>
+                <View className="flex-row p-4 bg-white border-t border-qgrey-2 items-end gap-3 shadow-lg">
                     <TextInput
-                        style={styles.input}
+                        className="flex-1 bg-qgrey-1 border border-qgrey-2 rounded-[20px] px-4 py-3 text-qnavy text-base max-h-[100px] min-h-[40px]"
                         placeholder="Écrivez un message..."
-                        placeholderTextColor="#64748b"
+                        placeholderTextColor="#94A3B8"
                         value={newMessage}
                         onChangeText={setNewMessage}
                         multiline
                     />
                     <Pressable 
-                        style={[styles.sendButton, !newMessage.trim() && { opacity: 0.5 }]} 
+                        className={`bg-qgreen w-11 h-11 rounded-full justify-center items-center mb-0.5 ${!newMessage.trim() ? 'opacity-50' : ''}`}
                         onPress={sendMessage}
                         disabled={!newMessage.trim()}
                     >
@@ -140,52 +140,3 @@ export default function ChatScreen() {
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#021812' },
-    center: { justifyContent: 'center', alignItems: 'center' },
-    header: { padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', backgroundColor: '#022c22' },
-    title: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-    subtitle: { fontSize: 12, color: '#34d399', marginTop: 2 },
-    keyboardView: { flex: 1 },
-    list: { padding: 16, gap: 12, paddingBottom: 100 },
-    messageWrapper: { flexDirection: 'row', marginBottom: 12 },
-    messageWrapperMe: { justifyContent: 'flex-end' },
-    messageWrapperOther: { justifyContent: 'flex-start' },
-    messageBubble: { maxWidth: '80%', padding: 12, borderRadius: 20 },
-    messageBubbleMe: { backgroundColor: '#10B981', borderBottomRightRadius: 4 },
-    messageBubbleOther: { backgroundColor: '#1e293b', borderBottomLeftRadius: 4 },
-    messageText: { color: '#fff', fontSize: 16 },
-    messageFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 4, gap: 4 },
-    messageTime: { fontSize: 10, color: 'rgba(255,255,255,0.7)' },
-    statusIcon: { marginLeft: 2 },
-    inputContainer: { 
-        flexDirection: 'row', 
-        padding: 16, 
-        backgroundColor: '#022c22',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.05)',
-        alignItems: 'flex-end',
-        gap: 12
-    },
-    input: {
-        flex: 1,
-        backgroundColor: '#0f172a',
-        borderRadius: 20,
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 12,
-        color: '#fff',
-        maxHeight: 100,
-        minHeight: 40
-    },
-    sendButton: {
-        backgroundColor: '#10B981',
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 2
-    }
-});

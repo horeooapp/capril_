@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../lib/api';
@@ -20,7 +20,6 @@ export default function CreateLeaseScreen() {
                 const res = await fetchWithAuth('/proprietaire/properties');
                 const data = await res.json();
                 if (res.ok) {
-                    // Ne garder que les biens vacants
                     const vacants = data.properties.filter((p: any) => p.status === 'Vacant');
                     setProperties(vacants);
                     if (vacants.length > 0) setSelectedPropertyId(vacants[0].id);
@@ -67,73 +66,73 @@ export default function CreateLeaseScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backBtn}>
-                    <ChevronLeft color="#fff" size={28} />
+        <SafeAreaView className="flex-1 bg-background">
+            <View className="flex-row items-center p-5 pt-3 border-b border-qgrey-2 bg-white/90">
+                <Pressable onPress={() => router.back()} className="p-1 mr-4">
+                    <ChevronLeft color="#0F1117" size={28} />
                 </Pressable>
-                <Text style={styles.title}>Nouveau Bail</Text>
+                <Text className="text-2xl font-bold text-qnavy">Nouveau Bail</Text>
             </View>
 
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboardView}>
-                <ScrollView contentContainerStyle={styles.scroll}>
-                    <Text style={styles.description}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
+                <ScrollView contentContainerStyle={{ padding: 20 }}>
+                    <Text className="text-qtext-light text-base mb-8 leading-6">
                         Renseignez les informations du locataire pour générer un contrat de bail PDF officiel certifié par QAPRIL.
                     </Text>
 
                     {loadingProps ? (
-                        <ActivityIndicator color="#d97706" style={{ marginTop: 20 }} />
+                        <ActivityIndicator color="#FF8B00" style={{ marginTop: 20 }} />
                     ) : properties.length === 0 ? (
-                        <View style={styles.emptyCard}>
-                            <Text style={styles.emptyText}>Vous n'avez aucun bien vacant. Ajoutez d'abord un bien.</Text>
+                        <View className="p-5 bg-qred-pale rounded-xl border border-qred/30">
+                            <Text className="text-qred text-center font-medium">Vous n'avez aucun bien vacant. Ajoutez d'abord un bien.</Text>
                         </View>
                     ) : (
-                        <View style={styles.form}>
-                            <Text style={styles.label}>Sélectionnez un bien vacant</Text>
-                            <View style={styles.propertyList}>
+                        <View className="gap-4">
+                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Sélectionnez un bien vacant</Text>
+                            <View className="flex-row flex-wrap gap-3 mb-2">
                                 {properties.map(p => (
                                     <Pressable 
                                         key={p.id} 
-                                        style={[styles.propertyCard, selectedPropertyId === p.id && styles.propertyCardSelected]}
+                                        className={`p-3 rounded-xl border ${selectedPropertyId === p.id ? 'border-qorange bg-qorange/10' : 'border-qgrey-2 bg-white'}`}
                                         onPress={() => setSelectedPropertyId(p.id)}
                                     >
-                                        <Text style={[styles.propertyText, selectedPropertyId === p.id && styles.propertyTextSelected]}>
+                                        <Text className={`${selectedPropertyId === p.id ? 'text-qorange font-bold' : 'text-qtext-light font-medium'}`}>
                                             {p.name}
                                         </Text>
                                     </Pressable>
                                 ))}
                             </View>
 
-                            <Text style={styles.label}>Email du locataire (compte QAPRIL)</Text>
+                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Email du locataire (compte QAPRIL)</Text>
                             <TextInput
-                                style={styles.input}
+                                className="bg-white border border-qgrey-2 rounded-xl p-4 text-qnavy text-base"
                                 placeholder="ex: locataire@gmail.com"
-                                placeholderTextColor="#64748b"
+                                placeholderTextColor="#94A3B8"
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                                 value={tenantEmail}
                                 onChangeText={setTenantEmail}
                             />
 
-                            <Text style={styles.label}>Loyer Mensuel (FCFA)</Text>
+                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Loyer Mensuel (FCFA)</Text>
                             <TextInput
-                                style={styles.input}
+                                className="bg-white border border-qgrey-2 rounded-xl p-4 text-qnavy text-base"
                                 placeholder="ex: 250000"
-                                placeholderTextColor="#64748b"
+                                placeholderTextColor="#94A3B8"
                                 keyboardType="numeric"
                                 value={rentAmount}
                                 onChangeText={setRentAmount}
                             />
 
                             <Pressable 
-                                style={[styles.submitBtn, loading && { opacity: 0.7 }]} 
+                                className={`bg-qorange p-4 rounded-xl items-center mt-5 shadow-sm ${loading ? 'opacity-70' : ''}`}
                                 onPress={handleCreate}
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <ActivityIndicator color="#0A1128" />
+                                    <ActivityIndicator color="#FFF" />
                                 ) : (
-                                    <Text style={styles.submitText}>Générer le contrat PDF</Text>
+                                    <Text className="text-white text-base font-bold">Générer le contrat PDF</Text>
                                 )}
                             </Pressable>
                         </View>
@@ -144,24 +143,3 @@ export default function CreateLeaseScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A1128' },
-    header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
-    backBtn: { padding: 4, marginRight: 16 },
-    title: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
-    keyboardView: { flex: 1 },
-    scroll: { padding: 20 },
-    description: { color: '#9ca3af', fontSize: 16, marginBottom: 30, lineHeight: 24 },
-    emptyCard: { padding: 20, backgroundColor: 'rgba(239,68,68,0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)' },
-    emptyText: { color: '#ef4444', textAlign: 'center' },
-    form: { gap: 16 },
-    label: { color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: -8 },
-    propertyList: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 8 },
-    propertyCard: { padding: 12, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', backgroundColor: '#0f172a' },
-    propertyCardSelected: { borderColor: '#d97706', backgroundColor: 'rgba(217, 119, 6, 0.1)' },
-    propertyText: { color: '#9ca3af', fontWeight: '500' },
-    propertyTextSelected: { color: '#d97706', fontWeight: 'bold' },
-    input: { backgroundColor: '#0f172a', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, color: '#fff', fontSize: 16 },
-    submitBtn: { backgroundColor: '#d97706', padding: 18, borderRadius: 12, alignItems: 'center', marginTop: 20 },
-    submitText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
-});

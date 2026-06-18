@@ -17,8 +17,20 @@ export default function MobileRuntimeDirector() {
                 // Si ce n'est pas une application native iOS/Android, on ne fait rien.
                 if (!Capacitor.isNativePlatform()) return
 
+                // Ajout de la classe native au body pour le CSS spécifique (safe areas, overscroll)
+                document.body.classList.add('is-native-app')
+
                 // @ts-ignore
                 const { App } = await import('@capacitor/app')
+                
+                // Gestion du bouton de retour Android
+                App.addListener('backButton', ({ canGoBack }: any) => {
+                    if (canGoBack) {
+                        router.back()
+                    } else {
+                        App.exitApp()
+                    }
+                })
                 const info = await App.getInfo()
                 
                 // Redirection forcée si l'utilisateur est sur l'écran d'accueil ou de sélection
