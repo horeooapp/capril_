@@ -52,7 +52,11 @@ jobs:
 
       - name: 📦 Install dependencies (Fresh Slate)
         run: |
-          npm install
+          npm config set registry https://registry.npmjs.org/
+          npm config set fetch-retries 2
+          npm config set fetch-retry-mintimeout 10000
+          npm config set fetch-retry-maxtimeout 60000
+          npm ci --verbose
 
       - name: 🧪 Client Guard (Verify Generated Client)
         run: |
