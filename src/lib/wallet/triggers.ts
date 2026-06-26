@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { calculateSuggestedRecharge } from "./calculator";
 import { generateDeepLink, Operator } from "./deeplinks";
 import { sendSMS } from "@/lib/sms";
+import { isPaywallActive } from "../paywall-utils";
 // import { sendWhatsApp } from "@/lib/whatsapp"; // A implémenter si besoin
 
 /**
@@ -11,6 +12,12 @@ import { sendSMS } from "@/lib/sms";
 export async function processWalletTriggers() {
   const now = new Date();
   const today = now.getDate();
+  
+  // 0. Vérifier si le paywall est actif (Mode Freemium)
+  if (!(await isPaywallActive())) {
+    console.log("Paywall désactivé (Mode Freemium): Arrêt des triggers wallet.");
+    return;
+  }
   
   // 1. Récupérer les constantes globales depuis ConfigTarif
   const configs = await prisma.configTarif.findMany({
@@ -94,6 +101,7 @@ export async function processWalletTriggers() {
  * Appelé par l'action de génération de quittance.
  */
 export async function triggerCreditGenere(userId: string) {
+  if (!(await isPaywallActive())) return;
   return sendRechargeNotification(userId, "CREDIT_GENERE");
 }
 

@@ -598,6 +598,8 @@ model User {
   agenceProfile AgenceProfile? @relation("AgenceProfileUser")
 
   // ADD-05 Freemium
+  isFreemiumOverride Boolean @default(false) @map("is_freemium_override")
+  freemiumSince      DateTime? @map("freemium_since")
   activePlanTier     PlanTier            @default(LOCATAIRE) @map("active_plan_tier")
   planExpiresAt      DateTime?           @map("plan_expires_at")
   subscriptionAudits SubscriptionAudit[]
@@ -2899,6 +2901,7 @@ model OffreAbonnement {
   prixUniteTtc     Float?    @default(0) @map("prix_unite_ttc")
   modules          Json?
   actif            Boolean   @default(true)
+  isFreemium       Boolean   @default(false) @map("is_freemium")
   visibleSignup    Boolean   @default(true) @map("visible_signup")
   ordreAffichage   Int       @default(0) @map("ordre_affichage")
   createdAt        DateTime  @default(now()) @map("created_at")

@@ -42,7 +42,7 @@ export class FiscalService {
       const loyerTotal = lease.rentAmount * duree;
       const droits = Math.round(loyerTotal * 0.025);
       const timbre = nbPages * 500;
-      const fraisQapril = 5000; // Frais de service QAPRIL par défaut
+      const fraisQapril = 0; // Mode Gratuit: Frais de service QAPRIL par défaut à 0 (WAS: 5000)
       const deadline = addDays(lease.signedAt || new Date(), 30);
 
       dossier = await prisma.fiscalDossier.create({

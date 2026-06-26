@@ -55,19 +55,20 @@ export function calculateFiscalDroits(
     const penalty = isLate ? Math.round(droits * 0.10) : 0;
 
     // Frais QAPRIL (Moteur de service dynamique M-PRIX-DYN - ADD-05)
-    const fraisTtc = DYNAMIC_PRICING.calculateServiceFee(loyerMensuel);
+    // Mode Gratuit: Neutralisation des frais
+    const fraisTtc = 0; // WAS: DYNAMIC_PRICING.calculateServiceFee(loyerMensuel);
     const tvaRate = 0.18;
-    const fraisHt = Math.round(fraisTtc / (1 + tvaRate));
-    const fraisTva = fraisTtc - fraisHt;
+    const fraisHt = 0;
+    const fraisTva = 0;
     
-    // Surcharge pour bail commercial (Minimum 5000 TTC)
+    // Surcharge pour bail commercial
     let finalFraisTtc = fraisTtc;
     if (leaseType === 'commercial') {
-        finalFraisTtc = Math.max(finalFraisTtc, 5000);
+        finalFraisTtc = Math.max(finalFraisTtc, 0); // WAS: 5000
     }
 
-    const finalFraisHt = Math.round(finalFraisTtc / (1 + tvaRate));
-    const finalFraisTva = finalFraisTtc - finalFraisHt;
+    const finalFraisHt = 0;
+    const finalFraisTva = 0;
 
     const totalDgi = droits + timbres + penalty;
     const totalBailleur = totalDgi + finalFraisTtc;

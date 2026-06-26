@@ -5,7 +5,7 @@ import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function QaprilLandingV2({ session }: { session: any }) {
+export default function QaprilLandingV2({ session, paywallActif = true }: { session: any, paywallActif?: boolean }) {
   const [activeTab, setActiveTab] = useState("tenant");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -667,8 +667,8 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>PROPRIÉTAIRE</div>
               <div className="price-icon">🏠</div>
               <div className="price-name">Propriétaire</div>
-              <div className="price-amount">Par quittance</div>
-              <div className="price-period">Facturation à l'acte généré</div>
+              <div className="price-amount">{paywallActif ? "Par quittance" : "Gratuit"}</div>
+              <div className="price-period">{paywallActif ? "Facturation à l'acte généré" : "Pour toujours"}</div>
               <div className="price-divider"></div>
               <div className="price-features">
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion baux</div>
@@ -684,8 +684,8 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="price-badge">⭐ AGENCE INTERMÉDIAIRE</div>
               <div className="price-icon">🏢</div>
               <div className="price-name">Agence Inter.</div>
-              <div className="price-amount">Par quittance</div>
-              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>Facturation à l'acte généré</div>
+              <div className="price-amount">{paywallActif ? "Par quittance" : "Gratuit"}</div>
+              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>{paywallActif ? "Facturation à l'acte généré" : "Pour toujours"}</div>
               <div className="price-divider"></div>
               <div className="price-features">
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Propriétaire</div>
@@ -701,8 +701,8 @@ export default function QaprilLandingV2({ session }: { session: any }) {
               <div className="price-badge" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>DIASPORA VIP</div>
               <div className="price-icon">🌍</div>
               <div className="price-name">Diaspora</div>
-              <div className="price-amount">2 500</div>
-              <div className="price-period">FCFA / mois · complet</div>
+              <div className="price-amount">{paywallActif ? "2 500" : "Gratuit"}</div>
+              <div className="price-period">{paywallActif ? "FCFA / mois · complet" : "Service 100% gratuit"}</div>
               <div className="price-divider"></div>
               <div className="price-features">
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Tableau de bord VIP</div>
