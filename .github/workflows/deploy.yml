@@ -1,6 +1,5 @@
-# Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
-# Trigger deploy with nuclear exorcism and Prisma fixes
-name: 🚀 Deploy QAPRIL v3.0 to Hostinger
+# Trigger deploy with Docker
+name: 🚀 Deploy QAPRIL v3.0 to Hostinger (Docker)
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -12,220 +11,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ──────────────────────────────────────────────────────
-  # JOB 1: unified (Build + Deploy)
-  # ──────────────────────────────────────────────────────
   deploy:
-    name: 🚀 Build & Deploy to Hostinger
+    name: 🚀 Build & Deploy to Hostinger via Docker
     runs-on: self-hosted
     environment: production
 
     steps:
       - name: 🛡️ Repair & Clean Runner Workspace
         run: |
-          # Reclaim ownership of the entire work directory
-          # This fixes "Access Denied" errors during checkout or cleanup
           echo "🛡️ Reclaiming ownership of the workspace..."
           sudo chown -R $USER:$USER /home/github/actions-runner/_work || true
           sudo chmod -R 755 /home/github/actions-runner/_work || true
           
-          # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
           echo "🧹 Clearing diagnostic telemetry..."
           [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
           
-          # Nuclear Cleanup to ensure zero contamination
-          echo "☢️ Nuking stale build artifacts..."
-          rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
+          echo "☢️ Nuking stale artifacts..."
+          sudo rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
 
       - name: 🚚 Checkout repository
         uses: actions/checkout@v6
 
-      - name: 🟢 Setup Node.js (Runner Env)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: 💾 Cache Next.js Build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: 🛡️ Prisma Guard (Pre-check Schema)
-        run: |
-          echo "🔍 Verifying Schema Content BEFORE Build..."
-          grep "provider = \"postgresql\"" prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
-
-      - name: 📦 Install dependencies (Fresh Slate)
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config set fetch-retries 2
-          npm config set fetch-retry-mintimeout 10000
-          npm config set fetch-retry-maxtimeout 60000
-          npm ci --no-audit --no-fund
-
-      - name: 🧪 Client Guard (Verify Generated Client)
-        run: |
-          echo "🔍 Checking Generated Client..."
-          grep -q 'provider = "postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
-          echo "✅ Client is 100% PostgreSQL-native."
-
-      - name: 🔍 TypeScript type check
-        run: npx tsc --noEmit
-
-      - name: 🏗️ Build App (PostgreSQL Native)
-        run: |
-          # Robustly extract DATABASE_URL from secret
-          RAW_URL='${{ secrets.DATABASE_URL }}'
-          CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
-          [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
-          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-          
-          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
-            echo "❌ ERROR: DATABASE_URL must start with postgresql://. Detected protocol: ${CLEAN_DB_URL%%://*}"
-            exit 1
-          fi
-          
-          export DATABASE_URL="$CLEAN_DB_URL"
-          npm run build
-        env:
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
-          EMAIL_SERVER: ${{ secrets.EMAIL_SERVER }}
-          MOBILE_MONEY_WEBHOOK_SECRET: ${{ secrets.MOBILE_MONEY_WEBHOOK_SECRET }}
-          ORANGE_MONEY_API_KEY: ${{ secrets.ORANGE_MONEY_API_KEY }}
-          MTN_MOMO_API_KEY: ${{ secrets.MTN_MOMO_API_KEY }}
-          MOOV_MONEY_API_KEY: ${{ secrets.MOOV_MONEY_API_KEY }}
-          MAPOSTE_WEBHOOK_SECRET: ${{ secrets.MAPOSTE_WEBHOOK_SECRET }}
-          MAPOSTE_API_KEY: ${{ secrets.MAPOSTE_API_KEY }}
-          SMS_GATEWAY_PROVIDER: ${{ vars.SMS_GATEWAY_PROVIDER }}
-          SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
-          USSD_SHARED_SECRET: ${{ secrets.USSD_SHARED_SECRET }}
-
-      - name: 📦 Create Deployment Package
-        run: |
-          mkdir -p dist_package
-          
-          # 1. Standalone bundle (Server logic + its own production node_modules)
-          # Use '.' to include hidden files like .next/
-          cp -a .next/standalone/. dist_package/
-          
-          # 2. Static assets (Must be separate in Next.js Standalone)
-          mkdir -p dist_package/.next/static
-          cp -a .next/static/. dist_package/.next/static/
-          
-          # 3. Public assets (Images, etc. - excluding local uploads if any)
-          mkdir -p dist_package/public
-          cp -a public/. dist_package/public/
-          
-          # 4. Prisma & Scripts (Migrations & Diagnostics)
-          mkdir -p dist_package/prisma
-          cp -a prisma/schema.prisma dist_package/prisma/
-          cp -a scripts dist_package/
-
-          # 🔥 COMPILE SEED (To avoid ts-node on VPS)
-          # We run tsc from inside the prisma dir to avoid nested output folders
-          echo "🌱 Compiling Prisma Seed..."
-          npx tsc prisma/seed.ts --esModuleInterop --module commonjs --target es2020 --outDir dist_package/prisma
-          
-          # Fix tsc nesting if it happened
-          if [ -d "dist_package/prisma/prisma" ]; then
-             mv dist_package/prisma/prisma/* dist_package/prisma/
-             rm -rf dist_package/prisma/prisma
-          fi
-
-          echo "🔍 Verifying Deployment Package Structure:"
-          ls -R dist_package/prisma
-          # Standalone generates its own server.js, we rename it to next-server.js
-          if [ -f "dist_package/server.js" ]; then
-            mv dist_package/server.js dist_package/next-server.js
-          fi
-
-          # 6. Global server.js (Our custom loader)
-          cp -a server.js dist_package/
-
-      - name: 🔱 Post-Build Exorcism (Nuclear Search & Destroy SQLite)
-        run: |
-          echo "🔱 Purging ALL 'sqlite' provider variants from ALL build artifacts..."
-          # Nuclear Regex: Catches 'provider = "sqlite"', 'provider: "sqlite"', '"provider": "sqlite"', etc.
-          EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-          
-          # Remove file extension filters to ensure we hit .rsc, .meta, and other Next.js internal files
-          find dist_package -type f -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
-          
-          echo "🧪 Verifying Nuclear Exorcism Results..."
-          # Check for ANY case-insensitive variation of sqlite provider in the final artifacts
-          # We output the matched lines for easier debugging if it fails
-          SURVIVORS=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' dist_package/ || true)
-          if [ -n "$SURVIVORS" ]; then
-            echo "❌ ERROR: SQLite ghosts survived the exorcism in these files:"
-            echo "$SURVIVORS"
-            exit 1
-          fi
-          echo "✅ Package fully purged of SQLite artifacts."
-
-      - name: 🚀 Transfer Files to VPS Target Folder
-        run: |
-          DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          sudo mkdir -p $DEPLOY_DEST
-          
-          echo "🧹 Nuking STALE artifacts on VPS (Pre-deployment)..."
-          # We only delete the `.next` and specific files. We DO NOT stop PM2 here to avoid 503 downtime!
-          sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package.json $DEPLOY_DEST/package-lock.json || true
-          
-          # Sync everything from dist_package
-          echo "🚀 Syncing 100% FRESH standalone build directly from local step..."
-          rsync -rlptvz --delete --no-owner --no-group --no-perms \
-            --exclude=".env*" \
-            --exclude="public/uploads/" \
-            dist_package/ $DEPLOY_DEST/
-
-          # Force restore ownership to github user
-          sudo chown -R github:github $DEPLOY_DEST || true
-
-          # 🧪 FINAL INTEGRITY CHECK & ON-SITE EXORCISM
-          echo "🧪 Final Pre-Restart Integrity Check & Sanitization..."
-          
-          # Force fix any survivors on the VPS filesystem using the Nuclear Regex (ALL files)
-          EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-          find $DEPLOY_DEST -type f -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
-
-          if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
-            echo "🚨 FATAL ERROR: Server directory missing! Deployment incomplete."
-            exit 1
-          fi
-          
-          # Case-insensitive verification with verbose output
-          OFFENDING_FILES=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' $DEPLOY_DEST/.next/server/ || true)
-          if [ -n "$OFFENDING_FILES" ]; then
-            echo "🚨 FATAL ERROR: SQLite ghost detected in these final deployment files:"
-            echo "$OFFENDING_FILES"
-            exit 1
-          fi
-          echo "✅ Integrity verified (PostgreSQL-native)."
-
       - name: 🔐 Create Production .env
         run: |
-          DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
-          cd $DEPLOY_DEST
-          
-          # Robustly extract DATABASE_URL from secret
           RAW_URL='${{ secrets.DATABASE_URL }}'
           CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
           [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
           CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
-          
-          if [[ ! "$CLEAN_DB_URL" =~ ^postgres(ql)?:// ]]; then
-            echo "❌ ERROR: Invalid DATABASE_URL protocol on production host."
-            exit 1
-          fi
           
           echo "DATABASE_URL=$CLEAN_DB_URL" > .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
@@ -260,121 +72,33 @@ jobs:
           echo "ENABLE_REDIS_MOCK=false" >> .env
           echo "NODE_ENV=production" >> .env
 
-      - name: 📦 Install and Start Local Redis
+      - name: 🐳 Build and Start Docker Container
         run: |
-          sudo apt-get update || true
-          sudo apt-get install -y redis-server || true
-          sudo systemctl enable redis-server || true
-          sudo systemctl start redis-server || true
+          echo "🛑 Stopping existing PM2 instances if any..."
+          pm2 stop capril || true
+          pm2 delete capril || true
+          pm2 save --force || true
+          
+          # Clean up the port just in case
+          sudo fuser -k -9 3000/tcp || true
 
-      - name: 🚀 Start Application (PM2)
+          echo "🚀 Building Docker Image and starting container..."
+          sudo docker-compose up --build -d
+
+      - name: 📦 Run Prisma Migrations
         run: |
-          DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
-          if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
+          echo "⏳ Waiting for DB to be accessible..."
+          sleep 5
+          echo "🔧 Running Prisma Migrations in Docker..."
+          # Run prisma db push using the Next.js container environment
+          sudo docker-compose exec -T web npx prisma db push --accept-data-loss
           
-          # Fix permissions for execution
-          sudo chown -R $USER:$USER ~/.pm2 || true
-
-          # 1. Robust Extraction
-          RAW_URL="${{ secrets.DATABASE_URL }}"
-          # Use grep to isolate the URL from any surrounding text/quotes
-          CLEAN_DB_URL=$(echo "$RAW_URL" | grep -oE "postgresql?://[^[:space:]'\" ]+" | head -n1)
-          
-          # 2. Validation
-          case "$CLEAN_DB_URL" in
-            postgres://*|postgresql://*) ;;
-            *) echo "❌ CRITICAL: Invalid DATABASE_URL protocol. Received: ${CLEAN_DB_URL:0:10}..."; exit 1 ;;
-          esac
-
-          # 3. Execution (Standard Block)
-          sudo -u github CLEAN_DB_URL="$CLEAN_DB_URL" DEPLOY_DEST="$DEPLOY_DEST" bash << 'EOF_DEPLOY'
-            set -e
-            export DATABASE_URL="$CLEAN_DB_URL"
-            cd "$DEPLOY_DEST"
-            
-            echo "🛡️ Synchronizing Database Credentials..."
-            # Extraire et décoder le mot de passe de manière ultra-robuste
-            ENCODED_PASS=$(echo "$CLEAN_DB_URL" | sed -e 's|^.*://[^:]*:\([^@]*\)@.*$|\1|')
-            DECODED_PASS=$(node -e "console.log(decodeURIComponent(process.argv[1]))" "$ENCODED_PASS")
-            # Echapper les apostrophes pour SQL
-            ESCAPED_PASS=$(echo "$DECODED_PASS" | sed "s/'/''/g")
-            
-            # Appliquer le mot de passe DIRECTEMENT au démarrage pour garantir l'alignement
-            sudo -u postgres psql -c "ALTER USER qapril_user WITH PASSWORD '$ESCAPED_PASS';" || echo "⚠️ Failed to reset password."
-
-            echo "🧪 Testing connectivity..."
-            if ! node scripts/test-db-connection.js; then
-              echo "❌ Final Connection Attempt Failed! Dumping logs..."
-              sudo systemctl status postgresql --no-pager || true
-              exit 1
-            fi
-            echo "✅ Connectivity Verified!"
-            
-            echo "🔧 Fixing PostgreSQL permissions for qapril_user..."
-            sudo -u postgres psql -c "ALTER USER qapril_user WITH SUPERUSER;" || true
-            sudo -u postgres psql -d qapril -c "GRANT ALL ON SCHEMA public TO qapril_user;" || true
-            sudo -u postgres psql -d qapril -c "ALTER SCHEMA public OWNER TO qapril_user;" || true
-            
-            # Massive ownership transfer via a single-line SQL command to avoid Heredoc indentation issues
-            sudo -u postgres psql -d qapril -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT typname FROM pg_type JOIN pg_namespace n ON n.oid = typnamespace WHERE n.nspname = 'public' AND typtype = 'e') LOOP EXECUTE 'ALTER TYPE public.' || quote_ident(r.typname) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP EXECUTE 'ALTER TABLE public.' || quote_ident(r.tablename) || ' OWNER TO qapril_user'; END LOOP; FOR r IN (SELECT relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'S') LOOP EXECUTE 'ALTER SEQUENCE public.' || quote_ident(r.relname) || ' OWNER TO qapril_user'; END LOOP; END \$\$;" || true
-
-            # Verify the provider in the logs for the main schema
-            echo "--- Server-side schema.prisma snippet ---"
-            grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
-
-            echo "🔧 Forcing PostgreSQL Enum coercions..."
-            sudo -u postgres psql -d qapril -f scripts/fix-enums-pg.sql || echo "⚠️ Non-fatal enum coercion error."
-
-            echo "📦 Running Prisma Migrations..."
-            npx prisma@6.4.1 db push --accept-data-loss --skip-generate
-            
-            # 🔥 RESTART PM2 & SEED
-            echo "🌱 Running Compiled Seed Logic..."
-            if [ -f "prisma/seed.js" ]; then
-               echo "🚀 EXEC: node prisma/seed.js"
-               if sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"; then
-                  echo "✅ SEED SUCCESSFUL"
-               else
-                  echo "❌ SEED FAILED (Non-fatal, continuing...)"
-               fi
-            else
-              echo "⚠️ Compiled seed NOT found at $DEPLOY_DEST/prisma/seed.js. Skipping seeding."
-            fi
-            
-            echo "📁 Setting up persistent storage..."
-            rm -rf public/uploads || true
-            mkdir -p /home/github/capril_data/uploads
-            [ -L "public/uploads" ] || ln -s /home/github/capril_data/uploads public/uploads || true
-            
-            echo "🚀 Restarting application (PM2) gracefully..."
-            
-            # Export necessary flags to prevent GitHub Action from killing background agents
-            export RUNNER_TRACKING_ID=""
-            
-            # We try to reload gracefully without deleting. If it fails, we fall back to start.
-            if pm2 describe capril > /dev/null 2>&1; then
-                echo "🔄 PM2 capril exists. Reloading..."
-                PORT=3000 HOSTNAME=127.0.0.1 pm2 restart capril --update-env || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
-            else
-                echo "⚡ PM2 capril not found. Starting fresh..."
-                # Clean up the port just in case it's blocked natively before doing a fresh start
-                fuser -k -9 3000/tcp || true
-                PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
-            fi
-            
-            pm2 save --force
-          EOF_DEPLOY
-
       - name: 🩺 Health Check
         run: |
-          DEPLOY_DEST="/home/github/capril_app"
           echo "🩺 Checking application health at http://127.0.0.1:3000/api/health"
-          
-          # Tentative de Health Check hyper-robuste
-          MAX_RETRIES=30
+          MAX_RETRIES=15
           COUNT=0
           while [ $COUNT -lt $MAX_RETRIES ]; do
-            # On vérifie le HTTP Status, les redirects et on ignore silencieusement les erreurs de connexion curl
             STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -L http://127.0.0.1:3000/api/health || echo "000")
             
             if [ "$STATUS_CODE" = "200" ]; then
@@ -383,31 +107,19 @@ jobs:
             fi
             
             echo "⏳ Waiting for application to boot... (Status: $STATUS_CODE) ($((COUNT+1))/$MAX_RETRIES)"
-            sleep 10
+            sleep 5
             COUNT=$((COUNT+1))
           done
           
-          echo "⚠️ Health check local n'a pas répondu 200, mais le déploiement a réussi. Affichage des diagnostics :"
-          sudo -u github bash << 'EOF_DIAG'
-            echo "--- PM2 Status ---"
-            pm2 list
-            echo "--- PM2 Logs (Last 15 lines) ---"
-            pm2 logs capril --lines 15 --no-daemon & sleep 2 && kill $!
-          EOF_DIAG
-          
-          # SUCCESS instead of FAILURE to prevent blocking the CI/CD pipeline on false positives.
-          exit 0
+          echo "⚠️ Health check timeout. Dumping Docker logs:"
+          sudo docker-compose logs --tail=50
+          exit 1
 
       - name: 📣 Notify on Success
         if: success()
         run: |
-          echo "🎉 QAPRIL v3.0 deployed successfully to production"
+          echo "🎉 QAPRIL Docker Deployment successful to production"
           echo "URL: ${{ vars.NEXT_PUBLIC_APP_URL }}"
-
-      - name: 🔴 Notify on Failure
-        if: failure()
-        run: |
-          echo "❌ Deployment failed. Check logs above."
 
       - name: 🧹 Fix permissions for next run
         if: always()
