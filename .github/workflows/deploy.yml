@@ -99,7 +99,11 @@ jobs:
           sleep 5
           echo "🔧 Running Prisma Migrations in Docker..."
           # Run prisma db push using the Next.js container environment
-          sudo docker compose exec -T web npx prisma db push --accept-data-loss
+          if ! sudo docker compose exec -T web npx prisma db push --accept-data-loss; then
+            echo "❌ Container failed to execute command. Dumping docker logs:"
+            sudo docker compose logs web
+            exit 1
+          fi
           
       - name: 🩺 Health Check
         run: |
