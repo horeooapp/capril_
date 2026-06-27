@@ -82,8 +82,16 @@ jobs:
           # Clean up the port just in case
           sudo fuser -k -9 3000/tcp || true
 
+          # Check if docker is installed, if not install it
+          if ! command -v docker &> /dev/null; then
+            echo "📦 Docker not found. Installing Docker..."
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+          fi
+
           echo "🚀 Building Docker Image and starting container..."
-          sudo docker-compose up --build -d
+          # Using "docker compose" instead of the deprecated "docker-compose"
+          sudo docker compose up --build -d
 
       - name: 📦 Run Prisma Migrations
         run: |
@@ -91,7 +99,7 @@ jobs:
           sleep 5
           echo "🔧 Running Prisma Migrations in Docker..."
           # Run prisma db push using the Next.js container environment
-          sudo docker-compose exec -T web npx prisma db push --accept-data-loss
+          sudo docker compose exec -T web npx prisma db push --accept-data-loss
           
       - name: 🩺 Health Check
         run: |
@@ -112,7 +120,7 @@ jobs:
           done
           
           echo "⚠️ Health check timeout. Dumping Docker logs:"
-          sudo docker-compose logs --tail=50
+          sudo docker compose logs --tail=50
           exit 1
 
       - name: 📣 Notify on Success
