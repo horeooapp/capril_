@@ -3,10 +3,11 @@ import { calculateTenantScore, getTenantScoringHistory } from "@/actions/scoring
 
 export async function GET(
     request: Request,
-    { params }: { params: { tenantId: string } }
+    { params }: { params: Promise<{ tenantId: string }> }
 ) {
     try {
-        const result = await getTenantScoringHistory(params.tenantId);
+        const { tenantId } = await params;
+        const result = await getTenantScoringHistory(tenantId);
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 404 });
@@ -20,10 +21,11 @@ export async function GET(
 
 export async function POST(
     request: Request,
-    { params }: { params: { tenantId: string } }
+    { params }: { params: Promise<{ tenantId: string }> }
 ) {
     try {
-        const result = await calculateTenantScore(params.tenantId);
+        const { tenantId } = await params;
+        const result = await calculateTenantScore(tenantId);
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });

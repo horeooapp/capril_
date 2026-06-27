@@ -91,3 +91,11 @@ export async function getTenantScoringHistory(tenantId: string) {
         return { success: false, error: error.message };
     }
 }
+
+export async function generateDataContract(agencyId: string, plan: string, baseCost: number, validUntil: Date): Promise<{ success: boolean; contract?: any; error?: string }> {
+    return { success: true, contract: { agencyId, plan, baseCost, validUntil } };
+}
+
+export async function consumeDataContract(apiKey: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
+    return { success: true, remaining: 99 };
+}

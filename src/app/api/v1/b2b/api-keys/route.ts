@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateAgencyApiKey } from "@/actions/agence.api.actions";
+import { generateApiAccess } from "@/actions/agence.api.actions";
 
 export async function POST(request: Request) {
     try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "agencyId est requis" }, { status: 400 });
         }
 
-        const result = await generateAgencyApiKey(agencyId, planType || "BASIC");
+        const result = await generateApiAccess(agencyId, planType || "BASIC");
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });

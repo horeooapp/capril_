@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createStripeCheckoutSessionMock } from "@/actions/diaspora.stripe.actions";
+import { createCheckoutSession } from "@/actions/diaspora.stripe.actions";
 
 export async function POST(request: Request) {
     try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "userId est requis" }, { status: 400 });
         }
 
-        const result = await createStripeCheckoutSessionMock(userId, planLevel || "PREMIUM");
+        const result = await createCheckoutSession(userId, planLevel || "PREMIUM");
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });

@@ -6,9 +6,10 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-export default async function FloatPoolDetailsPage({ params }: { params: { id: string } }) {
+export default async function FloatPoolDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const pool = await prisma.floatPool.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             movements: {
                 orderBy: { createdAt: "desc" },

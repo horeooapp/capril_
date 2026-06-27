@@ -16,8 +16,7 @@ export async function POST(request: Request) {
         const result = await handleStripeWebhookMock(
             userId, 
             sessionId, 
-            amount || 25000, 
-            status || "PAID"
+            amount || 25000
         );
         
         if (!result.success) {

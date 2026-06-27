@@ -24,7 +24,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "leadId, agencyId et amount sont requis" }, { status: 400 });
         }
 
-        const result = await purchaseLead(leadId, agencyId, amount);
+        const result = await purchaseLead(agencyId, leadId);
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });

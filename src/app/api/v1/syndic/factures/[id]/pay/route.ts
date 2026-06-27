@@ -3,13 +3,14 @@ import { markSyndicFacturePaid } from "@/actions/syndic-b2b.actions";
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const body = await request.json();
         const { paymentRef } = body;
 
-        const result = await markSyndicFacturePaid(params.id, paymentRef);
+        const result = await markSyndicFacturePaid(id, paymentRef);
         
         if (!result.success) {
             return NextResponse.json({ success: false, error: result.error }, { status: 400 });
