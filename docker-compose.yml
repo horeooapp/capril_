@@ -8,8 +8,6 @@ services:
       context: .
       dockerfile: Dockerfile
     network_mode: "host"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-      - NODE_ENV=production
+    env_file:
+      - .env
     restart: unless-stopped
