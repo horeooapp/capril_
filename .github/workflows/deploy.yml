@@ -81,6 +81,12 @@ jobs:
           
           # Clean up the port just in case
           sudo fuser -k -9 3000/tcp || true
+          sudo lsof -ti:3000 | xargs sudo kill -9 || true
+          
+          # Stop any old rogue Docker containers that might be holding port 3000
+          echo "🧹 Cleaning up old containers..."
+          sudo docker ps -q --filter "name=capril" | xargs -r sudo docker rm -f || true
+          sudo docker ps -q --filter "name=web" | xargs -r sudo docker rm -f || true
 
           # Check if docker is installed, if not install it
           if ! command -v docker &> /dev/null; then
