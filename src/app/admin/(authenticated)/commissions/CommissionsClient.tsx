@@ -28,16 +28,16 @@ export default function CommissionsClient() {
     actif: true
   })
 
-  useEffect(() => {
-    loadConfigs()
-  }, [])
-
   async function loadConfigs() {
     setLoading(true)
     const data = await getCommissionConfigs()
     setConfigs(data)
     setLoading(false)
   }
+
+  useEffect(() => {
+    loadConfigs()
+  }, [])
 
   async function handleSave() {
     const dataToSave = {
