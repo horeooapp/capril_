@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { CommissionService } from "@/services/commission.service";
 
 /**
  * Process the automatic split of a payment between stakeholders
@@ -29,15 +30,22 @@ export async function processSplitPayment(paymentId: string) {
       return { error: "Paiement déjà reversé." };
     }
 
-    // 1. Calculate Split
+    // 1. Appeler le service de commission pour déduire la part Qapril
+    const { montantNet: amountAfterCommission } = await CommissionService.deductCommission(paymentId);
+
+    // 2. Calculate Split sur le montant net (ou brut selon la logique, mais ici on répartit le net restant)
     // For v3.0, we assume a standard 10% commission for agencies if managed
     // In production, this would be fetched from the Mandate or Agency configuration
+    // Remarque : Si l'agence prend 10% du brut, il faudrait utiliser Number(payment.montant) * 0.10.
+    // Dans cet exemple, l'agence prend 10% du brut.
     const rentAmount = Number(payment.montant);
     const agencyCommissionRate = 0.10; // 10%
     const agencyCommission = rentAmount * agencyCommissionRate;
-    const landlordNet = rentAmount - agencyCommission;
+    
+    // Le propriétaire reçoit le montant final (montant brut - commission Qapril - commission agence)
+    const landlordNet = amountAfterCommission - agencyCommission;
 
-    // 2. Identify Recipients
+    // 3. Identify Recipients
     const agencyId = payment.lease.landlordId; // Simplification for demo: landlord is the agency user context
     const landlordId = payment.lease.property?.ownerUserId; // Real owner
 

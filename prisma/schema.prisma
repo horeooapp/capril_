@@ -505,7 +505,6 @@ enum EdlStatut {
   CERTIFIE
 }
 
-
 enum ProfileType {
   LANDLORD
   CERTIFIED_AGENCY
@@ -598,8 +597,8 @@ model User {
   agenceProfile AgenceProfile? @relation("AgenceProfileUser")
 
   // ADD-05 Freemium
-  isFreemiumOverride Boolean @default(false) @map("is_freemium_override")
-  freemiumSince      DateTime? @map("freemium_since")
+  isFreemiumOverride Boolean             @default(false) @map("is_freemium_override")
+  freemiumSince      DateTime?           @map("freemium_since")
   activePlanTier     PlanTier            @default(LOCATAIRE) @map("active_plan_tier")
   planExpiresAt      DateTime?           @map("plan_expires_at")
   subscriptionAudits SubscriptionAudit[]
@@ -679,13 +678,13 @@ model User {
   iclEvents           IclEvent[]
 
   // ADD-15 Rapports
-  redactedEdls        EtatsDesLieux[]    @relation("RedacteurEdl")
-  rapportsMensuels    RapportMensuel[]
+  redactedEdls     EtatsDesLieux[]  @relation("RedacteurEdl")
+  rapportsMensuels RapportMensuel[]
 
   // ADD-16 Succession Locataire
-  beneficiaireNom      String? @map("beneficiaire_nom")
-  beneficiaireLien     String? @map("beneficiaire_lien")
-  beneficiairePhone    String? @map("beneficiaire_phone")
+  beneficiaireNom           String?   @map("beneficiaire_nom")
+  beneficiaireLien          String?   @map("beneficiaire_lien")
+  beneficiairePhone         String?   @map("beneficiaire_phone")
   beneficiaireDesignationAt DateTime? @map("beneficiaire_designation_at")
 
   // ADD-17 & 18 Relations
@@ -695,11 +694,21 @@ model User {
   repartitionsUtilities RepartitionUtility[]
   walletTransactions    WalletTransaction[]
 
-  automationSettings AutomationSettings?
+  automationSettings      AutomationSettings?
   emailVerificationTokens EmailVerificationToken[]
 
   abonnementsOperateurs AbonnementOperateur[]
   vaultCautions         VaultCaution[]
+
+  // NOUVELLES RELATIONS PMT
+  tenantScoringHistory   TenantScoringHistory[]
+  insuranceSouscriptions InsuranceSouscription[]
+  agenceApiAccess        AgenceApiAccess?
+  leadTransactions       LeadTransaction[]
+  diasporaPaymentHistory DiasporaPaymentHistory[]
+  syndicatsManaged       Syndicate[]              @relation("SyndicManager")
+  consentDataScoringAt   DateTime?                @map("consent_data_scoring_at")
+  userConsents           UserConsent[]
 
   @@index([phone])
   @@index([role])
@@ -710,22 +719,21 @@ model User {
 // ANNUAIRE URGENCES (Contacts pour Locataires)
 // ═══════════════════════════════════════════════════════
 model AnnuaireUrgences {
-  id          String   @id @default(uuid()) @map("contact_id")
-  name        String   @map("name")
-  category    String   @map("category") // Plomberie, Electricité, Sécurité, etc.
-  phone       String   @map("phone")
-  location    String?  @map("location") 
-  hours       String?  @map("hours")
-  lat         Float?   @map("lat")
-  lng         Float?   @map("lng")
-  iconName    String?  @default("Phone") @map("icon_name")
-  
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id       String  @id @default(uuid()) @map("contact_id")
+  name     String  @map("name")
+  category String  @map("category") // Plomberie, Electricité, Sécurité, etc.
+  phone    String  @map("phone")
+  location String? @map("location")
+  hours    String? @map("hours")
+  lat      Float?  @map("lat")
+  lng      Float?  @map("lng")
+  iconName String? @default("Phone") @map("icon_name")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("annuaire_urgences")
 }
-
 
 // ═══════════════════════════════════════════════════════
 // LEGAL ENTITIES (Part 5.1/Level 4)
@@ -971,7 +979,6 @@ model Lease {
   paymentDay     Int       @default(5) @map("payment_day")
   depositAmount  Int       @default(0) @map("deposit_amount")
 
-  // NOUVEAUX CHAMPS — Pratique locative CI (DLP-001)
   paiementAvance        Boolean   @default(true) @map("paiement_avance") // TRUE = payé d'avance (standard CI)
   avanceLoyer           Int       @default(0) @map("avance_loyer")
   avanceLoyerConformeAt DateTime? @map("avance_loyer_conforme_at")
@@ -1069,21 +1076,22 @@ model Lease {
   repartitionsUtilities RepartitionUtility[]
 
   // ADD-01 v2 M-FISCAL
-  nbPagesBail               Int?           @map("nb_pages_bail")
-  droitsEnregistrement      Float?         @map("droits_enregistrement")
-  fraisTimbre               Float?         @map("frais_timbre")
-  totalFiscalBail           Float?         @map("total_fiscal_bail")
-  statutFiscal              String         @default("NON_CALCULÉ") @map("statut_fiscal")
-  recuFiscalUrl             String?        @map("recu_fiscal_url")
-  recuFiscalHash            String?        @map("recu_fiscal_hash")
-  deadlineEnregistrement    DateTime?      @map("deadline_enregistrement")
-  certEnregistrementDgiUrl  String?        @map("cert_enregistrement_dgi_url")
-  acteEnregistrementRemisAt DateTime?      @map("acte_enregistrement_remis_at")
+  nbPagesBail               Int?                    @map("nb_pages_bail")
+  droitsEnregistrement      Float?                  @map("droits_enregistrement")
+  fraisTimbre               Float?                  @map("frais_timbre")
+  totalFiscalBail           Float?                  @map("total_fiscal_bail")
+  statutFiscal              String                  @default("NON_CALCULÉ") @map("statut_fiscal")
+  recuFiscalUrl             String?                 @map("recu_fiscal_url")
+  recuFiscalHash            String?                 @map("recu_fiscal_hash")
+  deadlineEnregistrement    DateTime?               @map("deadline_enregistrement")
+  certEnregistrementDgiUrl  String?                 @map("cert_enregistrement_dgi_url")
+  acteEnregistrementRemisAt DateTime?               @map("acte_enregistrement_remis_at")
   colocPayments             ColocPayment[]
+  abonnementsOperateurs     AbonnementOperateur[]
+  CommissionTransaction     CommissionTransaction[]
+  InsuranceSouscription     InsuranceSouscription[]
 
   @@index([status, createdAt])
-  abonnementsOperateurs AbonnementOperateur[]
-
   @@index([propertyId])
   @@index([tenantId])
   @@map("leases")
@@ -1209,6 +1217,11 @@ model CDCDeposit {
   proofHash    String?             @map("proof_hash")
   consignedAt  DateTime?           @map("consigned_at")
   returnedAt   DateTime?           @map("returned_at")
+
+  floatEntreeAt   DateTime? @map("float_entree_at")
+  floatSortieAt   DateTime? @map("float_sortie_at")
+  joursConsignes  Int?      @map("jours_consignes")
+  rendementGenere Float?    @map("rendement_genere")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1753,12 +1766,14 @@ model Insurance {
 }
 
 model InsuranceClaim {
-  id          String               @id @default(uuid())
-  insuranceId String               @map("insurance_id")
-  insurance   Insurance            @relation(fields: [insuranceId], references: [id])
-  amount      Int
-  reason      String
-  status      InsuranceClaimStatus @default(OPEN)
+  id                      String                 @id @default(uuid())
+  insuranceId             String                 @map("insurance_id")
+  insurance               Insurance              @relation(fields: [insuranceId], references: [id])
+  insuranceSouscriptionId String?                @map("insurance_souscription_id")
+  insuranceSouscription   InsuranceSouscription? @relation(fields: [insuranceSouscriptionId], references: [id])
+  amount                  Int
+  reason                  String
+  status                  InsuranceClaimStatus   @default(OPEN)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -1934,6 +1949,8 @@ model PaymentPgw {
 
   quittanceId String?  @map("quittance_id")
   quittance   Receipt? @relation(fields: [quittanceId], references: [id])
+
+  commissionTransaction CommissionTransaction?
 
   webhooks        PgwWebhook[]
   tvaTransactions TvaTransaction[]
@@ -3371,8 +3388,17 @@ model Lead {
 
   statut String @default("NOUVEAU")
 
-  noteCommerciale String? @map("note_commerciale")
-  convertedUserId String? @map("converted_user_id")
+  scoreQualite      Int?      @default(0) @map("score_qualite")
+  budgetDeclare     Float?    @map("budget_declare")
+  communeCible      String?   @map("commune_cible")
+  typeBienRecherche String?   @map("type_bien_recherche")
+  prixLead          Float?    @map("prix_lead")
+  acheteurId        String?   @map("acheteur_id")
+  acheteurAt        DateTime? @map("acheteur_at")
+
+  noteCommerciale  String?           @map("note_commerciale")
+  convertedUserId  String?           @map("converted_user_id")
+  leadTransactions LeadTransaction[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -3431,8 +3457,17 @@ model UserDiasporaProfile {
   paysResidence           String?   @map("pays_residence")
   fuseauHoraire           String    @default("Africa/Abidjan") @map("fuseau_horaire")
   emailRapportMensuel     String?   @map("email_rapport_mensuel")
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  diasporaTier         String?   @default("FREE") @map("diaspora_tier")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripePriceId        String?   @map("stripe_price_id")
+  abonnementStatut     String?   @default("INACTIF") @map("abonnement_statut")
+  prochainPaiementAt   DateTime? @map("prochain_paiement_at")
+  montantMensuelEur    Float?    @map("montant_mensuel_eur")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("user_diaspora_profiles")
 }
@@ -3451,13 +3486,15 @@ model UserFraudProfile {
 }
 
 model WalletTransaction {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  type      String   @map("type") // Ex: CREDIT, DEBIT
-  amount    Int      @map("amount")
-  status    String   @default("COMPLETED") @map("status")
-  createdAt DateTime @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   @map("type") // Ex: CREDIT, DEBIT
+  amount      Int      @map("amount")
+  status      String   @default("COMPLETED") @map("status")
+  motif       String?
+  referenceId String?
+  createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([userId])
   @@index([createdAt])
@@ -3526,8 +3563,13 @@ model VaultCaution {
   hash             String
   status           VaultStatus @default(A_TRANSFERER)
   dateConsignation String?     @map("date_consignation")
-  createdAt        DateTime    @default(now()) @map("created_at")
-  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  floatPoolId     String?    @map("float_pool_id")
+  floatPool       FloatPool? @relation(fields: [floatPoolId], references: [id])
+  rendementGenere Float?     @map("rendement_genere")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([tenantId])
   @@index([propertyId])
@@ -3544,7 +3586,16 @@ model Syndicate {
   treasuryBalance Int    @map("treasury_balance")
   agState         String @map("ag_state")
 
+  syndicUserId  String?   @map("syndic_user_id")
+  syndicUser    User?     @relation("SyndicManager", fields: [syndicUserId], references: [id])
+  montantParLot Float     @default(750) @map("montant_par_lot")
+  prochainAgAt  DateTime? @map("prochain_ag_at")
+  statut        String    @default("ACTIF")
+  iban          String?
+
   properties Property[] // Liaison avec les lots de la copropriété
+  factures   SyndicFacture[]
+  ags        SyndicAG[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -3574,13 +3625,13 @@ model FinancialReport {
 }
 
 model EmailVerificationToken {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  token     String   @unique          // Le code OTP ou lien token
-  email     String                    // L'email à vérifier
-  expiresAt DateTime @map("expires_at")
+  token     String    @unique // Le code OTP ou lien token
+  email     String // L'email à vérifier
+  expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at") // null = pas encore utilisé
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -3608,30 +3659,31 @@ enum OperateurNiveau {
 }
 
 model AbonnementOperateur {
-  id               String                 @id @default(uuid())
-  locataireId      String                 @map("locataire_id")
-  leaseId          String                 @map("lease_id")
-  operateur        UtilityType
+  id                String                 @id @default(uuid())
+  locataireId       String                 @map("locataire_id")
+  leaseId           String                 @map("lease_id")
+  operateur         UtilityType
   niveauIntegration OperateurNiveau        @default(N1) @map("niveau_integration")
-  statut           OperateurDossierStatus @default(BROUILLON)
-  
-  // Documents
-  dossierPdfUrl    String?                @map("dossier_pdf_url")
-  cniUrl           String?                @map("cni_url")
-  contratBailUrl   String?                @map("contrat_bail_url")
-  
-  // Suivi
-  referenceDossier String?                @map("reference_dossier")
-  numeroAbonnement String?                @map("numero_abonnement")
-  
-  createdAt        DateTime               @default(now()) @map("created_at")
-  updatedAt        DateTime               @updatedAt @map("updated_at")
+  statut            OperateurDossierStatus @default(BROUILLON)
 
-  tenant           User                   @relation(fields: [locataireId], references: [id])
-  lease            Lease                  @relation(fields: [leaseId], references: [id])
+  // Documents
+  dossierPdfUrl  String? @map("dossier_pdf_url")
+  cniUrl         String? @map("cni_url")
+  contratBailUrl String? @map("contrat_bail_url")
+
+  // Suivi
+  referenceDossier String? @map("reference_dossier")
+  numeroAbonnement String? @map("numero_abonnement")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant User  @relation(fields: [locataireId], references: [id])
+  lease  Lease @relation(fields: [leaseId], references: [id])
 
   @@map("abonnements_operateurs")
 }
+
 enum UserStatus {
   ACTIVE
   SUSPENDED
@@ -3647,4 +3699,284 @@ enum VaultStatus {
   CONSIGNEE
   TERMINE
   RESTITUEE
+}
+
+model CommissionConfig {
+  id           String        @id @default(uuid())
+  profileType  ProfileType // LANDLORD | CERTIFIED_AGENCY | NON_CERTIFIED_AGENCY...
+  paymentCanal PaymentCanal? // null = tous canaux
+  tauxPourcent Float         @default(0.5) // ex: 0.5 = 0.5%
+  montantMin   Float?        @default(0) // plancher FCFA
+  montantMax   Float? // plafond FCFA
+  actif        Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("commission_configs")
+}
+
+model CommissionTransaction {
+  id           String     @id @default(uuid())
+  paymentPgwId String     @unique @map("payment_pgw_id")
+  paymentPgw   PaymentPgw @relation(fields: [paymentPgwId], references: [id])
+  leaseId      String     @map("lease_id")
+  lease        Lease      @relation(fields: [leaseId], references: [id])
+
+  montantBrut  Float @map("montant_brut") // loyer total
+  tauxApplique Float @map("taux_applique") // % prélevé
+  montantComm  Float @map("montant_comm") // FCFA commission
+  montantNet   Float @map("montant_net") // reversé au bénéficiaire final
+
+  canal      PaymentCanal
+  statut     String       @default("DEDUITE")
+  reversalId String?      @map("reversal_id") // si annulation
+  createdAt  DateTime     @default(now())
+
+  @@index([leaseId])
+  @@index([paymentPgwId])
+  @@map("commission_transactions")
+}
+
+// ═══════════════════════════════════════════════════════
+// NOUVEAUX MODULES (PLAN DE MODIFICATION TECHNIQUE)
+// ═══════════════════════════════════════════════════════
+
+model FloatPool {
+  id               String          @id @default(uuid())
+  compteRef        String          @map("compte_ref")
+  partenaireBanque String          @map("partenaire_banque") // SGBCI | ECOBANK | BNI
+  soldeTotal       Float           @default(0) @map("solde_total") // FCFA
+  soldeDisponible  Float           @default(0) @map("solde_disponible")
+  tauxRendement    Float           @default(4.5) @map("taux_rendement") // % annuel
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  movements        FloatMovement[]
+  vaultCautions    VaultCaution[]
+
+  @@map("float_pools")
+}
+
+model FloatMovement {
+  id              String    @id @default(uuid())
+  poolId          String    @map("pool_id")
+  pool            FloatPool @relation(fields: [poolId], references: [id])
+  sourceType      String    @map("source_type") // CDC_DEPOSIT | VAULT_CAUTION
+  sourceId        String    @map("source_id")
+  type            String // ENTREE | SORTIE | INTERET
+  montant         Float
+  soldeApres      Float     @map("solde_apres")
+  dateValeur      DateTime  @map("date_valeur")
+  rendementEstime Float?    @map("rendement_estime")
+  createdAt       DateTime  @default(now())
+
+  @@index([poolId])
+  @@index([sourceType, sourceId])
+  @@map("float_movements")
+}
+
+model InsuranceProduct {
+  id              String                  @id @default(uuid())
+  assureurNom     String                  @map("assureur_nom") // NSIA | ALLIANZ | SAHAM
+  codeProduit     String                  @unique @map("code_produit")
+  tauxPrime       Float                   @map("taux_prime") // % du loyer annuel
+  tauxCommission  Float                   @map("taux_commission") // % reversé à la plateforme
+  plafondGarantie Float                   @map("plafond_garantie") // max couvert en FCFA
+  nbMoisCouvert   Int                     @default(3) @map("nb_mois_couvert")
+  actif           Boolean                 @default(true)
+  createdAt       DateTime                @default(now())
+  souscriptions   InsuranceSouscription[]
+
+  @@map("insurance_products")
+}
+
+model InsuranceSouscription {
+  id                   String           @id @default(uuid())
+  productId            String           @map("product_id")
+  product              InsuranceProduct @relation(fields: [productId], references: [id])
+  leaseId              String           @map("lease_id")
+  lease                Lease            @relation(fields: [leaseId], references: [id])
+  landlordId           String           @map("landlord_id")
+  landlord             User             @relation(fields: [landlordId], references: [id])
+  scoringSnapshot      Json             @map("scoring_snapshot") // fraudScore au moment de souscription
+  montantPrimeAnnuelle Float            @map("montant_prime_annuelle")
+  commissionPlateforme Float            @map("commission_plateforme")
+  statut               InsuranceStatus  @default(ACTIVE)
+  dateDebut            DateTime         @map("date_debut")
+  dateFin              DateTime         @map("date_fin")
+  referenceAssureur    String?          @map("reference_assureur")
+  createdAt            DateTime         @default(now())
+  claims               InsuranceClaim[]
+
+  @@index([leaseId])
+  @@map("insurance_souscriptions")
+}
+
+model TenantScoringHistory {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  tenant          User     @relation(fields: [tenantId], references: [id])
+  nbLoyersPayes   Int      @map("nb_loyers_payes")
+  nbRetards       Int      @map("nb_retards")
+  nbImpayes       Int      @map("nb_impayes")
+  nbMediation     Int      @map("nb_mediation")
+  nbContestations Int      @map("nb_contestations")
+  scoreFinal      Int      @map("score_final") // 0-1000
+  tranche         String // AAA | AA | A | B | C | D
+  computedAt      DateTime @map("computed_at")
+
+  @@index([tenantId, computedAt])
+  @@map("tenant_scoring_history")
+}
+
+model LeadTransaction {
+  id        String        @id @default(uuid())
+  leadId    String        @map("lead_id")
+  lead      Lead          @relation(fields: [leadId], references: [id])
+  agenceId  String        @map("agence_id")
+  agence    User          @relation(fields: [agenceId], references: [id])
+  montant   Float // FCFA payé
+  canal     PaymentCanal?
+  statut    String        @default("COMPLETE")
+  createdAt DateTime      @default(now())
+
+  @@index([agenceId])
+  @@map("lead_transactions")
+}
+
+model AgenceApiAccess {
+  id             String    @id @default(uuid())
+  agenceId       String    @unique @map("agence_id")
+  agence         User      @relation(fields: [agenceId], references: [id])
+  tier           String    @default("BASIC") // BASIC | PREMIUM | ENTERPRISE
+  apiKey         String    @unique @map("api_key")
+  apiSecret      String    @map("api_secret")
+  requestsPerDay Int       @default(100) @map("requests_per_day")
+  montantMensuel Float     @map("montant_mensuel") // FCFA abonnement
+  actif          Boolean   @default(true)
+  lastUsedAt     DateTime? @map("last_used_at")
+  createdAt      DateTime  @default(now())
+
+  @@map("agence_api_accesses")
+}
+
+model DiasporaPaymentHistory {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id])
+  stripeInvoiceId String   @map("stripe_invoice_id")
+  montantEur      Float    @map("montant_eur")
+  montantFcfa     Float    @map("montant_fcfa")
+  tauxChange      Float    @map("taux_change")
+  statut          String   @default("PAID")
+  periodDebut     DateTime @map("period_debut")
+  periodFin       DateTime @map("period_fin")
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@map("diaspora_payment_history")
+}
+
+model SyndicFacture {
+  id            String    @id @default(uuid())
+  syndicateId   String    @map("syndicate_id")
+  syndicate     Syndicate @relation(fields: [syndicateId], references: [id])
+  periode       String // "2026-06"
+  nbLots        Int       @map("nb_lots")
+  montantParLot Float     @map("montant_par_lot")
+  montantTotal  Float     @map("montant_total")
+  statut        String    @default("EN_ATTENTE") // EN_ATTENTE | PAYEE | ECHEC
+  paymentPgwId  String?   @map("payment_pgw_id")
+  createdAt     DateTime  @default(now())
+
+  @@unique([syndicateId, periode])
+  @@map("syndic_factures")
+}
+
+model SyndicAG {
+  id             String    @id @default(uuid())
+  syndicateId    String    @map("syndicate_id")
+  syndicate      Syndicate @relation(fields: [syndicateId], references: [id])
+  dateAG         DateTime  @map("date_ag")
+  ordre_du_jour  String    @map("ordre_du_jour")
+  compte_rendu   String?   @map("compte_rendu")
+  montantFacture Float?    @map("montant_facture") // frais org. AG
+  statut         String    @default("PLANIFIEE")
+  createdAt      DateTime  @default(now())
+
+  @@map("syndic_ags")
+}
+
+model DataLicenseContract {
+  id            String        @id @default(uuid())
+  clientNom     String        @map("client_nom")
+  clientType    String        @map("client_type") // BANQUE | ASSUREUR | ETAT | PROMOTEUR
+  typeAcces     String        @map("type_acces") // AGREGAT | API_SCORING | RAPPORT
+  montantAnnuel Float         @map("montant_annuel")
+  apiKeyClient  String        @unique @map("api_key_client")
+  quotaRequetes Int           @default(1000) @map("quota_requetes") // par mois
+  dateDebut     DateTime      @map("date_debut")
+  dateFin       DateTime      @map("date_fin")
+  statut        String        @default("ACTIF")
+  clausesJson   Json?         @map("clauses_json")
+  createdAt     DateTime      @default(now())
+  apiCalls      DataApiCall[]
+
+  @@map("data_license_contracts")
+}
+
+model DataApiCall {
+  id           String              @id @default(uuid())
+  contractId   String              @map("contract_id")
+  contract     DataLicenseContract @relation(fields: [contractId], references: [id])
+  endpoint     String // /score | /market | /risk
+  parametres   Json?
+  responseCode Int                 @map("response_code")
+  latenceMs    Int?                @map("latence_ms")
+  createdAt    DateTime            @default(now())
+
+  @@index([contractId, createdAt])
+  @@map("data_api_calls")
+}
+
+model MarketReport {
+  id          String   @id @default(uuid())
+  titre       String
+  commune     String? // null = national
+  periode     String // "S1-2026"
+  typeRapport String   @map("type_rapport") // LOYERS | IMPAYÉS | MARCHÉ
+  contenuJson Json     @map("contenu_json")
+  pdfUrl      String?  @map("pdf_url")
+  prixFcfa    Float    @map("prix_fcfa")
+  actif       Boolean  @default(false) // publié ?
+  createdAt   DateTime @default(now())
+
+  @@map("market_reports")
+}
+
+model RevenueSnapshot {
+  id             String   @id @default(uuid())
+  periode        String // "2026-06"
+  revCommissions Float    @default(0) @map("rev_commissions")
+  revFloat       Float    @default(0) @map("rev_float")
+  revAssurance   Float    @default(0) @map("rev_assurance")
+  revLeads       Float    @default(0) @map("rev_leads")
+  revDiaspora    Float    @default(0) @map("rev_diaspora")
+  revSyndic      Float    @default(0) @map("rev_syndic")
+  revData        Float    @default(0) @map("rev_data")
+  totalFcfa      Float    @map("total_fcfa")
+  createdAt      DateTime @default(now())
+
+  @@unique([periode])
+  @@map("revenue_snapshots")
+}
+
+model UserConsent {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  user             User     @relation(fields: [userId], references: [id])
+  typeConsentement String
+  donnees          Json?
+  createdAt        DateTime @default(now())
+
+  @@map("user_consents")
 }
