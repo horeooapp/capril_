@@ -12,7 +12,7 @@ export default function MobileRuntimeDirector() {
         const checkAppId = async () => {
             try {
                 // @ts-ignore
-                const { Capacitor } = await import('@capacitor/core')
+                const { Capacitor } = await import(/* webpackIgnore: true */ '@capacitor/core' as any)
                 
                 // Si ce n'est pas une application native iOS/Android, on ne fait rien.
                 if (!Capacitor.isNativePlatform()) return
@@ -21,7 +21,7 @@ export default function MobileRuntimeDirector() {
                 document.body.classList.add('is-native-app')
 
                 // @ts-ignore
-                const { App } = await import('@capacitor/app')
+                const { App } = await import(/* webpackIgnore: true */ '@capacitor/app' as any)
                 
                 // Gestion du bouton de retour Android
                 App.addListener('backButton', ({ canGoBack }: any) => {

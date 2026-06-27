@@ -23,7 +23,7 @@ if (redisGlobal.redis) {
             };
 
             // Use dynamic import to avoid Edge bundling issues
-            import('ioredis').then((RedisModule) => {
+            import(/* webpackIgnore: true */ 'ioredis').then((RedisModule) => {
                 const Redis = RedisModule.default;
                 const client = new Redis(process.env.REDIS_URL!, redisOptions);
                 client.on('error', (err: any) => {
