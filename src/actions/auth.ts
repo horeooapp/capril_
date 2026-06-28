@@ -106,11 +106,15 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
         const OTP_ERROR_MESSAGES: Record<string, string> = {
             invalid_otp: "Code OTP incorrect ou expiré.",
             no_valid_role: "Compte sans rôle valide. Veuillez contacter le support.",
-            database_error: "Erreur technique lors de l'authentification."
         };
 
         if (OTP_ERROR_MESSAGES[errorCode]) {
             return { error: OTP_ERROR_MESSAGES[errorCode] };
+        }
+
+        // Expose the raw Prisma/DB error for debugging
+        if (error?.message?.includes("database_error:")) {
+            return { error: `[DB ERROR]: ${error.message}` };
         }
 
         if (lowerMsg.includes('credentialssignin') || error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin') {

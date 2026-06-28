@@ -38,6 +38,8 @@ jobs:
           CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
           [ -z "$CLEAN_DB_URL" ] && CLEAN_DB_URL="$RAW_URL"
           CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//')
+          # Force IPv4 resolution to prevent ECONNREFUSED in Docker Node 20
+          CLEAN_DB_URL=$(echo "$CLEAN_DB_URL" | sed 's/@localhost:/@127.0.0.1:/')
           
           echo "DATABASE_URL=$CLEAN_DB_URL" > .env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env

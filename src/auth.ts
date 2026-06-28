@@ -254,7 +254,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         throw dbError;
                     }
                     console.error("[AUTH] Database Error in authorize:", dbError?.message || dbError);
-                    throw new CustomAuthError("database_error");
+                    // Append the actual error message so we can debug it on the live site
+                    throw new Error(`database_error: ${dbError?.message || "Unknown Prisma Error"}`);
                 }
             }
         }),
