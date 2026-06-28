@@ -17,10 +17,10 @@ export async function GET(request: Request) {
             where: {
                 lease: {
                     property: {
-                        landlordId: user.userId
+                        OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
                     }
                 },
-                status: 'paid'
+                status: 'PAID'
             },
             include: {
                 lease: {

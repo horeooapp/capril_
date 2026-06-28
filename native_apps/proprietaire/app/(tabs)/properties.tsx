@@ -67,14 +67,14 @@ export default function PropertiesScreen() {
                             <View style={styles.cardRight}>
                                 <View style={[
                                     styles.statusBadge, 
-                                    item.status === 'Occupé' ? styles.statusOccupied : styles.statusVacant
+                                    item.occupancyStatus === 'Occupé' ? styles.statusOccupied : styles.statusVacant
                                 ]}>
                                     <Text style={[
                                         styles.statusText,
-                                        item.status === 'Occupé' ? styles.statusTextOccupied : styles.statusTextVacant
-                                    ]}>{item.status}</Text>
+                                        item.occupancyStatus === 'Occupé' ? styles.statusTextOccupied : styles.statusTextVacant
+                                    ]}>{item.occupancyStatus}</Text>
                                 </View>
-                                <Text style={styles.rent}>{item.rent > 0 ? `${item.rent.toLocaleString()} FCFA` : '-'}</Text>
+                                <Text style={styles.rent}>{item.currentRent > 0 ? `${item.currentRent.toLocaleString()} FCFA` : '-'}</Text>
                             </View>
                         </View>
                     )}

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
         // Récupérer les biens (Properties) du propriétaire
         const properties = await prisma.property.findMany({
             where: {
-                landlordId: user.userId
+                OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
             },
             include: {
                 leases: {
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
             where: {
                 lease: {
                     property: {
-                        landlordId: user.userId
+                        OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
                     }
                 },
                 statut: { in: ['OUVERT', 'EN_COURS'] }

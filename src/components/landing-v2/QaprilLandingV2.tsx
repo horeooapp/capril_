@@ -121,6 +121,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
           <a href="#how" className="nav-link">Comment ça marche</a>
           <a href="#users" className="nav-link">Pour qui ?</a>
           <a href="#pricing" className="nav-link">Tarifs</a>
+          <a href="#b2b-ecosystem" className="nav-link">B2B</a>
         </div>
         {session?.user ? (
             <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
@@ -152,6 +153,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
           <a href="#how" onClick={() => setMobileMenuOpen(false)}>Comment ça marche</a>
           <a href="#users" onClick={() => setMobileMenuOpen(false)}>Pour qui ?</a>
           <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
+          <a href="#b2b-ecosystem" onClick={() => setMobileMenuOpen(false)}>B2B</a>
           {session?.user ? (
             <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
           ) : (
@@ -410,6 +412,20 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               <div className="feature-tag">Photos · Certification</div>
             </div>
 
+            <div className="feature-card fc-mango feature-card-large reveal mt-6">
+              <div className="fc-icon" style={{ background: 'var(--ink)', color: 'white' }}>📱</div>
+              <h3>Applications Mobiles Natives</h3>
+              <p>Retrouvez toute l'expérience QAPRIL sur iOS et Android. Les locataires et propriétaires ont chacun leur application dédiée pour tout gérer depuis leur poche.</p>
+              <div className="feature-tag">iOS · Android · React Native</div>
+            </div>
+
+            <div className="feature-card fc-sky reveal reveal-d1 mt-6">
+              <div className="fc-icon" style={{ background: '#10B981', color: 'white' }}>🛡️</div>
+              <h3>Assurance Loyer Impayé</h3>
+              <p>Protégez vos revenus locatifs. Souscrivez directement depuis l'application à notre offre multirisque habitation et garantie loyer impayé.</p>
+              <div className="feature-tag">Couverture à 100% · Zéro paperasse</div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -580,7 +596,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
                 <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>📱</div><span className="benefit-text">Tableau de bord VIP & Rapports mensuels</span></div>
                 <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>🎥</div><span className="benefit-text">Demande d'inspection vidéo des biens</span></div>
                 <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>🤝</div><span className="benefit-text">Gestionnaire terrain dédié en Côte d'Ivoire</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>💬</div><span className="benefit-text">Assistance WhatsApp prioritaire</span></div>
+                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>💬</div><span className="benefit-text">Assistance WhatsApp prioritaire : <strong style={{color: 'var(--ink)'}}>+225 07 12 60 60 18</strong></span></div>
               </div>
             </div>
             <div className="user-visual">
@@ -713,6 +729,48 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               </div>
               <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Activer Pack Diaspora</button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ B2B ECOSYSTEM ═══ */}
+      <section className="features bg-cream" id="b2b-ecosystem" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <div className="section-inner">
+          <div className="features-header reveal">
+            <div className="section-eyebrow" style={{ background: 'var(--ink)', color: 'white' }}>💼 Écosystème B2B</div>
+            <h2>L'infrastructure de<br/>l'immobilier ivoirien</h2>
+            <p className="section-desc">QAPRIL propose des solutions sur-mesure pour les professionnels de l'immobilier, les artisans et les institutions financières.</p>
+          </div>
+          <div className="features-grid">
+
+            <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="fc-icon" style={{ background: 'var(--sky)', color: 'white' }}>🔌</div>
+              <h3>API Agences Premium</h3>
+              <p>Connectez votre logiciel existant à l'écosystème QAPRIL. Automatisation des baux, paiements et ICL directement dans vos outils.</p>
+              <div className="feature-tag" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>50 000 FCFA / mois</div>
+            </div>
+
+            <div className="feature-card reveal reveal-d1" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="fc-icon" style={{ background: 'var(--coral)', color: 'white' }}>🛠️</div>
+              <h3>Marketplace Artisans</h3>
+              <p>Plombiers, électriciens, peintres : recevez des demandes d'intervention qualifiées provenant directement des locataires et propriétaires.</p>
+              <div className="feature-tag" style={{ background: 'var(--coral-l)', color: 'var(--coral)' }}>2 000 FCFA / lead qualifié</div>
+            </div>
+
+            <div className="feature-card reveal reveal-d2" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🏢</div>
+              <h3>SaaS Syndic de Copropriété</h3>
+              <p>Une interface dédiée pour la gestion des charges communes, les assemblées générales et la trésorerie des immeubles.</p>
+              <div className="feature-tag" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>25 000 FCFA / mois</div>
+            </div>
+
+            <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="fc-icon" style={{ background: 'var(--teal)', color: 'white' }}>📊</div>
+              <h3>Licences Data Institutionnelles</h3>
+              <p>Accès anonymisé aux données du marché locatif ivoirien pour les banques, assurances et promoteurs immobiliers.</p>
+              <div className="feature-tag" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>5 000 000 FCFA / an</div>
+            </div>
+
           </div>
         </div>
       </section>

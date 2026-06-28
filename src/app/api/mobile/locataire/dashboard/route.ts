@@ -71,9 +71,17 @@ export async function GET(request: Request) {
                 id: true,
                 periodMonth: true,
                 status: true,
-                amount: true
+                totalAmount: true,
+                rentAmount: true
             }
         });
+        
+        const mappedReceipts = recentReceipts.map(r => ({
+            id: r.id,
+            periodMonth: r.periodMonth,
+            status: r.status,
+            amount: r.totalAmount || r.rentAmount || 0
+        }));
 
         // Count open maintenance requests
         const openMaintenanceCount = await prisma.reclamationLocataire.count({
@@ -99,7 +107,7 @@ export async function GET(request: Request) {
             currentRentAmount: currentRentAmount,
             rentStatus: rentStatus,
             currency: 'FCFA',
-            recentReceipts: recentReceipts,
+            recentReceipts: mappedReceipts,
             openMaintenanceCount: openMaintenanceCount,
             nextPaymentDate: nextPaymentDate.toISOString(),
         });
