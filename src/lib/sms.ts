@@ -135,14 +135,154 @@ export class OrangeSMSService implements SMSService {
   }
 }
 
+export class AfricasTalkingService implements SMSService {
+  private username: string;
+  private apiKey: string;
+  private senderId: string;
+
+  constructor() {
+    this.username = process.env.AT_USERNAME || "sandbox";
+    this.apiKey = process.env.AT_API_KEY || "";
+    this.senderId = process.env.AT_SENDER_ID || "";
+  }
+
+  async sendOTP(phone: string, otp: string) {
+    const message = `[QAPRIL] Code de sécurité : ${otp}. Valable 10 min.`;
+    return this.sendMessage(phone, message);
+  }
+
+  async sendMessage(phone: string, message: string) {
+    if (!this.apiKey) return { success: false, error: "Africa's Talking API key missing" };
+
+    try {
+      const isSandbox = this.username === "sandbox";
+      const url = isSandbox 
+        ? "https://api.sandbox.africastalking.com/version1/messaging"
+        : "https://api.africastalking.com/version1/messaging";
+
+      const formattedPhone = phone.startsWith("+") ? phone : `+225${phone}`;
+      
+      const body = new URLSearchParams();
+      body.append('username', this.username);
+      body.append('to', formattedPhone);
+      body.append('message', message);
+      if (this.senderId && !isSandbox) {
+        body.append('from', this.senderId);
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "apiKey": this.apiKey
+        },
+        body: body.toString()
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: `Africa's Talking Error: ${errorText}` };
+      }
+
+      const data = await response.json();
+      const recipient = data?.SMSMessageData?.Recipients?.[0];
+      
+      if (recipient && recipient.status === "Success") {
+         return { success: true, messageId: recipient.messageId };
+      }
+      
+      return { success: false, error: recipient?.status || "Unknown AT error" };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+}
+
+export class HSMSService implements SMSService {
+  private apiKey: string;
+  private senderId: string;
+  private apiUrl: string;
+
+  constructor() {
+    this.apiKey = process.env.HSMS_API_KEY || "";
+    this.senderId = process.env.HSMS_SENDER_ID || "QAPRIL";
+    this.apiUrl = process.env.HSMS_API_URL || "https://api.hsms.ci/send"; // Default HSMS endpoint
+  }
+
+  async sendOTP(phone: string, otp: string) {
+    const message = `[QAPRIL] Code de sécurité : ${otp}. Valable 10 min.`;
+    return this.sendMessage(phone, message);
+  }
+
+  async sendMessage(phone: string, message: string) {
+    if (!this.apiKey) return { success: false, error: "HSMS API key missing" };
+
+    try {
+      // Nettoyer le numéro (ex: +225... devient 225...)
+      const cleanPhone = phone.replace("+", "");
+      
+      // Standard HSMS payload
+      const payload = {
+        api_key: this.apiKey,
+        sender_id: this.senderId,
+        recipient: cleanPhone,
+        message: message
+      };
+
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return { success: false, error: `HSMS Error: ${errorText}` };
+      }
+
+      const data = await response.json();
+      
+      // Adaptation selon la réponse exacte de HSMS
+      if (data.status === "success" || data.code === 200) {
+         return { success: true, messageId: data.message_id || "sent_via_hsms" };
+      }
+      
+      return { success: false, error: data.message || "Unknown HSMS error" };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+}
+
 export function getSMSService(provider?: string) {
-  const activeProvider = provider || process.env.SMS_GATEWAY_PROVIDER || "RAPIDAPI_VERIFY";
+  const activeProvider = provider || process.env.SMS_GATEWAY_PROVIDER || "HSMS";
   if (activeProvider === "TWILIO") return new TwilioService();
-  if (activeProvider === "ORANGE") return new OrangeSMSService();
-  return new RapidAPIVerifyService();
+  if (activeProvider === "AFRICASTALKING") return new AfricasTalkingService();
+  if (activeProvider === "HSMS") return new HSMSService();
+  if (activeProvider === "RAPIDAPI_VERIFY") return new RapidAPIVerifyService();
+  return new OrangeSMSService(); // Default to Orange CI
 }
 
 export async function sendSMS(phone: string, message: string, forceProvider?: string) {
-  const result = await getSMSService(forceProvider).sendMessage(phone, message);
-  return result.success === true;
+  // Mechanism Fallback
+  const providersToTry = forceProvider ? [forceProvider] : ["HSMS", "ORANGE", "AFRICASTALKING", "TWILIO"];
+  
+  for (const provider of providersToTry) {
+    console.log(`[SMS] Attempting to send via ${provider}...`);
+    const service = getSMSService(provider);
+    const result = await service.sendMessage(phone, message);
+    
+    if (result.success) {
+      console.log(`[SMS] Success via ${provider} - ID: ${result.messageId}`);
+      return true;
+    } else {
+      console.error(`[SMS] Failed via ${provider}: ${result.error}`);
+    }
+  }
+  
+  console.error(`[SMS] All gateways failed for ${phone}.`);
+  return false;
 }

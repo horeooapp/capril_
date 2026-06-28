@@ -60,6 +60,46 @@ export async function sendEmail({
     }
   }
 
+  // 2. Fallback to SendGrid if configured
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (sendgridKey) {
+    try {
+      console.log(`[Email] Trying SendGrid provider (10s timeout)...`);
+      
+      const payload = {
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: from, name: "QAPRIL" },
+        subject: subject,
+        content: [{ type: "text/html", value: html }],
+        attachments: attachments ? attachments.map(a => ({
+          content: a.content.toString('base64'),
+          filename: a.filename,
+          disposition: "attachment"
+        })) : undefined
+      };
+
+      const sendgridReq = fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${sendgridKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const response = await withTimeout(sendgridReq, 10000, "SendGrid");
+      
+      if (response.ok) {
+        console.log("[Email] SendGrid delivery successful");
+        return { success: true, provider: 'sendgrid' };
+      }
+      const errorText = await response.text();
+      console.error("[Email] SendGrid returned error:", errorText);
+    } catch (error: any) {
+      console.error("[Email] SendGrid attempt failed/timed out:", error.message || error);
+    }
+  }
+
   // 2. Fallback to SMTP if configured
   if (smtpUrl) {
     try {
