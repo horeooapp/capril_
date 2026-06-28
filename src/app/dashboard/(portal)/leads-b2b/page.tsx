@@ -12,20 +12,20 @@ export default async function LeadsB2BPage() {
     // Fetch available leads
     const availableLeads = await prisma.lead.findMany({
         where: { statut: "NOUVEAU" },
-        orderBy: { scoreChaleur: "desc" },
+        orderBy: { scoreQualite: "desc" },
         take: 50
     });
 
     // Fetch recent transactions
     const recentTransactions = await prisma.leadTransaction.findMany({
-        orderBy: { dateAchat: "desc" },
+        orderBy: { createdAt: "desc" },
         include: { lead: true },
         take: 10
     });
 
     const totalLeads = availableLeads.length;
-    const hotLeads = availableLeads.filter(l => l.scoreChaleur >= 70).length;
-    const revenue = recentTransactions.reduce((acc, t) => acc + t.montantPaye, 0);
+    const hotLeads = availableLeads.filter(l => (l.scoreQualite || 0) >= 70).length;
+    const revenue = recentTransactions.reduce((acc, t) => acc + t.montant, 0);
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">

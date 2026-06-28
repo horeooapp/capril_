@@ -1,16 +1,19 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { getAllInsurances } from "@/actions/insurance"
-import { Shield, AlertTriangle, FileText, Loader2, Plus, X, Calendar, Upload, FileSignature } from "lucide-react"
+import { getAllInsurances, getLeasesWithoutInsurance, reportInsuranceClaim, subscribeInsurance } from "@/actions/insurance"
+import { Shield, AlertTriangle, FileText, Loader2, Plus, X, Calendar, Upload, FileSignature, CheckCircle } from "lucide-react"
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function InsuranceDashboardPage() {
     const [insurances, setInsurances] = useState<any[]>([])
+    const [uninsuredLeases, setUninsuredLeases] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isSubscribingModalOpen, setIsSubscribingModalOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [selectedLeaseId, setSelectedLeaseId] = useState("")
 
     useEffect(() => {
         loadData()
@@ -18,24 +21,54 @@ export default function InsuranceDashboardPage() {
 
     const loadData = async () => {
         try {
-            const res = await getAllInsurances()
-            if (res.success) setInsurances(res.insurances || [])
+            const [resIns, resLeases] = await Promise.all([
+                getAllInsurances(),
+                getLeasesWithoutInsurance()
+            ]);
+            if (resIns.success) setInsurances(resIns.insurances || [])
+            if (resLeases.success) setUninsuredLeases(resLeases.leases || [])
         } finally {
             setLoading(false)
         }
     }
 
-    const handleSubmitClaim = async (e: React.FormEvent) => {
+    const handleSubmitClaim = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsSubmitting(true)
-        // Simulation
-        setTimeout(() => {
-            setIsSubmitting(false)
+        
+        try {
+            const formData = new FormData(e.currentTarget);
+            const insuranceId = formData.get("insuranceId") as string;
+            const reason = formData.get("reason") as string;
+            const description = formData.get("description") as string;
+            
+            // Assume default amount 0 for now as it needs appraiser
+            await reportInsuranceClaim(insuranceId, 0, `${reason} - ${description}`);
+            
+            toast.success("Sinistre déclaré avec succès. Un inspecteur prendra en charge votre dossier.", { icon: '⚖️' })
             setIsModalOpen(false)
-            toast.success("Sinistre déclaré avec succès. Un inspecteur prendra en charge votre dossier et initiera le recouvrement sous 48h.", {
-                icon: '⚖️'
-            })
-        }, 2000)
+            await loadData();
+        } catch (error: any) {
+            toast.error(error.message || "Erreur lors de la déclaration");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    const handleSubscribe = async () => {
+        if (!selectedLeaseId) return;
+        setIsSubmitting(true);
+        try {
+            await subscribeInsurance(selectedLeaseId, "NSIA Assurances");
+            toast.success("Assurance souscrite avec succès. Votre portefeuille a été débité.", { icon: '🛡️' });
+            setIsSubscribingModalOpen(false);
+            setSelectedLeaseId("");
+            await loadData();
+        } catch (error: any) {
+            toast.error(error.message || "Erreur lors de la souscription");
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-emerald-500" size={40} /></div>
@@ -121,6 +154,78 @@ export default function InsuranceDashboardPage() {
                 )}
             </div>
 
+            <div className="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-sm">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <div>
+                        <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">Souscrire une couverture</h2>
+                        <p className="text-[11px] text-slate-500 mt-1">Sécurisez vos revenus locatifs en souscrivant à la Garantie Loyer Impayé.</p>
+                    </div>
+                </div>
+                <div className="p-6">
+                    {uninsuredLeases.length === 0 ? (
+                        <div className="text-center p-4">
+                            <p className="text-[13px] font-medium text-slate-400">Tous vos baux actifs sont déjà assurés.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {uninsuredLeases.map(lease => {
+                                const annualRent = (lease.rentAmount || 0) * 12;
+                                const fraudScore = lease.tenant?.fraudProfile?.fraudScore || 0;
+                                const rate = fraudScore > 50 ? 0.035 : 0.02;
+                                const estPremium = Math.round(annualRent * rate);
+
+                                return (
+                                    <div key={lease.id} className="border border-slate-200 rounded-[12px] p-4 flex justify-between items-center hover:border-emerald-300 transition-colors">
+                                        <div>
+                                            <p className="font-bold text-[13px] text-slate-900">{lease.property?.name || lease.property?.address}</p>
+                                            <p className="text-[11px] text-slate-500">Locataire: {lease.tenant?.firstName} {lease.tenant?.lastName} (Score Risque: {fraudScore}/100)</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Estimée</p>
+                                                <p className="font-black text-[14px] text-emerald-600">{estPremium.toLocaleString()} FCFA/an</p>
+                                            </div>
+                                            <button onClick={() => { setSelectedLeaseId(lease.id); setIsSubscribingModalOpen(true); }} className="bg-slate-900 text-white px-4 py-2 rounded-[8px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors">
+                                                Souscrire
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* MODALE DE SOUSCRIPTION */}
+            <AnimatePresence>
+                {isSubscribingModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isSubmitting && setIsSubscribingModalOpen(false)} />
+                        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-md rounded-[24px] shadow-2xl relative z-[101] overflow-hidden border border-slate-200">
+                            <div className="p-6 text-center border-b border-slate-100 bg-slate-50">
+                                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <CheckCircle size={24} />
+                                </div>
+                                <h2 className="text-[16px] font-black text-slate-900 uppercase tracking-widest">Confirmer Souscription</h2>
+                            </div>
+                            <div className="p-6">
+                                <p className="text-[13px] text-slate-600 mb-6 text-center">
+                                    En validant, la prime annuelle sera directement déduite de votre portefeuille QAPRIL (Wallet) et l'assurance sera activée immédiatement.
+                                </p>
+                                <div className="flex justify-end gap-3">
+                                    <button disabled={isSubmitting} onClick={() => setIsSubscribingModalOpen(false)} className="px-4 py-2 text-[11px] font-bold uppercase text-slate-500 bg-slate-100 rounded-[8px] hover:bg-slate-200">Annuler</button>
+                                    <button disabled={isSubmitting} onClick={handleSubscribe} className="px-6 py-2 text-[11px] font-bold uppercase text-white bg-emerald-500 rounded-[8px] hover:bg-emerald-600 flex items-center gap-2">
+                                        {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                                        Confirmer le paiement
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* MODALE DE DECLARATION DE SINISTRE */}
             <AnimatePresence>
                 {isModalOpen && (
@@ -165,7 +270,7 @@ export default function InsuranceDashboardPage() {
                                     {/* Police Selection */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Police d'Assurance Associée *</label>
-                                        <select required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] px-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none flex-shrink-0 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white cursor-pointer disabled:bg-slate-50 shadow-sm">
+                                        <select name="insuranceId" required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] px-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none flex-shrink-0 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white cursor-pointer disabled:bg-slate-50 shadow-sm">
                                             <option value="">Sélectionnez un contrat de bail couvert...</option>
                                             {insurances.filter(i => i.status === 'ACTIVE').map(ins => (
                                                 <option key={ins.id} value={ins.id}>
@@ -182,7 +287,7 @@ export default function InsuranceDashboardPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Nature du Sinistre *</label>
-                                            <select required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] px-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white cursor-pointer disabled:bg-slate-50 shadow-sm">
+                                            <select name="reason" required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] px-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white cursor-pointer disabled:bg-slate-50 shadow-sm">
                                                 <option value="">Choisissez...</option>
                                                 <option value="IMPAYE">Loyers Impayés (GLI)</option>
                                                 <option value="DOMMAGE">Dégâts Matériels / Dégradations</option>
@@ -195,7 +300,7 @@ export default function InsuranceDashboardPage() {
                                             <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Date du Constat *</label>
                                             <div className="relative">
                                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                                                <input type="date" required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] pl-10 pr-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white disabled:bg-slate-50 shadow-sm" />
+                                                <input name="date" type="date" required disabled={isSubmitting} className="w-full border border-slate-200 rounded-[12px] pl-10 pr-5 py-3.5 text-[13px] font-bold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white disabled:bg-slate-50 shadow-sm" />
                                             </div>
                                         </div>
                                     </div>
@@ -203,7 +308,7 @@ export default function InsuranceDashboardPage() {
                                     {/* Description */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Description Détaillée</label>
-                                        <textarea required disabled={isSubmitting} rows={4} placeholder="Veuillez décrire précisément les faits et les dommages observés..." className="w-full border border-slate-200 rounded-[12px] px-5 py-4 text-[13px] font-medium text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white resize-none disabled:bg-slate-50 shadow-sm"></textarea>
+                                        <textarea name="description" required disabled={isSubmitting} rows={4} placeholder="Veuillez décrire précisément les faits et les dommages observés..." className="w-full border border-slate-200 rounded-[12px] px-5 py-4 text-[13px] font-medium text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors bg-white resize-none disabled:bg-slate-50 shadow-sm"></textarea>
                                     </div>
 
                                     {/* Upload Evidence */}

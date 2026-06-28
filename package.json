@@ -42,6 +42,7 @@
     "react-dom": "19.2.3",
     "resend": "^6.9.3",
     "sonner": "^2.0.7",
+    "stripe": "^22.3.0",
     "tesseract.js": "^7.0.0",
     "ts-node": "^10.9.2",
     "twilio": "^5.13.0",

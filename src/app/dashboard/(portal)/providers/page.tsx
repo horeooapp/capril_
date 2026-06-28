@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { getAllProviders } from "@/actions/provider-actions"
-import { getUnassignedTickets, assignTicketToProvider } from "@/actions/maintenance-actions"
-import { Wrench, Phone, MapPin, Loader2, Star, Plus, ClipboardList, X } from "lucide-react"
+import { getUnassignedTickets } from "@/actions/maintenance-actions"
+import { assignPrestataireToTicket } from "@/actions/prestataire.actions"
+import { Wrench, Phone, MapPin, Loader2, Star, Plus, ClipboardList, X, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 
 export default function ProvidersDashboardPage() {
@@ -33,11 +34,16 @@ export default function ProvidersDashboardPage() {
 
     const handleAssign = async (ticketId: string) => {
         if (!selectedProvider) return
+        
+        if (!confirm(`Attention: Assigner ce ticket coûte 2 000 FCFA de frais de mise en relation (Lead). Ce montant sera débité de votre Wallet. Confirmer ?`)) {
+            return;
+        }
+
         setAssigningId(ticketId)
         try {
-            const res = await assignTicketToProvider(ticketId, selectedProvider.id)
+            const res = await assignPrestataireToTicket(ticketId, selectedProvider.id)
             if (res.success) {
-                toast.success("Ticket assigné avec succès à l'artisan")
+                toast.success("Ticket assigné avec succès ! Frais de lead prélevés.")
                 setSelectedProvider(null)
                 loadData()
             } else {

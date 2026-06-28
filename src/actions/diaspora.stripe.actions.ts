@@ -1,13 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-// import Stripe from "stripe";
+import Stripe from "stripe";
 
-// Mocking Stripe for the purpose of the action since we don't have the real key configured
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2023-10-16" });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", { 
+    apiVersion: "2026-06-24.dahlia" as any
+});
 
 /**
- * Creates a mock checkout session for the Diaspora Premium tier
+ * Creates a checkout session for the Diaspora Premium tier
  */
 export async function createCheckoutSession(userId: string, planId: string = "PREMIUM") {
     try {
@@ -18,20 +19,36 @@ export async function createCheckoutSession(userId: string, planId: string = "PR
 
         if (!user) throw new Error("Utilisateur introuvable");
 
-        // Logic for Stripe session creation would go here
-        // const session = await stripe.checkout.sessions.create({
-        //     customer: user.diasporaProfile?.stripeCustomerId,
-        //     payment_method_types: ['card'],
-        //     line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-        //     mode: 'subscription',
-        //     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/diaspora/success?session_id={CHECKOUT_SESSION_ID}`,
-        //     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/diaspora/cancel`,
-        // });
+        let customerId = user.diasporaProfile?.stripeCustomerId;
 
-        // Mock response
-        const mockUrl = `https://checkout.stripe.com/pay/cs_test_mock_${Date.now()}`;
-        
-        return { success: true, url: mockUrl };
+        // If no stripe customer exists, create one
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: user.email!,
+                metadata: { userId: user.id }
+            });
+            customerId = customer.id;
+            
+            await prisma.userDiasporaProfile.upsert({
+                where: { userId },
+                create: { userId, stripeCustomerId: customerId },
+                update: { stripeCustomerId: customerId }
+            });
+        }
+
+        const priceId = process.env.STRIPE_PRICE_ID_PREMIUM || "price_1Placeholder";
+
+        const session = await stripe.checkout.sessions.create({
+            customer: customerId,
+            payment_method_types: ['card'],
+            line_items: [{ price: priceId, quantity: 1 }],
+            mode: 'subscription',
+            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/diaspora?success=true&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/diaspora?canceled=true`,
+            metadata: { userId }
+        });
+
+        return { success: true, url: session.url };
     } catch (error: any) {
         return { success: false, error: error.message };
     }

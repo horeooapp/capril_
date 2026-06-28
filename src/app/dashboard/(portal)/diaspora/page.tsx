@@ -31,9 +31,9 @@ export default async function DiasporaPage() {
         },
         reports: [], // To be implemented with real reports storage
         manager: {
-            name: "Service Client QAPRIL",
+            name: "Service Client QAPRIL VIP",
             role: "Dédié Diaspora",
-            phone: "+2250500000001",
+            phone: "+2250712606018",
             photo: "/images/avatars/manager-diaspora.png"
         }
     };

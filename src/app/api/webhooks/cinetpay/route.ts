@@ -120,6 +120,17 @@ export async function POST(req: NextRequest) {
                 }
             });
 
+            // --- COMMISSION & WALLET ---
+            const { processCommissionAndWallet } = await import("@/actions/commission.actions");
+            await processCommissionAndWallet(
+                tx,
+                pgw.id,
+                intent.leaseId,
+                intent.amount,
+                intent.lease.landlordId,
+                PaymentCanal.CINETPAY_M17
+            );
+
             // --- ADD-05: M-TVA Ventilation ---
             const montantTtc = intent.amount;
             const montantHt = Math.round(montantTtc / 1.18);

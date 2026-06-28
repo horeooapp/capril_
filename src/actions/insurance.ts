@@ -5,43 +5,83 @@ import { prisma } from "@/lib/prisma"
 import { InsuranceStatus } from "@prisma/client"
 import { logAction } from "./audit"
 
-/**
- * Activates insurance for a lease.
- * Checks for lease compliance before activation.
- */
-export async function activateInsurance(leaseId: string, provider: string) {
+export async function subscribeInsurance(leaseId: string, provider: string = "NSIA Assurances") {
     const session = await auth()
     if (!session?.user) throw new Error("Non authentifié")
 
-    const lease = await prisma.lease.findUnique({
-        where: { id: leaseId },
-        include: { property: true }
-    })
+    return await prisma.$transaction(async (tx) => {
+        const lease = await tx.lease.findUnique({
+            where: { id: leaseId },
+            include: { 
+                property: true,
+                tenant: {
+                    include: { fraudProfile: true }
+                }
+            }
+        })
 
-    if (!lease) throw new Error("Bail introuvable")
+        if (!lease) throw new Error("Bail introuvable")
 
-    // Optimization: Ensure lease is ACTIVE and has valid financials (simplified check)
-    if (lease.status !== "ACTIVE") {
-        throw new Error("L'assurance ne peut être activée que sur un bail actif.")
-    }
-
-    const insurance = await prisma.insurance.create({
-        data: {
-            leaseId,
-            provider,
-            status: "ACTIVE",
-            policyNo: `QINS-${lease.id.substring(0, 8).toUpperCase()}`
+        if (lease.status !== "ACTIVE") {
+            throw new Error("L'assurance ne peut être activée que sur un bail actif.")
         }
-    })
 
-    await logAction({
-        action: "ACTIVATE_INSURANCE",
-        module: "INSURANCE",
-        entityId: insurance.id,
-        newValues: { leaseId, provider, policyNo: insurance.policyNo }
-    })
+        const existing = await tx.insurance.findUnique({ where: { leaseId } });
+        if (existing) throw new Error("Ce bail est déjà assuré.");
 
-    return insurance
+        // Calculate Premium based on Tenant Fraud Score
+        const fraudScore = lease.tenant?.fraudProfile?.fraudScore || 0;
+        const annualRent = (lease.rentAmount || 0) * 12;
+        
+        let premiumRate = 0.02; // 2% Base
+        if (fraudScore > 50) premiumRate = 0.035; // 3.5% High Risk
+        
+        const premiumAmount = Math.round(annualRent * premiumRate);
+        const platformCommission = Math.round(premiumAmount * 0.20); // 20% platform cut
+        
+        // Debit Landlord Wallet
+        const walletTransactions = await tx.walletTransaction.findMany({
+            where: { userId: session.user.id, status: "COMPLETED" }
+        });
+
+        const balance = walletTransactions.reduce((acc: number, t: any) => {
+            return t.type === "CREDIT" ? acc + t.amount : acc - t.amount;
+        }, 0);
+
+        if (balance < premiumAmount) {
+            throw new Error(`Solde insuffisant. La prime annuelle est de ${premiumAmount} FCFA.`);
+        }
+
+        await tx.walletTransaction.create({
+            data: {
+                userId: session.user.id,
+                type: "DEBIT",
+                amount: premiumAmount,
+                status: "COMPLETED",
+                motif: `Souscription Assurance Loyer Impayé (${provider}) - Bail ${leaseId}`,
+                referenceId: leaseId
+            }
+        });
+
+        // Create Insurance
+        const insurance = await tx.insurance.create({
+            data: {
+                leaseId,
+                provider,
+                status: "ACTIVE",
+                policyNo: `QINS-${lease.id.substring(0, 8).toUpperCase()}`
+            }
+        })
+
+        await logAction({
+            action: "SUBSCRIBE_INSURANCE",
+            module: "INSURANCE",
+            entityId: insurance.id,
+            newValues: { leaseId, provider, premiumAmount, platformCommission }
+        })
+
+        return { success: true, insurance, premiumAmount };
+    });
 }
 
 /**
@@ -115,4 +155,25 @@ export async function getAllInsurances() {
     });
 
     return { success: true, insurances };
+}
+
+export async function getLeasesWithoutInsurance() {
+    const session = await auth()
+    if (!session?.user) throw new Error("Non authentifié")
+
+    const leases = await prisma.lease.findMany({
+        where: {
+            landlordId: session.user.id,
+            status: "ACTIVE",
+            insurance: null
+        },
+        include: {
+            property: true,
+            tenant: {
+                include: { fraudProfile: true }
+            }
+        }
+    });
+
+    return { success: true, leases };
 }
