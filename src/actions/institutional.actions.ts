@@ -126,3 +126,76 @@ export async function generateMarketReport(commune: string | null, periode: stri
         return { success: false, error: error.message };
     }
 }
+
+import { auth } from "@/auth"
+
+const DATA_LICENSE_PRICE = 5000000; // 5,000,000 FCFA / an
+
+export async function getInstitutionalLicenses() {
+    const session = await auth()
+    if (!session?.user) throw new Error("Non authentifié")
+
+    try {
+        const contracts = await prisma.dataLicenseContract.findMany({
+            orderBy: { dateDebut: 'desc' }
+        });
+        return { success: true, contracts }
+    } catch (error: any) {
+        return { success: false, error: error.message }
+    }
+}
+
+export async function purchaseDataLicense(clientNom: string, clientType: string, typeAcces: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error("Non authentifié")
+
+    try {
+        return await prisma.$transaction(async (tx) => {
+            const walletTransactions = await tx.walletTransaction.findMany({
+                where: { userId: session.user.id, status: "COMPLETED" }
+            });
+
+            const balance = walletTransactions.reduce((acc: number, t: any) => {
+                return t.type === "CREDIT" ? acc + t.amount : acc - t.amount;
+            }, 0);
+
+            if (balance < DATA_LICENSE_PRICE) {
+                throw new Error(`Solde insuffisant. La licence annuelle est de ${DATA_LICENSE_PRICE.toLocaleString()} FCFA.`);
+            }
+
+            await tx.walletTransaction.create({
+                data: {
+                    userId: session.user.id,
+                    type: "DEBIT",
+                    amount: DATA_LICENSE_PRICE,
+                    status: "COMPLETED",
+                    motif: `Licence Data QAPRIL (Observatoire) - Accès ${typeAcces}`,
+                    referenceId: `DATA_${Date.now()}`
+                }
+            });
+
+            const apiKeyClient = "qdata_" + crypto.randomBytes(24).toString("hex");
+            const dateDebut = new Date();
+            const dateFin = new Date();
+            dateFin.setFullYear(dateFin.getFullYear() + 1);
+
+            const contract = await tx.dataLicenseContract.create({
+                data: {
+                    clientNom,
+                    clientType,
+                    typeAcces,
+                    montantAnnuel: DATA_LICENSE_PRICE,
+                    apiKeyClient,
+                    quotaRequetes: 50000,
+                    dateDebut,
+                    dateFin,
+                    statut: "ACTIF"
+                }
+            });
+
+            return { success: true, contract };
+        });
+    } catch (error: any) {
+        return { success: false, error: error.message }
+    }
+}

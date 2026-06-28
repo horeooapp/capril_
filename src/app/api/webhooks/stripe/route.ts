@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
 
         switch (event.type) {
             case "invoice.payment_succeeded": {
-                const invoice = event.data.object as Stripe.Invoice;
-                const subscriptionId = invoice.subscription as string | Stripe.Subscription;
+                const invoice = event.data.object as any;
+                const subscriptionId = invoice.subscription;
                 const customerId = invoice.customer as string;
 
                 // Find user by customerId
