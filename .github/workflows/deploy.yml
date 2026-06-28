@@ -79,9 +79,25 @@ jobs:
           pm2 delete capril || true
           pm2 save --force || true
           
-          # Clean up the port just in case
+          # Aggressively clean up port 3000
+          echo "🛑 Stopping any process on port 3000..."
           sudo fuser -k -9 3000/tcp || true
-          sudo lsof -ti:3000 | xargs sudo kill -9 || true
+          
+          # Try to kill PM2 globally just in case
+          sudo pm2 stop all || true
+          sudo pm2 delete all || true
+          
+          # Install lsof if missing (for Debian/Ubuntu) to guarantee we find the rogue process
+          if ! command -v lsof &> /dev/null; then
+            sudo apt-get update -y || true
+            sudo apt-get install -y lsof || true
+          fi
+          
+          # Kill with lsof
+          sudo lsof -ti:3000 | xargs -r sudo kill -9 || true
+          
+          # Kill with ss as fallback
+          sudo ss -lptn 'sport = :3000' | grep pid | grep -Eo 'pid=[0-9]+' | cut -d= -f2 | xargs -r sudo kill -9 || true
           
           # Stop any old rogue Docker containers that might be holding port 3000
           echo "🧹 Cleaning up old containers..."
