@@ -37,7 +37,8 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
       avanceMonthsStr = months.join(" et ");
   }
 
-  return     <div id="print-area" className="max-w-4xl mx-auto p-4 sm:p-8 md:p-12 bg-white text-black font-serif shadow-xl rounded my-4 md:my-8 print:shadow-none print:m-0 print:p-8">
+  return (
+    <div id="print-area" className="max-w-4xl mx-auto p-4 sm:p-8 md:p-12 bg-white text-black font-serif shadow-xl rounded my-4 md:my-8 print:shadow-none print:m-0 print:p-8">
       {/* HEADER */}
       <div className="text-center mb-8 border-b-2 border-black pb-4">
          <h1 className="text-lg md:text-xl font-bold uppercase tracking-widest">
