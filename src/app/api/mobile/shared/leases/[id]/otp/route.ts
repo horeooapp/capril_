@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { sendSMS } from '@/lib/sms';
+import crypto from 'crypto';
 
 export async function POST(
     request: Request,
@@ -36,12 +37,17 @@ export async function POST(
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
-        // OTP Generation
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // [SEC-FIX F-03] OTP cryptographiquement sécurisé (remplace Math.random non-crypto)
+        const otp = crypto.randomInt(100000, 999999).toString();
+        // [SEC-FIX F-04] Expiration OTP à 15 minutes maximum
+        const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
         
         await prisma.lease.update({ 
             where: { id: leaseId }, 
-            data: { signingOtp: otp } as any
+            data: { 
+                signingOtp: otp,
+                signingOtpExpiresAt: otpExpiresAt
+            } as any
         });
 
         if (lease.tenant.phone) {

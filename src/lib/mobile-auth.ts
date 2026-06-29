@@ -14,7 +14,7 @@ export async function signMobileToken(payload: { userId: string; email: string; 
         const token = await new SignJWT(payload)
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
-            .setExpirationTime('30d') // Jeton valide 30 jours sur mobile
+            .setExpirationTime('7d') // [SEC-FIX F-08] Réduit de 30d à 7d pour limiter l'exposition
             .sign(getJwtSecretKey());
         return token;
     } catch (error) {

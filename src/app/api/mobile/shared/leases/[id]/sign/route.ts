@@ -46,18 +46,37 @@ export async function POST(
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
+        // [SEC-FIX F-04] Vérification expiration OTP (15 min)
+        const leaseWithOtp = lease as any;
+        if (leaseWithOtp.signingOtpExpiresAt && new Date() > new Date(leaseWithOtp.signingOtpExpiresAt)) {
+            return NextResponse.json({ error: "Code OTP expiré. Veuillez en demander un nouveau." }, { status: 400 });
+        }
+
+        // [SEC-FIX F-04] Compteur d'échecs - bloquer après 5 tentatives
+        const failedAttempts = (leaseWithOtp.signingOtpFailedAttempts || 0);
+        if (failedAttempts >= 5) {
+            return NextResponse.json({ error: "Trop de tentatives échouées. Veuillez demander un nouveau code." }, { status: 429 });
+        }
+
         // Verify OTP
-        if ((lease as any).signingOtp !== otp) {
+        if (leaseWithOtp.signingOtp !== otp) {
+            // Incrémenter le compteur d'échecs
+            await prisma.lease.update({
+                where: { id: leaseId },
+                data: { signingOtpFailedAttempts: failedAttempts + 1 } as any
+            });
             return NextResponse.json({ error: "Code OTP invalide." }, { status: 400 });
         }
 
-        // Sign Lease
+        // Sign Lease — réinitialiser les champs OTP (F-04)
         await prisma.lease.update({
             where: { id: leaseId },
             data: {
                 isSignedElectronically: true,
                 signedAt: new Date(),
                 signingOtp: null,
+                signingOtpExpiresAt: null,    // [SEC-FIX F-04] Effacer l'expiration
+                signingOtpFailedAttempts: 0,  // [SEC-FIX F-04] Réinitialiser le compteur
                 status: "ACTIVE"
             } as any
         });

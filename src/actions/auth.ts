@@ -8,8 +8,9 @@ import { sendOTPEmail, sendPasswordResetEmail } from "@/lib/email";
 import { writeAuditLog } from "@/lib/audit";
 import crypto from "crypto";
 
+// [SEC-FIX F-03] OTP cryptographiquement sécurisé
 function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 /**

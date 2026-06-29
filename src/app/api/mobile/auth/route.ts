@@ -5,15 +5,18 @@ import { sendOTPEmail } from "@/lib/email";
 import crypto from 'crypto';
 import { signMobileToken } from '@/lib/mobile-auth';
 
-// Fonction interne de génération OTP
+// [SEC-FIX F-03] Génération OTP cryptographiquement sécurisée (Node.js crypto)
+// Math.random() est un PRNG non-crypto remplacé par crypto.randomInt()
 function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { action, email, otp, role } = body;
+        // [SEC-FIX F-01] Le paramètre 'role' n'est plus accepté depuis le client
+        // Le rôle est toujours lu depuis la base de données
+        const { action, email, otp } = body;
 
         if (!email) return NextResponse.json({ error: "L'adresse e-mail est requise." }, { status: 400 });
         const normalizedEmail = email.toLowerCase().trim();
@@ -102,11 +105,11 @@ export async function POST(req: Request) {
                 })
             ]);
 
-            // Sécurité : Génération d'un vrai JWT signé
+            // [SEC-FIX F-01] Rôle lu uniquement depuis la DB, jamais depuis le client
             const realToken = await signMobileToken({
                 userId: user.id, 
                 email: user.email || '', 
-                role: role || user.role || 'TENANT'
+                role: user.role || 'TENANT'
             });
 
             return NextResponse.json({ 
@@ -119,6 +122,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Action invalide." }, { status: 400 });
 
     } catch (error: any) {
-        return NextResponse.json({ error: "Erreur serveur : " + error.message }, { status: 500 });
+        // [SEC-FIX F-05] Ne jamais exposer error.message au client
+        console.error('[MOBILE_AUTH_ERROR]', error);
+        return NextResponse.json({ error: "Une erreur interne est survenue." }, { status: 500 });
     }
 }

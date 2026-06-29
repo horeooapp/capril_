@@ -43,6 +43,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Bail introuvable" }, { status: 404 });
         }
 
+        // [SEC-FIX F-02] Vérification IDOR : l'utilisateur authentifié doit être le locataire du bail
+        // Sans cette vérification, n'importe quel locataire peut payer le bail de quelqu'un d'autre
+        if (lease.tenantId !== payeurId) {
+            console.warn(`[SECURITY] IDOR attempt: user ${payeurId} tried to pay lease ${leaseId} owned by tenant ${lease.tenantId}`);
+            return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+        }
+
         // 2. RG-QUI-02: Vérification Wallet Bailleur (Comme sur le web)
         const walletBalance = lease.landlord.walletConfig?.walletBalance || 0;
         if (walletBalance < -1500) {
@@ -77,7 +84,9 @@ export async function POST(req: Request) {
             const receiptRef = await generateReceiptRef(lease.leaseType);
             const qrToken = generateQRToken();
             const paidAt = new Date();
-            const totalAmount = amount; // On suppose que le montant envoyé correspond au règlement
+            // [SEC-FIX F-07] Le montant est lu depuis la DB, jamais depuis le client
+            // Cela empêche le price tampering (envoyer amount: 1 pour un loyer de 150 000 FCFA)
+            const totalAmount = lease.rentAmount + (lease.chargesAmount || 0);
 
             const receiptHash = await calculateReceiptHash({
                 leaseId,

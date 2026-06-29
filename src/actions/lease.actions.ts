@@ -6,7 +6,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { createHash } from "crypto";
+import { createHash, randomInt } from "crypto"; // [SEC-FIX F-03] randomInt importé pour OTP sécurisé
 import { revalidatePath } from "next/cache";
 import { Role, TypeBail, LeaseStatus, Prisma, BdqStatut } from "@prisma/client";
 import { ensureAuthenticated, ensureLeaseAccess, ensurePropertyAccess } from "./auth-helpers";
@@ -345,7 +345,8 @@ export async function createBDQ(data: any) {
             }
         });
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // [SEC-FIX F-03] OTP cryptographiquement sécurisé
+        const otp = randomInt(100000, 999999).toString();
         await sendSMS(data.telephoneLocataire, `QAPRIL : Confirmation requise pour ${data.descriptionLogement} (${data.loyerMensuel} FCFA). Code : ${otp}`);
 
         return { success: true, bdqId: bdq.id };
@@ -362,7 +363,8 @@ export async function relancerBDQ(bdqId: string) {
         const bdq = await prisma.bailDeclaratif.findUnique({ where: { id: bdqId } });
         if (!bdq) throw new Error("BDQ introuvable.");
         
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // [SEC-FIX F-03] OTP cryptographiquement sécurisé
+        const otp = randomInt(100000, 999999).toString();
         await sendSMS(bdq.telephoneLocataire, `QAPRIL : Rappel confirmation pour ${bdq.descriptionLogement}. Code : ${otp}`);
         return { success: true };
     } catch (error: any) {
@@ -384,7 +386,8 @@ export async function requestSignatureOTP(leaseId: string) {
         const lease = await prisma.lease.findUnique({ where: { id: leaseId }, include: { tenant: true } });
         if (!lease || !lease.tenant) throw new Error("Bail ou locataire introuvable.");
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // [SEC-FIX F-03] OTP cryptographiquement sécurisé
+        const otp = randomInt(100000, 999999).toString();
         await prisma.lease.update({ where: { id: leaseId }, data: { signingOtp: otp } });
 
         if (lease.tenant.phone) {
@@ -478,7 +481,8 @@ export async function initiateSignature(data: {
         return { success: false, error: "Le signataire n'a pas de numéro de téléphone pour l'OTP." };
     }
 
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // [SEC-FIX F-03] OTP cryptographiquement sécurisé
+    const otpCode = randomInt(100000, 999999).toString();
     const signature = await (prisma as any).signatureElectronique.create({
       data: {
         documentType: data.documentType,

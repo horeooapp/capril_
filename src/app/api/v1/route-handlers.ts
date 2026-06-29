@@ -28,7 +28,9 @@ export async function POST_BauxDraft(req: NextRequest) {
     const result = await createLease(body);
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    // [SEC-FIX F-05] Ne jamais exposer error.message au client
+    console.error('[API] POST_BauxDraft error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 400 });
   }
 }
 
@@ -48,7 +50,8 @@ export async function PUT_BauxDraft(
     const result = await createLease({ ...body, leaseId: id });
     return NextResponse.json(result);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error('[API] PUT_BauxDraft error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 400 });
   }
 }
 
@@ -68,7 +71,8 @@ export async function POST_BauxValider(
     // const result = await validerLease(id, body);
     return NextResponse.json({ message: "Validation merged into createLease" }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error('[API] POST_BauxValider error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 400 });
   }
 }
 
@@ -86,7 +90,8 @@ export async function GET_Receipts(req: NextRequest) {
     const receipts = await getReceiptsForLease(leaseId!);
     return NextResponse.json(receipts);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('[API] GET_Receipts error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 500 });
   }
 }
 
@@ -104,11 +109,12 @@ export async function POST_Receipts(req: NextRequest) {
     const result = await createReceipt(body);
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
-    // Erreur RG-QUI-ORDRE → 422
+    // Erreur RG-QUI-ORDRE → 422 (seul cas où on peut donner un message métier)
     if (error.message?.includes('RG-QUI-ORDRE')) {
-      return NextResponse.json({ error: error.message, code: 'ORDRE_CHRONOLOGIQUE' }, { status: 422 });
+      return NextResponse.json({ error: 'Les quittances doivent être émises dans l\'ordre chronologique.', code: 'ORDRE_CHRONOLOGIQUE' }, { status: 422 });
     }
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error('[API] POST_Receipts error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 400 });
   }
 }
 
@@ -167,7 +173,8 @@ export async function GET_ReceiptVerify(
       bien:         'Immeuble Les Palmiers — Appt 4B',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('[API] GET_ReceiptVerify error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 500 });
   }
 }
 
@@ -202,7 +209,8 @@ export async function GET_Properties(req: NextRequest) {
 
     return NextResponse.json([]);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('[API] GET_Properties error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 500 });
   }
 }
 
@@ -225,7 +233,8 @@ export async function GET_PremierMoisImpaye(
     if (!mois) return NextResponse.json({ mois: null, message: 'Aucun impayé' });
     return NextResponse.json({ mois });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('[API] GET_PremierMoisImpaye error:', error);
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 500 });
   }
 }
 

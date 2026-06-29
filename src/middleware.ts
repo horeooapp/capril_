@@ -19,20 +19,35 @@ export default auth(async (req) => {
         return NextResponse.redirect(url, 301);
     }
 
-    // 1. General Rate Limiting for API and Dashboard (ADD-SCALABILITY)
+    // 1. Limitation générale pour /api et /dashboard
     if (path.startsWith("/api") || path.startsWith("/dashboard")) {
-        const withinLimit = await checkRateLimit(`gen:${ip}`, 100, 60); // 100 per min
+        const withinLimit = await checkRateLimit(`gen:${ip}`, 100, 60); // 100 par minute
         if (!withinLimit) {
             return new NextResponse("Too Many Requests", { status: 429 });
         }
     }
 
-    // 2. Strict Brute-Force Protection for Auth (ADD-SECURITY)
-    if (path.startsWith("/api/auth") || path.startsWith("/api/mobile/login") || path.includes("/otp")) {
-        const withinAuthLimit = await checkRateLimit(`auth:${ip}`, 5, 300); // 5 attempts per 5 minutes
+    // 2. [SEC-FIX F-06] Protection stricte brute-force sur les routes d'auth et OTP
+    // Couvre /api/auth, /api/mobile/auth, /api/mobile/shared/*/otp et /api/v1/auth/otp
+    const isSensitiveAuth = path.startsWith("/api/auth")
+        || path.startsWith("/api/mobile/auth")
+        || path.startsWith("/api/mobile/login")
+        || path.includes("/otp");
+
+    if (isSensitiveAuth) {
+        const withinAuthLimit = await checkRateLimit(`auth:${ip}`, 5, 300); // 5 tentatives / 5 min
         if (!withinAuthLimit) {
-            console.warn(`[SECURITY] Potential brute-force detected from IP: ${ip} on path: ${path}`);
+            console.warn(`[SECURITY] Potential brute-force from IP: ${ip} on: ${path}`);
             return new NextResponse("Security Lock: Too Many Attempts", { status: 429 });
+        }
+    }
+
+    // 3. [SEC-FIX F-06] Protection stricte sur la route de paiement mobile
+    if (path.startsWith("/api/mobile/pay-rent")) {
+        const withinPayLimit = await checkRateLimit(`pay:${ip}`, 10, 60); // 10 par minute
+        if (!withinPayLimit) {
+            console.warn(`[SECURITY] Payment rate limit exceeded from IP: ${ip}`);
+            return new NextResponse("Too Many Payment Requests", { status: 429 });
         }
     }
 
