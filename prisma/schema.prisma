@@ -4045,3 +4045,11 @@ model WaSession {
   @@map("wa_sessions")
   @@index([numeroWa])
 }
+
+model WaMessageLog {
+  id        String   @id @default(uuid()) @map("log_id")
+  wamid     String   @unique @map("wamid")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("wa_message_logs")
+}

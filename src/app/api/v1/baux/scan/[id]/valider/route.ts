@@ -4,7 +4,8 @@ import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
+    const params = await context.params;
   try {
     const scanId = params.id;
     const data = await req.json(); // Les champs corrigés/validés par l'humain

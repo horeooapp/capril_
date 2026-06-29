@@ -3,7 +3,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+    const params = await context.params;
   try {
     const scanId = params.id;
     const scan = await prisma.scanExtraction.findUnique({ where: { id: scanId } });

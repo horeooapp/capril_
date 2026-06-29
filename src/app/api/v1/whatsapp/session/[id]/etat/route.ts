@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+    const params = await context.params;
   try {
     const sessionId = params.id;
     // TODO: Lire l'état d'une conversation dans la DB

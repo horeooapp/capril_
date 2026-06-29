@@ -3,7 +3,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+    const params = await context.params;
   try {
     const leaseId = params.id;
     const lease = await prisma.lease.findUnique({ where: { id: leaseId } });
