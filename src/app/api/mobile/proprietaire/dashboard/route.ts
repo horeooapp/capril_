@@ -47,10 +47,19 @@ export async function GET(request: Request) {
         const occupancyRate = Math.round((occupiedCount / totalProperties) * 100);
         const vacantProperties = totalProperties - occupiedCount;
 
-        const pendingLeasesCount = await prisma.bailDeclaratif.count({
+        const pendingLeases = await prisma.lease.findMany({
             where: {
-                bailleurId: user.userId,
-                statut: 'PENDING_LOCATAIRE'
+                ownerId: user.userId,
+                status: 'PENDING',
+                isSignedElectronically: false // Assuming false means not signed by owner/tenant
+            },
+            take: 1
+        });
+        
+        const pendingLeasesCount = await prisma.lease.count({
+            where: {
+                ownerId: user.userId,
+                status: 'PENDING'
             }
         });
 
@@ -71,6 +80,7 @@ export async function GET(request: Request) {
             monthlyRevenue: expectedRevenue,
             vacantProperties,
             pendingLeasesCount,
+            pendingLeaseId: pendingLeases.length > 0 ? pendingLeases[0].id : null,
             incidentsCount,
             currency: 'FCFA'
         });

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../lib/api';
@@ -84,13 +84,22 @@ export default function DashboardScreen() {
                     <Text style={styles.sectionTitle}>Actions Requises</Text>
                     
                     <View style={styles.actionGrid}>
-                        <View style={styles.actionCard}>
+                        <Pressable 
+                            style={styles.actionCard}
+                            onPress={() => {
+                                if (data?.pendingLeaseId) {
+                                    router.push(`/signature/${data.pendingLeaseId}` as any);
+                                } else {
+                                    Alert.alert('Info', 'Aucun bail en attente de signature.');
+                                }
+                            }}
+                        >
                             <FileSignature color="#f59e0b" size={24} />
                             <View style={styles.actionInfo}>
                                 <Text style={styles.actionVal}>{data?.pendingLeasesCount || 0}</Text>
                                 <Text style={styles.actionDesc}>Baux en attente</Text>
                             </View>
-                        </View>
+                        </Pressable>
 
                         <View style={styles.actionCard}>
                             <AlertTriangle color="#ef4444" size={24} />

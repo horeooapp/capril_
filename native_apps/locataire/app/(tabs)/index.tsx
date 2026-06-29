@@ -159,7 +159,7 @@ export default function DashboardScreen() {
                         </Text>
                         <Pressable 
                             style={[styles.leaseButton, { backgroundColor: '#f59e0b', borderColor: '#d97706', marginBottom: 0 }]} 
-                            onPress={() => router.push('/(tabs)/leases' as any)}
+                            onPress={() => router.push(`/signature/${data.pendingLease.id}` as any)}
                         >
                             <FileSignature color="#fff" size={20} />
                             <Text style={[styles.leaseButtonText, { color: '#fff' }]}>Examiner le contrat</Text>

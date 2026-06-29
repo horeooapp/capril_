@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import SignaturePad from "./SignaturePad";
 import OtpVerification from "./OtpVerification";
 import { initiateSignature } from "@/actions/lease.actions";
+import PrintableLeaseContract from "../PrintableLeaseContract";
 
 interface SignatureFlowProps {
   documentId: string;
@@ -16,9 +17,10 @@ interface SignatureFlowProps {
   documentRef: string;
   signataireId: string;
   onComplete?: () => void;
+  fullDocument?: any;
 }
 
-export default function SignatureFlow({ documentId, documentType, documentRef, signataireId, onComplete }: SignatureFlowProps) {
+export default function SignatureFlow({ documentId, documentType, documentRef, signataireId, onComplete, fullDocument }: SignatureFlowProps) {
   const [step, setStep] = useState<"REVIEW" | "SIGNING" | "OTP" | "SUCCESS">("REVIEW");
   const [signatureId, setSignatureId] = useState<string | null>(null);
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
@@ -55,38 +57,50 @@ export default function SignatureFlow({ documentId, documentType, documentRef, s
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-gray-900 border border-gray-800 rounded-3xl p-10 shadow-2xl"
+            className="bg-gray-900 border border-gray-800 rounded-3xl p-6 md:p-10 shadow-2xl"
           >
-            <div className="flex justify-between items-start mb-10">
+            <div className="flex justify-between items-start mb-6 md:mb-10">
               <div>
                 <span className="text-[10px] bg-indigo-500 text-white px-3 py-1 rounded-full font-black uppercase tracking-widest mb-4 inline-block">Étape 1/3 : Lecture</span>
-                <h2 className="text-4xl font-black text-white tracking-tighter">Vérification du Document</h2>
+                <h2 className="text-2xl md:text-4xl font-black text-white tracking-tighter">Vérification du Document</h2>
               </div>
-              <FileText className="w-12 h-12 text-gray-700" />
+              <FileText className="w-10 h-10 md:w-12 md:h-12 text-gray-700 hidden md:block" />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <div className="p-6 bg-gray-950 border border-gray-800 rounded-2xl flex items-center gap-4">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 mb-8">
+              <div className="p-4 md:p-6 bg-gray-950 border border-gray-800 rounded-2xl flex items-center gap-4">
                 <div className="p-3 bg-gray-800 rounded-xl"><Landmark className="w-6 h-6 text-gray-400" /></div>
                 <div>
                   <p className="text-[10px] text-gray-500 font-bold uppercase">Référence</p>
-                  <p className="text-lg font-black text-white">{documentRef}</p>
+                  <p className="text-base md:text-lg font-black text-white">{documentRef}</p>
                 </div>
               </div>
-              <div className="p-6 bg-gray-950 border border-gray-800 rounded-2xl flex items-center gap-4">
+              <div className="p-4 md:p-6 bg-gray-950 border border-gray-800 rounded-2xl flex items-center gap-4">
                 <div className="p-3 bg-gray-800 rounded-xl"><User className="w-6 h-6 text-gray-400" /></div>
                 <div>
                   <p className="text-[10px] text-gray-500 font-bold uppercase">Signataire</p>
-                  <p className="text-lg font-black text-white">Prêt pour signature</p>
+                  <p className="text-base md:text-lg font-black text-white">Prêt pour signature</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-8 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl mb-12">
-              <h4 className="text-indigo-400 font-bold mb-2 flex items-center gap-2">
+            {/* DOCUMENT PREVIEW */}
+            {fullDocument && documentType === "BAIL" && (
+                <div className="bg-slate-50 border border-gray-800 rounded-2xl overflow-hidden shadow-inner relative mb-8">
+                    <div className="bg-gray-800 p-3 flex justify-between items-center border-b border-gray-700">
+                        <span className="font-bold text-sm text-gray-300">Contrat Officiel à lire avant signature</span>
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto">
+                        <PrintableLeaseContract lease={fullDocument} />
+                    </div>
+                </div>
+            )}
+
+            <div className="p-6 md:p-8 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl mb-8 md:mb-12">
+              <h4 className="text-indigo-400 font-bold mb-2 flex items-center gap-2 text-sm md:text-base">
                 <ShieldCheck className="w-4 h-4" /> Certification QAPRIL M-SIGN
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-xs md:text-sm text-gray-400 leading-relaxed">
                 En cliquant sur signer, vous reconnaissez avoir lu l'intégralité du document. 
                 Une vérification par SMS (OTP) sera requise pour finaliser la transaction avec valeur juridique probante.
               </p>

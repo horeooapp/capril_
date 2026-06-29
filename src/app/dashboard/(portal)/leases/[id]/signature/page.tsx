@@ -26,6 +26,7 @@ export default async function LandlordLeaseSignaturePage({ params }: { params: P
                 documentType="BAIL" 
                 documentRef={lease.leaseReference || "Bail en cours"} 
                 signataireId={userId}
+                fullDocument={lease}
                 onComplete={() => {
                   window.location.href = `/dashboard/leases/${lease.id}`;
                 }}
