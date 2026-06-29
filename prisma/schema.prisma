@@ -4027,3 +4027,21 @@ model VentilationFrais {
 
   @@map("ventilation_frais")
 }
+
+// ═══════════════════════════════════════════════════════
+// ADD-25 : WHATSAPP PIPELINE D'INGESTION
+// ═══════════════════════════════════════════════════════
+
+model WaSession {
+  id             String    @id @default(uuid()) @map("session_id")
+  numeroWa       String    @map("numero_wa")
+  etat           String    @default("COLLECTE") // COLLECTE|NORMALISATION|EXTRACTION|VALIDATION|RECAPTURE|PAIEMENT|TERMINE
+  pages          Json?     @default("[]")       // urls chiffrees + ordre + qualite
+  champs         Json?     @default("{}")       // champs extraits + scores + statut
+  champCourant   String?   @map("champ_courant")// champ en cours de validation
+  dernierMsgAt   DateTime? @map("dernier_msg_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@map("wa_sessions")
+  @@index([numeroWa])
+}
