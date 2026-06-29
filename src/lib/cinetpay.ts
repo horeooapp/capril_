@@ -117,6 +117,16 @@ export class CinetPayService {
             return { success: false, message: "Network error during CinetPay verification" };
         }
     }
+
+    /**
+     * Calcule le palier d'enregistrement du bail (PATCH-07)
+     */
+    calculateRegistrationFee(loyer: number): { palier: number; montant: number } {
+        if (loyer <= 80000) return { palier: 1, montant: 3000 };
+        if (loyer <= 170000) return { palier: 2, montant: 5000 };
+        if (loyer <= 350000) return { palier: 3, montant: 8000 };
+        return { palier: 4, montant: 10000 };
+    }
 }
 
 export const cinetpay = new CinetPayService();

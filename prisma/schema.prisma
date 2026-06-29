@@ -1091,6 +1091,19 @@ model Lease {
   CommissionTransaction     CommissionTransaction[]
   InsuranceSouscription     InsuranceSouscription[]
 
+  // ── ADD-21 / PATCH-07 : Nouveaux statuts et champs d'ingestion
+  origineBail         String  @default("GENERE") @map("origine_bail")
+  niveauCertification String  @default("CERTIFIE_QAPRIL") @map("niveau_certification")
+  statutDgi           String  @default("NON_SOUMIS") @map("statut_dgi")
+  dgiReference        String? @map("dgi_reference")
+  dgiDroitsCalcules   Int?    @map("dgi_droits_calcules")
+  scanFichierSha256   String? @map("scan_fichier_sha256")
+  fraisEnregPalier    Int?    @map("frais_enreg_palier")
+  fraisEnregMontant   Int?    @map("frais_enreg_montant")
+
+  scanExtractions  ScanExtraction[]
+  ventilationFrais VentilationFrais[]
+
   @@index([status, createdAt])
   @@index([propertyId])
   @@index([tenantId])
@@ -3979,4 +3992,38 @@ model UserConsent {
   createdAt        DateTime @default(now())
 
   @@map("user_consents")
+}
+
+// ═══════════════════════════════════════════════════════
+// ADD-21 / PATCH-07 : INGESTION & VENTILATION
+// ═══════════════════════════════════════════════════════
+
+model ScanExtraction {
+  id             String   @id @default(uuid()) @map("scan_id")
+  leaseId        String?  @map("bail_id")
+  lease          Lease?   @relation(fields: [leaseId], references: [id])
+  fichierUrl     String   @map("fichier_url")
+  ocrTexteBrut   String?  @map("ocr_texte_brut")
+  champsExtraits Json?    @map("champs_extraits")
+  champsValides  Json?    @map("champs_valides")
+  statutPipeline String   @default("DEPOSE") @map("statut_pipeline")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("scan_extractions")
+}
+
+model VentilationFrais {
+  id           String    @id @default(uuid()) @map("vent_id")
+  leaseId      String?   @map("bail_id")
+  lease        Lease?    @relation(fields: [leaseId], references: [id])
+  montantTotal Int       @map("montant_total")
+  partHabiteax Int       @map("part_habiteax")
+  partCpraima  Int       @map("part_cpraima")
+  partReserve  Int       @map("part_reserve")
+  collecteur   String    @default("CPRAIMA_CI")
+  reverseAt    DateTime? @map("reverse_at")
+  webhookRef   String?   @map("webhook_ref")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("ventilation_frais")
 }

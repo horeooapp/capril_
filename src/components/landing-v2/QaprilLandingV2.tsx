@@ -667,7 +667,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               <div className="price-icon">🧑</div>
               <div className="price-name">Locataire</div>
               <div className="price-amount">Gratuit</div>
-              <div className="price-period">Pour toujours</div>
+              <div className="price-period">Puis frais d'enreg. (selon barème)</div>
               <div className="price-divider"></div>
               <div className="price-features">
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Paiement Mobile Money</div>
@@ -683,14 +683,14 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>PROPRIÉTAIRE</div>
               <div className="price-icon">🏠</div>
               <div className="price-name">Propriétaire</div>
-              <div className="price-amount">{paywallActif ? "Par quittance" : "Gratuit"}</div>
-              <div className="price-period">{paywallActif ? "Facturation à l'acte généré" : "Pour toujours"}</div>
+              <div className="price-amount">Gratuit</div>
+              <div className="price-period">Sans commission ni frais cachés</div>
               <div className="price-divider"></div>
               <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion baux</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Suivi loyers</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion des biens et baux</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Quittances illimitées</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Relances auto</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Enregistrement DGI</div>
+                <div className="price-feature"><span className="price-feature-icon">✅</span> Enregistrement DGI (par le locataire)</div>
                 <div className="price-feature"><span className="price-feature-icon">✅</span> Caution CDC-CI</div>
               </div>
               <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Essayer gratuitement</button>
@@ -745,9 +745,9 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
 
             <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
               <div className="fc-icon" style={{ background: 'var(--sky)', color: 'white' }}>🔌</div>
-              <h3>API Agences Premium</h3>
-              <p>Connectez votre logiciel existant à l'écosystème QAPRIL. Automatisation des baux, paiements et ICL directement dans vos outils.</p>
-              <div className="feature-tag" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>50 000 FCFA / mois</div>
+              <h3>API Agences & DGI</h3>
+              <p>Connectez votre logiciel existant. Automatisez la gestion, le paiement des loyers et l'enregistrement DGI en marque blanche.</p>
+              <div className="feature-tag" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>Sur mesure / API</div>
             </div>
 
             <div className="feature-card reveal reveal-d1" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
@@ -758,16 +758,16 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
             </div>
 
             <div className="feature-card reveal reveal-d2" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🏢</div>
-              <h3>SaaS Syndic de Copropriété</h3>
-              <p>Une interface dédiée pour la gestion des charges communes, les assemblées générales et la trésorerie des immeubles.</p>
-              <div className="feature-tag" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>25 000 FCFA / mois</div>
+              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🏛</div>
+              <h3>Portail Partenaire État</h3>
+              <p>Interface et flux dédiés (CPRAIMA-CI, DGI) pour la collecte et la ventilation (50/20/30) automatisée des frais d'enregistrement.</p>
+              <div className="feature-tag" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>Accès Institutionnel</div>
             </div>
 
             <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
               <div className="fc-icon" style={{ background: 'var(--teal)', color: 'white' }}>📊</div>
-              <h3>Licences Data Institutionnelles</h3>
-              <p>Accès anonymisé aux données du marché locatif ivoirien pour les banques, assurances et promoteurs immobiliers.</p>
+              <h3>Licences Data & Scoring</h3>
+              <p>Accès anonymisé aux données de solvabilité (Score ICL) pour les banques, assurances, et promoteurs immobiliers.</p>
               <div className="feature-tag" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>5 000 000 FCFA / an</div>
             </div>
 
@@ -830,7 +830,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
           ) : (
             <button onClick={() => handleLoginClick("LOCATAIRE")} className="btn-cta-white">🚀 Créer mon compte gratuitement</button>
           )}
-          <div className="cta-sub">✓ Gratuit pour les locataires · ✓ Essai 30 jours pour les propriétaires · ✓ Support WhatsApp inclus</div>
+          <div className="cta-sub">✓ Gestion gratuite pour le propriétaire · ✓ Enregistrement DGI par le locataire · ✓ Support WhatsApp inclus</div>
         </div>
       </div>
 
