@@ -55,16 +55,21 @@ export default async function LeasesDashboardPage() {
                 orderBy: { createdAt: "desc" }
             });
 
-            const mappedBdqs = bdqs.map(b => ({
-                id: b.id,
-                leaseReference: `BDQ-${b.id.substring(0,8)}`,
-                leaseType: "VERBAL (BDQ)",
-                tenant: { firstName: b.prenomLocataireDeclare || "", lastName: b.nomLocataireDeclare || b.telephoneLocataire },
-                rentAmount: Number(b.loyerDeclareMensuel || 0),
-                status: b.statut === "PENDING_LOCATAIRE" ? "PENDING_CONFIRMATION" : b.statut,
-                daysSinceCreation: Math.floor((new Date().getTime() - new Date(b.createdAt).getTime()) / (1000 * 3600 * 24)),
-                isExpiringSoon: b.statut === "PENDING_LOCATAIRE",
-            }));
+            const mappedBdqs = bdqs.map(b => {
+                const days = Math.floor((new Date().getTime() - new Date(b.createdAt).getTime()) / (1000 * 3600 * 24));
+                const isExpired = b.statut === "PENDING_LOCATAIRE" && days >= 5;
+
+                return {
+                    id: b.id,
+                    leaseReference: `BDQ-${b.id.substring(0,8)}`,
+                    leaseType: "VERBAL (BDQ)",
+                    tenant: { firstName: b.prenomLocataireDeclare || "", lastName: b.nomLocataireDeclare || b.telephoneLocataire },
+                    rentAmount: Number(b.loyerDeclareMensuel || 0),
+                    status: isExpired ? "ANNULÉ" : (b.statut === "PENDING_LOCATAIRE" ? "PENDING_CONFIRMATION" : b.statut),
+                    daysSinceCreation: days,
+                    isExpiringSoon: !isExpired && b.statut === "PENDING_LOCATAIRE",
+                };
+            });
 
             leases = [...mappedBdqs, ...leases];
         }

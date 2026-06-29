@@ -110,11 +110,18 @@ export const serializeLease = (lease: any) => {
             totalAmount: Number(rec.totalAmount || 0),
             paidAt: rec.paidAt instanceof Date ? rec.paidAt.toISOString() : rec.paidAt
         })),
-        // Expiration management
-        daysSinceCreation: Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)),
-        isExpiringSoon: !['ACTIVE', 'TERMINATED', 'ARCHIVED'].includes(lease.status) && 
-                        Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24)) >= 3
     };
+
+    const days = Math.floor((new Date().getTime() - new Date(lease.createdAt).getTime()) / (1000 * 3600 * 24));
+    const isPending = ['DRAFT', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(lease.status);
+    const isExpired = isPending && days >= 5;
+
+    serialized.daysSinceCreation = days;
+    serialized.isExpiringSoon = isPending && !isExpired && days >= 3;
+
+    if (isExpired) {
+        serialized.status = "ANNULÉ";
+    }
 
     return serializeObject(serialized);
 }
