@@ -202,7 +202,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
 
                 {/* Info Card */}
                 <div className="space-y-6">
-                    <div className="glass-panel p-8 rounded-[2.5rem] border border-white/40 shadow-lg bg-gradient-to-br from-slate-800 to-[#122e47] text-white">
+                    <div className="p-8 rounded-[2.5rem] shadow-lg bg-gradient-to-br from-slate-800 to-[#122e47] text-white">
                         <h3 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2">
                             <ShieldCheck size={24} />
                             Pourquoi certifier ?
