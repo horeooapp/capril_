@@ -25,8 +25,8 @@ export default async function VaultPage() {
     });
 
     const allDeposits = properties.flatMap(p => 
-        p.leases.flatMap(l => 
-            l.cdcDeposits.map((d: any) => ({
+        (p.leases || []).flatMap(l => 
+            (l.cdcDeposits || []).map((d: any) => ({
                 id: d.id,
                 locataire: `${l.tenant?.firstName} ${l.tenant?.lastName}`,
                 bien: p.name,

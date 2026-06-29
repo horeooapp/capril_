@@ -55,9 +55,9 @@ export const serializeLease = (lease: any) => {
     if (!lease) return null
     
     // MM-04b: Identity Masking logic
-    const isAgreee = lease.typeGestion && lease.typeGestion.toLowerCase() === 'agreee';
+    const isAgreee = lease.typeGestion && typeof lease.typeGestion === 'string' && lease.typeGestion.toLowerCase() === 'agreee';
     const shouldMask = lease.bailleurMasque || isAgreee || 
-                       (lease.typeGestion && lease.typeGestion.toLowerCase() === 'mandat');
+                       (lease.typeGestion && typeof lease.typeGestion === 'string' && lease.typeGestion.toLowerCase() === 'mandat');
 
     let maskedName = lease.landlord?.walletConfig?.landlordCode || "BAI-CODE-PENDING";
     if (isAgreee && lease.agent) {
