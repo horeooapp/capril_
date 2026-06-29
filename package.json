@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node -e \"require('fs').mkdirSync('out', { recursive: true }); require('fs').writeFileSync('out/.nojekyll', '')\"",
-    "start": "next start",
+    "start": "npx prisma db push && next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "mobile:start:locataire": "cd native_apps/locataire && npx expo start",
