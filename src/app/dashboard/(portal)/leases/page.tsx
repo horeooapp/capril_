@@ -76,5 +76,7 @@ export default async function LeasesDashboardPage() {
         leases = [...mappedBdqs, ...leases];
     }
 
-    return <LeasesDashboardClient initialLeases={leases} />;
+    const safeLeases = JSON.parse(JSON.stringify(leases));
+
+    return <LeasesDashboardClient initialLeases={safeLeases} />;
 }
