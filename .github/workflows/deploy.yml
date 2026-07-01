@@ -1,4 +1,4 @@
-﻿# Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
+# Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
 # Trigger deploy with nuclear exorcism and Prisma fixes
 name: ­ƒÜÇ Deploy QAPRIL v3.0 to Hostinger
 
@@ -46,6 +46,14 @@ jobs:
           node-version: '24'
           # cache: 'npm' # [FIX] Desactive: declenchait un hashFiles sur node_modules en post-job
 
+      - name: 📦 Cache NPM Dependencies (~/.npm)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: ­ƒÆ¥ Cache Next.js Build
         uses: actions/cache@v4
         with:
@@ -65,7 +73,7 @@ jobs:
           npm config set fetch-retries 2
           npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retry-maxtimeout 60000
-          npm ci --no-audit --no-fund
+          npm ci --no-audit --no-fund --prefer-offline
 
       - name: ­ƒº¬ Client Guard (Verify Generated Client)
         run: |
@@ -90,6 +98,7 @@ jobs:
           fi
           
           export DATABASE_URL="$CLEAN_DB_URL"
+          export NEXT_TELEMETRY_DISABLED=1
           npm run build
         env:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
@@ -151,17 +160,15 @@ jobs:
 
       - name: ­ƒö▒ Post-Build Exorcism (Nuclear Search & Destroy SQLite)
         run: |
-          echo "­ƒö▒ Purging ALL 'sqlite' provider variants from ALL build artifacts..."
+          echo "­ƒö▒ Purging ALL 'sqlite' provider variants from server build artifacts..."
           # Nuclear Regex: Catches 'provider = "sqlite"', 'provider: "sqlite"', '"provider": "sqlite"', etc.
           EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
           
-          # Remove file extension filters to ensure we hit .rsc, .meta, and other Next.js internal files
-          find dist_package -type f -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX"
+          # [SPEED OPTIMIZATION] Target ONLY relevant server/prisma files instead of thousands of static js/images
+          find dist_package/prisma dist_package/.next/server dist_package/*.js -type f \( -name "*.js" -o -name "*.json" -o -name "*.rsc" -o -name "*.prisma" \) -print0 | xargs -0 sed -i -E "$EXORCISM_REGEX" || true
           
           echo "­ƒº¬ Verifying Nuclear Exorcism Results..."
-          # Check for ANY case-insensitive variation of sqlite provider in the final artifacts
-          # We output the matched lines for easier debugging if it fails
-          SURVIVORS=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' dist_package/ || true)
+          SURVIVORS=$(grep -rEi 'provider[[:space:]]*[:=][[:space:]]*["'\'']sqlite["'\'']' dist_package/prisma/ dist_package/.next/server/ || true)
           if [ -n "$SURVIVORS" ]; then
             echo "ÔØî ERROR: SQLite ghosts survived the exorcism in these files:"
             echo "$SURVIVORS"
@@ -192,9 +199,9 @@ jobs:
           # ­ƒº¬ FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "­ƒº¬ Final Pre-Restart Integrity Check & Sanitization..."
           
-          # Force fix any survivors on the VPS filesystem using the Nuclear Regex (ALL files)
+          # [SPEED OPTIMIZATION] Force fix only server & prisma directory instead of scanning entire VPS filesystem
           EXORCISM_REGEX='s/([\"'\'']?provider[\"'\'']?[[:space:]]*[:=][[:space:]]*[\"'\''])sqlite([\"'\''])/\1postgresql\2/gI'
-          find $DEPLOY_DEST -type f -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
+          find $DEPLOY_DEST/prisma $DEPLOY_DEST/.next/server $DEPLOY_DEST/*.js -type f \( -name "*.js" -o -name "*.json" -o -name "*.rsc" -o -name "*.prisma" \) -print0 | xargs -0 sudo sed -i -E "$EXORCISM_REGEX" || true
 
           if [ ! -d "$DEPLOY_DEST/.next/server" ]; then
             echo "­ƒÜ¿ FATAL ERROR: Server directory missing! Deployment incomplete."
@@ -262,8 +269,10 @@ jobs:
 
       - name: ­ƒôª Install and Start Local Redis
         run: |
-          sudo apt-get update || true
-          sudo apt-get install -y redis-server || true
+          if ! command -v redis-server >/dev/null 2>&1; then
+            sudo apt-get update || true
+            sudo apt-get install -y redis-server || true
+          fi
           sudo systemctl enable redis-server || true
           sudo systemctl start redis-server || true
 
@@ -332,7 +341,7 @@ jobs:
             echo "­ƒî▒ Running Compiled Seed Logic..."
             if [ -f "prisma/seed.js" ]; then
                echo "­ƒÜÇ EXEC: node prisma/seed.js"
-               if sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"; then
+               if sudo su - github -c "cd $DEPLOY_DEST && npm config set strict-ssl false && npm install bcrypt-ts --no-save --omit=dev --prefer-offline --no-audit && export DATABASE_URL='${{ secrets.DATABASE_URL }}' && node prisma/seed.js"; then
                   echo "Ô£à SEED SUCCESSFUL"
                else
                   echo "ÔØî SEED FAILED (Non-fatal, continuing...)"
@@ -370,7 +379,7 @@ jobs:
           DEPLOY_DEST="/home/github/capril_app"
           echo "­ƒ®║ Checking application health at http://127.0.0.1:3000/api/health"
           
-          # Tentative de Health Check hyper-robuste
+          # Tentative de Health Check hyper-robuste et rapide (sleep 2s)
           MAX_RETRIES=30
           COUNT=0
           while [ $COUNT -lt $MAX_RETRIES ]; do
@@ -383,7 +392,7 @@ jobs:
             fi
             
             echo "ÔÅ│ Waiting for application to boot... (Status: $STATUS_CODE) ($((COUNT+1))/$MAX_RETRIES)"
-            sleep 10
+            sleep 2
             COUNT=$((COUNT+1))
           done
           
