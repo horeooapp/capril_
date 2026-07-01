@@ -188,7 +188,7 @@ jobs:
           
           # Sync everything from dist_package
           echo "­ƒÜÇ Syncing 100% FRESH standalone build directly from local step..."
-          rsync -rlptvz --delete --no-owner --no-group --no-perms \
+          rsync -rlptz --stats --delete --no-owner --no-group --no-perms \
             --exclude=".env*" \
             --exclude="public/uploads/" \
             dist_package/ $DEPLOY_DEST/
