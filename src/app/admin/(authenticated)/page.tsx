@@ -171,7 +171,7 @@ export default async function AdminDashboardOverview() {
                 take: 6
             }).catch(() => []),
             ((prisma as any).passeportLocatif?.count?.() || Promise.resolve(0)).catch(() => 0),
-            ((prisma as any).vaultCaution?.aggregate?.({ _sum: { amount: true }, where: { status: "CONSIGNEE" } }) || Promise.resolve(null)).catch(() => null),
+            ((prisma as any).vaultCaution?.aggregate?.({ _sum: { montant: true }, where: { status: "CONSIGNEE" } }) || Promise.resolve(null)).catch(() => null),
             ((prisma as any).championProfile?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).userDiasporaProfile?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).abonnementOperateur?.count?.() || Promise.resolve(0)).catch(() => 0),
@@ -264,7 +264,7 @@ export default async function AdminDashboardOverview() {
             totalLitiges: totalLitiges || 0,
             activePromos: activePromos || 0,
             totalPasseports: passeportRes || 0,
-            totalVaultAmount: Number(vaultRes?._sum?.amount || 0),
+            totalVaultAmount: Number(vaultRes?._sum?.montant || 0),
             totalChampions: championsRes || 0,
             totalDiaspora: diasporaRes || 0,
             totalAbonnements: abonnementsRes || 0,
