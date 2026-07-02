@@ -362,13 +362,13 @@ jobs:
             
             # We try to reload gracefully without deleting. If it fails, we fall back to start.
             if pm2 describe capril > /dev/null 2>&1; then
-                echo "­ƒöä PM2 capril exists. Reloading..."
-                PORT=3000 HOSTNAME=127.0.0.1 pm2 restart capril --update-env || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
+                echo "🔄 PM2 capril exists. Reloading..."
+                PORT=3000 HOSTNAME=127.0.0.1 pm2 restart capril --update-env || PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js -i max --name capril --cwd "$DEPLOY_DEST" --env production --update-env
             else
-                echo "ÔÜí PM2 capril not found. Starting fresh..."
+                echo "⚡ PM2 capril not found. Starting fresh..."
                 # Clean up the port just in case it's blocked natively before doing a fresh start
                 fuser -k -9 3000/tcp || true
-                PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js --name capril --cwd "$DEPLOY_DEST" --env production --update-env
+                PORT=3000 HOSTNAME=127.0.0.1 pm2 start server.js -i max --name capril --cwd "$DEPLOY_DEST" --env production --update-env
             fi
             
             pm2 save --force
