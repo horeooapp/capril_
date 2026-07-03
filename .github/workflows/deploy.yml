@@ -327,8 +327,8 @@ jobs:
             echo "­ƒöº Forcing PostgreSQL Enum coercions..."
             sudo -u postgres psql -d qapril -f scripts/fix-enums-pg.sql || echo "ÔÜá´©Å Non-fatal enum coercion error."
 
-            echo "­ƒôª Running Prisma Migrations..."
-            npx prisma@6.4.1 db push --accept-data-loss --skip-generate
+            echo "🚀 Running Prisma Migrations (Controlled Deploy)..."
+            npx prisma@6.4.1 migrate deploy || npx prisma@6.4.1 db push --skip-generate
             
             # ­ƒöÑ RESTART PM2 & SEED
             echo "­ƒî▒ Running Compiled Seed Logic..."

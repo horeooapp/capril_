@@ -5,14 +5,34 @@ import { redis } from "./redis";
  * Rate limiting, input sanitization, and security headers.
  */
 
+// Cache in-memory de secours (Fallback) pour le Rate Limiting en cas de panne Redis
+const memoryFallback = new Map<string, { count: number; expiresAt: number }>();
+
+function checkMemoryRateLimit(key: string, maxRequests: number, windowSec: number): boolean {
+    const now = Date.now();
+    const entry = memoryFallback.get(key);
+    if (!entry || now > entry.expiresAt) {
+        memoryFallback.set(key, { count: 1, expiresAt: now + windowSec * 1000 });
+        // Nettoyage automatique si la Map grandit trop
+        if (memoryFallback.size > 10000) {
+            for (const [k, v] of memoryFallback.entries()) {
+                if (now > v.expiresAt) memoryFallback.delete(k);
+            }
+        }
+        return 1 <= maxRequests;
+    }
+    entry.count++;
+    return entry.count <= maxRequests;
+}
+
 /**
- * Distributed rate limiter using Redis.
- * Ensures consistent protection across multiple server instances.
+ * Distributed rate limiter using Redis with an automatic In-Memory Fallback.
+ * Ensures consistent protection even if Redis is temporarily unavailable (no fail-open vulnerability).
  */
 export async function checkRateLimit(key: string, maxRequests = 10, windowSec = 60): Promise<boolean> {
     if (!redis) {
-        // Fallback simple si Redis indisponible
-        return true; 
+        // Fallback sécurisé in-memory au lieu d'échouer ouvertement (fail open)
+        return checkMemoryRateLimit(key, maxRequests, windowSec);
     }
 
     try {
@@ -25,8 +45,8 @@ export async function checkRateLimit(key: string, maxRequests = 10, windowSec = 
         
         return current <= maxRequests;
     } catch (e) {
-        console.error("[Security] Rate limit check failed:", e);
-        return true; // Fail open to avoid blocking users on Redis failure
+        console.warn("[Security] Redis Rate limit failed, switching to in-memory fallback:", e);
+        return checkMemoryRateLimit(key, maxRequests, windowSec);
     }
 }
 

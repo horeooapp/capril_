@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { calculerTagsDynamiques } from "../annonces/route";
+import { calculerTagsDynamiques } from "@/lib/portail/tags";
 
 export async function GET(req: NextRequest) {
   try {
