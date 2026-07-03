@@ -54,3 +54,6 @@ test-smtp.js
 
 # mobile apps
 **/node_modules/
+
+# CI/CD runner cache markers (runner-local, must not be committed)
+.prisma_schema_hash

@@ -36,6 +36,15 @@ jobs:
           sudo chown -R $USER:$USER ${{ github.workspace }} || true
           sudo chmod -R u+rwX ${{ github.workspace }} || true
 
+          # ── Kill zombie processes from previous runs ─────────────────────
+          # A hung npm install or prisma generate from a previous job would
+          # cause the current job to conflict and appear as "failed but running".
+          echo "☠️ Killing any lingering npm/prisma processes from previous runs..."
+          pkill -f "npm install" || true
+          pkill -f "prisma generate" || true
+          pkill -f "next build" || true
+          sleep 2
+
           # Clear only telemetry diagnostic pages (known v4 bug on self-hosted)
           [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
           [ -d "/home/github/new-runner/_diag/pages" ]     && sudo rm -f /home/github/new-runner/_diag/pages/*     || true
@@ -73,9 +82,26 @@ jobs:
           npm config set fetch-retries 2
           npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retry-maxtimeout 60000
-          # --prefer-offline: uses ~/.npm disk cache for all already-downloaded packages.
-          # node_modules persists across runs, so this step is ~30s instead of ~30min.
-          npm install --no-audit --no-fund --prefer-offline
+
+          # ── CRITICAL: --ignore-scripts bypasses `postinstall: prisma generate` ──
+          # prisma generate takes ~2 min and runs unconditionally on every npm install.
+          # We handle it ourselves below, only when schema.prisma actually changed.
+          # node_modules persists across runs, so only new/changed packages are installed.
+          npm install --no-audit --no-fund --prefer-offline --ignore-scripts
+
+          # ── Conditional prisma generate (only if schema changed) ──────────
+          SCHEMA_HASH_FILE=".prisma_schema_hash"
+          CURRENT_HASH=$(sha256sum prisma/schema.prisma | awk '{print $1}')
+          STORED_HASH=$(cat "$SCHEMA_HASH_FILE" 2>/dev/null || echo "")
+
+          if [ "$CURRENT_HASH" != "$STORED_HASH" ]; then
+            echo "🔄 schema.prisma changed — running prisma generate..."
+            npx prisma generate
+            echo "$CURRENT_HASH" > "$SCHEMA_HASH_FILE"
+            echo "✅ Prisma client regenerated."
+          else
+            echo "⚡ schema.prisma unchanged — skipping prisma generate (using cached client)."
+          fi
 
       - name: 🛡️ Client Guard (Verify Generated Client)
         run: |
