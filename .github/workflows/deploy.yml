@@ -175,20 +175,21 @@ jobs:
           DEPLOY_DEST="${{ vars.DEPLOY_PATH }}"
           if [ -z "$DEPLOY_DEST" ]; then DEPLOY_DEST="/home/github/capril_app"; fi
           sudo mkdir -p $DEPLOY_DEST
+          sudo chown -R $USER:$USER $DEPLOY_DEST || true
           
           echo "­ƒº╣ Nuking STALE artifacts on VPS (Pre-deployment)..."
           # We only delete the `.next` and specific files. We DO NOT stop PM2 here to avoid 503 downtime!
           sudo rm -rf $DEPLOY_DEST/.next $DEPLOY_DEST/node_modules $DEPLOY_DEST/package.json $DEPLOY_DEST/package-lock.json || true
           
-          # Sync everything from dist_package
+          # Sync everything from dist_package using sudo to prevent permission errors on root-owned or residual files
           echo "­ƒÜÇ Syncing 100% FRESH standalone build directly from local step..."
-          rsync -rlptz --stats --delete --no-owner --no-group --no-perms \
+          sudo rsync -rlptz --stats --delete --no-owner --no-group --no-perms \
             --exclude=".env*" \
             --exclude="public/uploads/" \
             dist_package/ $DEPLOY_DEST/
 
-          # Force restore ownership to github user
-          sudo chown -R github:github $DEPLOY_DEST || true
+          # Force restore ownership to runner user / github user
+          sudo chown -R $USER:$USER $DEPLOY_DEST || sudo chown -R github:github $DEPLOY_DEST || true
 
           # ­ƒº¬ FINAL INTEGRITY CHECK & ON-SITE EXORCISM
           echo "­ƒº¬ Final Pre-Restart Integrity Check & Sanitization..."
