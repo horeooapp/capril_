@@ -1,6 +1,13 @@
-# Trigger: 2026-03-30 02:35 UTC (Fix Server Incident + Robust Layout + BDQ Fallback Safety)
-# Trigger deploy with nuclear exorcism and Prisma fixes
-name: ­ƒÜÇ Deploy QAPRIL v3.0 to Hostinger
+# ============================================================
+# QAPRIL v3.0 — Deploy to Hostinger (Optimised ≤ 12 min)
+# ============================================================
+# SPEED STRATEGY (self-hosted runner):
+#   • node_modules PERSISTS across runs  → npm install ~30s (incremental)
+#   • .next/cache PERSISTS across runs   → Next.js rebuilds changed pages only
+#   • NO standalone `npx tsc --noEmit`   → next build runs full type-check itself
+#   • Only dist_package is wiped per run (regenerated every time anyway)
+# ============================================================
+name: 🚀 Deploy QAPRIL v3.0 to Hostinger
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -21,21 +28,21 @@ jobs:
     environment: production
 
     steps:
-      - name: ­ƒøí´©Å Repair & Clean Runner Workspace
+      - name: 🛠️ Repair Runner Workspace (Preserve Speed Caches)
         run: |
-          # Reclaim ownership of the entire work directory
-          # This fixes "Access Denied" errors during checkout or cleanup
-          echo "­ƒøí´©Å Reclaiming ownership of the workspace..."
-          sudo chown -R $USER:$USER /home/github/actions-runner/_work || true
-          sudo chmod -R 755 /home/github/actions-runner/_work || true
-          
-          # The artifact v4 telemetry bug on self-hosted runners requires aggressive clearing of diagnostic pages
-          echo "­ƒº╣ Clearing diagnostic telemetry..."
+          echo "🛠️ Reclaiming workspace ownership..."
+          # Reclaim ownership WITHOUT touching node_modules or .next/cache.
+          # Those are the persistent speed caches that make incremental builds fast.
+          sudo chown -R $USER:$USER ${{ github.workspace }} || true
+          sudo chmod -R u+rwX ${{ github.workspace }} || true
+
+          # Clear only telemetry diagnostic pages (known v4 bug on self-hosted)
           [ -d "/home/github/actions-runner/_diag/pages" ] && sudo rm -f /home/github/actions-runner/_diag/pages/* || true
-          
-          # Nuclear Cleanup to ensure zero contamination
-          echo "Ôÿó´©Å Nuking stale build artifacts..."
-          rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
+          [ -d "/home/github/new-runner/_diag/pages" ]     && sudo rm -f /home/github/new-runner/_diag/pages/*     || true
+
+          # ONLY wipe dist_package from the previous run (rebuilt every time anyway)
+          rm -rf dist_package || true
+          echo "✅ Workspace ready. node_modules and .next/cache preserved for incremental builds."
 
       - name: 🚚 Checkout repository
         uses: actions/checkout@v4
@@ -60,13 +67,14 @@ jobs:
           grep -q -E 'provider[[:space:]]*=[[:space:]]*"postgresql"' prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
           echo "✅ Schema is 100% PostgreSQL-native."
 
-      - name: 📦 Install dependencies (Fast Incremental)
+      - name: 📦 Install dependencies (Incremental — ~30s on cache hit)
         run: |
           npm config set registry https://registry.npmjs.org/
           npm config set fetch-retries 2
           npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retry-maxtimeout 60000
-          # Remplacement de 'npm ci' (qui supprime et recrée 50 000 fichiers) par 'npm install' incrémental
+          # --prefer-offline: uses ~/.npm disk cache for all already-downloaded packages.
+          # node_modules persists across runs, so this step is ~30s instead of ~30min.
           npm install --no-audit --no-fund --prefer-offline
 
       - name: 🛡️ Client Guard (Verify Generated Client)
@@ -75,11 +83,11 @@ jobs:
           grep -q -E 'provider[[:space:]]*=[[:space:]]*"postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
           echo "✅ Client is 100% PostgreSQL-native."
 
-      - name: ­ƒöì TypeScript type check
-        run: npx tsc --noEmit
-
-      - name: ­ƒÅù´©Å Build App (PostgreSQL Native)
+      - name: 🏗️ Build App (Next.js Standalone + Incremental Cache)
         run: |
+          # Ensure incremental cache directory exists for faster repeated builds
+          mkdir -p .next/cache
+
           # Robustly extract DATABASE_URL from secret
           RAW_URL='${{ secrets.DATABASE_URL }}'
           CLEAN_DB_URL=$(echo "$RAW_URL" | sed -n 's/.*DATABASE_URL=\(.*\)/\1/p')
