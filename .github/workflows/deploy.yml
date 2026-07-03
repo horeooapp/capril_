@@ -37,8 +37,8 @@ jobs:
           echo "Ôÿó´©Å Nuking stale build artifacts..."
           rm -rf node_modules .next public prisma scripts dist dist_package package.json package-lock.json || true
 
-      - name: ­ƒÜÜ Checkout repository
-        uses: actions/checkout@v6
+      - name: 🚚 Checkout repository
+        uses: actions/checkout@v4
 
       - name: ­ƒƒó Setup Node.js (Runner Env)
         uses: actions/setup-node@v4
@@ -57,7 +57,8 @@ jobs:
       - name: 🛡️ Prisma Guard (Pre-check Schema)
         run: |
           echo "🔍 Verifying Schema Content BEFORE Build..."
-          grep "provider = \"postgresql\"" prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
+          grep -q -E 'provider[[:space:]]*=[[:space:]]*"postgresql"' prisma/schema.prisma || (echo "❌ ERROR: Schema is NOT postgresql!" && exit 1)
+          echo "✅ Schema is 100% PostgreSQL-native."
 
       - name: 📦 Install dependencies (Fast Incremental)
         run: |
@@ -68,11 +69,11 @@ jobs:
           # Remplacement de 'npm ci' (qui supprime et recrée 50 000 fichiers) par 'npm install' incrémental
           npm install --no-audit --no-fund --prefer-offline
 
-      - name: ­ƒº¬ Client Guard (Verify Generated Client)
+      - name: 🛡️ Client Guard (Verify Generated Client)
         run: |
-          echo "­ƒöì Checking Generated Client..."
-          grep -q 'provider = "postgresql"' node_modules/.prisma/client/schema.prisma || (echo "ÔØî ERROR: SQLite contamination in client!" && exit 1)
-          echo "Ô£à Client is 100% PostgreSQL-native."
+          echo "🔍 Checking Generated Client..."
+          grep -q -E 'provider[[:space:]]*=[[:space:]]*"postgresql"' node_modules/.prisma/client/schema.prisma || (echo "❌ ERROR: SQLite contamination in client!" && exit 1)
+          echo "✅ Client is 100% PostgreSQL-native."
 
       - name: ­ƒöì TypeScript type check
         run: npx tsc --noEmit
@@ -322,7 +323,7 @@ jobs:
 
             # Verify the provider in the logs for the main schema
             echo "--- Server-side schema.prisma snippet ---"
-            grep -C 2 "provider =" prisma/schema.prisma || echo "Schema not found in ./prisma/"
+            grep -C 2 -E "provider[[:space:]]*=" prisma/schema.prisma || echo "Schema not found in ./prisma/"
 
             echo "­ƒöº Forcing PostgreSQL Enum coercions..."
             sudo -u postgres psql -d qapril -f scripts/fix-enums-pg.sql || echo "ÔÜá´©Å Non-fatal enum coercion error."

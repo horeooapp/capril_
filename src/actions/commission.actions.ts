@@ -16,7 +16,7 @@ export async function processCommissionAndWallet(
     canal: PaymentCanal
 ) {
     // 1. Taux par défaut de 1% si aucune configuration trouvée
-    let taux = 1.0; 
+    const taux = 1.0; 
 
     // On pourrait chercher un config spécifique au propriétaire, mais on applique 1% en Quick Win.
     const commissionFcfa = Math.round((amountTtc * taux) / 100);
