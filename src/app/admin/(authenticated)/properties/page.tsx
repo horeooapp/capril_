@@ -70,7 +70,6 @@ export default async function AdminPropertiesPage() {
                                         <div className="tenant-cell">
                                             <div className="overflow-hidden rounded-lg flex-shrink-0 flex items-center justify-center border border-slate-200" style={{ width: '64px', height: '64px', backgroundColor: 'var(--ci-nuit2)', color: 'var(--text-main)' }}>
                                                 {prop.images && prop.images.length > 0 ? (
-                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img src={prop.images[0].s3Key} alt="" className="w-full h-full object-cover" />
                                                 ) : prop.propertyType === 'RESIDENCE' || prop.propertyType === 'IMMEUBLE' ? (
                                                     <Building2 size={24} />

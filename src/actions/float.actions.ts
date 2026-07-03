@@ -103,7 +103,7 @@ export async function releaseDeposit(
             let poolId = "";
             let daysConsigned = 0;
             let yieldGenerated = 0;
-            let dateSortie = new Date();
+            const dateSortie = new Date();
 
             if (depositType === "CDC_DEPOSIT") {
                 const dep = await tx.cDCDeposit.findUnique({ where: { id: depositId } });

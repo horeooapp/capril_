@@ -11,7 +11,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
         const session = await prisma.waSession.findUnique({ where: { id: params.id } });
         if (!session) return NextResponse.json({ error: "Session not found" }, { status: 404 });
         
-        let champs = JSON.parse((session.champs as string) || "{}");
+        const champs = JSON.parse((session.champs as string) || "{}");
         
         if (!champs[champ]) {
             return NextResponse.json({ error: "Champ inconnu" }, { status: 400 });

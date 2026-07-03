@@ -30,10 +30,10 @@ export async function calculateTenantScore(tenantId: string) {
             // 2. Lease History Factor (Mock logic)
             // In a real scenario, we'd check `Receipt` or `LeaseArrear` or `Dispute`
             let nbLoyersPayes = 0;
-            let nbRetards = 0;
-            let nbImpayes = 0;
-            let nbMediation = 0;
-            let nbContestations = 0;
+            const nbRetards = 0;
+            const nbImpayes = 0;
+            const nbMediation = 0;
+            const nbContestations = 0;
 
             const leases = tenant.leasesAsTenant;
             if (leases.length > 0) {

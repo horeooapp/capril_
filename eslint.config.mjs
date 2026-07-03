@@ -38,6 +38,8 @@ const eslintConfig = defineConfig([
     "test-*.ts",
     "check-*.ts",
     "server.js",
+    "prisma/*.js",
+    "prisma/*.mjs",
     "*.py",
     "*.docx",
   ]),

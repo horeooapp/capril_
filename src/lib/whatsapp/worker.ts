@@ -127,7 +127,7 @@ export async function processWhatsAppMessage(message: any, phoneNumber: string) 
                     return;
                 }
 
-                let champs = JSON.parse((session.champs as string) || "{}");
+                const champs = JSON.parse((session.champs as string) || "{}");
                 
                 if (textBody === "oui" || textBody === "ok") {
                     if (champs[champ]) champs[champ].statut = "CONFIRME";
