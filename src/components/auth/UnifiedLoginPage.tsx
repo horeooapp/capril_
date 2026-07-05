@@ -124,11 +124,11 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-2 rounded-2xl text-xs md:text-sm font-black transition-all duration-300 relative border ${isActive ? tab.activeBg : tab.inactiveBg}`}
+                                    className={`flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-1 md:px-2 rounded-2xl text-[10px] md:text-sm font-black transition-all duration-300 relative border ${isActive ? tab.activeBg : tab.inactiveBg} ${tab.id === 'admin' ? 'hidden md:flex' : ''}`}
                                     style={{ minHeight: '48px' }}
                                     aria-label={`Connexion profil ${tab.label}`}
                                 >
-                                    <tab.icon className={`w-4 h-4 ${isActive ? '' : tab.textColor}`} />
+                                    <tab.icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${isActive ? '' : tab.textColor}`} />
                                     <span className="tracking-wide">{tab.label}</span>
                                 </button>
                             )

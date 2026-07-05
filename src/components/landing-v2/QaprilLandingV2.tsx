@@ -158,14 +158,19 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
             <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', width: '100%', alignItems: 'center' }}>
-              <Link 
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="nav-cta"
-                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', textDecoration: 'none' }}
+              <button
+                  onClick={() => { handleLoginClick("LOCATAIRE"); setMobileMenuOpen(false); }}
+                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', fontFamily: 'var(--f-body)', fontWeight: 600, border: '2px solid var(--mango)', borderRadius: '50px', background: 'transparent', color: 'var(--ink)', cursor: 'pointer' }}
               >
-                  Connexion
-              </Link>
+                  Connexion Locataire
+              </button>
+              <button
+                  onClick={() => { handleLoginClick("BAILLEUR"); setMobileMenuOpen(false); }}
+                  className="nav-cta"
+                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', cursor: 'pointer', border: 'none' }}
+              >
+                  Connexion Propriétaire
+              </button>
             </div>
           )}
         </div>
