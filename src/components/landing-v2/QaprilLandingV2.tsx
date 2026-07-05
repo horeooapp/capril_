@@ -162,7 +162,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
                   onClick={() => { handleLoginClick("LOCATAIRE"); setMobileMenuOpen(false); }}
                   style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', fontFamily: 'var(--f-body)', fontWeight: 600, border: '2px solid var(--mango)', borderRadius: '50px', background: 'transparent', color: 'var(--ink)', cursor: 'pointer' }}
               >
-                  Connexion Locataire
+                  Connexion
               </button>
               <button
                   onClick={() => { handleLoginClick("BAILLEUR"); setMobileMenuOpen(false); }}
