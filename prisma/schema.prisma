@@ -53,6 +53,17 @@ model User {
   freemiumSince               DateTime?                @map("freemium_since")
   isFreemiumOverride          Boolean                  @default(false) @map("is_freemium_override")
   consentDataScoringAt        DateTime?                @map("consent_data_scoring_at")
+  /// Privacy by Design — consentement au partage de données tiers
+  dataSharingConsent          Boolean                  @default(false) @map("data_sharing_consent")
+  /// Privacy by Design — opt-in marketing (jamais activé par défaut)
+  marketingConsent            Boolean                  @default(false) @map("marketing_consent")
+  /// Privacy by Design — visibilité du profil : PRIVATE | INTERNAL | PUBLIC
+  profileVisibility           String                   @default("PRIVATE") @map("profile_visibility")
+  /// Privacy by Design — date d'anonymisation (droit à l'oubli exercé)
+  anonymizedAt                DateTime?                @map("anonymized_at")
+  /// Privacy by Design — demandes d'exercice des droits RGPD
+  privacyRequests             PrivacyRequest[]
+  privacyEventLogs            PrivacyEventLog[]
   abonnementsOperateurs       AbonnementOperateur[]
   agenceApiAccess             AgenceApiAccess?
   agenceProfile               AgenceProfile?           @relation("AgenceProfileUser")
@@ -2916,13 +2927,31 @@ model RevenueSnapshot {
 }
 
 model UserConsent {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  /// ANALYTICS | MARKETING | DATA_SHARING | SCORING | COOKIES | PROFILING
   typeConsentement String
+  /// Version de la politique de confidentialité en vigueur au moment du consentement
+  version          String    @default("1.0")
+  granted          Boolean   @default(false)
+  grantedAt        DateTime? @map("granted_at")
+  revokedAt        DateTime? @map("revoked_at")
+  /// Date d'expiration — le consentement doit être renouvelé au-delà
+  expiresAt        DateTime? @map("expires_at")
+  ipAddress        String?   @map("ip_address")
+  userAgent        String?   @map("user_agent")
+  /// WEB | MOBILE | API | PAPER
+  source           String?   @default("WEB")
+  /// CONSENT | CONTRACT | LEGAL_OBLIGATION | LEGITIMATE_INTEREST | VITAL_INTEREST
+  legalBasis       String?   @map("legal_basis") @default("CONSENT")
   donnees          Json?
-  createdAt        DateTime @default(now())
-  user             User     @relation(fields: [userId], references: [id])
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  user             User      @relation(fields: [userId], references: [id])
 
+  @@index([userId])
+  @@index([typeConsentement])
+  @@index([granted])
   @@map("user_consents")
 }
 
@@ -3521,3 +3550,102 @@ enum VaultStatus {
   TERMINE
   RESTITUEE
 }
+
+// =============================================================================
+// PRIVACY BY DESIGN — Modèles de conformité RGPD / Loi ivoirienne 2013-450
+// =============================================================================
+
+/// Registre des Activités de Traitement (Article 30 RGPD)
+/// À renseigner pour chaque traitement de données personnelles
+model DataProcessingActivity {
+  id                   String    @id @default(uuid()) @map("activity_id")
+  /// Ex: "Scoring de fiabilité locataire", "Envoi d'emails marketing"
+  name                 String
+  /// Ex: "Évaluation du risque locatif pour les agences partenaires"
+  purpose              String
+  /// CONSENT | CONTRACT | LEGAL_OBLIGATION | LEGITIMATE_INTEREST | VITAL_INTEREST | PUBLIC_TASK
+  legalBasis           String    @map("legal_basis")
+  /// Ex: ["IDENTITY", "FINANCIAL", "BEHAVIORAL", "LOCATION"]
+  dataCategories       String[]  @map("data_categories")
+  /// Qui a accès aux données : ["AGENCE", "PARTENAIRE_ASSURANCE", "FISC"]
+  recipients           String[]
+  /// Ex: "3 ans après la fin du bail"
+  retentionPeriod      String    @map("retention_period")
+  isActive             Boolean   @default(true) @map("is_active")
+  /// Date de dernière revue par le DPO
+  dpoReviewedAt        DateTime? @map("dpo_reviewed_at")
+  /// LOW | MEDIUM | HIGH | CRITICAL
+  riskLevel            String    @default("LOW") @map("risk_level")
+  /// Une analyse d'impact (DPIA) est-elle requise ?
+  dpiaRequired         Boolean   @default(false) @map("dpia_required")
+  dpiaCompletedAt      DateTime? @map("dpia_completed_at")
+  /// Transfert hors UE/Afrique UEMOA ?
+  crossBorderTransfer  Boolean   @default(false) @map("cross_border_transfer")
+  crossBorderCountries String[]  @map("cross_border_countries")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@index([legalBasis])
+  @@index([riskLevel])
+  @@index([isActive])
+  @@map("data_processing_activities")
+}
+
+/// Demandes d'exercice des droits (RGPD Art. 15-22 / Loi ivoirienne Art. 22-28)
+/// L'utilisateur peut soumettre une demande via le Centre de Confidentialité
+model PrivacyRequest {
+  id              String    @id @default(uuid()) @map("request_id")
+  userId          String    @map("user_id")
+  /// ACCESS | RECTIFICATION | ERASURE | PORTABILITY | OBJECTION | RESTRICTION | WITHDRAWAL
+  type            String
+  /// PENDING | IN_PROGRESS | COMPLETED | REJECTED | PARTIALLY_COMPLETED
+  status          String    @default("PENDING")
+  description     String?
+  /// Notes internes du DPO/Admin (non visibles par l'utilisateur)
+  adminNotes      String?   @map("admin_notes")
+  /// Raison de rejet (visible par l'utilisateur si status = REJECTED)
+  rejectionReason String?   @map("rejection_reason")
+  requestedAt     DateTime  @default(now()) @map("requested_at")
+  /// Délai légal : 30 jours selon RGPD, 15 jours selon loi ivoirienne
+  dueAt           DateTime  @map("due_at")
+  completedAt     DateTime? @map("completed_at")
+  /// Lien signé vers l'export de données (pour demandes de portabilité)
+  exportUrl       String?   @map("export_url")
+  exportExpiresAt DateTime? @map("export_expires_at")
+  /// Adresse IP de la demande (traçabilité)
+  ipAddress       String?   @map("ip_address")
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([dueAt])
+  @@map("privacy_requests")
+}
+
+/// Log dédié aux événements de vie privée (distinct des audit logs métier)
+/// Traçabilité des événements privacy : consentements, accès aux données, violations
+model PrivacyEventLog {
+  id        String   @id @default(uuid()) @map("log_id")
+  userId    String?  @map("user_id")
+  /// CONSENT_GRANTED | CONSENT_REVOKED | DATA_ACCESSED | DATA_EXPORTED
+  /// DATA_DELETED | DATA_ANONYMIZED | BREACH_DETECTED | SUSPICIOUS_ACCESS
+  /// RIGHT_EXERCISED | POLICY_UPDATED | RETENTION_PURGE
+  eventType String   @map("event_type")
+  /// INFO | WARNING | CRITICAL
+  severity  String   @default("INFO")
+  /// Ressource concernée (ex: "users.phone", "identity_documents")
+  resource  String?
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("privacy_event_logs")
+}
+

@@ -4,7 +4,9 @@ import { chainAuditHash } from "./proof";
 
 export type AuditModule =
     | 'AUTH' | 'KYC' | 'LEASE' | 'PAYMENT' | 'RECEIPT'
-    | 'CDC' | 'DISPUTE' | 'CERTIFICATE' | 'MANDATE' | 'ADMIN' | 'SYSTEM' | 'M17_FISCAL' | 'M16_ANAH';
+    | 'CDC' | 'DISPUTE' | 'CERTIFICATE' | 'MANDATE' | 'ADMIN' | 'SYSTEM' | 'M17_FISCAL' | 'M16_ANAH'
+    // Privacy by Design — module dédié aux opérations sur données personnelles
+    | 'PRIVACY' | 'CONSENT' | 'DATA_RETENTION' | 'ANONYMIZATION';
 
 export type AuditActionInput = {
     userId?: string;
@@ -44,14 +46,40 @@ export async function writeAuditLog(input: AuditActionInput): Promise<void> {
             details: input.newValues
         });
 
+/**
+ * Privacy by Design — Champs PII à masquer dans les audit logs.
+ * Ces valeurs ne doivent jamais apparaître en clair dans les logs.
+ */
+const PII_FIELDS_TO_MASK = [
+    'password', 'phone', 'email', 'docNumber', 'mrzRawData',
+    'bankAccount', 'taxId', 'companyRegNumber', 'otp', 'token',
+    'refreshToken', 'accessToken', 'pushToken', 'salary',
+];
+
+/**
+ * Masque les valeurs PII sensibles dans les données auditées.
+ * Remplace les valeurs par '***MASKED***' pour protéger les données personnelles.
+ */
+function maskPiiFields(data?: Record<string, any>): Record<string, any> | undefined {
+    if (!data) return data;
+    const masked = { ...data };
+    for (const field of PII_FIELDS_TO_MASK) {
+        if (field in masked && masked[field] !== null && masked[field] !== undefined) {
+            masked[field] = '***MASKED***';
+        }
+    }
+    return masked;
+}
+
         await prisma.auditLog.create({
             data: {
                 userId: userId ?? null,
                 action: input.action,
                 module: input.module,
                 entityId: input.entityId ?? null,
-                oldValues: input.oldValues ?? undefined,
-                newValues: input.newValues ?? undefined,
+                // Privacy by Design : masquer les PII dans les logs d'audit
+                oldValues: maskPiiFields(input.oldValues) ?? undefined,
+                newValues: maskPiiFields(input.newValues) ?? undefined,
                 ipAddress,
                 userAgent: userAgent.substring(0, 255),
                 proofHash

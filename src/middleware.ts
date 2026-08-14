@@ -51,7 +51,30 @@ export default auth(async (req) => {
         }
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+
+    // Privacy by Design — Principe 5 : Headers de sécurité et de confidentialité
+    // Limitation des API navigateur accessibles (caméra, micro, géolocalisation)
+    response.headers.set(
+        'Permissions-Policy',
+        'camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), serial=()'
+    );
+    // Prévention de la fuite d'informations via le header Referer
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // Prévention du MIME-sniffing
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    // Prévention du clickjacking
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    // HSTS : forçage HTTPS (1 an)
+    response.headers.set(
+        'Strict-Transport-Security',
+        'max-age=31536000; includeSubDomains; preload'
+    );
+    // Suppression des informations de version du serveur
+    response.headers.delete('X-Powered-By');
+    response.headers.delete('Server');
+
+    return response;
 })
 
 export const config = {
