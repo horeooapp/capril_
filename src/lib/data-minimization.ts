@@ -175,9 +175,12 @@ export function getUserSelectForRole(
   switch (role) {
     case "SUPER_ADMIN":
       return USER_SELECT_ADMIN as unknown as PrismaUserSelect;
-    case "MANAGER":
+    case "ADMIN":
       return USER_SELECT_MANAGER as unknown as PrismaUserSelect;
-    case "AGENT":
+    case "AGENCY":
+    case "ANAH_AGENT":
+    case "CDC_AGENT":
+    case "NON_CERTIFIED_AGENT":
     case "TENANT":
       return USER_SELECT_AGENT as unknown as PrismaUserSelect;
     case "PUBLIC":
