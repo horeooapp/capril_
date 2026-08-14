@@ -107,7 +107,7 @@ export default function RestrictedPortal() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8B00] to-yellow-400 font-serif italic font-medium pr-2">
                 immobilière
               </span>
-              ivoirienne
+              {" "}ivoirienne
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}

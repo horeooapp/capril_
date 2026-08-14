@@ -7,7 +7,7 @@
  * et alignée sur la réalité technique de la base de données.
  */
 
-import { generateDataInventorySummary, DATA_FIELD_REGISTRY, RETENTION_POLICIES } from "./data-classification";
+import { generateDataInventorySummary, DATA_FIELD_REGISTRY } from "./data-classification";
 // Note: RETENTION_POLICIES provient en fait de data-retention.ts dans la réalité, on ajuste l'import
 import { RETENTION_POLICIES as RetentionConfig } from "./data-retention";
 
