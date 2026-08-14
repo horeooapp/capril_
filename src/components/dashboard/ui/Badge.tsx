@@ -10,20 +10,20 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ children, color = 'gray', className = '' }) => {
   const map = {
-    green: "bg-emerald-100 text-emerald-800",
-    red: "bg-rose-100 text-rose-800",
-    amber: "bg-amber-100 text-amber-800",
-    blue: "bg-sky-100 text-sky-800",
-    sky: "bg-sky-100 text-sky-800",
-    violet: "bg-violet-100 text-violet-800",
-    gray: "bg-slate-100 text-slate-700",
-    rose: "bg-rose-100 text-rose-800",
-    purple: "bg-purple-100 text-purple-800",
-    emerald: "bg-emerald-100 text-emerald-800",
+    green: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+    red: "bg-rose-50 text-rose-700 border-rose-200/50",
+    amber: "bg-amber-50 text-amber-700 border-amber-200/50",
+    blue: "bg-sky-50 text-sky-700 border-sky-200/50",
+    sky: "bg-sky-50 text-sky-700 border-sky-200/50",
+    violet: "bg-violet-50 text-violet-700 border-violet-200/50",
+    gray: "bg-slate-50 text-slate-700 border-slate-200/50",
+    rose: "bg-rose-50 text-rose-700 border-rose-200/50",
+    purple: "bg-purple-50 text-purple-700 border-purple-200/50",
+    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
   };
   
   return (
-    <span className={`inline-block px-2 py-0.5 rounded-[6px] text-[10.5px] font-bold uppercase tracking-widest ${map[color]} ${className}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-[11px] font-medium ${map[color]} ${className}`}>
       {children}
     </span>
   );

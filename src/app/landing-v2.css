@@ -17,15 +17,15 @@
   --coral-l:  #FFE8E8;
   --teal:     #00C896;
   --teal-l:   #CCFAEE;
-  --ink:      #0F1117;
-  --ink2:     #2A2D3A;
-  --ink3:     #5C6075;
-  --ink4:     #9CA3B4;
+  --ink:      #09090B;
+  --ink2:     #18181B;
+  --ink3:     #52525B;
+  --ink4:     #A1A1AA;
   --white:    #FFFFFF;
-  --cream:    #FFFBF5;
-  --cream2:   #FFF5E8;
-  --f-display:'Bodoni Moda', 'Libre Bodoni', Bodoni, serif;
-  --f-body:   'Bodoni Moda', 'Libre Bodoni', Bodoni, serif;
+  --cream:    #FAFAFA;
+  --cream2:   #F4F4F5;
+  --f-display:system-ui, -apple-system, sans-serif;
+  --f-body:   system-ui, -apple-system, sans-serif;
   
   font-family: var(--f-body);
   background: var(--cream);
@@ -398,12 +398,12 @@
   background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
 }
 .landing-v2-wrapper .feature-card:hover::before { opacity: 1; }
-.landing-v2-wrapper .fc-mango { background: linear-gradient(135deg, #FFF3E0, #FFE0B2); }
-.landing-v2-wrapper .fc-sky { background: linear-gradient(135deg, #E0F7FA, #B2EBF2); }
-.landing-v2-wrapper .fc-lime { background: linear-gradient(135deg, #F1F8E9, #DCEDC8); }
-.landing-v2-wrapper .fc-fuchsia { background: linear-gradient(135deg, #FCE4EC, #F8BBD0); }
-.landing-v2-wrapper .fc-teal { background: linear-gradient(135deg, #E0F2F1, #B2DFDB); }
-.landing-v2-wrapper .fc-coral { background: linear-gradient(135deg, #FFF8E1, #FFECB3); }
+.landing-v2-wrapper .fc-mango { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+.landing-v2-wrapper .fc-sky { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+.landing-v2-wrapper .fc-lime { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+.landing-v2-wrapper .fc-fuchsia { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+.landing-v2-wrapper .fc-teal { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+.landing-v2-wrapper .fc-coral { background: #FFFFFF; border: 1px solid #E4E4E7; box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
 .landing-v2-wrapper .fc-icon {
   width: 54px; height: 54px; border-radius: 16px;
   display: grid; place-items: center; font-size: 24px;
@@ -425,7 +425,7 @@
 }
 .landing-v2-wrapper .fc-visual {
   border-radius: 16px; padding: 20px;
-  background: rgba(255,255,255,.5); backdrop-filter: blur(10px);
+  background: var(--cream2); border: 1px solid #E4E4E7;
 }
 
 /* ── HOW IT WORKS ── */
@@ -628,12 +628,12 @@
 
 /* ── CTA BAND ── */
 .landing-v2-wrapper .cta-band {
-  background: linear-gradient(135deg, var(--mango) 0%, var(--coral) 50%, var(--fuchsia) 100%);
+  background: var(--ink);
   padding: 90px 5%; text-align: center; position: relative; overflow: hidden;
 }
 .landing-v2-wrapper .cta-band::before {
   content: ''; position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,.12) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 .landing-v2-wrapper .cta-inner { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }

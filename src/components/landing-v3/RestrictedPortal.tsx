@@ -13,50 +13,10 @@ export default function RestrictedPortal() {
 
 
   return (
-    <div className="min-h-screen bg-[#060D1A] flex flex-col relative overflow-hidden font-bodoni selection:bg-mango/30 selection:text-white">
-      {/* Dynamic Background Elements */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Glow Emerald */}
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.25, 0.15],
-            x: [0, 40, 0],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px]"
-        />
-        {/* Glow Mango */}
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.1, 0.2, 0.1],
-            x: [0, -40, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
-          className="absolute top-1/3 -left-32 w-[500px] h-[500px] bg-[#FF8B00]/20 rounded-full blur-[100px]"
-        />
-        {/* Glow Blue */}
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.1, 0.15, 0.1],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 4,
-          }}
-          className="absolute -bottom-40 left-1/4 w-[700px] h-[400px] bg-blue-600/20 rounded-full blur-[120px]"
-        />
-      </div>
+    <div className="min-h-screen bg-[#09090B] flex flex-col relative overflow-hidden font-sans antialiased tracking-tight selection:bg-white/20 selection:text-white">
+      {/* Subtle Noise / Grid Element instead of heavy glowing orbs */}
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_50%)] pointer-events-none"></div>
 
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
@@ -100,14 +60,13 @@ export default function RestrictedPortal() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.1]"
-              style={{ fontFamily: '"Bodoni Moda", "Libre Bodoni", Bodoni, serif' }}
+              className="text-4xl sm:text-5xl md:text-6xl font-[1000] text-white tracking-tighter leading-[1.1]"
             >
-              L'excellence<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8B00] to-yellow-400 font-serif italic font-medium pr-2">
+              L'excellence
+              <span className="text-slate-400 font-medium pl-3">
                 immobilière
               </span>
-              {" "}ivoirienne
+              <br/>ivoirienne
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}

@@ -109,29 +109,19 @@ export function OwnerPortalDashboardV2({
         />
       </div>
 
-      {/* QUICK ACTIONS */}
-      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-3">
-          {[
-              { label: "Nouveau Bien", icon: <Building2 size={16} />, href: "/dashboard/properties/new" },
-              { label: "Générer Bail", icon: <ClipboardList size={16} />, href: "/dashboard/leases/new" },
-              { label: "Quittances", icon: <Receipt size={16} />, href: "/dashboard/receipts" },
-              { label: "États des lieux", icon: <MapPin size={16} />, href: "/dashboard/inspections" },
-              { label: "Procédures", icon: <Scale size={16} />, href: "/dashboard/disputes" },
-              { label: "Mandats", icon: <FileSignature size={16} />, href: "/dashboard/mandates" },
-              { label: "Dossiers Locs.", icon: <Users size={16} />, href: "/dashboard/matching" },
-              { label: "CRG & Flux", icon: <BarChart3 size={16} />, href: "/dashboard/reports" },
-              { label: "Portefeuille", icon: <Wallet size={16} />, href: "/dashboard/wallet" },
-          ].map((action, i) => (
-              <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-200 rounded-[10px] hover:border-emerald-500 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all">
-                  {action.icon}
-                  <span className="text-[11px] font-semibold tracking-wide text-center">{action.label}</span>
-              </Link>
-          ))}
-      </div>
+
 
       {/* BIFURCATION ETATS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SectionCard title="Biens & État Locatif">
+        <SectionCard 
+          title="Biens & État Locatif" 
+          action={
+            <div className="flex gap-4">
+              <Link href="/dashboard/leases/new" className="text-slate-500 hover:text-slate-900 transition-colors">Bail</Link>
+              <Link href="/dashboard/properties/new" className="text-emerald-600 hover:text-emerald-700 transition-colors">Nouveau Bien</Link>
+            </div>
+          }
+        >
           <div className="overflow-x-auto -mx-1 px-1">
             <div className="min-w-[300px]">
               {entities.flatMap((e: any) => e.unites).slice(0, 5).map((u: any, i: number) => (
@@ -150,7 +140,10 @@ export function OwnerPortalDashboardV2({
           </div>
         </SectionCard>
 
-        <SectionCard title="Derniers flux vérifiés (Quittances)">
+        <SectionCard 
+          title="Derniers flux vérifiés (Quittances)"
+          action={<Link href="/dashboard/receipts" className="text-slate-500 hover:text-slate-900 transition-colors">Voir tout</Link>}
+        >
           <div className="overflow-x-auto -mx-1 px-1">
             <div className="min-w-[300px]">
               {recentPayments.length === 0 ? (
@@ -233,7 +226,7 @@ export function OwnerPortalDashboardV2({
          ) : activeAlerts.map((a: any, i: number) => (
            <div key={i} className="flex justify-between items-center p-2 mb-2 bg-slate-50 rounded-[7px] text-[12.5px]">
              <span className="text-slate-700 font-medium">{a.icon} {a.text}</span>
-             <button className="px-3 py-1 bg-white border border-slate-200 rounded-[5px] text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-200 transition-colors">
+             <button className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-medium text-slate-700 hover:text-sky-600 hover:border-sky-200 hover:bg-sky-50 transition-colors">
                {a.btn}
              </button>
            </div>

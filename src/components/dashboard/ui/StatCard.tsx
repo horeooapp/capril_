@@ -9,11 +9,11 @@ interface StatCardProps {
 
 export const StatCard: React.FC<StatCardProps> = ({ label, value, sub, trend }) => {
   return (
-    <div className="bg-white rounded-[10px] p-[14px_16px] border border-slate-200">
-      <div className="text-[11px] text-slate-500 font-medium mb-1">{label}</div>
-      <div className="text-[22px] font-bold text-slate-800 leading-[1.1]">{value}</div>
+    <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="text-xs text-slate-500 font-medium mb-1.5">{label}</div>
+      <div className="text-2xl font-semibold text-slate-900 tracking-tight leading-none">{value}</div>
       {sub && (
-        <div className={`text-[11px] mt-1 ${trend === "up" ? "text-emerald-600" : trend === "down" ? "text-rose-600" : "text-slate-400"}`}>
+        <div className={`text-xs mt-2 font-medium ${trend === "up" ? "text-emerald-600" : trend === "down" ? "text-rose-600" : "text-slate-400"}`}>
           {trend === "up" ? "↑ " : trend === "down" ? "↓ " : ""}{sub}
         </div>
       )}

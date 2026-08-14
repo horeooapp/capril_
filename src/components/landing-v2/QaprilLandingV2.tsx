@@ -106,7 +106,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
   const dashUrl = isAdmin ? "/admin" : (session?.user?.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard");
 
   return (
-    <div className="landing-v2-wrapper font-bodoni text-ink bg-cream pb-0">
+    <div className="landing-v2-wrapper font-sans antialiased tracking-tight text-ink bg-cream pb-0">
       <div className="custom-cursor" ref={cursorRef}></div>
       <div className="custom-cursor-ring" ref={ringRef}></div>
       <div className="noise-overlay"></div>
@@ -176,9 +176,6 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap');
-      `}} />
 
       {/* ═══ HERO ═══ */}
       <section className="hero" id="hero">
@@ -509,7 +506,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               </div>
             </div>
             <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,var(--teal),var(--sky))', padding: '20px', textAlign: 'center' }}>
+              <div style={{ background: 'var(--ink2)', padding: '20px', textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--f-display)', fontSize: '18px', fontWeight: 800, color: 'white', marginBottom: '4px' }}>Score ICL</div>
                 <div style={{ fontSize: '52px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'white' }}>72</div>
                 <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 16px', display: 'inline-block', color: 'white', fontSize: '13px', fontWeight: 600 }}>Grade B · Bon locataire</div>
@@ -543,7 +540,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               </div>
             </div>
             <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,var(--mango),var(--coral))', padding: '20px' }}>
+              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
                 <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Revenus avril 2025</div>
                 <div style={{ fontFamily: 'var(--f-display)', fontSize: '36px', fontWeight: 800, color: 'white' }}>245 000 <span style={{ fontSize: '16px' }}>FCFA</span></div>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
@@ -573,7 +570,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               </div>
             </div>
             <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,var(--teal),#009B7E)', padding: '20px' }}>
+              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
                 <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Portefeuille · Prestige Immo</div>
                 <div style={{ fontFamily: 'var(--f-display)', fontSize: '36px', fontWeight: 800, color: 'white' }}>28 biens</div>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
@@ -605,7 +602,7 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
               </div>
             </div>
             <div className="user-visual">
-              <div style={{ background: 'linear-gradient(135deg,var(--sky),var(--teal))', padding: '20px' }}>
+              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
                 <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Statut Diaspora VIP</div>
                 <div style={{ fontFamily: 'var(--f-display)', fontSize: '28px', fontWeight: 800, color: 'white' }}>Connecté · Paris, FR</div>
                 <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px', marginTop: '10px', display: 'inline-block' }}>Gestionnaire : Kouassi N.</div>
