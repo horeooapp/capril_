@@ -115,7 +115,7 @@ export default function RestrictedPortal() {
               transition={{ delay: 0.5 }}
               className="text-lg sm:text-xl text-slate-400 font-medium leading-relaxed"
             >
-              Le site public est actuellement en accès restreint. Veuillez utiliser vos identifiants pour accéder à vos portefeuilles de gestion et d'investissement.
+              Le site public est actuellement en accès restreint. Veuillez utiliser vos identifiants pour accéder à votre compte.
             </motion.p>
           </div>
 
