@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -13,9 +13,17 @@ import {
 export default function QaprilLandingV2({ session, paywallActif = true }: { session: any; paywallActif?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0);
 
   const isAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN";
   const dashUrl = isAdmin ? "/admin" : session?.user?.role === "TENANT" ? "/mon-espace-locataire" : "/dashboard";
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex(prev => (prev + 1) % 5);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -224,14 +232,36 @@ export default function QaprilLandingV2({ session, paywallActif = true }: { sess
           HERO
       ═══════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 overflow-hidden">
+        
+        {/* BG Slider */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {[0, 1, 2, 3, 4].map((index) => (
+            <img
+              key={index}
+              src={`/slider/bg_slider_${index + 1}.png`}
+              alt={`QAPRIL Slider ${index + 1}`}
+              className="transition-all duration-[2000ms] ease-in-out"
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: bgIndex === index ? 0.35 : 0,
+                transform: bgIndex === index ? 'scale(1)' : 'scale(1.05)'
+              }}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#09090B]/60 via-[#09090B]/30 to-[#09090B]"></div>
+        </div>
+
         {/* Isometric Grid */}
-        <div className="qv3-grid-bg absolute inset-0 pointer-events-none" />
+        <div className="qv3-grid-bg absolute inset-0 pointer-events-none opacity-50 mix-blend-overlay" />
 
         {/* Radial glow center */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-amber-500/8 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/6 rounded-full blur-[100px]" />
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-500/6 rounded-full blur-[100px]" />
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-amber-500/15 rounded-full blur-[140px]" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px]" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-500/10 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto">
