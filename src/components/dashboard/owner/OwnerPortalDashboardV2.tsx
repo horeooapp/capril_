@@ -165,11 +165,19 @@ export function OwnerPortalDashboardV2({
         </SectionCard>
       </div>
 
-      {/* MARKETPLACE PUBLISHING MANAGEMENT */}
       <SectionCard title="Gestion de la Marketplace (Mise en location)">
         <div className="px-4 pt-1 text-xs font-semibold text-slate-500">Publiez ou retirez vos biens du store locatif public en un clic</div>
-        <div className="overflow-x-auto mt-2">
-          <table className="w-full text-left border-collapse min-w-[600px]">
+        <div className="overflow-x-auto mt-2 relative">
+          {/* Skeleton Overlay */}
+          {isPending && (
+            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-xs font-medium text-slate-600">Mise à jour...</span>
+              </div>
+            </div>
+          )}
+          <table className={`w-full text-left border-collapse min-w-[600px] transition-opacity ${isPending ? 'opacity-40' : ''}`}>
             <thead>
               <tr className="border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50/50">
                 <th className="p-3.5">Bien Immobilier</th>

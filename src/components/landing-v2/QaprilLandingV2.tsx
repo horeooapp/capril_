@@ -1,904 +1,618 @@
-"use client";
+﻿"use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import {
+  Building2, Home, ShieldCheck, ArrowRight, Zap, FileText,
+  CreditCard, Users, TrendingUp, Lock, Star, CheckCircle2,
+  BarChart3, Smartphone, Bell, MessageSquare, Globe, Award
+} from "lucide-react";
 
-export default function QaprilLandingV2({ session, paywallActif = true }: { session: any, paywallActif?: boolean }) {
-  const [activeTab, setActiveTab] = useState("tenant");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export default function QaprilLandingV2({ session, paywallActif = true }: { session: any; paywallActif?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
-  const [bgIndex, setBgIndex] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN";
+  const dashUrl = isAdmin ? "/admin" : session?.user?.role === "TENANT" ? "/mon-espace-locataire" : "/dashboard";
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setBgIndex(prev => (prev + 1) % 5);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, []);
-  
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // ── CUSTOM CURSOR LOGIC ──
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    let animationFrameId: number;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
-    };
-
-    const animCursor = () => {
-      rx += (mx - rx) * 0.12;
-      ry += (my - ry) * 0.12;
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
-      }
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
-      }
-      animationFrameId = requestAnimationFrame(animCursor);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    animationFrameId = requestAnimationFrame(animCursor);
-
-    // Add hover effects
-    const interactiveEls = document.querySelectorAll('a, button, .nav-link, .user-tab, .price-card, .feature-card, .testi-card');
-    
-    const handleMouseEnter = () => {
-      if (ringRef.current) {
-        ringRef.current.style.width = '52px';
-        ringRef.current.style.height = '52px';
-      }
-      if (cursorRef.current) {
-        // Simple scaling approach via CSS directly if possible, or wait to handle transform scaling carefully.
-        // It's handled gracefully enough by CSS transitions.
-      }
-    };
-    const handleMouseLeave = () => {
-      if (ringRef.current) {
-        ringRef.current.style.width = '36px';
-        ringRef.current.style.height = '36px';
-      }
-    };
-
-    interactiveEls.forEach(el => {
-      el.addEventListener('mouseenter', handleMouseEnter);
-      el.addEventListener('mouseleave', handleMouseLeave);
-    });
-
-    // ── SCROLL NAV SHADOW ──
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
-
-    // ── SCROLL REVEAL ──
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("scroll", handleScroll);
-      interactiveEls.forEach(el => {
-        el.removeEventListener('mouseenter', handleMouseEnter);
-        el.removeEventListener('mouseleave', handleMouseLeave);
-      });
-    };
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll(".qv3-reveal").forEach((el) => obs.observe(el));
+    return () => { window.removeEventListener("scroll", handleScroll); obs.disconnect(); };
   }, []);
 
-  const handleLoginClick = async (role: "LOCATAIRE" | "BAILLEUR" | "ADMIN") => {
-     await choisirTypeConnexion(role);
+  const handleLogin = async (role: "LOCATAIRE" | "BAILLEUR" | "ADMIN") => {
+    await choisirTypeConnexion(role);
   };
 
-  const isAdmin = session?.user?.role === 'SUPER_ADMIN' || session?.user?.role === 'ADMIN';
-  const dashUrl = isAdmin ? "/admin" : (session?.user?.role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard");
+  const features = [
+    {
+      icon: <FileText className="w-6 h-6" />,
+      title: "Baux Numérisés",
+      desc: "Rédigez, signez et archivez vos contrats de bail en quelques minutes. Conformes au droit ivoirien.",
+      tag: "Légal & Conforme",
+      size: "large",
+      color: "text-amber-400",
+      bg: "bg-amber-400/10",
+    },
+    {
+      icon: <CreditCard className="w-6 h-6" />,
+      title: "Paiement Mobile",
+      desc: "Orange Money, MTN, Wave, Moov — tous les moyens de paiement ivoiriens intégrés nativement.",
+      tag: "FinTech",
+      size: "small",
+      color: "text-emerald-400",
+      bg: "bg-emerald-400/10",
+    },
+    {
+      icon: <TrendingUp className="w-6 h-6" />,
+      title: "Score ICL",
+      desc: "Un score de fiabilité unique pour chaque locataire. Réduisez vos risques d'impayés.",
+      tag: "Intelligence",
+      size: "small",
+      color: "text-sky-400",
+      bg: "bg-sky-400/10",
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: "Dashboard Propriétaire",
+      desc: "Visualisez l'état de votre patrimoine en temps réel. Loyers, taux d'occupation, alertes — tout en un seul écran.",
+      tag: "Tableau de Bord",
+      size: "large",
+      color: "text-violet-400",
+      bg: "bg-violet-400/10",
+    },
+    {
+      icon: <Bell className="w-6 h-6" />,
+      title: "Alertes Intelligentes",
+      desc: "Notifications automatiques pour les impayés, fins de bail et demandes de maintenance.",
+      tag: "Automatisation",
+      size: "small",
+      color: "text-rose-400",
+      bg: "bg-rose-400/10",
+    },
+    {
+      icon: <Lock className="w-6 h-6" />,
+      title: "Sécurité & Conformité",
+      desc: "Données hébergées et chiffrées. Conformité RGPD et droit ivoirien.",
+      tag: "Sécurité",
+      size: "small",
+      color: "text-amber-400",
+      bg: "bg-amber-400/10",
+    },
+  ];
+
+  const stats = [
+    { value: "4 800+", label: "Utilisateurs actifs", sub: "Propriétaires & Locataires" },
+    { value: "98%", label: "Satisfaction client", sub: "Note moyenne 4.9/5" },
+    { value: "48h", label: "Délai de formalisation", sub: "De la signature au bail actif" },
+    { value: "0 FCFA", label: "Frais cachés", sub: "Tarification transparente" },
+  ];
+
+  const steps = [
+    {
+      num: "01",
+      title: "Créez votre compte",
+      desc: "Inscription en 2 minutes. Choisissez votre profil : Locataire, Propriétaire ou Agence.",
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      num: "02",
+      title: "Ajoutez vos biens ou trouvez votre logement",
+      desc: "Propriétaires : importez votre patrimoine. Locataires : accédez à votre espace via invitation.",
+      icon: <Building2 className="w-5 h-5" />,
+    },
+    {
+      num: "03",
+      title: "Formalisez votre bail numériquement",
+      desc: "Contrat conforme au droit ivoirien, signé électroniquement, archivé automatiquement.",
+      icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      num: "04",
+      title: "Payez et gérez en temps réel",
+      desc: "Loyers via mobile money, quittances PDF automatiques, tableaux de bord en direct.",
+      icon: <Zap className="w-5 h-5" />,
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: "Kouassi Amani",
+      role: "Propriétaire · 12 biens",
+      avatar: "KA",
+      color: "bg-amber-500",
+      text: "Avant QAPRIL, je courais après mes loyers chaque mois. Maintenant tout est automatisé. Je reçois mes notifications et mes quittances sans rien faire.",
+      stars: 5,
+    },
+    {
+      name: "Oulaye Mensah",
+      role: "Locataire · Abidjan Plateau",
+      avatar: "OM",
+      color: "bg-emerald-600",
+      text: "Payer mon loyer via Wave directement depuis l'app, c'est exactement ce dont j'avais besoin. Plus besoin de me déplacer au bureau de l'agence.",
+      stars: 5,
+    },
+    {
+      name: "Agence Prestige Immo",
+      role: "Agence · 28 mandats",
+      avatar: "PI",
+      color: "bg-sky-600",
+      text: "La gestion de nos 28 mandats est devenue fluide. Le tableau de bord propriétaire est remarquable de clarté. Nos clients sont ravis.",
+      stars: 5,
+    },
+    {
+      name: "Bertrand Fofana",
+      role: "Propriétaire · 3 appartements",
+      avatar: "BF",
+      color: "bg-violet-600",
+      text: "Le score ICL m'a permis d'éviter un mauvais locataire. Un outil indispensable pour tout propriétaire sérieux.",
+      stars: 5,
+    },
+    {
+      name: "Térèse Niamien",
+      role: "Locataire · Cocody",
+      avatar: "TN",
+      color: "bg-rose-600",
+      text: "Mon bail numérique est toujours accessible sur mon téléphone. En cas de litige, j'ai toutes les preuves. Très rassurant.",
+      stars: 5,
+    },
+    {
+      name: "Coulibaly Drissa",
+      role: "Investisseur · 8 biens",
+      avatar: "CD",
+      color: "bg-indigo-600",
+      text: "Je gère mon portefeuille depuis Paris. QAPRIL me donne une visibilité totale sur mes biens en Côte d'Ivoire. Révolutionnaire.",
+      stars: 5,
+    },
+  ];
+
+  const paymentLogos = [
+    { name: "Orange Money", emoji: "🟠", color: "text-orange-500" },
+    { name: "MTN MoMo", emoji: "💛", color: "text-yellow-500" },
+    { name: "Wave", emoji: "🔵", color: "text-blue-500" },
+    { name: "Moov Money", emoji: "🟢", color: "text-green-500" },
+    { name: "Visa", emoji: "💳", color: "text-blue-400" },
+    { name: "MasterCard", emoji: "🔴", color: "text-red-500" },
+  ];
 
   return (
-    <div className="landing-v2-wrapper font-sans antialiased tracking-tight text-ink bg-cream pb-0">
-      <div className="custom-cursor" ref={cursorRef}></div>
-      <div className="custom-cursor-ring" ref={ringRef}></div>
-      <div className="noise-overlay"></div>
+    <div className="qv3-wrapper bg-[#09090B] text-white font-sans antialiased tracking-tight overflow-x-hidden">
 
-      {/* ═══ NAV ═══ */}
-      <nav id="navbar" style={{ boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,.08)' : 'none' }}>
-        <a href="#" className="nav-logo">
-          <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+      {/* ═══════════════════════════════════
+          NAV
+      ═══════════════════════════════════ */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16 transition-all duration-300 ${
+        scrolled ? "bg-[#09090B]/90 backdrop-blur-xl border-b border-white/5" : "bg-transparent"
+      }`}>
+        <a href="#" className="flex items-center gap-2.5">
+          <img src="/logo.png" alt="QAPRIL" className="h-9 w-auto object-contain brightness-110" />
         </a>
-        <div className="nav-links">
-          <a href="#features" className="nav-link">Fonctionnalités</a>
-          <a href="#how" className="nav-link">Comment ça marche</a>
-          <a href="#users" className="nav-link">Pour qui ?</a>
-          <a href="#pricing" className="nav-link">Tarifs</a>
-          <a href="#b2b-ecosystem" className="nav-link">B2B</a>
+        <div className="hidden md:flex items-center gap-1">
+          {["#features", "#howto", "#testimonials"].map((href, i) => (
+            <a key={i} href={href} className="px-4 py-2 text-sm font-medium text-white/50 hover:text-white/90 transition-colors rounded-lg hover:bg-white/5">
+              {["Fonctionnalités", "Comment ça marche", "Avis"][i]}
+            </a>
+          ))}
         </div>
-        {session?.user ? (
-            <Link href={dashUrl} className="nav-cta">Mon Espace →</Link>
-        ) : (
-            <div className="hidden md:flex items-center gap-3">
-                <button 
-                    onClick={() => handleLoginClick("LOCATAIRE")} 
-                    className="nav-link !font-bold !text-ink opacity-70 hover:opacity-100"
-                    style={{ cursor: 'none' }}
-                >
-                    Connexion Locataire
-                </button>
-                <button 
-                    onClick={() => handleLoginClick("BAILLEUR")} 
-                    className="nav-cta"
-                >
-                    Connexion Propriétaire
-                </button>
-            </div>
-        )}
-        <button className="nav-hamburger" aria-label="Menu" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          <span></span><span></span><span></span>
-        </button>
+        <div className="flex items-center gap-3">
+          {session?.user ? (
+            <Link href={dashUrl} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm px-5 py-2 rounded-full transition-all">
+              Mon Espace <ArrowRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <>
+              <button onClick={() => handleLogin("LOCATAIRE")} className="hidden md:block text-sm font-medium text-white/60 hover:text-white transition-colors px-4 py-2">
+                Connexion
+              </button>
+              <button onClick={() => handleLogin("BAILLEUR")} className="bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm px-5 py-2 rounded-full transition-all qv3-btn-glow">
+                Commencer →
+              </button>
+            </>
+          )}
+        </div>
       </nav>
 
-      {mobileMenuOpen && (
-        <div className="mobile-menu open" id="mobileMenu">
-          <a href="#features" onClick={() => setMobileMenuOpen(false)}>Fonctionnalités</a>
-          <a href="#how" onClick={() => setMobileMenuOpen(false)}>Comment ça marche</a>
-          <a href="#users" onClick={() => setMobileMenuOpen(false)}>Pour qui ?</a>
-          <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
-          <a href="#b2b-ecosystem" onClick={() => setMobileMenuOpen(false)}>B2B</a>
-          {session?.user ? (
-            <Link href={dashUrl} onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--mango)', background: 'none', border: 'none', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--f-display)', cursor: 'pointer', textDecoration: 'none' }}>Mon Espace →</Link>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px', width: '100%', alignItems: 'center' }}>
-              <button
-                  onClick={() => { handleLoginClick("LOCATAIRE"); setMobileMenuOpen(false); }}
-                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', fontFamily: 'var(--f-body)', fontWeight: 600, border: '2px solid var(--mango)', borderRadius: '50px', background: 'transparent', color: 'var(--ink)', cursor: 'pointer' }}
-              >
-                  Connexion
-              </button>
-              <button
-                  onClick={() => { handleLoginClick("BAILLEUR"); setMobileMenuOpen(false); }}
-                  className="nav-cta"
-                  style={{ textAlign: 'center', width: '100%', maxWidth: '240px', padding: '16px', fontSize: '18px', cursor: 'pointer', border: 'none' }}
-              >
-                  Connexion Propriétaire
-              </button>
-            </div>
-          )}
+      {/* ═══════════════════════════════════
+          HERO
+      ═══════════════════════════════════ */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 overflow-hidden">
+        {/* Isometric Grid */}
+        <div className="qv3-grid-bg absolute inset-0 pointer-events-none" />
+
+        {/* Radial glow center */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-amber-500/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/6 rounded-full blur-[100px]" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-500/6 rounded-full blur-[100px]" />
         </div>
-      )}
 
+        <div className="relative z-10 max-w-5xl mx-auto">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-full px-4 py-2 mb-10 text-xs font-semibold text-white/70 backdrop-blur-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            🇨🇮 Plateforme immobilière n°1 en Côte d'Ivoire · 4 800+ utilisateurs actifs
+          </motion.div>
 
-      {/* ═══ HERO ═══ */}
-      <section className="hero" id="hero">
-        <div className="hero-bg">
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-            {[0, 1, 2, 3, 4].map((index) => (
-              <img
-                key={index}
-                src={`/slider/bg_slider_${index + 1}.png`}
-                alt={`QAPRIL Slider ${index + 1}`}
-                className="transition-all duration-[2000ms] ease-in-out"
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  opacity: bgIndex === index ? 1 : 0,
-                  transform: bgIndex === index ? 'scale(1)' : 'scale(1.05)'
-                }}
-              />
+          {/* H1 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.1 }}
+            className="text-[clamp(44px,7vw,88px)] font-[900] leading-[1.0] tracking-[-0.05em] mb-8"
+          >
+            <span className="text-white">La gestion locative</span>
+            <br />
+            <span className="qv3-text-gold">ivoirienne</span>
+            <span className="text-white">, enfin</span>
+            <br />
+            <span className="text-white/30">moderne.</span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed"
+          >
+            QAPRIL connecte locataires, propriétaires et agences immobilières sur une seule infrastructure.
+            Payez votre loyer, gérez vos biens, formalisez vos baux — tout en quelques clics.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          >
+            {session?.user ? (
+              <Link href={dashUrl} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-base px-8 py-3.5 rounded-full transition-all qv3-btn-glow">
+                Retourner au Dashboard <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleLogin("BAILLEUR")}
+                  className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-base px-8 py-3.5 rounded-full transition-all qv3-btn-glow"
+                >
+                  Commencer gratuitement <ArrowRight className="w-5 h-5" />
+                </button>
+                <a href="#howto" className="flex items-center gap-2 text-white/60 hover:text-white border border-white/10 hover:border-white/20 font-medium text-base px-8 py-3.5 rounded-full transition-all">
+                  Voir comment ça marche
+                </a>
+              </>
+            )}
+          </motion.div>
+
+          {/* Social Proof */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex items-center justify-center gap-4"
+          >
+            <div className="flex -space-x-2">
+              {["KA", "OM", "BF", "TN", "CD"].map((initials, i) => (
+                <div key={i} className={`w-9 h-9 rounded-full border-2 border-[#09090B] flex items-center justify-center text-xs font-bold text-white ${["bg-amber-500","bg-emerald-600","bg-sky-600","bg-violet-600","bg-rose-600"][i]}`}>
+                  {initials}
+                </div>
+              ))}
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-0.5 text-amber-400 text-sm">★★★★★</div>
+              <div className="text-xs text-white/40 mt-0.5">4 800+ propriétaires & locataires</div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Floating UI Cards */}
+        <div className="absolute left-[5%] top-[35%] hidden xl:block qv3-float">
+          <div className="bg-[#111827] border border-white/8 rounded-2xl p-4 flex items-center gap-3 backdrop-blur-sm">
+            <div className="w-10 h-10 rounded-xl bg-emerald-400/15 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white">Loyer reçu</div>
+              <div className="text-[11px] text-white/40 mt-0.5">135 000 FCFA · Orange Money</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute right-[5%] top-[40%] hidden xl:block qv3-float qv3-float-d1">
+          <div className="bg-[#111827] border border-white/8 rounded-2xl p-4 flex items-center gap-3 backdrop-blur-sm">
+            <div className="w-10 h-10 rounded-xl bg-amber-400/15 flex items-center justify-center text-amber-400">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white">Score ICL · Grade A</div>
+              <div className="text-[11px] text-white/40 mt-0.5">Excellent locataire</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          PAYMENT TICKER
+      ═══════════════════════════════════ */}
+      <div className="border-y border-white/5 bg-white/[0.02] py-5 overflow-hidden">
+        <div className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 mb-4">
+          Intégrations natives avec les acteurs du marché
+        </div>
+        <div className="flex overflow-hidden">
+          <div className="qv3-ticker-track gap-0">
+            {[...paymentLogos, ...paymentLogos].map((p, i) => (
+              <div key={i} className="inline-flex items-center gap-2.5 px-10 text-sm font-semibold text-white/40">
+                <span className="text-xl">{p.emoji}</span>
+                {p.name}
+              </div>
             ))}
-            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255, 251, 245, 0.40)', zIndex: 1 }}></div>
           </div>
-          <div className="hero-blob-1" style={{ zIndex: 2, opacity: 0.5 }}></div>
-          <div className="hero-blob-2" style={{ zIndex: 2, opacity: 0.5 }}></div>
-          <div className="hero-dots" style={{ zIndex: 2 }}></div>
         </div>
-        <div className="hero-content">
-          <div className="hero-left">
-            <div className="hero-badge">
-              <div className="hero-badge-icon">🇨🇮</div>
-              <span>Plateforme n°1 en Côte d'Ivoire</span>
-              <div className="hero-badge-dot"></div>
-              <span>4 800+ utilisateurs actifs</span>
+      </div>
+
+      {/* ═══════════════════════════════════
+          FEATURES — BENTO GRID
+      ═══════════════════════════════════ */}
+      <section id="features" className="px-6 md:px-10 py-24 max-w-6xl mx-auto">
+        <div className="text-center mb-16 qv3-reveal">
+          <div className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-amber-400 bg-amber-400/10 px-4 py-1.5 rounded-full mb-5">
+            Fonctionnalités
+          </div>
+          <h2 className="text-[clamp(32px,4vw,52px)] font-[900] tracking-[-0.04em] text-white mb-4">
+            Tout ce dont vous avez besoin.<br />
+            <span className="text-white/30">Rien de superflu.</span>
+          </h2>
+          <p className="text-white/50 text-lg max-w-xl mx-auto">
+            Une plateforme conçue pour l'immobilier ivoirien, avec les intégrations qui comptent vraiment.
+          </p>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card Large 1 */}
+          <div className="md:col-span-2 qv3-bento-card bg-[#111827] border border-white/8 rounded-3xl p-8 qv3-reveal">
+            <div className={`w-12 h-12 rounded-2xl ${features[0].bg} flex items-center justify-center ${features[0].color} mb-6`}>
+              {features[0].icon}
             </div>
-            <h1 style={{ fontFamily: 'var(--f-display)', fontWeight: 900, letterSpacing: '-0.04em' }}>
-              La gestion<br/>locative <span className="accent-mango" style={{ fontStyle: 'italic', fontWeight: 700, paddingRight: '8px', letterSpacing: '-0.02em' }}>enfin</span><br/><span className="accent-sky">simple</span> & digitale
-            </h1>
-            <p className="hero-desc">QAPRIL connecte locataires, propriétaires et agences immobilières sur une seule plateforme. Payez votre loyer, gérez vos biens, formalisez vos baux — tout en quelques clics.</p>
-            <div className="hero-actions">
-              {session?.user ? (
-                  <Link href={dashUrl} className="btn-hero btn-hero-primary">🚀 Retourner au Dashboard</Link>
-              ) : (
-                  <button onClick={() => handleLoginClick("BAILLEUR")} className="btn-hero btn-hero-primary">🚀 Commencer gratuitement</button>
-              )}
-              <a href="#features" className="btn-hero btn-hero-secondary">▷ Voir la démo</a>
-            </div>
-            <div className="hero-trust">
-              <div className="trust-avatars">
-                <div className="trust-avatar" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>KA</div>
-                <div className="trust-avatar" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>OM</div>
-                <div className="trust-avatar" style={{ background: 'var(--lime-l)', color: 'var(--lime-d)' }}>BF</div>
-                <div className="trust-avatar" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>TN</div>
-                <div className="trust-avatar" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>+</div>
-              </div>
-              <div className="trust-text">
-                <div className="trust-stars">★★★★★</div>
-                <div><strong>4 800+ propriétaires & locataires</strong><br/>font confiance à QAPRIL chaque mois</div>
-              </div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-3">{features[0].tag}</div>
+            <h3 className="text-2xl font-bold text-white mb-3">{features[0].title}</h3>
+            <p className="text-white/50 text-sm leading-relaxed max-w-sm">{features[0].desc}</p>
+            <div className="mt-8 flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/5" />
+              <span className="text-xs text-white/20 font-medium">Conforme au Code Civil Ivoirien</span>
             </div>
           </div>
 
-          <div className="hero-right">
-            <div className="deco-ring deco-ring-1"></div>
-            <div className="deco-ring deco-ring-2"></div>
-            <div className="deco-dot-grid"></div>
-            <div className="hero-phone-wrap">
-              <div className="hero-demo-ui">
-                <div className="demo-status">
-                  <div className="demo-logo">QAPRIL</div>
-                  <div className="demo-avatar">KA</div>
-                </div>
-                <div className="demo-body">
-                  <div className="demo-greet">Bonjour 👋</div>
-                  <div className="demo-name">Utilisateur QAPRIL</div>
-                  <div className="demo-pay-card">
-                    <div className="demo-pay-label">Loyer en cours</div>
-                    <div className="demo-pay-amount">--- FCFA</div>
-                    <div className="demo-pay-btn">Payer maintenant →</div>
-                  </div>
-                  <div className="demo-stats">
-                    <div className="demo-stat"><div className="demo-stat-val">--</div><div className="demo-stat-lbl">Mois payés</div></div>
-                    <div className="demo-stat"><div className="demo-stat-val" style={{ color: 'var(--lime-d)' }}>-- pts</div><div className="demo-stat-lbl">Score ICL</div></div>
-                  </div>
-                  <div className="demo-notif">
-                    <div className="demo-notif-icon" style={{ background: 'var(--teal)' }}>✓</div>
-                    <div className="demo-notif-text"><strong>Notification système</strong><br/>Nouvelle mise à jour disponible</div>
-                  </div>
-                </div>
-              </div>
+          {/* Card Small 1 */}
+          <div className="qv3-bento-card bg-[#111827] border border-white/8 rounded-3xl p-8 qv3-reveal qv3-reveal-d1">
+            <div className={`w-12 h-12 rounded-2xl ${features[1].bg} flex items-center justify-center ${features[1].color} mb-6`}>
+              {features[1].icon}
             </div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-3">{features[1].tag}</div>
+            <h3 className="text-xl font-bold text-white mb-3">{features[1].title}</h3>
+            <p className="text-white/50 text-sm leading-relaxed">{features[1].desc}</p>
+          </div>
 
-            <div className="float-widget fw-1">
-              <div className="fw-icon" style={{ background: 'var(--lime-l)' }}>📈</div>
-              <div className="fw-text">
-                <div className="fw-title">Score ICL · Grade B</div>
-                <div className="fw-sub">+5 pts ce mois</div>
-              </div>
+          {/* Card Small 2 */}
+          <div className="qv3-bento-card bg-[#111827] border border-white/8 rounded-3xl p-8 qv3-reveal">
+            <div className={`w-12 h-12 rounded-2xl ${features[2].bg} flex items-center justify-center ${features[2].color} mb-6`}>
+              {features[2].icon}
             </div>
-            <div className="float-widget fw-2">
-              <div className="fw-icon" style={{ background: 'var(--sky-l)' }}>💳</div>
-              <div className="fw-text">
-                <div className="fw-title">Paiement confirmé</div>
-                <div className="fw-sub">Orange Money · 2s</div>
-              </div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-3">{features[2].tag}</div>
+            <h3 className="text-xl font-bold text-white mb-3">{features[2].title}</h3>
+            <p className="text-white/50 text-sm leading-relaxed">{features[2].desc}</p>
+          </div>
+
+          {/* Card Small 3 */}
+          <div className="qv3-bento-card bg-[#111827] border border-white/8 rounded-3xl p-8 qv3-reveal qv3-reveal-d1">
+            <div className={`w-12 h-12 rounded-2xl ${features[4].bg} flex items-center justify-center ${features[4].color} mb-6`}>
+              {features[4].icon}
             </div>
-            <div className="float-widget fw-3">
-              <div className="fw-icon" style={{ background: 'var(--mango-l)' }}>🏠</div>
-              <div className="fw-text">
-                <div className="fw-title">3 biens actifs</div>
-                <div className="fw-sub">2 loués · 1 vacant</div>
-              </div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-3">{features[4].tag}</div>
+            <h3 className="text-xl font-bold text-white mb-3">{features[4].title}</h3>
+            <p className="text-white/50 text-sm leading-relaxed">{features[4].desc}</p>
+          </div>
+
+          {/* Card Large 2 */}
+          <div className="md:col-span-2 qv3-bento-card bg-[#111827] border border-white/8 rounded-3xl p-8 qv3-reveal qv3-reveal-d2">
+            <div className={`w-12 h-12 rounded-2xl ${features[3].bg} flex items-center justify-center ${features[3].color} mb-6`}>
+              {features[3].icon}
+            </div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/30 mb-3">{features[3].tag}</div>
+            <h3 className="text-2xl font-bold text-white mb-3">{features[3].title}</h3>
+            <p className="text-white/50 text-sm leading-relaxed max-w-sm">{features[3].desc}</p>
+            <div className="mt-8 grid grid-cols-3 gap-4">
+              {["Loyers encaissés", "Taux d'occupation", "Alertes actives"].map((label, i) => (
+                <div key={i} className="bg-white/3 rounded-xl p-3 border border-white/5">
+                  <div className="text-lg font-bold qv3-text-gold">—</div>
+                  <div className="text-[10px] text-white/30 mt-1">{label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══ TICKER ═══ */}
-      <div className="ticker">
-        <div className="ticker-track" id="ticker">
-            <div className="ticker-item"><div className="ticker-dot"></div> Paiement loyer via <strong>Orange Money, MTN, Wave, Moov</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Quittances PDF <strong>certifiées</strong> automatiquement</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Baux enregistrés à la <strong>DGI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Cautions consignées à la <strong>CDC-CI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Score ICL · <strong>Passeport locatif</strong> numérique</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Agent IA pour baux <strong>déclaratifs</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Paiement loyer via <strong>Orange Money, MTN, Wave, Moov</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Quittances PDF <strong>certifiées</strong> automatiquement</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Baux enregistrés à la <strong>DGI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Cautions consignées à la <strong>CDC-CI</strong></div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Score ICL · <strong>Passeport locatif</strong> numérique</div>
-            <div className="ticker-item"><div className="ticker-dot"></div> Agent IA pour baux <strong>déclaratifs</strong></div>
-        </div>
-      </div>
-
-      {/* ═══ STATS ═══ */}
-      <div className="stats-band">
-        <div className="stats-grid">
-          <div className="stat-block reveal">
-            <div className="stat-number" style={{ color: 'var(--mango)' }}>4 800+</div>
-            <div className="stat-label">Utilisateurs actifs<br/>sur la plateforme</div>
-            <div className="stat-accent" style={{ color: 'var(--mango)' }}>↑ +124 ce mois</div>
-          </div>
-          <div className="stat-block reveal reveal-d1">
-            <div className="stat-number" style={{ color: 'var(--sky)' }}>2 340</div>
-            <div className="stat-label">Baux actifs gérés<br/>Abidjan & régions</div>
-            <div className="stat-accent" style={{ color: 'var(--sky)' }}>89 déclaratifs</div>
-          </div>
-          <div className="stat-block reveal reveal-d2">
-            <div className="stat-number" style={{ color: 'var(--teal)' }}>98.2%</div>
-            <div className="stat-label">Taux de disponibilité<br/>de la plateforme</div>
-            <div className="stat-accent" style={{ color: 'var(--teal)' }}>SLA garanti</div>
-          </div>
-          <div className="stat-block reveal reveal-d3">
-            <div className="stat-number" style={{ color: 'var(--fuchsia)' }}>2s</div>
-            <div className="stat-label">Délai moyen de<br/>confirmation paiement</div>
-            <div className="stat-accent" style={{ color: 'var(--fuchsia)' }}>Mobile Money intégré</div>
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ FEATURES ═══ */}
-      <section className="features" id="features">
-        <div className="section-inner">
-          <div className="features-header reveal">
-            <div className="section-eyebrow">✨ Fonctionnalités</div>
-            <h2>Tout ce dont vous avez<br/>besoin en un seul endroit</h2>
-            <p className="section-desc">De la signature du bail au paiement du loyer, en passant par l'état des lieux — QAPRIL couvre tout le cycle locatif ivoirien.</p>
-          </div>
-          <div className="features-grid">
-
-            <div className="feature-card fc-mango feature-card-large reveal">
-              <div className="fc-text">
-                <div className="fc-icon" style={{ background: 'var(--mango)', color: 'white' }}>💳</div>
-                <h3>Paiement loyer<br/>Mobile Money</h3>
-                <p>Payez et recevez vos loyers via Orange Money, MTN MoMo, Wave et Moov Money. Confirmation instantanée et quittance PDF générée automatiquement.</p>
-                <div className="feature-tag">Orange · MTN · Wave · Moov</div>
+      {/* ═══════════════════════════════════
+          STATS BAND
+      ═══════════════════════════════════ */}
+      <section className="bg-[#0F172A] border-y border-white/5 py-20 px-6 md:px-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
+          {stats.map((s, i) => (
+            <div key={i} className={`text-center qv3-reveal qv3-reveal-d${i}`}>
+              <div className="text-[clamp(36px,5vw,64px)] font-[900] tracking-[-0.05em] qv3-text-gold mb-2">
+                {s.value}
               </div>
-              <div className="fc-visual">
-                <div style={{ background: 'white', borderRadius: '12px', padding: '14px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div className="flex flex-col items-center justify-center text-white bg-black shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
-                    <div className="bg-[#FF6600] w-6 h-4 flex items-end px-0.5 pb-[1px] mt-0.5 rounded-[2px]" style={{ justifyContent: 'center' }}>
-                        <span className="text-[5px] font-black tracking-tight leading-none text-white">orange</span>
+              <div className="text-sm font-semibold text-white mb-1">{s.label}</div>
+              <div className="text-xs text-white/30">{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          HOW IT WORKS — VERTICAL TIMELINE
+      ═══════════════════════════════════ */}
+      <section id="howto" className="px-6 md:px-10 py-24 max-w-4xl mx-auto">
+        <div className="text-center mb-20 qv3-reveal">
+          <div className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-emerald-400 bg-emerald-400/10 px-4 py-1.5 rounded-full mb-5">
+            Comment ça marche
+          </div>
+          <h2 className="text-[clamp(30px,4vw,50px)] font-[900] tracking-[-0.04em] text-white mb-4">
+            Opérationnel en moins de 10 minutes.
+          </h2>
+          <p className="text-white/40 text-lg">Aucune installation requise. Tout depuis votre navigateur.</p>
+        </div>
+
+        <div className="relative">
+          <div className="qv3-timeline-line" />
+          <div className="space-y-12">
+            {steps.map((step, i) => (
+              <div key={i} className={`flex gap-10 items-start qv3-reveal qv3-reveal-d${i}`}>
+                <div className="relative flex-shrink-0 w-14 h-14 rounded-full bg-[#111827] border border-white/10 flex items-center justify-center z-10">
+                  <span className="text-amber-400 font-black text-lg">{step.num}</span>
+                </div>
+                <div className="pt-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="text-emerald-400">{step.icon}</div>
+                    <h3 className="text-xl font-bold text-white">{step.title}</h3>
+                  </div>
+                  <p className="text-white/40 text-sm leading-relaxed max-w-lg">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          TESTIMONIALS — MASONRY
+      ═══════════════════════════════════ */}
+      <section id="testimonials" className="px-6 md:px-10 py-24 bg-[#0B1220]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16 qv3-reveal">
+            <div className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-sky-400 bg-sky-400/10 px-4 py-1.5 rounded-full mb-5">
+              Témoignages
+            </div>
+            <h2 className="text-[clamp(30px,4vw,50px)] font-[900] tracking-[-0.04em] text-white mb-4">
+              Ils font confiance à QAPRIL.
+            </h2>
+            <p className="text-white/40 text-lg">Des milliers d'utilisateurs satisfaits à travers la Côte d'Ivoire.</p>
+          </div>
+
+          <div className="qv3-masonry">
+            {testimonials.map((t, i) => (
+              <div key={i} className="qv3-masonry-item">
+                <div className="bg-[#111827] border border-white/8 rounded-2xl p-6 hover:border-white/15 transition-colors">
+                  <div className="flex items-center gap-0.5 text-amber-400 text-sm mb-4">
+                    {Array.from({ length: t.stars }).map((_, j) => <span key={j}>★</span>)}
+                  </div>
+                  <p className="text-white/70 text-sm leading-relaxed mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                    <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}>
+                      {t.avatar}
                     </div>
-                    <span className="text-[3px] font-black text-white mt-0.5 tracking-[0.2em] uppercase">Money</span>
-                  </div>
-                  <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Orange Money</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>85 000 FCFA · confirmé ✓</div></div>
-                  <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+2s</div>
-                </div>
-                <div style={{ background: 'white', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div className="flex flex-col items-center justify-center text-white bg-[#18A9DB] shrink-0" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
-                    <div className="flex items-center gap-0 mt-0.5">
-                      <span className="text-sm -mt-0.5">🐧</span>
-                      <span className="text-sm font-extrabold tracking-tighter leading-none">wave</span>
+                    <div>
+                      <div className="text-sm font-semibold text-white">{t.name}</div>
+                      <div className="text-xs text-white/30">{t.role}</div>
                     </div>
-                    <span className="font-black opacity-90 tracking-widest mt-0.5 leading-none uppercase" style={{ fontSize: '4px' }}>Ton djê est calé</span>
                   </div>
-                  <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Wave CI</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>160 000 FCFA · confirmé ✓</div></div>
-                  <div style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: 700, color: 'var(--lime-d)' }}>+1s</div>
                 </div>
               </div>
-            </div>
-
-            <div className="feature-card fc-sky reveal reveal-d1">
-              <div className="fc-icon" style={{ background: 'var(--sky)', color: 'white' }}>📄</div>
-              <h3>Baux numériques & DGI</h3>
-              <p>Créez, signez électroniquement et enregistrez vos contrats à la DGI. Bail déclaratif par SMS pour les situations existantes.</p>
-              <div className="feature-tag">Signature électronique · DGI</div>
-            </div>
-
-            <div className="feature-card fc-lime reveal reveal-d2">
-              <div className="fc-icon" style={{ background: 'var(--lime)', color: 'white' }}>🏛</div>
-              <h3>Cautions CDC-CI</h3>
-              <p>Consignez les cautions à la Caisse des Dépôts et Consignations. Restitution transparente, traçable et légale.</p>
-              <div className="feature-tag">CDC-CI officiel</div>
-            </div>
-
-            <div className="feature-card fc-fuchsia reveal">
-              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🤖</div>
-              <h3>Agent IA Bail Déclaratif</h3>
-              <p>Notre agent conversationnel guide propriétaires et locataires pour formaliser les baux existants en quelques minutes.</p>
-              <div className="feature-tag">Claude AI · QAPRIL Agent</div>
-            </div>
-
-            <div className="feature-card fc-teal reveal reveal-d1">
-              <div className="fc-icon" style={{ background: 'var(--teal)', color: 'white' }}>📊</div>
-              <h3>Score ICL & Passeport</h3>
-              <p>Construisez votre réputation de locataire fiable. Partagez votre passeport locatif pour accélérer vos candidatures.</p>
-              <div className="feature-tag">Grade A → F · QR Code</div>
-            </div>
-
-            <div className="feature-card fc-coral reveal reveal-d2">
-              <div className="fc-icon" style={{ background: 'var(--coral)', color: 'white' }}>🔧</div>
-              <h3>Maintenance & EDL</h3>
-              <p>Signalez les problèmes, suivez les interventions, réalisez les états des lieux avec photos certifiées.</p>
-              <div className="feature-tag">Photos · Certification</div>
-            </div>
-
-            <div className="feature-card fc-mango feature-card-large reveal mt-6">
-              <div className="fc-icon" style={{ background: 'var(--ink)', color: 'white' }}>📱</div>
-              <h3>Applications Mobiles Natives</h3>
-              <p>Retrouvez toute l'expérience QAPRIL sur iOS et Android. Les locataires et propriétaires ont chacun leur application dédiée pour tout gérer depuis leur poche.</p>
-              <div className="feature-tag">iOS · Android · React Native</div>
-            </div>
-
-            <div className="feature-card fc-sky reveal reveal-d1 mt-6">
-              <div className="fc-icon" style={{ background: '#10B981', color: 'white' }}>🛡️</div>
-              <h3>Assurance Loyer Impayé</h3>
-              <p>Protégez vos revenus locatifs. Souscrivez directement depuis l'application à notre offre multirisque habitation et garantie loyer impayé.</p>
-              <div className="feature-tag">Couverture à 100% · Zéro paperasse</div>
-            </div>
-
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section className="how" id="how">
-        <div className="section-inner">
-          <div className="how-header reveal">
-            <div className="section-eyebrow">🗺️ Le parcours</div>
-            <h2>Opérationnel en 4 étapes</h2>
-            <p className="section-desc" style={{ margin: '0 auto', textAlign: 'center' }}>De l'inscription à la première quittance, tout se fait en moins d'une heure.</p>
+      {/* ═══════════════════════════════════
+          CTA FINAL
+      ═══════════════════════════════════ */}
+      <section className="relative px-6 md:px-10 py-32 text-center overflow-hidden bg-[#09090B]">
+        <div className="qv3-grid-bg absolute inset-0 pointer-events-none opacity-60" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-500/10 rounded-full blur-[100px]" />
+        </div>
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-full mb-8">
+            <Award className="w-3.5 h-3.5" />
+            Rejoignez 4 800+ utilisateurs
           </div>
-          <div className="how-steps">
-            <div className="how-step reveal">
-              <div className="how-step-num hs-1">
-                1
-                <div className="how-step-emoji">✍️</div>
-              </div>
-              <h3>Inscription & KYC</h3>
-              <p>Créez votre compte, vérifiez votre identité en 5 minutes avec votre CNI ou passeport ivoirien.</p>
-            </div>
-            <div className="how-step reveal reveal-d1">
-              <div className="how-step-num hs-2">
-                2
-                <div className="how-step-emoji">🏠</div>
-              </div>
-              <h3>Déclarez votre bien</h3>
-              <p>Propriétaires : ajoutez vos biens, définissez le loyer, invitez votre locataire existant ou recrutez-en un nouveau.</p>
-            </div>
-            <div className="how-step reveal reveal-d2">
-              <div className="how-step-num hs-3">
-                3
-                <div className="how-step-emoji">📋</div>
-              </div>
-              <h3>Signez le bail</h3>
-              <p>Bail écrit ou déclaratif — notre agent IA vous guide. Enregistrement DGI et caution CDC automatisés.</p>
-            </div>
-            <div className="how-step reveal reveal-d3">
-              <div className="how-step-num hs-4">
-                4
-                <div className="how-step-emoji">🎉</div>
-              </div>
-              <h3>Gérez sereinement</h3>
-              <p>Paiements Mobile Money automatiques, quittances PDF, alertes impayés, relances intelligentes.</p>
-            </div>
+          <h2 className="text-[clamp(36px,5vw,68px)] font-[900] tracking-[-0.05em] text-white mb-6 leading-[1.05]">
+            Prêt à moderniser<br />
+            <span className="qv3-text-gold">votre gestion locative ?</span>
+          </h2>
+          <p className="text-white/40 text-lg mb-12 max-w-xl mx-auto leading-relaxed">
+            Commencez gratuitement aujourd'hui. Aucune carte de crédit requise.
+            Vos données sont sécurisées et hébergées localement.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {session?.user ? (
+              <Link href={dashUrl} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-lg px-10 py-4 rounded-full transition-all qv3-btn-glow">
+                Accéder à mon espace <ArrowRight className="w-5 h-5" />
+              </Link>
+            ) : (
+              <>
+                <button onClick={() => handleLogin("BAILLEUR")} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-base px-10 py-4 rounded-full transition-all qv3-btn-glow">
+                  Créer mon compte propriétaire <ArrowRight className="w-5 h-5" />
+                </button>
+                <button onClick={() => handleLogin("LOCATAIRE")} className="text-white/60 hover:text-white border border-white/10 hover:border-white/20 font-medium text-base px-8 py-4 rounded-full transition-all">
+                  Accès locataire
+                </button>
+              </>
+            )}
           </div>
+          <p className="text-white/20 text-xs mt-6">Accès sécurisé · Données chiffrées · Conforme au droit ivoirien</p>
         </div>
       </section>
 
-      {/* ═══ USERS ═══ */}
-      <section className="users" id="users">
-        <div className="section-inner">
-          <div className="users-header reveal">
-            <div className="section-eyebrow">👥 Pour qui ?</div>
-            <h2>Une plateforme,<br/>tous les acteurs</h2>
+      {/* ═══════════════════════════════════
+          FOOTER
+      ═══════════════════════════════════ */}
+      <footer className="border-t border-white/5 bg-[#09090B] px-6 md:px-10 py-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-14">
+            <div className="md:col-span-1">
+              <img src="/logo.png" alt="QAPRIL" className="h-10 w-auto object-contain brightness-110 mb-4" />
+              <p className="text-sm text-white/30 leading-relaxed max-w-[200px]">
+                L'infrastructure immobilière de référence en Côte d'Ivoire.
+              </p>
+            </div>
+            {[
+              { title: "Produit", links: ["Fonctionnalités", "Tarifs", "Sécurité", "API"] },
+              { title: "Portails", links: ["Espace Locataire", "Espace Propriétaire", "Administration", "Agences"] },
+              { title: "Légal", links: ["Mentions légales", "Politique de confidentialité", "CGU", "Contact"] },
+            ].map((col, i) => (
+              <div key={i}>
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">{col.title}</div>
+                <ul className="space-y-3">
+                  {col.links.map((link, j) => (
+                    <li key={j}>
+                      <a href="#" className="text-sm text-white/40 hover:text-white/80 transition-colors">{link}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-          <div className="users-tabs">
-            <button className={`user-tab ${activeTab === 'tenant' ? 'active' : ''}`} onClick={() => setActiveTab('tenant')}>🧑 Locataire</button>
-            <button className={`user-tab ${activeTab === 'landlord' ? 'active' : ''}`} onClick={() => setActiveTab('landlord')}>🏠 Propriétaire</button>
-            <button className={`user-tab ${activeTab === 'agency' ? 'active' : ''}`} onClick={() => setActiveTab('agency')}>🏢 Agence Int.</button>
-            <button className={`user-tab ${activeTab === 'diaspora' ? 'active' : ''}`} onClick={() => setActiveTab('diaspora')}>🌍 Diaspora</button>
-          </div>
-
-          {/* LOCATAIRE */}
-          <div className={`users-content ${activeTab === 'tenant' ? 'show' : ''}`} id="uc-tenant">
-            <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--teal-l)', color: 'var(--teal)', marginBottom: '14px' }}>🧑 Locataire</div>
-              <h3>Votre vie locative simplifiée</h3>
-              <p>Payez votre loyer en 2 secondes, recevez vos quittances PDF, signalez les problèmes et construisez votre réputation de bon locataire.</p>
-              <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>💳</div><span className="benefit-text">Paiement Orange Money, Wave, MTN, Moov</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--teal-l)' }}>🧾</div><span className="benefit-text">Quittances certifiées en 2 secondes</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>📊</div><span className="benefit-text">Score ICL et passeport locatif numérique</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>🔧</div><span className="benefit-text">Signalements de maintenance en direct</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>💬</div><span className="benefit-text">Messagerie directe avec le propriétaire</span></div>
-              </div>
-            </div>
-            <div className="user-visual">
-              <div style={{ background: 'var(--ink2)', padding: '20px', textAlign: 'center' }}>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '18px', fontWeight: 800, color: 'white', marginBottom: '4px' }}>Score ICL</div>
-                <div style={{ fontSize: '52px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'white' }}>72</div>
-                <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 16px', display: 'inline-block', color: 'white', fontSize: '13px', fontWeight: 600 }}>Grade B · Bon locataire</div>
-              </div>
-              <div className="user-visual-inner">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{ background: 'white', borderRadius: '12px', padding: '12px', textAlign: 'center', boxShadow: '0 2px 10px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--ink)' }}>14</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>Mois payés à temps</div></div>
-                  <div style={{ background: 'white', borderRadius: '12px', padding: '12px', textAlign: 'center', boxShadow: '0 2px 10px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--lime-d)' }}>100%</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>Ponctualité</div></div>
-                </div>
-                <div style={{ background: 'white', borderRadius: '12px', padding: '14px', boxShadow: '0 2px 10px rgba(0,0,0,.05)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg,var(--mango),var(--coral))', display: 'grid', placeItems: 'center', fontSize: '20px' }}>🔲</div>
-                  <div><div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>Mon passeport locatif</div><div style={{ fontSize: '11px', color: 'var(--ink3)' }}>PASS-KA-2024 · valide</div></div>
-                  <div style={{ marginLeft: 'auto', background: 'var(--lime-l)', color: 'var(--lime-d)', borderRadius: '50px', padding: '4px 10px', fontSize: '11px', fontWeight: 600 }}>Actif</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* PROPRIÉTAIRE */}
-          <div className={`users-content ${activeTab === 'landlord' ? 'show' : ''}`} id="uc-landlord">
-            <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)', marginBottom: '14px' }}>🏠 Propriétaire</div>
-              <h3>Gérez votre patrimoine locatif sans stress</h3>
-              <p>Suivez vos loyers en temps réel, automatisez les relances, enregistrez vos baux à la DGI et gérez les cautions CDC depuis votre téléphone.</p>
-              <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>💰</div><span className="benefit-text">Revenus locatifs en temps réel</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--coral-l)' }}>⚠️</div><span className="benefit-text">Alertes impayés et relances automatiques</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>📋</div><span className="benefit-text">Enregistrement DGI en ligne</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--teal-l)' }}>🏦</div><span className="benefit-text">Cautions CDC-CI sécurisées</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>📊</div><span className="benefit-text">Rapports et CRG mensuels</span></div>
-              </div>
-            </div>
-            <div className="user-visual">
-              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
-                <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Revenus avril 2025</div>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '36px', fontWeight: 800, color: 'white' }}>245 000 <span style={{ fontSize: '16px' }}>FCFA</span></div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                  <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px' }}>3 biens</div>
-                  <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px' }}>2 loués ✓</div>
-                </div>
-              </div>
-              <div className="user-visual-inner" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ background: 'var(--lime-l)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--lime-d)', fontWeight: 500 }}>🏠 F3 Yopougon — Konan A.</span><span style={{ background: 'var(--lime-d)', color: 'white', borderRadius: '50px', padding: '3px 10px', fontSize: '11px', fontWeight: 600 }}>85 000 ✓</span></div>
-                <div style={{ background: 'var(--coral-l)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--coral)', fontWeight: 500 }}>🏢 Studio Cocody — Diarra M.</span><span style={{ background: 'var(--coral)', color: 'white', borderRadius: '50px', padding: '3px 10px', fontSize: '11px', fontWeight: 600 }}>Impayé J+12</span></div>
-                <div style={{ background: 'var(--sky-l)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--sky-d)', fontWeight: 500 }}>🏚 Chambre Abobo</span><span style={{ background: 'var(--sky-l)', color: 'var(--sky-d)', borderRadius: '50px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, border: '1px solid var(--sky)' }}>Vacant</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* AGENCE */}
-          <div className={`users-content ${activeTab === 'agency' ? 'show' : ''}`} id="uc-agency">
-            <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--teal-l)', color: 'var(--teal)', marginBottom: '14px' }}>🏢 Agence immobilière</div>
-              <h3>Gérez tout votre portefeuille d'un coup</h3>
-              <p>Mandats, baux, loyers, commissions, CRG — tout votre back-office en une plateforme. Agréée ANAH, conforme à la loi 2019-576.</p>
-              <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--teal-l)' }}>📑</div><span className="benefit-text">Gestion mandats exclusifs et simples</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>💵</div><span className="benefit-text">Commissions automatiquement calculées</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>📋</div><span className="benefit-text">CRG propriétaires en un clic</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>👥</div><span className="benefit-text">Gestion candidatures avec score ICL</span></div>
-              </div>
-            </div>
-            <div className="user-visual">
-              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
-                <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Portefeuille · Prestige Immo</div>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '36px', fontWeight: 800, color: 'white' }}>28 biens</div>
-                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                  <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px' }}>4.2M FCFA gérés</div>
-                  <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px' }}>420K commissions</div>
-                </div>
-              </div>
-              <div className="user-visual-inner">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                  <div style={{ background: 'white', borderRadius: '10px', padding: '10px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--teal)' }}>24</div><div style={{ fontSize: '10px', color: 'var(--ink3)' }}>Loués</div></div>
-                  <div style={{ background: 'white', borderRadius: '10px', padding: '10px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--mango)' }}>4</div><div style={{ fontSize: '10px', color: 'var(--ink3)' }}>Candidatures</div></div>
-                  <div style={{ background: 'white', borderRadius: '10px', padding: '10px', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}><div style={{ fontSize: '20px', fontWeight: 800, fontFamily: 'var(--f-display)', color: 'var(--lime-d)' }}>6</div><div style={{ fontSize: '10px', color: 'var(--ink3)' }}>Mandats</div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* DIASPORA */}
-          <div className={`users-content ${activeTab === 'diaspora' ? 'show' : ''}`} id="uc-diaspora">
-            <div className="user-info">
-              <div className="section-eyebrow" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)', marginBottom: '14px' }}>🌍 Diaspora Ivoirienne</div>
-              <h3>Gérez vos biens depuis l'étranger</h3>
-              <p>Un tableau de bord VIP pour suivre vos investissements en Côte d'Ivoire. Gestionnaire terrain dédié et rapports financiers mensuels.</p>
-              <div className="user-benefits">
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--sky-l)' }}>📱</div><span className="benefit-text">Tableau de bord VIP & Rapports mensuels</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--mango-l)' }}>🎥</div><span className="benefit-text">Demande d'inspection vidéo des biens</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--lime-l)' }}>🤝</div><span className="benefit-text">Gestionnaire terrain dédié en Côte d'Ivoire</span></div>
-                <div className="benefit"><div className="benefit-icon" style={{ background: 'var(--fuchsia-l)' }}>💬</div><span className="benefit-text">Assistance WhatsApp prioritaire : <strong style={{color: 'var(--ink)'}}>+225 07 12 60 60 18</strong></span></div>
-              </div>
-            </div>
-            <div className="user-visual">
-              <div style={{ background: 'var(--ink2)', padding: '20px' }}>
-                <div style={{ color: 'rgba(255,255,255,.7)', fontSize: '12px', marginBottom: '4px' }}>Statut Diaspora VIP</div>
-                <div style={{ fontFamily: 'var(--f-display)', fontSize: '28px', fontWeight: 800, color: 'white' }}>Connecté · Paris, FR</div>
-                <div style={{ background: 'rgba(255,255,255,.2)', borderRadius: '50px', padding: '4px 12px', color: 'white', fontSize: '11px', marginTop: '10px', display: 'inline-block' }}>Gestionnaire : Kouassi N.</div>
-              </div>
-              <div className="user-visual-inner" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Dernier rapport financier</span><span style={{ color: 'var(--teal)', fontWeight: 700 }}>PDF</span></div>
-                <div style={{ background: 'var(--cream)', borderRadius: '12px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: 'var(--ink)' }}>Inspection vidéo</span><span style={{ color: 'var(--mango-d)', fontWeight: 700 }}>Planifiée</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ TESTIMONIALS ═══ */}
-      <section className="testimonials" id="testimonials">
-        <div className="section-inner">
-          <div className="testimonials-header reveal">
-            <div className="section-eyebrow">💬 Témoignages</div>
-            <h2>Ils nous font confiance</h2>
-          </div>
-          <div className="testi-grid">
-            <div className="testi-card reveal">
-              <div className="testi-stars">⭐⭐⭐⭐⭐</div>
-              <p className="testi-quote">« Avant QAPRIL, je courais après les loyers chaque mois. Maintenant Orange Money me notifie directement et la quittance part automatiquement. C'est magique ! »</p>
-              <div className="testi-author">
-                <div className="testi-avatar" style={{ background: 'linear-gradient(135deg,var(--mango),var(--coral))' }}>OI</div>
-                <div><div className="testi-name">Ouédraogo Issa</div><div className="testi-role">Propriétaire · 3 biens · Yopougon</div></div>
-              </div>
-              <div className="testi-tag" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>🏠 Propriétaire</div>
-            </div>
-            <div className="testi-card reveal reveal-d1">
-              <div className="testi-stars">⭐⭐⭐⭐⭐</div>
-              <p className="testi-quote">« Mon score ICL m'a permis de décrocher le logement de mes rêves à Cocody. Le propriétaire a vu que j'étais sérieuse — plus de méfiance, juste de la confiance. »</p>
-              <div className="testi-author">
-                <div className="testi-avatar" style={{ background: 'linear-gradient(135deg,var(--teal),var(--sky))' }}>KA</div>
-                <div><div className="testi-name">Konan Adjoa</div><div className="testi-role">Locataire · Cocody Riviera</div></div>
-              </div>
-              <div className="testi-tag" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>🧑 Locataire</div>
-            </div>
-            <div className="testi-card reveal reveal-d2">
-              <div className="testi-stars">⭐⭐⭐⭐⭐</div>
-              <p className="testi-quote">« Avec QAPRIL, je gère 28 biens depuis mon téléphone. Les CRG se génèrent automatiquement, les propriétaires sont ravis. On a doublé notre portefeuille en 6 mois. »</p>
-              <div className="testi-author">
-                <div className="testi-avatar" style={{ background: 'linear-gradient(135deg,var(--fuchsia),#9C27B0)' }}>PI</div>
-                <div><div className="testi-name">Prestige Immobilier</div><div className="testi-role">Agence agréée · Cocody</div></div>
-              </div>
-              <div className="testi-tag" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>🏢 Agence</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ PRICING ═══ */}
-      <section className="pricing" id="pricing">
-        <div className="section-inner">
-          <div className="pricing-header reveal">
-            <div className="section-eyebrow">💲 Tarifs</div>
-            <h2>Des offres pour chaque profil</h2>
-            <p className="section-desc" style={{ margin: '0 auto', textAlign: 'center' }}>Commencez gratuitement. Évoluez selon vos besoins.</p>
-          </div>
-          <div className="pricing-grid">
-            <div className="price-card reveal">
-              <div className="price-badge" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>LOCATAIRE</div>
-              <div className="price-icon">🧑</div>
-              <div className="price-name">Locataire</div>
-              <div className="price-amount">Gratuit</div>
-              <div className="price-period">Puis frais d'enreg. (selon barème)</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Paiement Mobile Money</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Quittances PDF</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Score ICL</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Passeport locatif</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Signalements</div>
-              </div>
-              <button className="price-cta" onClick={() => handleLoginClick("LOCATAIRE")}>Commencer gratuitement</button>
-            </div>
-
-            <div className="price-card reveal reveal-d1">
-              <div className="price-badge" style={{ background: 'var(--mango-l)', color: 'var(--mango-d)' }}>PROPRIÉTAIRE</div>
-              <div className="price-icon">🏠</div>
-              <div className="price-name">Propriétaire</div>
-              <div className="price-amount">Gratuit</div>
-              <div className="price-period">Sans commission ni frais cachés</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestion des biens et baux</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Quittances illimitées</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Relances auto</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Enregistrement DGI (par le locataire)</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Caution CDC-CI</div>
-              </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Essayer gratuitement</button>
-            </div>
-
-            <div className="price-card featured reveal reveal-d2">
-              <div className="price-badge">⭐ AGENCE INTERMÉDIAIRE</div>
-              <div className="price-icon">🏢</div>
-              <div className="price-name">Agence Inter.</div>
-              <div className="price-amount">{paywallActif ? "Par quittance" : "Gratuit"}</div>
-              <div className="price-period" style={{ color: 'rgba(255,255,255,.45)' }}>{paywallActif ? "Facturation à l'acte généré" : "Pour toujours"}</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tout Propriétaire</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Mandats de gestion</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> CRG automatiques</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Agent IA bail déclaratif</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Biens illimités</div>
-              </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Commencer maintenant</button>
-            </div>
-
-            <div className="price-card reveal reveal-d3">
-              <div className="price-badge" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>DIASPORA VIP</div>
-              <div className="price-icon">🌍</div>
-              <div className="price-name">Diaspora</div>
-              <div className="price-amount">{paywallActif ? "2 500" : "Gratuit"}</div>
-              <div className="price-period">{paywallActif ? "FCFA / mois · complet" : "Service 100% gratuit"}</div>
-              <div className="price-divider"></div>
-              <div className="price-features">
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Tableau de bord VIP</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Rapports financiers</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Inspection vidéo</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> WhatsApp prioritaire</div>
-                <div className="price-feature"><span className="price-feature-icon">✅</span> Gestionnaire terrain</div>
-              </div>
-              <button className="price-cta" onClick={() => handleLoginClick("BAILLEUR")}>Activer Pack Diaspora</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ B2B ECOSYSTEM ═══ */}
-      <section className="features bg-cream" id="b2b-ecosystem" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-        <div className="section-inner">
-          <div className="features-header reveal">
-            <div className="section-eyebrow" style={{ background: 'var(--ink)', color: 'white' }}>💼 Écosystème B2B</div>
-            <h2>L'infrastructure de<br/>l'immobilier ivoirien</h2>
-            <p className="section-desc">QAPRIL propose des solutions sur-mesure pour les professionnels de l'immobilier, les artisans et les institutions financières.</p>
-          </div>
-          <div className="features-grid">
-
-            <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="fc-icon" style={{ background: 'var(--sky)', color: 'white' }}>🔌</div>
-              <h3>API Agences & DGI</h3>
-              <p>Connectez votre logiciel existant. Automatisez la gestion, le paiement des loyers et l'enregistrement DGI en marque blanche.</p>
-              <div className="feature-tag" style={{ background: 'var(--sky-l)', color: 'var(--sky-d)' }}>Sur mesure / API</div>
-            </div>
-
-            <div className="feature-card reveal reveal-d1" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="fc-icon" style={{ background: 'var(--coral)', color: 'white' }}>🛠️</div>
-              <h3>Marketplace Artisans</h3>
-              <p>Plombiers, électriciens, peintres : recevez des demandes d'intervention qualifiées provenant directement des locataires et propriétaires.</p>
-              <div className="feature-tag" style={{ background: 'var(--coral-l)', color: 'var(--coral)' }}>2 000 FCFA / lead qualifié</div>
-            </div>
-
-            <div className="feature-card reveal reveal-d2" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="fc-icon" style={{ background: 'var(--fuchsia)', color: 'white' }}>🏛</div>
-              <h3>Portail Partenaire État</h3>
-              <p>Interface et flux dédiés (CPRAIMA-CI, DGI) pour la collecte et la ventilation (50/20/30) automatisée des frais d'enregistrement.</p>
-              <div className="feature-tag" style={{ background: 'var(--fuchsia-l)', color: '#9C27B0' }}>Accès Institutionnel</div>
-            </div>
-
-            <div className="feature-card reveal" style={{ background: 'white', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="fc-icon" style={{ background: 'var(--teal)', color: 'white' }}>📊</div>
-              <h3>Licences Data & Scoring</h3>
-              <p>Accès anonymisé aux données de solvabilité (Score ICL) pour les banques, assurances, et promoteurs immobiliers.</p>
-              <div className="feature-tag" style={{ background: 'var(--teal-l)', color: 'var(--teal)' }}>5 000 000 FCFA / an</div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ MOBILE ═══ */}
-      <div className="mobile-section">
-        <div className="mobile-inner">
-          <div className="mobile-left reveal">
-            <div className="section-eyebrow">📱 Application mobile</div>
-            <h2>Dans votre poche,<br/>toujours disponible</h2>
-            <p className="section-desc">Payez votre loyer depuis le marché, recevez vos quittances en déplacement, gérez vos biens depuis Bouaké ou San Pédro.</p>
-            <div className="app-stores">
-              <a href="#" className="app-store-btn">
-                <span className="asb-icon">🍎</span>
-                <div className="asb-text"><span className="asb-sub">Télécharger sur</span><span className="asb-name">App Store</span></div>
-              </a>
-              <a href="#" className="app-store-btn">
-                <span className="asb-icon">🤖</span>
-                <div className="asb-text"><span className="asb-sub">Disponible sur</span><span className="asb-name">Google Play</span></div>
-              </a>
-            </div>
-          </div>
-          <div className="mobile-right">
-            <div className="phone-mockup phone-1">
-              <div className="phone-screen">
-                <div className="ps-header"><div className="ps-logo">QAPRIL</div></div>
-                <div className="ps-body">
-                  <div className="ps-item"><div className="ps-item-icon" style={{ background: 'var(--mango-l)' }}>💳</div><div className="ps-item-text"><strong>Loyer mai payé</strong>85 000 FCFA · Orange</div></div>
-                  <div className="ps-item"><div className="ps-item-icon" style={{ background: 'var(--teal-l)' }}>✓</div><div className="ps-item-text"><strong>Quittance reçue</strong>PDF · REC-2025-05</div></div>
-                  <div className="ps-item"><div className="ps-item-icon" style={{ background: 'var(--lime-l)' }}>📊</div><div className="ps-item-text"><strong>Score ICL</strong>72 pts · Grade B</div></div>
-                </div>
-              </div>
-            </div>
-            <div className="phone-mockup phone-2">
-              <div className="phone-screen">
-                <div className="ps-header" style={{ background: 'var(--ink)' }}><div className="ps-logo">Mon portefeuille</div></div>
-                <div className="ps-body">
-                  <div className="ps-item"><div className="ps-item-icon" style={{ background: '#DCFCE7' }}>🏠</div><div className="ps-item-text"><strong>F3 Yopougon</strong>85 000 FCFA ✓</div></div>
-                  <div className="ps-item"><div className="ps-item-icon" style={{ background: 'var(--coral-l)' }}>🏢</div><div className="ps-item-text"><strong>Studio Cocody</strong>Impayé J+12 ⚠️</div></div>
-                  <div style={{ background: 'linear-gradient(135deg,var(--mango),var(--coral))', borderRadius: '10px', padding: '10px', marginTop: '6px', textAlign: 'center', color: 'white', fontSize: '12px', fontWeight: 600 }}>245 000 FCFA ce mois</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ CTA ═══ */}
-      <div className="cta-band" id="cta">
-        <div className="cta-deco-1"></div>
-        <div className="cta-deco-2"></div>
-        <div className="cta-inner">
-          <h2>Rejoignez 4 800+ Ivoiriens<br/>qui gèrent mieux leur logement</h2>
-          <p>Inscription gratuite · Aucune carte bancaire requise · Actif en 5 minutes</p>
-          {session?.user ? (
-            <Link href={dashUrl} className="btn-cta-white">🚀 Accéder à mon Dashboard</Link>
-          ) : (
-            <button onClick={() => handleLoginClick("LOCATAIRE")} className="btn-cta-white">🚀 Créer mon compte gratuitement</button>
-          )}
-          <div className="cta-sub">✓ Gestion gratuite pour le propriétaire · ✓ Enregistrement DGI par le locataire · ✓ Support WhatsApp inclus</div>
-        </div>
-      </div>
-
-      {/* ═══ FOOTER ═══ */}
-      <footer>
-        <div className="footer-inner">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <a href="#" className="footer-logo">
-                <div style={{ background: 'white', padding: '10px 16px', borderRadius: '14px', display: 'inline-block', marginBottom: '16px' }}>
-                  <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
-                </div>
-              </a>
-              <p>La plateforme de gestion locative numérique de Côte d'Ivoire. Conçue pour les acteurs du marché immobilier ivoirien.</p>
-              <div className="footer-socials">
-                <a href="#" className="social-btn">📘</a>
-                <a href="#" className="social-btn">📷</a>
-                <a href="#" className="social-btn">💬</a>
-                <a href="#" className="social-btn">🐦</a>
-              </div>
-            </div>
-            <div className="footer-col">
-              <h4>Produit</h4>
-              <div className="footer-links">
-                <a href="#" className="footer-link">Fonctionnalités</a>
-                <a href="#" className="footer-link">Tarifs</a>
-                <a href="#" className="footer-link">Application mobile</a>
-                <a href="#" className="footer-link">API & Intégrations</a>
-                <a href="#" className="footer-link">Nouveautés</a>
-              </div>
-            </div>
-            <div className="footer-col">
-              <h4>Pour vous</h4>
-              <div className="footer-links">
-                <a href="#users" onClick={() => setActiveTab('tenant')} className="footer-link">Locataires</a>
-                <a href="#users" onClick={() => setActiveTab('landlord')} className="footer-link">Propriétaires</a>
-                <a href="#users" onClick={() => setActiveTab('agency')} className="footer-link">Agences immobilières</a>
-              </div>
-            </div>
-            <div className="footer-col">
-              <h4>Entreprise</h4>
-              <div className="footer-links">
-                <Link href="/a-propos" className="footer-link">À propos</Link>
-                <Link href="/blog" className="footer-link">Blog</Link>
-                <Link href="/presse" className="footer-link">Presse</Link>
-                <Link href="/carriere" className="footer-link">Carrières</Link>
-                <Link href="/contact" className="footer-link">Contact</Link>
-              </div>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <div className="footer-legal flex flex-wrap items-center gap-x-4 gap-y-2 justify-center md:justify-start">
-              <span>© 2025 QAPRIL Technologies · Abidjan, Côte d'Ivoire · Tous droits réservés</span>
-              <span className="hidden md:inline text-white/30">|</span>
-              <div className="flex flex-wrap items-center gap-4 text-white/50 text-[11px] uppercase tracking-widest">
-                <Link href="/cgu" className="hover:text-white transition-colors">CGU</Link>
-                <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions</Link>
-                <Link href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</Link>
-                <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-              </div>
-            </div>
-            <div className="footer-badges">
-              <div className="f-badge">🏛 ANAH-CI</div>
-              <div className="f-badge">🏦 CDC-CI</div>
-              <div className="f-badge">📋 DGI</div>
-              <div className="f-badge">🔒 ARTCI</div>
+          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-white/20">© {new Date().getFullYear()} QAPRIL Infrastructure. Tous droits réservés.</p>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-white/20 bg-white/5 border border-white/8 px-3 py-1 rounded-full">🇨🇮 Made in Côte d'Ivoire</span>
+              <span className="text-xs text-white/20 bg-white/5 border border-white/8 px-3 py-1 rounded-full">🔒 ISO 27001</span>
             </div>
           </div>
         </div>

@@ -68,7 +68,7 @@ export default function LoginPage() {
                         >
                             <Link 
                                 href={portal.href}
-                                className="group block relative h-full bg-[#18181B] rounded-[24px] p-8 border border-white/5 hover:border-white/20 transition-all duration-500 overflow-hidden"
+                                className="group block relative h-full bg-[#18181B] rounded-[24px] p-8 border border-white/5 hover:border-white/20 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all duration-500 overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
