@@ -25,10 +25,10 @@ export default function LocataireLayoutClient({
     const activeRole = dbActiveRole || session?.user?.role;
     return (
         <SessionProvider session={session}>
-            <div className="min-h-screen bg-transparent flex flex-col relative overflow-x-hidden font-bodoni">
-            {/* Mesh Background */}
-            <div className="fixed inset-0 bg-mesh -z-20 opacity-70"></div>
-            <div className="fixed inset-0 bg-ivory-pattern opacity-30 -z-10 animate-pulse duration-[10s]"></div>
+            <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-x-hidden">
+            {/* Trame architecturale filigrane */}
+            <div className="fixed inset-0 bg-[linear-gradient(to_right,#0F172A08_1px,transparent_1px),linear-gradient(to_bottom,#0F172A08_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+            <div className="fixed top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0" />
             
             {/* Vertical Sidebar - Only for Desktop */}
             {session?.user && (

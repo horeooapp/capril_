@@ -39,12 +39,11 @@ async function main() {
                 data: {
                     role: 'ADMIN',
                     password: hashedPassword,
-                    status: 'active'
+                    status: 'ACTIVE'
                 }
             });
             console.log(`✅ Success: User ${email} has been promoted to ADMIN and password updated.`);
         } else {
-            // Need a phone number as it's unique and required in schema
             const dummyPhone = `+2250101010101_admin`; 
             await prisma.user.create({
                 data: {
@@ -52,8 +51,11 @@ async function main() {
                     password: hashedPassword,
                     role: 'ADMIN',
                     phone: dummyPhone,
-                    fullName: 'Administrateur Central',
-                    status: 'active'
+                    firstName: 'Administrateur',
+                    lastName: 'Central',
+                    status: 'ACTIVE',
+                    isCertified: true,
+                    onboardingComplete: true
                 }
             });
             console.log(`✅ Success: User ${email} has been created as ADMIN.`);

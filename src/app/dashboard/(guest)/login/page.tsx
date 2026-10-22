@@ -2,104 +2,137 @@
 
 import Link from "next/link"
 import EmailOTPForm from "@/components/auth/EmailOTPForm"
-import { ShieldCheck, TrendingUp, Gem } from "lucide-react"
+import { ShieldCheck, TrendingUp, Gem, Sparkles, ArrowLeft } from "lucide-react"
 import { motion } from "framer-motion"
 import UnifiedLoginPage from "@/components/auth/UnifiedLoginPage"
 
 export default function LandlordLoginPage() {
     return (
         <>
-            {/* Version Web PC - Intacte */}
-            <div className="hidden md:block min-h-screen bg-[#0A1128] relative overflow-hidden">
-                {/* Elegant Background Immersive Mesh */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
-                <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] bg-amber-600/20 blur-[150px] rounded-full animate-pulse opacity-60 mix-blend-screen pointer-events-none"></div>
-                <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#1F4E79]/30 blur-[150px] rounded-full animate-pulse animation-delay-2000 opacity-60 mix-blend-screen pointer-events-none"></div>
+            {/* Version Web Desktop — Split 50/50 Architectural Exécutif Lumineux */}
+            <div className="hidden md:flex min-h-screen bg-[#F8FAFC] text-slate-900 font-sans tracking-tight">
                 
-                {/* Grid structure overlay */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)] pointer-events-none"></div>
-
-                <div className="container mx-auto px-4 z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-32 w-full max-w-7xl relative">
+                {/* Visual Left Side — Bâtiment architectural et cadre souverain */}
+                <div className="relative w-1/2 min-h-screen hidden lg:flex flex-col justify-between p-12 xl:p-16 overflow-hidden border-r border-slate-200 bg-slate-900">
+                    {/* Background Cityscape Image */}
+                    <img
+                        src="/images/login_landlord_visual.jpg"
+                        alt="Immeuble moderne Plateau Abidjan"
+                        className="absolute inset-0 w-full h-full object-cover object-center opacity-65 scale-105 transition-transform duration-1000"
+                    />
                     
-                    {/* Visual Typography Left */}
-                    <div className="hidden lg:flex flex-col items-start w-full max-w-lg">
-                        <motion.div 
-                            initial={{ opacity: 0, x: -30, filter: "blur(10px)" }}
-                            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                        >
-                            <div className="mb-8 inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl rounded-[18px] border border-white/10 text-[10px] font-black tracking-[0.2em] uppercase text-amber-500 shadow-xl shadow-black/20">
-                                <ShieldCheck className="w-5 h-5" />
-                                Accès Distingué & Sécurisé
-                            </div>
-                            <h2 className="text-6xl xl:text-7xl font-[1000] tracking-tighter leading-[0.9] mb-8 uppercase text-white">
-                                Supervisez <br />
-                                votre <span className="italic font-serif normal-case text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600 text-7xl xl:text-8xl">patrimoine.</span>
-                            </h2>
-                            
-                            <div className="h-1 w-24 bg-gradient-to-r from-amber-500 to-transparent mb-10 rounded-full"></div>
+                    {/* Overlay architectural sombre élégant */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/40" />
 
-                            <p className="text-xl text-gray-400 font-light leading-relaxed mb-12">
-                                Accédez en temps réel à vos rapports financiers, vos baux certifiés et la rentabilité de vos actifs sur notre plateforme sécurisée.
-                            </p>
-                            
-                            <div className="flex gap-12 bg-white/5 backdrop-blur-md p-6 rounded-[24px] border border-white/5 inline-flex shadow-2xl">
-                                <div>
-                                    <div className="text-3xl font-black text-white mb-1 font-serif">A+</div>
-                                    <div className="text-[9px] uppercase tracking-[0.2em] text-amber-500 font-black">Notation Sûreté</div>
-                                </div>
-                                <div className="w-px h-12 bg-white/10 mt-1"></div>
-                                <div>
-                                    <div className="text-3xl font-black text-white mb-1 font-serif">100%</div>
-                                    <div className="text-[9px] uppercase tracking-[0.2em] text-amber-500 font-black">Connexion Chiffrée</div>
-                                </div>
+                    {/* Top Branding */}
+                    <div className="relative z-10">
+                        <Link href="/" className="inline-flex items-center gap-3.5 group">
+                            <img 
+                                src="/logo.png" 
+                                alt="QAPRIL Logo" 
+                                className="h-10 w-auto group-hover:scale-105 transition-transform duration-300 brightness-0 invert" 
+                            />
+                            <div className="h-5 w-px bg-white/20" />
+                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-white/10">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-wider text-amber-300">
+                                    Console Bailleurs & Propriétaires
+                                </span>
                             </div>
-                        </motion.div>
+                        </Link>
                     </div>
 
-                    {/* Login Form Right */}
-                    <div className="w-full max-w-md">
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                        >
-                            <Link href="/" className="flex flex-col items-center lg:items-start mb-12 group lg:hidden">
+                    {/* Bottom Content Over Image */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="relative z-10 max-w-xl text-white"
+                    >
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-wider text-amber-300 mb-6">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                            Garantie & Certification Foncière
+                        </div>
+
+                        <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-tight mb-4 uppercase text-white">
+                            Supervisez votre <br />
+                            <span className="text-amber-400">Patrimoine Locatif.</span>
+                        </h1>
+
+                        <p className="text-sm xl:text-base text-slate-300 font-medium leading-relaxed mb-8 max-w-lg">
+                            Suivi en temps réel des encaissements par Mobile Money, consignation légale des cautions à la CDC-CI et quittances fiscales conformes DGI.
+                        </p>
+
+                        {/* Trust Badges */}
+                        <div className="flex items-center gap-6 bg-slate-900/80 px-6 py-3.5 rounded-xl border border-slate-700/80 inline-flex shadow-xl">
+                            <div>
+                                <div className="text-xl xl:text-2xl font-black text-white">99.4%</div>
+                                <div className="text-[9px] uppercase tracking-wider text-amber-400 font-bold">Taux Recouvrement</div>
+                            </div>
+                            <div className="w-px h-8 bg-white/15" />
+                            <div>
+                                <div className="text-xl xl:text-2xl font-black text-white">100%</div>
+                                <div className="text-[9px] uppercase tracking-wider text-amber-400 font-bold">Quittances Certifiées</div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Form Right Side — Blanc épuré lumineux */}
+                <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center p-6 lg:p-12 relative z-20 bg-[#F8FAFC]">
+                    {/* Grille fine vectorielle */}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="w-full max-w-md relative z-10"
+                    >
+                        {/* Mobile/Tablet logo */}
+                        <div className="flex flex-col items-center mb-8 lg:hidden">
+                            <Link href="/">
                                 <img 
                                     src="/logo.png" 
                                     alt="QAPRIL Logo" 
-                                    className="h-16 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] brightness-0 invert" 
-                                />
-                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mt-4 ml-1 drop-shadow-md">Console Propriétaire</p>
-                            </Link>
-                            <Link href="/" className="hidden lg:flex flex-col items-center mb-10 group">
-                                <img 
-                                    src="/logo.png" 
-                                    alt="QAPRIL Logo" 
-                                    className="h-14 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] brightness-0 invert" 
+                                    className="h-12 w-auto mb-3" 
                                 />
                             </Link>
+                            <span className="text-[10px] font-black text-[#D97706] uppercase tracking-wider">Console Propriétaire</span>
+                        </div>
 
-                            <div className="relative z-20">
-                                <EmailOTPForm 
-                                    role="LANDLORD"
-                                    redirectPath="/dashboard"
-                                    title="Espace Patrimoine"
-                                    subtitle="Saisissez votre email pour surveiller vos investissements locatifs."
-                                />
-                            </div>
+                        {/* Back Link */}
+                        <div className="mb-6">
+                            <Link 
+                                href="/login" 
+                                className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors group"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                                <span>Changer d'espace d'accès</span>
+                            </Link>
+                        </div>
 
-                            <div className="mt-12 flex items-center justify-between text-[10px] font-black text-gray-500 uppercase tracking-widest relative z-10 px-4">
-                                <Link href="/auth/help" title="Accès de secours" className="hover:text-amber-500 transition-colors">Assistance</Link>
-                                <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                                <Link href="/contact" className="hover:text-amber-500 transition-colors">Contact Expert</Link>
-                            </div>
-                        </motion.div>
-                    </div>
+                        {/* Form Card */}
+                        <div className="relative">
+                            <EmailOTPForm 
+                                role="LANDLORD"
+                                redirectPath="/dashboard"
+                                title="Espace Propriétaire"
+                                subtitle="Saisissez votre email certifié pour accéder à votre console de gestion."
+                            />
+                        </div>
+
+                        {/* Footer Links */}
+                        <div className="mt-8 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-2">
+                            <Link href="/contact" className="hover:text-slate-900 transition-colors">Assistance & Support</Link>
+                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                            <Link href="/cgu" className="hover:text-slate-900 transition-colors">Cadre Juridique</Link>
+                        </div>
+                    </motion.div>
                 </div>
             </div>
 
-            {/* Version Web Mobile Exclusive - Nouveau design unifié */}
+            {/* Version Web Mobile — Tab unifié */}
             <div className="block md:hidden w-full min-h-screen">
                 <UnifiedLoginPage initialTab="landlord" />
             </div>

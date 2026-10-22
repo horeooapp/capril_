@@ -391,7 +391,8 @@ export async function requestSignatureOTP(leaseId: string) {
         await prisma.lease.update({ where: { id: leaseId }, data: { signingOtp: otp } });
 
         if (lease.tenant.phone) {
-            await sendSMS(lease.tenant.phone, `QAPRIL - Code de Signature : ${otp}`);
+            const { sendOpenWAOTP } = await import("@/lib/openwa");
+            await sendOpenWAOTP(lease.tenant.phone, otp, "Signature de contrat de bail");
         }
         return { success: true };
     } catch (error: any) {

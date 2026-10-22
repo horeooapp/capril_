@@ -21,75 +21,60 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             id: 'tenant' as ProfileTab,
             label: "Locataire",
             icon: Home,
-            color: "from-emerald-500 to-emerald-700",
-            textColor: "text-emerald-400",
-            activeBg: "bg-emerald-500/20 border-emerald-500/50 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]",
-            inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
-            indicator: "bg-emerald-500"
+            color: "text-slate-900",
+            textColor: "text-slate-600",
+            activeBg: "bg-white text-slate-900 border-slate-300 shadow-sm",
+            inactiveBg: "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 border-transparent",
+            indicator: "bg-amber-600"
         },
         {
             id: 'landlord' as ProfileTab,
             label: "Propriétaire",
             icon: Building2,
-            color: "from-amber-500 to-amber-700",
-            textColor: "text-amber-400",
-            activeBg: "bg-amber-500/20 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)]",
-            inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
-            indicator: "bg-amber-500"
+            color: "text-slate-900",
+            textColor: "text-slate-600",
+            activeBg: "bg-white text-slate-900 border-slate-300 shadow-sm",
+            inactiveBg: "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 border-transparent",
+            indicator: "bg-amber-600"
         },
         {
             id: 'admin' as ProfileTab,
             label: "Administration",
             icon: ShieldAlert,
-            color: "from-[#C55A11] to-[#E87B2E]",
-            textColor: "text-[#E87B2E]",
-            activeBg: "bg-[#C55A11]/20 border-[#C55A11]/50 text-white shadow-[0_0_20px_rgba(197,90,17,0.3)]",
-            inactiveBg: "text-gray-400 hover:text-gray-200 hover:bg-white/5 border-transparent",
-            indicator: "bg-[#C55A11]"
+            color: "text-slate-900",
+            textColor: "text-slate-600",
+            activeBg: "bg-white text-slate-900 border-slate-300 shadow-sm",
+            inactiveBg: "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 border-transparent",
+            indicator: "bg-amber-600"
         }
     ]
 
     const backgroundThemes = {
         tenant: {
-            bg: "bg-[#021812]",
-            gradient: "from-[#021812]/90 via-[#022c22]/80 to-[#064e3b]/90",
-            glow1: "bg-emerald-500/20 blur-[120px]",
-            glow2: "bg-[#10B981]/20 blur-[150px]",
-            tagText: "Expérience Locataire Certifiée",
-            tagIconColor: "text-emerald-400",
-            badgeColor: "text-emerald-400"
+            tagText: "Espace Locataire Résidentiel",
+            tagIconColor: "text-amber-600",
+            badgeColor: "text-amber-600"
         },
         landlord: {
-            bg: "bg-[#0A1128]",
-            gradient: "from-[#0A1128]/90 via-[#001f3f]/80 to-[#1F4E79]/90",
-            glow1: "bg-amber-600/20 blur-[150px]",
-            glow2: "bg-blue-600/20 blur-[150px]",
-            tagText: "Accès Distingué & Sécurisé",
-            tagIconColor: "text-amber-500",
-            badgeColor: "text-amber-500"
+            tagText: "Gestion Patrimoniale Institutionnelle",
+            tagIconColor: "text-amber-600",
+            badgeColor: "text-amber-600"
         },
         admin: {
-            bg: "bg-[#020617]",
-            gradient: "from-[#020617]/90 via-[#0B1120]/80 to-[#1e293b]/90",
-            glow1: "bg-[#C55A11]/20 blur-[150px]",
-            glow2: "bg-blue-600/20 blur-[150px]",
-            tagText: "Console d'Administration",
-            tagIconColor: "text-[#C55A11]",
-            badgeColor: "text-[#C55A11]"
+            tagText: "Console d'Administration Centrale",
+            tagIconColor: "text-amber-600",
+            badgeColor: "text-amber-600"
         }
     }
 
     const currentTheme = backgroundThemes[activeTab]
 
     return (
-        <div className={`min-h-screen ${currentTheme.bg} flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden transition-colors duration-1000`}>
-            {/* Arrière-plan dynamique et immersif */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${currentTheme.gradient} pointer-events-none transition-all duration-1000 z-0`}></div>
-            <div className={`absolute top-[-20%] left-[-10%] w-[60%] h-[60%] ${currentTheme.glow1} rounded-full animate-pulse opacity-50 mix-blend-screen pointer-events-none z-0 transition-all duration-1000`}></div>
-            <div className={`absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] ${currentTheme.glow2} rounded-full animate-pulse animation-delay-2000 opacity-50 mix-blend-screen pointer-events-none z-0 transition-all duration-1000`}></div>
-            
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay z-0"></div>
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_80%)] pointer-events-none z-0"></div>
+        <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
+            {/* Trame architecturale filigrane */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0F172A08_1px,transparent_1px),linear-gradient(to_bottom,#0F172A08_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-200/50 rounded-full blur-3xl pointer-events-none z-0" />
 
             <div className="container mx-auto z-10 flex flex-col items-center w-full max-w-5xl">
                 
@@ -99,7 +84,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                         <img 
                             src="/logo.png" 
                             alt="QAPRIL Logo" 
-                            className="h-16 md:h-20 w-auto group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] brightness-0 invert" 
+                            className="h-16 md:h-20 w-auto group-hover:scale-105 transition-transform duration-300" 
                         />
                     </Link>
 
@@ -107,29 +92,28 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                         key={currentTheme.tagText}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 text-[10px] md:text-xs font-black tracking-widest uppercase text-white shadow-xl shadow-black/20"
+                        transition={{ duration: 0.3 }}
+                        className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-slate-200 text-[10px] md:text-xs font-bold tracking-widest uppercase text-slate-700 shadow-sm"
                     >
                         <Sparkles className={`w-3.5 h-3.5 ${currentTheme.tagIconColor}`} />
                         <span>{currentTheme.tagText}</span>
                     </motion.div>
                 </div>
 
-                {/* Sélecteur de profil tactile et élégant (Pill Tabs) */}
+                {/* Sélecteur de profil (Pill Tabs épuré) */}
                 <div className="w-full max-w-md mb-8 px-2">
-                    <div className="flex items-center bg-[#0B1120]/80 backdrop-blur-2xl p-1.5 rounded-3xl border border-white/10 shadow-2xl relative">
+                    <div className="flex items-center bg-slate-200/70 p-1.5 rounded-2xl border border-slate-300/70 shadow-inner relative">
                         {tabs.map((tab) => {
                             const isActive = activeTab === tab.id
                             return (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-1 flex items-center justify-center gap-1 md:gap-2 py-3 px-1 md:px-2 rounded-2xl text-[10px] md:text-sm font-black transition-all duration-300 relative border ${isActive ? tab.activeBg : tab.inactiveBg} ${tab.id === 'admin' ? 'hidden md:flex' : ''}`}
-                                    style={{ minHeight: '48px' }}
+                                    className={`flex-1 flex items-center justify-center gap-1.5 md:gap-2 py-2.5 px-2 rounded-xl text-xs md:text-sm font-bold transition-all duration-200 relative border ${isActive ? tab.activeBg : tab.inactiveBg} ${tab.id === 'admin' ? 'hidden md:flex' : ''}`}
                                     aria-label={`Connexion profil ${tab.label}`}
                                 >
-                                    <tab.icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${isActive ? '' : tab.textColor}`} />
-                                    <span className="tracking-wide">{tab.label}</span>
+                                    <tab.icon className={`w-4 h-4 ${isActive ? 'text-amber-600' : 'text-slate-500'}`} />
+                                    <span className="tracking-tight">{tab.label}</span>
                                 </button>
                             )
                         })}
@@ -141,18 +125,18 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
-                            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -15 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
                             className="relative"
                         >
                             {activeTab === 'tenant' && (
                                 <EmailOTPForm 
                                     role="TENANT"
                                     redirectPath="/mon-espace-locataire"
-                                    title="Votre Habitat"
-                                    subtitle="Saisissez votre email pour accéder à votre espace locataire sécurisé."
+                                    title="Espace Locataire"
+                                    subtitle="Saisissez votre email certifié pour accéder à votre habitat et vos quittances."
                                 />
                             )}
                             
@@ -160,20 +144,18 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                 <EmailOTPForm 
                                     role="LANDLORD"
                                     redirectPath="/dashboard"
-                                    title="Espace Patrimoine"
-                                    subtitle="Saisissez votre email pour gérer et superviser vos investissements."
+                                    title="Espace Bailleur"
+                                    subtitle="Saisissez votre email certifié pour superviser vos actifs et rendements."
                                 />
                             )}
                             
                             {activeTab === 'admin' && (
                                 <AdminLoginForm 
                                     redirectPath="/admin"
-                                    title="Authentification"
-                                    subtitle="Console d'Administration Centrale (Certifiée)"
+                                    title="Console d'Administration"
+                                    subtitle="Accès réservé aux administrateurs de la plateforme"
                                 />
                             )}
-
-
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -182,12 +164,12 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="mt-12 text-center flex flex-col items-center gap-2"
+                    transition={{ delay: 0.3 }}
+                    className="mt-10 text-center flex flex-col items-center gap-2"
                 >
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 text-[10px] font-bold text-slate-600 uppercase tracking-widest shadow-sm">
                         <ShieldCheck className={`w-4 h-4 ${currentTheme.badgeColor}`} />
-                        <span>Protocole National de Sûreté 100% Certifié</span>
+                        <span>Plateforme Immobilière Institutionnelle Sécurisée</span>
                     </div>
                 </motion.div>
 

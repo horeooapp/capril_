@@ -9,7 +9,7 @@ export default function PushRegistration() {
     const [status, setStatus] = useState<NotificationPermission | 'unsupported'>('default')
 
     useEffect(() => {
-        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+        if (!('Notification' in window) || !('serviceWorker' in navigator) || !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
             setStatus('unsupported')
             return
         }
@@ -23,6 +23,13 @@ export default function PushRegistration() {
 
     const subscribeToPush = async () => {
         try {
+            const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+            if (!vapidPublicKey) {
+                console.warn("[PUSH] VAPID Public Key non configurée dans l'environnement.")
+                setShowBanner(false)
+                return
+            }
+
             const permission = await Notification.requestPermission()
             setStatus(permission)
             setShowBanner(false)
@@ -32,12 +39,6 @@ export default function PushRegistration() {
                 let subscription = await registration.pushManager.getSubscription()
 
                 if (!subscription) {
-                    const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-                    if (!vapidPublicKey) {
-                        console.error("VAPID Public Key missing")
-                        return
-                    }
-
                     subscription = await registration.pushManager.subscribe({
                         userVisibleOnly: true,
                         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
@@ -47,7 +48,7 @@ export default function PushRegistration() {
                 await savePushToken(JSON.stringify(subscription))
             }
         } catch (error) {
-            console.error("Push subscription failed", error)
+            console.warn("[PUSH] Inscription push ignorée ou non supportée:", error)
         }
     }
 

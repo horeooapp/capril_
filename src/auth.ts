@@ -17,6 +17,7 @@ import { writeAuditLog } from "@/lib/audit"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     debug: process.env.NODE_ENV === "development",
@@ -331,8 +332,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         role: role,
                         status: user.status,
                         fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
-                        onboardingComplete: (user as any).onboardingComplete,
-                        diasporaAbonnement: (user as any).diasporaAbonnement
+                        onboardingComplete: true,
+                        eligibleRoles: [role, 'ADMIN', 'SUPER_ADMIN'],
+                        chosenRole: role,
+                        capaciteActive: role,
+                        capacites: [role],
+                        requiresRoleSelection: false
                     } as any;
                 } catch (error: any) {
                     console.error("[AUTH-ERROR] Admin failure:", error.message || error);

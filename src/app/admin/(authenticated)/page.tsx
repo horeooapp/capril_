@@ -275,7 +275,7 @@ export default async function AdminDashboardOverview() {
             <>
                 <div className="page-header">
                     <div>
-                        <h1 className="page-title">Survision Centrale</h1>
+                        <h1 className="page-title">Supervision Centrale</h1>
                         <p className="page-sub">Contrôle intégral des flux - Hub Abidjan</p>
                     </div>
                     <div className="date-badge">

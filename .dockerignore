@@ -1,0 +1,44 @@
+# ── Build artifacts ───────────────────────────────────────────────
+.next
+out
+node_modules
+
+# ── Git & IDE ─────────────────────────────────────────────────────
+.git
+.gitignore
+.idea
+.vscode
+
+# ── Env files (injectés via docker-compose) ───────────────────────
+.env
+.env.local
+.env.production
+# .env.docker EST inclus car utilisé comme référence — les secrets
+# réels doivent être dans un fichier séparé non commité.
+
+# ── Dev/test files ────────────────────────────────────────────────
+prisma/dev.db
+prisma/dev.db-shm
+prisma/dev.db-wal
+*.test.*
+__tests__
+coverage
+
+# ── Docs & scripts non nécessaires ────────────────────────────────
+docs
+brain
+tmp
+output
+README.md
+*.docx
+*.py
+create_*.py
+generate_doc.js
+check_*.js
+reset_db.ts
+deploy.sh
+
+# ── Native/mobile (non servis par le container web) ───────────────
+mobile
+mobile_apps
+native_apps

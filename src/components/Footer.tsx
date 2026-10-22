@@ -3,75 +3,111 @@
 import Link from "next/link";
 
 export default function Footer() {
-    return (
-      <div className="landing-v2-wrapper font-sans text-ink pb-0" style={{ backgroundColor: 'transparent', minHeight: 'auto' }}>
-        <footer>
-          <div className="footer-inner">
-            <div className="footer-top">
-              <div className="footer-brand">
-                <Link href="/" className="footer-logo">
-                  <div style={{ background: 'white', padding: '10px 16px', borderRadius: '14px', display: 'inline-block', marginBottom: '16px' }}>
-                    <img src="/logo.png" alt="QAPRIL Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
-                  </div>
-                </Link>
-                <p>La plateforme de gestion locative numérique de Côte d'Ivoire. Conçue pour les acteurs du marché immobilier ivoirien.</p>
-                <div className="footer-socials">
-                  <a href="#" className="social-btn">📘</a>
-                  <a href="#" className="social-btn">📷</a>
-                  <a href="#" className="social-btn">💬</a>
-                  <a href="#" className="social-btn">🐦</a>
-                </div>
+  return (
+    <footer className="border-t border-white/10 bg-[#09090B] px-6 md:px-12 py-16 text-white font-sans">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-14">
+          {/* Brand Col */}
+          <div className="md:col-span-1 space-y-4">
+            <Link href="/" className="inline-block">
+              <div className="bg-white/5 p-2 rounded-2xl border border-white/10 inline-block">
+                <img src="/logo.png" alt="QAPRIL" className="h-10 w-auto object-contain brightness-110" />
               </div>
-              <div className="footer-col">
-                <h4>Produit</h4>
-                <div className="footer-links">
-                  <a href="/#features" className="footer-link">Fonctionnalités</a>
-                  <a href="/#pricing" className="footer-link">Tarifs</a>
-                  <a href="#" className="footer-link">Application mobile</a>
-                  <a href="#" className="footer-link">API & Intégrations</a>
-                  <a href="#" className="footer-link">Nouveautés</a>
-                </div>
-              </div>
-              <div className="footer-col">
-                <h4>Pour vous</h4>
-                <div className="footer-links">
-                  <Link href="/mon-espace-locataire/login" className="footer-link">Locataires</Link>
-                  <Link href="/dashboard/login" className="footer-link">Propriétaires</Link>
-                  <Link href="/dashboard/login" className="footer-link">Agences immobilières</Link>
-                  <Link href="/dashboard/login" className="footer-link">Agents NC</Link>
-                </div>
-              </div>
-              <div className="footer-col">
-                <h4>Entreprise</h4>
-                <div className="footer-links">
-                  <Link href="/a-propos" className="footer-link">À propos</Link>
-                  <Link href="/blog" className="footer-link">Blog</Link>
-                  <Link href="/presse" className="footer-link">Presse</Link>
-                  <Link href="/carriere" className="footer-link">Carrières</Link>
-                  <Link href="/contact" className="footer-link">Contact</Link>
-                </div>
-              </div>
-            </div>
-            <div className="footer-bottom">
-              <div className="footer-legal flex flex-wrap items-center gap-x-4 gap-y-2 justify-center md:justify-start">
-                <span>© 2025 QAPRIL Technologies · Abidjan, Côte d'Ivoire · Tous droits réservés</span>
-                <span className="hidden md:inline text-white/30">|</span>
-                <div className="flex flex-wrap items-center gap-4 text-white/50 text-[11px] uppercase tracking-widest">
-                  <Link href="/cgu" className="hover:text-white transition-colors">CGU</Link>
-                  <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions</Link>
-                  <Link href="/confidentialite" className="hover:text-white transition-colors">Confidentialité</Link>
-                  <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-                </div>
-              </div>
-              <div className="footer-badges">
-                <div className="f-badge">🏛 ANAH-CI</div>
-                <div className="f-badge">🏦 CDC-CI</div>
-                <div className="f-badge">📋 DGI</div>
-                <div className="f-badge">🔒 ARTCI</div>
-              </div>
+            </Link>
+            <p className="text-sm text-white/40 leading-relaxed max-w-xs">
+              L&apos;infrastructure technologique de référence pour la gestion locative et la certification des baux en Côte d&apos;Ivoire.
+            </p>
+            <div className="pt-2">
+              <span className="text-[11px] font-bold text-white/40 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+                Abidjan · Cocody Riviera
+              </span>
             </div>
           </div>
-        </footer>
+
+          {/* Nav Col 1 */}
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Plateforme</div>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/piliers" className="text-white/45 hover:text-white transition-colors">4 Piliers Fondateurs</Link>
+              </li>
+              <li>
+                <Link href="/solutions" className="text-white/45 hover:text-white transition-colors">Solutions Métiers</Link>
+              </li>
+              <li>
+                <Link href="/services" className="text-white/45 hover:text-white transition-colors">Services & Modules</Link>
+              </li>
+              <li>
+                <Link href="/comparatif" className="text-white/45 hover:text-white transition-colors">Comparatif Analytique</Link>
+              </li>
+              <li>
+                <Link href="/tarifs" className="text-white/45 hover:text-white transition-colors">Tarifs & Formules</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-white/45 hover:text-white transition-colors">Assistance & Support</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Nav Col 2 */}
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Portails d&apos;accès</div>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/mon-espace-locataire/login" className="text-white/45 hover:text-white transition-colors">Espace Locataire</Link>
+              </li>
+              <li>
+                <Link href="/dashboard/login" className="text-white/45 hover:text-white transition-colors">Espace Propriétaire</Link>
+              </li>
+              <li>
+                <Link href="/dashboard/login" className="text-white/45 hover:text-white transition-colors">Agences Immobilières</Link>
+              </li>
+              <li>
+                <Link href="/admin" className="text-white/45 hover:text-white transition-colors">Administration</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Nav Col 3 */}
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Légal & Sécurité</div>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/mentions-legales" className="text-white/45 hover:text-white transition-colors">Mentions Légales</Link>
+              </li>
+              <li>
+                <Link href="/confidentialite" className="text-white/45 hover:text-white transition-colors">Confidentialité (RGPD/CI)</Link>
+              </li>
+              <li>
+                <Link href="/cgu" className="text-white/45 hover:text-white transition-colors">Conditions Générales (CGU)</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">Nous Contacter</Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-white/8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p suppressHydrationWarning className="text-xs text-white/30">
+            © {new Date().getFullYear()} QAPRIL Technologies SAS · Tous droits réservés.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span suppressHydrationWarning className="inline-flex items-center gap-2 text-xs text-white/40 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+              <span className="inline-flex w-3.5 h-2.5 rounded-[2px] overflow-hidden border border-white/20 shrink-0" aria-label="Drapeau Côte d'Ivoire">
+                <span className="w-1/3 h-full bg-[#F77F00]" />
+                <span className="w-1/3 h-full bg-white" />
+                <span className="w-1/3 h-full bg-[#009E60]" />
+              </span>
+              Conforme droit ivoirien
+            </span>
+            <span className="text-xs text-white/40 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+              🔒 Données chiffrées & certifiées
+            </span>
+          </div>
+        </div>
       </div>
-    );
+    </footer>
+  );
 }

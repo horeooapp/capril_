@@ -41,33 +41,35 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
         <div className="w-full relative">
             <div className="relative p-2">
                 <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-3">
-                        <ShieldCheck className="w-8 h-8 text-amber-600" />
-                        <h2 className="text-3xl font-black text-white tracking-tight uppercase leading-none">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600">
+                            <ShieldCheck className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                             {title}
                         </h2>
                     </div>
-                    <p className="text-sm text-gray-400 font-medium">
+                    <p className="text-sm text-slate-500 font-medium">
                         {subtitle}
                     </p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-2xl text-xs font-bold mb-6 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-xs font-bold mb-6 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-600" />
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div className="space-y-4">
                         <div className="relative group">
-                            <label htmlFor="admin-email" className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">
-                                Identifiant Admin
+                            <label htmlFor="admin-email" className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-0.5">
+                                Identifiant Administrateur
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-500" />
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <Mail className="h-4 w-4 text-slate-400" />
                                 </div>
                                 <input
                                     id="admin-email"
@@ -75,19 +77,19 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-amber-600/10 focus:border-amber-600 outline-none transition-all font-bold text-white placeholder:text-gray-600"
+                                    className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 outline-none transition-all"
                                     placeholder="admin@qapril.ci"
                                 />
                             </div>
                         </div>
 
                         <div className="relative group">
-                            <label htmlFor="admin-password" className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">
+                            <label htmlFor="admin-password" className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-0.5">
                                 Mot de passe
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-gray-500" />
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <Lock className="h-4 w-4 text-slate-400" />
                                 </div>
                                 <input
                                     id="admin-password"
@@ -95,7 +97,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-4 focus:ring-amber-600/10 focus:border-amber-600 outline-none transition-all font-bold text-white placeholder:text-gray-600"
+                                    className="block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 outline-none transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -105,32 +107,31 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="w-full flex items-center justify-center gap-3 py-5 bg-gradient-to-r from-[#C55A11] to-[#E87B2E] text-white rounded-2xl shadow-xl shadow-[#C55A11]/20 font-black uppercase tracking-widest text-xs transition-all disabled:opacity-50 hover:opacity-90 active:scale-[0.98]"
+                        className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-sm hover:shadow font-bold text-sm tracking-wide transition-all active:scale-[0.99] disabled:opacity-50"
                     >
                         {isPending ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <>
                                 Accéder à la console
-                                <ArrowRight className="h-5 w-5" />
+                                <ArrowRight className="h-4 w-4" />
                             </>
                         )}
                     </button>
                 </form>
 
-                <div className="mt-10 pt-6 border-t border-white/5 flex flex-col items-center gap-4">
+                <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col items-center gap-3">
                     <Link
                         href="/"
-                        className="flex items-center gap-2 text-[10px] font-black text-gray-400 hover:text-amber-600 uppercase tracking-[0.2em] transition-colors"
+                        className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
                     >
                         <Home className="w-3.5 h-3.5" />
                         Retour à l'accueil
                     </Link>
-                    <div className="flex items-center gap-2 opacity-30">
-                        <Activity className="w-3 h-3 text-amber-600 animate-pulse" />
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center leading-relaxed">
-                            Terminal QAPRIL v3.5 <br />
-                            <span className="opacity-50">Accès restreint aux domaines certifiés</span>
+                    <div className="flex items-center gap-2 text-slate-400">
+                        <Activity className="w-3.5 h-3.5 text-amber-600" />
+                        <p className="text-[11px] font-medium text-slate-500 text-center">
+                            Console Institutionnelle v3.5 • Accès sécurisé
                         </p>
                     </div>
                 </div>

@@ -13,39 +13,64 @@ function generateOTP(): string {
   return crypto.randomInt(100000, 999999).toString();
 }
 
-/**
- * Part 3.3: Request Email OTP (Server Action)
- * Initiates the email verification flow.
- */
-export async function requestOTP(email: string) {
-    console.log("[SERVER ACTION] requestOTP called for email:", email);
+import { sendOpenWAOTP } from "@/lib/openwa";
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return { error: "Format d'email invalide" };
+/**
+ * Part 3.3: Request Email / WhatsApp OTP (Server Action)
+ * Initiates the verification flow via OpenWA (WhatsApp) and Email fallback.
+ */
+export async function requestOTP(identifier: string) {
+    console.log("[SERVER ACTION] requestOTP called for:", identifier);
+
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const cleanPhone = identifier.replace(/[\s-]/g, '');
+    const isPhone = /^\+?[0-9]{8,15}$/.test(cleanPhone);
+
+    if (!isEmail && !isPhone) {
+        return { error: "Veuillez saisir une adresse e-mail ou un numéro de téléphone valide." };
     }
 
     try {
-        const normalizedEmail = email.toLowerCase().trim();
-        // 1. Generate OTP
         const otp = generateOTP();
         const ttl = parseInt(process.env.OTP_TTL_SECONDS || '600');
 
-        // 2. Store in Redis
         if (!redis) {
             console.error("[SERVER ACTION] Redis not available");
             return { error: 'Service de validation temporairement indisponible' };
         }
-        await redis.set(`otp:${normalizedEmail}`, otp, 'EX', ttl);
 
-        // 3. Send Email
-        const emailResult = await sendOTPEmail(normalizedEmail, otp);
-
-        if (!emailResult.success) {
-            console.error(`[SERVER ACTION] Failed to send email to ${normalizedEmail}:`, emailResult.error);
-            return { error: `Échec de l'envoi de l'email de validation.` };
+        if (isPhone) {
+            // Stocker pour le numéro de téléphone
+            await redis.set(`otp:${cleanPhone}`, otp, 'EX', ttl);
+            const waResult = await sendOpenWAOTP(cleanPhone, otp, "Connexion");
+            console.log(`[AUTH] OTP ${otp} sent via OpenWA to ${cleanPhone} (Success: ${waResult.success})`);
+            return { success: true, channel: "WHATSAPP" };
         }
 
-        console.log(`[AUTH] OTP ${otp} sent to ${normalizedEmail} (TTL: ${ttl}s)`);
+        // Si c'est un email
+        const normalizedEmail = identifier.toLowerCase().trim();
+        await redis.set(`otp:${normalizedEmail}`, otp, 'EX', ttl);
+
+        // Envoyer par OpenWA si l'utilisateur a un numéro de téléphone associé
+        try {
+            const user = await prisma.user.findFirst({
+                where: { email: normalizedEmail },
+                select: { phone: true }
+            });
+            if (user?.phone) {
+                await sendOpenWAOTP(user.phone, otp, "Connexion");
+            }
+        } catch (dbErr) {
+            console.warn("[AUTH] Could not lookup user phone for OpenWA notification:", dbErr);
+        }
+
+        // Envoyer également l'email en parallèle
+        const emailResult = await sendOTPEmail(normalizedEmail, otp);
+        if (!emailResult.success) {
+            console.error(`[SERVER ACTION] Failed to send email to ${normalizedEmail}:`, emailResult.error);
+        }
+
+        console.log(`[AUTH] OTP ${otp} generated for ${normalizedEmail} (TTL: ${ttl}s)`);
         return { success: true };
     } catch (error: any) {
         console.error("[SERVER ACTION] requestOTP error:", error?.message || error);
@@ -145,7 +170,8 @@ export async function loginWithAdminCredentials(email: string, password: string)
         console.log(`[DEBUG] auth.ts admin - process.env.DATABASE_URL starts with: '${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 15) : "UNDEFINED"}'`);
         
         const user = await prisma.user.findFirst({
-            where: { email: normalizedEmail }
+            where: { email: normalizedEmail },
+            select: { id: true, email: true, role: true, password: true }
         });
 
         if (!user) {
@@ -166,28 +192,52 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: "Mot de passe non configuré pour ce compte." };
         }
 
-        // 3. Perform Actual Sign In
-        const result = await signIn("admin-password", {
-            email: normalizedEmail,
-            password,
-            redirect: false,
-        });
-
-        if (result?.error) {
-            // Since we already checked user existence and domain, this error is most likely wrong password
-            console.warn("[SERVER ACTION] Admin login failed for:", normalizedEmail, "Error:", result.error);
+        // 3. Pre-verify password with bcrypt-ts to provide clear error message before NextAuth session creation
+        const { compare } = await import("bcrypt-ts");
+        const isPasswordCorrect = await compare(password, user.password);
+        if (!isPasswordCorrect) {
             return { error: "Mot de passe incorrect." };
+        }
+
+        // 4. Perform Actual Sign In
+        try {
+            await signIn("admin-password", {
+                email: normalizedEmail,
+                password,
+                redirect: false,
+            });
+        } catch (signInErr: any) {
+            if (signInErr instanceof Error && signInErr.message === "NEXT_REDIRECT") {
+                return { success: true };
+            }
+            console.error("[SERVER ACTION] signIn error inside loginWithAdminCredentials:", signInErr);
+            // If credentials was correct, check if it's NextAuth internal error or redirect
+            if (signInErr?.type === 'CredentialsSignin' || signInErr?.name === 'CredentialsSignin') {
+                return { error: "Identifiants administratifs rejetés par la session." };
+            }
+            throw signInErr;
         }
 
         return { success: true };
     } catch (error: any) {
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-             return { success: true }; // Should never happen with redirect: false, but safe.
+             return { success: true };
         }
         
         const errorString = String(error);
-        const errorCode = error?.code || error?.type || "";
+        const innerError = error?.cause || error;
+        const errorCode = innerError?.code || innerError?.type || error?.code || error?.type || "";
         
+        console.error("[SERVER ACTION] loginWithAdminCredentials detail:", {
+            name: error?.name,
+            message: error?.message,
+            type: error?.type,
+            code: error?.code,
+            cause: error?.cause,
+            innerCode: errorCode,
+            stack: error?.stack
+        });
+
         const ADMIN_ERROR_MESSAGES: Record<string, string> = {
             domain_restricted: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)",
             account_not_found: "Compte administrateur non trouvé.",
@@ -202,28 +252,19 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: ADMIN_ERROR_MESSAGES[errorCode] };
         }
         
-        if (error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin') {
+        if (error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin' || innerError?.type === 'CredentialsSignin') {
              return { error: "Identifiants incorrects ou accès non autorisé." };
         }
         
         if (
-            error?.type === 'CallbackRouteError' || 
-            error?.name === 'CallbackRouteError' || 
-            errorString.includes('CallbackRouteError')
+            (error?.type === 'CallbackRouteError' || error?.name === 'CallbackRouteError' || errorString.includes('CallbackRouteError')) &&
+            innerError?.message
         ) {
-             return { error: "L'authentification a échoué (erreur de routage)." };
+             return { error: `Échec d'authentification: ${innerError.message}` };
         }
         
-        console.error("[SERVER ACTION] loginWithAdminCredentials detail:", {
-            name: error?.name,
-            message: error?.message,
-            type: error?.type,
-            code: error?.code,
-            stack: error?.stack
-        });
-        
         // Debug fallback
-        return { error: `[DEBUG] Prisma Error: Code=${error?.code} | Meta=${JSON.stringify(error?.meta || {})} | Msg: ${error?.message?.substring(0,250)}` };
+        return { error: `[DEBUG] Erreur Auth: Code=${errorCode || error?.code} | Msg: ${innerError?.message || error?.message || errorString}` };
     }
 }
 

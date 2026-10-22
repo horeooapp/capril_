@@ -257,8 +257,11 @@ export class HSMSService implements SMSService {
   }
 }
 
-export function getSMSService(provider?: string) {
-  const activeProvider = provider || process.env.SMS_GATEWAY_PROVIDER || "HSMS";
+import { OpenWAService } from "@/lib/openwa";
+
+export function getSMSService(provider?: string): SMSService {
+  const activeProvider = provider || process.env.SMS_GATEWAY_PROVIDER || "OPENWA";
+  if (activeProvider === "OPENWA") return new OpenWAService();
   if (activeProvider === "TWILIO") return new TwilioService();
   if (activeProvider === "AFRICASTALKING") return new AfricasTalkingService();
   if (activeProvider === "HSMS") return new HSMSService();
@@ -267,22 +270,22 @@ export function getSMSService(provider?: string) {
 }
 
 export async function sendSMS(phone: string, message: string, forceProvider?: string) {
-  // Mechanism Fallback
-  const providersToTry = forceProvider ? [forceProvider] : ["HSMS", "ORANGE", "AFRICASTALKING", "TWILIO"];
+  // Mechanism Fallback : OpenWA (WhatsApp) en priorité pour toutes les validations
+  const providersToTry = forceProvider ? [forceProvider] : ["OPENWA", "HSMS", "ORANGE", "AFRICASTALKING", "TWILIO"];
   
   for (const provider of providersToTry) {
-    console.log(`[SMS] Attempting to send via ${provider}...`);
+    console.log(`[Validation/SMS] Attempting to send via ${provider}...`);
     const service = getSMSService(provider);
     const result = await service.sendMessage(phone, message);
     
     if (result.success) {
-      console.log(`[SMS] Success via ${provider} - ID: ${result.messageId}`);
+      console.log(`[Validation/SMS] Success via ${provider} - ID: ${result.messageId}`);
       return true;
     } else {
-      console.error(`[SMS] Failed via ${provider}: ${result.error}`);
+      console.error(`[Validation/SMS] Failed via ${provider}: ${result.error}`);
     }
   }
   
-  console.error(`[SMS] All gateways failed for ${phone}.`);
+  console.error(`[Validation/SMS] All gateways failed for ${phone}.`);
   return false;
 }

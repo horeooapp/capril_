@@ -35,62 +35,87 @@ export default function LoginPage() {
 
     return (
         <>
-            {/* Version Web PC - Intacte */}
-            <div className="hidden md:flex min-h-screen bg-[#09090B] flex-col items-center justify-center p-6 relative overflow-hidden font-sans tracking-tight">
-                {/* Premium Clean Background */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_50%)] pointer-events-none"></div>
+            {/* Version Web Desktop — Design Exécutif Lumineux Architectural */}
+            <div className="hidden md:flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden bg-[#F8FAFC] font-sans tracking-tight">
+                {/* Grille fine vectorielle d'architecture */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
                 
+                {/* Lueur ambrée très subtile et nette */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0" />
+
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-16 relative z-10"
+                    className="text-center mb-12 relative z-10"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-md rounded-full border border-white/10 mb-6 font-semibold text-[10px] uppercase tracking-widest text-slate-400">
-                        Portail Officiel QAPRIL
+                    <Link href="/" className="inline-block mb-6 group">
+                        <img 
+                            src="/logo.png" 
+                            alt="QAPRIL Logo" 
+                            className="h-12 w-auto mx-auto group-hover:scale-105 transition-transform" 
+                        />
+                    </Link>
+
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white rounded-full border border-slate-200 mb-4 shadow-sm">
+                        <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-800">
+                            Portail Officiel QAPRIL · Infrastructure Souveraine
+                        </span>
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-[1000] text-white tracking-tighter uppercase leading-none mb-4">
-                        Choisissez votre <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-300 to-gray-600">interface.</span>
+
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight uppercase leading-tight mb-3">
+                        Sélectionnez votre <br />
+                        <span className="text-[#D97706]">Espace d'Accès.</span>
                     </h1>
-                    <p className="text-gray-400 font-medium max-w-sm mx-auto text-sm">
-                        Connectez-vous à votre espace dédié pour une expérience certifiée et sécurisée.
+                    <p className="text-slate-600 font-medium max-w-md mx-auto text-sm leading-relaxed">
+                        Authentification certifiée et scellée pour propriétaires, locataires et administrateurs institutionnels.
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl relative z-10">
                     {portals.map((portal, index) => (
                         <motion.div
                             key={portal.title}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 25 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1, duration: 0.6, ease: "easeOut" }}
+                            transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
                         >
                             <Link 
                                 href={portal.href}
-                                className="group block relative h-full bg-[#18181B] rounded-[24px] p-8 border border-white/5 hover:border-white/20 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)] transition-all duration-500 overflow-hidden"
+                                className="group block relative h-full bg-white rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 overflow-hidden shadow-sm"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                {/* Card image avec bandeau soigné */}
+                                <div className="relative h-44 overflow-hidden border-b border-slate-100 bg-slate-100">
+                                    <img
+                                        src={
+                                            index === 0 ? "/images/hero_ivory_coast_home_interior_1773609718319.png"
+                                            : index === 1 ? "/images/login_landlord_visual.jpg"
+                                            : "/slider/bg_slider_2.png"
+                                        }
+                                        alt={portal.title}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-sm text-[10px] font-black uppercase tracking-wider text-slate-800">
+                                        {portal.tag}
+                                    </div>
+                                </div>
 
-                                <div className="relative z-10">
-                                    <div className={`w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white mb-8 group-hover:-rotate-6 group-hover:scale-110 transition-transform duration-500`}>
-                                        <portal.icon className="w-6 h-6" />
+                                <div className="p-6">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-[#D97706] flex items-center justify-center mb-4 group-hover:bg-[#D97706] group-hover:text-white transition-colors duration-300">
+                                        <portal.icon className="w-5 h-5" />
                                     </div>
                                     
-                                    <span className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block text-slate-500 transition-colors`}>
-                                        {portal.tag}
-                                    </span>
-                                    
-                                    <h2 className="text-2xl font-bold text-white tracking-tight mb-4 transition-all">
+                                    <h2 className="text-xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-[#D97706] transition-colors">
                                         {portal.title}
                                     </h2>
                                     
-                                    <p className="text-sm text-gray-400 leading-relaxed pr-6 mb-8 font-medium group-hover:text-gray-300 transition-colors">
+                                    <p className="text-xs text-slate-600 leading-relaxed mb-6 font-medium">
                                         {portal.description}
                                     </p>
                                     
-                                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/50 group-hover:text-white transition-colors">
-                                        Accéder <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                                    <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#D97706] group-hover:text-[#B45309] transition-colors">
+                                        <span>Connexion à l'espace</span>
+                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                                     </div>
                                 </div>
                             </Link>
@@ -101,17 +126,18 @@ export default function LoginPage() {
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-20 text-center relative z-10"
+                    transition={{ delay: 0.4 }}
+                    className="mt-14 text-center relative z-10 flex items-center justify-center gap-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider"
                 >
-                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] mb-4">
-                        QAPRIL v3.0
-                    </p>
-                    <div className="inline-flex h-1 w-12 bg-white/10 rounded-full"></div>
+                    <Link href="/" className="hover:text-slate-900 transition-colors">← Retour au site public</Link>
+                    <span>·</span>
+                    <span>Conformité Loi 2019-576 & OHADA</span>
+                    <span>·</span>
+                    <Link href="/contact" className="hover:text-slate-900 transition-colors">Assistance</Link>
                 </motion.div>
             </div>
 
-            {/* Version Web Mobile Exlusive - Nouveau design unifié */}
+            {/* Version Web Mobile — Cohérente et épurée */}
             <div className="block md:hidden w-full min-h-screen">
                 <UnifiedLoginPage initialTab="tenant" />
             </div>

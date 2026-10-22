@@ -43,10 +43,10 @@ export default async function AdminLayout({
     } : null;
 
     return (
-        <div className="admin-v2" style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: 'var(--ci-nuit)' }}>
+        <div className="admin-v2" style={{ display: 'flex', minHeight: '100vh', width: '100%', backgroundColor: '#F8FAFC' }}>
             <AdminSidebar onLogout={logout} sessionUser={sessionUser} />
 
-            <div className="main-content" style={{ flex: 1 }}>
+            <div className="main-content" style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
                 <AdminHeader 
                     session={{ user: sessionUser }} 
                     onLogout={logout} 
@@ -61,7 +61,7 @@ export default async function AdminLayout({
 
             <style dangerouslySetInnerHTML={{__html: `
               body {
-                background: var(--ci-nuit) !important;
+                background: #F8FAFC !important;
               }
             `}} />
         </div>

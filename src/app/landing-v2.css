@@ -1,81 +1,171 @@
-/* -- CSS MINIMAL � QAPRIL LANDING V3 -- */
-/* Tout le design est g�r� par Tailwind dans le composant. */
+/* ══════════════════════════════════════════════════════════════════
+   QAPRIL — DESIGN SYSTEM PREMIUM LUMINEUX (SANS GLASSMORPHISM)
+   Style: Architectural Haute-Précision / FinTech Institutionnelle
+   Palette: Blanc Épuré / Ardoise Titanium / Or Ambré Chaud
+   ══════════════════════════════════════════════════════════════════ */
 
-@keyframes marquee {
+:root, .landing-v2-wrapper {
+  --qp-bg-main:       #F8FAFC;
+  --qp-bg-surface:    #FFFFFF;
+  --qp-bg-surface-2:  #F1F5F9;
+  --qp-bg-surface-3:  #E2E8F0;
+  --qp-border:        #E2E8F0;
+  --qp-border-subtle: #F1F5F9;
+  --qp-border-active: #CBD5E1;
+
+  --qp-gold:          #D97706;
+  --qp-gold-hover:    #B45309;
+  --qp-gold-bg:       #FEF3C7;
+  --qp-gold-border:   #FDE68A;
+
+  --qp-text-primary:  #0F172A;
+  --qp-text-secondary:#334155;
+  --qp-text-muted:    #64748B;
+  
+  --qp-emerald:       #059669;
+  --qp-emerald-bg:    #D1FAE5;
+  --qp-blue:          #0284C7;
+  --qp-blue-bg:       #E0F2FE;
+
+  /* Variables héritées pour les sections hero sombres et pages publiques */
+  --ink:              #09090B;
+  --ink2:             #18181B;
+  --ink3:             #52525B;
+  --ink4:             #A1A1AA;
+  --white:            #FFFFFF;
+  --cream:            #FFFBF5;
+  --cream2:           #FFF5E8;
+  --mango:            #FF8B00;
+  --mango-l:          #FFF0D6;
+  --mango-d:          #CC6E00;
+  --sky:              #00B4D8;
+  --sky-l:            #D0F4FC;
+  --coral:            #FF4E50;
+  --coral-l:          #FFE8E8;
+  --teal:             #00C896;
+  --teal-l:           #CCFAEE;
+}
+
+/* Utilitaires de couleur explicites pour compatibilité Tailwind/Landing */
+.text-ink { color: var(--ink) !important; }
+.text-ink2 { color: var(--ink2) !important; }
+.text-ink3 { color: var(--ink3) !important; }
+.text-ink4 { color: var(--ink4) !important; }
+.bg-cream { background-color: var(--cream) !important; }
+.bg-cream2 { background-color: var(--cream2) !important; }
+.bg-ink { background-color: var(--ink) !important; }
+
+
+.landing-v2-wrapper {
+  background-color: var(--qp-bg-main);
+  color: var(--qp-text-primary);
+  min-height: 100vh;
+  position: relative;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* ── Grille fine d'architecture en filigrane (vectoriel net, fond clair) ── */
+.qp-grid-pattern-light {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ── Cartes opaques architecturales (strictement sans glassmorphism) ── */
+.qp-card-light {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.qp-card-light:hover {
+  border-color: #94A3B8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+/* ── Ticker partenaires & protocoles ── */
+@keyframes qp-marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-@keyframes float-up {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-@keyframes grid-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-.qv3-ticker-track {
+.qp-ticker-track-light {
   display: flex;
-  animation: marquee 36s linear infinite;
+  animation: qp-marquee 30s linear infinite;
   width: max-content;
 }
 
-.qv3-grid-bg {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  animation: grid-fade-in 1.2s ease forwards;
+.qp-ticker-track-light:hover {
+  animation-play-state: paused;
 }
 
-.qv3-reveal {
+/* ── Boutons haute-définition ── */
+.qp-btn-gold-solid {
+  background-color: #D97706;
+  color: #FFFFFF;
+  font-weight: 800;
+  transition: all 0.2s ease;
+}
+
+.qp-btn-gold-solid:hover {
+  background-color: #B45309;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+  transform: translateY(-1px);
+}
+
+.qp-btn-dark-solid {
+  background-color: #0F172A;
+  color: #FFFFFF;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.qp-btn-dark-solid:hover {
+  background-color: #1E293B;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  transform: translateY(-1px);
+}
+
+.qp-btn-outline-light {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.qp-btn-outline-light:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
+  transform: translateY(-1px);
+}
+
+/* ── Reveal scroll ── */
+.qv4-reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.qv3-reveal.visible { opacity: 1; transform: none; }
-.qv3-reveal-d1 { transition-delay: 0.1s; }
-.qv3-reveal-d2 { transition-delay: 0.2s; }
-.qv3-reveal-d3 { transition-delay: 0.3s; }
-.qv3-reveal-d4 { transition-delay: 0.4s; }
-
-.qv3-timeline-line {
-  position: absolute;
-  left: 28px;
-  top: 56px;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, rgba(245,158,11,0.5), rgba(245,158,11,0.05));
+  transform: translateY(16px);
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
 }
 
-.qv3-text-gold {
-  background: linear-gradient(135deg, #F59E0B, #FCD34D);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.qv4-visible {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-.qv3-float { animation: float-up 5s ease-in-out infinite; }
-.qv3-float-d1 { animation-delay: 0.5s; }
-
-.qv3-bento-card {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.qv3-bento-card:hover {
-  border-color: rgba(245,158,11,0.3);
-  box-shadow: 0 0 30px rgba(245,158,11,0.06);
+/* ── Suppression barre de défilement visuelle ── */
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-.qv3-btn-glow {
-  position: relative;
-  transition: all 0.25s ease;
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
-.qv3-btn-glow:hover { transform: translateY(-2px); }
 
-.qv3-masonry {
-  columns: 3;
-  column-gap: 20px;
-}
-.qv3-masonry-item { break-inside: avoid; margin-bottom: 20px; }
-@media (max-width: 1024px) { .qv3-masonry { columns: 2; } }
-@media (max-width: 640px) { .qv3-masonry { columns: 1; } }
