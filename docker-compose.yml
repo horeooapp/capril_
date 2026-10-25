@@ -88,6 +88,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-Stone2026}@postgres:5432/${POSTGRES_DB:-qapril}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379
       ENABLE_REDIS_MOCK: "false"
+      OPENWA_API_URL: http://qapril_whatsapp:8085
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
