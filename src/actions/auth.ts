@@ -152,9 +152,9 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
 }
 
 /**
- * Login direct avec Credentials (Admin) - Sans double validation
+ * Étape 1 du 2FA Admin : Vérification email + mot de passe, génération et envoi de l'OTP WhatsApp
  */
-export async function loginWithAdminCredentials(email: string, password: string) {
+export async function requestAdmin2FA(email: string, password: string) {
     if (!email || !password) return { error: "Email et mot de passe requis." };
 
     try {
@@ -166,7 +166,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
 
         const user = await prisma.user.findFirst({
             where: { email: normalizedEmail },
-            select: { id: true, email: true, role: true, password: true }
+            select: { id: true, email: true, role: true, password: true, phone: true }
         });
 
         if (!user) {
@@ -177,7 +177,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
         const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
 
         if (!isAdmin) {
-            return { error: "Accès refusé: Privilèges administrateur requis." };
+            return { error: "Accès refusé: Votre compte n'a pas les privilèges administrateur." };
         }
 
         if (!user.password) {
@@ -190,7 +190,57 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: "Mot de passe incorrect." };
         }
 
-        // Connexion directe NextAuth
+        // Numéro WhatsApp cible
+        const targetPhone = user.phone || "+2250707334770";
+
+        // Génération du code OTP 6 chiffres
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const ttl = 600; // 10 minutes
+
+        // Stockage sécurisé de l'OTP dans Redis
+        await redis.set(`admin_otp:${normalizedEmail}`, otp, 'EX', ttl);
+
+        // Envoi par WhatsApp via OpenWA
+        try {
+            await sendOpenWAOTP(targetPhone, otp, "Connexion Console Centrale Administrateur");
+            console.log(`[AUTH-2FA] WhatsApp OTP ${otp} envoyé avec succès au ${targetPhone}`);
+        } catch (waErr) {
+            console.error("[AUTH-2FA] Échec envoi WhatsApp OpenWA:", waErr);
+        }
+
+        // Masquer le numéro pour l'affichage utilisateur (ex: +225 •• •• 47 70)
+        const maskedPhone = targetPhone.replace(/(\+\d{3})(\d{2})\d{4}(\d{4})/, '$1 $2 •• •• $3');
+
+        return { 
+            success: true, 
+            requireOTP: true, 
+            phoneMasked: maskedPhone 
+        };
+    } catch (error: any) {
+        console.error("[SERVER ACTION] requestAdmin2FA error:", error);
+        return { error: `Erreur lors de l'initiation 2FA (${error?.message || "Erreur interne"}).` };
+    }
+}
+
+/**
+ * Étape 2 du 2FA Admin : Vérification de l'OTP WhatsApp et finalisation de la session
+ */
+export async function verifyAdmin2FA(email: string, password: string, otp: string) {
+    if (!email || !password || !otp) return { error: "Paramètres manquants pour la double validation." };
+
+    try {
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // 1. Vérification de l'OTP dans Redis
+        const storedOtp = await redis.get(`admin_otp:${normalizedEmail}`);
+        if (!storedOtp || storedOtp !== otp.trim()) {
+            return { error: "Code de sécurité WhatsApp incorrect ou expiré." };
+        }
+
+        // 2. Suppression de l'OTP à usage unique
+        await redis.del(`admin_otp:${normalizedEmail}`);
+
+        // 3. Authentification NextAuth
         const signInResult = await signIn("admin-password", {
             email: normalizedEmail,
             password,
@@ -198,7 +248,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
         });
 
         if (signInResult?.error) {
-            return { error: "Identifiants administratifs rejetés." };
+            return { error: "Échec de finalisation de session administrative." };
         }
 
         return { success: true };
@@ -206,9 +256,16 @@ export async function loginWithAdminCredentials(email: string, password: string)
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
             return { success: true };
         }
-        console.error("[SERVER ACTION] loginWithAdminCredentials error:", error);
-        return { error: `Erreur d'authentification: ${error?.message || "Erreur interne"}` };
+        console.error("[SERVER ACTION] verifyAdmin2FA error:", error);
+        return { error: `Erreur de validation 2FA: ${error?.message || "Erreur interne"}` };
     }
+}
+
+/**
+ * Login with Credentials (Admin) - Redirige vers la demande 2FA
+ */
+export async function loginWithAdminCredentials(email: string, password: string) {
+    return requestAdmin2FA(email, password);
 }
 
 export async function logout() {
