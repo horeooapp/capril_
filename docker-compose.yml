@@ -107,9 +107,25 @@ services:
       retries: 3
       start_period: 40s
 
+  # ── OpenWA (WhatsApp Automate) ─────────────────────────────────
+  openwa:
+    image: openwa/wa-automate:latest
+    container_name: qapril_openwa
+    restart: unless-stopped
+    environment:
+      PORT: "8085"
+      AUTH_KEY: "qapril_wa_secret_2026"
+    volumes:
+      - openwa_data:/app/session
+    ports:
+      - "127.0.0.1:8085:8085"
+    networks:
+      - qapril_net
+
 volumes:
   postgres_data:
   redis_data:
+  openwa_data:
 
 networks:
   qapril_net:
