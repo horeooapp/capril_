@@ -40,7 +40,6 @@ model User {
   pushToken                   String?                  @map("push_token")
   whiteLabelConfig            Json?                    @map("white_label_config")
   companyRegNumber            String?                  @map("company_reg_number")
-  taxId                       String?                  @map("tax_id")
   /// Chiffré au niveau applicatif (AES-256-GCM / KMS)
   taxIdEnc                    String?                  @map("tax_id_enc")
   agencyConfig                Json?                    @map("agency_config")
