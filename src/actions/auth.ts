@@ -152,37 +152,29 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
 }
 
 /**
- * Login with Credentials (Admin)
+ * Étape 1 du 2FA Admin : Vérification email + mot de passe, génération et envoi de l'OTP WhatsApp
  */
-export async function loginWithAdminCredentials(email: string, password: string) {
-    if (!email || !password) return { error: "Email et mot de passe requis" };
+export async function requestAdmin2FA(email: string, password: string) {
+    if (!email || !password) return { error: "Email et mot de passe requis." };
 
     try {
         const normalizedEmail = email.toLowerCase().trim();
 
-        // 1. Domain Restriction (Fast check)
         if (!normalizedEmail.endsWith("@qapril.ci") && !normalizedEmail.endsWith("@qapril.net")) {
             return { error: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)" };
         }
 
-        // 2. User & Role Check (using JS validation to bypass Prisma Enum errors)
-        console.log(`[DEBUG] auth.ts - process.env.DATABASE_URL starts with: '${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 10) : "UNDEFINED"}'`);
-        console.log(`[DEBUG] auth.ts admin - process.env.DATABASE_URL starts with: '${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 15) : "UNDEFINED"}'`);
-        
         const user = await prisma.user.findFirst({
             where: { email: normalizedEmail },
-            select: { id: true, email: true, role: true, password: true }
+            select: { id: true, email: true, role: true, password: true, phone: true }
         });
 
         if (!user) {
-            console.error(`[AUTH-ERROR] Admin login failed: User ${normalizedEmail} not found.`);
             return { error: "Compte administrateur non trouvé." };
         }
 
         const userRole = String(user.role || '').toUpperCase().trim();
         const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
-
-        console.log(`[AUTH-DEBUG] Attempting admin login for: ${user.email} | Role in DB: ${user.role} | Normalized Role: ${userRole} | Match: ${isAdmin}`);
 
         if (!isAdmin) {
             return { error: "Accès refusé: Votre compte n'a pas les privilèges administrateur." };
@@ -192,80 +184,88 @@ export async function loginWithAdminCredentials(email: string, password: string)
             return { error: "Mot de passe non configuré pour ce compte." };
         }
 
-        // 3. Pre-verify password with bcrypt-ts to provide clear error message before NextAuth session creation
         const { compare } = await import("bcrypt-ts");
         const isPasswordCorrect = await compare(password, user.password);
         if (!isPasswordCorrect) {
             return { error: "Mot de passe incorrect." };
         }
 
-        // 4. Perform Actual Sign In
+        // Numéro WhatsApp cible
+        const targetPhone = user.phone || "+2250707334770";
+
+        // Génération du code OTP 6 chiffres
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const ttl = 600; // 10 minutes
+
+        // Stockage sécurisé de l'OTP dans Redis
+        await redis.set(`admin_otp:${normalizedEmail}`, otp, 'EX', ttl);
+
+        // Envoi par WhatsApp via OpenWA
         try {
-            await signIn("admin-password", {
-                email: normalizedEmail,
-                password,
-                redirect: false,
-            });
-        } catch (signInErr: any) {
-            if (signInErr instanceof Error && signInErr.message === "NEXT_REDIRECT") {
-                return { success: true };
-            }
-            console.error("[SERVER ACTION] signIn error inside loginWithAdminCredentials:", signInErr);
-            // If credentials was correct, check if it's NextAuth internal error or redirect
-            if (signInErr?.type === 'CredentialsSignin' || signInErr?.name === 'CredentialsSignin') {
-                return { error: "Identifiants administratifs rejetés par la session." };
-            }
-            throw signInErr;
+            await sendOpenWAOTP(targetPhone, otp, "Connexion Console Centrale Administrateur");
+            console.log(`[AUTH-2FA] WhatsApp OTP ${otp} envoyé avec succès au ${targetPhone}`);
+        } catch (waErr) {
+            console.error("[AUTH-2FA] Échec envoi WhatsApp OpenWA:", waErr);
+        }
+
+        // Masquer le numéro pour l'affichage utilisateur (ex: +225 •• •• 47 70)
+        const maskedPhone = targetPhone.replace(/(\+\d{3})(\d{2})\d{4}(\d{4})/, '$1 $2 •• •• $3');
+
+        return { 
+            success: true, 
+            requireOTP: true, 
+            phoneMasked: maskedPhone 
+        };
+    } catch (error: any) {
+        console.error("[SERVER ACTION] requestAdmin2FA error:", error);
+        return { error: `Erreur lors de l'initiation 2FA (${error?.message || "Erreur interne"}).` };
+    }
+}
+
+/**
+ * Étape 2 du 2FA Admin : Vérification de l'OTP WhatsApp et finalisation de la session
+ */
+export async function verifyAdmin2FA(email: string, password: string, otp: string) {
+    if (!email || !password || !otp) return { error: "Paramètres manquants pour la double validation." };
+
+    try {
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // 1. Vérification de l'OTP dans Redis
+        const storedOtp = await redis.get(`admin_otp:${normalizedEmail}`);
+        if (!storedOtp || storedOtp !== otp.trim()) {
+            return { error: "Code de sécurité WhatsApp incorrect ou expiré." };
+        }
+
+        // 2. Suppression de l'OTP à usage unique
+        await redis.del(`admin_otp:${normalizedEmail}`);
+
+        // 3. Authentification NextAuth
+        const signInResult = await signIn("admin-password", {
+            email: normalizedEmail,
+            password,
+            redirect: false,
+        });
+
+        if (signInResult?.error) {
+            return { error: "Échec de finalisation de session administrative." };
         }
 
         return { success: true };
     } catch (error: any) {
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-             return { success: true };
+            return { success: true };
         }
-        
-        const errorString = String(error);
-        const innerError = error?.cause || error;
-        const errorCode = innerError?.code || innerError?.type || error?.code || error?.type || "";
-        
-        console.error("[SERVER ACTION] loginWithAdminCredentials detail:", {
-            name: error?.name,
-            message: error?.message,
-            type: error?.type,
-            code: error?.code,
-            cause: error?.cause,
-            innerCode: errorCode,
-            stack: error?.stack
-        });
-
-        const ADMIN_ERROR_MESSAGES: Record<string, string> = {
-            domain_restricted: "Accès restreint aux domaines autorisés (@qapril.ci, @qapril.net)",
-            account_not_found: "Compte administrateur non trouvé.",
-            insufficient_role: "Rôle insuffisant pour accéder à la console.",
-            password_not_configured: "Mot de passe non configuré pour ce compte.",
-            invalid_password: "Mot de passe incorrect.",
-            database_error: "Erreur de base de données. Veuillez réessayer.",
-            admin_access_denied: "Accès refusé : Privilèges administrateur requis."
-        };
-
-        if (ADMIN_ERROR_MESSAGES[errorCode]) {
-            return { error: ADMIN_ERROR_MESSAGES[errorCode] };
-        }
-        
-        if (error?.type === 'CredentialsSignin' || errorCode === 'CredentialsSignin' || innerError?.type === 'CredentialsSignin') {
-             return { error: "Identifiants incorrects ou accès non autorisé." };
-        }
-        
-        if (
-            (error?.type === 'CallbackRouteError' || error?.name === 'CallbackRouteError' || errorString.includes('CallbackRouteError')) &&
-            innerError?.message
-        ) {
-             return { error: `Échec d'authentification: ${innerError.message}` };
-        }
-        
-        // Debug fallback
-        return { error: `[DEBUG] Erreur Auth: Code=${errorCode || error?.code} | Msg: ${innerError?.message || error?.message || errorString}` };
+        console.error("[SERVER ACTION] verifyAdmin2FA error:", error);
+        return { error: `Erreur de validation 2FA: ${error?.message || "Erreur interne"}` };
     }
+}
+
+/**
+ * Login with Credentials (Admin) - Redirige vers la demande 2FA
+ */
+export async function loginWithAdminCredentials(email: string, password: string) {
+    return requestAdmin2FA(email, password);
 }
 
 export async function logout() {
