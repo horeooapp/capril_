@@ -93,10 +93,12 @@ CREATE TYPE "VaultStatus" AS ENUM ('A_TRANSFERER', 'CONSIGNEE', 'TERMINE', 'REST
 -- AlterEnum
 BEGIN;
 CREATE TYPE "RepartitionModel_new" AS ENUM ('PRORATA_CHAMBRE', 'FORFAIT_FIXE', 'USAGE_DECLARE');
+ALTER TABLE "leases" ALTER COLUMN "modele_repartition" DROP DEFAULT;
 ALTER TABLE "leases" ALTER COLUMN "modele_repartition" TYPE "RepartitionModel_new" USING ("modele_repartition"::text::"RepartitionModel_new");
 ALTER TYPE "RepartitionModel" RENAME TO "RepartitionModel_old";
 ALTER TYPE "RepartitionModel_new" RENAME TO "RepartitionModel";
 DROP TYPE "RepartitionModel_old";
+ALTER TABLE "leases" ALTER COLUMN "modele_repartition" SET DEFAULT 'PRORATA_CHAMBRE';
 COMMIT;
 
 -- AlterEnum
@@ -125,10 +127,12 @@ COMMIT;
 -- AlterEnum
 BEGIN;
 CREATE TYPE "UtilityMode_new" AS ENUM ('INDIVIDUEL_LOCATAIRE', 'PARTAGE_PROPRIO', 'INDIVIDUEL_PROPRIO', 'MIXTE', 'NON_APPLICABLE');
+ALTER TABLE "leases" ALTER COLUMN "mode_utilities" DROP DEFAULT;
 ALTER TABLE "leases" ALTER COLUMN "mode_utilities" TYPE "UtilityMode_new" USING ("mode_utilities"::text::"UtilityMode_new");
 ALTER TYPE "UtilityMode" RENAME TO "UtilityMode_old";
 ALTER TYPE "UtilityMode_new" RENAME TO "UtilityMode";
 DROP TYPE "UtilityMode_old";
+ALTER TABLE "leases" ALTER COLUMN "mode_utilities" SET DEFAULT 'NON_APPLICABLE';
 COMMIT;
 
 -- AlterEnum
