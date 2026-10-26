@@ -19,8 +19,10 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /app
 
-# Installation de wa-automate globalement sur Node 20 LTS (stable)
-RUN npm install -g @open-wa/wa-automate@latest
+# Mise à jour de npm vers la dernière version pour éviter le bug Arborist 'edgesOut'
+# puis installation de wa-automate avec legacy-peer-deps
+RUN npm install -g npm@latest && \
+    npm install -g --legacy-peer-deps --no-audit --no-fund @open-wa/wa-automate@latest
 
 EXPOSE 8085
 
