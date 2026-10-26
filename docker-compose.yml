@@ -88,7 +88,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-Stone2026}@postgres:5432/${POSTGRES_DB:-qapril}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379
       ENABLE_REDIS_MOCK: "false"
-      OPENWA_API_URL: http://qapril_whatsapp:8085
+      OPENWA_API_URL: http://openwa:8085
+      OPENWA_API_KEY: ${OPENWA_API_KEY:-qapril_wa_secret_2026}
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
@@ -110,12 +111,17 @@ services:
 
   # ── OpenWA (WhatsApp Automate) ─────────────────────────────────
   openwa:
-    image: openwa/wa-automate:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.openwa
+    image: qapril_openwa:latest
     container_name: qapril_openwa
     restart: unless-stopped
+    shm_size: '2gb'
     environment:
       PORT: "8085"
       AUTH_KEY: "qapril_wa_secret_2026"
+      WA_API_KEY: "qapril_wa_secret_2026"
     volumes:
       - openwa_data:/app/session
     ports:

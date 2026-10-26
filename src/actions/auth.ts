@@ -200,12 +200,20 @@ export async function requestAdmin2FA(email: string, password: string) {
         // Stockage sécurisé de l'OTP dans Redis
         await redis.set(`admin_otp:${normalizedEmail}`, otp, 'EX', ttl);
 
-        // Envoi par WhatsApp via OpenWA
+        // Envoi multi-canal : WhatsApp (OpenWA) + Email certifié (Resend)
         try {
             await sendOpenWAOTP(targetPhone, otp, "Connexion Console Centrale Administrateur");
-            console.log(`[AUTH-2FA] WhatsApp OTP ${otp} envoyé avec succès au ${targetPhone}`);
+            console.log(`[AUTH-2FA] WhatsApp OTP ${otp} envoyé vers ${targetPhone}`);
         } catch (waErr) {
             console.error("[AUTH-2FA] Échec envoi WhatsApp OpenWA:", waErr);
+        }
+
+        // Envoi garanti par Email (Resend qapril.net) en simultané
+        try {
+            await sendOTPEmail(normalizedEmail, otp);
+            console.log(`[AUTH-2FA] Email OTP ${otp} envoyé avec succès à ${normalizedEmail}`);
+        } catch (mailErr) {
+            console.error("[AUTH-2FA] Échec envoi Email OTP:", mailErr);
         }
 
         // Masquer le numéro pour l'affichage utilisateur (ex: +225 •• •• 47 70)

@@ -1,0 +1,29 @@
+# ──────────────────────────────────────────────────────────────────
+# QAPRIL — Dockerfile.openwa (WhatsApp Automation Gateway)
+# Node 20 LTS + Chromium stable (résout le bug Node 23 d'OpenWA)
+# ──────────────────────────────────────────────────────────────────
+FROM node:20-bookworm-slim
+
+# Installation des dépendances système Chromium
+RUN apt-get update && apt-get install -y \
+    chromium \
+    fonts-freefont-ttf \
+    ca-certificates \
+    dumb-init \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+    CHROME_PATH=/usr/bin/chromium
+
+WORKDIR /app
+
+# Installation de wa-automate globalement sur Node 20 LTS (stable)
+RUN npm install -g @open-wa/wa-automate@latest
+
+EXPOSE 8085
+
+ENTRYPOINT ["dumb-init", "--"]
+
+CMD ["wa-automate", "--port", "8085", "--api-key", "qapril_wa_secret_2026", "--use-chrome", "--in-docker", "--qr-timeout", "0"]
