@@ -1,8 +1,8 @@
 # ──────────────────────────────────────────────────────────────────
 # QAPRIL — Dockerfile.openwa (WhatsApp Automation Gateway)
-# Node 20 LTS + Chromium stable (résout le bug Node 23 d'OpenWA)
+# Node 22 LTS + Chromium + Installation locale (évite le bug npm edgesOut)
 # ──────────────────────────────────────────────────────────────────
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 # Installation des dépendances système Chromium
 RUN apt-get update && apt-get install -y \
@@ -19,13 +19,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /app
 
-# Mise à jour de npm vers la dernière version pour éviter le bug Arborist 'edgesOut'
-# puis installation de wa-automate avec legacy-peer-deps
-RUN npm install -g npm@latest && \
-    npm install -g --legacy-peer-deps --no-audit --no-fund @open-wa/wa-automate@latest
+# Installation locale avec package.json pour un arbre de dépendances 100% propre
+RUN npm init -y && \
+    npm install --no-audit --no-fund @open-wa/wa-automate
 
 EXPOSE 8085
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["wa-automate", "--port", "8085", "--api-key", "qapril_wa_secret_2026", "--use-chrome", "--in-docker", "--qr-timeout", "0"]
+CMD ["npx", "@open-wa/wa-automate", "--port", "8085", "--api-key", "qapril_wa_secret_2026", "--use-chrome", "--in-docker", "--qr-timeout", "0"]
