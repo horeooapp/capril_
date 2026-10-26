@@ -1,0 +1,13 @@
+{
+  "name": "qapril-openwa-server",
+  "version": "1.0.0",
+  "description": "Serveur OpenWA WhatsApp Gateway avec support QR Code Web pour QAPRIL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@open-wa/wa-automate": "^4.71.0",
+    "express": "^4.21.2"
+  }
+}
