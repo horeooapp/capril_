@@ -30,8 +30,8 @@ export async function calculateTenantScore(tenantId: string) {
             // 2. Lease History Factor based on real database records
             const leases = tenant.leasesAsTenant;
             let nbLoyersPayes = 0;
-            let nbRetards = 0;
-            let nbImpayes = 0;
+            const nbRetards = 0;
+            const nbImpayes = 0;
             let nbMediation = 0;
             let nbContestations = 0;
 
