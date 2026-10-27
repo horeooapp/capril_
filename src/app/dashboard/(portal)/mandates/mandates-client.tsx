@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { ClipboardList, Search, FileSignature, CheckCircle, ShieldAlert, ArrowRight, UserCheck } from "lucide-react"
+import { ClipboardList, Search, FileSignature, CheckCircle, ShieldAlert, ArrowRight, UserCheck, Building2, Users, Home, Phone, Mail } from "lucide-react"
 import { toast } from "sonner";
 import { updateMandateStatus, createMandate, CreateMandateInput } from "@/actions/mandate-actions";
 import { MandateType } from "@prisma/client";
@@ -9,7 +9,7 @@ import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 
-export default function MandatesDashboardClient({ initialMandates, properties }: { initialMandates: any[], properties?: any[] }) {
+export default function MandatesDashboardClient({ initialMandates, properties, managedLandlords = [] }: { initialMandates: any[], properties?: any[], managedLandlords?: any[] }) {
     const [mandates, setMandates] = useState<any[]>(initialMandates.length > 0 ? initialMandates : [])
     const [isPending, startTransition] = useTransition()
 
@@ -103,7 +103,118 @@ export default function MandatesDashboardClient({ initialMandates, properties }:
                     label="Total Mandats"
                     value={`${mandates.length}`}
                  />
+                 <StatCard
+                    label="Propriétaires en Gestion"
+                    value={`${managedLandlords.length}`}
+                 />
             </div>
+
+            {/* Section: Propriétaires ayant confié leurs biens */}
+            <SectionCard title="Propriétaires en Gestion" icon={<Users className="text-amber-500" size={20} />}>
+                {managedLandlords.length === 0 ? (
+                    <p className="text-center py-8 text-[13px] font-bold text-slate-400">
+                        Aucun propriétaire n'a encore confié de bien à votre agence.
+                    </p>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {managedLandlords.map(landlord => (
+                            <div key={landlord.id} className="bg-slate-50 border border-slate-200 rounded-[14px] p-4 hover:border-amber-300 hover:shadow-md transition-all">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        {landlord.avatarUrl ? (
+                                            <img src={landlord.avatarUrl} alt="" className="w-full h-full object-cover rounded-full" />
+                                        ) : (
+                                            <span className="text-amber-600 font-black text-[13px]">
+                                                {(landlord.firstName?.[0] || '') + (landlord.lastName?.[0] || '') || 'P'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-black text-[14px] text-slate-900 truncate">
+                                            {landlord.firstName} {landlord.lastName}
+                                        </p>
+                                        {landlord.email && (
+                                            <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1 truncate">
+                                                <Mail size={10} /> {landlord.email}
+                                            </p>
+                                        )}
+                                        {landlord.phone && (
+                                            <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+                                                <Phone size={10} /> {landlord.phone}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-1">
+                                        <Home size={10} /> {landlord.managedProperties.length} bien(s) confié(s)
+                                    </p>
+                                    {landlord.managedProperties.map((prop: any) => (
+                                        <div key={prop.id} className="flex items-center justify-between bg-white border border-slate-100 rounded-[8px] px-3 py-2">
+                                            <span className="text-[12px] font-bold text-slate-700 truncate flex-1">{prop.address || 'Adresse N/A'}</span>
+                                            <span className={`ml-2 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full flex-shrink-0 ${
+                                                prop.mandateStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                                            }`}>
+                                                {prop.mandateStatus}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </SectionCard>
+
+            {/* Section: Biens en Gestion */}
+            <SectionCard title="Biens en Gestion" icon={<Building2 className="text-slate-500" size={20} />}>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr className="border-b border-slate-200">
+                                <th className="pb-3 font-bold text-[10px] uppercase tracking-widest text-slate-400 pl-2">Bien</th>
+                                <th className="pb-3 font-bold text-[10px] uppercase tracking-widest text-slate-400">Propriétaire</th>
+                                <th className="pb-3 font-bold text-[10px] uppercase tracking-widest text-slate-400">Type Mandat</th>
+                                <th className="pb-3 font-bold text-[10px] uppercase tracking-widest text-slate-400">Commission</th>
+                                <th className="pb-3 font-bold text-[10px] uppercase tracking-widest text-slate-400 text-right pr-2">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {mandates.map(m => (
+                                <tr key={m.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                    <td className="py-3 pl-2">
+                                        <p className="font-bold text-[13px] text-slate-900">{m.property?.address || 'N/A'}</p>
+                                        <p className="text-[11px] text-slate-400 font-medium">{m.property?.propertyCode}</p>
+                                    </td>
+                                    <td className="py-3">
+                                        <p className="font-bold text-[13px] text-slate-700">
+                                            {m.property?.owner ? `${m.property.owner.firstName || ''} ${m.property.owner.lastName || ''}`.trim() || 'N/A' : 'N/A'}
+                                        </p>
+                                    </td>
+                                    <td className="py-3">
+                                        <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-[6px] text-[10px] font-bold uppercase border border-slate-200">{m.mandateType || 'GESTION'}</span>
+                                    </td>
+                                    <td className="py-3 font-black text-[14px] text-slate-900">{m.commissionPct}%</td>
+                                    <td className="py-3 text-right pr-2">
+                                        {(m.status === 'ACTIVE' || m.status === 'ACTIF') ? (
+                                            <Badge color="green" className="inline-flex items-center gap-1"><CheckCircle size={10}/> Actif</Badge>
+                                        ) : (
+                                            <Badge color="red" className="inline-flex items-center gap-1"><ShieldAlert size={10}/> {m.status}</Badge>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {mandates.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="py-10 text-center text-[13px] font-bold text-slate-400 bg-slate-50 rounded-[12px] border border-dashed border-slate-200">
+                                        Aucun bien en gestion.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </SectionCard>
 
             <SectionCard title="Registre" icon={<ClipboardList className="text-slate-500" />}>
                 <div className="mb-4">

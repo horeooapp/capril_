@@ -21,7 +21,15 @@ export type CreateMandateInput = {
 export async function createMandate(input: CreateMandateInput) {
     try {
         const session = await auth();
-        if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'AGENCY')) {
+        const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
+        const AGENCY_ROLES = ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE', 'AGENCE_NON_AGREE'];
+        const userRole = session.user.role as string;
+        const capaciteActive = (session.user as any).capaciteActive as string | undefined;
+
+        const isAdmin = ADMIN_ROLES.includes(userRole);
+        const isAgency = AGENCY_ROLES.includes(userRole) || capaciteActive?.includes('AGENCY') || capaciteActive?.includes('AGENCE');
+
+        if (!session || !session.user || (!isAdmin && !isAgency)) {
             return { error: "Action réservée aux agences ou administrateurs." };
         }
 
