@@ -36,7 +36,10 @@ run_cmd("cd /opt/qapril && git fetch origin main && git reset --hard origin/main
 # 2. Rebuild et relance du conteneur Docker app
 run_cmd("cd /opt/qapril && docker compose build app && docker compose up -d app")
 
-# 3. Vérification du statut du conteneur qapril_app
+# 3. Assurer les permissions utilisateur (nextjs:nodejs) sur le volume uploads_data
+run_cmd("docker exec -u 0 qapril_app chown -R nextjs:nodejs /app/uploads_data && docker exec -u 0 qapril_app chmod -R 775 /app/uploads_data")
+
+# 4. Vérification du statut du conteneur qapril_app
 run_cmd("docker ps --filter name=qapril_app --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'")
 
 ssh.close()

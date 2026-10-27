@@ -78,6 +78,7 @@ export async function getProperties() {
         const dbProperties = await prisma.property.findMany({
             where: whereCondition,
             include: {
+                images: true,
                 annonces: true,
                 units: {
                     where: {
@@ -85,6 +86,7 @@ export async function getProperties() {
                         deletedAt: null
                     },
                     include: {
+                        images: true,
                         annonces: true,
                         leases: {
                             include: {
@@ -120,7 +122,7 @@ export async function creerBien(formData: FormData) {
   try {
     const session = await ensureAuthenticated();
     const ownerUserId = (formData.get("ownerUserId") as string) || session.user.id;
-    
+      const amenitiesRaw = formData.getAll("amenities") as string[];
     const data = {
         typeStructure: formData.get("typeStructure") as TypeStructure,
         name: formData.get("name") as string,
@@ -128,9 +130,14 @@ export async function creerBien(formData: FormData) {
         parentPropertyId: formData.get("parentPropertyId") as string,
         commune: formData.get("commune") as string,
         address: formData.get("addressLine1") as string || formData.get("address") as string,
+        city: (formData.get("city") as string) || "Abidjan",
         propertyType: (formData.get("propertyType") as string) || "BUILDING",
         declaredRentFcfa: parseInt(formData.get("rent") as string) || 0,
         superficieM2: parseFloat(formData.get("area") as string) || undefined,
+        rooms: parseInt(formData.get("rooms") as string) || undefined,
+        bedrooms: parseInt(formData.get("bedrooms") as string) || undefined,
+        referenceCadastre: (formData.get("referenceCadastre") as string) || undefined,
+        amenities: amenitiesRaw.length > 0 ? amenitiesRaw : undefined,
         nbUnits: parseInt(formData.get("nbUnits") as string) || 0,
         unitRent: parseInt(formData.get("unitRent") as string) || 0,
         leaseType: (formData.get("leaseType") as any) || "residential",
@@ -196,21 +203,28 @@ export async function creerBien(formData: FormData) {
           parentPropertyId: data.parentPropertyId,
           commune:          data.commune || inheritedData.commune,
           address:          data.address || inheritedData.address,
+          city:             data.city || inheritedData.city || "Abidjan",
           leaseType:        data.leaseType || inheritedData.leaseType || "residential",
           propertyType:     data.propertyType,
           declaredRentFcfa: data.declaredRentFcfa,
           superficieM2:     data.superficieM2,
+          rooms:            data.rooms,
+          bedrooms:         data.bedrooms,
+          referenceCadastre: data.referenceCadastre,
+          amenities:        data.amenities || [],
           status:           "active"
         }
       });
 
       // 5b. Gestion des images
+      let firstUploadedImageUrl: string | null = null;
       if (imageFiles && imageFiles.length > 0) {
         for (let i = 0; i < imageFiles.length; i++) {
           const file = imageFiles[i];
           if (file && file.size > 0) {
             try {
               const url = await savePhysicalFile(file, "properties");
+              if (!firstUploadedImageUrl) firstUploadedImageUrl = url;
               await tx.propertyImage.create({
                 data: {
                   propertyId: bien.id,
@@ -225,12 +239,80 @@ export async function creerBien(formData: FormData) {
         }
       }
 
-      // 6. Bulk creation si nécessaire
-      if (nbUnits && nbUnits > 0 && typeStructure !== 'INDEPENDANT') {
+      // Si c'est un bien enfant et qu'aucune photo n'a été uploadée, hériter de la photo principale du parent
+      if (!firstUploadedImageUrl && parentPropertyId) {
+        const parentImage = await tx.propertyImage.findFirst({
+          where: { propertyId: parentPropertyId, isMain: true }
+        });
+        if (parentImage) {
+          firstUploadedImageUrl = parentImage.s3Key;
+          await tx.propertyImage.create({
+            data: {
+              propertyId: bien.id,
+              s3Key: parentImage.s3Key,
+              isMain: true
+            }
+          });
+        }
+      }
+
+      // 6. Bulk creation si nécessaire (support des loyers et caractéristiques individuels par appartement)
+      let customUnitsList: any[] = [];
+      const customUnitsRaw = formData.get("customUnits") as string;
+      if (customUnitsRaw) {
+        try {
+          customUnitsList = JSON.parse(customUnitsRaw);
+        } catch (e) {
+          console.error("Failed to parse customUnits JSON", e);
+        }
+      }
+
+      if (customUnitsList.length > 0 && typeStructure !== 'INDEPENDANT') {
+        const prefix = typeStructure === 'IMMEUBLE' ? 'Apt' : 'Porte';
+        for (let i = 0; i < customUnitsList.length; i++) {
+           const u = customUnitsList[i];
+           const childLabel = u.label?.trim() || `${prefix} ${i + 1}`;
+           const childRent = Number(u.rent) || 0;
+           const childType = u.type || (typeStructure === 'IMMEUBLE' ? 'APARTMENT' : 'ROOM');
+           const childArea = u.area ? Number(u.area) : undefined;
+           const childRooms = u.rooms ? Number(u.rooms) : undefined;
+
+           const childUnit = await tx.property.create({
+             data: {
+               propertyCode: `${propertyCode}-${childLabel.replace(/\s+/g, '').toUpperCase()}`,
+               ownerUserId,
+               typeStructure,
+               name: `${bien.name} - ${childLabel}`,
+               unitLabel: childLabel,
+               parentPropertyId: bien.id,
+               commune: bien.commune,
+               address: bien.address,
+               city: bien.city,
+               leaseType: bien.leaseType,
+               propertyType: childType,
+               declaredRentFcfa: childRent,
+               superficieM2: childArea,
+               rooms: childRooms,
+               status: "active"
+             }
+           });
+
+           // Si le parent a une photo principale, la rattacher aussi à l'unité fille
+           if (firstUploadedImageUrl) {
+             await tx.propertyImage.create({
+               data: {
+                 propertyId: childUnit.id,
+                 s3Key: firstUploadedImageUrl,
+                 isMain: true
+               }
+             });
+           }
+        }
+      } else if (nbUnits && nbUnits > 0 && typeStructure !== 'INDEPENDANT') {
         const prefix = typeStructure === 'IMMEUBLE' ? 'Apt' : 'Porte';
         for (let i = 1; i <= nbUnits; i++) {
            const childLabel = `${prefix} ${i}`;
-           await tx.property.create({
+           const childUnit = await tx.property.create({
              data: {
                propertyCode: `${propertyCode}-${childLabel.replace(/\s/g, '').toUpperCase()}`,
                ownerUserId,
@@ -240,12 +322,23 @@ export async function creerBien(formData: FormData) {
                parentPropertyId: bien.id,
                commune: bien.commune,
                address: bien.address,
+               city: bien.city,
                leaseType: bien.leaseType,
                propertyType: typeStructure === 'IMMEUBLE' ? 'APARTMENT' : 'ROOM',
-               declaredRentFcfa: unitRent,
-               status: "ACTIVE"
+               declaredRentFcfa: unitRent || 0,
+               status: "active"
              }
            });
+
+           if (firstUploadedImageUrl) {
+             await tx.propertyImage.create({
+               data: {
+                 propertyId: childUnit.id,
+                 s3Key: firstUploadedImageUrl,
+                 isMain: true
+               }
+             });
+           }
         }
       }
 

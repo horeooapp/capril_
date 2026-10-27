@@ -49,10 +49,29 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                             !isChild && <div className="w-6 h-6" />
                         )}
                         {isChild && <div className="w-4 h-px bg-slate-300"></div>}
+
+                        {/* Miniature Photo */}
+                        <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 border border-slate-200 shadow-xs flex items-center justify-center">
+                            {p.images && p.images.length > 0 ? (
+                                <img 
+                                    src={(p.images.find((img: any) => img.isMain) || p.images[0]).s3Key} 
+                                    alt={p.name || "Photo du bien"} 
+                                    className="w-full h-full object-cover" 
+                                    onError={(e) => {
+                                        (e.target as HTMLElement).style.display = 'none';
+                                    }}
+                                />
+                            ) : (
+                                <div className="text-slate-400 flex flex-col items-center justify-center">
+                                    {p.typeStructure === 'IMMEUBLE' ? <Building2 size={16} /> : <Home size={16} />}
+                                </div>
+                            )}
+                        </div>
+
                         <div>
                             <p className="font-semibold text-[13px] text-slate-800">{p.name || p.propertyCode || "Bien sans nom"}</p>
                             <p className="text-[11px] text-slate-400 mt-0.5 tracking-wide">
-                                {isChild ? `Unité de : ${p.parentProperty?.name || p.parentPropertyId.substring(0,8)}` : `ID: ${p.id.substring(0,8)}`}
+                                {isChild ? `Unité de : ${p.parentProperty?.name || p.parentPropertyId?.substring(0,8)}` : `${p.commune ? p.commune + ' · ' : ''}Code: ${p.propertyCode || p.id.substring(0,8)}`}
                             </p>
                         </div>
                     </div>
