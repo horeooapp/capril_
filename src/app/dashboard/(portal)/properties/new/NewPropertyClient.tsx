@@ -110,15 +110,15 @@ export default function NewPropertyClient() {
                             </label>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <button type="button" onClick={() => setStructureCategory('INDEPENDANT')} className={`p-4 border rounded-xl text-left transition-all ${structureCategory === 'INDEPENDANT' ? 'border-[#FF8200] bg-orange-50 ring-2 ring-orange-200' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
-                                    <div className="text-sm font-bold text-gray-900 mb-1">🏡 Indépendant</div>
+                                    <div className="text-sm font-bold text-gray-900 mb-1">🏡 Villas et Maisons Basses</div>
                                     <div className="text-xs text-gray-500 leading-snug">Villa seule, studio autonome (sans structure parente)</div>
                                 </button>
                                 <button type="button" onClick={() => setStructureCategory('PARENT')} className={`p-4 border rounded-xl text-left transition-all ${structureCategory === 'PARENT' ? 'border-sky-500 bg-sky-50 ring-2 ring-sky-200' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
-                                    <div className="text-sm font-bold text-gray-900 mb-1">🏢 Structure Parente</div>
+                                    <div className="text-sm font-bold text-gray-900 mb-1">🏢 Immeuble et Bloc Résidentiel</div>
                                     <div className="text-xs text-gray-500 leading-snug">Créer un immeuble, une résidence ou une cour commune</div>
                                 </button>
                                 <button type="button" onClick={() => setStructureCategory('ENFANT')} className={`p-4 border rounded-xl text-left transition-all ${structureCategory === 'ENFANT' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
-                                    <div className="text-sm font-bold text-gray-900 mb-1">🚪 Unité Enfant</div>
+                                    <div className="text-sm font-bold text-gray-900 mb-1">🚪 Appartement & Portes</div>
                                     <div className="text-xs text-gray-500 leading-snug">Ajouter un appartement ou une porte dans une structure existante</div>
                                 </button>
                             </div>
