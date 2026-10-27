@@ -1,7 +1,5 @@
-"use client"
-
 import React, { useState, useTransition } from "react"
-import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check } from "lucide-react"
+import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check, MessageSquare, PlusCircle, AlertCircle, FileSignature } from "lucide-react"
 import { toast } from "sonner";
 import { processCandidature } from "@/actions/matching-actions";
 import { Badge } from "@/components/dashboard/ui/Badge";
@@ -11,13 +9,84 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
     const [isPending, startTransition] = useTransition()
     const [activeModalCandidate, setActiveModalCandidate] = useState<any>(null)
 
-    const handleProcess = (id: string, action: "ACCEPTE" | "REJETE") => {
+    // Lease creation modal state
+    const [leaseModalCandidate, setLeaseModalCandidate] = useState<any>(null)
+    const [rentAmount, setRentAmount] = useState<number>(150000)
+    const [depositAmount, setDepositAmount] = useState<number>(300000)
+    const [chargesAmount, setChargesAmount] = useState<number>(0)
+    const [startDate, setStartDate] = useState<string>(new Date().toISOString().split("T")[0])
+    const [durationMonths, setDurationMonths] = useState<number>(12)
+
+    // Request more info modal state
+    const [infoModalCandidate, setInfoModalCandidate] = useState<any>(null)
+    const [infoMessage, setInfoMessage] = useState<string>("")
+
+    const handleOpenLeaseModal = (cand: any) => {
+        setLeaseModalCandidate(cand);
+        const monthly = cand.logement?.priceMonthly || 150000;
+        setRentAmount(monthly);
+        setDepositAmount(monthly * 2);
+        setChargesAmount(0);
+        setStartDate(new Date().toISOString().split("T")[0]);
+        setDurationMonths(12);
+    };
+
+    const handleConfirmLeaseAndAccept = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!leaseModalCandidate) return;
+
         startTransition(async () => {
-            const res = await processCandidature(id, action);
+            const res = await processCandidature(leaseModalCandidate.id, "ACCEPTE", {
+                leaseData: {
+                    rentAmount: Number(rentAmount),
+                    depositAmount: Number(depositAmount),
+                    chargesAmount: Number(chargesAmount),
+                    startDate,
+                    durationMonths: Number(durationMonths)
+                }
+            });
+
             if (res.success) {
-                toast.success(action === "ACCEPTE" ? "Match Immo ! Dossier Validé." : "Candidature rejetée.");
+                toast.success("Dossier accepté ! Le contrat de bail a été généré et notifié au locataire par email et WhatsApp.");
+                setLeaseModalCandidate(null);
+                setActiveModalCandidate(null);
             } else {
-                toast.error(res.error || "Erreur lors du traitement.");
+                toast.error(res.error || "Erreur lors de la validation du bail.");
+            }
+        });
+    };
+
+    const handleSendInfoRequest = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!infoModalCandidate) return;
+        if (!infoMessage.trim()) {
+            toast.error("Veuillez saisir votre demande de complément.");
+            return;
+        }
+
+        startTransition(async () => {
+            const res = await processCandidature(infoModalCandidate.id, "INFO_DEMANDEE", {
+                messageComplement: infoMessage
+            });
+
+            if (res.success) {
+                toast.success("Demande d'information transmise au locataire par email et WhatsApp !");
+                setInfoModalCandidate(null);
+                setInfoMessage("");
+                setActiveModalCandidate(null);
+            } else {
+                toast.error(res.error || "Erreur lors de l'envoi de la demande.");
+            }
+        });
+    };
+
+    const handleReject = (id: string) => {
+        startTransition(async () => {
+            const res = await processCandidature(id, "REJETE");
+            if (res.success) {
+                toast.success("Candidature rejetée. Le locataire en a été informé courtoisement.");
+            } else {
+                toast.error(res.error || "Erreur lors du rejet.");
             }
             setActiveModalCandidate(null);
         });
@@ -86,22 +155,39 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
                                 Voir le dossier complet & notation →
                             </button>
 
-                            <div className="flex justify-center gap-8 pt-2 border-t border-slate-100">
+                            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-100">
                                 <button 
+                                    type="button"
                                     disabled={isPending} 
-                                    onClick={() => handleProcess(nextCand.id, 'REJETE')}
-                                    className="w-16 h-16 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:border-rose-400 hover:bg-rose-50 transition-all shadow-md disabled:opacity-50 hover:scale-110"
-                                    title="Refuser"
+                                    onClick={() => handleReject(nextCand.id)}
+                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 transition-all font-black text-[11px] uppercase tracking-wider disabled:opacity-50"
+                                    title="Rejeter la candidature"
                                 >
-                                    <X size={28} strokeWidth={2.5} />
+                                    <X size={20} className="mb-1" />
+                                    Rejeter
                                 </button>
                                 <button 
+                                    type="button"
                                     disabled={isPending} 
-                                    onClick={() => handleProcess(nextCand.id, 'ACCEPTE')}
-                                    className="w-16 h-16 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-400 hover:bg-emerald-50 transition-all shadow-md disabled:opacity-50 hover:scale-110"
-                                    title="Accepter"
+                                    onClick={() => {
+                                        setInfoModalCandidate(nextCand);
+                                        setInfoMessage("");
+                                    }}
+                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-700 transition-all font-black text-[11px] uppercase tracking-wider disabled:opacity-50"
+                                    title="Demander plus d'informations"
                                 >
-                                    <Heart size={28} strokeWidth={2.5} className="hover:fill-emerald-500 transition-colors" />
+                                    <MessageSquare size={20} className="mb-1" />
+                                    Précisions
+                                </button>
+                                <button 
+                                    type="button"
+                                    disabled={isPending} 
+                                    onClick={() => handleOpenLeaseModal(nextCand)}
+                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all font-black text-[11px] uppercase tracking-wider disabled:opacity-50"
+                                    title="Accepter et introduire le bail"
+                                >
+                                    <FileSignature size={20} className="mb-1" />
+                                    Bail & Valider
                                 </button>
                             </div>
                         </div>
@@ -253,24 +339,208 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
                             {/* ACTIONS IF PENDING */}
                             {activeModalCandidate.statut === "SOUMISE" && (
-                                <div className="flex gap-4 pt-4 border-t border-slate-100">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-100">
                                     <button 
+                                        type="button"
                                         disabled={isPending}
-                                        onClick={() => handleProcess(activeModalCandidate.id, 'REJETE')}
-                                        className="flex-1 bg-rose-50 text-rose-600 hover:bg-rose-100 font-black text-xs uppercase tracking-widest py-3.5 rounded-2xl transition-colors text-center"
+                                        onClick={() => handleReject(activeModalCandidate.id)}
+                                        className="bg-rose-50 text-rose-600 hover:bg-rose-100 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-colors text-center"
                                     >
                                         Refuser le dossier
                                     </button>
                                     <button 
+                                        type="button"
                                         disabled={isPending}
-                                        onClick={() => handleProcess(activeModalCandidate.id, 'ACCEPTE')}
-                                        className="flex-1 bg-emerald-600 text-white hover:bg-emerald-700 font-black text-xs uppercase tracking-widest py-3.5 rounded-2xl transition-colors shadow-lg shadow-emerald-500/20 text-center"
+                                        onClick={() => {
+                                            setInfoModalCandidate(activeModalCandidate);
+                                            setInfoMessage("");
+                                        }}
+                                        className="bg-blue-50 text-blue-700 hover:bg-blue-100 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-colors text-center"
                                     >
-                                        Valider le locataire ✓
+                                        Demander précisions
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        disabled={isPending}
+                                        onClick={() => handleOpenLeaseModal(activeModalCandidate)}
+                                        className="bg-emerald-600 text-white hover:bg-emerald-700 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-colors shadow-lg shadow-emerald-500/20 text-center"
+                                    >
+                                        Bail & Valider ✓
                                     </button>
                                 </div>
                             )}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODALE D'INTRODUCTION DU CONTRAT DE BAIL */}
+            {leaseModalCandidate && (
+                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
+                        <div className="bg-gradient-to-r from-emerald-800 to-teal-950 p-6 text-white relative">
+                            <button 
+                                onClick={() => setLeaseModalCandidate(null)}
+                                className="absolute top-5 right-5 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300 block mb-1">Contractualisation Sécurisée</span>
+                            <h3 className="text-xl font-black">Introduire le Contrat de Bail</h3>
+                            <p className="text-xs text-emerald-100/80 mt-1">
+                                Pour {leaseModalCandidate.prenom} {leaseModalCandidate.nom} · {leaseModalCandidate.logement?.name || leaseModalCandidate.logement?.address || "Logement"}
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleConfirmLeaseAndAccept} className="p-6 space-y-4">
+                            <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-100 flex items-start gap-2.5">
+                                <CheckCircle size={18} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-[11px] font-semibold text-emerald-900 leading-snug">
+                                    En validant, le bail sera généré et une notification automatique sera envoyée au locataire par <strong>email</strong> et sur <strong>WhatsApp</strong> pour sa signature électronique.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Loyer Mensuel (FCFA) *</label>
+                                    <input 
+                                        type="number"
+                                        required
+                                        min={1000}
+                                        value={rentAmount}
+                                        onChange={(e) => {
+                                            const v = Number(e.target.value);
+                                            setRentAmount(v);
+                                            setDepositAmount(v * 2);
+                                        }}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Dépôt de garantie (Max 2 mois) *</label>
+                                    <input 
+                                        type="number"
+                                        required
+                                        min={0}
+                                        max={rentAmount * 2}
+                                        value={depositAmount}
+                                        onChange={(e) => setDepositAmount(Number(e.target.value))}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Charges (FCFA)</label>
+                                    <input 
+                                        type="number"
+                                        min={0}
+                                        value={chargesAmount}
+                                        onChange={(e) => setChargesAmount(Number(e.target.value))}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Durée (Mois)</label>
+                                    <input 
+                                        type="number"
+                                        min={1}
+                                        value={durationMonths}
+                                        onChange={(e) => setDurationMonths(Number(e.target.value))}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Date d'effet</label>
+                                    <input 
+                                        type="date"
+                                        required
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-3 border-t border-slate-100">
+                                <button 
+                                    type="button"
+                                    onClick={() => setLeaseModalCandidate(null)}
+                                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-colors text-center"
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    type="submit"
+                                    disabled={isPending}
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/25 text-center disabled:opacity-50"
+                                >
+                                    {isPending ? "Génération en cours..." : "Générer le bail & Notifier ✓"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODALE DE DEMANDE DE PRÉCISIONS / COMPLÉMENTS */}
+            {infoModalCandidate && (
+                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
+                        <div className="bg-gradient-to-r from-blue-900 to-indigo-950 p-6 text-white relative">
+                            <button 
+                                onClick={() => setInfoModalCandidate(null)}
+                                className="absolute top-5 right-5 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-300 block mb-1">Échange & Précisions</span>
+                            <h3 className="text-xl font-black">Demander un complément</h3>
+                            <p className="text-xs text-blue-100/80 mt-1">
+                                Destiné à {infoModalCandidate.prenom} {infoModalCandidate.nom} ({infoModalCandidate.telephone})
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSendInfoRequest} className="p-6 space-y-4">
+                            <div className="bg-blue-50/70 p-3 rounded-2xl border border-blue-100 flex items-start gap-2.5">
+                                <AlertCircle size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-[11px] font-semibold text-blue-900 leading-snug">
+                                    Ce message sera instantanément transmis au locataire par <strong>email</strong>, <strong>notification</strong> et message <strong>WhatsApp</strong>.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">
+                                    Votre demande / Pièces souhaitées *
+                                </label>
+                                <textarea 
+                                    required
+                                    rows={4}
+                                    value={infoMessage}
+                                    onChange={(e) => setInfoMessage(e.target.value)}
+                                    placeholder="Ex: Bonjour, pourriez-vous fournir votre dernier avis d'imposition ou préciser si vous disposez d'un garant ?"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 pt-2 border-t border-slate-100">
+                                <button 
+                                    type="button"
+                                    onClick={() => setInfoModalCandidate(null)}
+                                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-colors text-center"
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    type="submit"
+                                    disabled={isPending}
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 text-center disabled:opacity-50"
+                                >
+                                    {isPending ? "Envoi en cours..." : "Transmettre la demande →"}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
