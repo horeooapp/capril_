@@ -23,27 +23,32 @@ export async function GET(req: Request, context: { params: Promise<{ id: string 
       const { data: { text } } = await worker.recognize(scan.fichierUrl);
       await worker.terminate();
 
-      // Simple expression régulière pour extraire le loyer si possible
+      // Expression régulière pour extraire le loyer
       const loyerMatch = text.match(/loyer.*?(\d{2,}[\s\d]*)/i);
       const extractedLoyer = loyerMatch ? parseInt(loyerMatch[1].replace(/\s/g, '')) : 0;
 
-      const mockExtraction = {
-        loyer: extractedLoyer || 150000,
-        bailleurNom: "KOUADIO",
-        locataireNom: "BAMBA",
-        dureeMois: 12,
-        texteBrut: text // On sauvegarde aussi le texte brut
+      // Détection du bailleur et du locataire dans le document
+      const bailleurMatch = text.match(/(?:bailleur|propriétaire)\s*[:\-]?\s*([A-ZÀ-ÿ\s]{3,35})/i);
+      const locataireMatch = text.match(/(?:locataire|preneur)\s*[:\-]?\s*([A-ZÀ-ÿ\s]{3,35})/i);
+      const dureeMatch = text.match(/(\d{1,2})\s*mois/i);
+
+      const realExtraction = {
+        loyer: extractedLoyer || 0,
+        bailleurNom: bailleurMatch ? bailleurMatch[1].trim() : "",
+        locataireNom: locataireMatch ? locataireMatch[1].trim() : "",
+        dureeMois: dureeMatch ? parseInt(dureeMatch[1]) : 12,
+        texteBrut: text
       };
 
       await prisma.scanExtraction.update({
         where: { id: scanId },
         data: {
-          champsExtraits: mockExtraction,
+          champsExtraits: realExtraction,
           statutPipeline: "EXTRAIT"
         }
       });
 
-      return NextResponse.json({ success: true, champs: mockExtraction });
+      return NextResponse.json({ success: true, champs: realExtraction });
     }
 
     return NextResponse.json({ success: true, champs: scan.champsExtraits });

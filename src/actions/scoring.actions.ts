@@ -27,21 +27,36 @@ export async function calculateTenantScore(tenantId: string) {
                 score -= 100;
             }
 
-            // 2. Lease History Factor (Mock logic)
-            // In a real scenario, we'd check `Receipt` or `LeaseArrear` or `Dispute`
-            let nbLoyersPayes = 0;
-            const nbRetards = 0;
-            const nbImpayes = 0;
-            const nbMediation = 0;
-            const nbContestations = 0;
-
+            // 2. Lease History Factor based on real database records
             const leases = tenant.leasesAsTenant;
+            let nbLoyersPayes = 0;
+            let nbRetards = 0;
+            let nbImpayes = 0;
+            let nbMediation = 0;
+            let nbContestations = 0;
+
             if (leases.length > 0) {
-                score += 50; // Bonus for having a lease history
-                // Just as an example, we count active leases
-                nbLoyersPayes = leases.filter(l => l.status === 'ACTIVE').length * 12; 
+                score += 50; // Bonus pour historique de bail existant
+                const leaseIds = leases.map(l => l.id);
+
+                // Comptabiliser les quittances réelles payées
+                const receipts = await tx.receipt.findMany({
+                    where: { leaseId: { in: leaseIds }, status: "PAID" },
+                    select: { id: true }
+                });
+                nbLoyersPayes = receipts.length;
+                score += Math.min(200, nbLoyersPayes * 15);
+
+                // Comptabiliser les litiges réels
+                const disputes = await tx.dispute.findMany({
+                    where: { leaseId: { in: leaseIds } },
+                    select: { statut: true }
+                });
+                nbMediation = disputes.filter(d => d.statut === "RESOLVED").length;
+                nbContestations = disputes.filter(d => d.statut !== "RESOLVED").length;
+                score -= nbContestations * 40;
             } else {
-                score -= 50; // Penalty for no history
+                score -= 30;
             }
 
             // Ensure score bounds
