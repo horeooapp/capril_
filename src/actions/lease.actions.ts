@@ -673,10 +673,97 @@ export async function getTenantLeases() {
 }
 
 export async function renewLeaseAction(leaseId: string) {
-    const session = await ensureAuthenticated();
-    await prisma.lease.update({ where: { id: leaseId }, data: { endDate: new Date() } }); // Simplified for logic
-    revalidatePath("/dashboard/leases");
-    return { success: true };
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+
+        // 1. Tenter la recherche d'un bail formel (Lease)
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            include: { property: true }
+        });
+
+        if (lease) {
+            const isAuthorized = lease.landlordId === userId || 
+                                 lease.agentId === userId || 
+                                 lease.property.managedByUserId === userId || 
+                                 lease.property.ownerUserId === userId;
+            if (!isAuthorized && session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
+                return { success: false, error: "Action non autorisée sur ce bail." };
+            }
+
+            // Calculer la nouvelle date de fin (+ 1 an)
+            const currentDuration = lease.durationMonths || 12;
+            const newDuration = currentDuration + 12;
+            const baseDate = lease.endDate 
+                ? new Date(lease.endDate) 
+                : new Date(new Date(lease.startDate).getTime() + currentDuration * 30 * 24 * 3600 * 1000);
+            const newEndDate = new Date(baseDate);
+            newEndDate.setFullYear(newEndDate.getFullYear() + 1);
+
+            await prisma.lease.update({
+                where: { id: leaseId },
+                data: {
+                    durationMonths: newDuration,
+                    endDate: newEndDate,
+                    status: (lease.status === 'TERMINATED' || (lease.status as string) === 'EXPIRED') ? 'ACTIVE' : lease.status
+                }
+            });
+
+            await prisma.auditLog.create({
+                data: {
+                    userId,
+                    action: "LEASE_RENEWAL",
+                    module: "LEASES",
+                    entityId: leaseId,
+                    newValues: { durationMonths: newDuration, endDate: newEndDate }
+                }
+            }).catch(() => {});
+
+            revalidatePath("/dashboard/leases");
+            return { success: true, message: "Bail renouvelé avec succès pour un an supplémentaire." };
+        }
+
+        // 2. Tenter la recherche d'un bail verbal / déclaratif (BailDeclaratif)
+        const bdq = await prisma.bailDeclaratif.findUnique({
+            where: { id: leaseId }
+        });
+
+        if (bdq) {
+            if (bdq.bailleurId !== userId && session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
+                return { success: false, error: "Action non autorisée sur ce bail verbal." };
+            }
+
+            // Si le bail verbal a déjà été formalisé en bail formel, renouveler le bail formel
+            if (bdq.bailFormelId) {
+                return await renewLeaseAction(bdq.bailFormelId);
+            }
+
+            // Si en attente de confirmation locataire, prolonger le délai d'expiration de 5 jours
+            if (bdq.statut === "PENDING_LOCATAIRE" || (bdq.statut as string) === "PENDING_AGENT") {
+                await prisma.bailDeclaratif.update({
+                    where: { id: leaseId },
+                    data: { createdAt: new Date() } // Réinitialise le délai des 5 jours
+                });
+                revalidatePath("/dashboard/leases");
+                return { success: true, message: "Délai de confirmation du bail verbal prolongé de 5 jours." };
+            }
+
+            // Pour un BDQ confirmé, mettre à jour la date
+            await prisma.bailDeclaratif.update({
+                where: { id: leaseId },
+                data: { updatedAt: new Date() }
+            });
+
+            revalidatePath("/dashboard/leases");
+            return { success: true, message: "Bail verbal prolongé avec succès." };
+        }
+
+        return { success: false, error: "Bail introuvable." };
+    } catch (err: any) {
+        console.error("[renewLeaseAction Error]", err);
+        return { success: false, error: err?.message || "Erreur lors du renouvellement du contrat." };
+    }
 }
 
 // --- [GENERIC SIGNATURE] Electronic Signature System ---

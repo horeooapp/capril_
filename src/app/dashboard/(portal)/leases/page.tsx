@@ -63,6 +63,7 @@ export default async function LeasesDashboardPage() {
                     id: b.id,
                     leaseReference: `BDQ-${b.id.substring(0,8)}`,
                     leaseType: "VERBAL (BDQ)",
+                    isBdq: true,
                     tenant: { firstName: b.prenomLocataireDeclare || "", lastName: b.nomLocataireDeclare || b.telephoneLocataire },
                     rentAmount: Number(b.loyerDeclareMensuel || 0),
                     status: isExpired ? "ANNULÉ" : (b.statut === "PENDING_LOCATAIRE" ? "PENDING_CONFIRMATION" : b.statut),

@@ -9,9 +9,13 @@ import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 
 export default function LeasesDashboardClient({ initialLeases }: { initialLeases: any[] }) {
-    const [leases] = useState<any[]>(initialLeases.length > 0 ? initialLeases : [])
+    const [leases, setLeases] = useState<any[]>(initialLeases || [])
     const [isPending, startTransition] = useTransition()
     const [search, setSearch] = useState("");
+
+    React.useEffect(() => {
+        setLeases(initialLeases || []);
+    }, [initialLeases]);
 
     const filteredLeases = leases.filter(l => 
         (l.tenant?.firstName || '').toLowerCase().includes(search.toLowerCase()) || 
@@ -21,13 +25,18 @@ export default function LeasesDashboardClient({ initialLeases }: { initialLeases
 
     const handleRenew = (leaseId: string) => {
         startTransition(async () => {
-            const promise = renewLeaseAction(leaseId)
-            toast.promise(promise, {
-                loading: "Génération de l'avenant de renouvellement et log sécurisé...",
-                success: "Bail renouvelé avec succès pour un an supplémentaire.",
-                error: (err) => err?.message || "Erreur de renouvellement."
-            })
-        })
+            const toastId = toast.loading("Traitement du renouvellement...");
+            try {
+                const res = await renewLeaseAction(leaseId);
+                if (res && !res.success) {
+                    toast.error(res.error || "Erreur de renouvellement.", { id: toastId });
+                } else {
+                    toast.success(res?.message || "Bail renouvelé avec succès.", { id: toastId });
+                }
+            } catch (err: any) {
+                toast.error(err?.message || "Erreur lors du renouvellement.", { id: toastId });
+            }
+        });
     }
 
     return (
@@ -102,12 +111,21 @@ export default function LeasesDashboardClient({ initialLeases }: { initialLeases
                                         )}
                                     </td>
                                     <td className="py-3 px-4 text-right">
-                                        <button 
-                                            onClick={() => handleRenew(l.id)} 
-                                            disabled={isPending}
-                                            className="text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-300 transition-colors border border-slate-200 px-3 py-1.5 rounded-[6px] disabled:opacity-50">
-                                            Renouveler 1 An
-                                        </button>
+                                        <div className="flex items-center justify-end gap-2">
+                                            {!l.isBdq && (
+                                                <Link 
+                                                    href={`/dashboard/leases/${l.id}`}
+                                                    className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition-colors border border-slate-200 px-2.5 py-1.5 rounded-[6px]">
+                                                    Détails
+                                                </Link>
+                                            )}
+                                            <button 
+                                                onClick={() => handleRenew(l.id)} 
+                                                disabled={isPending}
+                                                className="text-[11px] font-semibold text-slate-600 hover:text-sky-600 hover:border-sky-300 transition-colors border border-slate-200 px-3 py-1.5 rounded-[6px] disabled:opacity-50">
+                                                {l.isBdq ? "Prolonger (5j)" : "Renouveler 1 An"}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
