@@ -1,6 +1,11 @@
 /**
- * OpenWA Integration (WhatsApp Web Automation API)
- * Service centralisé pour toutes les validations et envois de codes OTP par WhatsApp
+ * OpenWA Integration — WhatsApp API Gateway (Baileys/WAHA)
+ * Utilise l'API REST OpenWA v2 : /api/sessions/:sessionId/messages/send-text
+ *
+ * Configuration requise (variables d'environnement) :
+ *   OPENWA_API_URL     = http://openwa-api:2785  (URL de base du gateway)
+ *   OPENWA_API_KEY     = owa_k1_...              (clé API OpenWA)
+ *   OPENWA_SESSION_ID  = 06353e46-...            (UUID de la session WhatsApp active)
  */
 
 export interface OpenWAResponse {
@@ -10,12 +15,12 @@ export interface OpenWAResponse {
 }
 
 /**
- * Nettoie et formate le numéro au format international attendu par OpenWA (ex: 2250700000000@c.us)
+ * Nettoie et formate le numéro au format chatId WhatsApp (ex: 2250700000000@c.us)
  */
 export function formatOpenWAChatId(phone: string): string {
   let clean = phone.replace(/[^\d]/g, '');
 
-  // Format Côte d'Ivoire : si numéro à 10 chiffres commençant par 01, 05, 07, etc.
+  // Format Côte d'Ivoire : 10 chiffres commençant par 0 → ajouter indicatif 225
   if (clean.length === 10 && clean.startsWith('0')) {
     clean = '225' + clean;
   } else if (clean.length === 8) {
@@ -27,20 +32,32 @@ export function formatOpenWAChatId(phone: string): string {
 }
 
 /**
- * Envoie un message texte simple via l'API OpenWA
+ * Envoie un message texte via l'API OpenWA v2 (Baileys)
+ * Endpoint: POST /api/sessions/:sessionId/messages/send-text
  */
 export async function sendOpenWAMessage(phone: string, text: string): Promise<OpenWAResponse> {
-  const apiUrl = process.env.OPENWA_API_URL || process.env.OPENWA_HOST || 'http://localhost:8085';
+  const apiUrl = (process.env.OPENWA_API_URL || 'http://localhost:2785').replace(/\/$/, '');
   const apiKey = process.env.OPENWA_API_KEY || '';
+  const sessionId = process.env.OPENWA_SESSION_ID || '';
   const chatId = formatOpenWAChatId(phone);
 
-  const isMock = process.env.ENABLE_OPENWA_MOCK === 'true' || 
-                 (!process.env.OPENWA_API_URL && process.env.NODE_ENV !== 'production');
+  // Mode simulation : si pas de session configurée et hors production
+  const isMock =
+    process.env.ENABLE_OPENWA_MOCK === 'true' ||
+    (!process.env.OPENWA_API_URL && process.env.NODE_ENV !== 'production');
 
   if (isMock) {
     console.log(`[OPENWA SIMULATION] To: ${chatId} | Message:\n${text}`);
     return { success: true, messageId: `mock_openwa_${Date.now()}` };
   }
+
+  if (!sessionId) {
+    const errMsg = '[OPENWA] OPENWA_SESSION_ID non configuré — impossible d\'envoyer le message.';
+    console.error(errMsg);
+    return { success: false, error: 'OPENWA_SESSION_ID manquant dans la configuration.' };
+  }
+
+  const endpoint = `${apiUrl}/api/sessions/${sessionId}/messages/send-text`;
 
   try {
     const headers: Record<string, string> = {
@@ -48,54 +65,39 @@ export async function sendOpenWAMessage(phone: string, text: string): Promise<Op
     };
 
     if (apiKey) {
+      // OpenWA v2 utilise X-Api-Key
+      headers['X-Api-Key'] = apiKey;
+      // Compatibilité Bearer pour les proxys
       headers['Authorization'] = `Bearer ${apiKey}`;
-      headers['api-key'] = apiKey;
     }
 
-    // Endpoint standard OpenWA : /sendText
-    const response = await fetch(`${apiUrl.replace(/\/$/, '')}/sendText`, {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({
         chatId,
-        content: text,
+        text,
       }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
 
     if (response.ok) {
       const data = await response.json().catch(() => ({}));
-      const messageId = data?.response || data?.id || data?.messageId || 'sent_via_openwa';
-      console.log(`[OPENWA] Message envoyé avec succès à ${chatId} (ID: ${messageId})`);
+      const messageId = data?.messageId || data?.id || data?.response || 'sent_via_openwa';
+      console.log(`[OPENWA] ✅ Message envoyé à ${chatId} (ID: ${messageId})`);
       return { success: true, messageId: String(messageId) };
     }
 
-    // Fallback éventuel sur /sendMessage
-    const fallbackResponse = await fetch(`${apiUrl.replace(/\/$/, '')}/sendMessage`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        to: chatId,
-        body: text,
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (fallbackResponse.ok) {
-      const fallbackData = await fallbackResponse.json().catch(() => ({}));
-      return { success: true, messageId: String(fallbackData?.id || 'sent_via_openwa_fallback') };
-    }
-
-    const errorText = await response.text().catch(() => 'Unknown error');
-    console.error(`[OPENWA] Échec d'envoi à ${chatId} (${response.status}): ${errorText}`);
-    return { success: false, error: `OpenWA error (${response.status}): ${errorText}` };
+    const errorText = await response.text().catch(() => 'Erreur inconnue');
+    console.error(`[OPENWA] ❌ Échec d'envoi à ${chatId} (HTTP ${response.status}): ${errorText}`);
+    return { success: false, error: `OpenWA HTTP ${response.status}: ${errorText}` };
 
   } catch (error: any) {
-    console.error(`[OPENWA] Erreur réseau / connexion à ${apiUrl}:`, error?.message || error);
-    
-    // En dev/test, si le serveur OpenWA n'est pas démarré, simuler pour ne pas bloquer l'utilisateur
+    console.error(`[OPENWA] ❌ Erreur réseau / connexion à ${apiUrl}:`, error?.message || error);
+
+    // En dev sans serveur OpenWA, simuler pour ne pas bloquer
     if (process.env.NODE_ENV !== 'production') {
-      console.warn(`[OPENWA] Fallback simulation activé pour le dev (serveur non joignable). Code envoyé virtuellement.`);
+      console.warn(`[OPENWA] Fallback simulation activé (serveur non joignable en dev).`);
       return { success: true, messageId: `fallback_sim_${Date.now()}` };
     }
 
@@ -104,11 +106,11 @@ export async function sendOpenWAMessage(phone: string, text: string): Promise<Op
 }
 
 /**
- * Envoie un code de validation OTP formaté par OpenWA (WhatsApp)
+ * Envoie un code OTP formaté via WhatsApp
  */
 export async function sendOpenWAOTP(
-  phone: string, 
-  otp: string, 
+  phone: string,
+  otp: string,
   context: string = 'Validation'
 ): Promise<OpenWAResponse> {
   const message = [
@@ -126,7 +128,7 @@ export async function sendOpenWAOTP(
 }
 
 /**
- * Implémentation du service SMS / WhatsApp compatible avec l'interface SMSService
+ * Service WhatsApp compatible avec l'interface SMSService
  */
 export class OpenWAService {
   async sendOTP(phone: string, otp: string): Promise<OpenWAResponse> {

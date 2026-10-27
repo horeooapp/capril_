@@ -3,9 +3,7 @@
 import React from "react"
 import OwnerPortalWrapper from "./owner/OwnerPortalWrapper"
 import AgencyPortalWrapper from "./agency/AgencyPortalWrapper"
-
-// Nettoyage complet : Seul le Dashboard Propriétaire (MBESSODEDOU) est rendu par défaut.
-// Le "téléphone vert/bleu" (Tenant/Diaspora) et les vieux tableaux de bord ont été supprimés.
+import { BrokerPortalDashboard } from "@/components/dashboard/broker/BrokerPortalDashboard"
 
 export default function DashboardOverviewClient({ 
     user,
@@ -29,22 +27,28 @@ export default function DashboardOverviewClient({
     tenantData?: any,
     aggregates?: any
 }) {
-    if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole)) {
-        let payload = undefined;
-        if (agencyData) {
-            payload = {
-                ...agencyData,
-                candidates: agencyData.candidatures || []
-            };
-        } else if (intermData) {
-            payload = {
-                ...intermData,
-                candidates: intermData.candidatures || []
-            };
-        }
+    // Profil 4 : Démarcheur / Intermédiaire Certifié -> Dashboard Démarcheur Spécifique
+    if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole)) {
+        return (
+            <BrokerPortalDashboard 
+                user={user}
+                mandates={intermData?.mandates || []}
+                properties={intermData?.properties || []}
+                candidatures={intermData?.candidatures || []}
+                stats={intermData?.stats || {}}
+            />
+        );
+    }
+
+    // Profil 3 : Agence Immobilière Agréée -> Dashboard Agence Agréée Spécifique
+    if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(activeRole)) {
+        const payload = agencyData ? {
+            ...agencyData,
+            candidates: agencyData.candidatures || []
+        } : undefined;
         return <AgencyPortalWrapper initialData={payload} aggregates={aggregates} />;
     }
 
-    // Par défaut pour tout le monde (Propriétaire, Diaspora, etc.) => Dashboard Propriétaire Premium
+    // Profil 2 : Propriétaire / Diaspora -> Dashboard Propriétaire Gestion Directe
     return <OwnerPortalWrapper user={user} properties={properties} diasporaData={diasporaData} activeRole={activeRole} aggregates={aggregates} />;
 }

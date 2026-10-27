@@ -51,7 +51,14 @@ export default auth(async (req) => {
         }
     }
 
-    const response = NextResponse.next();
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set('x-pathname', path);
+
+    const response = NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        }
+    });
 
     // Privacy by Design — Principe 5 : Headers de sécurité et de confidentialité
     // Limitation des API navigateur accessibles (caméra, micro, géolocalisation)

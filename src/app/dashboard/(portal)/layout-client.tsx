@@ -161,16 +161,30 @@ export default function DashboardLayoutClient({
                     </div>
                 </main>
 
-                {/* Mobile Bottom Navigation */}
+                {/* Mobile Bottom Navigation Dynamique par Rôle */}
                 {session?.user && (
                     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-                        <BottomNav items={[
-                            { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
-                            { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
-                            { href: "/dashboard/leases", label: "Baux", icon: <ClipboardList size={24} /> },
-                            { href: "/dashboard/receipts", label: "Finance", icon: <Wallet size={24} /> },
-                            { label: "Profils", icon: <User size={24} />, onClick: () => { window.location.href = "/auth/choose-role" } }
-                        ]} />
+                        <BottomNav items={
+                            ['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole || '') ? [
+                                { href: "/dashboard", label: "Synthèse", icon: <LayoutDashboard size={24} /> },
+                                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={24} /> },
+                                { href: "/dashboard/matching", label: "Candidats", icon: <User size={24} /> },
+                                { href: "/dashboard/marketplace", label: "Annonces", icon: <Building2 size={24} /> },
+                                { href: "/dashboard/wallet", label: "Wallet", icon: <Wallet size={24} /> },
+                            ] : ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(activeRole || '') ? [
+                                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
+                                { href: "/dashboard/mandates", label: "Mandats", icon: <ClipboardList size={24} /> },
+                                { href: "/dashboard/properties", label: "Parc", icon: <Building2 size={24} /> },
+                                { href: "/dashboard/reports", label: "CRG", icon: <FileText size={24} /> },
+                                { href: "/dashboard/wallet", label: "Wallet", icon: <Wallet size={24} /> },
+                            ] : [
+                                { href: "/dashboard", label: "Accueil", icon: <LayoutDashboard size={24} /> },
+                                { href: "/dashboard/properties", label: "Biens", icon: <Building2 size={24} /> },
+                                { href: "/dashboard/leases", label: "Baux", icon: <ClipboardList size={24} /> },
+                                { href: "/dashboard/receipts", label: "Finance", icon: <Wallet size={24} /> },
+                                { label: "Profil", icon: <User size={24} />, onClick: () => { window.location.href = "/dashboard/profile" } }
+                            ]
+                        } />
                     </div>
                 )}
             </div>

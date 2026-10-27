@@ -85,19 +85,13 @@ export default function Header() {
           })}
         </div>
 
-        {/* Action CTAs */}
+        {/* Action CTAs — Bouton Unique Connexion */}
         <div className="hidden md:flex items-center gap-3">
           <Link
-            href="/mon-espace-locataire/login"
-            className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm px-5 py-2.5 rounded-full transition-all shadow-md shadow-amber-500/20 hover:scale-105"
+            href="/login"
+            className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm px-6 py-2.5 rounded-full transition-all shadow-md shadow-amber-500/20 hover:scale-105"
           >
-            Espace Locataire <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/dashboard/login"
-            className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm px-5 py-2.5 rounded-full transition-all shadow-md shadow-amber-500/20 hover:scale-105"
-          >
-            Espace Propriétaire <ArrowRight className="w-4 h-4" />
+            Connexion <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -142,18 +136,11 @@ export default function Header() {
           </div>
           <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
             <Link
-              href="/mon-espace-locataire/login"
+              href="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-3 rounded-2xl border border-white/20 text-white font-bold text-sm hover:bg-white/5"
+              className="w-full text-center py-3 rounded-2xl bg-[#F59E0B] text-black font-black text-sm hover:bg-[#D97706] flex items-center justify-center gap-2"
             >
-              Connexion Locataire
-            </Link>
-            <Link
-              href="/dashboard/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-3 rounded-2xl bg-[#F59E0B] text-black font-black text-sm hover:bg-[#D97706]"
-            >
-              Connexion Propriétaire
+              Connexion <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

@@ -310,6 +310,15 @@ export default function AdminWhatsAppPage() {
                   />
                   <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-xl pointer-events-none"></div>
                 </div>
+              ) : data?.error ? (
+                <div className="w-64 h-64 flex flex-col items-center justify-center gap-3 bg-white rounded-xl p-4 text-center">
+                  <AlertCircle size={32} className="text-rose-500 shrink-0" />
+                  <p className="text-xs font-bold text-rose-700">Service OpenWA inaccessible</p>
+                  <span className="text-[10px] text-slate-500 leading-relaxed">{data.error}</span>
+                  <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                    Statut : {data.status}
+                  </span>
+                </div>
               ) : (
                 <div className="w-64 h-64 flex flex-col items-center justify-center gap-3 text-slate-400 bg-white rounded-xl">
                   <RefreshCw size={32} className="animate-spin text-emerald-500" />

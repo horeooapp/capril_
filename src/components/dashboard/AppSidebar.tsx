@@ -44,7 +44,25 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             ]
         }
         
-        if (['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(role)) {
+        // Profil 4 : Démarcheur / Intermédiaire Certifié (Mandats de prospection, candidatures, commissions, marketplace)
+        if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role)) {
+            return [
+                { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
+                { href: "/dashboard/mandates", label: "Mandats Prospection", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/matching", label: "Candidatures Locataires", icon: <User size={18} /> },
+                { href: "/dashboard/marketplace", label: "Marketplace & Annonces", icon: <Store size={18} /> },
+                { href: "/dashboard/properties", label: "Biens Confiés", icon: <Building2 size={18} /> },
+                { href: "/dashboard/agenda", label: "Visites & Agenda", icon: <CalendarDays size={18} /> },
+                { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} /> },
+                { href: "/dashboard/receipts", label: "Mes Commissions", icon: <BarChart3 size={18} /> },
+                { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
+                { href: "/dashboard/profile", label: "Paramètres Profil", icon: <Settings size={18} /> },
+                { href: "/dashboard/manual", label: "Manuel Démarcheur", icon: <BookOpen size={18} /> },
+            ];
+        }
+
+        // Profil 3 : Agence Immobilière Agréée (Gestion déléguée, parc, mandats, CRG, baux, équipe, observatoire)
+        if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) {
             const isManager = agencyConfig?.isManager !== false 
             const perms = agencyConfig?.permissions || []
 
@@ -52,33 +70,24 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 { href: "/dashboard", label: "Tableau de bord", icon: <LayoutDashboard size={18} />, id: "READ_DASHBOARD" },
                 { href: "/dashboard/mandates", label: "Mandats gestion", icon: <ClipboardList size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/properties", label: "Biens en gestion", icon: <Building2 size={18} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} />, id: "MANAGE_PROPERTIES" },
                 { href: "/dashboard/matching", label: "Candidatures", icon: <User size={18} />, id: "MANAGE_TENANTS" },
                 { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} />, id: "MANAGE_TENANTS" },
-                { href: "/dashboard/receipts", label: "Commissions", icon: <BarChart3 size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/receipts", label: "Comptabilité & Quittances", icon: <BarChart3 size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/wallet", label: "Wallet & Reversements", icon: <Wallet size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/reports", label: "CRG Mensuels", icon: <FileText size={18} />, id: "READ_DASHBOARD" },
                 { href: "/dashboard/certificates", label: "Certificats DGI", icon: <FileBadge size={18} />, id: "MANAGE_MANDATES" },
-                { href: "/dashboard/automations", label: "Automatisations", icon: <Zap size={18} />, id: "SETTINGS" },
-                { href: "/dashboard/reports", label: "CRG mensuels", icon: <FileText size={18} />, id: "READ_DASHBOARD" },
-                { href: "/dashboard/insurance", label: "Assurances", icon: <Shield size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/succession", label: "Successions", icon: <Users size={18} />, id: "MANAGE_PROPERTIES" },
-                { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={18} />, id: "MANAGE_PROPERTIES" },
-                { href: "/dashboard/disputes", label: "Contentieux", icon: <Scale size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/marketplace", label: "Annonces", icon: <Store size={18} />, id: "READ_DASHBOARD" },
-                { href: "/dashboard/procurations", label: "Délégations", icon: <FileSignature size={18} />, id: "MANAGE_MANDATES" },
+                { href: "/dashboard/disputes", label: "Contentieux & Alertes", icon: <Scale size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/inspections", label: "États des lieux (EDL)", icon: <MapPin size={18} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/procurations", label: "Délégations & Pouvoirs", icon: <FileSignature size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/fiscal", label: "Fiscalité & DGI", icon: <Landmark size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/charges", label: "Régul. Charges", icon: <Calculator size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/providers", label: "Prestataires", icon: <Wrench size={18} />, id: "MANAGE_PROPERTIES" },
-                { href: "/dashboard/inspections", label: "Inspections", icon: <MapPin size={18} />, id: "MANAGE_PROPERTIES" },
-                { href: "/dashboard/bdq", label: "Baux Déclaratifs", icon: <SmartphoneNfc size={18} />, id: "MANAGE_MANDATES" },
-                { href: "/dashboard/mediation", label: "Médiations", icon: <MessageSquareWarning size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/crm", label: "Leads CRM", icon: <BarChartHorizontal size={18} />, id: "READ_DASHBOARD" },
-                { href: "/dashboard/utilities", label: "Factures CIE/SODECI", icon: <Zap size={18} />, id: "MANAGE_PROPERTIES" },
-                { href: "/dashboard/vault", label: "Vault Caution", icon: <ShieldAlert size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/trust", label: "Régularisation", icon: <ShieldAlert size={18} />, id: "MANAGE_ACCOUNTING" },
-                { href: "/dashboard/profile", label: "Paramètres", icon: <Settings size={18} />, id: "SETTINGS" },
-                { href: "/dashboard/observatory", label: "Observatoire", icon: <LineChart size={18} />, id: "READ_DASHBOARD" },
-                ...(isManager ? [{ href: "/dashboard/team", label: "Mon Équipe", icon: <Users size={18} />, id: "TEAM" }] : [])
+                { href: "/dashboard/charges", label: "Régularisation Charges", icon: <Calculator size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/providers", label: "Prestataires & Artisans", icon: <Wrench size={18} />, id: "MANAGE_PROPERTIES" },
+                { href: "/dashboard/observatory", label: "Observatoire du Marché", icon: <LineChart size={18} />, id: "READ_DASHBOARD" },
+                ...(isManager ? [{ href: "/dashboard/team", label: "Mon Équipe", icon: <Users size={18} />, id: "TEAM" }] : []),
+                { href: "/dashboard/profile", label: "Paramètres Agence", icon: <Settings size={18} />, id: "SETTINGS" },
+                { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={18} />, id: "MANUAL" },
             ]
 
             return allLinks.filter(l => isManager || ["SETTINGS", "MANUAL"].includes(l.id) || perms.includes(l.id))
@@ -88,36 +97,22 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
         const commonLinks = [
             { href: "/dashboard", label: "Synthèse", icon: <LayoutDashboard size={18} /> },
             { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
-            { href: "/dashboard/properties", label: "Mes biens", icon: <Building2 size={18} /> },
-            { href: "/dashboard/mandates", label: "Mes mandats", icon: <FileSignature size={18} /> },
-            { href: "/dashboard/leases", label: "Mes baux", icon: <ClipboardList size={18} /> },
-            { href: "/dashboard/receipts", label: "Loyers", icon: <Receipt size={18} /> },
-            { href: "/dashboard/disputes", label: "Impayés", icon: <Scale size={18} /> },
-            { href: "/dashboard/inspections", label: "États des lieux", icon: <MapPin size={18} /> },
-            { href: "/dashboard/maintenance", label: "Maintenance", icon: <Wrench size={18} /> },
+            { href: "/dashboard/properties", label: "Mes Biens", icon: <Building2 size={18} /> },
+            { href: "/dashboard/leases", label: "Mes Baux", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard/receipts", label: "Loyers & Quittances", icon: <Receipt size={18} /> },
+            { href: "/dashboard/disputes", label: "Impayés & Contentieux", icon: <Scale size={18} /> },
+            { href: "/dashboard/inspections", label: "États des lieux (EDL)", icon: <MapPin size={18} /> },
+            { href: "/dashboard/maintenance", label: "Maintenance & Travaux", icon: <Wrench size={18} /> },
             { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} /> },
-            { href: "/dashboard/fiscal", label: "Fiscal DGI", icon: <Landmark size={18} /> },
+            { href: "/dashboard/fiscal", label: "Fiscalité & DGI", icon: <Landmark size={18} /> },
             { href: "/dashboard/documents", label: "Documents", icon: <FileText size={18} /> },
             { href: "/dashboard/certificates", label: "Certificats", icon: <FileBadge size={18} /> },
             { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
             { href: "/dashboard/insurance", label: "Assurances", icon: <Shield size={18} /> },
             { href: "/dashboard/succession", label: "Successions", icon: <Users size={18} /> },
             { href: "/dashboard/syndic", label: "Syndic", icon: <Building2 size={18} /> },
-            { href: "/dashboard/automations", label: "Automatisations", icon: <Zap size={18} /> },
-            { href: "/dashboard/marketplace", label: "Marketplace", icon: <Store size={18} /> },
-            { href: "/dashboard/procurations", label: "Procurations", icon: <FileSignature size={18} /> },
-            { href: "/dashboard/charges", label: "Régul. Charges", icon: <Calculator size={18} /> },
-            { href: "/dashboard/import", label: "Outils d'Import", icon: <HardDriveUpload size={18} /> },
-            { href: "/dashboard/reports", label: "Rapports", icon: <FileText size={18} /> },
-            { href: "/dashboard/utilities", label: "Factures CIE/SODECI", icon: <Zap size={18} /> },
-            { href: "/dashboard/vault", label: "Vault Caution", icon: <ShieldAlert size={18} /> },
-            { href: "/dashboard/profile", label: "Profil", icon: <User size={18} /> },
-            { href: "/dashboard/matching", label: "Matching", icon: <Handshake size={18} /> },
-            { href: "/dashboard/governance", label: "Gouvernance", icon: <BarChart3 size={18} /> },
-            { href: "/dashboard/icl", label: "Indice ICL", icon: <Star size={18} /> },
-            { href: "/dashboard/agent", label: "Assistant IA", icon: <Bot size={18} /> },
-            { href: "/dashboard/diaspora", label: "Diaspora", icon: <Globe size={18} /> },
-            { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={18} /> },
+            { href: "/dashboard/profile", label: "Profil & Paramètres", icon: <User size={18} /> },
+            { href: "/dashboard/manual", label: "Manuel Propriétaire", icon: <BookOpen size={18} /> },
         ]
 
         return commonLinks;
@@ -128,10 +123,8 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
     const getRoleLabel = () => {
         if (role === 'TENANT') return "LOCATAIRE"
         if (role === 'DIASPORA') return "DIASPORA"
-        if (role === 'INTERMEDIARY') return "INTERMÉDIAIRE"
-
-        if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) return "AGENCE CERTIFIÉE"
-        if (['NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role)) return "GESTIONNAIRE"
+        if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role)) return "DÉMARCHEUR"
+        if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(role)) return "AGENCE AGRÉÉE"
         return "PROPRIÉTAIRE"
     }
 

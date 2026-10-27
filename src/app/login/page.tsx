@@ -9,27 +9,30 @@ export default function LoginPage() {
     const portals = [
         {
             title: "Locataire",
-            description: "Gérez votre habitat, baux et quittances.",
+            description: "Gérez votre habitat, réglez vos loyers et téléchargez vos quittances certifiées.",
             href: "/mon-espace-locataire/login",
             icon: Home,
             color: "text-white",
-            tag: "Habitat"
+            tag: "Habitat",
+            image: "/images/hero_ivory_coast_home_interior_1773609718319.png"
         },
         {
             title: "Propriétaire",
-            description: "Supervisez votre patrimoine immobilier.",
+            description: "Supervisez votre patrimoine immobilier, vos baux et encaissez vos loyers.",
             href: "/dashboard/login",
             icon: Building2,
             color: "text-white",
-            tag: "Patrimoine"
+            tag: "Patrimoine",
+            image: "/images/login_landlord_visual.jpg"
         },
         {
-            title: "Administration",
-            description: "Accès certifié aux outils de régulation.",
-            href: "/admin/login",
-            icon: ShieldAlert,
+            title: "Agences & Démarcheurs",
+            description: "Gérez vos mandats de gestion déléguée, prospection, parcs et commissions.",
+            href: "/dashboard/login/agency",
+            icon: Building2,
             color: "text-white",
-            tag: "Équipe"
+            tag: "Professionnels",
+            image: "/images/abidjan_plateau_bg.png"
         }
     ]
 
@@ -87,11 +90,7 @@ export default function LoginPage() {
                                 {/* Card image avec bandeau soigné */}
                                 <div className="relative h-44 overflow-hidden border-b border-slate-100 bg-slate-100">
                                     <img
-                                        src={
-                                            index === 0 ? "/images/hero_ivory_coast_home_interior_1773609718319.png"
-                                            : index === 1 ? "/images/login_landlord_visual.jpg"
-                                            : "/slider/bg_slider_2.png"
-                                        }
+                                        src={portal.image || "/slider/bg_slider_2.png"}
                                         alt={portal.title}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />

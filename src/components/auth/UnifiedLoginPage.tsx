@@ -7,7 +7,7 @@ import Link from "next/link"
 import EmailOTPForm from "./EmailOTPForm"
 import AdminLoginForm from "./AdminLoginForm"
 
-type ProfileTab = 'tenant' | 'landlord' | 'admin'
+type ProfileTab = 'tenant' | 'landlord' | 'agency' | 'admin'
 
 interface UnifiedLoginPageProps {
     initialTab?: ProfileTab
@@ -38,6 +38,16 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             indicator: "bg-amber-600"
         },
         {
+            id: 'agency' as ProfileTab,
+            label: "Agence & Démarcheur",
+            icon: Building2,
+            color: "text-slate-900",
+            textColor: "text-slate-600",
+            activeBg: "bg-white text-slate-900 border-slate-300 shadow-sm",
+            inactiveBg: "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 border-transparent",
+            indicator: "bg-sky-600"
+        },
+        {
             id: 'admin' as ProfileTab,
             label: "Administration",
             icon: ShieldAlert,
@@ -59,6 +69,11 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
             tagText: "Gestion Patrimoniale Institutionnelle",
             tagIconColor: "text-amber-600",
             badgeColor: "text-amber-600"
+        },
+        agency: {
+            tagText: "Console Professionnels : Agences Agréées & Démarcheurs",
+            tagIconColor: "text-sky-600",
+            badgeColor: "text-sky-600"
         },
         admin: {
             tagText: "Console d'Administration Centrale",
@@ -146,6 +161,15 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                     redirectPath="/dashboard"
                                     title="Espace Bailleur"
                                     subtitle="Saisissez votre email certifié pour superviser vos actifs et rendements."
+                                />
+                            )}
+                            
+                            {activeTab === 'agency' && (
+                                <EmailOTPForm 
+                                    role="AGENCY"
+                                    redirectPath="/dashboard"
+                                    title="Console Agences & Démarcheurs"
+                                    subtitle="Saisissez votre email certifié pour accéder à votre espace de gestion et mandats."
                                 />
                             )}
                             

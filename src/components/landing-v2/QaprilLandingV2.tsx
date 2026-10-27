@@ -168,7 +168,7 @@ export default function QaprilLandingV2({
             </Link>
           </nav>
 
-          {/* Actions Droite sur Une Seule Ligne */}
+          {/* Actions Droite sur Une Seule Ligne — Bouton Unique Connexion */}
           <div className="flex items-center gap-2.5 shrink-0 whitespace-nowrap">
             {session?.user ? (
               <Link
@@ -178,20 +178,12 @@ export default function QaprilLandingV2({
                 Mon Espace <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             ) : (
-              <>
-                <button
-                  onClick={() => handleLogin("LOCATAIRE")}
-                  className="qp-btn-gold-solid px-3 sm:px-4 py-2 rounded text-[11px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  Espace Locataire <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => handleLogin("BAILLEUR")}
-                  className="qp-btn-gold-solid px-3 sm:px-4 py-2 rounded text-[11px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  Accès Propriétaire <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </>
+              <Link
+                href="/login"
+                className="qp-btn-gold-solid px-4 sm:px-5 py-2 rounded text-xs sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+              >
+                Connexion <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             )}
           </div>
         </div>
@@ -254,7 +246,7 @@ export default function QaprilLandingV2({
                 </button>
 
                 <Link
-                  href="/dashboard/mandates"
+                  href="/dashboard/login/agency"
                   className="qp-card-light p-4 text-left rounded-lg group transition-all block"
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -265,7 +257,7 @@ export default function QaprilLandingV2({
                     Agences & Démarcheurs
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Gérez plusieurs biens & faites vos comptes en toute clarté.
+                    Gérez vos mandats, portefeuilles & commissions en toute clarté.
                   </p>
                 </Link>
               </div>

@@ -8,7 +8,7 @@ import Link from "next/link"
 import { requestOTP, loginWithOTP } from "@/actions/auth"
 
 interface EmailOTPFormProps {
-    role: 'TENANT' | 'LANDLORD' | 'ADMIN'
+    role: 'TENANT' | 'LANDLORD' | 'ADMIN' | 'AGENCY'
     redirectPath: string
     title: string
     subtitle: string
@@ -84,6 +84,17 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
             btn2Bg: "bg-[#D97706] hover:bg-[#B45309]",
             btn2Shadow: "shadow-sm",
             hoverText: "hover:text-[#B45309]"
+        },
+        AGENCY: {
+            primaryText: "text-slate-900",
+            focusWithin: "group-focus-within:text-sky-600",
+            inputFocus: "focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600",
+            btn1Bg: "bg-sky-600 hover:bg-sky-700",
+            btn1Shadow: "shadow-sm",
+            accentText: "text-sky-600",
+            btn2Bg: "bg-sky-600 hover:bg-sky-700",
+            btn2Shadow: "shadow-sm",
+            hoverText: "hover:text-sky-700"
         },
         ADMIN: {
             primaryText: "text-slate-900",

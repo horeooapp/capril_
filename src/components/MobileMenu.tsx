@@ -213,6 +213,13 @@ export default function MobileMenu({
                                 >
                                     Connexion Propriétaire
                                 </Link>
+                                <Link 
+                                    href="/dashboard/login/agency"
+                                    onClick={() => setIsOpen(false)}
+                                    className="block w-full text-center bg-sky-600 text-white py-4 rounded-2xl font-black text-[13px] uppercase tracking-widest shadow-xl shadow-sky-600/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                >
+                                    Agences & Démarcheurs
+                                </Link>
                             </div>
                         )}
                     </div>

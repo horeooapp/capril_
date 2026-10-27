@@ -88,8 +88,9 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-Stone2026}@postgres:5432/${POSTGRES_DB:-qapril}?schema=public
       REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379
       ENABLE_REDIS_MOCK: "false"
-      OPENWA_API_URL: http://openwa:8085
-      OPENWA_API_KEY: ${OPENWA_API_KEY:-qapril_wa_secret_2026}
+      OPENWA_API_URL: http://qapril_openwa:8085
+      OPENWA_API_KEY: ${OPENWA_API_KEY:-owa_k1_431cb51ca66d73d5fdaa067f9964808e12f90166f7d9824cdae5a39a7a20182a}
+      OPENWA_SESSION_ID: ${OPENWA_SESSION_ID:-06353e46-3dd0-4f54-8230-9844eb1ca970}
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
@@ -111,31 +112,33 @@ services:
       retries: 3
       start_period: 40s
 
-  # ── OpenWA (WhatsApp Automate) ─────────────────────────────────
+  # ── OpenWA (WhatsApp) ─ Passerelle @open-wa/wa-automate ───────────
   openwa:
     build:
       context: .
       dockerfile: Dockerfile.openwa
-    image: qapril_openwa:latest
     container_name: qapril_openwa
     restart: unless-stopped
-    shm_size: '2gb'
     environment:
       PORT: "8085"
-      AUTH_KEY: "qapril_wa_secret_2026"
-      WA_API_KEY: "qapril_wa_secret_2026"
+      AUTH_KEY: ${OPENWA_API_KEY:-qapril_wa_secret_2026}
+      SESSION_PATH: /app/session
+      CHROME_WRAPPER: /usr/local/bin/chrome-wrapper
     volumes:
-      - openwa_data:/app/session
+      - openwa_session:/app/session
+    # Port exposé uniquement sur localhost pour sécurité
     ports:
       - "127.0.0.1:8085:8085"
     networks:
       - qapril_net
+    # Chromium nécessite plus de mémoire partagée
+    shm_size: '256mb'
 
 volumes:
   postgres_data:
   redis_data:
-  openwa_data:
   uploads_data:
+  openwa_session:
 
 networks:
   qapril_net:
