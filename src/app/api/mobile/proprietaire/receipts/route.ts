@@ -150,10 +150,16 @@ export async function POST(request: Request) {
             .digest('hex');
 
         // Débit wallet propriétaire
+        const currentWallet = await prisma.userWalletConfig.findUnique({
+            where: { userId: user.userId },
+            select: { walletBalance: true }
+        });
+        const currentBal = currentWallet?.walletBalance ?? 0;
+        const newBal = Math.max(0, currentBal - PRIX_QUI);
         await prisma.userWalletConfig.upsert({
             where:  { userId: user.userId },
-            create: { userId: user.userId, walletBalance: -PRIX_QUI },
-            update: { walletBalance: { decrement: PRIX_QUI } },
+            create: { userId: user.userId, walletBalance: 0 },
+            update: { walletBalance: newBal },
         });
 
         const receipt = await prisma.receipt.create({

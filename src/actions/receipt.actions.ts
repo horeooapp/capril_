@@ -48,10 +48,16 @@ export async function createReceipt(data: {
         }
 
         // 2. Debit Wallet
+        const currentWallet = await prisma.userWalletConfig.findUnique({
+            where: { userId: lease.landlordId },
+            select: { walletBalance: true }
+        });
+        const currentBal = currentWallet?.walletBalance ?? 0;
+        const newBal = Math.max(0, currentBal - PRIX_QUITTANCE);
         await prisma.userWalletConfig.upsert({
             where: { userId: lease.landlordId },
-            create: { userId: lease.landlordId, walletBalance: -PRIX_QUITTANCE },
-            update: { walletBalance: { decrement: PRIX_QUITTANCE } }
+            create: { userId: lease.landlordId, walletBalance: 0 },
+            update: { walletBalance: newBal }
         });
 
         const total = data.rentAmount + (data.chargesAmount || 0);

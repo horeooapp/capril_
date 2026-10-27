@@ -151,10 +151,17 @@ export async function createLease(data: {
         if ((data.depositAmount || 0) > maxLoyerAvanceCaution) throw new Error("Caution illégale : maximum 2 mois autorisés (Art. 416 CCH).");
 
         // 5. Certification Fee (2000 FCFA)
+        const CERTIFICATION_FEE = 2000;
+        const currentWallet = await prisma.userWalletConfig.findUnique({
+            where: { userId: ownerId },
+            select: { walletBalance: true }
+        });
+        const currentBal = currentWallet?.walletBalance ?? 0;
+        const newBal = Math.max(0, currentBal - CERTIFICATION_FEE);
         await prisma.userWalletConfig.upsert({
             where: { userId: ownerId },
-            create: { userId: ownerId, walletBalance: -2000 },
-            update: { walletBalance: { decrement: 2000 } }
+            create: { userId: ownerId, walletBalance: 0 },
+            update: { walletBalance: newBal }
         });
 
         // 6. Security Hash

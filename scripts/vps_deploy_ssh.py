@@ -12,17 +12,23 @@ ssh.connect(
     username='root', 
     password='Qap@vpserv2026', 
     disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}, 
-    timeout=20
+    timeout=60
 )
+if ssh.get_transport():
+    ssh.get_transport().set_keepalive(10)
 
 def run_cmd(cmd):
     print(f"\n--- EXEC: {cmd} ---")
     stdin, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
-    for line in iter(stdout.readline, ""):
+    while True:
+        line = stdout.readline()
+        if not line:
+            break
         print(line, end="")
-    err = stderr.read().decode('utf-8', errors='replace')
-    if err:
-        print(f"[ERR] {err}")
+        sys.stdout.flush()
+    exit_status = stdout.channel.recv_exit_status()
+    print(f"\n[Exit status: {exit_status}]")
+    return exit_status
 
 # 1. Mise à jour du code via git pull dans /opt/qapril
 run_cmd("cd /opt/qapril && git fetch origin main && git reset --hard origin/main")

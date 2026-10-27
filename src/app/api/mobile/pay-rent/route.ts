@@ -74,10 +74,16 @@ export async function POST(req: Request) {
         // 4. Transaction Prisma pour garantir l'atomicité
         const result = await prisma.$transaction(async (tx) => {
             // A. Débiter le wallet bailleur
+            const currentWallet = await tx.userWalletConfig.findUnique({
+                where: { userId: lease.landlordId },
+                select: { walletBalance: true }
+            });
+            const currentBal = currentWallet?.walletBalance ?? 0;
+            const newBal = Math.max(0, currentBal - PRIX_QUITTANCE);
             await tx.userWalletConfig.upsert({
                 where: { userId: lease.landlordId },
-                create: { userId: lease.landlordId, walletBalance: -PRIX_QUITTANCE },
-                update: { walletBalance: { decrement: PRIX_QUITTANCE } }
+                create: { userId: lease.landlordId, walletBalance: 0 },
+                update: { walletBalance: newBal }
             });
 
             // B. Créer la quittance certifiée

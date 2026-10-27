@@ -53,8 +53,7 @@ export class WalletService {
       const userWallet = await tx.userWalletConfig.findUnique({ where: { userId: userId } });
       if (!userWallet) throw new Error("User not found");
 
-      const OVERDRAFT_LIMIT = -1500;
-      if (userWallet.walletBalance - amount < OVERDRAFT_LIMIT) {
+      if (userWallet.walletBalance < amount) {
         throw new Error("INSUFFICIENT_FUNDS");
       }
 
