@@ -7,21 +7,24 @@ export default async function InspectionsDashboardPage() {
     let edls: Record<string, any>[] = [];
 
     if (session?.user?.id) {
-        edls = await (prisma as any).etatsDesLieux.findMany({
-            where: {
-                redigeParId: session.user.id
-            },
-            include: {
-                lease: {
-                    include: {
-                        property: true,
-                        tenant: true
+        try {
+            edls = await (prisma as any).etatsDesLieux.findMany({
+                where: { redigeParId: session.user.id },
+                include: {
+                    lease: {
+                        include: {
+                            property: true,
+                            tenant: true
+                        }
                     }
-                }
-            },
-            take: 20,
-            orderBy: { createdAt: "desc" }
-        });
+                },
+                take: 20,
+                orderBy: { createdAt: "desc" }
+            });
+        } catch (err) {
+            console.error("[inspections] Erreur chargement EDL:", err);
+            edls = [];
+        }
     }
 
     return <InspectionsDashboardClient initialEdls={edls} />;

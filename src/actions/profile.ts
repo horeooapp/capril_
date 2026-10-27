@@ -65,11 +65,23 @@ export async function updateUserProfile(data: {
 
         let newKycLevel = user.kycLevel || 0;
 
-        // Automatically upgrade to Level 2 if basic info is provided
-        const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.profession && data.phone && data.docType && data.docNumber;
-        if (hasAllRequired && newKycLevel < 2) {
-            newKycLevel = 2;
+        if (data.isAgency) {
+            // Pour les entités professionnelles (agences, démarcheurs) :
+            // Le KYC niveau 2 est accordé sur la base de documents professionnels,
+            // pas d'identité personnelle (birthDate, passeport, etc. sont sans objet).
+            const hasAgencyDocs = (data.rccm || data.agrement || data.dfe) && data.phone && data.lastName;
+            if (hasAgencyDocs && newKycLevel < 2) {
+                newKycLevel = 2;
+            }
+        } else {
+            // Pour les particuliers (locataires, propriétaires) :
+            // Le KYC niveau 2 requiert un profil complet avec pièce d'identité.
+            const hasAllRequired = data.firstName && data.lastName && data.birthDate && data.birthPlace && data.neighborhood && data.profession && data.phone && data.docType && data.docNumber;
+            if (hasAllRequired && newKycLevel < 2) {
+                newKycLevel = 2;
+            }
         }
+
 
         // Security: Check if user is locked (Tenant with a lease)
         const tenantLease = await prisma.lease.findFirst({
