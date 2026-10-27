@@ -344,6 +344,11 @@ export async function supprimerBailDeclaratif(bdqId: string) {
 }
 
 // Aliases
-export const updateBDQAction = modifierBailDeclaratif;
-export const deleteBDQAction = supprimerBailDeclaratif;
+export async function updateBDQAction(data: UpdateBailDeclaratifData) {
+  return await modifierBailDeclaratif(data);
+}
+
+export async function deleteBDQAction(bdqId: string) {
+  return await supprimerBailDeclaratif(bdqId);
+}
 

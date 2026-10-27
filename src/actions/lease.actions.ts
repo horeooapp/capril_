@@ -553,8 +553,26 @@ export async function deleteLeaseAction(leaseOrBdqId: string) {
     }
 }
 
-// Re-exports for convenient use
-export { modifierBailDeclaratif, supprimerBailDeclaratif, updateBDQAction, deleteBDQAction } from "./bail-declaratif.actions";
+// Explicit async functions for convenient use
+export async function modifierBailDeclaratif(data: any) {
+  const { modifierBailDeclaratif: fn } = await import("./bail-declaratif.actions");
+  return await fn(data);
+}
+
+export async function supprimerBailDeclaratif(bdqId: string) {
+  const { supprimerBailDeclaratif: fn } = await import("./bail-declaratif.actions");
+  return await fn(bdqId);
+}
+
+export async function updateBDQAction(data: any) {
+  const { updateBDQAction: fn } = await import("./bail-declaratif.actions");
+  return await fn(data);
+}
+
+export async function deleteBDQAction(bdqId: string) {
+  const { deleteBDQAction: fn } = await import("./bail-declaratif.actions");
+  return await fn(bdqId);
+}
 
 
 // --- [BDQ] Bail Déclaratif (Situation A/B/C) ---
