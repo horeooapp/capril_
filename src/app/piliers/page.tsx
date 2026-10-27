@@ -37,139 +37,139 @@ export default function PiliersPage() {
       num: "01",
       icon: <FileText className="w-7 h-7 text-[#D97706]" />,
       badge: "Cadre Juridique & Légal",
-      title: "Baux Certifiés & Signature Électronique OTP",
-      lawRef: "Loi N° 2019-576 & Acte Uniforme OHADA",
+      title: "Baux Clairs & Signature par SMS",
+      lawRef: "Loi N° 2019-576 & Droit Ivoirien",
       accent: "#D97706",
       summary:
-        "Création assistée de contrats d'habitation ou commerciaux 100 % conformes au droit ivoirien. Signature à distance par SMS OTP, horodatage cryptographique SHA-256 et valeur probante opposable.",
+        "Création facile de contrats d'habitation ou de commerce 100 % conformes aux lois ivoiriennes. Signature directe par code SMS sans se déplacer, document sécurisé et reconnu par la justice.",
       points: [
         {
-          title: "Clauses réglementaires obligatoires",
-          desc: "Intégration systématique des clauses exigées par la loi ivoirienne (désignation des parties, destination des lieux, répartition des charges, règles de révision triennale)."
+          title: "Contrats conformes à la loi ivoirienne",
+          desc: "Toutes les mentions obligatoires sont incluses (noms, désignation des lieux, montant du loyer, charges) pour protéger le propriétaire et le locataire."
         },
         {
-          title: "Signature électronique qualifiée par OTP SMS",
-          desc: "Chaque signataire reçoit un code d'authentification unique sur son mobile avec contrôle d'identité, garantissant le consentement plein et éclairé sans déplacement physique."
+          title: "Signature rapide par code secret SMS",
+          desc: "Chaque partie reçoit un code unique par SMS sur son téléphone pour signer sans avoir besoin de se déplacer ni d'imprimer du papier."
         },
         {
-          title: "Scellement cryptographique & Horodatage SHA-256",
-          desc: "Le document final est scellé avec une empreinte numérique infalsifiable certifiée. Toute tentative de modification ultérieure invalide automatiquement le sceau."
+          title: "Document infalsifiable et sécurisé",
+          desc: "Le contrat final est scellé numériquement : personne ne peut modifier une ligne ou une condition en cachette."
         },
         {
-          title: "Coffre-fort numérique souverain",
-          desc: "Conservation pérenne sécurisée des exemplaires originaux, accessibles 24/7 par le propriétaire et le locataire, recevables devant les tribunaux ivoiriens."
+          title: "Vos contrats gardés en sécurité à vie",
+          desc: "Vos contrats signés restent toujours accessibles sur votre téléphone 24h/24, prêts à être présentés en cas de besoin ou devant les autorités."
         }
       ],
-      legalImpact: "Élimine 100% des clauses abusives ou nulles couramment insérées dans les modèles papier non certifiés."
+      legalImpact: "Élimine les mauvais contrats rédigés à la main qui causent des palabres inutiles."
     },
     {
       id: "paiement-quittance",
       num: "02",
       icon: <CreditCard className="w-7 h-7 text-[#059669]" />,
-      badge: "FinTech & Traçabilité Fiscale",
-      title: "Paiement Mobile Money & Quittances Inviolables",
-      lawRef: "Conforme Réglementation UEMOA & DGI-CI",
+      badge: "Paiements & Reçus Officiels",
+      title: "Paiement Wave & Mobile Money avec Reçu Officiel",
+      lawRef: "Paiements Sécurisés UEMOA & DGI-CI",
       accent: "#059669",
       summary:
-        "Collecte multi-opérateurs par Wave, Orange Money, MTN MoMo, Moov Money et Cartes Bancaires. Émission instantanée d'une quittance fiscale horodatée avec QR Code vérifiable.",
+        "Paiement facile par Wave, Orange Money, MTN MoMo, Moov Money ou carte bancaire. Délivrance instantanée d'un reçu officiel avec code QR de vérification.",
       points: [
         {
-          title: "Interconnexion native multi-opérateurs",
-          desc: "Le locataire règle en quelques secondes depuis son compte mobile préféré sans frais cachés ni tracas de monnaie."
+          title: "Paiement sur vos comptes habituels",
+          desc: "Le locataire paie son loyer en quelques secondes depuis son compte Wave ou Mobile Money, sans problème de monnaie ni déplacement."
         },
         {
-          title: "Quittance automatique instantanée en PDF",
-          desc: "Dès que le débit est confirmé, la quittance officielle est générée, signée numériquement et envoyée par SMS/Email au locataire."
+          title: "Reçu officiel envoyé sur-le-champ",
+          desc: "Dès que le transfert est validé, le reçu officiel en PDF est généré et envoyé automatiquement par SMS et WhatsApp."
         },
         {
-          title: "QR Code de vérification publique en ligne",
-          desc: "Chaque quittance intègre un code cryptographique scannable permettant aux banques, employeurs et services des impôts de vérifier son authenticité en direct."
+          title: "Code QR vérifiable partout",
+          desc: "Chaque reçu possède un code QR que la banque, l'employeur ou les impôts peuvent scanner pour vérifier son authenticité en direct."
         },
         {
-          title: "Rapprochement bancaire sans intervention",
-          desc: "Le compte propriétaire est crédité sans délai et les écritures comptables sont automatiquement mises à jour, supprimant la gestion manuelle."
+          title: "Versement direct au propriétaire",
+          desc: "Le compte du propriétaire est crédité directement avec mise à jour automatique des comptes sans calculs manuels."
         }
       ],
-      legalImpact: "Met un terme définitif aux litiges sur les dates de versement, les montants contestés et les carnets à souche papier perdus."
+      legalImpact: "Fini les disputes sur les dates de versement, les faux reçus et les carnets à souche perdus."
     },
     {
       id: "consignation-cdc",
       num: "03",
       icon: <ShieldCheck className="w-7 h-7 text-[#0284C7]" />,
-      badge: "Protection des Fonds & Séquestre",
-      title: "Consignation Réglementaire des Cautions (CDC-CI)",
+      badge: "Protection de la Caution",
+      title: "Caution Protégée à la Caisse des Dépôts (CDC-CI)",
       lawRef: "Plafonnement légal à 2 mois de loyer",
       accent: "#0284C7",
       summary:
-        "Sécurisation des dépôts de garantie sous protocole institutionnel. Les sommes sont séquestrées en toute neutralité et ne sont restituées qu'après constat contradictoire de l'état des lieux.",
+        "Sécurisation de la caution selon la loi ivoirienne (2 mois maximum). L'argent est gardé en lieu sûr et restitué rapidement après l'état des lieux sans palabre.",
       points: [
         {
-          title: "Plafonnement légal strict",
-          desc: "Respect rigoureux de la limitation légale du dépôt de garantie à deux mois de loyer maximum en Côte d'Ivoire, protégeant le budget d'entrée du locataire."
+          title: "Respect de la loi (2 mois maximum)",
+          desc: "La caution est strictement limitée à deux mois de loyer comme l'exige la loi en Côte d'Ivoire, évitant les abus à l'entrée."
         },
         {
-          title: "Séquestre des fonds de garantie",
-          desc: "L'argent de la caution n'est pas confondu avec la trésorerie personnelle du propriétaire : il est consigné sous protocole sécurisé et garanti disponible."
+          title: "Caution mise en sécurité",
+          desc: "L'argent de la caution est mis de côté en toute neutralité : le propriétaire est couvert et le locataire est rassuré."
         },
         {
-          title: "Restitution automatisée sans délai",
-          desc: "À la sortie des lieux et après signature de l'état des lieux de sortie sans dégradation, la caution est reversée directement sur le Mobile Money du locataire en 48 heures."
+          title: "Remboursement rapide sur Mobile Money",
+          desc: "À la fin du bail, si la maison est rendue en bon état, la caution est reversée directement sur le Wave ou Mobile Money du locataire sous 48h."
         },
         {
-          title: "Arbitrage contradictoire en cas de retenue",
-          desc: "En cas de dégradation avérée, la déduction des devis de réparation est soumise à validation contradictoire documentée par photos certifiées."
+          title: "Entente claire en cas de réparations",
+          desc: "Si une réparation est nécessaire, la retenue se fait sur la base de photos et de devis clairs présentés aux deux parties."
         }
       ],
-      legalImpact: "Supprime la première source de conflits locatifs en Côte d'Ivoire : la rétention arbitraire et injustifiée des cautions de départ."
+      legalImpact: "Supprime la première source de disputes locatives en Côte d'Ivoire : le refus injustifié de rembourser la caution de départ."
     },
     {
       id: "score-icl",
       num: "04",
       icon: <TrendingUp className="w-7 h-7 text-[#D97706]" />,
-      badge: "Intelligence Locative & Confiance",
-      title: "Score ICL (Indice de Confiance Locative)",
-      lawRef: "Algorithme propriétaire conforme ARTCI",
+      badge: "Confiance & Réputation",
+      title: "Carnet de Confiance Locataire (Score ICL)",
+      lawRef: "Conforme ARTCI · Données protégées",
       accent: "#D97706",
       summary:
-        "Algorithme prédictif évaluant la régularité et le civisme locatif. Il offre aux propriétaires une sélection fiable et aux locataires sérieux un passeport numérique valorisable.",
+        "Un carnet de confiance qui récompense les locataires sérieux et aide les propriétaires à choisir de bons locataires en toute sérénité.",
       points: [
         {
-          title: "Notation objective et transparente (A+ à C)",
-          desc: "Calcul fondé sur l'historique vérifié des paiements, la ponctualité, l'absence de contentieux et le respect des engagements contractuels."
+          title: "Note claire et transparente",
+          desc: "Calculée uniquement sur la ponctualité des loyers et le respect du contrat, sans aucun favoritisme."
         },
         {
-          title: "Passeport Locataire certifié",
-          desc: "Le locataire dispose d'une attestation probante qu'il peut présenter à tout moment pour louer plus vite, sans garanties excessives ni discrimination."
+          title: "Attestation de bon payeur",
+          desc: "Le locataire dispose d'un certificat pour prouver son sérieux et trouver son prochain logement plus facilement."
         },
         {
-          title: "Réduction drastique des impayés (-85%)",
-          desc: "Les bailleurs choisissent en toute confiance des profils qualifiés, limitant quasi-totalement les retards de paiement et les procédures d'expulsion."
+          title: "Moins de risques d'impayés pour le propriétaire",
+          desc: "Les bailleurs choisissent en toute confiance des personnes fiables, évitant les retards de loyer et les expulsions."
         },
         {
-          title: "Valorisation de la bonne foi locative",
-          desc: "Les locataires exemplaires bénéficient d'avantages préférentiels, d'offres prioritaires et de démarches allégées pour leur prochain logement."
+          title: "Avantages pour les locataires ponctuels",
+          desc: "Ceux qui paient à bonne date bénéficient d'une réputation solide et d'un traitement prioritaire pour se loger."
         }
       ],
-      legalImpact: "Crée une culture vertueuse de respect mutuel et professionnalise l'accès au logement sans discrimination."
+      legalImpact: "Installe la confiance mutuelle entre propriétaires et locataires sans discrimination."
     }
   ];
 
   const FAQS = [
     {
-      q: "En quoi la signature électronique QAPRIL est-elle juridiquement valable en Côte d'Ivoire ?",
-      a: "La loi ivoirienne n° 2019-576 ainsi que les textes de l'ARTCI reconnaissent expressément la valeur juridique pleine et entière des actes sous seing privé signés par procédé électronique fiable. L'authentification par SMS OTP, combinée à l'horodatage SHA-256 et à la délivrance d'un certificat d'intégrité, confère au contrat QAPRIL une force probante incontestable devant toutes les juridictions civiles et commerciales."
+      q: "En quoi la signature par SMS est-elle valable en Côte d'Ivoire ?",
+      a: "La loi ivoirienne n° 2019-576 ainsi que les textes de l'ARTCI reconnaissent la pleine valeur juridique des contrats signés par code SMS sécurisé. Le code secret unique envoyé sur le téléphone prouve l'accord du signataire, ce qui rend le contrat totalement valable devant la justice ivoirienne."
     },
     {
-      q: "Pourquoi consigner la caution plutôt que de la verser directement au bailleur ?",
-      a: "En Côte d'Ivoire, la majorité des litiges locatifs proviennent du non-remboursement des cautions par les propriétaires à la fin du bail. La consignation protège les deux parties : le propriétaire est assuré que les fonds existent en cas de dégradations justifiées, et le locataire a la garantie de récupérer son argent sous 48 heures si le bien est rendu en bon état."
+      q: "Pourquoi mettre la caution en sécurité plutôt que de la verser directement ?",
+      a: "En Côte d'Ivoire, la majorité des disputes viennent des cautions non remboursées au départ du locataire. En sécurisant la caution, le propriétaire sait que l'argent est disponible en cas de dégâts avérés, et le locataire a la certitude de revoir son argent sous 48h si le logement est rendu propre et en bon état."
     },
     {
-      q: "Comment est calculé le Score ICL du locataire ?",
-      a: "Le Score ICL repose sur un algorithme strict et éthique qui mesure la régularité des paiements à échéance, la stabilité locative et la conformité aux états des lieux passés. Aucune donnée personnelle intrusive n'est exploitée : seul l'historique financier certifié des loyers est pris en compte."
+      q: "Comment fonctionne le Carnet de Confiance (Score ICL) du locataire ?",
+      a: "Le carnet mesure uniquement la régularité des paiements à bonne date et le respect des lieux. Aucune information personnelle indiscrète n'est demandée : payer son loyer à temps permet simplement de se bâtir une solide réputation de bon payeur."
     },
     {
-      q: "Les quittances générées par QAPRIL sont-elles acceptées par la DGI pour les déductions fiscales ?",
-      a: "Absolument. Chaque quittance émise par QAPRIL comporte les mentions obligatoires de la Direction Générale des Impôts (DGI), l'adresse cadastrale, le montant détaillé du loyer et des charges, ainsi qu'un QR Code sécurisé permettant aux contrôleurs fiscaux d'attester l'authenticité de la quittance en direct."
+      q: "Les reçus délivrés par QAPRIL sont-ils reconnus par les banques et les impôts ?",
+      a: "Oui, parfaitement. Chaque reçu comporte les mentions obligatoires de la loi, l'adresse exacte du logement, le détail du loyer et un code QR officiel que les banques, employeurs et services des impôts peuvent scanner directement pour vérification."
     }
   ];
 
@@ -213,19 +213,19 @@ export default function PiliersPage() {
                 style={{ background: "rgba(245,158,11,0.08)" }}
               >
                 <Landmark className="w-3.5 h-3.5" />
-                Fondements Réglementaires & FinTech · Côte d'Ivoire
+                Gestion Locative Moderne · Conforme Loi Ivoirienne
               </span>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-8 uppercase">
                 Les 4 Piliers Fondateurs <br />
-                <span style={{ color: "var(--mango)" }}>de l'Infrastructure QAPRIL</span>
+                <span style={{ color: "var(--mango)" }}>de QAPRIL en Côte d'Ivoire</span>
               </h1>
 
               <p
                 className="text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed mb-10"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
-                Conçu dans le respect absolu de la Loi N° 2019-576 et des standards OHADA, QAPRIL déploie quatre technologies clés pour moderniser la gestion locative, éliminer les litiges et sécuriser les transactions en Côte d'Ivoire.
+                Conçu dans le strict respect de la Loi N° 2019-576, QAPRIL met à votre disposition quatre solutions simples pour gérer vos locations, payer et encaisser les loyers en toute sécurité, sans palabre.
               </p>
 
               {/* Raccourcis piliers */}

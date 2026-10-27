@@ -27,10 +27,23 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    // CRITICAL (Rule R-01): Verify active role carefully. 
-    // We prioritize DB state (capaciteActive) because cookie updates can lag behind UI.
-    // If capaciteActive is null, we fallback to session's chosenRole or default role.
-    const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
+    // CRITICAL: Determine effective active role
+    let activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
+
+    // Check if user has landlord/agency capabilities
+    const userCapacites = ((dbUser as any).capacites as string[]) || [];
+    const canAccessDashboard = ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE'].includes(dbUser.role) ||
+        userCapacites.some((c: string) => ['PROPRIETAIRE', 'LANDLORD', 'LANDLORD_PRO', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE', 'AGENCY'].includes(c.toUpperCase()));
+
+    // If activeRole is TENANT but user has landlord capabilities, switch activeRole automatically to PROPRIETAIRE
+    if (activeRole === "TENANT" && canAccessDashboard) {
+        activeRole = "PROPRIETAIRE";
+        await prisma.user.update({
+            where: { id: dbUser.id },
+            data: { capaciteActive: "PROPRIETAIRE" }
+        }).catch(() => {});
+    }
+
     const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
     if (!isGloballyActive && activeRole) {
         // Just sync redis with DB to self-heal
@@ -42,9 +55,8 @@ export default async function DashboardLayout({
         }
     }
 
-    // Role Enforcement based on activeRole, NOT hardcoded dbUser.role
-    // because a user with dbUser.role === "TENANT" is allowed here if activeRole === "LANDLORD".
-    if (activeRole === "TENANT") {
+    // Role Enforcement: Only redirect to tenant space if user is strictly a tenant with no dashboard capabilities
+    if (activeRole === "TENANT" && !canAccessDashboard) {
         redirect("/mon-espace-locataire")
     }
 

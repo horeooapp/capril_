@@ -35,35 +35,35 @@ export default function SolutionsPage() {
   const ROLES = [
     {
       id: "bailleurs",
-      label: "Propriétaires & Bailleurs",
+      label: "Propriétaires",
       icon: <Building2 className="w-5 h-5" />,
-      tagline: "Pour les bailleurs individuels, SCI familiales & multipropriétaires",
-      heroTitle: "Encaissement garanti et rentabilité sereine de votre patrimoine",
-      desc: "Pilotez tous vos biens locatifs (studios, villas, immeubles entiers) sans le stress des retards de paiement, sans paperasse et sans dépendre d'intermédiaires informels.",
+      tagline: "Pour tous les propriétaires : cours communes, maisons, villas, immeubles",
+      heroTitle: "Encaissez vos loyers à bonne date et gérez vos biens en toute tranquillité",
+      desc: "Suivez toutes vos locations sans le stress des retards de paiement, sans paperasse inutile et sans dépendre d'intermédiaires informels.",
       badgeColor: "bg-amber-50 text-[#B45309] border-amber-200",
       accent: "#D97706",
       keyMetrics: [
-        { val: "99.2%", label: "Taux de recouvrement à date" },
+        { val: "99.2%", label: "Loyers payés à bonne date" },
         { val: "0 FCFA", label: "Commission sur le montant du loyer" },
-        { val: "15 min", label: "Pour formaliser un bail certifié" },
+        { val: "15 min", label: "Pour faire un bail complet" },
         { val: "100%", label: "Conforme à la loi N° 2019-576" }
       ],
       features: [
         {
-          title: "Collecte automatisée multi-Mobile Money",
-          desc: "Vos locataires paient par Wave, Orange Money, MTN MoMo ou carte. Votre compte bancaire est crédité directement sans manipulation d'espèces."
+          title: "Paiement direct Wave et Mobile Money",
+          desc: "Vos locataires paient par Wave, Orange Money, MTN MoMo ou carte. Votre compte bancaire ou compte mobile est crédité directement sans avoir à courir après l'argent liquide."
         },
         {
-          title: "Relances préventives et impayés gérés",
-          desc: "Des rappels automatisés et courtois sont envoyés par SMS et WhatsApp 3 jours avant l'échéance. En cas de retard, les protocoles de relance légaux s'activent."
+          title: "Rappels automatiques sans gâter les relations",
+          desc: "Des rappels polis et automatiques sont envoyés par SMS et WhatsApp avant l'échéance. En cas de retard, des courriers officiels clairs sont prêts en un clic."
         },
         {
-          title: "Bilan fiscal annuel prêt pour la DGI",
-          desc: "Générez en un clic vos récapitulatifs fonciers annuels avec justificatifs certifiés conformes pour vos déclarations de revenus locatifs."
+          title: "Bilan annuel clair pour les impôts (DGI)",
+          desc: "Téléchargez en un clic le récapitulatif annuel de vos loyers encaissés pour vos déclarations foncières sans erreur."
         },
         {
-          title: "Contrats de bail et quittances horodatés",
-          desc: "Chaque signature et chaque paiement produisent des actes juridiquement opposables scellés par certificat cryptographique SHA-256."
+          title: "Contrats et reçus officiels reconnus par la loi",
+          desc: "Chaque signature par code SMS et chaque reçu avec code QR sont infalsifiables et ont une vraie valeur juridique devant la justice."
         }
       ],
       actionBtn: "Ouvrir mon Espace Propriétaire",
@@ -71,35 +71,35 @@ export default function SolutionsPage() {
     },
     {
       id: "locataires",
-      label: "Locataires & Résidents",
+      label: "Locataires",
       icon: <Users className="w-5 h-5" />,
-      tagline: "Pour tous les locataires exigeant transparence et respect de leurs droits",
-      heroTitle: "Louez en toute sérénité, payez en 1 clic et valorisez votre réputation",
-      desc: "Accédez à un habitat sécurisé, signez votre bail en ligne sans frais d'intermédiaires abusifs, payez sans file d'attente et récupérez votre caution sans bataille judiciaire.",
+      tagline: "Pour tous les locataires qui veulent la tranquillité et le respect de leurs droits",
+      heroTitle: "Louez en toute sérénité, payez par Wave / Mobile Money et gardez vos reçus",
+      desc: "Accédez à un logement décent, signez votre contrat sur votre téléphone sans faux frais, payez sans faire de rang et récupérez votre caution sans palabre.",
       badgeColor: "bg-sky-50 text-[#0284C7] border-sky-200",
       accent: "#0284C7",
       keyMetrics: [
-        { val: "0 FCFA", label: "Coût de la plateforme pour le locataire" },
-        { val: "2 mois", label: "Plafonnement strict de la caution" },
-        { val: "48h", label: "Délai moyen de restitution de caution" },
-        { val: "Score ICL", label: "Passeport locatif certifié à vie" }
+        { val: "0 FCFA", label: "Frais de dossier locataire" },
+        { val: "2 mois", label: "Caution max légale en Côte d'Ivoire" },
+        { val: "48h", label: "Remboursement rapide de la caution" },
+        { val: "Score ICL", label: "Votre carnet de bon payeur à vie" }
       ],
       features: [
         {
           title: "Paiement du loyer en 1 clic sans déplacement",
-          desc: "Réglez directement depuis votre smartphone via Wave, Orange, MTN ou Moov à toute heure, sans courir après le propriétaire ni retirer des espèces."
+          desc: "Payez directement depuis votre smartphone via Wave, Orange, MTN ou Moov à toute heure, sans chercher la monnaie ni retirer des espèces."
         },
         {
-          title: "Quittances officielles téléchargeables à vie",
-          desc: "Fini les carnets à souche perdus. Toutes vos quittances certifiées avec QR Code sont stockées dans votre espace, recevables auprès des banques et employeurs."
+          title: "Reçus officiels conservés à vie sur votre mobile",
+          desc: "Fini les carnets papier déchirés ou perdus. Tous vos reçus officiels avec code QR sont rangés dans votre espace, utilisables pour la banque, un prêt ou votre employeur."
         },
         {
-          title: "Caution protégée sous séquestre réglementaire",
-          desc: "Votre dépôt de garantie est plafonné à 2 mois maximum et consigné sous protocole sécurisé. Aucune retenue abusive ne peut vous être imposée sans justificatif."
+          title: "Caution protégée (2 mois maximum)",
+          desc: "Votre caution est strictement plafonnée à 2 mois maximum et gardée en sécurité. Aucune retenue injustifiée ne peut vous être imposée au départ."
         },
         {
-          title: "Score ICL : Votre Passeport de Confiance",
-          desc: "Chaque paiement ponctuel améliore votre indice de réputation. Pour votre prochain logement, prouvez votre sérieux en un clic sans garanties démesurées."
+          title: "Carnet de Confiance (Score ICL)",
+          desc: "Chaque loyer payé à temps renforce votre réputation. Pour votre prochaine maison ou magasin, prouvez votre sérieux en un clic sans tracasseries."
         }
       ],
       actionBtn: "Accéder à l'Espace Locataire",
@@ -107,35 +107,35 @@ export default function SolutionsPage() {
     },
     {
       id: "agences",
-      label: "Agences & Administrateurs",
+      label: "Agences & Démarcheurs",
       icon: <Briefcase className="w-5 h-5" />,
-      tagline: "Pour les cabinets de gestion, agents agréés et syndics de copropriété",
-      heroTitle: "Multipliez votre portefeuille sous gestion par 3 sans recruter",
-      desc: "Automatisez la gestion administrative, la répartition comptable des honoraires, la génération des mandats conformes et le suivi des équipes sur le terrain.",
+      tagline: "Pour les agences immobilières, démarcheurs professionnels et syndics",
+      heroTitle: "Gérez plus de maisons et d'immeubles en toute simplicité",
+      desc: "Gagnez du temps sur l'administration, le prélèvement automatique de vos commissions, la rédaction rapide des baux et le suivi de vos agents sur le terrain.",
       badgeColor: "bg-emerald-50 text-[#059669] border-emerald-200",
       accent: "#059669",
       keyMetrics: [
-        { val: "+300%", label: "Capacité de gestion par gestionnaire" },
+        { val: "+300%", label: "Capacité de gestion accrue" },
         { val: "100%", label: "Mandats conformes Loi 2019-576" },
-        { val: "Auto", label: "Reversement des honoraires d'agence" },
-        { val: "Multi-sites", label: "Tableau de bord centralisé agence" }
+        { val: "Auto", label: "Prélèvement de votre commission" },
+        { val: "Multi-sites", label: "Suivi centralisé de vos biens" }
       ],
       features: [
         {
-          title: "Gestion multi-bailleurs et multi-immeubles",
-          desc: "Supervisez des centaines de lots locatifs avec une vue d'ensemble instantanée des baux actifs, des entrées/sorties et des encaissements journaliers."
+          title: "Gestion multi-propriétaires et multi-immeubles",
+          desc: "Supervisez tous vos biens avec une vue d'ensemble claire des contrats en cours, des entrées/sorties et des encaissements de chaque jour."
         },
         {
-          title: "Répartition automatique des honoraires de gestion",
-          desc: "Configurez votre barème de gestion (ex. 8% ou 10%). Lors de chaque encaissement, la quote-part agence est automatiquement séparée du net propriétaire."
+          title: "Prélèvement automatique de votre commission",
+          desc: "Fixez votre taux de commission (ex. 8% ou 10%). À chaque loyer payé, votre commission est immédiatement séparée du montant reversé au propriétaire."
         },
         {
-          title: "Mandats de gérance numérisés conformes",
-          desc: "Générez et signez vos mandats de gestion avec les propriétaires à distance par SMS OTP, scellés avec valeur probante."
+          title: "Mandats de gestion clairs et rapides",
+          desc: "Rédigez et faites signer vos mandats de gestion avec les propriétaires par SMS sans rendez-vous interminables."
         },
         {
-          title: "Droits d'accès et rôles collaborateurs",
-          desc: "Créez des accès spécifiques pour vos gestionnaires, comptables et agents de terrain pour les états des lieux, tout en conservant le contrôle total de la direction."
+          title: "Comptes pour vos collaborateurs et agents de terrain",
+          desc: "Donnez des accès simples à vos agents pour faire les états des lieux avec photos tout en gardant la main sur les comptes."
         }
       ],
       actionBtn: "Découvrir la Solution Agences",
@@ -143,74 +143,74 @@ export default function SolutionsPage() {
     },
     {
       id: "diaspora",
-      label: "Diaspora & Investisseurs Off-shore",
+      label: "Diaspora Ivoirienne",
       icon: <Globe className="w-5 h-5" />,
-      tagline: "Pour les Ivoiriens et investisseurs résidant à l'étranger (France, USA, Canada...)",
-      heroTitle: "Contrôlez vos investissements à Abidjan depuis votre salon",
-      desc: "Éliminez l'opacité et les déconvenues des intermédiaires informels. Suivez vos loyers en direct, signez vos contrats à distance et sécurisez votre patrimoine ivoirien.",
+      tagline: "Pour les Ivoiriens et investisseurs vivant à l'étranger (France, USA, Canada...)",
+      heroTitle: "Suivez vos maisons à Abidjan et en province depuis votre salon",
+      desc: "Fini les soucis et les déconvenues avec les proches ou les démarcheurs informels. Suivez vos loyers en direct, signez vos contrats à distance et gardez le contrôle de votre patrimoine.",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
       accent: "#7C3AED",
       keyMetrics: [
-        { val: "24/7", label: "Accès temps réel depuis l'étranger" },
+        { val: "24/7", label: "Accès en direct depuis l'étranger" },
         { val: "Zéro", label: "Dépendance envers les intermédiaires" },
-        { val: "Multi-devises", label: "Suivi en FCFA, EUR ou USD" },
-        { val: "HD", label: "États des lieux photos & vidéos certifiées" }
+        { val: "FCFA / EUR", label: "Suivi clair des montants" },
+        { val: "Photos HD", label: "États des lieux visibles à distance" }
       ],
       features: [
         {
-          title: "Notification instantanée à chaque loyer perçu",
-          desc: "Dès que le locataire paie son loyer à Abidjan ou en province, vous recevez une notification en temps réel avec le reçu bancaire associé."
+          title: "Alerte immédiate à chaque loyer versé",
+          desc: "Dès que le locataire paie son loyer en Côte d'Ivoire, vous recevez une alerte sur votre téléphone avec le reçu officiel."
         },
         {
-          title: "Compte séquestre et rapatriement fluide",
-          desc: "Conservez vos revenus locatifs sur votre compte QAPRIL sécurisé ou rapatriez-les vers votre compte bancaire international en toute conformité de change."
+          title: "Versement sécurisé de vos loyers",
+          desc: "Conservez vos revenus locatifs en toute sécurité sur votre espace ou virez-les directement sur votre compte bancaire."
         },
         {
-          title: "États des lieux contradictoires visuels à distance",
-          desc: "Consultez les photographies haute définition d'entrée et de sortie des lieux pour constater l'état réel de votre bien sans billet d'avion."
+          title: "États des lieux avec photos visibles à distance",
+          desc: "Regardez les photos de l'état du logement à l'entrée et à la sortie pour vérifier vos biens sans devoir payer un billet d'avion."
         },
         {
-          title: "Mandat clair et assistance juridique sur place",
-          desc: "Bénéficiez de l'appui du réseau d'experts juridiques et d'huissiers partenaires QAPRIL en Côte d'Ivoire en cas de besoin."
+          title: "Accompagnement juridique sur place",
+          desc: "Bénéficiez du réseau d'experts juridiques et de commissaires de justice partenaires en Côte d'Ivoire en cas de difficulté."
         }
       ],
-      actionBtn: "Sécuriser mes Biens depuis l'Étranger",
+      actionBtn: "Gérer mes Biens depuis l'Étranger",
       actionHref: "/contact"
     },
     {
       id: "institutionnels",
-      label: "Banques & Institutionnels",
+      label: "Professionnels & Partenaires",
       icon: <Landmark className="w-5 h-5" />,
-      tagline: "Pour les établissements financiers, la CDC-CI, la DGI et les assureurs",
-      heroTitle: "Fiabilisation des données immobilières et traçabilité financière",
+      tagline: "Pour les banques, la CDC-CI, la DGI, notaires et assureurs",
+      heroTitle: "Fiabilisation des données locatives et traçabilité financière",
       desc: "Appuyez vos décisions de crédit, conformités fiscales et sécurisations de dépôts sur des historiques de paiement et des baux infalsifiables.",
       badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-300",
       accent: "#047857",
       keyMetrics: [
-        { val: "100%", label: "Traçabilité financière certifiée" },
-        { val: "API", label: "Intégration bancaire & institutionnelle" },
-        { val: "KYC/AML", label: "Conformité anti-blanchiment UEMOA" },
-        { val: "DGI", label: "QR Code opposable aux contrôles" }
+        { val: "100%", label: "Traçabilité des paiements" },
+        { val: "Sécurisé", label: "Conforme CDC-CI & DGI" },
+        { val: "UEMOA", label: "Normes financières respectées" },
+        { val: "Code QR", label: "Reçus vérifiables en direct" }
       ],
       features: [
         {
-          title: "Score ICL pour l'octroi de crédits bancaires",
-          desc: "Utilisez l'historique locatif certifié QAPRIL pour évaluer la solvabilité réelle d'un particulier sollicitant un prêt immobilier ou à la consommation."
+          title: "Historique locatif pour crédits bancaires",
+          desc: "Utilisez le carnet de paiement certifié pour évaluer la capacité réelle de remboursement d'un client demandant un prêt."
         },
         {
-          title: "Interfaçage réglementaire CDC-CI",
-          desc: "Flux automatisé pour la consignation et la traçabilité des dépôts de garantie locatifs conformément aux prérogatives de la Caisse des Dépôts."
+          title: "Lien réglementaire avec la Caisse des Dépôts (CDC-CI)",
+          desc: "Gestion automatique de la mise en réserve et du suivi des cautions locatives selon les règles de la CDC-CI."
         },
         {
-          title: "Transparence foncière pour les administrations",
-          desc: "Quittances et déclarations infalsifiables pour faciliter le recensement fiscal et la perception des droits d'enregistrement sans déperdition."
+          title: "Reçus et déclarations vérifiables pour les impôts",
+          desc: "Reçus dotés de codes QR infalsifiables pour faciliter les contrôles et justifier les déclarations foncières."
         },
         {
-          title: "Sécurité & Confidentialité de niveau bancaire",
-          desc: "Chiffrement AES-256, protocoles TLS 1.3 et respect scrupuleux des directives de l'ARTCI sur la protection des données financières et civiles."
+          title: "Sécurité et protection des données privées",
+          desc: "Respect strict des règles de l'ARTCI sur la confidentialité des données personnelles et financières des citoyens."
         }
       ],
-      actionBtn: "Contacter le Pôle Institutionnel",
+      actionBtn: "Contacter le Pôle Partenaires",
       actionHref: "/contact"
     }
   ];
@@ -257,19 +257,19 @@ export default function SolutionsPage() {
                 style={{ background: "rgba(245,158,11,0.08)" }}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Solutions Métiers Spécialisées · Marché Ivoirien
+                Des Solutions Adaptées à Chacun · Côte d'Ivoire
               </span>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-8 uppercase">
-                Une Infrastructure Dédiée <br />
-                <span style={{ color: "var(--mango)" }}>à Chaque Rôle du Secteur</span>
+                Une Solution Simple <br />
+                <span style={{ color: "var(--mango)" }}>pour Chaque Profil</span>
               </h1>
 
               <p
                 className="text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed mb-12"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
-                Que vous soyez propriétaire d'un studio, gestionnaire de plusieurs centaines de lots, locataire ou investisseur résidant à l'étranger, QAPRIL vous offre un espace adapté à vos priorités.
+                Que vous soyez propriétaire d'une maison ou d'un grand immeuble, locataire, agent immobilier ou Ivoirien vivant à l'étranger, QAPRIL vous offre un espace adapté à vos priorités.
               </p>
 
               {/* Onglets de sélection de rôle */}

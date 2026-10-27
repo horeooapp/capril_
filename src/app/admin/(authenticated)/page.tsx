@@ -276,7 +276,7 @@ export default async function AdminDashboardOverview() {
                 <div className="page-header">
                     <div>
                         <h1 className="page-title">Supervision Centrale</h1>
-                        <p className="page-sub">Contrôle intégral des flux - Hub Abidjan</p>
+                        <p className="page-sub">Suivi général des locations, loyers et cautions en Côte d'Ivoire</p>
                     </div>
                     <div className="date-badge">
                         {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -286,14 +286,14 @@ export default async function AdminDashboardOverview() {
                 <div className="kpi-grid">
                     <div className="kpi-card orange">
                         <div className="kpi-glow"></div>
-                        <div className="kpi-label">Volume Encaissements</div>
+                        <div className="kpi-label">Total Loyers Encaissés</div>
                         <div className="kpi-val">{safeData.totalPayments.toLocaleString()} F</div>
                         <div className="kpi-delta up"><ArrowUpRight className="w-3 h-3" /> {safeData.totalPayments > 0 ? "Actif" : "Initial"}</div>
                     </div>
                     
                     <div className="kpi-card vert">
                         <div className="kpi-glow"></div>
-                        <div className="kpi-label">Baux Actifs</div>
+                        <div className="kpi-label">Contrats de Bail Actifs</div>
                         <div className="kpi-val">{safeData.totalLeases}</div>
                         <div className={`kpi-delta ${leaseDelta >= 0 ? 'up' : 'down'}`}>
                             {leaseDelta >= 0 ? "+" : ""}{leaseDelta} ce mois
@@ -302,7 +302,7 @@ export default async function AdminDashboardOverview() {
                     
                     <div className="kpi-card or">
                         <div className="kpi-glow"></div>
-                        <div className="kpi-label">Médiation & Litiges</div>
+                        <div className="kpi-label">Dossiers en Médiation</div>
                         <div className="kpi-val">{safeData.activeMediations}</div>
                         <div className="kpi-delta text-yellow-500">
                             {safeData.activeMediations > 5 ? "Haute Vigilance" : "Sous Contrôle"}
@@ -311,9 +311,9 @@ export default async function AdminDashboardOverview() {
                     
                     <div className="kpi-card gris">
                         <div className="kpi-glow"></div>
-                        <div className="kpi-label">Taux Certification KYC</div>
+                        <div className="kpi-label">Identités Vérifiées</div>
                         <div className="kpi-val">{safeData.kycAutoRate}%</div>
-                        <div className="kpi-delta up">QAPRIL IA Opti</div>
+                        <div className="kpi-delta up">Vérification Conforme</div>
                     </div>
                 </div>
 
@@ -324,7 +324,7 @@ export default async function AdminDashboardOverview() {
                 <div className="dash-grid">
                     <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="panel-header">
-                            <h2 className="panel-title">Tendance Loyers (6 Mois)</h2>
+                            <h2 className="panel-title">Évolution des Loyers (6 derniers mois)</h2>
                             <div className="panel-action">Détail financier</div>
                         </div>
                         <div className="chart-bars" style={{ flex: 1, marginBottom: '24px' }}>
@@ -344,7 +344,7 @@ export default async function AdminDashboardOverview() {
                         </div>
 
                         <div className="panel-header" style={{ marginTop: 'auto' }}>
-                            <h2 className="panel-title">Surveillance Baux Actifs</h2>
+                            <h2 className="panel-title">Derniers Contrats de Bail</h2>
                             <div className="panel-action">Tous les baux</div>
                         </div>
                         <table className="lease-table">
@@ -352,9 +352,9 @@ export default async function AdminDashboardOverview() {
                                 <tr>
                                     <th>Locataire</th>
                                     <th>Propriétaire</th>
-                                    <th>Localisation</th>
-                                    <th>Loyer Brut</th>
-                                    <th>Statut de Paiement</th>
+                                    <th>Commune</th>
+                                    <th>Loyer Mensuel</th>
+                                    <th>Situation du Paiement</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -400,7 +400,7 @@ export default async function AdminDashboardOverview() {
                     <div className="right-col">
                         <div className="panel" style={{ paddingBottom: '12px' }}>
                             <div className="panel-header">
-                                <h2 className="panel-title">Passerelles & Quittances</h2>
+                                <h2 className="panel-title">Derniers Loyers & Reçus</h2>
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B949E" strokeWidth="1.5"/><path d="M8 5v3l2 2" stroke="#8B949E" strokeWidth="1.5" strokeLinecap="round"/></svg>
                             </div>
                             <div className="mm-grid">
@@ -420,9 +420,9 @@ export default async function AdminDashboardOverview() {
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
                                 <div className="mm-card mtn-card mt-2 col-span-2" style={{ background: 'linear-gradient(135deg, var(--ci-nuit), #3b82f6)', color: '#fff' }}>
-                                    <div className="mm-op">TRESOR/CDC</div>
+                                    <div className="mm-op">TRESOR / CDC-CI</div>
                                     <div className="mm-amount">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
-                                    <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Fonds Consignés Global</div>
+                                    <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Total Cautions en Sécurité (CDC-CI)</div>
                                 </div>
                             </div>
                         </div>
@@ -447,7 +447,7 @@ export default async function AdminDashboardOverview() {
 
                         <div className="panel" style={{ flex: 1 }}>
                             <div className="panel-header">
-                                <h2 className="panel-title">Audit IA & Logs</h2>
+                                <h2 className="panel-title">Historique des Actions Récentes</h2>
                             </div>
                             <div className="activity-list">
                                 {safeData.recentAuditLogs?.slice(0, 4).map((log: any) => (

@@ -89,15 +89,15 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             href="/mon-espace-locataire/login"
-            className="text-sm font-bold text-white/70 hover:text-white transition-colors px-4 py-2"
+            className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm px-5 py-2.5 rounded-full transition-all shadow-md shadow-amber-500/20 hover:scale-105"
           >
-            Locataire
+            Espace Locataire <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
             href="/dashboard/login"
             className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm px-5 py-2.5 rounded-full transition-all shadow-md shadow-amber-500/20 hover:scale-105"
           >
-            Espace Bailleur <ArrowRight className="w-4 h-4" />
+            Espace Propriétaire <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -153,7 +153,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-3 rounded-2xl bg-[#F59E0B] text-black font-black text-sm hover:bg-[#D97706]"
             >
-              Connexion Bailleur
+              Connexion Propriétaire
             </Link>
           </div>
         </div>

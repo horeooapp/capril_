@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react"
 import { updateUserProfile } from "@/actions/profile"
-import { CheckCircle2, User, Camera, ShieldCheck } from "lucide-react"
+import { CheckCircle2, User, Camera, ShieldCheck, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activeRole }: { initialData: any, isIdentityLocked?: boolean, activeRole?: string }) => {
@@ -104,8 +104,12 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-                <div className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm font-bold border border-red-200">
-                    {error}
+                <div className="bg-red-50 text-red-800 p-4 rounded-2xl text-sm font-semibold border-2 border-red-200 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 shadow-sm">
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                        <p className="font-bold text-red-900">Impossible de mettre à jour le profil</p>
+                        <p className="text-xs text-red-700 leading-relaxed">{error}</p>
+                    </div>
                 </div>
             )}
             
@@ -231,10 +235,22 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                         inputMode="tel"
                         autoComplete="tel"
                         value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none" 
+                        onChange={(e) => {
+                            setFormData({...formData, phone: e.target.value});
+                            if (error && error.toLowerCase().includes('téléphone')) setError(null);
+                        }}
+                        className={`w-full bg-gray-50 border rounded-2xl p-4 font-bold text-gray-800 outline-none transition-all ${
+                            error && error.toLowerCase().includes('téléphone')
+                                ? 'border-red-400 focus:ring-2 focus:ring-red-400 bg-red-50/20'
+                                : 'border-gray-200 focus:ring-2 focus:ring-[#1F4E79]'
+                        }`} 
                         placeholder="+225 00000000"
                     />
+                    {error && error.toLowerCase().includes('téléphone') && (
+                        <p className="text-[11px] font-semibold text-red-600 pl-2 flex items-center gap-1">
+                            ⚠️ Ce numéro est déjà utilisé par un autre compte. Veuillez en saisir un autre.
+                        </p>
+                    )}
                 </div>
             </div>
 

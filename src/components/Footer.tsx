@@ -15,7 +15,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-sm text-white/40 leading-relaxed max-w-xs">
-              L&apos;infrastructure technologique de référence pour la gestion locative et la certification des baux en Côte d&apos;Ivoire.
+              L&apos;application simple et sécurisée pour gérer vos maisons, contrats de bail et loyers en Côte d&apos;Ivoire.
             </p>
             <div className="pt-2">
               <span className="text-[11px] font-bold text-white/40 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
@@ -26,22 +26,22 @@ export default function Footer() {
 
           {/* Nav Col 1 */}
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Plateforme</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Découvrir QAPRIL</div>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/piliers" className="text-white/45 hover:text-white transition-colors">4 Piliers Fondateurs</Link>
+                <Link href="/piliers" className="text-white/45 hover:text-white transition-colors">Les 4 Piliers</Link>
               </li>
               <li>
-                <Link href="/solutions" className="text-white/45 hover:text-white transition-colors">Solutions Métiers</Link>
+                <Link href="/solutions" className="text-white/45 hover:text-white transition-colors">Solutions par Profil</Link>
               </li>
               <li>
-                <Link href="/services" className="text-white/45 hover:text-white transition-colors">Services & Modules</Link>
+                <Link href="/services" className="text-white/45 hover:text-white transition-colors">Nos Services</Link>
               </li>
               <li>
-                <Link href="/comparatif" className="text-white/45 hover:text-white transition-colors">Comparatif Analytique</Link>
+                <Link href="/comparatif" className="text-white/45 hover:text-white transition-colors">Comparatif</Link>
               </li>
               <li>
-                <Link href="/tarifs" className="text-white/45 hover:text-white transition-colors">Tarifs & Formules</Link>
+                <Link href="/tarifs" className="text-white/45 hover:text-white transition-colors">Tarifs & Offres</Link>
               </li>
               <li>
                 <Link href="/contact" className="text-white/45 hover:text-white transition-colors">Assistance & Support</Link>

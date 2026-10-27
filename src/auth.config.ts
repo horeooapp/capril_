@@ -71,25 +71,28 @@ export const authConfig = {
                 pathname.includes("/login") ||
                 pathname.startsWith("/api/webhooks") ||
                 pathname.startsWith("/api/public") ||
+                pathname.startsWith("/api/system") ||
                 pathname.startsWith("/auth/") ||
+                pathname.startsWith("/setup") ||
                 ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif"].includes(pathname);
 
             if (isPublic) {
                 if (isLoggedIn && pathname.includes("/login")) {
                     const onboardingFait = (auth?.user as any)?.onboardingComplete;
                     const chosenRole = (auth?.user as any)?.chosenRole;
+                    const capaciteActive = (auth?.user as any)?.capaciteActive;
                     const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
                     
-                    if (requiresRoleSelection && !chosenRole) {
+                    if (requiresRoleSelection && !chosenRole && !capaciteActive) {
                         return Response.redirect(new URL("/auth/choose-role", nextUrl));
                     }
                     
-                    const effectiveRole = chosenRole || role;
+                    const effectiveRole = capaciteActive || chosenRole || role;
 
-                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     if (effectiveRole === 'ADMIN' || effectiveRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
+                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     
-                    // LANDLORD
+                    // LANDLORD / PROPRIETAIRE
                     if (!onboardingFait) {
                          return Response.redirect(new URL("/onboarding", nextUrl));
                     }
@@ -107,38 +110,40 @@ export const authConfig = {
 
             // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
             const onboardingFait = (auth?.user as any)?.onboardingComplete;
-            const eligibleRoles = (auth?.user as any)?.eligibleRoles || [role];
             const chosenRole = (auth?.user as any)?.chosenRole;
+            const capaciteActive = (auth?.user as any)?.capaciteActive;
+            const capacites = ((auth?.user as any)?.capacites as string[]) || [];
+            const rawEligible = ((auth?.user as any)?.eligibleRoles as string[]) || [role];
+            const allRoles = [...rawEligible, ...capacites, capaciteActive, chosenRole, role].filter(Boolean);
+
             const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
 
             // Enforce role selection if needed
-            if (requiresRoleSelection && !chosenRole && !pathname.startsWith("/auth/choose-role") && !pathname.startsWith("/api/auth")) {
+            if (requiresRoleSelection && !chosenRole && !capaciteActive && !pathname.startsWith("/auth/choose-role") && !pathname.startsWith("/api/auth")) {
                 return Response.redirect(new URL("/auth/choose-role", nextUrl));
             }
 
             // 4. PATH-BASED ACCESS CONTROL
-            const isAdmin = eligibleRoles?.some((r: string) => ['ADMIN', 'SUPER_ADMIN'].includes(r.toUpperCase()));
-            const isTenant = eligibleRoles?.some((r: string) => ['TENANT', 'LOCATAIRE'].includes(r.toUpperCase()));
-            const hasDashAccess = eligibleRoles?.some((r: string) => 
-                ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'BAILLEUR'].includes(r.toUpperCase())
+            const isAdmin = allRoles.some((r: string) => ['ADMIN', 'SUPER_ADMIN'].includes(r.toUpperCase()));
+            const isTenant = allRoles.some((r: string) => ['TENANT', 'LOCATAIRE'].includes(r.toUpperCase()));
+            const hasDashAccess = allRoles.some((r: string) => 
+                ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'BAILLEUR', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE'].includes(r.toUpperCase())
             );
 
             // Access to Dashboard (Bailleurs, Agencies, Diaspora)
             if (pathname.startsWith("/dashboard")) {
-                if (!hasDashAccess) {
-                    if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
+                if (!hasDashAccess && !isAdmin) {
                     if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     return Response.redirect(new URL("/", nextUrl));
                 }
-                if (!onboardingFait && !pathname.startsWith("/onboarding")) {
+                if (!onboardingFait && hasDashAccess && !pathname.startsWith("/onboarding")) {
                      return Response.redirect(new URL("/onboarding", nextUrl));
                 }
             }
             
             // Access to Locataire
             if (pathname.startsWith("/mon-espace-locataire")) {
-                if (!isTenant) {
-                    if (isAdmin) return Response.redirect(new URL("/admin", nextUrl));
+                if (!isTenant && !isAdmin) {
                     if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
                     return Response.redirect(new URL("/", nextUrl));
                 }

@@ -7,11 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * Handles permanent file storage on VPS outside the deployment root.
  */
 
-const PERSISTENT_ROOT = process.env.NODE_ENV === 'production' 
-  ? '/home/github/capril_data' 
-  : path.join(process.cwd(), 'persistence');
-
-const UPLOADS_DIR = path.join(PERSISTENT_ROOT, 'uploads');
+export const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(process.cwd(), 'uploads_data');
 
 /**
  * Save a File (Blob) to disk and return the public URL path

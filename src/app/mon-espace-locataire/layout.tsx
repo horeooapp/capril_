@@ -35,8 +35,24 @@ export default async function LocataireLayout({
             if (redis) await redis.set(`user:active_role:${session.user.id}`, computedRole);
         }
 
+        // Si l'utilisateur consulte son espace locataire, basculer sa capacité active sur TENANT
+        const isTenant = computedRole === "TENANT" || (session.user as any).role === "TENANT";
         if (computedRole !== "TENANT") {
-            redirect("/dashboard")
+            // Vérifier s'il a un bail locataire actif ou le rôle tenant
+            const hasTenantLease = await prisma.lease.findFirst({
+                where: { tenantId: session.user.id },
+                select: { id: true }
+            });
+
+            if (hasTenantLease || isTenant) {
+                computedRole = "TENANT";
+                await prisma.user.update({
+                    where: { id: session.user.id },
+                    data: { capaciteActive: "TENANT" }
+                }).catch(() => {});
+            } else {
+                redirect("/dashboard");
+            }
         }
     }
 

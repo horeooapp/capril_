@@ -9,23 +9,47 @@ app.use(express.json());
 const PORT = process.env.PORT || 8085;
 const AUTH_KEY = process.env.AUTH_KEY || process.env.WA_API_KEY || 'qapril_wa_secret_2026';
 const SESSION_PATH = process.env.SESSION_PATH || '/app/session';
+// Wrapper Chrome qui injecte --no-sandbox sans passer par chromiumArgs
+const CHROME_WRAPPER = process.env.CHROME_WRAPPER || '/usr/local/bin/chrome-wrapper';
 
 let latestQr = null;
 let clientInstance = null;
 let isConnected = false;
 let connectedPhone = null;
 let currentStatus = 'INITIALIZING';
+let retryCount = 0;
+const MAX_RETRIES = 5;
 
-// Écoute de l'événement QR Code avant toute initialisation
+// ── Nettoyage des dossiers de session corrompus (_IGNORE_*) ──────────
+function cleanCorruptedSessions() {
+  try {
+    if (!fs.existsSync(SESSION_PATH)) {
+      fs.mkdirSync(SESSION_PATH, { recursive: true });
+      return;
+    }
+    const entries = fs.readdirSync(SESSION_PATH);
+    for (const entry of entries) {
+      if (entry.startsWith('_IGNORE_')) {
+        const fullPath = path.join(SESSION_PATH, entry);
+        console.log(`[OPENWA] 🧹 Nettoyage session corrompue: ${fullPath}`);
+        fs.rmSync(fullPath, { recursive: true, force: true });
+      }
+    }
+  } catch (err) {
+    console.warn('[OPENWA] Avertissement nettoyage session:', err.message);
+  }
+}
+
+// Écoute des QR codes avant initialisation
 ev.on('qr.**', async (base64Qr, asciiQR, attempts, urlCode) => {
-  console.log(`[OPENWA] Nouveau QR Code généré (Tentative: ${attempts})`);
+  console.log(`[OPENWA] 📱 Nouveau QR Code (Tentative: ${attempts})`);
   latestQr = base64Qr;
   isConnected = false;
   connectedPhone = null;
   currentStatus = 'WAITING_FOR_SCAN';
 });
 
-// Middleware d'authentification pour les endpoints protégés
+// Middleware d'authentification
 function checkAuth(req, res, next) {
   if (!AUTH_KEY) return next();
   const authHeader = req.headers['authorization'] || '';
@@ -35,71 +59,87 @@ function checkAuth(req, res, next) {
 }
 
 async function initClient() {
+  cleanCorruptedSessions();
+
   try {
     currentStatus = 'STARTING_BROWSER';
-    console.log('[OPENWA] Lancement du moteur Chromium WhatsApp...');
+    console.log(`[OPENWA] 🚀 Démarrage Chromium via wrapper (tentative ${retryCount + 1}/${MAX_RETRIES})...`);
+    console.log(`[OPENWA] Wrapper: ${CHROME_WRAPPER}`);
 
     clientInstance = await create({
       sessionId: 'qapril_session',
       sessionDataPath: SESSION_PATH,
-      useChrome: true,
+
+      // ⚠️ IMPORTANT : PAS de chromiumArgs avec MD mode (v4.76+)
+      // Les flags --no-sandbox sont injectés via le wrapper chrome-wrapper.sh
+      executablePath: CHROME_WRAPPER,
+
       headless: true,
-      qrTimeout: 0,
-      authTimeout: 0,
+      qrTimeout: 0,    // Pas de timeout sur l'attente du QR
+      authTimeout: 0,  // Pas de timeout sur l'authentification
       cacheEnabled: false,
       restartOnCrash: true,
-      chromiumArgs: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ]
+      // NE PAS mettre chromiumArgs — cela brise le mode Multi-Device
     });
 
     isConnected = true;
     latestQr = null;
     currentStatus = 'CONNECTED';
+    retryCount = 0;
 
     try {
       const me = await clientInstance.getMe();
       connectedPhone = me?.wid?.user || me?.id?.user || 'Connecté';
-      console.log(`[OPENWA] ✅ Client WhatsApp connecté avec succès sur le numéro: +${connectedPhone}`);
+      console.log(`[OPENWA] ✅ WhatsApp connecté sur: +${connectedPhone}`);
     } catch {
       connectedPhone = 'Connecté';
-      console.log('[OPENWA] ✅ Client WhatsApp connecté avec succès');
+      console.log('[OPENWA] ✅ WhatsApp connecté avec succès');
     }
 
     clientInstance.onStateChanged((state) => {
-      console.log(`[OPENWA] Changement d'état de session: ${state}`);
+      console.log(`[OPENWA] État de session: ${state}`);
       if (state === 'CONFLICT' || state === 'UNPAIRED' || state === 'UNLAUNCHED') {
         isConnected = false;
         connectedPhone = null;
         currentStatus = 'DISCONNECTED';
+        setTimeout(() => scheduleRetry(), 5000);
       }
     });
 
   } catch (err) {
-    console.error('[OPENWA] Erreur initialisation client:', err.message);
+    console.error(`[OPENWA] ❌ Erreur init (tentative ${retryCount + 1}):`, err.message);
     currentStatus = 'ERROR';
     isConnected = false;
+    clientInstance = null;
+    scheduleRetry();
   }
 }
 
-// Initialisation au lancement
-initClient();
+function scheduleRetry() {
+  if (retryCount >= MAX_RETRIES) {
+    console.error(`[OPENWA] ❌ Échec après ${MAX_RETRIES} tentatives.`);
+    currentStatus = 'FAILED';
+    return;
+  }
+  retryCount++;
+  const delay = Math.min(15000 * retryCount, 120000);
+  console.log(`[OPENWA] ⏳ Retry dans ${delay / 1000}s (${retryCount}/${MAX_RETRIES})...`);
+  setTimeout(() => initClient(), delay);
+}
+
+// Démarrage après stabilisation du conteneur
+setTimeout(() => initClient(), 3000);
 
 // ── Endpoints HTTP ───────────────────────────────────────────────────
 
-// Endpoint public interne pour récupérer l'état et le QR Code dans l'admin QAPRIL
 app.get('/qr', (req, res) => {
   res.json({
     connected: isConnected,
     phone: connectedPhone,
     status: currentStatus,
-    qr: latestQr
+    qr: latestQr,
+    retryCount,
+    maxRetries: MAX_RETRIES,
   });
 });
 
@@ -108,26 +148,25 @@ app.get('/status', (req, res) => {
     connected: isConnected,
     phone: connectedPhone,
     status: currentStatus,
-    hasQr: Boolean(latestQr)
+    hasQr: Boolean(latestQr),
+    retryCount,
   });
 });
 
-// Envoi de messages texte (utilisé par auth.ts et openwa.ts dans QAPRIL)
 app.post('/sendText', checkAuth, async (req, res) => {
   const { chatId, content, text } = req.body;
   const messageContent = content || text;
 
   if (!chatId || !messageContent) {
-    return res.status(400).json({ error: 'Paramètres manquants: chatId et content sont requis' });
+    return res.status(400).json({ error: 'chatId et content sont requis' });
   }
-
   if (!clientInstance || !isConnected) {
-    return res.status(503).json({ error: 'WhatsApp non connecté. Veuillez scanner le QR Code depuis la console Admin.' });
+    return res.status(503).json({ error: 'WhatsApp non connecté. Scannez le QR depuis /admin/whatsapp' });
   }
 
   try {
     const result = await clientInstance.sendText(chatId, messageContent);
-    console.log(`[OPENWA] Message envoyé avec succès à ${chatId}`);
+    console.log(`[OPENWA] ✉️ Message envoyé à ${chatId}`);
     return res.json({ success: true, response: result, id: result });
   } catch (err) {
     console.error(`[OPENWA] Erreur envoi vers ${chatId}:`, err.message);
@@ -135,15 +174,10 @@ app.post('/sendText', checkAuth, async (req, res) => {
   }
 });
 
-// Compatibilité fallback /sendMessage
 app.post('/sendMessage', checkAuth, async (req, res) => {
   const { to, body } = req.body;
-  if (!to || !body) {
-    return res.status(400).json({ error: 'Paramètres manquants: to et body sont requis' });
-  }
-  if (!clientInstance || !isConnected) {
-    return res.status(503).json({ error: 'WhatsApp non connecté. Veuillez scanner le QR Code depuis la console Admin.' });
-  }
+  if (!to || !body) return res.status(400).json({ error: 'to et body sont requis' });
+  if (!clientInstance || !isConnected) return res.status(503).json({ error: 'WhatsApp non connecté.' });
   try {
     const result = await clientInstance.sendText(to, body);
     return res.json({ success: true, id: result });
@@ -152,9 +186,8 @@ app.post('/sendMessage', checkAuth, async (req, res) => {
   }
 });
 
-// Réinitialisation de session si l'administrateur veut changer de numéro
 app.post('/reset', checkAuth, async (req, res) => {
-  console.log('[OPENWA] Réinitialisation de la session demandée par l\'admin...');
+  console.log('[OPENWA] 🔄 Réinitialisation manuelle...');
   try {
     if (clientInstance) {
       await clientInstance.kill().catch(() => {});
@@ -164,23 +197,20 @@ app.post('/reset', checkAuth, async (req, res) => {
     connectedPhone = null;
     latestQr = null;
     currentStatus = 'RESETTING';
+    retryCount = 0;
 
-    // Nettoyer les fichiers de session
     if (fs.existsSync(SESSION_PATH)) {
       fs.rmSync(SESSION_PATH, { recursive: true, force: true });
       fs.mkdirSync(SESSION_PATH, { recursive: true });
     }
 
-    setTimeout(() => {
-      initClient();
-    }, 2000);
-
-    return res.json({ success: true, message: 'Session réinitialisée. Nouveau QR code en cours de génération.' });
+    setTimeout(() => initClient(), 3000);
+    return res.json({ success: true, message: 'Session réinitialisée. QR code en cours de génération.' });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[OPENWA] Passerelle WhatsApp prête et écoute sur http://0.0.0.0:${PORT}`);
+  console.log(`[OPENWA] 🚀 Passerelle WhatsApp démarrée sur http://0.0.0.0:${PORT}`);
 });

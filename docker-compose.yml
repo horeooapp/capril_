@@ -100,6 +100,8 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads_data
     networks:
       - qapril_net
     healthcheck:
@@ -133,6 +135,7 @@ volumes:
   postgres_data:
   redis_data:
   openwa_data:
+  uploads_data:
 
 networks:
   qapril_net:

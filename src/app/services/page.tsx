@@ -33,105 +33,105 @@ export default function ServicesPage() {
   const MODULES = [
     {
       id: "m-edl",
-      code: "MODULE M-EDL",
-      title: "États des Lieux (EDL) Numériques & Comparateur HD",
-      subtitle: "Constat contradictoire certifié avec galerie photographique haute définition",
+      code: "ÉTAT DES LIEUX",
+      title: "État des Lieux sur Téléphone avec Photos HD",
+      subtitle: "Constat clair avec photos nettes pour protéger le propriétaire et le locataire",
       icon: <Camera className="w-6 h-6 text-[#D97706]" />,
       badge: "Entrée & Sortie des Lieux",
       accent: "#D97706",
-      desc: "Réalisez vos états des lieux directement sur smartphone ou tablette. Prenez des photos détaillées pièce par pièce, notez l'état des équipements (neuf, bon, usagé, dégradé) et faites signer le locataire immédiatement par signature tactile sécurisée.",
+      desc: "Réalisez vos états des lieux directement sur smartphone ou tablette. Prenez des photos pièce par pièce, notez l'état des équipements (neuf, bon, usagé, abîmé) et faites signer le locataire directement sur l'écran en toute simplicité.",
       details: [
-        "Inventaire exhaustif pièce par pièce avec grille standardisée",
-        "Comparateur visuel automatique entre l'entrée et la sortie pour détecter les dégradations réelles",
-        "Distinction juridique entre vétusté d'usage normal et détérioration imputable au locataire",
-        "Rapport PDF scellé horodaté immédiatement transmis aux deux parties"
+        "Vérification pièce par pièce avec une liste simple et complète",
+        "Comparateur photo automatique entre l'entrée et la sortie pour voir les vrais changements",
+        "Distinction claire entre l'usure normale du temps et les dégâts causés par le locataire",
+        "Rapport PDF officiel envoyé immédiatement par SMS et WhatsApp aux deux parties"
       ],
-      legalNote: "Conforme à l'article 15 de la loi n° 2019-576 régissant les états des lieux contradictoires."
+      legalNote: "Conforme à la loi n° 2019-576 régissant les états des lieux contradictoires en Côte d'Ivoire."
     },
     {
       id: "m-mediation",
-      code: "MODULE M-MÉDIATION",
-      title: "Centre de Médiation & Règlement Amiable",
-      subtitle: "Désamorçage des litiges locatifs sans passer par des procédures judiciaires lentes",
+      code: "RÈGLEMENT AMIABLE",
+      title: "Entente & Règlement à l'Amiable",
+      subtitle: "Résoudre les désaccords rapidement sans passer par des procès longs et coûteux",
       icon: <Scale className="w-6 h-6 text-[#059669]" />,
       badge: "Résolution des Conflits",
       accent: "#059669",
-      desc: "En cas de retard de paiement, de retenue sur caution contestée ou de réparations litigieuses, le module de médiation ouvre un canal d'arbitrage structuré pour trouver un accord amiable écrit sous 14 jours.",
+      desc: "En cas de retard de loyer, de désaccord sur la caution ou de réparations contestées, notre outil d'entente vous aide à trouver un accord écrit, équitable et respectueux sans palabre.",
       details: [
-        "Protocole de médiation guidé étape par étape avec dépôt des pièces justificatives",
-        "Échéanciers d'apurement d'arriérés négociés et formalisés en ligne",
-        "Procès-verbal de conciliation doté d'une valeur contractuelle obligatoire pour les signataires",
-        "Réduction de 90% des saisines judiciaires et préservation de la relation bailleur-locataire"
+        "Procédure d'entente guidée étape par étape avec partage des justificatifs",
+        "Possibilité d'étaler les paiements en retard selon un calendrier convenu d'un commun accord",
+        "Accord d'entente écrit doté d'une vraie valeur d'engagement pour les deux parties",
+        "Évite les convocations au commissariat ou au tribunal et préserve la bonne entente"
       ],
-      legalNote: "Inspiré des mécanismes de médiation conventionnelle reconnus par l'Acte Uniforme OHADA."
+      legalNote: "Reconnu par les mécanismes de conciliation amiable en Côte d'Ivoire."
     },
     {
       id: "m-charges",
-      code: "MODULE M-CHARGES",
-      title: "Gestion des Charges & Fluides CIE / SODECI",
-      subtitle: "Suivi rigoureux des compteurs divisionnaires et répartition équitable des charges",
+      code: "EAU & ÉLECTRICITÉ",
+      title: "Suivi des Factures CIE & SODECI",
+      subtitle: "Relevé facile des compteurs et partage équitable des factures d'eau et de courant",
       icon: <Droplets className="w-6 h-6 text-[#0284C7]" />,
-      badge: "Fluides & Charges Communes",
+      badge: "Compteurs & Charges",
       accent: "#0284C7",
-      desc: "Automatisez la saisie des index de compteurs d'électricité (CIE) et d'eau (SODECI). Le module calcule au centime près les consommations individuelles et les charges communes d'immeuble (gardiennage, entretien, vidange).",
+      desc: "Prenez simplement en photo les index des compteurs d'électricité (CIE) et d'eau (SODECI). L'application calcule au franc près la consommation de chacun et les charges communes (vidange, gardiennage, nettoyage).",
       details: [
-        "Saisie photographique des index de compteurs avec lecture optique",
-        "Clé de répartition paramétrable selon les tantièmes ou au forfait déclaré",
-        "Intégration directe sur l'avis d'échéance mensuel du loyer",
-        "Historique des consommations pour prévenir les fuites et gaspillages anormaux"
+        "Relevé photo des compteurs avec calcul automatique de la consommation",
+        "Partage clair et transparent entre les différents locataires de la cour ou de l'immeuble",
+        "Montant ajouté clairement sur l'avis de loyer de chaque mois",
+        "Historique des consommations pour repérer rapidement les fuites d'eau"
       ],
-      legalNote: "Supprime les contestations récurrentes sur les factures partagées entre locataires."
+      legalNote: "Supprime les disputes récurrentes sur le partage des factures CIE et SODECI."
     },
     {
       id: "m-fiscal",
-      code: "MODULE M-FISCAL",
-      title: "Déclarations DGI & Rapprochement Fiscal",
-      subtitle: "Génération automatique des bordereaux de déclaration des revenus locatifs",
+      code: "DÉCLARATION IMPÔTS",
+      title: "Bilan des Loyers pour les Impôts (DGI)",
+      subtitle: "Récapitulatif officiel de vos revenus locatifs en un seul clic",
       icon: <Receipt className="w-6 h-6 text-[#D97706]" />,
-      badge: "Fiscalité Foncière & DGI",
+      badge: "Fiscalité & DGI",
       accent: "#D97706",
-      desc: "Pour les bailleurs soumis à l'impôt sur le revenu foncier ou aux droits d'enregistrement des baux en Côte d'Ivoire, QAPRIL consolide automatiquement l'ensemble des encaissements certifiés et génère le récapitulatif fiscal officiel.",
+      desc: "Pour les bailleurs qui déclarent leurs impôts fonciers en Côte d'Ivoire, QAPRIL rassemble tous les loyers réellement encaissés dans l'année et produit le récapitulatif officiel demandé par le fisc.",
       details: [
-        "Calcul automatique des acomptes et impôts fonciers applicables selon votre régime",
-        "Génération des états récapitulatifs certifiés avec identifiant fiscal DGI",
-        "Export au format comptable pour votre expert-comptable ou centre des impôts",
-        "Sécurisation contre les pénalités pour déclaration tardive ou incomplète"
+        "Calcul automatique du total des loyers perçus sur l'année civile",
+        "Génération d'un récapitulatif officiel avec références cadastrales et montants certifiés",
+        "Téléchargement en PDF prêt à remettre à votre centre des impôts ou comptable",
+        "Protection contre les erreurs et les pénalités de retard"
       ],
-      legalNote: "Conforme aux prescriptions de la Direction Générale des Impôts de Côte d'Ivoire."
+      legalNote: "Conforme aux exigences de la Direction Générale des Impôts (DGI) de Côte d'Ivoire."
     },
     {
       id: "m-recouvrement",
-      code: "MODULE M-RECOUVREMENT",
-      title: "Procédures de Relance & Mises en Demeure OHADA",
-      subtitle: "Gestion automatisée et graduée du recouvrement des loyers impayés",
+      code: "RELANCES LOYERS",
+      title: "Rappels et Mises en Demeure Officielles",
+      subtitle: "Rappels polis par SMS/WhatsApp et courriers officiels en cas de retard",
       icon: <FileCheck2 className="w-6 h-6 text-[#7C3AED]" />,
-      badge: "Sécurité Financière",
+      badge: "Sécurité des Loyers",
       accent: "#7C3AED",
-      desc: "Dès le premier jour de retard, un calendrier légal de relance s'active. De la simple alerte bienveillante par SMS à la génération d'une mise en demeure formelle prête pour signification par huissier de justice.",
+      desc: "Dès les premiers jours du mois, des rappels automatiques et courtois par SMS et WhatsApp sont envoyés. En cas de retard important, l'application génère une mise en demeure officielle prête pour commissaire de justice.",
       details: [
-        "Relances préventives intelligentes par SMS et WhatsApp à J-3, J et J+3",
-        "Application optionnelle des pénalités de retard contractuelles autorisées",
-        "Édition automatique de la sommation de payer conforme à l'article 33 de la loi 2019-576",
-        "Dossier contentieux complet pré-constitué prêt à être transmis aux commissaires de justice partenaires"
+        "Rappels automatiques et polis par SMS et WhatsApp avant l'échéance",
+        "Suivi précis du calendrier des paiements sans avoir à relancer soi-même au téléphone",
+        "Génération automatique d'une mise en demeure conforme à la loi ivoirienne n° 2019-576",
+        "Dossier complet et propre prêt à transmettre à un commissaire de justice si besoin"
       ],
-      legalNote: "Respecte scrupuleusement les délais légaux impératifs préalables à toute action résolutoire."
+      legalNote: "Respecte scrupuleusement les délais légaux prévus par la loi ivoirienne avant toute action."
     },
     {
       id: "m-vault",
-      code: "MODULE M-VAULT",
-      title: "Coffre-Fort Numérique & Horodatage Cryptographique",
-      subtitle: "Conservation souveraine et inviolable de l'intégralité du dossier locatif",
+      code: "CLASSEUR NUMÉRIQUE",
+      title: "Classeur Numérique Sécurisé à Vie",
+      subtitle: "Tous vos contrats, reçus et pièces d'identité conservés à vie sur votre téléphone",
       icon: <Lock className="w-6 h-6 text-[#059669]" />,
-      badge: "Archivage Légal & Sécurité",
+      badge: "Sécurité & Archivage",
       accent: "#059669",
-      desc: "Tous les documents générés ou téléversés (contrats de bail signés, avenants, quittances, pièces d'identité, états des lieux, photos) sont cryptés et stockés dans un coffre-fort numérique accessible 24h/24 sans limite de durée.",
+      desc: "Tous vos baux signés, reçus de loyer, pièces d'identité, états des lieux et photos sont gardés dans un coffre numérique sécurisé. Jamais perdus, accessibles 24h/24 où que vous soyez.",
       details: [
-        "Chiffrement AES-256 de chaque document à l'état de repos et en transit",
-        "Empreinte numérique SHA-256 garantie inaltérable et vérifiable publiquement",
-        "Stockage souverain redondant assurant une disponibilité permanente de 99.98%",
-        "Accès sécurisé pour le bailleur, le locataire et les ayants droit en cas de succession"
+        "Documents protégés et scellés pour empêcher toute altération",
+        "Accès facile depuis votre smartphone à tout moment, même après plusieurs années",
+        "Sauvegarde permanente en ligne pour ne plus jamais égarer de contrat papier",
+        "Preuves reconnues et recevables devant toutes les autorités ivoiriennes"
       ],
-      legalNote: "Garantit la pérennité probante des documents pendant toute la durée légale de conservation (10 ans)."
+      legalNote: "Conserve vos preuves locatives pendant toute la durée légale requise."
     }
   ];
 
@@ -175,19 +175,19 @@ export default function ServicesPage() {
                 style={{ background: "rgba(245,158,11,0.08)" }}
               >
                 <Layers className="w-3.5 h-3.5" />
-                Suite Opérationnelle Complète · 6 Modules Experts
+                6 Outils Pratiques · Simple & Efficace
               </span>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-8 uppercase">
-                Services & Modules <br />
-                <span style={{ color: "var(--mango)" }}>de Haute Précision</span>
+                Tous les Outils <br />
+                <span style={{ color: "var(--mango)" }}>pour Gérer vos Locations</span>
               </h1>
 
               <p
                 className="text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed mb-12"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
-                Chaque module opérationnel de QAPRIL résout un point de douleur critique de la gestion locative en Côte d'Ivoire. Découvrez comment ces 6 briques technologiques s'articulent pour éliminer 100% des frictions.
+                Chaque outil de QAPRIL a été pensé pour régler les vraies difficultés des locations en Côte d'Ivoire. Découvrez comment faciliter la gestion de vos maisons et éviter les palabres au quotidien.
               </p>
 
               {/* Raccourcis rapides */}
@@ -202,7 +202,7 @@ export default function ServicesPage() {
                         : "bg-white/10 text-white/70 hover:bg-white/15 hover:text-white border border-white/10"
                     }`}
                   >
-                    <span>{m.code.split(" ")[1]}</span>
+                    <span>{m.code}</span>
                   </button>
                 ))}
               </div>

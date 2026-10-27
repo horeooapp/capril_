@@ -141,7 +141,7 @@ export default function QaprilLandingV2({
                 QAPRIL
               </span>
               <span className="block text-[9px] text-[#D97706] font-bold uppercase tracking-wider">
-                Infrastructure Locative
+                Gestion Locative Simple
               </span>
             </div>
           </Link>
@@ -181,13 +181,13 @@ export default function QaprilLandingV2({
               <>
                 <button
                   onClick={() => handleLogin("LOCATAIRE")}
-                  className="hidden sm:inline-flex text-xs font-bold text-slate-700 hover:text-slate-900 px-3 py-2 border border-slate-300 bg-white rounded hover:border-slate-400 transition-colors shrink-0 whitespace-nowrap"
+                  className="qp-btn-gold-solid px-3 sm:px-4 py-2 rounded text-[11px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  Espace Locataire
+                  Espace Locataire <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleLogin("BAILLEUR")}
-                  className="qp-btn-gold-solid px-3.5 sm:px-4 py-2 rounded text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                  className="qp-btn-gold-solid px-3 sm:px-4 py-2 rounded text-[11px] sm:text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   Accès Propriétaire <ArrowRight className="w-3.5 h-3.5" />
                 </button>
@@ -207,16 +207,16 @@ export default function QaprilLandingV2({
             <div className="lg:col-span-7">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-6">
                 <BadgeCheck className="w-4 h-4 text-[#D97706]" />
-                Conformité Légale Loi N° 2019-576 & OHADA · Côte d'Ivoire
+                Conforme à la loi sur le bail d'habitation · Côte d'Ivoire
               </div>
 
               <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
-                L'Infrastructure Intégrale de{" "}
-                <span className="text-[#D97706]">Gestion & Certification</span> Locative.
+                Gérez vos maisons et vos loyers en toute confiance,{" "}
+                <span className="text-[#D97706]">sans palabre.</span>
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed mb-8 max-w-2xl">
-                Baux numériques scellés par horodatage cryptographique, consignation réglementaire des cautions à la Caisse des Dépôts et Consignations (CDC-CI), encaissement automatisé des loyers par Mobile Money et quittances fiscales infalsifiables.
+                Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution à la Caisse des Dépôts (CDC-CI). Tout est clair, rapide et protégé.
               </p>
 
               {/* 3 Portails Métiers Directs (Cartes Claires Opaques) */}
@@ -233,7 +233,7 @@ export default function QaprilLandingV2({
                     Propriétaires
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Encaissement garanti & rapports fiscaux DGI.
+                    Suivez vos maisons & touchez vos loyers sans vous déplacer.
                   </p>
                 </button>
 
@@ -249,7 +249,7 @@ export default function QaprilLandingV2({
                     Locataires
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Paiement Wave/Orange & caution protégée.
+                    Payez par Wave/Mobile Money & recevez votre reçu immédiat.
                   </p>
                 </button>
 
@@ -262,10 +262,10 @@ export default function QaprilLandingV2({
                     <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#059669] group-hover:translate-x-1 transition-all" />
                   </div>
                   <div className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                    Agences & Mandats
+                    Agences & Démarcheurs
                   </div>
                   <p className="text-[11px] text-slate-500 mt-0.5">
-                    Multi-lots, reversements & comptabilité.
+                    Gérez plusieurs biens & faites vos comptes en toute clarté.
                   </p>
                 </Link>
               </div>
@@ -274,19 +274,19 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-200">
                 <div>
                   <div className="text-2xl font-black text-slate-900">4 800+</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Baux Scellés</div>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Baux Signés</div>
                 </div>
                 <div>
                   <div className="text-2xl font-black text-[#059669]">99.4 %</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Recouvrement</div>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Loyers à Jour</div>
                 </div>
                 <div>
                   <div className="text-2xl font-black text-[#0284C7]">2 Mois</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Plafond Caution</div>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Caution Max Légale</div>
                 </div>
                 <div>
                   <div className="text-2xl font-black text-[#D97706]">0 Litige</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Non Tracé</div>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sans Solution</div>
                 </div>
               </div>
             </div>
@@ -355,7 +355,7 @@ export default function QaprilLandingV2({
                     ))}
                   </div>
                   <span className="text-[11px] font-semibold text-slate-500">
-                    Architecture & Patrimoine Certifié
+                    Maisons, appartements & résidences en Côte d'Ivoire
                   </span>
                 </div>
               </div>
@@ -372,7 +372,7 @@ export default function QaprilLandingV2({
             <div className="shrink-0 flex items-center gap-2 border-r border-slate-200 pr-4 whitespace-nowrap z-10 bg-white">
               <span className="w-2 h-2 rounded-full bg-[#D97706] shrink-0" />
               <span className="text-[11px] font-black uppercase tracking-wider text-slate-900">
-                Interconnexions Natives aux Réseaux de Paiement & Institutions
+                Paiements Faciles & Partenaires Officiels
               </span>
             </div>
 
@@ -457,17 +457,17 @@ export default function QaprilLandingV2({
         <section id="piliers" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
           <div className="mb-14 max-w-3xl">
             <div className="inline-block px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-3">
-              Piliers Réglementaires & FinTech
+              Ce que QAPRIL fait pour vous
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Quatre technologies conçues pour structurer le marché immobilier.
+              Quatre garanties pour louer ou mettre en location l'esprit tranquille.
             </h2>
             <p className="text-base text-slate-600 mt-3 leading-relaxed">
-              QAPRIL ne se contente pas de numériser des documents : la plateforme standardise l'ensemble du cycle de vie locatif conformément à la législation ivoirienne.
+              QAPRIL simplifie les démarches pour les propriétaires et les locataires, dans le respect strict des lois de Côte d'Ivoire.
             </p>
             <div className="mt-4">
               <Link href="/piliers" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors">
-                Découvrir l'analyse approfondie des 4 piliers <ArrowRight className="w-3.5 h-3.5" />
+                Comprendre comment ça marche en détail <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -483,21 +483,21 @@ export default function QaprilLandingV2({
                   <span className="text-xs font-mono text-slate-400 font-bold">PILIER 01</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Baux Certifiés & Signature Électronique OTP
+                  Contrat de bail clair & signature facile par SMS
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Génération assistée de contrats d'habitation ou commerciaux 100 % conformes à la loi n° 2019-576. Validation d'identité par SMS OTP, horodatage certifié SHA-256 et scellement inviolable conférant une valeur probante pleine et entière devant les juridictions.
+                  Remplissez votre contrat de bail d'habitation ou de commerce en quelques minutes. Les deux parties signent simplement avec un code secret reçu par SMS, sans avoir besoin de se déplacer. Le document est officiel et valable devant la loi.
                 </p>
               </div>
               <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Clauses obligatoires et dérogatoires formalisées
+                  <Check className="w-4 h-4 text-[#059669]" /> Contrat 100 % conforme à la loi ivoirienne (Loi 2019-576)
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Signature à distance sécurisée sans déplacement physique
+                  <Check className="w-4 h-4 text-[#059669]" /> Signature facile par SMS sur votre téléphone sans vous déplacer
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Archivage pérenne certifié dans le coffre-fort numérique
+                  <Check className="w-4 h-4 text-[#059669]" /> Votre contrat est conservé en lieu sûr et disponible à tout moment
                 </li>
               </ul>
             </div>
@@ -512,21 +512,21 @@ export default function QaprilLandingV2({
                   <span className="text-xs font-mono text-slate-400 font-bold">PILIER 02</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Paiement Mobile Money & Quittances Inviolables
+                  Paiement Wave & Mobile Money avec reçu officiel
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Collecte multi-opérateurs (Wave, Orange, MTN, Moov, Carte). Dès validation de la transaction, émission immédiate d'une quittance de loyer au format PDF sécurisé, pourvue d'un QR code vérifiable en ligne. Élimination totale des reçus manuels contestables.
+                  Payez le loyer en quelques secondes avec Wave, Orange Money, MTN ou Moov. Dès réception du paiement, le locataire reçoit aussitôt son reçu officiel avec code QR, et le propriétaire est immédiatement notifié. Fini les querelles et les reçus papier perdus.
                 </p>
               </div>
               <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Quittances opposables auprès des administrations et banques
+                  <Check className="w-4 h-4 text-[#059669]" /> Reçu de loyer officiel avec QR Code reconnu par les banques et services
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Rapprochement bancaire et comptable sans intervention manuelle
+                  <Check className="w-4 h-4 text-[#059669]" /> L'argent arrive directement sur le compte ou le numéro du propriétaire
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Traçabilité bancaire garantissant l'absence de contestation
+                  <Check className="w-4 h-4 text-[#059669]" /> Historique propre et sans contestation de chaque mois payé
                 </li>
               </ul>
             </div>
@@ -541,21 +541,21 @@ export default function QaprilLandingV2({
                   <span className="text-xs font-mono text-slate-400 font-bold">PILIER 03</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Consignation Réglementaire des Cautions (CDC-CI)
+                  Caution de 2 mois protégée à la Caisse des Dépôts (CDC-CI)
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Application stricte du plafonnement légal à 2 mois de loyer pour le dépôt de garantie. Les sommes sont séquestrées de manière sécurisée sous protocole institutionnel, et ne sont débloquées qu'à la sortie des lieux après confrontation de l'état des lieux d'entrée et de sortie.
+                  Respect strict de la loi ivoirienne : 2 mois de caution au maximum. L'argent est gardé en toute sécurité auprès de la Caisse des Dépôts et Consignations (CDC-CI). À la fin du contrat, la caution est reversée au locataire sans tracasserie si la maison est bien entretenue.
                 </p>
               </div>
               <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Séquestre officiel garantissant la disponibilité des fonds
+                  <Check className="w-4 h-4 text-[#059669]" /> Plafonnement respecté : 2 mois de loyer au maximum
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Restitution rapide et automatisée sans rétention abusive
+                  <Check className="w-4 h-4 text-[#059669]" /> Caution gardée en sécurité par l'institution publique (CDC-CI)
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Procédure de médiation intégrée en cas de retenue contestée
+                  <Check className="w-4 h-4 text-[#059669]" /> Remboursement rapide à la sortie des lieux sans rétention injustifiée
                 </li>
               </ul>
             </div>
@@ -570,21 +570,21 @@ export default function QaprilLandingV2({
                   <span className="text-xs font-mono text-slate-400 font-bold">PILIER 04</span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Score ICL (Indice de Confiance Locative)
+                  Carnet de confiance & profil locataire sérieux
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Algorithme prédictif évaluant la régularité et le civisme locatif sur la base des historiques certifiés. Permet aux bailleurs de sélectionner des profils fiables et aux locataires sérieux de valoriser un passeport numérique probant pour accéder rapidement aux meilleurs logements.
+                  Chaque loyer payé à bonne date améliore la réputation du locataire. Ce carnet de confiance permet aux locataires sérieux de trouver facilement une nouvelle maison, et aux propriétaires de choisir des locataires fiables sans stress.
                 </p>
               </div>
               <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Classification transparente de Grade A+ à Grade C
+                  <Check className="w-4 h-4 text-[#059669]" /> Niveau de confiance clair (du Grade A+ au Grade C)
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Réduction de 85 % des risques d'impayés dès la sélection
+                  <Check className="w-4 h-4 text-[#059669]" /> Moins de risques d'impayés pour les propriétaires
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Passeport portable d'un logement à un autre
+                  <Check className="w-4 h-4 text-[#059669]" /> Attestation facile à présenter pour trouver un nouveau logement
                 </li>
               </ul>
             </div>
@@ -597,14 +597,14 @@ export default function QaprilLandingV2({
         <section id="solutions" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
           <div className="mb-10 max-w-3xl">
             <div className="inline-block px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-3">
-              Solutions Métiers
+              Des solutions adaptées à chacun
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Une infrastructure unifiée pour chaque rôle du secteur.
+              Que vous soyez propriétaire, locataire ou gestionnaire, QAPRIL vous facilite la vie.
             </h2>
             <div className="mt-3">
               <Link href="/solutions" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors">
-                Explorer les solutions complètes par métier <ArrowRight className="w-3.5 h-3.5" />
+                Explorer les fonctionnalités par métier <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -639,7 +639,7 @@ export default function QaprilLandingV2({
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Agences
+              Agences & Démarcheurs
             </button>
             <button
               onClick={() => setActiveTab("institutionnels")}
@@ -649,7 +649,7 @@ export default function QaprilLandingV2({
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Institutionnels
+              Professionnels & Notaires
             </button>
           </div>
 
@@ -659,31 +659,31 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#D97706] mb-2 block">
-                    Pour Bailleurs Particuliers & Investisseurs
+                    Pour propriétaires de maisons, cours communes, villas et appartements
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-4">
-                    Sérénité absolue et encaissement sans friction de vos loyers.
+                    Touchez vos loyers à temps et sans prise de tête.
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    Centralisez l'ensemble de vos actifs immobiliers — studios, villas ou immeubles entiers — sur un tableau de bord clair. Ne courez plus après vos loyers chaque fin de mois.
+                    Que vous ayez un studio, une cour commune, une villa ou un immeuble entier, suivez tout sur votre téléphone. Ne passez plus vos fins de mois à réclamer votre argent.
                   </p>
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Reversement automatique :</strong> Loyers versés directement sur votre compte bancaire ou mobile wallet dès réception.
+                        <strong className="text-slate-900">Versement automatique :</strong> Loyers reçus directement sur votre compte Wave, Mobile Money ou compte bancaire dès que le locataire paie.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Alertes prédictives d'impayés :</strong> Relances automatiques par SMS et WhatsApp sans détériorer la relation humaine.
+                        <strong className="text-slate-900">Rappels automatiques par SMS & WhatsApp :</strong> QAPRIL rappelle poliment l'échéance au locataire sans gâter vos relations humaines.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Rapport fiscal DGI en 1 clic :</strong> Édition des états annuels certifiés pour votre déclaration foncière.
+                        <strong className="text-slate-900">Bilan clair pour vos impôts :</strong> Obtenez en un clic la liste certifiée de tous vos loyers pour votre déclaration foncière.
                       </div>
                     </div>
                   </div>
@@ -700,20 +700,20 @@ export default function QaprilLandingV2({
                   </div>
                   <div className="space-y-2.5 font-mono text-xs">
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Patrimoine actif</span>
-                      <span className="text-slate-900 font-bold">14 Biens · Abidjan (Cocody/Marcory)</span>
+                      <span className="text-slate-500">Patrimoine suivi</span>
+                      <span className="text-slate-900 font-bold">14 Biens · Abidjan (Cocody / Marcory)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Loyers encaissés (Mois en cours)</span>
-                      <span className="text-[#059669] font-bold">4 250 000 FCFA (100%)</span>
+                      <span className="text-slate-500">Loyers encaissés ce mois</span>
+                      <span className="text-[#059669] font-bold">4 250 000 FCFA (100% à jour)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Cautions séquestrées (CDC-CI)</span>
-                      <span className="text-[#0284C7] font-bold">8 500 000 FCFA</span>
+                      <span className="text-slate-500">Cautions gardées en sécurité</span>
+                      <span className="text-[#0284C7] font-bold">8 500 000 FCFA (CDC-CI)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Dernier rapport fiscal</span>
-                      <span className="text-slate-900 font-bold">Généré le 15/01/2026 ✓</span>
+                      <span className="text-slate-500">Dernier reçu délivré</span>
+                      <span className="text-slate-900 font-bold">Reçu N° 2026-042 envoyé ✓</span>
                     </div>
                   </div>
                 </div>
@@ -724,31 +724,31 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#0284C7] mb-2 block">
-                    Pour les Locataires Résidentiels & Professionnels
+                    Pour tous ceux qui louent une maison ou un magasin
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-4">
-                    Votre logement sécurisé, vos droits protégés et vos quittances instantanées.
+                    Votre logement en règle, vos reçus immédiats et votre caution protégée.
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    Fini les déplacements à l'agence ou les reçus manuscrits égarés. Payez depuis votre mobile avec Wave ou Orange Money, accédez à votre bail à tout moment et valorisez votre réputation locative.
+                    Fini les déplacements à l'agence ou les reçus papier perdus. Payez depuis votre téléphone avec Wave ou Orange Money, retrouvez votre contrat de bail à tout moment et prouvez votre sérieux.
                   </p>
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Zéro litige de paiement :</strong> Quittance PDF horodatée avec QR Code transmise dès réception du loyer.
+                        <strong className="text-slate-900">Zéro contestation :</strong> Un vrai reçu officiel avec code QR arrive sur votre téléphone dès que vous payez.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Caution préservée :</strong> Votre dépôt de 2 mois est consigné à la CDC-CI, protégé de toute retenue arbitraire.
+                        <strong className="text-slate-900">Caution de 2 mois protégée :</strong> Votre caution est mise en sécurité à la Caisse des Dépôts (CDC-CI), pas de surprise à la sortie.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Charges CIE & SODECI :</strong> Suivez vos décomptes divisionnaires d'eau et d'électricité en toute transparence.
+                        <strong className="text-slate-900">Factures CIE & SODECI claires :</strong> Suivez vos compteurs d'eau et d'électricité en toute transparence sans surfacturation.
                       </div>
                     </div>
                   </div>
@@ -765,20 +765,20 @@ export default function QaprilLandingV2({
                   </div>
                   <div className="space-y-2.5 font-mono text-xs">
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Score ICL personnel</span>
-                      <span className="text-[#059669] font-bold">Grade A+ (870/900)</span>
+                      <span className="text-slate-500">Niveau de confiance</span>
+                      <span className="text-[#059669] font-bold">Très bon payeur (Grade A+)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Prochaine échéance</span>
                       <span className="text-slate-900 font-bold">05 Novembre · 180 000 FCFA</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Dépôt de garantie protégé</span>
-                      <span className="text-[#D97706] font-bold">360 000 FCFA sous séquestre</span>
+                      <span className="text-slate-500">Caution protégée</span>
+                      <span className="text-[#D97706] font-bold">360 000 FCFA à la CDC-CI</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Téléchargement Quittances</span>
-                      <span className="text-slate-700 font-bold">24 Quittances Disponibles</span>
+                      <span className="text-slate-500">Mes reçus de loyer</span>
+                      <span className="text-slate-700 font-bold">24 Reçus Disponibles</span>
                     </div>
                   </div>
                 </div>
@@ -789,31 +789,31 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#059669] mb-2 block">
-                    Pour Agences Immobilières & Administrateurs de Biens
+                    Pour Agences Immobilières, Démarcheurs Agréés & Administrateurs de Biens
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-4">
-                    L'outil d'échelle industrielle pour gérer vos mandats et clients.
+                    Gérez vos mandats et vos propriétaires avec clarté et professionnalisme.
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    Gérez des centaines de lots locatifs avec une rigueur comptable absolue. Découpez vos mandats, automatisez les reversements aux propriétaires après déduction de vos commissions et offrez un service irréprochable.
+                    Suivez des dizaines ou des centaines de logements sans confusion. Prélevez vos honoraires automatiquement et reversez la part de chaque propriétaire en toute transparence.
                   </p>
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Multi-mandats & Reversements :</strong> Calcul automatique des commissions d'agence et virement automatique aux mandants.
+                        <strong className="text-slate-900">Gestion multi-biens & Reversements :</strong> Calcul automatique de vos commissions et reversement facile aux propriétaires.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Permissions collaborateurs :</strong> Rôles dédiés pour agents négociateurs, comptables et directeurs d'agence.
+                        <strong className="text-slate-900">Accès pour votre équipe :</strong> Comptes séparés pour vos agents de terrain, vos comptables et la direction.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Signature de baux en masse :</strong> Formalisation accélérée des entrées et sorties pour vos parcs résidentiels.
+                        <strong className="text-slate-900">Signature rapide des baux :</strong> Entrées et sorties simplifiées pour occuper rapidement tous vos logements disponibles.
                       </div>
                     </div>
                   </div>
@@ -830,20 +830,20 @@ export default function QaprilLandingV2({
                   </div>
                   <div className="space-y-2.5 font-mono text-xs">
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Lots sous mandat</span>
-                      <span className="text-slate-900 font-bold">142 Logements sous gestion</span>
+                      <span className="text-slate-500">Lots sous gestion</span>
+                      <span className="text-slate-900 font-bold">142 Logements sous mandat</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Taux d'occupation du parc</span>
-                      <span className="text-[#059669] font-bold">96.8 %</span>
+                      <span className="text-slate-500">Taux d'occupation</span>
+                      <span className="text-[#059669] font-bold">96.8 % de maisons louées</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Honoraires collectés</span>
-                      <span className="text-[#D97706] font-bold">Automatisés à J+1</span>
+                      <span className="text-slate-500">Commissions d'agence</span>
+                      <span className="text-[#D97706] font-bold">Automatisées à J+1</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Exports comptables</span>
-                      <span className="text-slate-700 font-bold">Format Sage / Excel ✓</span>
+                      <span className="text-slate-700 font-bold">Format Excel / Sage ✓</span>
                     </div>
                   </div>
                 </div>
@@ -854,31 +854,31 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-widest text-[#D97706] mb-2 block">
-                    Pour Notaires, Promoteurs & Pouvoirs Publics
+                    Pour Notaires, Promoteurs & Professionnels de l'Immobilier
                   </span>
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mb-4">
-                    Auditabilité totale, régulation et assainissement du secteur foncier.
+                    Sécurité juridique, traçabilité et assainissement des locations.
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                    QAPRIL fournit les outils d'audit, de séquestre institutionnel et de traçabilité nécessaires aux grands acteurs de l'immobilier et de la régulation étatique en Côte d'Ivoire.
+                    QAPRIL apporte toute la transparence nécessaire pour sécuriser les investissements locatifs, vérifier les identités et respecter les normes officielles de Côte d'Ivoire.
                   </p>
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Conformité anti-blanchiment (KYC/AML) :</strong> Traçabilité complète des flux financiers des baux de standing.
+                        <strong className="text-slate-900">Contrats certifiés conformes :</strong> Respect rigoureux des règles ivoiriennes et de l'OHADA.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Observatoire des prix au m² :</strong> Données fiables et agrégées pour l'évaluation immobilière.
+                        <strong className="text-slate-900">Prix des loyers par quartier :</strong> Données réelles pour connaître les montants pratiqués sur le marché.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Régulation des dépôts de garantie :</strong> Protocole d'interconnexion certifié avec les caisses de consignation.
+                        <strong className="text-slate-900">Cautions sécurisées CDC-CI :</strong> Interconnexion officielle avec la Caisse des Dépôts et Consignations.
                       </div>
                     </div>
                   </div>
@@ -886,29 +886,29 @@ export default function QaprilLandingV2({
                     href="/contact"
                     className="qp-btn-outline-light px-5 py-2.5 rounded text-xs uppercase tracking-wider inline-flex items-center gap-2"
                   >
-                    Demander une présentation institutionnelle <ArrowRight className="w-4 h-4" />
+                    Demander une présentation <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <div className="text-xs font-mono text-[#D97706] mb-4 uppercase tracking-wider font-bold">
-                    [Protocole Institutionnel & Sécurité]
+                    [Protocole Professionnel & Sécurité]
                   </div>
                   <div className="space-y-2.5 font-mono text-xs">
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Standard Cryptographique</span>
-                      <span className="text-slate-900 font-bold">AES-256-GCM / SHA-256</span>
+                      <span className="text-slate-500">Protection des documents</span>
+                      <span className="text-slate-900 font-bold">Cryptage de niveau bancaire</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Audit Trail & Logs</span>
-                      <span className="text-[#059669] font-bold">Inviolables & Non répudiables</span>
+                      <span className="text-slate-500">Signatures et reçus</span>
+                      <span className="text-[#059669] font-bold">Infalsifiables & Inviolables</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Régulation des flux</span>
-                      <span className="text-[#0284C7] font-bold">Conforme Banque Centrale (BCEAO)</span>
+                      <span className="text-slate-500">Paiements & Opérations</span>
+                      <span className="text-[#0284C7] font-bold">Conforme aux normes bancaires</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Souveraineté des données</span>
-                      <span className="text-slate-900 font-bold">Hébergement Sécurisé Souverain</span>
+                      <span className="text-slate-500">Protection des données</span>
+                      <span className="text-slate-900 font-bold">Données hébergées en sécurité</span>
                     </div>
                   </div>
                 </div>
@@ -923,17 +923,17 @@ export default function QaprilLandingV2({
         <section id="modules" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
           <div className="mb-14 max-w-3xl">
             <div className="inline-block px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-3">
-              Services Intégrés
+              Outils Pratiques
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Six modules opérationnels pour une gestion sans angle mort.
+              Six outils indispensables pour tout gérer facilement.
             </h2>
             <p className="text-base text-slate-600 mt-3 leading-relaxed">
-              Chaque fonctionnalité répond à un besoin concret identifié sur le terrain en Côte d'Ivoire.
+              Chaque fonctionnalité a été conçue pour résoudre les vrais soucis quotidiens des propriétaires et locataires en Côte d'Ivoire.
             </p>
             <div className="mt-4">
               <Link href="/services" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors">
-                Voir le détail des 6 modules et le cycle locatif <ArrowRight className="w-3.5 h-3.5" />
+                Découvrir toutes les fonctionnalités en détail <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -946,14 +946,14 @@ export default function QaprilLandingV2({
                   <Wrench className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  États des Lieux (EDL) Numériques
+                  État des lieux sur téléphone avec photos
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Comparateur photographique haute définition entre l'entrée et la sortie des lieux. Constat contradictoire certifié horodaté évitant les contestations sur l'usure locative.
+                  Prenez des photos de chaque pièce à l'entrée et à la sortie. Tout le monde est d'accord sur l'état de la maison, ce qui évite les palabres au moment de rendre la caution.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Module M-EDL · Conforme loi 2019
+                Protection de la caution · Photos datées
               </div>
             </div>
 
@@ -964,14 +964,14 @@ export default function QaprilLandingV2({
                   <Scale className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  Centre de Médiation Locative
+                  Entente & règlement à l'amiable
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Dispositif de conciliation amiable intégré pour désamorcer les conflits d'impayés ou de réparations locatives avant toute saisine judiciaire longue et coûteuse.
+                  En cas de retard de paiement ou de réparation à faire, un échange simple et encadré permet de trouver une solution rapide sans passer par de longues démarches au tribunal.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Module M10-M11 · Règlement amiable
+                Résolution sans palabre
               </div>
             </div>
 
@@ -982,14 +982,14 @@ export default function QaprilLandingV2({
                   <Droplets className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  Gestion des Charges CIE & SODECI
+                  Suivi des factures CIE & SODECI
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Suivi des compteurs divisionnaires ou collectifs, répartition transparente des consommations d'eau et d'électricité entre locataires et régularisation des charges.
+                  Suivi clair des compteurs d'eau et d'électricité (compteurs partagés ou individuels) pour savoir exactement ce que chacun consomme sans surfacturation.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Module Services Publics
+                Compteurs d'eau et d'électricité
               </div>
             </div>
 
@@ -1000,14 +1000,14 @@ export default function QaprilLandingV2({
                   <FolderArchive className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  Coffre-Fort & Documents Sécurisés
+                  Classeur numérique sécurisé
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Conservation cryptée des titres de propriété (ACD, CMP), CNI/Passeports vérifiés, pièces justificatives de revenus et baux signés sous clé de chiffrement dédiée.
+                  Gardez vos pièces d'identité, attestations de propriété (ACD, CMP) et contrats de bail bien rangés et protégés sur votre compte, accessibles à tout moment.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Chiffrement AES-256
+                Documents protégés & confidentiels
               </div>
             </div>
 
@@ -1018,14 +1018,14 @@ export default function QaprilLandingV2({
                   <BarChart4 className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  Observatoire des Loyers d'Abidjan
+                  Vrais prix des loyers par quartier
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Baromètre en temps réel des prix moyens au mètre carré pratiqués par commune (Cocody, Marcory, Plateau, Riviera, Yopougon, Bingerville) pour fixer le juste loyer.
+                  Consultez les prix moyens pratiqués quartier par quartier à Abidjan et à l'intérieur (Cocody, Yopougon, Marcory, Plateau, Riviera, etc.) pour fixer le juste loyer.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Indicateurs Marché
+                Repères du marché ivoirien
               </div>
             </div>
 
@@ -1036,14 +1036,14 @@ export default function QaprilLandingV2({
                   <Smartphone className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-black text-slate-900 mb-2">
-                  Alertes SMS & Notifications WhatsApp
+                  Rappels par SMS & WhatsApp
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Canal de communication direct avec vos locataires pour les rappels d'échéance, la confirmation de réception de paiement et les alertes d'interventions techniques.
+                  Recevez vos rappels de loyer, confirmations de paiement et messages importants directement sur votre WhatsApp ou par SMS classique sans connexion requise.
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Réseaux Mobiles CI
+                Orange, MTN, Moov, Wave
               </div>
             </div>
           </div>
@@ -1055,14 +1055,14 @@ export default function QaprilLandingV2({
         <section id="comparatif" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
           <div className="mb-14 max-w-3xl">
             <div className="inline-block px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-3">
-              Comparatif Analytique
+              Comparatif Clair
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Pourquoi le marché ivoirien migre vers l'infrastructure QAPRIL.
+              Pourquoi choisir QAPRIL pour votre logement ?
             </h2>
             <div className="mt-3">
               <Link href="/comparatif" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors">
-                Ouvrir le comparatif complet & le simulateur de rentabilité <ArrowRight className="w-3.5 h-3.5" />
+                Voir la comparaison détaillée et les avantages <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -1072,86 +1072,86 @@ export default function QaprilLandingV2({
               <thead>
                 <tr className="bg-slate-100 border-b border-slate-200">
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-slate-600 w-1/3">
-                    Critères de Gestion Locative
+                    Ce qu'il faut gérer
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-red-600 w-1/3">
-                    Gestion Traditionnelle & Manuelle
+                    À l'ancienne (papier et bouche-à-oreille)
                   </th>
                   <th className="p-4 sm:p-5 text-xs font-bold uppercase tracking-wider text-[#B45309] w-1/3">
-                    Infrastructure QAPRIL
+                    Avec QAPRIL (simple, rapide et officiel)
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Formalisation du Contrat de Bail
+                    Contrat de bail
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Papier manuscrit, 2 à 3 semaines, déplacements physiques, risque élevé de clauses nulles.
+                    Contrat sur papier écrit à la main, voyages répétés, risque d'erreurs et de clauses non valables.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">15 minutes en ligne :</span> Signature OTP certifiée, 100 % conforme à la loi 2019-576.
+                    <span className="text-[#059669] font-bold">15 minutes sur téléphone :</span> Rempli facilement, signé par code secret SMS, conforme à la loi ivoirienne.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Mode de Paiement des Loyers
+                    Paiement du loyer
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Espèces sans traçabilité, chèques avec risque d'impayé, déplacements à domicile.
+                    Paiement en espèces de la main à la main, risque de vol ou de contestation, perte de temps.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Wave, Orange, MTN, Moov & CB :</span> Débit instantané sans déplacement, traçabilité bancaire complète.
+                    <span className="text-[#059669] font-bold">Wave, Orange, MTN ou Moov :</span> Payez en 1 clic sans vous déplacer, avec preuve instantanée pour chacun.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Délivrance des Quittances
+                    Reçu de loyer (quittance)
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Carnets papier achetés en papeterie, pertes fréquentes, contestations de date.
+                    Reçu sur petit carnet papier qui se déchire ou se perd, dates souvent contestées.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">PDF certifié instantané :</span> Horodatage cryptographique et QR Code vérifiable par la DGI.
+                    <span className="text-[#059669] font-bold">Reçu officiel avec code QR :</span> Immédiat sur votre téléphone, valable pour les banques, visas et démarches administratives.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Dépôt de Garantie (Caution)
+                    Caution (dépôt de garantie)
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Dépassant souvent le plafond légal (3 à 6 mois exigés), fonds souvent non restitués.
+                    On exige souvent 3 à 6 mois de caution, et il est très difficile de récupérer son argent à la sortie.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Consignation CDC-CI :</span> Respect strict du plafond de 2 mois, fonds séquestrés et restitués sans litige.
+                    <span className="text-[#059669] font-bold">2 mois de caution maximum :</span> Respect strict de la loi, argent protégé à la Caisse des Dépôts (CDC-CI) et rendu sans palabre.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Sélection des Candidats Locataires
+                    Choix du locataire
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Jugement subjectif ou bulletins de paie falsifiables, taux d'impayés élevé.
+                    Au hasard ou sur simple promesse, risque élevé d'impayés après quelques mois.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Score ICL certifié :</span> Évaluation objective de l'historique réel de paiement, impayés réduits de 85 %.
+                    <span className="text-[#059669] font-bold">Profil sérieux vérifié :</span> Historique de ponctualité des loyers pour louer en toute confiance.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-slate-50 transition-colors">
                   <td className="p-4 sm:p-5 font-bold text-slate-900">
-                    Gestion des Litiges
+                    En cas de litige ou désaccord
                   </td>
                   <td className="p-4 sm:p-5 text-slate-600">
-                    Blocage verbal, expulsions sauvages illégales ou procédures judiciaires de 18 mois.
+                    Disputes verbales, menaces de fermeture de maison ou longues attentes au tribunal.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Centre de médiation intégré :</span> Dossier contradictoire opposable pour résolution sous 14 jours.
+                    <span className="text-[#059669] font-bold">Entente à l'amiable encadrée :</span> Tous les reçus et le contrat sont sous la main pour régler la situation rapidement.
                   </td>
                 </tr>
               </tbody>
@@ -1166,10 +1166,10 @@ export default function QaprilLandingV2({
           <div className="qp-card-light p-8 sm:p-12 rounded-xl bg-white border border-slate-200">
             <div className="max-w-3xl mb-10">
               <div className="inline-block px-3 py-1 rounded bg-emerald-50 border border-emerald-200 text-[#059669] text-xs font-bold uppercase tracking-wider mb-3">
-                Normes Techniques & Souveraineté
+                Sécurité & Tranquillité
               </div>
               <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                Une architecture conçue pour la protection absolue des données foncières.
+                Vos données et vos documents sont protégés comme à la banque.
               </h2>
             </div>
 
@@ -1178,9 +1178,9 @@ export default function QaprilLandingV2({
                 <div className="w-9 h-9 rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706] mb-3">
                   <Lock className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Chiffrement Bancaire</h4>
+                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Protection Maximale</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Toutes les données sensibles, identités et relevés de paiement sont chiffrés au repos via le standard AES-256 et transportés sous protocole TLS 1.3 hautement sécurisé.
+                  Toutes vos informations personnelles et vos relevés de paiement sont verrouillés et protégés avec les normes de sécurité les plus strictes.
                 </p>
               </div>
 
@@ -1188,9 +1188,9 @@ export default function QaprilLandingV2({
                 <div className="w-9 h-9 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#059669] mb-3">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Conformité ARTCI & RGPD</h4>
+                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Respect de Votre Vie Privée</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Strict respect de la loi ivoirienne n° 2013-450 sur la protection des données personnelles. Vos actifs et informations financières ne font l'objet d'aucune revente commerciale.
+                  Strict respect de la loi ivoirienne (ARTCI). Vos informations personnelles, contrats et finances restent totalement confidentiels et ne sont jamais vendus.
                 </p>
               </div>
 
@@ -1198,9 +1198,9 @@ export default function QaprilLandingV2({
                 <div className="w-9 h-9 rounded-md bg-sky-50 border border-sky-200 flex items-center justify-center text-[#0284C7] mb-3">
                   <Zap className="w-5 h-5" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Disponibilité Continue</h4>
+                <h4 className="text-sm font-bold text-slate-900 mb-1.5">Disponible 24h/24</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Architecture conteneurisée déployée sur infrastructure redondée avec sauvegardes quotidiennes chiffrées, garantissant une disponibilité permanente de vos quittances et contrats.
+                  Vos contrats de bail, quittances et reçus de loyer restent accessibles à tout moment sur votre téléphone, de jour comme de nuit.
                 </p>
               </div>
             </div>
@@ -1223,24 +1223,24 @@ export default function QaprilLandingV2({
           <div className="space-y-3">
             {[
               {
-                q: "Un bail signé électroniquement sur QAPRIL a-t-il une valeur juridique devant les tribunaux ivoiriens ?",
-                a: "Oui, parfaitement. En vertu de la loi ivoirienne sur les transactions électroniques et des dispositions du Code Civil, la signature par validation OTP horodatée confère au bail numérique une pleine valeur probante, identique à celle d'un acte sous seing privé manuscrit.",
+                q: "Est-ce que le contrat signé sur QAPRIL est reconnu par la justice ivoirienne ?",
+                a: "Oui, tout à fait. La signature par code secret envoyé par SMS est reconnue par la loi ivoirienne sur les transactions électroniques. Le contrat a exactement la même valeur juridique qu'un contrat signé sur papier chez un notaire ou en agence.",
               },
               {
-                q: "Comment fonctionne la consignation des deux mois de caution ?",
-                a: "Conformément à la réglementation encadrant les baux d'habitation en Côte d'Ivoire, le locataire verse son dépôt de garantie (plafonné à 2 mois). Ces fonds sont enregistrés sous protocole de séquestre officiel auprès de la Caisse des Dépôts et Consignations (CDC-CI). À la fin du bail, après validation de l'état des lieux de sortie contradictoire, la somme est restituée sans délai injustifié.",
+                q: "Comment sont protégés les 2 mois de caution ?",
+                a: "La loi ivoirienne interdit d'exiger plus de 2 mois de caution. Sur QAPRIL, cette somme est mise en sécurité auprès de la Caisse des Dépôts et Consignations de Côte d'Ivoire (CDC-CI). À la fin du bail, après vérification de l'état des lieux de sortie, l'argent est restitué au locataire sans difficulté.",
               },
               {
-                q: "Quels sont les frais d'utilisation pour les propriétaires et les locataires ?",
-                a: "L'inscription et la gestion de base sont entièrement gratuites. Les locataires ne paient aucun frais caché sur le règlement de leur loyer par Mobile Money. Les propriétaires et agences bénéficient de formules transparentes selon le volume de lots administrés, sans commission abusive.",
+                q: "Combien ça coûte pour les propriétaires et les locataires ?",
+                a: "L'inscription et l'utilisation de base sont gratuites. Les locataires ne paient aucun frais caché sur le règlement de leur loyer par Wave ou Mobile Money. Les propriétaires et gestionnaires bénéficient de formules simples et transparentes sans surprise.",
               },
               {
-                q: "Que se passe-t-il si un locataire refuse de payer ou accumule des retards ?",
-                a: "La plateforme active automatiquement des rappels graduels par SMS et WhatsApp. Si le retard persiste, le centre de médiation locative intégré propose un plan d'apurement contradictoire. En cas d'échec, le bailleur dispose d'un dossier complet horodaté (bail certifié, quittances, historique) opposable immédiatement devant le juge des référés.",
+                q: "Que faire si un locataire a du retard pour payer son loyer ?",
+                a: "QAPRIL lui envoie d'abord des rappels automatiques et courtois par SMS et WhatsApp. Si le retard continue, notre service d'entente à l'amiable aide les deux parties à trouver un calendrier pour régulariser le paiement sans se disputer. En cas de besoin, le propriétaire dispose d'un dossier complet avec tous les reçus pour faire valoir ses droits.",
               },
               {
-                q: "Une agence immobilière peut-elle connecter son propre logiciel ou ses comptes bancaires ?",
-                a: "Oui. QAPRIL propose une suite dédiée aux agences avec gestion des mandats de gérance, reversements automatisés, exports comptables compatibles avec les logiciels du marché (Sage, Excel) et des accès multi-agents avec gestion des permissions.",
+                q: "Est-ce qu'une agence ou un démarcheur peut utiliser QAPRIL ?",
+                a: "Oui, bien sûr. QAPRIL dispose d'un espace dédié aux agences immobilières et aux démarcheurs pour gérer facilement plusieurs maisons, calculer leurs commissions automatiquement et envoyer des bilans clairs aux propriétaires.",
               },
             ].map((faq, index) => (
               <div
@@ -1274,15 +1274,15 @@ export default function QaprilLandingV2({
         <section className="py-20 px-4 sm:px-6 max-w-7xl mx-auto">
           <div className="qp-card-light p-8 sm:p-14 rounded-2xl bg-white border border-slate-300 text-center max-w-4xl mx-auto shadow-sm">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-5">
-              Modernisez Votre Gestion Locative
+              Rejoignez QAPRIL dès aujourd'hui
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mb-4 leading-tight">
-              Rejoignez l'infrastructure nationale qui certifie l'immobilier ivoirien.
+              Louez et gérez vos maisons en toute confiance partout en Côte d'Ivoire.
             </h2>
 
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto mb-8">
-              Démarrez gratuitement dès aujourd'hui. Sécurisez vos baux, automatisez vos encaissements et profitez d'une conformité légale totale.
+              Démarrez gratuitement aujourd'hui. Rédigez vos baux, recevez vos loyers à temps et conservez vos reçus officiels sans vous déplacer.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -1299,20 +1299,20 @@ export default function QaprilLandingV2({
                     onClick={() => handleLogin("BAILLEUR")}
                     className="qp-btn-gold-solid px-7 py-3 rounded text-xs uppercase tracking-wider font-black flex items-center gap-2 w-full sm:w-auto justify-center"
                   >
-                    Créer mon compte Propriétaire <ArrowRight className="w-4 h-4" />
+                    Accès Propriétaire <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleLogin("LOCATAIRE")}
-                    className="qp-btn-outline-light px-7 py-3 rounded text-xs uppercase tracking-wider font-black flex items-center gap-2 w-full sm:w-auto justify-center"
+                    className="qp-btn-gold-solid px-7 py-3 rounded text-xs uppercase tracking-wider font-black flex items-center gap-2 w-full sm:w-auto justify-center"
                   >
-                    Accès Locataire
+                    Espace Locataire <ArrowRight className="w-4 h-4" />
                   </button>
                 </>
               )}
             </div>
 
             <p className="text-xs text-slate-400 mt-5">
-              Inscription sans engagement · Zéro carte requise · Conforme au Code Civil ivoirien
+              Inscription simple et rapide · Sans engagement · Conforme aux lois ivoiriennes
             </p>
           </div>
         </section>
@@ -1332,7 +1332,7 @@ export default function QaprilLandingV2({
                 </span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
-                QAPRIL est la plateforme nationale de normalisation, certification et gestion des baux et quittances de loyer en Côte d'Ivoire. Développée pour apporter transparence, sécurité et efficacité au marché immobilier.
+                QAPRIL est la solution ivoirienne qui rend la location de maison simple, claire et sécurisée. Pour que propriétaires et locataires s'entendent sans palabre, dans le respect de la loi.
               </p>
               <div className="text-xs text-slate-500">
                 Abidjan, Côte d'Ivoire · Assistance : support@qapril.net
@@ -1341,32 +1341,32 @@ export default function QaprilLandingV2({
 
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-[#B45309] mb-3">
-                Services & Modules
+                Nos Services
               </div>
               <ul className="space-y-2 text-xs text-slate-600">
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    Baux Certifiés OTP
+                    Contrats de bail par SMS
                   </Link>
                 </li>
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    Paiements Mobile Money
+                    Paiements Wave & Mobile Money
                   </Link>
                 </li>
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    Consignation Cautions (CDC)
+                    Cautions sécurisées (CDC-CI)
                   </Link>
                 </li>
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    Score ICL Locataire
+                    Carnet de confiance locataire
                   </Link>
                 </li>
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    États des Lieux (EDL)
+                    États des lieux photo
                   </Link>
                 </li>
               </ul>
@@ -1374,7 +1374,7 @@ export default function QaprilLandingV2({
 
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-[#B45309] mb-3">
-                Portails Métiers
+                Espaces Dédiés
               </div>
               <ul className="space-y-2 text-xs text-slate-600">
                 <li>
@@ -1389,7 +1389,7 @@ export default function QaprilLandingV2({
                 </li>
                 <li>
                   <Link href="/dashboard/mandates" className="hover:text-slate-900 transition-colors">
-                    Gestion des Mandats Agences
+                    Agences & Démarcheurs
                   </Link>
                 </li>
                 <li>
@@ -1399,7 +1399,7 @@ export default function QaprilLandingV2({
                 </li>
                 <li>
                   <Link href="/tarifs" className="hover:text-slate-900 transition-colors">
-                    Grille Tarifaire
+                    Tarifs & Formules
                   </Link>
                 </li>
               </ul>
@@ -1407,7 +1407,7 @@ export default function QaprilLandingV2({
 
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-[#B45309] mb-3">
-                Cadre Légal & Éthique
+                Règles & Sécurité
               </div>
               <ul className="space-y-2 text-xs text-slate-600">
                 <li>
@@ -1417,7 +1417,7 @@ export default function QaprilLandingV2({
                 </li>
                 <li>
                   <Link href="/confidentialite" className="hover:text-slate-900 transition-colors">
-                    Protection des Données (ARTCI)
+                    Protection de vos données
                   </Link>
                 </li>
                 <li>
@@ -1427,7 +1427,7 @@ export default function QaprilLandingV2({
                 </li>
                 <li>
                   <Link href="/contact" className="hover:text-slate-900 transition-colors">
-                    Centre de Contact
+                    Assistance & Contact
                   </Link>
                 </li>
               </ul>
@@ -1440,10 +1440,10 @@ export default function QaprilLandingV2({
             </p>
             <div className="flex items-center gap-3">
               <span className="px-2.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600">
-                Hébergement Souverain
+                Hébergement Sécurisé
               </span>
               <span className="px-2.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600">
-                Conforme OHADA & Loi 2019-576
+                Conforme aux Lois de Côte d'Ivoire
               </span>
             </div>
           </div>

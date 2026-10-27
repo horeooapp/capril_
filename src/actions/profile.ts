@@ -5,6 +5,23 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { writeAuditLog } from "@/lib/audit"
 import { normalizePhone } from "@/lib/phone"
+import * as crypto from "crypto"
+
+/**
+ * Chiffre un numéro de document avec AES-256-GCM.
+ * Utilise DOCUMENT_ENCRYPTION_KEY (32 bytes en hex) ou dérive une clé depuis NEXTAUTH_SECRET.
+ * Retourne iv:authTag:ciphertext encodés en base64.
+ */
+function encryptDocNumber(value: string): string {
+    const rawKey = process.env.DOCUMENT_ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET || "fallback_key_replace_in_prod";
+    // Dériver exactement 32 bytes depuis n'importe quelle clé source
+    const key = crypto.createHash("sha256").update(rawKey).digest();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+    const encrypted = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+    return `${iv.toString("base64")}:${authTag.toString("base64")}:${encrypted.toString("base64")}`;
+}
 
 /**
  * Updates the user's personal profile information.
@@ -76,27 +93,42 @@ export async function updateUserProfile(data: {
         const normalizedPhone = normalizePhone(data.phone);
 
         // ────────────────────────────────────────────────────────
-        // LOGIQUE DE FUSION DE COMPTES (Rule: C-MERGE-01)
-        // Si un compte "fantôme" (sans email) possède déjà ce téléphone, 
-        // on rapatrie ses baux/biens vers le compte actif avant de le supprimer.
+        // GESTION DU TÉLÉPHONE & CONFLITS D'UNICITÉ
         // ────────────────────────────────────────────────────────
-        const ghostUser = await prisma.user.findFirst({
-            where: { 
-                phone: normalizedPhone,
-                id: { not: session.user.id }
-            }
-        });
+        if (normalizedPhone && normalizedPhone !== user.phone) {
+            const existingUserWithPhone = await prisma.user.findFirst({
+                where: { 
+                    phone: normalizedPhone,
+                    id: { not: session.user.id }
+                }
+            });
 
-        if (ghostUser && !ghostUser.email) {
-            await prisma.$transaction([
-                prisma.lease.updateMany({ where: { tenantId: ghostUser.id }, data: { tenantId: session.user.id } }),
-                prisma.lease.updateMany({ where: { landlordId: ghostUser.id }, data: { landlordId: session.user.id } }),
-                prisma.lease.updateMany({ where: { agentId: ghostUser.id }, data: { agentId: session.user.id } }),
-                prisma.property.updateMany({ where: { ownerUserId: ghostUser.id }, data: { ownerUserId: session.user.id } }),
-                prisma.property.updateMany({ where: { managedByUserId: ghostUser.id }, data: { managedByUserId: session.user.id } }),
-                prisma.user.delete({ where: { id: ghostUser.id } })
-            ]);
-            console.log(`[C-MERGE-01] Merged ghost user ${ghostUser.id} into ${session.user.id}`);
+            if (existingUserWithPhone) {
+                // Si c'est un compte fantôme (sans email), on rapatrie ses baux/biens et on libère le téléphone
+                if (!existingUserWithPhone.email) {
+                    try {
+                        await prisma.$transaction([
+                            prisma.lease.updateMany({ where: { tenantId: existingUserWithPhone.id }, data: { tenantId: session.user.id } }),
+                            prisma.lease.updateMany({ where: { landlordId: existingUserWithPhone.id }, data: { landlordId: session.user.id } }),
+                            prisma.lease.updateMany({ where: { agentId: existingUserWithPhone.id }, data: { agentId: session.user.id } }),
+                            prisma.property.updateMany({ where: { ownerUserId: existingUserWithPhone.id }, data: { ownerUserId: session.user.id } }),
+                            prisma.property.updateMany({ where: { managedByUserId: existingUserWithPhone.id }, data: { managedByUserId: session.user.id } }),
+                            // Libérer le numéro pour éviter la violation de contrainte unique
+                            prisma.user.update({
+                                where: { id: existingUserWithPhone.id },
+                                data: { phone: `${normalizedPhone}_merged_${Date.now()}` }
+                            })
+                        ]);
+                        console.log(`[C-MERGE-01] Merged ghost user ${existingUserWithPhone.id} into ${session.user.id}`);
+                    } catch (mergeErr) {
+                        console.warn("[C-MERGE-01] Erreur fusion compte fantôme:", mergeErr);
+                        return { error: "Ce numéro de téléphone est déjà enregistré sur un compte existant." };
+                    }
+                } else {
+                    // C'est un vrai compte utilisateur avec email -> refuser le doublon avec un message explicite
+                    return { error: "Ce numéro de téléphone est déjà associé à un autre compte QAPRIL. Veuillez le modifier et renseigner un autre numéro personnel." };
+                }
+            }
         }
 
         await prisma.$transaction(async (tx) => {
@@ -139,6 +171,7 @@ export async function updateUserProfile(data: {
                                 where: { id: existingDoc.id },
                                 data: {
                                     docNumber: ad.value!,
+                                    docNumberEnc: encryptDocNumber(ad.value!),
                                     docNumberHash: composedHash,
                                     fullName: fullName
                                 }
@@ -149,6 +182,7 @@ export async function updateUserProfile(data: {
                                     userId: session.user.id,
                                     docType: ad.type,
                                     docNumber: ad.value!,
+                                    docNumberEnc: encryptDocNumber(ad.value!),
                                     docNumberHash: composedHash,
                                     status: "pending",
                                     fullName: fullName
@@ -213,6 +247,7 @@ export async function updateUserProfile(data: {
                             data: {
                                 docType: data.docType,
                                 docNumber: data.docNumber,
+                                docNumberEnc: encryptDocNumber(data.docNumber!),
                                 docNumberHash: standardHash,
                                 fullName: fullName,
                                 birthDate: data.birthDate
@@ -224,6 +259,7 @@ export async function updateUserProfile(data: {
                                 userId: session.user.id,
                                 docType: data.docType,
                                 docNumber: data.docNumber,
+                                docNumberEnc: encryptDocNumber(data.docNumber!),
                                 docNumberHash: standardHash,
                                 status: "pending",
                                 fullName: fullName,

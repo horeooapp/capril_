@@ -43,45 +43,45 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
                      <div className="mb-2 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
-                        <Gavel size={12} /> Tribunal & Chambre Arbitrale (CACI)
+                        <Gavel size={12} /> Résolution des Litiges & Impayés
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
-                        Triage <span className="text-rose-600">Judiciaire</span>
+                        Litiges & <span className="text-rose-600">Impayés</span>
                     </h1>
                     <p className="text-[13.5px] font-medium text-slate-500 mt-1">
-                        Dossiers Litiges Certifiés (DLC) et procédures de recouvrement contentieux.
+                        Suivi des impayés, des relances officielles et des dossiers pour commissaire de justice.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                     <Link 
                         href="/dashboard/mediation" 
                         className="bg-white border text-slate-700 border-slate-200 px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none">
-                        <ArrowRight size={16} /> Médiations
+                        <ArrowRight size={16} /> Entente Amiable
                     </Link>
                     <button 
                         onClick={() => setIsDlcModalOpen(true)}
                         className="bg-rose-600 text-white px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-md shadow-rose-600/20 flex items-center justify-center gap-2 flex-1 sm:flex-none"
                     >
-                        <ShieldAlert size={16} /> Initier un DLC
+                        <ShieldAlert size={16} /> Ouvrir un Litige
                     </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                  <StatCard 
-                     label="Dossiers Certifiés (DLC)" 
+                     label="Dossiers de Litige" 
                      value={disputes.length.toString()} 
-                     sub="Émis via le portail" 
+                     sub="Dossiers enregistrés" 
                  />
 
                  <div className="bg-indigo-50 border border-indigo-200 rounded-[10px] p-4 flex flex-col justify-between group h-full">
                      <div className="flex items-center gap-2 mb-2">
                          <KeyRound className="text-indigo-600" size={16} />
-                         <p className="text-[12px] font-semibold text-indigo-700 uppercase">Clés Cyber-Sécurité</p>
+                         <p className="text-[12px] font-semibold text-indigo-700 uppercase">Preuves du Dossier</p>
                      </div>
                      <div>
-                        <p className="text-xl font-black text-slate-800 tracking-tight">Hashes Transmis</p>
-                        <p className="text-[11px] font-semibold text-indigo-600 mt-1">Conformité CACI : 100%</p>
+                        <p className="text-xl font-black text-slate-800 tracking-tight">Preuves Sécurisées</p>
+                        <p className="text-[11px] font-semibold text-indigo-600 mt-1">Conformité Légale : 100%</p>
                      </div>
                  </div>
 
@@ -89,11 +89,11 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                      <Gavel className="absolute -right-4 -bottom-4 text-white opacity-10" size={80} />
                      <div className="relative z-10 flex items-center gap-2 mb-2">
                          <FileCheck2 className="text-white" size={16} />
-                         <p className="text-[12px] font-semibold text-rose-100 uppercase tracking-widest">Ordres d'Expulsion</p>
+                         <p className="text-[12px] font-semibold text-rose-100 uppercase tracking-widest">Procédures d'Expulsion</p>
                      </div>
                      <div className="relative z-10">
                         <p className="text-3xl font-black text-white">{disputes.filter((d: any) => d.status === 'EVICTION_ORDER').length}</p>
-                        <p className="text-[11px] font-semibold text-rose-200 mt-1">Force Publique Informée</p>
+                        <p className="text-[11px] font-semibold text-rose-200 mt-1">Dossiers en cours</p>
                      </div>
                  </div>
             </div>
@@ -181,7 +181,7 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                         <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white relative">
                             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                                 <div className="p-1.5 bg-rose-50 rounded-[8px] border border-rose-100"><Scale className="text-rose-600" size={18}/></div>
-                                Initier un Dossier DLC
+                                Ouvrir un Dossier de Litige
                             </h2>
                             <button onClick={() => setIsDlcModalOpen(false)} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
                                 <X size={16} />
@@ -191,13 +191,13 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                         <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
                             <div className="p-6 overflow-y-auto space-y-6 flex-1">
                                 <div className="bg-rose-50 border border-rose-200 p-4 rounded-[10px]">
-                                    <p className="font-bold text-[11px] uppercase tracking-widest text-rose-700 mb-1.5 flex items-center gap-1.5"><Gavel size={14}/> Avertissement Légal</p>
-                                    <p className="text-[12px] leading-relaxed text-rose-800">L'activation de ce protocole enverra automatiquement un pré-avis légalement contraignant au locataire, validé par la Chambre d'Arbitrage. Ce dossier devient une pièce à conviction irrévocable en cas de saisie judiciaire.</p>
+                                    <p className="font-bold text-[11px] uppercase tracking-widest text-rose-700 mb-1.5 flex items-center gap-1.5"><Gavel size={14}/> Avertissement Officiel</p>
+                                    <p className="text-[12px] leading-relaxed text-rose-800">L'ouverture de ce dossier enverra automatiquement un avertissement officiel au locataire. Ce dossier constituera une preuve complète et certifiée si vous devez faire intervenir un commissaire de justice.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
-                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Locataire en Infraction</label>
+                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Locataire Concerné</label>
                                         <select name="leaseId" required className="w-full p-2.5 bg-slate-50 rounded-[8px] border border-slate-200 text-[13px] font-medium text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500">
                                             <option value="">Sélectionnez un bail</option>
                                             {activeLeases.map((l: any) => (
@@ -208,18 +208,18 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Nature</label>
+                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Motif du Litige</label>
                                         <select name="type" required className="w-full p-2.5 bg-slate-50 rounded-[8px] border border-slate-200 text-[13px] font-medium text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500">
-                                            <option value="DEFAUT_PAIEMENT">Défaut de Paiement Accumulé</option>
-                                            <option value="DEGRADATION_LOURDE">Dégradation Lourdes / Sinistre Non-Déclaré</option>
-                                            <option value="SOUS_LOCATION_ILLICITE">Sous-location Illicite</option>
-                                            <option value="TROUBLES_VOISINAGE">Troubles du Voisinage (Grave)</option>
+                                            <option value="DEFAUT_PAIEMENT">Loyers Impayés Accumulés</option>
+                                            <option value="DEGRADATION_LOURDE">Dégradations Lourdes / Logement Abîmé</option>
+                                            <option value="SOUS_LOCATION_ILLICITE">Sous-location Non Autorisée</option>
+                                            <option value="TROUBLES_VOISINAGE">Troubles Graves du Voisinage</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Constitution de Preuve</label>
+                                    <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Preuves à Joindre</label>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                         <button type="button" onClick={() => {
                                             const p = new Promise(r => setTimeout(r, 1000));
@@ -227,8 +227,8 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                         }} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-[8px] flex items-center gap-3 hover:bg-slate-100 transition-colors">
                                             <div className="bg-white border border-slate-200 text-slate-600 p-2 rounded-[6px]"><History size={16}/></div>
                                             <div className="text-left">
-                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre Bilan CRM</p>
-                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Automatique mensuel</p>
+                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre Relevé des Loyers</p>
+                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Historique des paiements</p>
                                             </div>
                                         </button>
                                         <button type="button" onClick={() => {
@@ -237,8 +237,8 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                         }} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-[8px] flex items-center gap-3 hover:bg-slate-100 transition-colors">
                                             <div className="bg-white border border-slate-200 text-slate-600 p-2 rounded-[6px]"><MapPin size={16}/></div>
                                             <div className="text-left">
-                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre l'EDL</p>
-                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Signature approuvée</p>
+                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre État des Lieux</p>
+                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Photos et constats</p>
                                             </div>
                                         </button>
                                     </div>
@@ -247,8 +247,8 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                 <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-[8px] border border-slate-200 cursor-pointer">
                                     <input type="checkbox" name="isCryptoSealed" defaultChecked className="mt-0.5 w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500" />
                                     <div>
-                                        <p className="text-[12.5px] font-bold text-slate-800">Sceller cryptographiquement (CACI)</p>
-                                        <p className="text-[11px] text-slate-500 mt-0.5">Un Hash inviolable sera généré pour la Cour.</p>
+                                        <p className="text-[12.5px] font-bold text-slate-800">Certifier le dossier officiellement</p>
+                                        <p className="text-[11px] text-slate-500 mt-0.5">Le dossier sera scellé et opposable légalement.</p>
                                     </div>
                                 </label>
 
@@ -260,7 +260,7 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                     type="submit"
                                     disabled={loading}
                                     className="bg-rose-600 text-white px-6 py-2 rounded-[8px] font-semibold text-[12px] uppercase tracking-wide hover:bg-rose-700 transition-colors shadow-sm active:scale-95 flex items-center gap-2 disabled:opacity-50">
-                                    {loading ? 'EN COURS...' : 'SCELLER LE DOSSIER'} <ShieldAlert size={14}/>
+                                    {loading ? 'EN COURS...' : 'ENREGISTRER LE DOSSIER'} <ShieldAlert size={14}/>
                                 </button>
                             </div>
                         </form>

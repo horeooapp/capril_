@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/jwt';
 import { writeAuditLog } from '@/lib/audit';
+import * as crypto from 'crypto';
+
+function encryptDocNumber(value: string): string {
+    const rawKey = process.env.DOCUMENT_ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET || 'fallback_key_replace_in_prod';
+    const key = crypto.createHash('sha256').update(rawKey).digest();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const encrypted = Buffer.concat([cipher.update(value, 'utf8'), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+    return `${iv.toString('base64')}:${authTag.toString('base64')}:${encrypted.toString('base64')}`;
+}
 
 /**
  * PATCH /api/v1/proprietaires/me/profile
@@ -61,7 +72,8 @@ export async function PATCH(req: Request) {
                 data: {
                     docType,
                     docNumber,
-                    docNumberHash: docNumber,
+                    docNumberEnc: encryptDocNumber(docNumber),
+                    docNumberHash: `${user.id}_${docType}_${docNumber}`,
                     fullName,
                     birthDate: birthDate ? new Date(birthDate) : null
                 }
@@ -72,8 +84,9 @@ export async function PATCH(req: Request) {
                     userId: user.id,
                     docType,
                     docNumber,
-                    docNumberHash: docNumber,
-                    status: "pending",
+                    docNumberEnc: encryptDocNumber(docNumber),
+                    docNumberHash: `${user.id}_${docType}_${docNumber}`,
+                    status: 'pending',
                     fullName,
                     birthDate: birthDate ? new Date(birthDate) : null
                 }

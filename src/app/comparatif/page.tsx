@@ -38,74 +38,74 @@ export default function ComparatifPage() {
   const CRITERES = [
     {
       titre: "Rédaction et signature du contrat de bail",
-      traditionnel: "Papier manuscrit, 2 à 3 semaines de délais, déplacements physiques, risque élevé de clauses nulles ou abusives.",
-      qapril: "15 minutes chrono en ligne. Signature électronique OTP SMS certifiée, 100 % conforme à la loi ivoirienne n° 2019-576.",
+      traditionnel: "Papier manuscrit, 2 à 3 semaines d'attente, déplacements fatigants, risque d'erreurs ou de clauses illégales.",
+      qapril: "15 minutes chrono sur votre téléphone. Signature par code secret SMS sans se déplacer, 100 % conforme à la loi ivoirienne n° 2019-576.",
       status: "win"
     },
     {
       titre: "Mode d'encaissement des loyers",
-      traditionnel: "Paiement en espèces sans traçabilité, chèques sans provision, manipulations de billets et risques de vol.",
-      qapril: "Collecte instantanée par Wave, Orange Money, MTN MoMo, Moov et Carte Bancaire. Rapprochement bancaire sans faille.",
+      traditionnel: "Paiement en espèces avec risques de vol ou de faux billets, chèques sans provision et allers-retours incessants.",
+      qapril: "Paiement direct par Wave, Orange Money, MTN MoMo, Moov ou carte. L'argent arrive directement sur votre compte en sécurité.",
       status: "win"
     },
     {
-      titre: "Délivrance des quittances de loyer",
-      traditionnel: "Carnets à souche achetés en papeterie, délivrance manuelle différée, pertes de quittances et contestations.",
-      qapril: "PDF sécurisé horodaté délivré automatiquement dès encaissement, avec QR Code vérifiable auprès de la DGI et des banques.",
+      titre: "Délivrance des reçus de loyer",
+      traditionnel: "Petits carnets achetés au marché ou en librairie, reçus souvent perdus, raturés ou source de contestations.",
+      qapril: "Reçu officiel en PDF envoyé instantanément sur le téléphone avec code QR vérifiable par la banque et les impôts.",
       status: "win"
     },
     {
-      titre: "Gestion et séquestre de la caution",
-      traditionnel: "Sommes versées directement au propriétaire, souvent dépensées, litiges quasi-systématiques à la sortie.",
-      qapril: "Plafonnement légal strict à 2 mois. Séquestre officiel garantissant la restitution immédiate sous 48h.",
+      titre: "Gestion et sécurité de la caution",
+      traditionnel: "Caution dépensée par le propriétaire avant le départ du locataire, disputes presque assurées à la remise des clés.",
+      qapril: "Caution plafonnée à 2 mois maximum selon la loi. Remboursement rapide sous 48h sans palabre si le logement est propre.",
       status: "win"
     },
     {
-      titre: "Sélection et solvabilité du locataire",
-      traditionnel: "Évaluation subjective au feeling, bulletins de salaire facilement falsifiables, aucun historique locatif vérifié.",
-      qapril: "Score ICL (Indice de Confiance Locative) algorithmique fondé sur l'historique vérifié. Réduction de 85% du risque d'impayé.",
+      titre: "Choix et sérieux du locataire",
+      traditionnel: "Choix au feeling, faux bulletins de salaire, aucun moyen de savoir si le locataire paie vraiment à bonne date.",
+      qapril: "Carnet de Confiance (Score ICL) qui vérifie l'historique réel des paiements. Évite 85% des risques d'impayés.",
       status: "win"
     },
     {
       titre: "États des lieux d'entrée et de sortie",
-      traditionnel: "Feuilles volantes descriptives succinctes sans photos probantes, sources de désaccords interminables.",
-      qapril: "Constat numérique contradictoire avec photos HD horodatées et comparateur visuel automatique entrée/sortie.",
+      traditionnel: "Feuille volante écrite à la va-vite sans photos, entraînant des querelles infinies sur les dégradations.",
+      qapril: "Constat avec photos nettes sur smartphone. Comparaison visuelle claire entre l'entrée et la sortie sans contestation possible.",
       status: "win"
     },
     {
-      titre: "Gestion des charges (CIE & SODECI)",
-      traditionnel: "Calculs manuels contestés sur un bout de papier, retards de régularisation, coupures de compteurs collectives.",
-      qapril: "Saisie d'index de compteurs divisionnaires, répartition automatique des charges au centime près sur l'avis d'échéance.",
+      titre: "Partage des factures CIE & SODECI",
+      traditionnel: "Calculs compliqués sur des bouts de papier, discussions tendues entre voisins de cour, risques de coupure.",
+      qapril: "Relevé des compteurs en photo. Calcul automatique au franc près de la part de chacun sur l'avis de loyer.",
       status: "win"
     },
     {
-      titre: "Déclarations fiscales foncières",
-      traditionnel: "Calculs complexes en fin d'année, oublis de déclarations, risques de redressement fiscal DGI.",
-      qapril: "Bilan fiscal foncier annuel pré-rempli en un clic avec toutes les quittances horodatées conformes.",
+      titre: "Déclarations foncières pour les impôts",
+      traditionnel: "Calculs manuels fastidieux en fin d'année, reçus manquants, risques de pénalités avec la DGI.",
+      qapril: "Bilan annuel complet et certifié prêt en un clic pour votre déclaration d'impôts fonciers.",
       status: "win"
     },
     {
-      titre: "Gestion à distance (Diaspora & Bailleurs éloignés)",
-      traditionnel: "Dépendance totale envers des proches ou démarcheurs informels, manque d'informations et déconvenues financières.",
-      qapril: "Tableau de bord complet en temps réel accessible depuis le monde entier, notifications instantanées et traçabilité.",
+      titre: "Gestion des maisons à distance (Diaspora)",
+      traditionnel: "Dépendance totale envers la famille ou des démarcheurs informels, manque d'informations et loyers non reversés.",
+      qapril: "Suivi en direct depuis votre téléphone où que vous soyez dans le monde, alertes automatiques et argent sécurisé.",
       status: "win"
     },
     {
-      titre: "Traitement des retards et impayés",
-      traditionnel: "Visites houleuses, tensions personnelles, procédures judiciaires d'expulsion lentes (8 à 18 mois).",
-      qapril: "Relances préventives automatiques par SMS/WhatsApp, centre de médiation en ligne sous 14 jours et mises en demeure OHADA.",
+      titre: "Gestion des retards et impayés",
+      traditionnel: "Disputes houleuses, déplacements pour réclamer l'argent, procédures judiciaires lentes et coûteuses.",
+      qapril: "Rappels polis par SMS/WhatsApp, accord d'entente à l'amiable et mise en demeure officielle prête pour commissaire de justice.",
       status: "win"
     },
     {
-      titre: "Modèle de tarification & Commissions",
-      traditionnel: "Agences prélevant 8 % à 10 % sur chaque loyer chaque mois à perpétuité (ex: 300 000 FCFA/an sur un loyer de 250 000 FCFA).",
-      qapril: "Zéro commission en pourcentage sur vos loyers. Abonnement fixe abordable sans engagement (à partir de 0 FCFA pour tester).",
+      titre: "Frais et commissions de gestion",
+      traditionnel: "Agences qui prennent 8 % à 10 % sur chaque loyer chaque mois (ex: 300 000 FCFA par an pour un loyer de 250 000 FCFA).",
+      qapril: "Zéro commission en pourcentage sur vos loyers. Votre loyer vous revient à 100 % (1er bien gratuit pour tester).",
       status: "win"
     },
     {
-      titre: "Valeur juridique probante des actes",
-      traditionnel: "Reçus sur papier libre facilement contestables, clauses déclarées nulles par le juge ivoirien.",
-      qapril: "Actes scellés par signature électronique qualifiée OTP et empreinte cryptographique SHA-256 pleinement opposables.",
+      titre: "Valeur juridique et preuve officielle",
+      traditionnel: "Bouts de papier faciles à contester devant la police ou le tribunal, contrats mal ficelés sans protection.",
+      qapril: "Contrats signés par SMS avec code secret et reçus officiels infalsifiables, 100 % valables devant la justice ivoirienne.",
       status: "win"
     }
   ];
@@ -150,19 +150,19 @@ export default function ComparatifPage() {
                 style={{ background: "rgba(245,158,11,0.08)" }}
               >
                 <Scale className="w-3.5 h-3.5" />
-                Benchmark Analytique · Méthodes Classiques vs QAPRIL
+                Comparatif Clair · Gestion à l'Ancienne vs QAPRIL
               </span>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-8 uppercase">
-                Pourquoi le Marché Ivoirien <br />
-                <span style={{ color: "var(--mango)" }}>Migre vers QAPRIL</span>
+                Pourquoi Choisir QAPRIL <br />
+                <span style={{ color: "var(--mango)" }}>pour vos Locations en Côte d'Ivoire</span>
               </h1>
 
               <p
                 className="text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed mb-10"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
-                Découvrez point par point pourquoi les méthodes manuelles et les agences traditionnelles cèdent la place à l'infrastructure technologique certifiée la plus sécurisée de Côte d'Ivoire.
+                Comparez point par point la gestion traditionnelle (papier, déplacements et palabres) avec la gestion simple, rapide et officielle de QAPRIL.
               </p>
             </motion.div>
           </div>

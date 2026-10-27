@@ -68,7 +68,7 @@ export default async function DocumentsPage() {
                         <ShieldCheck size={24} />
                         <h3 className="font-bold">Coffre-fort QAPRIL</h3>
                     </div>
-                    <p className="text-sm font-medium text-slate-500 relative z-10">Tous vos documents sont signés et archivés cryptographiquement sur la blockchain.</p>
+                    <p className="text-sm font-medium text-slate-500 relative z-10">Tous vos contrats et reçus officiels sont protégés, infalsifiables et conservés en sécurité à vie.</p>
                 </div>
             </div>
 
