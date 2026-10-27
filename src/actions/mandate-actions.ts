@@ -8,11 +8,15 @@ import { Role, MandateType, MandateStatus } from "@prisma/client"
 
 export type CreateMandateInput = {
     propertyId: string;
-    agentId: string;
+    agentId?: string;
     mandateType: MandateType;
     commissionPct: number;
+    commissionFixed?: number;
     startDate: string;
     endDate: string;
+    scope?: string[];
+    taciteReconduction?: boolean;
+    seuilTravauxSansAccord?: number;
 };
 
 /**
@@ -21,20 +25,36 @@ export type CreateMandateInput = {
 export async function createMandate(input: CreateMandateInput) {
     try {
         const session = await auth();
-        const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
-        const AGENCY_ROLES = ['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE', 'AGENCE_NON_AGREE'];
+        if (!session?.user?.id) {
+            return { error: "Session expirée. Veuillez vous reconnecter." };
+        }
+
         const userRole = session.user.role as string;
         const capaciteActive = (session.user as any).capaciteActive as string | undefined;
 
-        const isAdmin = ADMIN_ROLES.includes(userRole);
-        const isAgency = AGENCY_ROLES.includes(userRole) || capaciteActive?.includes('AGENCY') || capaciteActive?.includes('AGENCE');
+        const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
+        const ALLOWED_ROLES = [
+            'AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE', 'AGENCE_NON_AGREE', 
+            'LANDLORD', 'LANDLORD_PRO', 'INTERMEDIAIRE', 'AGENT', 'BROKER',
+            'ADMIN', 'SUPER_ADMIN'
+        ];
 
-        if (!session || !session.user || (!isAdmin && !isAgency)) {
-            return { error: "Action réservée aux agences ou administrateurs." };
+        const isAllowed = ALLOWED_ROLES.includes(userRole) || 
+                          ADMIN_ROLES.includes(userRole) || 
+                          capaciteActive?.includes('AGENCY') || 
+                          capaciteActive?.includes('AGENCE') ||
+                          capaciteActive?.includes('PROPRIETAIRE');
+
+        if (!isAllowed) {
+            return { error: "Action réservée aux agences, gestionnaires ou propriétaires." };
         }
 
-        if (!validateCommission(input.commissionPct)) {
-            return { error: "La commission ne peut excéder 15%." };
+        if (!input.propertyId) {
+            return { error: "Veuillez choisir un bien immobilier à confier en gestion." };
+        }
+
+        if (input.commissionPct !== undefined && !validateCommission(input.commissionPct)) {
+            return { error: "La commission de gestion ne peut excéder le plafond légal de 15%." };
         }
 
         const mandateRef = await generateMandateRef(session.user.id);
@@ -45,19 +65,38 @@ export async function createMandate(input: CreateMandateInput) {
                 propertyId: input.propertyId,
                 agentUserId: session.user.id,
                 mandateType: input.mandateType,
-                commissionPct: input.commissionPct,
+                commissionPct: input.commissionPct !== undefined ? input.commissionPct : 8,
+                commissionFixed: input.commissionFixed ? Number(input.commissionFixed) : null,
+                scope: input.scope && input.scope.length > 0 ? input.scope : [
+                    "RECHERCHE_LOCATAIRE",
+                    "REDACTION_BAIL",
+                    "ENCAISSEMENT_LOYERS",
+                    "MAINTENANCE_TRAVAUX",
+                    "GESTION_IMPAYES"
+                ],
                 startDate: new Date(input.startDate),
-                endDate: new Date(input.endDate),
+                endDate: input.endDate ? new Date(input.endDate) : null,
                 status: MandateStatus.DRAFT
             }
         });
+
+        // Audit log
+        await prisma.auditLog.create({
+            data: {
+                userId: session.user.id,
+                action: "CREATE_MANDATE",
+                module: "MANDATES",
+                entityId: mandate.id,
+                newValues: { mandateRef, propertyId: input.propertyId, type: input.mandateType, commissionPct: input.commissionPct }
+            }
+        }).catch(() => {});
 
         revalidatePath(`/dashboard/mandates`);
         return { success: true, mandateId: mandate.id, mandateRef };
 
     } catch (error: unknown) {
         console.error("Erreur création mandat:", error);
-        return { error: "Impossible de créer le mandat." };
+        return { error: "Impossible de créer le mandat. Vérifiez que le bien est valide." };
     }
 }
 
