@@ -226,11 +226,11 @@ export async function updateMandateStatus(mandateId: string) {
         const mandate = await prisma.mandate.findUnique({ where: { id: mandateId }});
         if (!mandate) return { error: "Mandat introuvable" };
 
-        const newStatus = mandate.status === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+        const newStatus = mandate.status === MandateStatus.ACTIVE ? MandateStatus.SUSPENDED : MandateStatus.ACTIVE;
 
         await prisma.mandate.update({
             where: { id: mandateId },
-            data: { status: newStatus as any }
+            data: { status: newStatus }
         });
 
         const { writeAuditLog } = await import("@/lib/audit");
@@ -248,3 +248,222 @@ export async function updateMandateStatus(mandateId: string) {
         return { error: "Erreur lors de la mise à jour." };
     }
 }
+
+export type UpdateMandateInput = {
+    mandateId: string;
+    mandateType?: MandateType;
+    commissionPct?: number;
+    commissionFixed?: number | null;
+    startDate?: string;
+    endDate?: string | null;
+    scope?: string[];
+    status?: MandateStatus;
+};
+
+/**
+ * Modifier les clauses et paramètres d'un mandat de gérance
+ */
+export async function updateMandate(input: UpdateMandateInput) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { error: "Session expirée. Veuillez vous reconnecter." };
+    }
+
+    try {
+        const mandate = await prisma.mandate.findUnique({
+            where: { id: input.mandateId },
+            include: { property: true }
+        });
+
+        if (!mandate) {
+            return { error: "Mandat de gérance introuvable." };
+        }
+
+        const isOwner = mandate.property.ownerUserId === session.user.id;
+        const isAgent = mandate.agentUserId === session.user.id;
+        const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as string);
+
+        if (!isOwner && !isAgent && !isAdmin) {
+            return { error: "Vous n'avez pas l'autorisation de modifier ce mandat." };
+        }
+
+        if (input.commissionPct !== undefined && !validateCommission(input.commissionPct)) {
+            return { error: "La commission de gestion ne peut excéder le plafond légal de 15%." };
+        }
+
+        const updateData: any = {};
+        if (input.mandateType) updateData.mandateType = input.mandateType;
+        if (input.commissionPct !== undefined) updateData.commissionPct = Number(input.commissionPct);
+        if (input.commissionFixed !== undefined) {
+            updateData.commissionFixed = input.commissionFixed !== null ? Number(input.commissionFixed) : null;
+        }
+        if (input.startDate) updateData.startDate = new Date(input.startDate);
+        if (input.endDate !== undefined) {
+            updateData.endDate = input.endDate ? new Date(input.endDate) : null;
+        }
+        if (input.scope && Array.isArray(input.scope)) {
+            updateData.scope = input.scope;
+        }
+        if (input.status) {
+            updateData.status = input.status;
+        }
+
+        const updated = await prisma.mandate.update({
+            where: { id: input.mandateId },
+            data: updateData
+        });
+
+        // Audit log
+        await prisma.auditLog.create({
+            data: {
+                userId: session.user.id,
+                action: "UPDATE_MANDATE",
+                module: "MANDATES",
+                entityId: mandate.id,
+                newValues: updateData
+            }
+        }).catch(() => {});
+
+        revalidatePath("/dashboard/mandates");
+        return { success: true, mandate: updated };
+    } catch (error: any) {
+        console.error("Erreur modification mandat:", error);
+        return { error: "Erreur lors de la modification du mandat : " + (error?.message || "Veuillez réessayer.") };
+    }
+}
+
+export type RevokeMandateInput = {
+    mandateId: string;
+    reason: string;
+    immediateEffect?: boolean;
+    effectiveDate?: string;
+};
+
+/**
+ * Révoquer ou résilier un mandat de gérance
+ */
+export async function revokeMandate(input: RevokeMandateInput) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { error: "Session expirée. Veuillez vous reconnecter." };
+    }
+
+    try {
+        const mandate = await prisma.mandate.findUnique({
+            where: { id: input.mandateId },
+            include: { property: true }
+        });
+
+        if (!mandate) {
+            return { error: "Mandat de gérance introuvable." };
+        }
+
+        const isOwner = mandate.property.ownerUserId === session.user.id;
+        const isAgent = mandate.agentUserId === session.user.id;
+        const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as string);
+
+        if (!isOwner && !isAgent && !isAdmin) {
+            return { error: "Vous n'avez pas l'autorisation de révoquer ce mandat." };
+        }
+
+        if (!input.reason?.trim()) {
+            return { error: "Veuillez préciser le motif de révocation du mandat." };
+        }
+
+        // Met le statut à CANCELLED (qui correspond à révoqué/résilié en base)
+        const updated = await prisma.mandate.update({
+            where: { id: input.mandateId },
+            data: {
+                status: MandateStatus.CANCELLED,
+                cancelledAt: new Date(),
+                cancelledByUserId: session.user.id,
+                cancelReason: input.reason.trim()
+            }
+        });
+
+        // Si l'agent était le gestionnaire assigné du bien, le bien repasse en gestion directe
+        if (mandate.property.managedByUserId === mandate.agentUserId) {
+            await prisma.property.update({
+                where: { id: mandate.propertyId },
+                data: {
+                    managedByUserId: null,
+                    managementMode: 'DIRECT'
+                }
+            }).catch(e => console.warn("Notice: property manager reset:", e));
+        }
+
+        // Clôture de l'historique
+        await prisma.mandateHistory.updateMany({
+            where: { mandateId: mandate.id, propertyId: mandate.propertyId },
+            data: { endDate: new Date() }
+        }).catch(() => {});
+
+        // Audit log
+        await prisma.auditLog.create({
+            data: {
+                userId: session.user.id,
+                action: "REVOKE_MANDATE",
+                module: "MANDATES",
+                entityId: mandate.id,
+                newValues: {
+                    status: MandateStatus.CANCELLED,
+                    reason: input.reason,
+                    cancelledBy: session.user.id,
+                    cancelledAt: new Date()
+                }
+            }
+        }).catch(() => {});
+
+        revalidatePath("/dashboard/mandates");
+        return { 
+            success: true, 
+            message: "Le mandat a été révoqué avec succès. La gestion du bien a été basculée en gestion directe sous la responsabilité du propriétaire." 
+        };
+    } catch (error: any) {
+        console.error("Erreur révocation mandat:", error);
+        return { error: "Erreur lors de la révocation du mandat : " + (error?.message || "Veuillez réessayer.") };
+    }
+}
+
+/**
+ * Supprimer un mandat à l'état de brouillon ou annulé
+ */
+export async function deleteMandate(mandateId: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { error: "Session expirée. Veuillez vous reconnecter." };
+    }
+
+    try {
+        const mandate = await prisma.mandate.findUnique({
+            where: { id: mandateId },
+            include: { property: true }
+        });
+
+        if (!mandate) {
+            return { error: "Mandat introuvable." };
+        }
+
+        const isOwner = mandate.property.ownerUserId === session.user.id;
+        const isAgent = mandate.agentUserId === session.user.id;
+        const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as string);
+
+        if (!isOwner && !isAgent && !isAdmin) {
+            return { error: "Action non autorisée." };
+        }
+
+        if (mandate.status === MandateStatus.ACTIVE) {
+            return { error: "Un mandat actif ne peut pas être supprimé. Vous devez d'abord le révoquer." };
+        }
+
+        await prisma.mandate.delete({
+            where: { id: mandateId }
+        });
+
+        revalidatePath("/dashboard/mandates");
+        return { success: true };
+    } catch (error: any) {
+        return { error: "Impossible de supprimer ce mandat : " + (error?.message || "Veuillez réessayer.") };
+    }
+}
+

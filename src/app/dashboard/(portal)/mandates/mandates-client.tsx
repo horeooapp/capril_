@@ -4,15 +4,18 @@ import React, { useState, useTransition, useMemo } from "react"
 import { 
     ClipboardList, Search, FileSignature, CheckCircle, ShieldAlert, 
     ArrowRight, UserCheck, Building2, Users, Home, Phone, Mail, 
-    BookOpen, HelpCircle, Eye, Info, Sparkles, X, Check, DollarSign, ShieldCheck
+    BookOpen, HelpCircle, Eye, Info, Sparkles, X, Check, DollarSign, ShieldCheck,
+    Edit3, Trash2, Clock
 } from "lucide-react"
 import { toast } from "sonner"
-import { updateMandateStatus } from "@/actions/mandate-actions"
+import { updateMandateStatus, deleteMandate } from "@/actions/mandate-actions"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 import CreateMandateModal from "@/components/dashboard/mandates/CreateMandateModal"
 import MandateDetailModal from "@/components/dashboard/mandates/MandateDetailModal"
+import EditMandateModal from "@/components/dashboard/mandates/EditMandateModal"
+import RevokeMandateModal from "@/components/dashboard/mandates/RevokeMandateModal"
 
 export default function MandatesDashboardClient({ 
     initialMandates, 
@@ -29,6 +32,8 @@ export default function MandatesDashboardClient({
     // Modals
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [viewingMandate, setViewingMandate] = useState<any | null>(null)
+    const [editingMandate, setEditingMandate] = useState<any | null>(null)
+    const [revokingMandate, setRevokingMandate] = useState<any | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
     const [showEducationalBanner, setShowEducationalBanner] = useState(false)
 
@@ -37,7 +42,7 @@ export default function MandatesDashboardClient({
              const promise = updateMandateStatus(mandateId)
              toast.promise(promise, {
                  loading: "Mise à jour sécurisée du mandat...",
-                 success: "C'est fait. Le contrat a été mis à jour.",
+                 success: "C'est fait. Le statut du contrat a été mis à jour.",
                  error: "Erreur lors de la mise à jour."
              })
              
@@ -45,6 +50,19 @@ export default function MandatesDashboardClient({
              if (res.success) {
                  setMandates(prev => prev.map(m => m.id === mandateId ? { ...m, status: res.newStatus } : m))
              }
+        })
+    }
+
+    const handleDeleteMandate = (mandateId: string) => {
+        if (!confirm("Voulez-vous vraiment supprimer ce mandat de vos registres ?")) return;
+        startTransition(async () => {
+            const res = await deleteMandate(mandateId)
+            if (res.error) {
+                toast.error(res.error)
+            } else {
+                toast.success("Le mandat a été supprimé.")
+                setMandates(prev => prev.filter(m => m.id !== mandateId))
+            }
         })
     }
 
@@ -274,6 +292,8 @@ export default function MandatesDashboardClient({
                             {filteredMandates.map(m => {
                                 const isActive = m.status === 'ACTIVE' || m.status === 'ACTIF'
                                 const isDraft = m.status === 'DRAFT'
+                                const isCancelled = m.status === 'CANCELLED'
+                                const isSuspended = m.status === 'SUSPENDED'
                                 const ownerName = m.property?.owner 
                                     ? `${m.property.owner.firstName || ''} ${m.property.owner.lastName || ''}`.trim() 
                                     : 'Non assigné'
@@ -289,11 +309,19 @@ export default function MandatesDashboardClient({
                                                     </span>
                                                 ) : isDraft ? (
                                                     <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1">
-                                                        Brouillon
+                                                        <FileSignature size={10} /> Brouillon
+                                                    </span>
+                                                ) : isCancelled ? (
+                                                    <span className="bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1">
+                                                        <ShieldAlert size={10} /> Révoqué
+                                                    </span>
+                                                ) : isSuspended ? (
+                                                    <span className="bg-orange-50 text-orange-700 border border-orange-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1">
+                                                        <Clock size={10} /> Suspendu
                                                     </span>
                                                 ) : (
-                                                    <span className="bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1">
-                                                        <ShieldAlert size={10} /> {m.status}
+                                                    <span className="bg-slate-50 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1">
+                                                        {m.status}
                                                     </span>
                                                 )}
                                             </div>
@@ -318,22 +346,51 @@ export default function MandatesDashboardClient({
                                             {m.endDate ? new Date(m.endDate).toLocaleDateString('fr-FR') : '1 an reconductible'}
                                         </td>
                                         <td className="py-4 text-right pr-2">
-                                            <div className="flex items-center justify-end gap-1.5">
+                                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                                {/* 1. Consulter Fiche */}
                                                 <button 
                                                     type="button"
                                                     onClick={() => setViewingMandate(m)}
-                                                    className="text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                                    className="text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                                    title="Consulter les détails du mandat et imprimer"
                                                 >
-                                                    <Eye size={12} /> Fiche Détail
+                                                    <Eye size={12} /> Fiche
                                                 </button>
+
+                                                {/* 2. Éditer / Modifier */}
                                                 <button 
                                                     type="button"
-                                                    onClick={() => handleUpdateStatus(m.id)} 
-                                                    disabled={isPending}
-                                                    className="text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:text-amber-600 border border-slate-200 bg-white hover:bg-amber-50 px-2.5 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
+                                                    onClick={() => setEditingMandate(m)}
+                                                    className="text-[10px] font-bold uppercase tracking-wider text-amber-800 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                                    title="Modifier la formule, les honoraires ou les missions de ce mandat"
                                                 >
-                                                    {isActive ? "Suspendre" : "Rétablir"}
+                                                    <Edit3 size={12} /> Modifier
                                                 </button>
+
+                                                {/* 3. Révoquer (si non déjà révoqué) */}
+                                                {!isCancelled && (
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setRevokingMandate(m)}
+                                                        className="text-[10px] font-bold uppercase tracking-wider text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                                        title="Révoquer ou résilier ce contrat de gérance"
+                                                    >
+                                                        <ShieldAlert size={12} /> Révoquer
+                                                    </button>
+                                                )}
+
+                                                {/* 4. Supprimer (uniquement brouillon ou révoqué) */}
+                                                {(isDraft || isCancelled) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteMandate(m.id)}
+                                                        disabled={isPending}
+                                                        className="text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200 px-2 py-1.5 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+                                                        title="Supprimer ce mandat"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -367,8 +424,38 @@ export default function MandatesDashboardClient({
             <MandateDetailModal 
                 mandate={viewingMandate}
                 onClose={() => setViewingMandate(null)}
+                onEdit={(m) => {
+                    setViewingMandate(null)
+                    setEditingMandate(m)
+                }}
+                onRevoke={(m) => {
+                    setViewingMandate(null)
+                    setRevokingMandate(m)
+                }}
                 onStatusChanged={() => {
                     setViewingMandate(null)
+                    window.location.reload()
+                }}
+            />
+
+            {/* Modal: Edit Mandate */}
+            <EditMandateModal
+                isOpen={!!editingMandate}
+                mandate={editingMandate}
+                onClose={() => setEditingMandate(null)}
+                onMandateUpdated={() => {
+                    setEditingMandate(null)
+                    window.location.reload()
+                }}
+            />
+
+            {/* Modal: Revoke Mandate */}
+            <RevokeMandateModal
+                isOpen={!!revokingMandate}
+                mandate={revokingMandate}
+                onClose={() => setRevokingMandate(null)}
+                onMandateRevoked={() => {
+                    setRevokingMandate(null)
                     window.location.reload()
                 }}
             />
