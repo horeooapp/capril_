@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
+import { useRouter } from "next/navigation";
 import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check, MessageSquare, PlusCircle, AlertCircle, FileSignature } from "lucide-react"
 import { toast } from "sonner";
 import { processCandidature } from "@/actions/matching-actions";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/dashboard/ui/Badge";
 import { SectionCard } from "@/components/dashboard/ui/SectionCard";
 
 export default function MatchingDashboardClient({ candidatures, acceptedCandidatures = [] }: { candidatures: any[], acceptedCandidatures?: any[] }) {
+    const router = useRouter()
     const [isPending, startTransition] = useTransition()
     const [activeModalCandidate, setActiveModalCandidate] = useState<any>(null)
 
@@ -24,13 +26,20 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
     const [infoMessage, setInfoMessage] = useState<string>("")
 
     const handleOpenLeaseModal = (cand: any) => {
-        setLeaseModalCandidate(cand);
-        const monthly = cand.logement?.priceMonthly || 150000;
-        setRentAmount(monthly);
-        setDepositAmount(monthly * 2);
-        setChargesAmount(0);
-        setStartDate(new Date().toISOString().split("T")[0]);
-        setDurationMonths(12);
+        const rent = cand.logement?.declaredRentFcfa || cand.logement?.priceMonthly || cand.revenuMensuel || "";
+        const phone = cand.telephone || cand.candidat?.phone || "";
+        const name = `${cand.prenom || ""} ${cand.nom || ""}`.trim();
+        const propertyId = cand.logementId || cand.logement?.id || "";
+        const candidatureId = cand.id || "";
+        const params = new URLSearchParams({
+            propertyId,
+            candidatureId,
+            tenantPhone: phone,
+            tenantName: name,
+            rentAmount: rent ? String(rent) : ""
+        });
+        toast.info("Redirection vers la création de bail préremplie...");
+        router.push(`/dashboard/leases/new?${params.toString()}`);
     };
 
     const handleConfirmLeaseAndAccept = (e: React.FormEvent) => {
@@ -249,10 +258,17 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
                                             <div>{cand.telephone || cand.candidat?.phone}</div>
                                             <div className="text-[11px] text-slate-400">{cand.candidat?.email || 'Email vérifié'}</div>
                                         </td>
-                                        <td className="p-4 text-right">
+                                        <td className="p-4 text-right space-x-2">
+                                            <button 
+                                                onClick={() => handleOpenLeaseModal(cand)}
+                                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-colors shadow-sm inline-flex items-center gap-1.5"
+                                                title="Générer le contrat de bail prérempli"
+                                            >
+                                                <FileSignature size={13} /> Créer le Bail
+                                            </button>
                                             <button 
                                                 onClick={() => setActiveModalCandidate(cand)}
-                                                className="bg-white hover:bg-indigo-50 text-indigo-600 border border-slate-200 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors shadow-sm"
+                                                className="bg-white hover:bg-indigo-50 text-indigo-600 border border-slate-200 px-3.5 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-colors shadow-sm"
                                             >
                                                 Ouvrir Fiche
                                             </button>

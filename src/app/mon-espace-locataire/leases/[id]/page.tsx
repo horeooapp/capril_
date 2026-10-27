@@ -9,6 +9,8 @@ import { getEdlsByLease } from "@/actions/edl-actions"
 import TenantEdlManager from "@/components/dashboard/edl/TenantEdlManager"
 import { ContactSupportButton } from "@/components/tenant/actions/TenantButtons"
 
+import { prisma } from "@/lib/prisma"
+
 export default async function TenantLeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
     const { id } = await params
@@ -16,16 +18,28 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
     const userId = session?.user?.id
     if (!userId) return null
 
-    const lease = await getLeaseById(id) as any // Keeping any for the complex property access for now, but removed @ts-ignore
+    const lease = await getLeaseById(id) as any
     if (!lease) notFound()
 
-    if (lease.tenantId !== userId) {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true } });
+    const isOwnerOfLease = lease.tenantId === userId || (user?.phone && lease.tenant?.phone === user.phone);
+
+    if (!isOwnerOfLease) {
         return <div className="p-8 text-center text-red-600 font-bold uppercase">Accès non autorisé.</div>
+    }
+
+    if (lease.tenantId !== userId && isOwnerOfLease) {
+        await prisma.lease.update({
+            where: { id: lease.id },
+            data: { tenantId: userId }
+        }).catch(() => null);
     }
 
     const edls = await getEdlsByLease(id)
 
     const formatDate = (date: Date | string | null) => date ? new Date(date).toLocaleDateString('fr-FR') : '---';
+
+    const isAwaitingSignature = ['PENDING', 'PENDING_SIGNATURE', 'DRAFT', 'PENDING_CONFIRMATION'].includes(lease.status);
 
     return (
         <div className="max-w-6xl mx-auto py-8">
@@ -36,7 +50,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                 </Link>
             </div>
 
-            {lease.status === "PENDING" && (
+            {isAwaitingSignature && (
                 <div className="mb-8 p-6 bg-orange-50 border-2 border-orange-200 rounded-3xl flex flex-col md:flex-row justify-between items-center shadow-lg shadow-orange-100">
                     <div className="mb-4 md:mb-0">
                         <h3 className="text-lg font-black text-orange-800 uppercase tracking-tight">Signature Attendue ✍️</h3>

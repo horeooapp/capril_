@@ -176,7 +176,7 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
 export async function getPublicMarketplaceAnnonces(filters?: { commune?: string, minPrice?: number, maxPrice?: number }) {
     try {
         const whereClause: any = {
-            statut: "ACTIVE"
+            statut: { in: ["ACTIVE", "LOUE"] }
         }
 
         if (filters?.commune && filters.commune !== "Toutes") {
@@ -194,7 +194,13 @@ export async function getPublicMarketplaceAnnonces(filters?: { commune?: string,
             include: { 
                 logement: {
                     include: {
-                        images: true
+                        images: true,
+                        leases: {
+                            where: {
+                                status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] }
+                            },
+                            select: { status: true }
+                        }
                     }
                 },
                 agence: {

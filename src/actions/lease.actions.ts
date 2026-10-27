@@ -16,6 +16,8 @@ import { normalizePhone } from "@/lib/phone";
 import { serializeLease } from "@/lib/serialize";
 import { evaluateTransactionRisk } from "@/lib/m-guard";
 import { sendSMS } from "@/lib/sms";
+import { sendOpenWAMessage } from "@/lib/openwa";
+import { sendEmail, wrapInPremiumTemplate } from "@/lib/email";
 import { generateProofHash } from "@/lib/proof";
 import { LoyerService } from "@/lib/loyer-service";
 import { FiscalService } from "@/lib/fiscal-service";
@@ -28,6 +30,8 @@ import { NotificationService } from "@/lib/notification-service";
  */
 export async function createLease(data: {
     propertyId: string,
+    candidatureId?: string,
+    tenantName?: string,
     leaseType: 'residential' | 'commercial',
     typeBail?: TypeBail,
     tenantPhone?: string,
@@ -45,14 +49,22 @@ export async function createLease(data: {
     try {
         const session = await ensureAuthenticated();
         
-        // 1. Availability Check
+        // 1. Availability Check: Check if already an ACTIVE lease
         const activeLease = await prisma.lease.findFirst({
             where: {
                 propertyId: data.propertyId,
-                status: { notIn: [LeaseStatus.TERMINATED, LeaseStatus.CANCELLED, LeaseStatus.ARCHIVED] }
+                status: LeaseStatus.ACTIVE
             }
         });
-        if (activeLease) throw new Error("Ce bien est déjà engagé dans un contrat actif.");
+        if (activeLease) throw new Error("Ce bien est déjà engagé dans un contrat de bail actif.");
+
+        // Clean up any stale draft leases for this property
+        await prisma.lease.deleteMany({
+            where: {
+                propertyId: data.propertyId,
+                status: LeaseStatus.DRAFT
+            }
+        });
 
         // 2. Access Check
         const property = await prisma.property.findUnique({ where: { id: data.propertyId } });
@@ -73,25 +85,70 @@ export async function createLease(data: {
             }
         }
 
-        // 3. Tenant Identification
+        // 3. Tenant Identification & Candidate Linking
         let tenantId: string | undefined;
-        if (data.tenantPhone) {
-            const normalized = normalizePhone(data.tenantPhone);
-            let tenant = await prisma.user.findUnique({ where: { phone: normalized } });
-            if (!tenant) {
-                tenant = await prisma.user.create({
-                    data: { phone: normalized, role: Role.TENANT, status: 'PENDING' }
-                });
+        let tenantEmail: string | undefined;
+        let finalTenantName: string = (data.tenantName || "").trim();
+
+        if (data.candidatureId) {
+            const cand = await prisma.candidature.findUnique({
+                where: { id: data.candidatureId },
+                include: { candidat: true }
+            });
+            if (cand) {
+                if (cand.candidatId) tenantId = cand.candidatId;
+                if (cand.candidat?.email) tenantEmail = cand.candidat.email;
+                if (!finalTenantName) finalTenantName = `${cand.prenom} ${cand.nom}`.trim();
+                if (!data.tenantPhone && (cand.telephone || cand.candidat?.phone)) {
+                    data.tenantPhone = cand.telephone || cand.candidat?.phone || undefined;
+                }
             }
-            tenantId = tenant.id;
         }
 
-        // 4. Legal Validations
+        if (data.tenantPhone) {
+            const normalized = normalizePhone(data.tenantPhone);
+            let tenant = await prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { phone: normalized },
+                        ...(tenantId ? [{ id: tenantId }] : [])
+                    ]
+                }
+            });
+
+            if (!tenant) {
+                const parts = (finalTenantName || "Locataire").split(" ");
+                tenant = await prisma.user.create({
+                    data: {
+                        phone: normalized,
+                        firstName: parts[0] || "Locataire",
+                        lastName: parts.slice(1).join(" ") || "",
+                        role: Role.TENANT,
+                        status: 'PENDING'
+                    }
+                });
+            } else {
+                if (finalTenantName && (!tenant.firstName || tenant.firstName === "Locataire")) {
+                    const parts = finalTenantName.split(" ");
+                    await prisma.user.update({
+                        where: { id: tenant.id },
+                        data: {
+                            firstName: parts[0] || tenant.firstName,
+                            lastName: parts.slice(1).join(" ") || tenant.lastName
+                        }
+                    });
+                }
+            }
+            tenantId = tenant.id;
+            if (!tenantEmail && tenant.email) tenantEmail = tenant.email;
+        }
+
+        // 4. Legal Validations (Arts. 415, 416, 440, 442 CCH)
         const preavis = data.preavisRequisMois ?? 3;
         if (preavis < 3) throw new Error("Le préavis ne peut être inférieur à 3 mois (Arts. 440 et 442 CCH).");
         const maxLoyerAvanceCaution = data.rentAmount * 2;
-        if ((data.avanceLoyer || 0) > maxLoyerAvanceCaution) throw new Error("Avances illégales (Art. 415 CCH).");
-        if ((data.depositAmount || 0) > maxLoyerAvanceCaution) throw new Error("Caution illégale (Art. 416 CCH).");
+        if ((data.avanceLoyer || 0) > maxLoyerAvanceCaution) throw new Error("Avances illégales : maximum 2 mois autorisés (Art. 415 CCH).");
+        if ((data.depositAmount || 0) > maxLoyerAvanceCaution) throw new Error("Caution illégale : maximum 2 mois autorisés (Art. 416 CCH).");
 
         // 5. Certification Fee (2000 FCFA)
         await prisma.userWalletConfig.upsert({
@@ -104,7 +161,7 @@ export async function createLease(data: {
         const leaseRef = await generateLeaseRef(data.leaseType);
         const sha256 = await generateProofHash({ leaseRef, propertyId: data.propertyId, landlordId: ownerId, rent: data.rentAmount });
 
-        // 7. DB Save
+        // 7. DB Save: Set status to PENDING_SIGNATURE for direct tenant review & signature
         const lease = await prisma.lease.create({
             data: {
                 leaseReference: leaseRef,
@@ -126,24 +183,164 @@ export async function createLease(data: {
                 commercialData: data.commercialData as Prisma.InputJsonValue,
                 sha256Hash: sha256,
                 sha256CalculeLe: new Date(),
-                status: data.typeBail === TypeBail.DECLARATIF_BDQ ? LeaseStatus.PENDING_CONFIRMATION : LeaseStatus.DRAFT,
+                status: data.typeBail === TypeBail.DECLARATIF_BDQ ? LeaseStatus.PENDING_CONFIRMATION : LeaseStatus.PENDING_SIGNATURE,
                 deadlineEnregistrement: new Date(new Date(data.startDate).getTime() + (30 * 24 * 60 * 60 * 1000))
             }
         });
 
-        // 8. Envoyer l'invitation au locataire
+        // 8. Update Candidature to ACCEPTE
+        if (data.candidatureId) {
+            await prisma.candidature.update({
+                where: { id: data.candidatureId },
+                data: { statut: "ACCEPTE" }
+            }).catch(() => null);
+        } else {
+            await prisma.candidature.updateMany({
+                where: {
+                    logementId: data.propertyId,
+                    statut: "SOUMISE",
+                    OR: [
+                        ...(tenantId ? [{ candidatId: tenantId }] : []),
+                        ...(data.tenantPhone ? [{ telephone: normalizePhone(data.tenantPhone) }] : [])
+                    ]
+                },
+                data: { statut: "ACCEPTE" }
+            }).catch(() => null);
+        }
+
+        // 9. Lock Property on Marketplace & Mark as rented
+        await prisma.annonce.updateMany({
+            where: { logementId: data.propertyId },
+            data: {
+                statut: "LOUE",
+                archiveeAt: new Date()
+            }
+        });
+        await prisma.property.update({
+            where: { id: data.propertyId },
+            data: { status: "RENTED" }
+        });
+
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qapril.net";
+        const bienNom = property.name || property.address || "le logement";
+        const tenantDisplayName = finalTenantName || "Locataire";
+
+        // 10. Multi-Channel Notifications to Locataire (Tenant)
+        // a) In-App Notification
+        if (tenantId) {
+            await prisma.notification.create({
+                data: {
+                    userId: tenantId,
+                    title: "🎉 Contrat de bail prêt à signer !",
+                    message: `Le propriétaire a validé votre choix pour ${bienNom} et vous a transmis le contrat de bail (${leaseRef}).`,
+                    type: "BAIL_CREE",
+                    link: `/mon-espace-locataire/leases/${lease.id}`
+                }
+            }).catch(() => null);
+        }
+
+        // b) WhatsApp & SMS Notification to Tenant
         if (data.tenantPhone) {
-            const tenantPhone = normalizePhone(data.tenantPhone);
-            await sendSMS(
-                tenantPhone, 
-                `QAPRIL : Un contrat de bail a été préparé pour vous par le propriétaire. Veuillez vous connecter pour le consulter.`
-            );
+            const tenantPhoneNorm = normalizePhone(data.tenantPhone);
+            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} FCFA/mois).\n\nVotre contrat est accessible directement sur votre tableau de bord pour consultation et signature électronique sécurisée :\n👉 ${appUrl}/mon-espace-locataire/leases/${lease.id}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
+
+            const waRes = await sendOpenWAMessage(tenantPhoneNorm, waMsg).catch(() => ({ success: false }));
+            if (!waRes?.success) {
+                await sendSMS(
+                    tenantPhoneNorm,
+                    `QAPRIL : Votre contrat de bail pour ${bienNom} est prêt. Connectez-vous sur ${appUrl}/mon-espace-locataire/leases/${lease.id} pour le signer.`
+                ).catch(() => null);
+            }
+        }
+
+        // c) Email Notification to Tenant
+        if (tenantEmail) {
+            const emailHtml = `
+                <p style="margin: 0 0 16px 0;">Bonjour <strong>${tenantDisplayName}</strong>,</p>
+                <p style="margin: 0 0 16px 0;">Excellente nouvelle ! Le propriétaire a validé votre dossier de candidature et vous a transmis votre contrat de bail pour le bien <strong>${bienNom}</strong>.</p>
+                
+                <div style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Référence du Bail :</strong> ${leaseRef}</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Loyer mensuel :</strong> ${data.rentAmount.toLocaleString('fr-FR')} FCFA</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Dépôt de garantie :</strong> ${(data.depositAmount || 0).toLocaleString('fr-FR')} FCFA</p>
+                    <p style="margin: 0; font-size: 14px; color: #065F46;">Ce bail est certifié conforme au Code de la Construction et de l'Habitation (CCH) et sécurisé par empreinte numérique SHA-256.</p>
+                </div>
+
+                <p style="margin: 0 0 24px 0;">Veuillez cliquer sur le bouton ci-dessous pour relire attentivement votre contrat et procéder à votre signature électronique sécurisée :</p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${appUrl}/mon-espace-locataire/leases/${lease.id}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; display: inline-block;">
+                        Consulter & Signer mon Bail →
+                    </a>
+                </div>
+            `;
+
+            await sendEmail({
+                to: tenantEmail,
+                subject: `🎉 Félicitations ! Votre contrat de bail pour ${bienNom} est prêt - QAPRIL`,
+                html: wrapInPremiumTemplate(emailHtml, "Validation de Bail & Signature")
+            }).catch(err => console.error("[Tenant Acceptance Email Error]", err));
+        }
+
+        // 11. Multi-Channel Notifications to Propriétaire (Landlord)
+        const ownerUser = await prisma.user.findUnique({
+            where: { id: ownerId },
+            select: { name: true, firstName: true, lastName: true, email: true, phone: true }
+        });
+
+        // a) In-App Notification to Landlord
+        await prisma.notification.create({
+            data: {
+                userId: ownerId,
+                title: "✅ Contrat de bail généré et transmis",
+                message: `Le contrat de bail (${leaseRef}) pour ${bienNom} a été généré et notifié au locataire (${tenantDisplayName}) par WhatsApp et Email.`,
+                type: "BAIL_TRANSMIS",
+                link: `/dashboard/leases/${lease.id}`
+            }
+        }).catch(() => null);
+
+        // b) WhatsApp to Landlord
+        if (ownerUser?.phone) {
+            const ownerPhoneNorm = normalizePhone(ownerUser.phone);
+            const ownerWaMsg = `✅ *QAPRIL — Contrat de Bail Transmis*\n\nBonjour ${ownerUser.firstName || ownerUser.name || 'Propriétaire'},\n\nLe contrat de bail *${leaseRef}* pour *${bienNom}* a été généré avec succès et transmis au locataire *${tenantDisplayName}*.\n\nLe logement est désormais verrouillé et marqué *LOUÉ* sur le marketplace.\n\n👉 Suivre le dossier : ${appUrl}/dashboard/leases/${lease.id}`;
+            await sendOpenWAMessage(ownerPhoneNorm, ownerWaMsg).catch(() => null);
+        }
+
+        // c) Email to Landlord
+        if (ownerUser?.email) {
+            const ownerEmailHtml = `
+                <p style="margin: 0 0 16px 0;">Bonjour <strong>${ownerUser.firstName || ownerUser.name || 'Propriétaire'}</strong>,</p>
+                <p style="margin: 0 0 16px 0;">Votre contrat de bail <strong>${leaseRef}</strong> pour le bien <strong>${bienNom}</strong> a été créé avec succès et transmis au locataire <strong>${tenantDisplayName}</strong>.</p>
+                
+                <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Statut :</strong> En attente de signature électronique du locataire</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Loyer convenu :</strong> ${data.rentAmount.toLocaleString('fr-FR')} FCFA / mois</p>
+                    <p style="margin: 0; font-size: 14px;">Le logement a été automatiquement verrouillé et marqué comme <strong>LOUÉ</strong> sur le marketplace.</p>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${appUrl}/dashboard/leases/${lease.id}" style="background-color: #FF8200; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; display: inline-block;">
+                        Suivre le contrat de bail →
+                    </a>
+                </div>
+            `;
+            await sendEmail({
+                to: ownerUser.email,
+                subject: `✅ Contrat de bail ${leaseRef} généré et transmis au locataire - QAPRIL`,
+                html: wrapInPremiumTemplate(ownerEmailHtml, "Bail Généré & Transmis")
+            }).catch(err => console.error("[Owner Lease Confirmation Email Error]", err));
         }
 
         await writeAuditLog({ userId: session.user.id, action: "LEASE_CREATED", module: "LEASE", entityId: lease.id });
         revalidatePath("/dashboard/leases");
+        revalidatePath("/dashboard/properties");
+        revalidatePath("/mon-espace-locataire/leases");
+        revalidatePath("/mon-espace-locataire/marketplace");
+        revalidatePath("/dashboard/matching");
+
         return { success: true, leaseId: lease.id, leaseReference: leaseRef };
     } catch (error: any) {
+        console.error("[createLease Error]", error);
         return { error: error.message || "Erreur lors de la création du bail." };
     }
 }
@@ -451,9 +648,19 @@ export async function signLease(leaseId: string, otp: string) {
 
 export async function getTenantLeases() {
     const session = await ensureAuthenticated();
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { id: true, phone: true }
+    });
     const leases = await prisma.lease.findMany({
-        where: { tenantId: session.user.id },
-        include: { property: true, landlord: { select: { firstName: true, lastName: true } } }
+        where: {
+            OR: [
+                { tenantId: session.user.id },
+                ...(user?.phone ? [{ tenant: { phone: user.phone } }] : [])
+            ]
+        },
+        include: { property: true, landlord: { select: { firstName: true, lastName: true } } },
+        orderBy: { createdAt: 'desc' }
     });
     return leases.map(l => serializeLease(l));
 }

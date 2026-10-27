@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react"
 import { useSession } from "next-auth/react"
-import { Search, MapPin, DollarSign, Building2, Ruler, Bed, Home, CheckCircle, ArrowUpRight, X, Sparkles, Filter, Phone, Briefcase, FileText } from "lucide-react"
+import { Search, MapPin, DollarSign, Building2, Ruler, Bed, Home, CheckCircle, ArrowUpRight, X, Sparkles, Filter, Phone, Briefcase, FileText, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { soumettreCandidat } from "@/actions/annonce.actions"
 import { getPublicMarketplaceAnnonces } from "@/actions/marketplace-actions"
@@ -158,16 +158,24 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {annonces.map((annonce) => {
                         const logement = annonce.logement || {};
+                        const isLoue = annonce.statut === "LOUE" || logement.status === "RENTED" || (logement.leases && logement.leases.some((l: any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status)));
+
                         return (
-                            <div key={annonce.id} className="bg-white rounded-[28px] shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col group">
+                            <div key={annonce.id} className={`bg-white rounded-[28px] shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col group ${isLoue ? 'opacity-85' : ''}`}>
                                 <div className="h-56 bg-slate-100 relative overflow-hidden">
                                     <img 
                                         src={annonce.photosUrls?.[0] || logement.images?.[0]?.url || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80"}
                                         alt={annonce.titre}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    <div className="absolute top-4 left-4">
-                                        <Badge color="emerald">Vérifié QAPRIL ✓</Badge>
+                                    <div className="absolute top-4 left-4 flex items-center gap-2">
+                                        {isLoue ? (
+                                            <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                                                <Lock size={12} /> Loué
+                                            </span>
+                                        ) : (
+                                            <Badge color="emerald">Vérifié QAPRIL ✓</Badge>
+                                        )}
                                     </div>
                                     <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-black border border-white/20 shadow-md">
                                         {annonce.loyerDemande.toLocaleString()} FCFA / mois
@@ -196,12 +204,24 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                                         </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => handleOpenApplyModal(annonce)}
-                                        className="w-full bg-slate-900 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest py-3 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-indigo-500/25"
-                                    >
-                                        Déposer mon dossier <ArrowUpRight size={16} />
-                                    </button>
+                                    {isLoue ? (
+                                        <button
+                                            type="button"
+                                            disabled
+                                            className="w-full bg-slate-100 border border-slate-200 text-slate-400 font-black text-xs uppercase tracking-widest py-3 rounded-2xl cursor-not-allowed flex items-center justify-center gap-2"
+                                            title="Ce bien est déjà loué et ne peut plus recevoir de candidatures"
+                                        >
+                                            <Lock size={14} /> Bien Loué 🔒
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleOpenApplyModal(annonce)}
+                                            className="w-full bg-slate-900 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest py-3 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-indigo-500/25"
+                                        >
+                                            Déposer mon dossier <ArrowUpRight size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         );

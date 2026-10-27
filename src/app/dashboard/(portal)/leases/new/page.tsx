@@ -22,17 +22,23 @@ function LeaseRegistrationForm() {
     const [step, setStep] = useState(1)
     
     const searchParams = useSearchParams()
+    const urlPropertyId = searchParams.get('propertyId') || ""
+    const urlCandidatureId = searchParams.get('candidatureId') || ""
+    const urlTenantPhone = searchParams.get('tenantPhone') || ""
+    const urlTenantName = searchParams.get('tenantName') || ""
+    const urlRentAmount = Number(searchParams.get('rentAmount')) || 0
     
     // Form State
     const [typeBail, setTypeBail] = useState<TypeBail>(TypeBail.ECRIT)
-    const [propertyId, setPropertyId] = useState(searchParams.get('propertyId') || "")
-    const [tenantPhone, setTenantPhone] = useState("")
-    const [tenantName, setTenantName] = useState("")
+    const [propertyId, setPropertyId] = useState(urlPropertyId)
+    const [candidatureId, setCandidatureId] = useState(urlCandidatureId)
+    const [tenantPhone, setTenantPhone] = useState(urlTenantPhone)
+    const [tenantName, setTenantName] = useState(urlTenantName)
     const [propertyDescription, setPropertyDescription] = useState("")
-    const [rentAmount, setRentAmount] = useState<number>(0)
+    const [rentAmount, setRentAmount] = useState<number>(urlRentAmount)
     const [chargesAmount, setChargesAmount] = useState<number>(0)
-    const [depositAmount, setDepositAmount] = useState<number>(0)
-    const [advanceMonths, setAdvanceMonths] = useState<number>(0)
+    const [depositAmount, setDepositAmount] = useState<number>(2)
+    const [advanceMonths, setAdvanceMonths] = useState<number>(2)
     const [agencyFees, setAgencyFees] = useState<number>(0)
     const [isPending, startTransition] = useTransition()
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
@@ -42,8 +48,19 @@ function LeaseRegistrationForm() {
     const [showSuggestions, setShowSuggestions] = useState(false)
 
     useEffect(() => {
-        getProperties().then(setProperties).catch(console.error)
-    }, [])
+        getProperties().then((props) => {
+            setProperties(props);
+            if (urlPropertyId) {
+                const found = props.find((p: any) => p.id === urlPropertyId);
+                if (found) {
+                    setPropertyDescription(found.address || found.name || "");
+                    if (!urlRentAmount && found.declaredRentFcfa) {
+                        setRentAmount(found.declaredRentFcfa);
+                    }
+                }
+            }
+        }).catch(console.error)
+    }, [urlPropertyId, urlRentAmount])
 
     useEffect(() => {
         if (rentAmount >= 0) {
@@ -56,7 +73,7 @@ function LeaseRegistrationForm() {
             return setError("Veuillez remplir tous les champs de cette étape.")
         }
         if (step === 2) {
-            if (depositAmount > rentAmount * 2) {
+            if (depositAmount > 2) {
                 return setError("Oups ! La loi limite la caution à 2 mois de loyer maximum.")
             }
             if (advanceMonths > 2) {
@@ -81,9 +98,11 @@ function LeaseRegistrationForm() {
 
         const data = {
             propertyId,
+            candidatureId: candidatureId || undefined,
             leaseType: 'residential' as const,
             typeBail,
             tenantPhone,
+            tenantName,
             startDate: new Date(startDate),
             rentAmount,
             durationMonths: 12,
@@ -132,6 +151,19 @@ function LeaseRegistrationForm() {
                     <div key={s} className={`w-3 h-3 rounded-full transition-all duration-300 ${step >= s ? 'bg-[#FF8200] w-10' : 'bg-gray-200'}`} />
                 ))}
             </div>
+
+            {candidatureId && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-6 py-4 rounded-2xl text-sm font-semibold flex items-center justify-between shadow-sm animate-in fade-in">
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl">📋</span>
+                        <div>
+                            <span className="font-black uppercase tracking-wider text-xs text-emerald-700 block">Dossier Candidat Prérempli</span>
+                            Bail préparé pour <strong>{tenantName || "Locataire"}</strong> ({tenantPhone}) suite à son choix sur le marketplace.
+                        </div>
+                    </div>
+                    <span className="bg-emerald-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full">Certifié QAPRIL</span>
+                </div>
+            )}
 
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl text-sm font-medium animate-shake">
