@@ -137,3 +137,213 @@ export async function creerBailDeclaratif(
     return { error: err.message || "Erreur interne lors de la création du bail" };
   }
 }
+
+export interface UpdateBailDeclaratifData {
+  bdqId: string;
+  nomLocataire: string;
+  prenomLocataire?: string;
+  telephoneLocataire: string;
+  loyerDeclareMensuel: number;
+  descriptionLogement?: string;
+  adresseLibre?: string;
+  dateEntreeEstimee?: string | Date | null;
+  propertyId?: string | null;
+}
+
+/**
+ * Modifier un bail déclaratif (BDQ)
+ */
+export async function modifierBailDeclaratif(data: UpdateBailDeclaratifData) {
+  try {
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Vous devez être connecté pour modifier ce bail." };
+    }
+    const userId = session.user.id;
+    const userRole = (session.user as any)?.role;
+
+    if (!data.bdqId) return { success: false, error: "Identifiant du bail manquant." };
+    if (!data.nomLocataire?.trim()) return { success: false, error: "Le nom du locataire est obligatoire." };
+    if (!data.telephoneLocataire?.trim()) return { success: false, error: "Le numéro de téléphone est obligatoire." };
+    if (!data.loyerDeclareMensuel || Number(data.loyerDeclareMensuel) <= 0) {
+      return { success: false, error: "Le montant du loyer mensuel doit être supérieur à zéro." };
+    }
+
+    const bdq = await prisma.bailDeclaratif.findUnique({
+      where: { id: data.bdqId },
+      include: { property: true }
+    });
+
+    if (!bdq) return { success: false, error: "Ce bail déclaratif est introuvable." };
+    if (bdq.bailleurId !== userId && userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+      return { success: false, error: "Vous n'avez pas l'autorisation de modifier ce bail." };
+    }
+
+    const phoneNorm = normaliserTelephone(data.telephoneLocataire);
+
+    // Historique de loyer si montant modifié
+    if (Number(data.loyerDeclareMensuel) !== Number(bdq.loyerDeclareMensuel)) {
+      await prisma.bdqHistoriqueLoyer.create({
+        data: {
+          bdqId: bdq.id,
+          ancienLoyer: bdq.loyerDeclareMensuel,
+          nouveauLoyer: Number(data.loyerDeclareMensuel),
+          motif: "Ajustement des termes du bail déclaratif par le bailleur",
+          effectiveLe: new Date(),
+          hashModification: `MODIF_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          modifieParId: userId,
+        }
+      }).catch(() => null);
+    }
+
+    // Mise à jour de BailDeclaratif
+    const updatedBdq = await prisma.bailDeclaratif.update({
+      where: { id: data.bdqId },
+      data: {
+        nomLocataireDeclare: data.nomLocataire.trim(),
+        prenomLocataireDeclare: data.prenomLocataire?.trim() || null,
+        telephoneLocataire: phoneNorm,
+        loyerDeclareMensuel: Number(data.loyerDeclareMensuel),
+        descriptionLogement: data.descriptionLogement?.trim() || bdq.descriptionLogement,
+        adresseLibre: data.adresseLibre?.trim() || bdq.adresseLibre,
+        dateEntreeEstimee: data.dateEntreeEstimee ? new Date(data.dateEntreeEstimee) : bdq.dateEntreeEstimee,
+        propertyId: data.propertyId !== undefined ? (data.propertyId || null) : bdq.propertyId,
+        updatedAt: new Date(),
+      }
+    });
+
+    // Synchronisation si bail formel lié
+    if (bdq.bailFormelId) {
+      await prisma.lease.update({
+        where: { id: bdq.bailFormelId },
+        data: {
+          rentAmount: Number(data.loyerDeclareMensuel),
+          startDate: data.dateEntreeEstimee ? new Date(data.dateEntreeEstimee) : undefined,
+          propertyId: data.propertyId || undefined,
+        }
+      }).catch(() => null);
+    }
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: {
+        userId,
+        action: "BDQ_UPDATE",
+        module: "LEASES",
+        entityId: data.bdqId,
+        newValues: {
+          nom: data.nomLocataire,
+          tel: phoneNorm,
+          loyer: data.loyerDeclareMensuel,
+          dateEntree: data.dateEntreeEstimee,
+          propertyId: data.propertyId
+        }
+      }
+    }).catch(() => null);
+
+    revalidatePath("/dashboard/leases");
+    revalidatePath(`/dashboard/leases/${data.bdqId}`);
+    return serializeObject({
+      success: true,
+      message: "Le bail déclaratif a été mis à jour avec succès.",
+      bdq: updatedBdq
+    });
+  } catch (err: any) {
+    console.error("[BDQ_UPDATE_ERROR]", err);
+    return { success: false, error: err.message || "Erreur lors de la modification du bail déclaratif." };
+  }
+}
+
+/**
+ * Supprimer / Archiver un bail déclaratif (BDQ)
+ */
+export async function supprimerBailDeclaratif(bdqId: string) {
+  try {
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Vous devez être connecté pour supprimer ce bail." };
+    }
+    const userId = session.user.id;
+    const userRole = (session.user as any)?.role;
+
+    const bdq = await prisma.bailDeclaratif.findUnique({
+      where: { id: bdqId },
+      include: { property: true }
+    });
+
+    if (!bdq) {
+      return { success: false, error: "Ce bail déclaratif est introuvable." };
+    }
+
+    if (bdq.bailleurId !== userId && userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+      return { success: false, error: "Vous n'avez pas l'autorisation de supprimer ce bail." };
+    }
+
+    // 1. Archiver le BailDeclaratif
+    await prisma.bailDeclaratif.update({
+      where: { id: bdqId },
+      data: {
+        statut: "ARCHIVE",
+        deletedAt: new Date()
+      }
+    });
+
+    // 2. Archiver le Lease associé si existant
+    if (bdq.bailFormelId) {
+      await prisma.lease.update({
+        where: { id: bdq.bailFormelId },
+        data: { status: "ARCHIVED" }
+      }).catch(() => null);
+    }
+
+    // 3. Libérer le bien si aucun autre bail actif n'est en cours
+    if (bdq.propertyId) {
+      const otherActive = await prisma.lease.findFirst({
+        where: {
+          propertyId: bdq.propertyId,
+          status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] },
+          id: { not: bdq.bailFormelId || "" }
+        }
+      });
+      if (!otherActive) {
+        await prisma.property.update({
+          where: { id: bdq.propertyId },
+          data: { status: "ACTIVE" }
+        }).catch(() => null);
+      }
+    }
+
+    // 4. Clore toute médiation ouverte liée au BDQ
+    await prisma.mediation.updateMany({
+      where: { bdqId, status: "OPEN" },
+      data: {
+        status: "RESOLVED",
+        resolutionNotes: "Bail déclaratif supprimé / annulé par le bailleur."
+      }
+    }).catch(() => null);
+
+    // 5. Audit Log
+    await prisma.auditLog.create({
+      data: {
+        userId,
+        action: "BDQ_DELETE",
+        module: "LEASES",
+        entityId: bdqId,
+        newValues: { statut: "ARCHIVE" }
+      }
+    }).catch(() => null);
+
+    revalidatePath("/dashboard/leases");
+    return { success: true, message: "Le bail déclaratif a été supprimé avec succès." };
+  } catch (err: any) {
+    console.error("[BDQ_DELETE_ERROR]", err);
+    return { success: false, error: err.message || "Erreur lors de la suppression du bail." };
+  }
+}
+
+// Aliases
+export const updateBDQAction = modifierBailDeclaratif;
+export const deleteBDQAction = supprimerBailDeclaratif;
+

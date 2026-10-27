@@ -13,7 +13,7 @@ import { ensureAuthenticated, ensureLeaseAccess, ensurePropertyAccess } from "./
 import { writeAuditLog } from "@/lib/audit";
 import { generateLeaseRef } from "@/lib/lease";
 import { normalizePhone } from "@/lib/phone";
-import { serializeLease } from "@/lib/serialize";
+import { serializeLease, serializeObject } from "@/lib/serialize";
 import { evaluateTransactionRisk } from "@/lib/m-guard";
 import { sendSMS } from "@/lib/sms";
 import { sendOpenWAMessage } from "@/lib/openwa";
@@ -358,27 +358,54 @@ export async function createLease(data: {
 export async function updateLeaseDraft(leaseId: string, data: any) {
     try {
         const session = await ensureAuthenticated();
-        const lease = await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY, Role.ADMIN, Role.SUPER_ADMIN]);
-        if (![LeaseStatus.DRAFT, LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION].includes(lease.status as any)) {
-            throw new Error("Ce bail ne peut plus être modifié.");
+        const userId = session.user.id;
+
+        // 1. Tenter la recherche d'un bail formel
+        const lease = await prisma.lease.findUnique({ where: { id: leaseId }, include: { property: true } });
+        if (lease) {
+            await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY, Role.ADMIN, Role.SUPER_ADMIN]);
+            if (![LeaseStatus.DRAFT, LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.ACTIVE_DECLARATIF as any].includes(lease.status as any)) {
+                throw new Error("Ce bail ne peut plus être modifié.");
+            }
+            await prisma.lease.update({
+                where: { id: leaseId },
+                data: { ...data, commercialData: data.commercialData as Prisma.InputJsonValue }
+            });
+            revalidatePath(`/dashboard/leases/${leaseId}`);
+            revalidatePath(`/dashboard/leases`);
+            return { success: true };
         }
-        await prisma.lease.update({
-            where: { id: leaseId },
-            data: { ...data, commercialData: data.commercialData as Prisma.InputJsonValue }
-        });
-        revalidatePath(`/dashboard/leases/${leaseId}`);
-        return { success: true };
+
+        // 2. Tenter la recherche d'un bail déclaratif (BDQ)
+        const bdq = await prisma.bailDeclaratif.findUnique({ where: { id: leaseId } });
+        if (bdq) {
+            if (bdq.bailleurId !== userId && (session.user as any).role !== 'ADMIN' && (session.user as any).role !== 'SUPER_ADMIN') {
+                throw new Error("Action non autorisée sur ce bail déclaratif.");
+            }
+            const { modifierBailDeclaratif } = await import("@/actions/bail-declaratif.actions");
+            return await modifierBailDeclaratif({
+                bdqId: leaseId,
+                nomLocataire: data.tenantName || data.nomLocataireDeclare || bdq.nomLocataireDeclare,
+                prenomLocataire: data.prenomLocataire || bdq.prenomLocataireDeclare || "",
+                telephoneLocataire: data.tenantPhone || data.telephoneLocataire || bdq.telephoneLocataire,
+                loyerDeclareMensuel: data.rentAmount || data.loyerDeclareMensuel || bdq.loyerDeclareMensuel,
+                descriptionLogement: data.descriptionLogement || bdq.descriptionLogement,
+                dateEntreeEstimee: data.startDate || data.dateEntreeEstimee || bdq.dateEntreeEstimee,
+                propertyId: data.propertyId || bdq.propertyId
+            });
+        }
+
+        throw new Error("Bail introuvable.");
     } catch (error: any) {
         return { error: error.message };
     }
 }
 
 /**
- * [LEA-03] Get Lease Details
+ * [LEA-03] Get Lease Details (supports Lease & BailDeclaratif)
  */
 export async function getLeaseById(id: string) {
     try {
-        await ensureLeaseAccess(id);
         const lease = await prisma.lease.findUnique({
             where: { id },
             include: {
@@ -390,11 +417,145 @@ export async function getLeaseById(id: string) {
                 receipts: { orderBy: { periodMonth: 'desc' } }
             }
         });
-        return lease ? serializeLease(lease) : null;
+        if (lease) return serializeLease(lease);
+
+        // Fallback: BailDéclaratif
+        const bdq = await prisma.bailDeclaratif.findUnique({
+            where: { id },
+            include: {
+                property: true,
+                bailleur: { select: { firstName: true, lastName: true, phone: true, email: true, walletConfig: { select: { landlordCode: true } } } },
+                locataire: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } },
+                mediation: true,
+                historiqueLoyer: { orderBy: { createdAt: 'desc' } }
+            }
+        });
+
+        if (bdq) {
+            return serializeObject({
+                id: bdq.id,
+                leaseReference: `BDQ-${bdq.id.substring(0, 8)}`,
+                typeBail: "DECLARATIF_BDQ",
+                isBdq: true,
+                status: bdq.statut,
+                rentAmount: bdq.loyerDeclareMensuel,
+                chargesAmount: 0,
+                depositAmount: 0,
+                startDate: bdq.dateEntreeEstimee || bdq.createdAt,
+                signedAt: bdq.confirmationAt,
+                propertyId: bdq.propertyId,
+                property: bdq.property || {
+                    name: bdq.descriptionLogement,
+                    address: bdq.adresseLibre || bdq.descriptionLogement,
+                    commune: "Abidjan",
+                    propertyType: "Logement Déclaratif"
+                },
+                landlord: bdq.bailleur,
+                tenant: bdq.locataire || {
+                    id: bdq.locataireId || bdq.id,
+                    firstName: bdq.prenomLocataireDeclare || "",
+                    lastName: bdq.nomLocataireDeclare || bdq.telephoneLocataire,
+                    fullName: `${bdq.prenomLocataireDeclare ? bdq.prenomLocataireDeclare + " " : ""}${bdq.nomLocataireDeclare || ""}`.trim() || bdq.telephoneLocataire,
+                    phone: bdq.telephoneLocataire,
+                    email: null,
+                    reliabilityScore: 85
+                },
+                procedurePhases: [],
+                repaymentPlans: [],
+                receipts: [],
+                cdcDeposits: [],
+                insurance: null,
+                reminders: [],
+                mediation: bdq.mediation,
+                descriptionLogement: bdq.descriptionLogement,
+                telephoneLocataire: bdq.telephoneLocataire,
+                nomLocataireDeclare: bdq.nomLocataireDeclare,
+                prenomLocataireDeclare: bdq.prenomLocataireDeclare,
+                dateEntreeEstimee: bdq.dateEntreeEstimee
+            });
+        }
+
+        return null;
     } catch (error) {
         return null;
     }
 }
+
+/**
+ * Supprimer / Archiver un bail (Bail Déclaratif ou Bail Formel)
+ */
+export async function deleteLeaseAction(leaseOrBdqId: string) {
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+        const userRole = (session.user as any)?.role;
+
+        // 1. Tenter la suppression en tant que BDQ
+        const bdq = await prisma.bailDeclaratif.findUnique({ where: { id: leaseOrBdqId } });
+        if (bdq) {
+            const { supprimerBailDeclaratif } = await import("@/actions/bail-declaratif.actions");
+            return await supprimerBailDeclaratif(leaseOrBdqId);
+        }
+
+        // 2. Tenter la suppression en tant que Lease
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseOrBdqId },
+            include: { property: true }
+        });
+        if (!lease) return { success: false, error: "Bail introuvable." };
+
+        const isAuthorized = lease.landlordId === userId || 
+                             lease.agentId === userId || 
+                             lease.property.ownerUserId === userId || 
+                             lease.property.managedByUserId === userId ||
+                             userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+
+        if (!isAuthorized) {
+            return { success: false, error: "Action non autorisée sur ce bail." };
+        }
+
+        await prisma.lease.update({
+            where: { id: leaseOrBdqId },
+            data: { status: "ARCHIVED" }
+        });
+
+        if (lease.propertyId) {
+            const remainingActive = await prisma.lease.findFirst({
+                where: {
+                    propertyId: lease.propertyId,
+                    status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] },
+                    id: { not: leaseOrBdqId }
+                }
+            });
+            if (!remainingActive) {
+                await prisma.property.update({
+                    where: { id: lease.propertyId },
+                    data: { status: "ACTIVE" }
+                }).catch(() => null);
+            }
+        }
+
+        await prisma.auditLog.create({
+            data: {
+                userId,
+                action: "LEASE_DELETE",
+                module: "LEASES",
+                entityId: leaseOrBdqId,
+                newValues: { status: "ARCHIVED" }
+            }
+        }).catch(() => null);
+
+        revalidatePath("/dashboard/leases");
+        return { success: true, message: "Bail supprimé et archivé avec succès." };
+    } catch (err: any) {
+        console.error("[deleteLeaseAction Error]", err);
+        return { success: false, error: err?.message || "Erreur lors de la suppression du bail." };
+    }
+}
+
+// Re-exports for convenient use
+export { modifierBailDeclaratif, supprimerBailDeclaratif, updateBDQAction, deleteBDQAction } from "./bail-declaratif.actions";
+
 
 // --- [BDQ] Bail Déclaratif (Situation A/B/C) ---
 
