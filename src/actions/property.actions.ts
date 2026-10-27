@@ -339,42 +339,164 @@ export async function validateProperty(propertyId: string, checklist: PropertyVa
 }
 
 /**
- * [PRP-06] Retrait d'un bien (Soft Delete + Notifications)
+ * [PRP-06] Modifier un bien immobilier
+ * RÈGLE : Aucun bien en location active ne peut être modifié.
+ */
+export async function modifierBien(propertyId: string, formData: FormData) {
+  try {
+    const session = await ensureAuthenticated();
+
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+      include: {
+        leases: {
+          where: { status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] } }
+        },
+        units: {
+          include: {
+            leases: { where: { status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] } } }
+          }
+        }
+      }
+    });
+
+    if (!property) return { error: "Bien introuvable." };
+    if (property.ownerUserId !== session.user.id && !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as any)) {
+      return { error: "Non autorisé : vous n'êtes pas le propriétaire de ce bien." };
+    }
+
+    // VÉRIFICATION BIEN EN LOCATION
+    const hasActiveLease = property.leases.length > 0 || property.status === 'rented' || property.status === 'RENTED';
+    const childHasActiveLease = property.units.some(u => u.leases.length > 0 || u.status === 'rented' || u.status === 'RENTED');
+
+    if (hasActiveLease || childHasActiveLease) {
+      return { 
+        error: "Action impossible : Ce bien est actuellement sous contrat de location (ou en cours de contractualisation). Aucun bien loué ne peut être modifié." 
+      };
+    }
+
+    const name = formData.get("name") as string;
+    const unitLabel = formData.get("unitLabel") as string;
+    const address = (formData.get("addressLine1") as string) || (formData.get("address") as string);
+    const commune = formData.get("commune") as string;
+    const rent = parseInt(formData.get("rent") as string);
+    const area = parseFloat(formData.get("area") as string);
+    const propertyType = formData.get("propertyType") as string;
+
+    const updated = await prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        name: name || undefined,
+        unitLabel: unitLabel || undefined,
+        address: address || undefined,
+        commune: commune || undefined,
+        declaredRentFcfa: !isNaN(rent) ? rent : undefined,
+        superficieM2: !isNaN(area) ? area : undefined,
+        propertyType: propertyType || undefined,
+      }
+    });
+
+    // Mettre à jour l'annonce associée si présente
+    if (name || rent) {
+      await prisma.annonce.updateMany({
+        where: { logementId: propertyId },
+        data: {
+          titre: name || undefined,
+          loyerDemande: !isNaN(rent) ? rent : undefined
+        }
+      }).catch(() => null);
+    }
+
+    revalidatePath("/dashboard/properties");
+    revalidatePath(`/dashboard/properties/${propertyId}`);
+    return { success: true, bien: serializeProperty(updated) };
+  } catch (error: any) {
+    console.error("[modifierBien Error]:", error);
+    return { error: error.message || "Erreur lors de la modification du bien." };
+  }
+}
+
+/**
+ * [PRP-07] Supprimer un bien immobilier
+ * RÈGLE : Aucun bien en location active ne peut être supprimé.
+ */
+export async function supprimerBien(propertyId: string) {
+  try {
+    const session = await ensureAuthenticated();
+
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+      include: {
+        leases: {
+          where: { status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] } }
+        },
+        units: {
+          include: {
+            leases: { where: { status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] } } }
+          }
+        }
+      }
+    });
+
+    if (!property) return { error: "Bien introuvable." };
+    if (property.ownerUserId !== session.user.id && !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as any)) {
+      return { error: "Non autorisé : vous n'êtes pas le propriétaire de ce bien." };
+    }
+
+    // VÉRIFICATION BIEN EN LOCATION
+    const hasActiveLease = property.leases.length > 0 || property.status === 'rented' || property.status === 'RENTED';
+    const childHasActiveLease = property.units.some(u => u.leases.length > 0 || u.status === 'rented' || u.status === 'RENTED');
+
+    if (hasActiveLease || childHasActiveLease) {
+      return { 
+        error: "Action impossible : Ce bien est actuellement sous contrat de location (ou en attente de signature). Aucun bien loué ne peut être supprimé." 
+      };
+    }
+
+    // Archivage / Suppression douce du bien et de ses annonces
+    await prisma.$transaction(async (tx) => {
+      // Désactiver toutes les annonces
+      await tx.annonce.updateMany({
+        where: { logementId: propertyId },
+        data: { statut: "ARCHIVEE", archiveeAt: new Date() }
+      });
+
+      // Supprimer ou archiver les unités enfants si structure parente
+      if (property.units.length > 0) {
+        for (const unit of property.units) {
+          await tx.annonce.updateMany({
+            where: { logementId: unit.id },
+            data: { statut: "ARCHIVEE", archiveeAt: new Date() }
+          });
+          await tx.property.update({
+            where: { id: unit.id },
+            data: { status: "archived", deletedAt: new Date() }
+          });
+        }
+      }
+
+      // Marquer le bien comme archivé/supprimé
+      await tx.property.update({
+        where: { id: propertyId },
+        data: { status: "archived", deletedAt: new Date() }
+      });
+    });
+
+    revalidatePath("/dashboard/properties");
+    revalidatePath("/dashboard");
+    revalidatePath("/mon-espace-locataire/marketplace");
+    return { success: true };
+  } catch (error: any) {
+    console.error("[supprimerBien Error]:", error);
+    return { error: error.message || "Erreur lors de la suppression du bien." };
+  }
+}
+
+/**
+ * [PRP-06 Legacy] Retrait d'un bien (Soft Delete + Notifications)
  */
 export async function retirerProperty(propertyId: string) {
-    try {
-        const session = await ensureAuthenticated();
-        const result = await prisma.$transaction(async (tx) => {
-            const property = await tx.property.findUnique({
-                where: { id: propertyId },
-                include: {
-                    leases: { where: { status: 'ACTIVE' }, include: { tenant: { select: { phone: true } } } },
-                    mandates: { where: { status: 'ACTIVE' }, include: { agent: { select: { phone: true } } } }
-                }
-            });
-
-            if (!property) throw new Error("Bien non trouvé.");
-            if (property.ownerUserId !== session.user.id) throw new Error("Non autorisé.");
-
-            await tx.property.update({ where: { id: propertyId }, data: { status: 'archived' } });
-
-            for (const lease of property.leases) {
-                if (lease.tenantId) {
-                    await tx.notification.create({
-                        data: { userId: lease.tenantId, channel: 'SMS', title: 'Retrait de bien', content: `QAPRIL : Le bien ${property.propertyCode} a été retiré.` }
-                    });
-                }
-            }
-
-            return { success: true };
-        });
-
-        revalidatePath("/dashboard/properties");
-        return result;
-    } catch (error) {
-        console.error("Erreur retrait bien:", error);
-        return { error: "Erreur lors du retrait." };
-    }
+  return supprimerBien(propertyId);
 }
 
 export async function formaterAdresseBien(bien: any): Promise<string> {

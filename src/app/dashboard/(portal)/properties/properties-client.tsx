@@ -72,12 +72,29 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                         ) : (
                             <Badge color="amber">EN ATTENTE</Badge>
                         )}
-                        {p.isOccupied || p.leases?.some((l:any) => l.status === 'ACTIVE') ? (
+                        {p.isOccupied || p.status === 'rented' || p.leases?.some((l:any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status)) ? (
                             <Badge color="sky">LOUÉ</Badge>
                         ) : (
                             <Badge color="gray">DISPONIBLE</Badge>
                         )}
                     </div>
+                </td>
+                <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    {(p.isOccupied || p.status === 'rented' || p.leases?.some((l:any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status))) ? (
+                        <span 
+                            title="Ce bien est sous contrat de location actif. Il ne peut être ni modifié ni supprimé."
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-md text-[11px] font-semibold tracking-wide cursor-not-allowed"
+                        >
+                            🔒 Verrouillé
+                        </span>
+                    ) : (
+                        <Link
+                            href={`/dashboard/properties/${p.id}`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-semibold transition-colors"
+                        >
+                            Gérer / Modifier
+                        </Link>
+                    )}
                 </td>
             </tr>
             {expandedIds.has(p.id) && p.units?.map((unit: any) => (
@@ -125,6 +142,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                                         <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Propriété</th>
                                         <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Unité / Type</th>
                                         <th className="text-left py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">État Locatif</th>
+                                        <th className="text-right py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -133,7 +151,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                                     ))}
                                     {topLevelProps.length === 0 && (
                                         <tr>
-                                            <td colSpan={3} className="py-8 text-center text-slate-500 text-[13px]">
+                                            <td colSpan={4} className="py-8 text-center text-slate-500 text-[13px]">
                                                 Aucun bien immobilier trouvé.
                                             </td>
                                         </tr>

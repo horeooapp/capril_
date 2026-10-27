@@ -7,6 +7,7 @@ import { Building2, ShieldCheck, Users, ArrowLeft, Plus } from "lucide-react"
 import InviteManagerForm from "@/components/properties/InviteManagerForm"
 import ManagersList from "@/components/properties/ManagersList"
 import PropertyImageGallery from "@/components/properties/PropertyImageGallery"
+import PropertyActionsBar from "@/components/properties/PropertyActionsBar"
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -15,6 +16,10 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
 
     const property = await getPropertyById(id)
     if (!property) notFound()
+
+    // Vérifier si l'utilisateur est propriétaire ou administrateur
+    const isOwner = property.ownerUserId === session.user.id || 
+                    ['ADMIN', 'SUPER_ADMIN', 'LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(session.user.role as any)
 
     // Charger les accès existants (Gestionnaires)
     // Note: Utilisation de (prisma as any) pour éviter les erreurs de type tant que le client n'est pas synchro
@@ -40,7 +45,9 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         {property.addressLine1}, {property.commune}
                     </p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                     <PropertyActionsBar property={property} isOwner={isOwner} />
+
                      <Link 
                         href={`/dashboard/leases/new?propertyId=${id}`}
                         className="px-6 py-3 bg-slate-800 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-900 transition-all flex items-center gap-2 shadow-sm"
