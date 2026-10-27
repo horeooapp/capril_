@@ -22,15 +22,19 @@ export async function createMandatGestion(data: {
         acces_revenus_globaux: false
     }
 
-    const mandat = await (prisma as any).mandatGestion.create({
+    const mandat = await prisma.mandatGestion.create({
         data: {
             proprietaireId: data.proprietaireId,
             intermediaireId: data.intermediaireId,
             profil: data.profil,
-            biensConcernes: (data as any).biensConcernes || [],
             dateFin: data.dateFin,
             permissions: data.permissions || defaultPermissions,
-            statut: "EN_ATTENTE"
+            statut: "EN_ATTENTE",
+            ...(data.biensConcernes && data.biensConcernes.length > 0 ? {
+                biens: {
+                    create: data.biensConcernes.map(propertyId => ({ propertyId }))
+                }
+            } : {})
         }
     })
 
@@ -41,9 +45,9 @@ export async function getMandatGestion(mandatId: string) {
     const session = await auth()
     if (!session || !session.user) return null
 
-    const mandat = await (prisma as any).mandatGestion.findUnique({
+    const mandat = await prisma.mandatGestion.findUnique({
         where: { id: mandatId },
-        include: { proprietaire: true, intermediaire: true }
+        include: { proprietaire: true, intermediaire: true, biens: { include: { property: true } } }
     })
 
     if (!mandat) return null
@@ -61,7 +65,8 @@ export async function acceptMandatGestion(mandatId: string) {
     if (!session || !session.user) return { success: false, error: "Non autorisé" }
 
     const mandat = await prisma.mandatGestion.findUnique({
-        where: { id: mandatId }
+        where: { id: mandatId },
+        include: { biens: true }
     })
 
     if (!mandat || mandat.intermediaireId !== session.user.id) {
@@ -81,7 +86,7 @@ export async function acceptMandatGestion(mandatId: string) {
     })
 
     // Define accesses
-    const biensIds = (mandat as any).biensConcernes || []
+    const biensIds = (mandat as any).biens?.map((b: any) => b.propertyId) || (mandat as any).biensConcernes || []
     for (const bienId of biensIds) {
         await (prisma as any).propertyAccess.updateMany({
             where: { propertyId: bienId, userId: session.user.id, mandatId: mandat.id },

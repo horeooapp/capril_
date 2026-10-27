@@ -14,7 +14,9 @@ import { checkGuardrails } from "./guardrails"
  */
 export async function inviteManager(propertyId: string, phone: string, role: BienRole, profil?: ProfilInterm, note?: string) {
     const session = await auth()
-    if (!session || !session.user || session.user.role !== "LANDLORD") {
+    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
+    const isOwnerOrAdmin = ['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE', 'ADMIN', 'SUPER_ADMIN', 'AGENCY'].includes(activeRole);
+    if (!session || !session.user || !isOwnerOrAdmin) {
         return { success: false, error: "Non autorisé. Seul le propriétaire peut inviter." }
     }
 
@@ -28,8 +30,11 @@ export async function inviteManager(propertyId: string, phone: string, role: Bie
         }
 
         // Vérifier si le propriétaire détient bien le bien
-        const property = await prisma.property.findUnique({
-            where: { id: propertyId, ownerUserId: session.user.id }
+        const property = await prisma.property.findFirst({
+            where: {
+                id: propertyId,
+                ...(activeRole === 'ADMIN' || activeRole === 'SUPER_ADMIN' ? {} : { ownerUserId: session.user.id })
+            }
         })
 
         if (!property) return { success: false, error: "Bien introuvable ou non autorisé." }
@@ -103,9 +108,9 @@ export async function inviteManager(propertyId: string, phone: string, role: Bie
         revalidatePath(`/dashboard/properties/${propertyId}`)
         return { success: true, message: "Invitation et projet de mandat envoyés." }
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("[M-ROLES] Invite Error:", error)
-        return { success: false, error: "Erreur lors de l'invitation." }
+        return { success: false, error: error?.message || "Erreur lors de l'invitation." }
     }
 }
 
