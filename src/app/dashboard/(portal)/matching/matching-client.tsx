@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useTransition } from "react"
 import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check, MessageSquare, PlusCircle, AlertCircle, FileSignature } from "lucide-react"
 import { toast } from "sonner";
