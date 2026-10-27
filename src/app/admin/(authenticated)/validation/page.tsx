@@ -1,17 +1,21 @@
 import { getPendingValidations } from "@/actions/admin-actions"
 import CertificationButton from "./certification-button"
+import KycLevelManager from "@/components/admin/KycLevelManager"
 
 export default async function AdminValidationPage() {
     const pendings = await getPendingValidations()
 
     return (
-        <div className="space-y-6">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 border-l-4 border-gray-900 pl-4">Validations Agences & Agents</h1>
+        <div className="space-y-8">
+            <div className="mb-2">
+                <h1 className="text-3xl font-black text-gray-900 border-l-4 border-amber-600 pl-4 uppercase tracking-tight">Validations Agences & KYC</h1>
                 <p className="mt-1 text-sm text-gray-500 ml-5">
-                    Gérez les demandes de certification pour les professionnels de l&apos;immobilier.
+                    Gérez les niveaux d'exigence KYC et les demandes de certification pour les professionnels de l&apos;immobilier.
                 </p>
             </div>
+
+            {/* CONTRÔLE DES NIVEAUX KYC */}
+            <KycLevelManager showBulkUserActions={true} />
 
             <div className="grid grid-cols-1 gap-6">
                 {pendings.length === 0 ? (

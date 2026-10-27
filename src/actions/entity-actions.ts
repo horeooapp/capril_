@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Role } from "@prisma/client"
+import { isUserKycSufficient } from "@/lib/kyc-config"
 
 export type RegisterEntityInput = {
     companyName: string
@@ -29,7 +30,7 @@ export async function registerLegalEntity(input: RegisterEntityInput) {
         select: { kycLevel: true, role: true }
     })
 
-    if (!user || user.kycLevel < 3) {
+    if (!user || !(await isUserKycSufficient(user.kycLevel, 3))) {
         throw new Error("L'identité individuelle doit être vérifiée (Niveau 3) avant de créer une entité.")
     }
 

@@ -9,6 +9,7 @@ import { serializeProperty, serializeLease } from "@/lib/serialize";
 import { ensureAuthenticated, ensurePropertyAccess } from "./auth-helpers";
 import { generatePropertyCode as generatePropertyCodeLegacy } from "@/lib/property";
 import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } from "@/lib/property-utils";
+import { isUserKycSufficient } from "@/lib/kyc-config";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
@@ -143,8 +144,8 @@ export async function creerBien(formData: FormData) {
     // Checks PRO/AGENCY
     const isPro = ['AGENCY', 'LANDLORD_PRO'].includes(session.user.role as any);
     const userKyc = await prisma.user.findUnique({ where: { id: ownerUserId }, select: { kycLevel: true } });
-    if (isPro && (userKyc?.kycLevel || 0) < 4) throw new Error("KYC niveau 4 requis pour les comptes PRO.");
-    if (!isPro && (userKyc?.kycLevel || 0) < 2) throw new Error("KYC niveau 2 requis pour enregistrer des biens.");
+    if (isPro && !(await isUserKycSufficient(userKyc?.kycLevel, 4))) throw new Error("KYC niveau 4 requis pour les comptes PRO.");
+    if (!isPro && !(await isUserKycSufficient(userKyc?.kycLevel, 2))) throw new Error("KYC niveau 2 requis pour enregistrer des biens.");
 
     return await prisma.$transaction(async (tx) => {
       // 1. Validation hiérarchie

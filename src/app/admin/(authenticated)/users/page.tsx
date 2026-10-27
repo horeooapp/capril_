@@ -2,6 +2,7 @@ import { getAllUsers } from "@/actions/admin-actions"
 import { auth } from "@/auth"
 import UserActions from "@/components/admin/UserActions"
 import CreateUserModal from "@/components/admin/CreateUserModal"
+import KycLevelManager from "@/components/admin/KycLevelManager"
 import { Role } from "@prisma/client"
 import { UserCheck, ShieldAlert } from "lucide-react"
 
@@ -11,7 +12,7 @@ export default async function AdminUsersPage() {
     const isSuperAdmin = session?.user?.role === Role.SUPER_ADMIN
 
     return (
-        <div className="space-y-12 pb-16 relative">
+        <div className="space-y-10 pb-16 relative">
             <div className="fixed inset-0 bg-mesh -z-10 opacity-60"></div>
 
             <div className="page-header">
@@ -29,6 +30,9 @@ export default async function AdminUsersPage() {
                     </div>
                 </div>
             </div>
+
+            {/* CONTRÔLE CENTRALISÉ DES NIVEAUX KYC */}
+            <KycLevelManager showBulkUserActions={true} />
 
             <div className="panel">
                 <div className="panel-header">
@@ -76,17 +80,19 @@ export default async function AdminUsersPage() {
                                         </div>
                                     </td>
                                     <td>
-                                        {isVerified ? (
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--ci-vert)] uppercase tracking-widest bg-[rgba(0,154,61,0.1)] px-3 py-1 rounded-full w-max">
-                                                <UserCheck size={12} />
-                                                Vérifié
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest bg-gray-900 border border-gray-800 px-3 py-1 rounded-full w-max">
-                                                <ShieldAlert size={12} />
-                                                En attente
-                                            </div>
-                                        )}
+                                        <div className="flex flex-col gap-1">
+                                            {isVerified ? (
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full w-max">
+                                                    <UserCheck size={12} className="text-emerald-600" />
+                                                    <span>Niveau {user.kycLevel || 0} • Vérifié</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-700 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full w-max">
+                                                    <ShieldAlert size={12} className="text-amber-600" />
+                                                    <span>Niveau {user.kycLevel || 0} • En attente</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td>
                                         <div className="t-name text-gray-400 font-mono text-[10px]">
@@ -101,6 +107,8 @@ export default async function AdminUsersPage() {
                                                 currentRole={user.role} 
                                                 isSuperAdmin={isSuperAdmin} 
                                                 currentUserId={session?.user?.id || ""}
+                                                currentKycLevel={user.kycLevel || 0}
+                                                currentKycStatus={user.kycStatus || 'unverified'}
                                             />
                                         </div>
                                     </td>

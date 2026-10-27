@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import FeatureManager from "@/components/admin/FeatureManager";
+import KycLevelManager from "@/components/admin/KycLevelManager";
 import { Settings2, Info } from "lucide-react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -107,6 +108,9 @@ export default async function FeaturesPage() {
           </p>
         </div>
       </div>
+
+      {/* Contrôle des Niveaux KYC */}
+      <KycLevelManager showBulkUserActions={false} />
 
       {/* Liste des Modules */}
       <FeatureManager initialFeatures={features} />

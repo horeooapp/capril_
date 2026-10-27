@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { toggleFeature, getFeatureFlags } from "@/actions/system-actions"
 import { AppFeature } from "@/lib/features"
 import { motion } from "framer-motion"
+import KycLevelManager from "@/components/admin/KycLevelManager"
 
 const FEATURES: { key: AppFeature; label: string; description: string }[] = [
     { 
@@ -152,8 +153,16 @@ export default function SystemPage() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Configuration du Système</h1>
-                <p className="text-gray-400">Activez ou désactivez les modules applicatifs en temps réel.</p>
+                <h1 className="text-3xl font-bold text-slate-900 mb-2">Configuration du Système</h1>
+                <p className="text-slate-500 font-medium">Contrôlez les niveaux de sécurité KYC et activez/désactivez les modules applicatifs en temps réel.</p>
+            </div>
+
+            {/* CONTRÔLE PRINCIPAL DES NIVEAUX KYC */}
+            <KycLevelManager showBulkUserActions={true} />
+
+            <div className="pt-4 border-t border-slate-200">
+                <h2 className="text-xl font-bold text-slate-900 mb-1">Modules Applicatifs & Fonctionnalités</h2>
+                <p className="text-xs text-slate-500 mb-6">Activez ou désactivez les fonctionnalités spécifiques du cœur applicatif.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
