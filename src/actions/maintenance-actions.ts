@@ -16,6 +16,8 @@ export async function createMaintenanceTicket(data: {
   titre?: string;
   categorie?: any;
   description: string;
+  photoUrl?: string;
+  urgence?: string;
 }) {
   const session = await ensureAuthenticated();
   const userId = session.user.id;
@@ -36,6 +38,8 @@ export async function createMaintenanceTicket(data: {
       locataireId: data.declarantId || userId,
       categorie: data.categorie || "MAI_AU",
       description: data.description,
+      photoUrl: data.photoUrl,
+      urgence: data.urgence || "NORMALE",
     });
 
     revalidatePath("/dashboard/maintenance");

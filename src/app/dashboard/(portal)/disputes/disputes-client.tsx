@@ -1,7 +1,26 @@
 "use client"
 
 import React, { useState } from "react"
-import { Scale, FileWarning, Gavel, FileCheck2, Search, ArrowRight, ShieldAlert, History, KeyRound, AlertTriangle, ShieldX, X, MapPin } from "lucide-react"
+import { 
+    Scale, 
+    FileWarning, 
+    Gavel, 
+    FileCheck2, 
+    Search, 
+    ArrowRight, 
+    ShieldAlert, 
+    History, 
+    KeyRound, 
+    AlertTriangle, 
+    ShieldX, 
+    X, 
+    MapPin,
+    HeartHandshake,
+    CheckCircle2,
+    Clock,
+    FileText,
+    ShieldCheck
+} from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { createDisputeDLC } from "@/actions/disputes-actions"
@@ -14,14 +33,14 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState("");
 
-    // Using real data
     const disputes = initialDisputes
 
     const filteredDisputes = disputes.filter((d: any) => 
         (d.id || '').toLowerCase().includes(search.toLowerCase()) || 
         (d.hash || '').toLowerCase().includes(search.toLowerCase()) || 
         (d.lease?.tenant?.firstName || '').toLowerCase().includes(search.toLowerCase()) ||
-        (d.lease?.tenant?.lastName || '').toLowerCase().includes(search.toLowerCase())
+        (d.lease?.tenant?.lastName || '').toLowerCase().includes(search.toLowerCase()) ||
+        (d.lease?.property?.name || '').toLowerCase().includes(search.toLowerCase())
     );
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,137 +52,147 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
         if (res.error) {
             toast.error(res.error)
         } else {
-            toast.success(`Dossier DLC Scellé avec succès. Hash (${res.hash || 'Non-Scellé'}). L'avertissement locataire a été transmis.`)
+            toast.success("Dossier de litige ouvert et certifié. Un avis officiel a été transmis au locataire.")
             setIsDlcModalOpen(false)
         }
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                     <div className="mb-2 bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
-                        <Gavel size={12} /> Résolution des Litiges & Impayés
+                    <div className="mb-2 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
+                        <Gavel size={13} /> Protection Juridique & Recouvrement
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
-                        Litiges & <span className="text-rose-600">Impayés</span>
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        Gestion des Litiges & Impayés
                     </h1>
-                    <p className="text-[13.5px] font-medium text-slate-500 mt-1">
-                        Suivi des impayés, des relances officielles et des dossiers pour commissaire de justice.
+                    <p className="text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+                        Suivez les retards de paiement, formalisez les avertissements légaux et préparez les éléments de preuve pour commissaire de justice.
                     </p>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:gap-3">
+                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
                     <Link 
                         href="/dashboard/mediation" 
-                        className="bg-white border text-slate-700 border-slate-200 px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none">
-                        <ArrowRight size={16} /> Entente Amiable
+                        className="bg-white border text-slate-700 border-slate-200 px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none"
+                    >
+                        <HeartHandshake size={16} className="text-emerald-600" /> Accord Amiable
                     </Link>
                     <button 
                         onClick={() => setIsDlcModalOpen(true)}
-                        className="bg-rose-600 text-white px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-md shadow-rose-600/20 flex items-center justify-center gap-2 flex-1 sm:flex-none"
+                        className="bg-rose-600 text-white px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 flex-1 sm:flex-none"
                     >
-                        <ShieldAlert size={16} /> Ouvrir un Litige
+                        <ShieldAlert size={16} /> Ouvrir un Dossier de Litige
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                 <StatCard 
-                     label="Dossiers de Litige" 
-                     value={disputes.length.toString()} 
-                     sub="Dossiers enregistrés" 
-                 />
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard 
+                    label="Dossiers Actifs" 
+                    value={disputes.length.toString()} 
+                    sub="Total des dossiers enregistrés" 
+                />
 
-                 <div className="bg-indigo-50 border border-indigo-200 rounded-[10px] p-4 flex flex-col justify-between group h-full">
-                     <div className="flex items-center gap-2 mb-2">
-                         <KeyRound className="text-indigo-600" size={16} />
-                         <p className="text-[12px] font-semibold text-indigo-700 uppercase">Preuves du Dossier</p>
-                     </div>
-                     <div>
-                        <p className="text-xl font-black text-slate-800 tracking-tight">Preuves Sécurisées</p>
-                        <p className="text-[11px] font-semibold text-indigo-600 mt-1">Conformité Légale : 100%</p>
-                     </div>
-                 </div>
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between shadow-sm">
+                    <div className="flex items-center gap-2 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-2">
+                        <ShieldCheck size={16} /> Preuves Certifiées
+                    </div>
+                    <div>
+                        <p className="text-2xl font-black text-slate-900">Horodatage Légal</p>
+                        <p className="text-xs text-slate-500 mt-1">Éléments opposables devant les juridictions</p>
+                    </div>
+                </div>
 
-                 <div className="bg-rose-600 border border-rose-500 rounded-[10px] p-4 flex flex-col justify-between relative overflow-hidden h-full shadow-sm">
-                     <Gavel className="absolute -right-4 -bottom-4 text-white opacity-10" size={80} />
-                     <div className="relative z-10 flex items-center gap-2 mb-2">
-                         <FileCheck2 className="text-white" size={16} />
-                         <p className="text-[12px] font-semibold text-rose-100 uppercase tracking-widest">Procédures d'Expulsion</p>
-                     </div>
-                     <div className="relative z-10">
+                <div className="bg-gradient-to-br from-rose-700 to-rose-900 text-white rounded-3xl p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
+                    <Gavel className="absolute -right-4 -bottom-4 text-white opacity-10" size={90} />
+                    <div className="relative z-10 flex items-center gap-2 text-rose-200 text-xs font-bold uppercase tracking-wider mb-2">
+                        <FileCheck2 size={16} /> Procédures d'Avertissement
+                    </div>
+                    <div className="relative z-10">
                         <p className="text-3xl font-black text-white">{disputes.filter((d: any) => d.status === 'EVICTION_ORDER').length}</p>
-                        <p className="text-[11px] font-semibold text-rose-200 mt-1">Dossiers en cours</p>
-                     </div>
-                 </div>
+                        <p className="text-xs text-rose-200 mt-1">Dossiers transmis pour exécution</p>
+                    </div>
+                </div>
             </div>
 
-            <SectionCard title="Registre Légal des Litiges" noPadding>
+            {/* Table */}
+            <SectionCard title="Registre des Dossiers en Cours" noPadding>
                 <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 bg-white">
                     <div className="relative flex-1 w-full max-w-md">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input 
                             type="text" 
-                            placeholder="Rechercher (Locataire ou UUID)..." 
+                            placeholder="Rechercher par nom de locataire ou numéro de dossier..." 
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-[8px] text-[13px] focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all placeholder:text-slate-400" 
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-rose-500 focus:bg-white transition-all placeholder:text-slate-400" 
                         />
                     </div>
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[800px]">
+                    <table className="w-full text-left border-collapse min-w-[750px]">
                         <thead>
-                            <tr>
-                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Mise en Demeure / UUID</th>
-                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Nature & Objet</th>
-                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Préjudice</th>
-                                <th className="py-2 px-4 text-slate-500 font-semibold text-[11px] border-b border-slate-200 bg-slate-50 uppercase tracking-wide">Statut Judiciaire</th>
+                            <tr className="bg-slate-50/70 border-b border-slate-200">
+                                <th className="py-3 px-5 text-slate-500 font-bold text-[11px] uppercase tracking-wider">Référence du Dossier</th>
+                                <th className="py-3 px-5 text-slate-500 font-bold text-[11px] uppercase tracking-wider">Locataire & Logement</th>
+                                <th className="py-3 px-5 text-slate-500 font-bold text-[11px] uppercase tracking-wider">Montant Réclamé</th>
+                                <th className="py-3 px-5 text-slate-500 font-bold text-[11px] uppercase tracking-wider">État d'Avancement</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredDisputes.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="py-8 text-center text-slate-500 font-medium text-sm">Aucun dossier litige trouvé.</td>
+                                    <td colSpan={4} className="py-12 text-center text-slate-400 font-medium text-xs">
+                                        Aucun dossier de litige en cours.
+                                    </td>
                                 </tr>
                             )}
                             {filteredDisputes.map((d: any) => (
-                                <tr key={d.id} onClick={() => toast("Consultation de l'empreinte judiciaire " + d.id)} className="border-b border-slate-100 hover:bg-slate-50 transition-colors group cursor-pointer">
-                                    <td className="py-3 px-4">
-                                        <p className="font-semibold text-[13px] text-slate-800 flex items-center gap-2">
-                                            {d.severity === 'CRITIQUE' ? <ShieldX size={14} className="text-rose-600"/> : <AlertTriangle size={14} className="text-rose-600"/>}
-                                            {d.id.substring(0, 15)}...
+                                <tr key={d.id} className="border-b border-slate-100 hover:bg-slate-50/70 transition-colors">
+                                    <td className="py-4 px-5">
+                                        <p className="font-bold text-xs text-slate-800 flex items-center gap-2">
+                                            {d.severity === 'CRITIQUE' ? <ShieldX size={15} className="text-rose-600"/> : <AlertTriangle size={15} className="text-amber-500"/>}
+                                            Dossier N° {d.id.substring(0, 8).toUpperCase()}
                                         </p>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="bg-slate-200 px-2 py-0.5 rounded-[4px] text-[9.5px] font-mono text-slate-600 flex items-center gap-1"><KeyRound size={10}/> {d.hash || 'Non Scellé'}</div>
-                                            <span className="text-[10px] font-semibold text-slate-400">{new Date(d.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[11px] text-slate-400 mt-1 block">
+                                            Ouvert le {new Date(d.createdAt).toLocaleDateString("fr-FR")}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-5">
+                                        <div className="inline-block px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[10px] font-bold uppercase tracking-wider mb-1">
+                                            {d.type?.replace(/_/g, ' ') || 'LITIGE'}
                                         </div>
+                                        <p className="text-xs font-bold text-slate-800">{d.lease?.tenant?.firstName} {d.lease?.tenant?.lastName}</p>
+                                        <p className="text-[11px] text-slate-500">{d.lease?.property?.name || d.lease?.property?.address || "Logement non précisé"}</p>
                                     </td>
-                                    <td className="py-3 px-4">
-                                        <div className="inline-block px-2 py-0.5 border border-slate-200 bg-slate-100 rounded text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-1">{d.type?.replace('_', ' ') || 'LITIGE'}</div>
-                                        <p className="text-[12.5px] font-semibold text-slate-700">{d.lease?.tenant?.firstName} {d.lease?.tenant?.lastName}</p>
-                                        <p className="text-[11px] text-slate-500">{d.lease?.property?.name || d.lease?.property?.propertyCode}</p>
-                                    </td>
-                                     <td className="py-3 px-4">
-                                        {d.monthsDefeated > 0 ? (
-                                             <div>
-                                                <p className="font-black text-[13px] text-rose-600">{d.amountInDispute ? `${d.amountInDispute} ₣` : 'Non-Applicable'}</p>
-                                                <p className="text-[10.5px] font-semibold text-rose-500 flex items-center gap-1 mt-0.5"><History size={12}/> {d.monthsDefeated} Mois de Retard</p>
-                                             </div>
+                                    <td className="py-4 px-5">
+                                        {d.amountInDispute ? (
+                                            <div>
+                                                <p className="font-black text-xs text-rose-600">{Number(d.amountInDispute).toLocaleString()} FCFA</p>
+                                                {d.monthsDefeated > 0 && (
+                                                    <p className="text-[10px] text-slate-400">{d.monthsDefeated} mois en retard</p>
+                                                )}
+                                            </div>
                                         ) : (
-                                            <p className="font-bold text-[12px] text-slate-400 line-through">{d.amountInDispute ? `${d.amountInDispute} ₣` : 'Non-Applicable'}</p>
+                                            <span className="text-xs text-slate-400 font-medium">À évaluer</span>
                                         )}
                                     </td>
-                                    <td className="py-3 px-4">
+                                    <td className="py-4 px-5">
                                         {d.status === 'EVICTION_ORDER' && (
-                                            <Badge color="red">Eviction Prononcée</Badge>
+                                            <Badge color="red">Procédure Commissaire</Badge>
                                         )}
                                         {d.status === 'ESCALATED' && (
-                                            <Badge color="rose">Escaladé</Badge>
+                                            <Badge color="rose">Mise en Demeure</Badge>
                                         )}
                                         {d.status === 'OPEN' && (
-                                            <Badge color="blue">Nouveau Dossier</Badge>
+                                            <Badge color="blue">Dossier Ouvert</Badge>
+                                        )}
+                                        {d.status !== 'EVICTION_ORDER' && d.status !== 'ESCALATED' && d.status !== 'OPEN' && (
+                                            <Badge color="gray">{d.status}</Badge>
                                         )}
                                     </td>
                                 </tr>
@@ -173,94 +202,114 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                 </div>
             </SectionCard>
 
-             {/* DLC MODAL */}
-             {isDlcModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[16px] w-full max-w-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200">
-                        
-                        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white relative">
-                            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <div className="p-1.5 bg-rose-50 rounded-[8px] border border-rose-100"><Scale className="text-rose-600" size={18}/></div>
-                                Ouvrir un Dossier de Litige
-                            </h2>
-                            <button onClick={() => setIsDlcModalOpen(false)} className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
+            {/* OPEN DISPUTE MODAL */}
+            {isDlcModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200">
+                        {/* Modal Header */}
+                        <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
+                                    <Scale size={20} />
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-black text-slate-900">
+                                        Ouvrir un Dossier de Litige ou de Relance
+                                    </h2>
+                                    <p className="text-xs text-slate-500">Formalisation d'un constat officiel</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setIsDlcModalOpen(false)} 
+                                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors"
+                            >
                                 <X size={16} />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
-                            <div className="p-6 overflow-y-auto space-y-6 flex-1">
-                                <div className="bg-rose-50 border border-rose-200 p-4 rounded-[10px]">
-                                    <p className="font-bold text-[11px] uppercase tracking-widest text-rose-700 mb-1.5 flex items-center gap-1.5"><Gavel size={14}/> Avertissement Officiel</p>
-                                    <p className="text-[12px] leading-relaxed text-rose-800">L'ouverture de ce dossier enverra automatiquement un avertissement officiel au locataire. Ce dossier constituera une preuve complète et certifiée si vous devez faire intervenir un commissaire de justice.</p>
+                        {/* Modal Body */}
+                        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                            <div className="p-6 overflow-y-auto space-y-5 flex-1">
+                                <div className="bg-rose-50/70 border border-rose-200/80 p-4 rounded-2xl text-xs text-rose-950 space-y-1">
+                                    <p className="font-bold text-rose-900 flex items-center gap-1.5">
+                                        <AlertTriangle size={14} className="text-rose-600" /> Avertissement officiel
+                                    </p>
+                                    <p className="leading-relaxed">
+                                        L'ouverture de ce dossier génère un avis officiel transmis au locataire. Ce dossier constituera votre pièce maîtresse horodatée si vous devez solliciter un commissaire de justice.
+                                    </p>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Locataire Concerné</label>
-                                        <select name="leaseId" required className="w-full p-2.5 bg-slate-50 rounded-[8px] border border-slate-200 text-[13px] font-medium text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500">
-                                            <option value="">Sélectionnez un bail</option>
+                                        <label className="text-xs font-bold text-slate-700 mb-1.5 block">
+                                            Contrat de bail concerné <span className="text-rose-500">*</span>
+                                        </label>
+                                        <select 
+                                            name="leaseId" 
+                                            required 
+                                            className="w-full px-4 py-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                                        >
+                                            <option value="">-- Sélectionnez le bail du locataire --</option>
                                             {activeLeases.map((l: any) => (
                                                 <option key={l.id} value={l.id}>
-                                                    {l.leaseReference} : {l.tenant?.firstName} {l.tenant?.lastName}
+                                                    {l.leaseReference} : {l.tenant?.firstName} {l.tenant?.lastName} ({l.property?.address || l.property?.name || "Logement"})
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
+
                                     <div>
-                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Motif du Litige</label>
-                                        <select name="type" required className="w-full p-2.5 bg-slate-50 rounded-[8px] border border-slate-200 text-[13px] font-medium text-slate-800 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500">
-                                            <option value="DEFAUT_PAIEMENT">Loyers Impayés Accumulés</option>
-                                            <option value="DEGRADATION_LOURDE">Dégradations Lourdes / Logement Abîmé</option>
+                                        <label className="text-xs font-bold text-slate-700 mb-1.5 block">
+                                            Motif principal du litige <span className="text-rose-500">*</span>
+                                        </label>
+                                        <select 
+                                            name="type" 
+                                            required 
+                                            className="w-full px-4 py-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                                        >
+                                            <option value="DEFAUT_PAIEMENT">Loyers Impayés ou Retards Répétés</option>
+                                            <option value="DEGRADATION_LOURDE">Dégradations Constatées dans le Logement</option>
                                             <option value="SOUS_LOCATION_ILLICITE">Sous-location Non Autorisée</option>
                                             <option value="TROUBLES_VOISINAGE">Troubles Graves du Voisinage</option>
                                         </select>
                                     </div>
-                                </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-1.5 block">Preuves à Joindre</label>
-                                    <div className="flex flex-col sm:flex-row gap-3">
-                                        <button type="button" onClick={() => {
-                                            const p = new Promise(r => setTimeout(r, 1000));
-                                            toast.promise(p, { loading: "Analyse...", success: "Bilan Financier joint." });
-                                        }} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-[8px] flex items-center gap-3 hover:bg-slate-100 transition-colors">
-                                            <div className="bg-white border border-slate-200 text-slate-600 p-2 rounded-[6px]"><History size={16}/></div>
-                                            <div className="text-left">
-                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre Relevé des Loyers</p>
-                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Historique des paiements</p>
-                                            </div>
-                                        </button>
-                                        <button type="button" onClick={() => {
-                                            const p = new Promise(r => setTimeout(r, 1500));
-                                            toast.promise(p, { loading: "Analyse...", success: "EDL Inclus." });
-                                        }} className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-[8px] flex items-center gap-3 hover:bg-slate-100 transition-colors">
-                                            <div className="bg-white border border-slate-200 text-slate-600 p-2 rounded-[6px]"><MapPin size={16}/></div>
-                                            <div className="text-left">
-                                                <p className="text-[12.5px] font-bold text-slate-800">Joindre État des Lieux</p>
-                                                <p className="text-[10.5px] text-slate-500 mt-0.5">Photos et constats</p>
-                                            </div>
-                                        </button>
-                                    </div>
+                                    {/* Plain French Certification */}
+                                    <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            name="isCryptoSealed" 
+                                            defaultChecked 
+                                            className="mt-1 w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500" 
+                                        />
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-900">
+                                                Certifier et horodater officiellement le dossier
+                                            </p>
+                                            <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                                                Une empreinte numérique certifiée et infalsifiable sera enregistrée pour donner une pleine valeur juridique à votre démarche.
+                                            </p>
+                                        </div>
+                                    </label>
                                 </div>
-                                
-                                <label className="flex items-start gap-3 p-4 bg-slate-50 rounded-[8px] border border-slate-200 cursor-pointer">
-                                    <input type="checkbox" name="isCryptoSealed" defaultChecked className="mt-0.5 w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500" />
-                                    <div>
-                                        <p className="text-[12.5px] font-bold text-slate-800">Certifier le dossier officiellement</p>
-                                        <p className="text-[11px] text-slate-500 mt-0.5">Le dossier sera scellé et opposable légalement.</p>
-                                    </div>
-                                </label>
-
                             </div>
 
-                            <div className="p-5 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 shrink-0">
-                                <button type="button" onClick={() => setIsDlcModalOpen(false)} className="px-4 py-2 rounded-[8px] font-semibold text-[12px] uppercase tracking-wide text-slate-600 hover:bg-slate-200 transition-colors">Annuler</button>
+                            {/* Modal Footer */}
+                            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+                                <button 
+                                    type="button" 
+                                    onClick={() => setIsDlcModalOpen(false)} 
+                                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
+                                >
+                                    Annuler
+                                </button>
                                 <button 
                                     type="submit"
                                     disabled={loading}
-                                    className="bg-rose-600 text-white px-6 py-2 rounded-[8px] font-semibold text-[12px] uppercase tracking-wide hover:bg-rose-700 transition-colors shadow-sm active:scale-95 flex items-center gap-2 disabled:opacity-50">
-                                    {loading ? 'EN COURS...' : 'ENREGISTRER LE DOSSIER'} <ShieldAlert size={14}/>
+                                    className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {loading ? 'Enregistrement...' : 'Enregistrer le Dossier'}
+                                    <ShieldAlert size={14} />
                                 </button>
                             </div>
                         </form>
