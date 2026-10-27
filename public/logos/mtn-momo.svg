@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <rect width="200" height="80" rx="16" fill="#FFCC00"/>
+  <!-- MTN Oval Icon -->
+  <g transform="translate(16, 18)">
+    <ellipse cx="28" cy="22" rx="26" ry="18" fill="#002B49"/>
+    <text x="28" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="900" fill="#FFCC00" text-anchor="middle" letter-spacing="-0.5">MTN</text>
+  </g>
+  <!-- MoMo wordmark -->
+  <g transform="translate(80, 24)">
+    <text x="0" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#002B49" letter-spacing="-0.5">MoMo</text>
+    <text x="0" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" fill="#002B49" letter-spacing="1.5">MOBILE MONEY</text>
+  </g>
+</svg>

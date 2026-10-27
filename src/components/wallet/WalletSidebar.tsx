@@ -32,8 +32,8 @@ export default function WalletSidebar({userId,solde,nbBails,seuilAlerte=1000,ope
   return (
     <div className={Q.walletCard}>
       <div className="text-[10px] text-[#7A9AC0] font-semibold uppercase tracking-wide mb-1">Wallet QAPRIL · ADD-07 v3</div>
-      <div className="text-[26px] font-bold text-white font-mono mb-1">{solde.toLocaleString("fr-FR")} FCFA</div>
-      <div className="text-xs text-[#7A9AC0] mb-2.5">{nbBails} baux · Besoin : {besoinMois.toLocaleString("fr-FR")} FCFA/mois</div>
+      <div className="text-[26px] font-bold text-white font-mono mb-1">{solde.toLocaleString("fr-FR")} XOF</div>
+      <div className="text-xs text-[#7A9AC0] mb-2.5">{nbBails} baux · Besoin : {besoinMois.toLocaleString("fr-FR")} XOF/mois</div>
       {/* Barre progression */}
       <div className="bg-white/10 rounded-full h-2 mb-1 overflow-hidden">
         <div className="h-full rounded-full bg-gradient-to-r from-[#CC2020] to-[#F5A800] transition-all duration-500" style={{width:`${pct}%`}} />
@@ -65,7 +65,7 @@ export default function WalletSidebar({userId,solde,nbBails,seuilAlerte=1000,ope
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs font-bold text-white">{OP_COLORS[op].label}</div>
-            <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger {montant.toLocaleString("fr-FR")} FCFA</div>
+            <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger {montant.toLocaleString("fr-FR")} XOF</div>
           </div>
           <a href={url || "#"} target="_blank"
             className="border-none px-2.5 py-1.5 rounded-md text-xs font-bold cursor-pointer no-underline transition-all"

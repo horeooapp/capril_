@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <rect width="200" height="80" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
+  <!-- VISA Logo -->
+  <g transform="translate(18, 25)">
+    <text x="0" y="26" font-family="'Arial Black', sans-serif" font-size="28" font-style="italic" font-weight="900" fill="#1A1F71" letter-spacing="-1">VISA</text>
+    <polygon points="0,5 6,5 3,13 0,13" fill="#F7B600"/>
+  </g>
+  <line x1="98" y1="16" x2="98" y2="64" stroke="#CBD5E1" stroke-width="1.5"/>
+  <!-- Mastercard Logo -->
+  <g transform="translate(112, 18)">
+    <circle cx="20" cy="22" r="18" fill="#EB001B"/>
+    <circle cx="44" cy="22" r="18" fill="#F79E1B" fill-opacity="0.9"/>
+    <path d="M 32 9 A 18 18 0 0 0 32 35 A 18 18 0 0 0 32 9 Z" fill="#FF5F00"/>
+  </g>
+</svg>

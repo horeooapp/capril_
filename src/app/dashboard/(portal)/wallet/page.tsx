@@ -117,7 +117,7 @@ export default function WalletPage() {
               Solde Actuel
             </span>
             <div className="text-5xl font-black tracking-tighter text-white">
-              {profile?.balance?.toLocaleString() || 0} <span className="text-lg text-white/60">FCFA</span>
+              {profile?.balance?.toLocaleString() || 0} <span className="text-lg text-white/60">XOF</span>
             </div>
             {profile?.balance < 0 && (
               <div className="mt-4 flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded-full w-fit border border-red-400/50 shadow-lg">
@@ -197,7 +197,7 @@ export default function WalletPage() {
                 className="p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-amber-600/30 hover:bg-amber-600/5 transition-all text-left space-y-4 group"
               >
                 <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Indispensable</div>
-                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.minimum.toLocaleString()} <span className="text-xs">FCFA</span></div>
+                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.minimum.toLocaleString()} <span className="text-xs">XOF</span></div>
                 <p className="text-[10px] text-gray-500 leading-relaxed">
                   Couvre le strict nécessaire pour vos quittances immédiates.
                 </p>
@@ -216,7 +216,7 @@ export default function WalletPage() {
                   <CheckCircle2 size={12} className="text-white" />
                 </div>
                 <div className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">Zéro Friction</div>
-                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.recommande.toLocaleString()} <span className="text-xs">FCFA</span></div>
+                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.recommande.toLocaleString()} <span className="text-xs">XOF</span></div>
                 <p className="text-[10px] text-gray-500 leading-relaxed font-bold">
                   Couvre vos {profile?.suggestions?.mois_couverture || 2} prochains mois de gestion.
                 </p>
@@ -232,7 +232,7 @@ export default function WalletPage() {
                 className="p-6 rounded-3xl border-2 border-slate-800/20 hover:border-slate-800 hover:bg-slate-800/5 transition-all text-left space-y-4 group"
               >
                 <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Tranquillité</div>
-                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.confort.toLocaleString()} <span className="text-xs">FCFA</span></div>
+                <div className="text-2xl font-black text-slate-800">{profile?.suggestions?.confort.toLocaleString()} <span className="text-xs">XOF</span></div>
                 <p className="text-[10px] text-gray-500 leading-relaxed">
                   Évitez toute notification pendant un cycle complet.
                 </p>
@@ -267,7 +267,7 @@ export default function WalletPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[12px] font-bold text-amber-600">+{link.montantSuggere.toLocaleString()} FCFA</div>
+                      <div className="text-[12px] font-bold text-amber-600">+{link.montantSuggere.toLocaleString()} XOF</div>
                       <div className={`text-[9px] font-black uppercase tracking-tighter ${link.clique ? 'text-green-600' : 'text-gray-400'}`}>
                         {link.clique ? 'Consulté' : 'En attente'}
                       </div>
@@ -303,25 +303,32 @@ export default function WalletPage() {
                   <Smartphone size={14} /> Opérateur par défaut
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {['WAVE', 'ORANGE', 'MTN', 'MOOV'].map((op) => (
+                  {[
+                    { id: 'WAVE', name: 'Wave', logo: '/logos/wave.svg' },
+                    { id: 'ORANGE', name: 'Orange Money', logo: '/logos/orange-money.svg' },
+                    { id: 'MTN', name: 'MTN MoMo', logo: '/logos/mtn-momo.svg' },
+                    { id: 'MOOV', name: 'Moov Money', logo: '/logos/moov-money.svg' }
+                  ].map((op) => (
                     <button
-                      key={op}
-                      onClick={() => setPrefs({...prefs, operateur: op})}
-                      className={`relative flex items-center justify-center p-3 rounded-xl transition-all border-2 overflow-hidden ${
-                        prefs.operateur === op 
-                        ? 'bg-white border-slate-800 shadow-lg shadow-[#1F4E79]/10' 
-                        : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200'
+                      key={op.id}
+                      type="button"
+                      onClick={() => setPrefs({...prefs, operateur: op.id})}
+                      className={`relative flex items-center justify-center p-2.5 rounded-xl transition-all border-2 overflow-hidden h-14 ${
+                        prefs.operateur === op.id 
+                        ? 'bg-white border-amber-500 shadow-md ring-2 ring-amber-500/20' 
+                        : 'bg-gray-50 border-gray-200 hover:bg-white hover:border-gray-300'
                       }`}
                     >
-                      {prefs.operateur === op && (
-                         <div className="absolute top-1 right-1 bg-slate-800 rounded-full p-0.5">
-                            <CheckCircle2 size={10} className="text-white" />
+                      {prefs.operateur === op.id && (
+                         <div className="absolute top-1 right-1 bg-amber-600 rounded-full p-0.5 z-10 shadow-sm">
+                            <CheckCircle2 size={11} className="text-white" />
                          </div>
                       )}
-                      {op === 'WAVE' && <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wave_logo.svg/512px-Wave_logo.svg.png" alt="Wave" className="h-8 object-contain" />}
-                      {op === 'ORANGE' && <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" alt="Orange" className="h-8 object-contain" />}
-                      {op === 'MTN' && <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" alt="MTN" className="h-8 w-auto object-contain" />}
-                      {op === 'MOOV' && <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Moov_Africa_logo.png" alt="Moov" className="h-8 w-auto object-contain" />}
+                      <img 
+                        src={op.logo} 
+                        alt={op.name} 
+                        className="h-9 w-auto max-w-[120px] object-contain drop-shadow-sm" 
+                      />
                     </button>
                   ))}
                 </div>
@@ -353,7 +360,7 @@ export default function WalletPage() {
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 justify-between">
                   <span>Seuil d'alerte bas</span>
-                  <span className="text-amber-600">{prefs.seuil} FCFA</span>
+                  <span className="text-amber-600">{prefs.seuil} XOF</span>
                 </label>
                 <input 
                   type="range" 

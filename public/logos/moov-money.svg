@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <rect width="200" height="80" rx="16" fill="#005BA4"/>
+  <!-- Moov Orange Accent Diamond / Symbol -->
+  <g transform="translate(18, 16)">
+    <rect x="8" y="8" width="34" height="34" rx="8" transform="rotate(45 25 25)" fill="#FF6600"/>
+    <circle cx="25" cy="25" r="9" fill="#FFFFFF"/>
+    <circle cx="25" cy="25" r="5" fill="#005BA4"/>
+  </g>
+  <!-- Moov Money Wordmark -->
+  <g transform="translate(76, 22)">
+    <text x="0" y="24" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="900" fill="#FFFFFF" letter-spacing="1">MOOV</text>
+    <text x="0" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="#FF8200" letter-spacing="1.2">MONEY</text>
+  </g>
+</svg>

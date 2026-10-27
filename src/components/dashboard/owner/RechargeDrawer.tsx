@@ -6,8 +6,6 @@ import {
   X, 
   Wallet, 
   Zap, 
-  CreditCard, 
-  Smartphone, 
   ChevronRight, 
   Check, 
   Loader2,
@@ -21,74 +19,49 @@ interface RechargeDrawerProps {
   onRecharge: (amount: number, operator: string, method: string) => Promise<any>;
 }
 
-const operators = [
-  { id: 'WAVE', name: 'Wave Cote d\'Ivoire', color: 'bg-[#18A9DB]', border: 'border-transparent', method: 'DEEP_LINK', 
-    renderLogo: () => (
-      <div className="flex flex-col items-center justify-center w-full h-full text-white bg-[#18A9DB] rounded-lg">
-        <div className="flex items-center gap-0.5 mt-1">
-          <span className="text-xl -mt-1">🐧</span>
-          <span className="text-xl font-extrabold tracking-tighter leading-none">wave</span>
-        </div>
-        <span className="text-[5px] font-black opacity-90 tracking-widest mt-1 leading-none uppercase">Ton djê est calé</span>
-      </div>
-    ) 
+interface OperatorItem {
+  id: string;
+  name: string;
+  subtitle: string;
+  logoUrl: string;
+  method: string;
+}
+
+const operators: OperatorItem[] = [
+  { 
+    id: 'WAVE', 
+    name: 'Wave Côte d\'Ivoire', 
+    subtitle: 'Paiement sans frais (0%)', 
+    logoUrl: '/logos/wave.svg', 
+    method: 'DEEP_LINK' 
   },
-  { id: 'ORANGE', name: 'Orange Money', color: 'bg-[#000000]', border: 'border-transparent', method: 'DEEP_LINK',
-    renderLogo: () => (
-      <div className="flex flex-col items-center justify-center w-full h-full text-white bg-[#000000] rounded-lg">
-        <div className="bg-[#FF6600] w-10 h-6 flex items-end px-1 pb-0.5 mt-0.5 rounded-sm">
-            <span className="text-[10px] font-black tracking-tight leading-none text-white">orange</span>
-        </div>
-        <span className="text-[5px] font-black text-white mt-1 tracking-[0.2em] uppercase">Money</span>
-      </div>
-    )
+  { 
+    id: 'ORANGE', 
+    name: 'Orange Money', 
+    subtitle: 'Réseau Orange CI', 
+    logoUrl: '/logos/orange-money.svg', 
+    method: 'DEEP_LINK' 
   },
-  { id: 'MTN', name: 'MTN MoMo', color: 'bg-[#FFCC00]', border: 'border-[#FFCC00]', method: 'DEEP_LINK',
-    renderLogo: () => (
-      <div className="flex flex-col items-center justify-center w-full h-full text-[#004b73] bg-[#FFCC00] rounded-lg border-2 border-[#FFCC00]">
-        <div className="w-4 h-4 bg-[#004b73] rounded shadow-sm relative overflow-hidden flex items-center justify-center mt-0.5">
-          <svg viewBox="0 0 100 100" className="w-3 h-3 fill-[#FFCC00]">
-             <path d="M20 80 Q 50 20 80 80 Z" />
-             <circle cx="50" cy="65" r="12" fill="#004b73" />
-          </svg>
-        </div>
-        <span className="text-[10px] font-black tracking-tighter leading-none mt-0.5">MoMo</span>
-        <span className="text-[4px] font-extrabold uppercase mt-[1px] tracking-wide">from MTN</span>
-      </div>
-    )
+  { 
+    id: 'MTN', 
+    name: 'MTN MoMo', 
+    subtitle: 'MTN Mobile Money', 
+    logoUrl: '/logos/mtn-momo.svg', 
+    method: 'DEEP_LINK' 
   },
-  { id: 'MOOV', name: 'Moov Money', color: 'bg-[#005CA8]', border: 'border-transparent', method: 'DEEP_LINK',
-    renderLogo: () => (
-      <div className="flex items-center justify-center w-full h-full bg-[#005CA8] rounded-lg overflow-hidden relative">
-        <div className="absolute w-9 h-9 bg-[#F06222] rounded-sm transform rotate-45"></div>
-        <div className="relative z-10 flex flex-col items-center justify-center -mt-0.5">
-           <span className="text-[6px] font-black text-[#005CA8] uppercase tracking-tighter leading-none mt-0.5">MOOV</span>
-           <span className="text-[7px] font-extrabold text-white italic tracking-tight leading-none drop-shadow-sm -mt-0.5 flex items-center gap-0.5">
-             Money
-             <svg viewBox="0 0 24 24" className="w-[6px] h-[6px] fill-white" opacity="0.9">
-               <path d="M4 6h16v12H4z" />
-             </svg>
-           </span>
-        </div>
-      </div>
-    )
+  { 
+    id: 'MOOV', 
+    name: 'Moov Money', 
+    subtitle: 'Moov Africa CI', 
+    logoUrl: '/logos/moov-money.svg', 
+    method: 'DEEP_LINK' 
   },
-  { id: 'CARD', name: 'Cartes Bancaires', color: 'bg-white', border: 'border-gray-200', method: 'CINETPAY',
-    renderLogo: () => (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded-lg gap-0.5 border border-gray-100">
-        {/* VISA */}
-        <div className="relative flex items-center">
-          <span className="text-[14px] font-black italic tracking-tighter text-[#1A1F71] leading-none drop-shadow-sm">VISA</span>
-          <div className="absolute top-0 left-0 w-2 h-1.5 bg-[#F7B600] rounded-tl-sm" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}></div>
-        </div>
-        {/* MASTERCARD */}
-        <div className="relative flex items-center justify-center w-12 h-5 -mt-1">
-           <div className="w-5 h-5 bg-[#EB001B] rounded-full absolute left-2 opacity-95"></div>
-           <div className="w-5 h-5 bg-[#F79E1B] rounded-full absolute right-2 opacity-95 mix-blend-multiply"></div>
-           <span className="relative z-10 text-[4px] font-extrabold text-white italic tracking-tighter drop-shadow-md mt-0.5">MasterCard</span>
-        </div>
-      </div>
-    )
+  { 
+    id: 'CARD', 
+    name: 'Cartes Bancaires', 
+    subtitle: 'Visa & MasterCard', 
+    logoUrl: '/logos/carte-bancaire.svg', 
+    method: 'CINETPAY' 
   },
 ];
 
@@ -112,7 +85,7 @@ export default function RechargeDrawer({
         window.location.href = result.url;
       }
     } catch (e: any) {
-      setError(e.message || "Erreur lors de l'initialisation");
+      setError(e.message || "Erreur lors de l'initialisation du rechargement.");
       setLoading(false);
     }
   };
@@ -141,7 +114,7 @@ export default function RechargeDrawer({
             {/* Header */}
             <div className="p-8 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-orange-50 text-ivoire-orange rounded-2xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-orange-50 text-amber-600 rounded-2xl flex items-center justify-center">
                   <Wallet size={24} />
                 </div>
                 <div>
@@ -159,15 +132,15 @@ export default function RechargeDrawer({
               
               {/* Amount Suggestions */}
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Montant personnalisé</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Montant à recharger</label>
                 <div className="relative">
                    <input 
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(Number(e.target.value))}
-                      className="w-full p-6 bg-gray-50 rounded-[1.5rem] text-3xl font-black text-slate-800 focus:ring-2 focus:ring-ivoire-orange outline-none transition-all pr-20"
+                      className="w-full p-6 bg-gray-50 rounded-[1.5rem] text-3xl font-black text-slate-800 focus:ring-2 focus:ring-amber-500 outline-none transition-all pr-20"
                    />
-                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xl font-black text-gray-400">FCFA</span>
+                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-base font-black text-gray-400">XOF</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   {[2000, 5000, 10000].map((val) => (
@@ -180,46 +153,62 @@ export default function RechargeDrawer({
                         : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'
                       }`}
                     >
-                      {val.toLocaleString()}
+                      {val.toLocaleString()} XOF
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Operator Selection */}
+              {/* Operator Selection with Real Logos */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Choisir un opérateur</label>
-                <div className="grid grid-cols-1 gap-4">
-                   {operators.map((op) => (
-                     <button
-                        key={op.id}
-                        onClick={() => setSelectedOp(op)}
-                        className={`flex items-center justify-between p-6 rounded-[1.5rem] border transition-all relative overflow-hidden group ${
-                          selectedOp.id === op.id 
-                          ? 'border-ivoire-orange bg-orange-50/30' 
-                          : 'border-gray-100 hover:border-gray-200 bg-white'
-                        }`}
-                     >
-                       <div className="flex items-center gap-4 relative z-10">
-                          <div className={`w-16 h-12 ${op.color} border border-gray-100 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden shrink-0`}>
-                            {op.renderLogo()}
-                          </div>
-                          <span className={`font-black text-[14px] uppercase tracking-widest ${selectedOp.id === op.id ? 'text-slate-800' : 'text-gray-500'}`}>
-                            {op.name}
-                          </span>
-                       </div>
-                       {selectedOp.id === op.id && (
-                         <div className="w-6 h-6 bg-ivoire-orange text-white rounded-full flex items-center justify-center relative z-10 scale-110 shadow-lg">
-                           <Check size={14} strokeWidth={4} />
+                <div className="grid grid-cols-1 gap-3.5">
+                   {operators.map((op) => {
+                     const isSelected = selectedOp.id === op.id;
+                     return (
+                       <button
+                          key={op.id}
+                          type="button"
+                          onClick={() => setSelectedOp(op)}
+                          className={`flex items-center justify-between p-4 rounded-2xl border transition-all relative overflow-hidden group ${
+                            isSelected 
+                            ? 'border-amber-500 bg-amber-50/40 shadow-sm ring-1 ring-amber-500/20' 
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                          }`}
+                       >
+                         <div className="flex items-center gap-4 relative z-10">
+                            {/* Vrai Logo Officiel */}
+                            <div className="w-24 h-12 rounded-xl flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform shadow-sm">
+                              <img 
+                                src={op.logoUrl} 
+                                alt={op.name} 
+                                className="w-full h-full object-contain" 
+                              />
+                            </div>
+                            <div className="text-left">
+                              <span className={`font-black text-[13px] block tracking-tight ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                                {op.name}
+                              </span>
+                              <span className="text-[11px] font-medium text-gray-400">
+                                {op.subtitle}
+                              </span>
+                            </div>
                          </div>
-                       )}
-                       {op.method === 'DEEP_LINK' && (
-                         <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[40px] opacity-[0.03] font-black select-none group-hover:opacity-[0.05] transition-opacity">
-                           FAST
-                         </div>
-                       )}
-                     </button>
-                   ))}
+
+                         {isSelected && (
+                           <div className="w-6 h-6 bg-amber-600 text-white rounded-full flex items-center justify-center relative z-10 scale-110 shadow-md">
+                             <Check size={14} strokeWidth={3} />
+                           </div>
+                         )}
+
+                         {op.method === 'DEEP_LINK' && (
+                           <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[32px] opacity-[0.03] font-black select-none group-hover:opacity-[0.06] transition-opacity">
+                             RAPIDE
+                           </div>
+                         )}
+                       </button>
+                     )
+                   })}
                 </div>
               </div>
 
@@ -236,23 +225,23 @@ export default function RechargeDrawer({
                <button 
                   disabled={loading || amount < 100}
                   onClick={handleRecharge}
-                  className="w-full py-6 bg-amber-600 hover:bg-[#A54A0D] disabled:opacity-50 disabled:grayscale text-white rounded-[1.5rem] font-black text-[14px] uppercase tracking-[0.2em] shadow-xl shadow-orange-900/20 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                  className="w-full py-5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:grayscale text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-amber-600/20 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                >
                  {loading ? (
                    <>
-                    <Loader2 size={24} className="animate-spin" />
-                    Initialisation...
+                    <Loader2 size={20} className="animate-spin" />
+                    <span>Initialisation du paiement...</span>
                    </>
                  ) : (
                    <>
-                    <Zap size={20} className="group-hover:animate-pulse" />
-                    Confirmer & Recharger
+                    <Zap size={18} className="group-hover:animate-pulse" />
+                    <span>Confirmer & Recharger ({amount.toLocaleString()} XOF)</span>
                    </>
                  )}
                </button>
                <p className="text-center text-[10px] font-medium text-gray-400 mt-4 leading-relaxed">
                  * Le rechargement est instantané pour Wave et Orange Money.<br/>
-                 Pour les cartes bancaires, un délai de 2 à 5 min peut s'appliquer.
+                 Pour MTN, Moov et les cartes bancaires, la validation s'effectue en quelques secondes.
                </p>
             </div>
 
