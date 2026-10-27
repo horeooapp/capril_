@@ -49,7 +49,11 @@ export async function getProperties() {
 
         let whereCondition: any;
         if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
-            whereCondition = { ownerUserId: userId };
+            whereCondition = { 
+                ownerUserId: userId,
+                status: { not: "archived" },
+                deletedAt: null
+            };
         } else {
             const orConditions: any[] = [
                 { ownerUserId: userId },
@@ -63,7 +67,11 @@ export async function getProperties() {
                 orConditions.push({ leases: { some: { agentId: managerId } } });
                 orConditions.push({ accessRoles: { some: { userId: managerId, statut: "ACTIF" } } });
             }
-            whereCondition = { OR: orConditions };
+            whereCondition = { 
+                OR: orConditions,
+                status: { not: "archived" },
+                deletedAt: null
+            };
         }
 
         const dbProperties = await prisma.property.findMany({
@@ -71,6 +79,10 @@ export async function getProperties() {
             include: {
                 annonces: true,
                 units: {
+                    where: {
+                        status: { not: "archived" },
+                        deletedAt: null
+                    },
                     include: {
                         annonces: true,
                         leases: {
@@ -258,7 +270,8 @@ export async function getPropertyById(id: string) {
                 leases: { include: { tenant: { select: { firstName: true, lastName: true, phone: true } } } } 
             }
         });
-        return property ? serializeProperty(property) : null;
+        if (!property || property.status === "archived" || property.deletedAt) return null;
+        return serializeProperty(property);
     } catch (error) {
         console.error("[ACTION] getPropertyById error:", error);
         return null;

@@ -79,8 +79,8 @@ export default function PropertyActionsBar({ property, isOwner }: PropertyAction
       } else {
         toast.success("Le bien a été retiré de votre patrimoine avec succès.");
         setShowDeleteModal(false);
-        router.push("/dashboard/properties");
-        router.refresh();
+        // Utiliser window.location.href pour vider le cache client et garantir le rechargement immédiat
+        window.location.href = "/dashboard/properties";
       }
     });
   };
