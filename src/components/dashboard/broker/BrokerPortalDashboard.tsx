@@ -83,7 +83,7 @@ export function BrokerPortalDashboard({
                 />
                 <StatCard 
                     label="Commissions Générées" 
-                    value={`${fmt(totalCommissions)} ₣`} 
+                    value={`${fmt(totalCommissions)} XOF`} 
                     sub="Cumul des honoraires d'apport" 
                     trend="up" 
                 />

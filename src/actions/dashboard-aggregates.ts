@@ -98,7 +98,7 @@ export async function getDashboardAggregates(userId: string, role: string): Prom
                 return {
                     locataire: tenantName || "Locataire Inconnu",
                     mois: mois,
-                    montant: `${fmt(r.totalAmount)} ₣`,
+                    montant: `${fmt(r.totalAmount)} XOF`,
                     mode: r.paymentMethod || "VIREMENT",
                     statut: "COMPLET",
                     color: "green"

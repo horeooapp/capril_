@@ -84,7 +84,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
                                     <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                                         <div>
                                             <p className="text-[10px] uppercase font-black tracking-widest text-gray-400">Loyer Mensuel</p>
-                                            <p className="text-2xl font-black text-slate-800">{a.loyerDemande.toLocaleString()} ₣</p>
+                                            <p className="text-2xl font-black text-slate-800">{a.loyerDemande.toLocaleString()} XOF</p>
                                         </div>
                                         <button className="bg-gray-100 text-slate-800 w-12 h-12 rounded-xl flex items-center justify-center font-black hover:bg-[#FF7A00] hover:text-white transition-colors">
                                             +

@@ -92,7 +92,7 @@ export function OwnerPortalDashboardV2({
         />
         <StatCard 
             label="Loyer Mensuel (Portefeuille)" 
-            value={`${fmt(aggregates?.totalPortfolioValue || 0)} ₣`} 
+            value={`${fmt(aggregates?.totalPortfolioValue || 0)} XOF`} 
             sub="Revenu brut estimé" 
             trend="up" 
         />
@@ -104,7 +104,7 @@ export function OwnerPortalDashboardV2({
         />
         <StatCard 
             label="Wallet QAPRIL" 
-            value={`${fmt(walletBalance)} ₣`} 
+            value={`${fmt(walletBalance)} XOF`} 
             sub="Solde disponible" 
         />
       </div>
@@ -129,7 +129,7 @@ export function OwnerPortalDashboardV2({
                   <span className="text-slate-700 font-medium truncate max-w-[55%]">{u.name || u.label}</span>
                   <div className="flex items-center gap-3">
                     <Badge color={u.statut === "occupé" ? "green" : "gray"}>{u.statut === "occupé" ? "ACTIVE" : "VACANT"}</Badge>
-                    <span className="font-semibold text-slate-800 w-[70px] text-right">{fmt(u.loyer)} ₣</span>
+                    <span className="font-semibold text-slate-800 w-[70px] text-right">{fmt(u.loyer)} XOF</span>
                   </div>
                 </div>
               ))}

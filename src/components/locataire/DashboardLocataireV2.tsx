@@ -51,7 +51,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
             label="Loyer mensuel" 
-            value={`${fmt(mainBail?.rentAmount)} ₣`} 
+            value={`${fmt(mainBail?.rentAmount)} XOF`} 
             sub={`Échéance le ${mainBail?.paymentDay || 5}`} 
         />
         <StatCard 
@@ -160,7 +160,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
                         <div className="text-[11px] text-slate-400 font-mono">{q.receiptRef}</div>
                         </div>
                         <div className="text-right">
-                        <div className="font-semibold text-slate-800 mb-1">{fmt(q.totalAmount)} ₣</div>
+                        <div className="font-semibold text-slate-800 mb-1">{fmt(q.totalAmount)} XOF</div>
                         <Badge color={q.status === "paid" ? "green" : "red"}>{q.status === "paid" ? "Payé" : "En attente"}</Badge>
                         </div>
                     </div>

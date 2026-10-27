@@ -60,7 +60,7 @@ export function AgencyPortalDashboardV2({
             <StatCard 
                 label="Baux actifs" 
                 value={totalBiens.toString()} 
-                sub={`Portefeuille : ${fmt(totalPortfolioValue)} ₣ / mois`} 
+                sub={`Portefeuille : ${fmt(totalPortfolioValue)} XOF / mois`} 
             />
             <StatCard 
                 label="Occupation" 
@@ -74,7 +74,7 @@ export function AgencyPortalDashboardV2({
             />
             <StatCard 
                 label="Wallet Agence" 
-                value={`${fmt(walletBalance)} ₣`} 
+                value={`${fmt(walletBalance)} XOF`} 
                 sub={`Commissions & Provision`} 
                 trend="up" 
             />

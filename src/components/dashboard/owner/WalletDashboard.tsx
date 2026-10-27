@@ -107,7 +107,7 @@ export default function WalletDashboard() {
          <div className="flex flex-col gap-3">
              <StatCard 
                  label="Découvert" 
-                 value={`${Math.abs(decouvertMax).toLocaleString()} ₣`} 
+                 value={`${Math.abs(decouvertMax).toLocaleString()} XOF`} 
                  sub="Tolérance plafond" 
              />
              <div className="bg-emerald-50 border border-emerald-200 rounded-[10px] p-4 flex-1 flex flex-col justify-center">
@@ -171,9 +171,9 @@ export default function WalletDashboard() {
                             </td>
                             <td className="py-3 px-4 text-right">
                                 <p className={`font-bold text-[13px] ${tx.type === 'CREDIT' ? 'text-emerald-600' : 'text-slate-800'}`}>
-                                    {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} ₣
+                                    {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} XOF
                                 </p>
-                                <p className="text-[10px] text-slate-400 font-medium">Solde: {tx.balanceAfter.toLocaleString()} ₣</p>
+                                <p className="text-[10px] text-slate-400 font-medium">Solde: {tx.balanceAfter.toLocaleString()} XOF</p>
                             </td>
                         </tr>
                     ))}

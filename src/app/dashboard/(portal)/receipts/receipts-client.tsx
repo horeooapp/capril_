@@ -113,20 +113,20 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                  />
                  <StatCard 
                      label="Encaissé (Mois)" 
-                     value={`${(encaiss).toLocaleString()} ₣`} 
+                     value={`${(encaiss).toLocaleString()} XOF`} 
                      sub="Paiements confirmés" 
                  />
                  <div className="bg-slate-50 border border-slate-200 rounded-[10px] p-4 flex flex-col justify-between">
                      <p className="text-[12px] font-semibold text-slate-500 uppercase">En Attente</p>
                      <div>
-                        <p className="text-2xl font-black text-rose-500 mt-2">{(pending).toLocaleString()} ₣</p>
+                        <p className="text-2xl font-black text-rose-500 mt-2">{(pending).toLocaleString()} XOF</p>
                         <p className="text-[11px] text-slate-400 mt-1">À recevoir ce mois-ci</p>
                      </div>
                  </div>
                  <div className="bg-rose-50 border border-rose-200 rounded-[10px] p-4 flex flex-col justify-between">
                      <p className="text-[12px] font-semibold text-rose-700 uppercase">Impayés (Arriérés)</p>
                      <div>
-                        <p className="text-2xl font-black text-rose-600 mt-2">{(overdue).toLocaleString()} ₣</p>
+                        <p className="text-2xl font-black text-rose-600 mt-2">{(overdue).toLocaleString()} XOF</p>
                         <p className="text-[11px] text-rose-500 mt-1">Dossiers en contentieux</p>
                      </div>
                  </div>
@@ -164,7 +164,7 @@ export default function ReceiptsDashboardClient({ initialReceipts }: { initialRe
                                     <td className="py-3 px-4 font-semibold text-[13px] text-slate-800">{r.id.substring(0,18)}</td>
                                     <td className="py-3 px-4 font-medium text-[12.5px] text-slate-500">{r.leaseId?.substring(0,12) || "N/A"}</td>
                                     <td className="py-3 px-4 font-semibold text-[12.5px] text-slate-700">{r.periodMonth}</td>
-                                    <td className="py-3 px-4 font-black text-[13px] text-slate-900">{(r.totalAmount || 0).toLocaleString()} ₣</td>
+                                    <td className="py-3 px-4 font-black text-[13px] text-slate-900">{(r.totalAmount || 0).toLocaleString()} XOF</td>
                                     <td className="py-3 px-4">
                                         {r.status === 'PAID' && <Badge color="green">PAYÉE</Badge>}
                                         {r.status === 'PENDING' && <Badge color="amber">EN ATTENTE</Badge>}

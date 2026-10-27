@@ -93,7 +93,7 @@ export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }
                                         <p className="font-bold text-[13.5px] text-slate-900">{l.titre}</p>
                                         <p className="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5 mt-1"><MapPin size={12} className="text-slate-400"/> {l.logement?.city || l.logement?.address || "Adresse Non Spécifiée"}</p>
                                     </td>
-                                    <td className="p-4 font-black text-[13px] text-slate-700">{l.loyerDemande.toLocaleString()} ₣</td>
+                                    <td className="p-4 font-black text-[13px] text-slate-700">{l.loyerDemande.toLocaleString()} XOF</td>
                                     <td className="p-4">
                                         <div className="flex items-center gap-1.5 text-[12px] font-bold text-slate-600">
                                             <Eye size={14} className="text-indigo-500"/> {l.nbVisites || 0} Vues

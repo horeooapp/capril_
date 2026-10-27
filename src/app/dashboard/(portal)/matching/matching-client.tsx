@@ -136,7 +136,7 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
                             <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                 <div>
                                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Revenus Mensuels</span>
-                                    <span className="text-lg font-black text-emerald-600">{nextCand.revenuMensuel ? `${nextCand.revenuMensuel.toLocaleString()} ₣` : 'Non renseigné'}</span>
+                                    <span className="text-lg font-black text-emerald-600">{nextCand.revenuMensuel ? `${nextCand.revenuMensuel.toLocaleString()} XOF` : 'Non renseigné'}</span>
                                 </div>
                                 <div>
                                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Taux d'effort</span>
@@ -336,7 +336,7 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
                                     <div className="flex items-center gap-2"><Phone size={14} className="text-slate-400"/> {activeModalCandidate.telephone || activeModalCandidate.candidat?.phone || 'Non renseigné'}</div>
                                     <div className="flex items-center gap-2"><Mail size={14} className="text-slate-400"/> {activeModalCandidate.candidat?.email || 'email@candidat-verifie.ci'}</div>
                                     <div className="flex items-center gap-2"><Briefcase size={14} className="text-slate-400"/> {activeModalCandidate.employeur || 'Secteur Privé / Cadre'}</div>
-                                    <div className="flex items-center gap-2 font-black text-emerald-600"><FileText size={14}/> Revenu : {activeModalCandidate.revenuMensuel ? `${activeModalCandidate.revenuMensuel.toLocaleString()} ₣ / mois` : 'Vérifié'}</div>
+                                    <div className="flex items-center gap-2 font-black text-emerald-600"><FileText size={14}/> Revenu : {activeModalCandidate.revenuMensuel ? `${activeModalCandidate.revenuMensuel.toLocaleString()} XOF / mois` : 'Vérifié'}</div>
                                 </div>
                             </div>
 
