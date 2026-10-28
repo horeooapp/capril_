@@ -7,7 +7,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 8085;
 const WAHA_URL = process.env.WAHA_URL || 'http://openwa-api:3000';
 const WAHA_API_KEY = process.env.WAHA_API_KEY || 'qapril_wa_secret_2026';
-const SESSION_NAME = process.env.SESSION_NAME || 'qapril';
+const SESSION_NAME = process.env.SESSION_NAME || 'default';
 
 // Utiliser le fetch natif de Node 18+ ou https
 function requestWaha(endpoint, options = {}) {
@@ -59,8 +59,16 @@ async function ensureSession() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: SESSION_NAME, start: true })
       });
-    } else if (current.status === 'STOPPED' || current.status === 'FAILED') {
-      console.log(`[BRIDGE] Redémarrage session ${SESSION_NAME} (${current.status})...`);
+    } else if (current.status === 'FAILED') {
+      console.log(`[BRIDGE] Nettoyage et recréation session ${SESSION_NAME} (statut FAILED)...`);
+      await requestWaha(`/api/sessions/${SESSION_NAME}`, { method: 'DELETE' }).catch(() => {});
+      await requestWaha('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: SESSION_NAME, start: true })
+      });
+    } else if (current.status === 'STOPPED') {
+      console.log(`[BRIDGE] Redémarrage session ${SESSION_NAME} (STOPPED)...`);
       await requestWaha(`/api/sessions/${SESSION_NAME}/start`, { method: 'POST' });
     }
   } catch (err) {
@@ -91,8 +99,19 @@ app.get('/qr', async (req, res) => {
       });
     }
 
-    if (status === 'STOPPED' || status === 'FAILED') {
+    if (status === 'STOPPED') {
       await requestWaha(`/api/sessions/${SESSION_NAME}/start`, { method: 'POST' });
+      return res.json({ connected: false, phone: null, status: 'RESTARTING', qr: null });
+    }
+
+    if (status === 'FAILED') {
+      console.log(`[BRIDGE] Nettoyage session FAILED dans /qr...`);
+      await requestWaha(`/api/sessions/${SESSION_NAME}`, { method: 'DELETE' }).catch(() => {});
+      await requestWaha('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: SESSION_NAME, start: true })
+      }).catch(() => {});
       return res.json({ connected: false, phone: null, status: 'RESTARTING', qr: null });
     }
 
@@ -126,7 +145,7 @@ app.get('/status', async (req, res) => {
   }
 });
 
-app.post('/sendText', async (req, res) => {
+app.post(['/sendText', '/api/sessions/:sessionId/messages/send-text'], async (req, res) => {
   const { chatId, content, text } = req.body;
   const messageContent = content || text;
   if (!chatId || !messageContent) {
@@ -146,7 +165,7 @@ app.post('/sendText', async (req, res) => {
 
     const data = await wahaRes.json();
     if (wahaRes.ok) {
-      return res.json({ success: true, response: data, id: data?.id });
+      return res.json({ success: true, response: data, id: data?.id, messageId: data?.id });
     }
     return res.status(wahaRes.status).json({ success: false, error: data?.message || 'Erreur WAHA' });
   } catch (err) {
