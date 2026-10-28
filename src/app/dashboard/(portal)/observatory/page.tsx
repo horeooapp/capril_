@@ -1,7 +1,11 @@
 import GeoRadarDashboardClient from "./observatory-client"
-import { getMapProperties } from "@/actions/observatory-actions"
+import { getMapProperties, getObservatorySummary } from "@/actions/observatory-actions"
 
 export default async function GeoRadarDashboardPage() {
-    const properties = await getMapProperties()
-    return <GeoRadarDashboardClient properties={properties} />
+    const [properties, summary] = await Promise.all([
+        getMapProperties(),
+        getObservatorySummary()
+    ])
+    return <GeoRadarDashboardClient properties={properties} summary={summary} />
 }
+
