@@ -187,11 +187,14 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
                   <div className="space-y-4">
                      <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Preuves Photos (Horodatées)</label>
                      <div className="grid grid-cols-2 gap-4 h-48">
-                        <button className="rounded-2xl border-2 border-dashed border-gray-800 flex flex-col items-center justify-center text-gray-600 hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group overflow-hidden relative" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                           <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                           <Camera className="w-10 h-10 mb-2 group-hover:scale-110 transition-transform" />
-                           <span className="text-[10px] font-black uppercase tracking-widest">Capture Photo</span>
-                        </button>
+                        <label className="rounded-2xl border-2 border-dashed border-gray-800 flex flex-col items-center justify-center text-gray-400 hover:border-indigo-500 hover:text-indigo-400 hover:bg-indigo-500/5 transition-all group overflow-hidden relative cursor-pointer">
+                            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) toast.success(`Photo capturée : ${file.name}`);
+                            }} />
+                            <Camera className="w-10 h-10 mb-2 group-hover:scale-110 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Capture Photo</span>
+                         </label>
                         <div className="rounded-2xl bg-gray-800/20 border-2 border-gray-800 flex items-center justify-center">
                            <Info className="w-6 h-6 text-gray-600" />
                         </div>
@@ -242,9 +245,13 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
                           className="w-full bg-black/40 border-2 border-gray-800 rounded-2xl py-6 px-6 text-2xl font-black text-white focus:border-indigo-500 outline-none transition-all placeholder:text-gray-800"
                         />
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-2">
-                           <button className="p-3 bg-gray-800 rounded-xl text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                           <label className="p-3 bg-gray-800 rounded-xl text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all cursor-pointer">
+                              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) toast.success(`Photo compteur : ${file.name}`);
+                              }} />
                               <Camera className="w-5 h-5" />
-                           </button>
+                           </label>
                         </div>
                       </div>
                     </div>

@@ -92,7 +92,17 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
                   </div>
                   <span className="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">{contact.role}</span>
                 </div>
-                <button className="p-2 text-gray-500 hover:text-white transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                <button 
+                  className="p-2 text-gray-500 hover:text-white transition-colors" 
+                  title="Copier les coordonnées"
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(`${contact.fullName || ''} - ${contact.phone || ''} - ${contact.email || ''}`);
+                      toast.success("Coordonnées copiées dans le presse-papier");
+                    }
+                  }}
+                >
                   <MoreHorizontal className="w-5 h-5" />
                 </button>
               </div>
@@ -100,11 +110,11 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
               <div className="space-y-3 mb-8">
                 <div className="flex items-center gap-3 text-sm text-gray-400">
                   <Mail className="w-4 h-4 text-indigo-500" />
-                  <span className="truncate">{contact.email}</span>
+                  <a href={`mailto:${contact.email}`} className="truncate hover:text-white transition-colors">{contact.email}</a>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-400">
                   <Phone className="w-4 h-4 text-indigo-500" />
-                  <span>{contact.phone}</span>
+                  <a href={`tel:${contact.phone}`} className="hover:text-white transition-colors">{contact.phone}</a>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-500 pt-2">
                   <Clock className="w-4 h-4" />
@@ -113,10 +123,29 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
               </div>
 
               <div className="mt-auto flex gap-2">
-                <button className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                <button 
+                  className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2" 
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    if (contact.email) {
+                      window.location.href = `mailto:${contact.email}?subject=Contact QAPRIL Immobilier`;
+                    } else if (contact.phone) {
+                      window.location.href = `tel:${contact.phone}`;
+                    } else {
+                      toast.info("Aucun canal de contact direct disponible");
+                    }
+                  }}
+                >
                   <MessageSquare className="w-4 h-4" /> Message
                 </button>
-                <button className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                <button 
+                  className="px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all" 
+                  title="Détails"
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    toast.info(`Fiche contact : ${contact.fullName} (${contact.role})`);
+                  }}
+                >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

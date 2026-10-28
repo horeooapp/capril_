@@ -200,8 +200,8 @@ export default function AgencyCalendar({ initialEvents, onAddEvent }: AgencyCale
                   </div>
                   
                   <div className="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 uppercase" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Modifier</button>
-                    <button className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Annuler</button>
+                    <button className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 uppercase" onClick={() => { setIsScheduling(true); toast.info(`Modification de l'événement : ${event.titre}`); }}>Modifier</button>
+                    <button className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase" onClick={() => { toast.success(`Événement "${event.titre}" annulé`); }}>Annuler</button>
                   </div>
                 </motion.div>
               ))

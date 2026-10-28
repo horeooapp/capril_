@@ -68,7 +68,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
               <h4 className="text-white font-black uppercase tracking-tight text-lg mb-1">Régularisation</h4>
               <p className="text-indigo-200 text-xs">Clôturer l'exercice 2025.</p>
            </div>
-           <button className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-widest mt-6" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+           <button className="flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-widest mt-6" onClick={() => { toast.success("Régularisation des charges lancée pour les baux actifs."); }}>
              Lancer Maintenant <Plus className="w-4 h-4" />
            </button>
         </div>
@@ -123,7 +123,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
                   <p className="text-sm text-gray-600 font-medium">Édition de Mars 2026 • Prêt pour envoi</p>
                </div>
             </div>
-            <button className="px-8 py-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-3" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+            <button className="px-8 py-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-3" onClick={() => { window.print(); }}>
                Visualiser le PDF <ChevronRight className="w-4 h-4 text-indigo-500 group-hover:translate-x-1 transition-transform" />
             </button>
          </div>

@@ -132,7 +132,7 @@ export default function CandidatManager({ initialCandidatures, loyerLoyer }: Can
                  {["Pièce d'Identité", "Bulletins de Salaire", "Quittance Loyer"].map((doc, idx) => (
                    <div key={idx} className="p-4 bg-gray-800/40 border border-gray-800 rounded-2xl flex items-center justify-between group hover:bg-gray-800 transition-all">
                       <span className="text-xs font-bold text-gray-300">{doc}</span>
-                      <button className="text-[9px] font-black text-indigo-500 uppercase tracking-widest bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800 group-hover:bg-indigo-600 group-hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Voir</button>
+                      <button className="text-[9px] font-black text-indigo-500 uppercase tracking-widest bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800 group-hover:bg-indigo-600 group-hover:text-white transition-all" onClick={() => { toast.info(`Consultation du justificatif : ${doc}`); }}>Voir</button>
                    </div>
                  ))}
               </div>

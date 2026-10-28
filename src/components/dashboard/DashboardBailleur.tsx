@@ -1,5 +1,6 @@
 "use client"
-import { toast } from "sonner";;
+import { toast } from "sonner";
+import Link from "next/link";
 // QAPRIL - Dashboard Bailleur - Visuel approuve 01/04/2026
 // NE PAS MODIFIER les classes Q.* - elles encodent le design approuve
 
@@ -49,7 +50,7 @@ export default function DashboardBailleur({ data }: Props) {
                 </div>
               </div>
             </div>
-            <button className={Q.btnAmber + " !px-3 !py-2 text-xs"} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>⚡ Recharger</button>
+            <Link href="/dashboard/billing" className={Q.btnAmber + " !px-3 !py-2 text-xs inline-flex items-center"}>⚡ Recharger</Link>
           </div>
         )}
 
@@ -149,10 +150,10 @@ export default function DashboardBailleur({ data }: Props) {
                     <div className="text-xs font-bold text-white">{OP_COLORS[opWallet].label}</div>
                     <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger 2 000 FCFA</div>
                   </div>
-                  <button className="border-none px-2.5 py-1.5 rounded-md text-xs font-bold cursor-pointer transition-all"
-                    style={{background:OP_COLORS[opWallet].bg, color:OP_COLORS[opWallet].text}} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                  <Link href={`/dashboard/billing?operator=${opWallet}`} className="border-none px-2.5 py-1.5 rounded-md text-xs font-bold cursor-pointer transition-all inline-block"
+                    style={{background:OP_COLORS[opWallet].bg, color:OP_COLORS[opWallet].text}}>
                     Ouvrir →
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

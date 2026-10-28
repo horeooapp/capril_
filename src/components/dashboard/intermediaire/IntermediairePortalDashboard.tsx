@@ -261,9 +261,9 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                                 <div className={`w-2 h-2 rounded-full ${p.leases?.[0]?.receipts?.[0]?.status === 'paid' ? 'bg-green-500' : 'bg-red-500'}`} />
                                                 <span className="text-[9px] font-black uppercase text-slate-500">{p.leases?.[0]?.receipts?.[0]?.status === 'paid' ? 'À JOUR' : 'IMPAYÉ'}</span>
                                             </div>
-                                            <button className="text-[9px] font-black uppercase text-[#0D2B6E] flex items-center gap-1 hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                                                Gérer <ChevronRight size={12} />
-                                            </button>
+                                            <button className="text-[9px] font-black uppercase text-[#0D2B6E] flex items-center gap-1 hover:underline" onClick={() => { setSelectedProperty(p); setSheet("quittanceForm"); }}>
+                                                 Gérer <ChevronRight size={12} />
+                                             </button>
                                         </div>
                                     </div>
                                 ))}
@@ -379,7 +379,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                             <div className="text-3xl font-black italic">{fmt(Math.round(stats.totalCommissions))} F</div>
                                         </div>
                                     </div>
-                                    <button className="w-full py-4 bg-white text-[#C9A84C] rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Relais de virement →</button>
+                                    <button className="w-full py-4 bg-white text-[#C9A84C] rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all" onClick={() => { toast.success("Demande de reversement des commissions transmise au bailleur."); }}>Relais de virement →</button>
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] pl-2 leading-none">Canaux Mobile Money</h3>
@@ -440,8 +440,8 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                              <div>
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 mb-2 block italic">Période du loyer</label>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <button className="py-4 bg-[#0D2B6E] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 italic" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Avril 2026</button>
-                                    <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl text-[12px] font-black uppercase tracking-widest italic opacity-50" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Mai 2026</button>
+                                    <button className="py-4 bg-[#0D2B6E] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 italic" onClick={() => { toast.info("Période sélectionnée : Avril 2026"); }}>Avril 2026</button>
+                                    <button className="py-4 bg-slate-100 text-slate-600 rounded-2xl text-[12px] font-black uppercase tracking-widest italic" onClick={() => { toast.info("Période sélectionnée : Mai 2026"); }}>Mai 2026</button>
                                 </div>
                              </div>
 
@@ -454,10 +454,10 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                         { l: "MoMo", i: "🟡" },
                                         { l: "Transfert", i: "🏦" },
                                     ].map((m, i) => (
-                                        <button key={i} className="p-4 border border-slate-100 rounded-2xl flex flex-col items-center gap-2 hover:border-[#0D2B6E] transition-all group active:scale-95 shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                                            <span className="text-2xl">{m.i}</span>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-[#0D2B6E]">{m.l}</span>
-                                        </button>
+                                        <button key={i} className="p-4 border border-slate-100 rounded-2xl flex flex-col items-center gap-2 hover:border-[#0D2B6E] transition-all group active:scale-95 shadow-sm" onClick={() => { toast.info(`Mode de versement sélectionné : ${m.l}`); }}>
+                                             <span className="text-2xl">{m.i}</span>
+                                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest group-hover:text-[#0D2B6E]">{m.l}</span>
+                                         </button>
                                     ))}
                                 </div>
                              </div>
@@ -501,10 +501,10 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                 { l: "SMS Premium", i: "📱", c: "#000000" },
                                 { l: "Appel Vocal", i: "📞", c: "#0D2B6E" }
                              ].map((c, i) => (
-                                <button key={i} className="w-full flex items-center justify-between p-5 border border-slate-100 rounded-3xl hover:border-slate-800 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                                <button key={i} className="w-full flex items-center justify-between p-5 border border-slate-100 rounded-3xl hover:border-slate-800 transition-all" onClick={() => { setSheet(null); toast.success(`Relance initiée via canal : ${c.l}`); }}>
                                      <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ background: c.c }}>{c.i}</div>
-                                        <div className="text-[12px] font-black uppercase italic" style={{ color: c.c }}>{c.l}</div>
+                                         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{ background: c.c }}>{c.i}</div>
+                                         <div className="text-[12px] font-black uppercase italic" style={{ color: c.c }}>{c.l}</div>
                                      </div>
                                      <ChevronRight size={16} />
                                 </button>
@@ -531,7 +531,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option B: Délai étendu (15 jours)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Approbation mandataire nécessaire</p>
                             </button>
-                            <button className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all opacity-50" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                            <button className="w-full p-5 border border-slate-100 rounded-3xl text-left hover:border-orange-500 transition-all" onClick={() => { setSheet(null); activerClemenceM07(selectedProperty?.id, { type: "echeancier", noteInterne: "Plan de paiement CACI en 3 mensualités" }); }}>
                                 <div className="text-[12px] font-black text-[#0D2B6E] uppercase italic">Option C: Échéancier (CACI)</div>
                                 <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">Plan de paiement en 3 fois</p>
                             </button>

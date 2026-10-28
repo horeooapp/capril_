@@ -133,7 +133,14 @@ export default function MaintenanceAgencyDash({ initialTickets }: { initialTicke
                       Clôturer
                     </button>
                 )}
-                <button className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                <button 
+                  className="p-4 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl transition-all" 
+                  title="Détails du ticket"
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    window.location.href = `/dashboard/maintenance?ticketId=${ticket.id}`;
+                  }}
+                >
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>

@@ -179,7 +179,13 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
                       <div className="p-3 bg-gray-800 rounded-xl text-gray-600"><FileUp className="w-5 h-5" /></div>
                       <span className="text-sm font-bold text-gray-300">{doc}</span>
                     </div>
-                    <button className="text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-white" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Téléverser</button>
+                    <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest hover:text-white cursor-pointer px-3 py-1.5 rounded-lg border border-gray-800 bg-gray-900 hover:bg-indigo-600 transition-all">
+                      Téléverser
+                      <input type="file" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) toast.success(`${doc} sélectionné : ${file.name}`);
+                      }} />
+                    </label>
                  </div>
                ))}
             </div>

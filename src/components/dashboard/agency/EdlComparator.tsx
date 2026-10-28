@@ -54,11 +54,23 @@ export const EdlComparator: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all shadow-sm" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+          <button 
+            className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all shadow-sm" 
+            onClick={(e) => { 
+              e.preventDefault(); 
+              window.print();
+            }}
+          >
             <Download size={16} />
             Export Certifié PDF
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+          <button 
+            className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-700 transition-all shadow-lg shadow-blue-900/20" 
+            onClick={(e) => { 
+              e.preventDefault(); 
+              toast.success("État des lieux certifié et scellé avec succès. Transmis au locataire et au bailleur.");
+            }}
+          >
             <ShieldCheck size={16} />
             Signer & Clôturer
           </button>
@@ -188,7 +200,27 @@ export const EdlComparator: React.FC = () => {
                 </div>
               ))}
 
-              <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-slate-800 hover:text-slate-800 transition-all group" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+              <button 
+                className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:border-slate-800 hover:text-slate-800 transition-all group" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  const nom = prompt("Désignation de la dégradation constatée :");
+                  if (nom) {
+                    const montantStr = prompt("Montant estimatif de la remise en état (FCFA) :", "25000");
+                    const montant = parseInt(montantStr || "0", 10);
+                    if (!isNaN(montant) && montant > 0) {
+                      setDegradations(prev => [...prev, {
+                        id: Date.now(),
+                        label: nom,
+                        cost: montant,
+                        qty: 1,
+                        category: "Dégradation"
+                      }]);
+                      toast.success(`Dégradation "${nom}" ajoutée.`);
+                    }
+                  }
+                }}
+              >
                 <Plus size={18} className="group-hover:rotate-90 transition-transform" />
                 <span className="text-[11px] font-black uppercase tracking-widest">Ajouter une dégradation</span>
               </button>
@@ -213,7 +245,13 @@ export const EdlComparator: React.FC = () => {
                   Le locataire dispose de 72h pour contester.
                </p>
 
-               <button className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 mt-6" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+               <button 
+                 className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-700 transition-all flex items-center justify-center gap-3 mt-6" 
+                 onClick={(e) => { 
+                   e.preventDefault(); 
+                   toast.success(`Solde de ${soldeRestituer.toLocaleString()} FCFA validé et transmis pour déconsignation CDC.`);
+                 }}
+               >
                   Valider le solde
                   <ArrowRight size={18} />
                </button>

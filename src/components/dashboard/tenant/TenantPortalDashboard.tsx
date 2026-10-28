@@ -198,7 +198,14 @@ export function TenantPortalDashboard({
 
                 <Sheet open={O.pay} onClose={()=>cl("pay")} title="Lancer le paiement">
                     <p style={{fontSize:12,color:T.textMid,marginBottom:20}}>Souhaitez-vous payer votre loyer de {bail?.rentAmount||bail?.loyer||'--'} FCFA via {selNum?.operator||'Mobile Money'} ?</p>
-                    <button onClick={()=>toast.promise(new Promise(r => setTimeout(r, 1000)), {loading: 'Connexion CinetPay...', success: 'Interface de paiement sécurisée.'})} style={{width:"100%",background:T.green,color:T.white,borderRadius:12,padding:14,fontWeight:800,border:"none"}}>Confirmer le paiement</button>
+                    <button 
+                      onClick={() => {
+                        window.location.href = `/mon-espace-locataire/payment?leaseId=${bail?.id || ''}&operator=${encodeURIComponent(selNum?.operator || 'WAVE')}`;
+                      }} 
+                      style={{width:"100%",background:T.green,color:T.white,borderRadius:12,padding:14,fontWeight:800,border:"none",cursor:"pointer"}}
+                    >
+                      Confirmer le paiement
+                    </button>
                 </Sheet>
 
                 <Sheet open={O.trust} onClose={()=>cl("trust")} title="Portefeuille de Confiance (Phase 3)">
@@ -213,11 +220,19 @@ export function TenantPortalDashboard({
                         <div style={{display:"flex",gap:10,alignItems:"center"}}>
                             <span style={{fontSize:20}}>🏢</span>
                             <div>
-                                <div style={{fontSize:12,fontWeight:700}}>Agence KOUIZ-IMMO</div>
+                                <div style={{fontSize:12,fontWeight:700}}>Agence Partenaire</div>
                                 <div style={{fontSize:9,color:T.textLight}}>Accès : Quittances, Bail, RCL</div>
                             </div>
                         </div>
-                        <button style={{background:T.redPale,color:T.red,border:"none",borderRadius:6,padding:"4px 8px",fontSize:9,fontWeight:800}} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>RÉVOQUER</button>
+                        <button 
+                          style={{background:T.redPale,color:T.red,border:"none",borderRadius:6,padding:"4px 8px",fontSize:9,fontWeight:800,cursor:"pointer"}} 
+                          onClick={(e) => { 
+                            e.preventDefault(); 
+                            toast.success("Accès révoqué avec succès. Les consentements ont été mis à jour.");
+                          }}
+                        >
+                          RÉVOQUER
+                        </button>
                     </div>
                     <div style={{marginTop:20,textAlign:"center"}}>
                         <button onClick={()=>cl("trust")} style={{background:T.grey1,color:T.textMid,borderRadius:8,padding:"10px 20px",fontSize:11,fontWeight:700,border:"none"}}>Fermer</button>

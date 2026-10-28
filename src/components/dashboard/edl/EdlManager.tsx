@@ -1,5 +1,6 @@
 "use client"
 import { toast } from "sonner";
+import Link from "next/link";
 
 import { useState, useEffect } from "react";
 import { 
@@ -127,9 +128,9 @@ export default function EdlManager({ leaseId, initialEdls }: EdlManagerProps) {
                         </div>
                     )}
 
-                    <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                    <Link href={`/dashboard/edl/${edl.id}`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all inline-block" title="Consulter l EDL">
                       <Eye className="w-5 h-5" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
 

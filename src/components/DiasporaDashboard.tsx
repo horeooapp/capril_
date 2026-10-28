@@ -476,7 +476,7 @@ const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA,
                <div style={{fontSize:11,opacity:0.8,marginBottom:20,lineHeight:1.4}}>Délai maximum autorisé pour la signalisation d'un incident majeur.</div>
                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
                  {["12h","24h","48h","72h"].map(h=>(
-                   <button key={h} style={{padding:"12px",borderRadius:10,background:h==="24h"?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.05)",border:"none",color:T.white,fontSize:13,fontWeight:900,cursor:"pointer"}} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>{h}</button>
+                   <button key={h} style={{padding:"12px",borderRadius:10,background:h==="24h"?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.05)",border:"none",color:T.white,fontSize:13,fontWeight:900,cursor:"pointer"}} onClick={() => { toast.success(`SLA incident configuré sur ${h}`); }}>{h}</button>
                  ))}
                </div>
                <div style={{marginTop:20,fontSize:10,fontWeight:700,textAlign:"center",opacity:0.6}}>Paramètre actuel : 24h</div>
@@ -615,7 +615,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
             <div style={{fontSize:11,fontWeight:700,color:T.textLight,textTransform:"uppercase",marginBottom:8}}>Rôle du mandataire</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
               {["Agence Agréée","Particulier"].map(r=>(
-                <button key={r} style={{padding:"12px",borderRadius:10,border:`1.5px solid ${T.grey2}`,background:T.white,fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer"}} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>{r}</button>
+                <button key={r} style={{padding:"12px",borderRadius:10,border:`1.5px solid ${T.grey2}`,background:T.white,fontSize:11,fontWeight:700,color:T.textMid,cursor:"pointer"}} onClick={() => { toast.info(`Rôle du mandataire sélectionné : ${r}`); }}>{r}</button>
               ))}
             </div>
           </div>

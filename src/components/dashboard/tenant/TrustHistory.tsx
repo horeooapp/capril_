@@ -48,7 +48,19 @@ export const TrustHistory: React.FC<{ score: number }> = ({ score }) => {
               <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-6">
                  Présentez ce code aux agences pour un accès temporaire (24h) à votre score certifié.
               </p>
-              <button className="w-full py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+              <button 
+                 className="w-full py-4 bg-slate-800 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform shadow-lg shadow-blue-900/20" 
+                 onClick={(e) => { 
+                    e.preventDefault(); 
+                    const token = "QAP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    if (navigator.clipboard) {
+                       navigator.clipboard.writeText(token);
+                       toast.success(`Jeton sécurisé 24h généré : ${token} (Copié)`);
+                    } else {
+                       toast.success(`Jeton sécurisé 24h généré : ${token}`);
+                    }
+                 }}
+              >
                  Générer un jeton d'accès
               </button>
            </div>

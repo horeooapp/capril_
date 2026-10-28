@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { T } from '@/constants/agency-data';
 import { Badge } from './Badge';
 import { ChevronRight, User, ShieldCheck, Loader2 } from 'lucide-react';
@@ -25,9 +26,9 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
           <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Candidatures.</h2>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Suivi des dossiers M-CAND</p>
         </div>
-        <button className="px-4 py-2 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-200 transition-colors" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+        <Link href="/dashboard/candidatures/new" className="px-4 py-2 bg-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-700 transition-colors inline-block">
           Nouvelle Candidature
-        </button>
+        </Link>
       </div>
 
       <div className="space-y-3">

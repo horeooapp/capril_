@@ -230,51 +230,76 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
       <div className="bg-slate-50 p-6 sm:p-8 rounded-[3rem] border border-white shadow-inner">
          <div className="flex justify-between items-center mb-6">
             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest italic">Dernières Factures.</h3>
-            <button className="text-[10px] font-black uppercase text-blue-600 hover:underline" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>Historique</button>
-         </div>
-          <div className="space-y-4">
-            {filteredData.slice(0, 5).map((f: any, i: number) => (
-               <div key={f.month} className="bg-white p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between border border-slate-100 hover:shadow-md transition-shadow gap-4">
-                  <div className="flex items-center gap-4">
-                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
-                        <Calendar size={18} />
-                     </div>
-                     <div className="overflow-hidden">
-                        <div className="text-[12px] sm:text-[13px] font-black text-slate-800 uppercase truncate">Facture {activeProvider.toUpperCase()} — {f.month}</div>
-                        <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Réduction Profil Activée</div>
-                     </div>
-                  </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 pt-4 sm:pt-0">
-                     <div className="text-left sm:text-right">
-                        <div className="text-[14px] sm:text-[15px] font-black text-slate-900 font-mono">{f.cost.toLocaleString()} FCFA</div>
-                        <div className="flex items-center gap-1 sm:justify-end">
-                           <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                           <span className="text-[9px] font-black text-green-600 uppercase">Payée</span>
-                        </div>
-                     </div>
-                     <button className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-                        <Download size={16} />
-                     </button>
-                  </div>
-               </div>
-            ))}
-         </div>
-      </div>
+             <button 
+                className="text-[10px] font-black uppercase text-blue-600 hover:underline" 
+                onClick={(e) => { 
+                   e.preventDefault(); 
+                   window.location.href = `/mon-espace-locataire/cie-sodeci#historique`;
+                }}
+             >
+                Historique
+             </button>
+          </div>
+           <div className="space-y-4">
+             {filteredData.slice(0, 5).map((f: any, i: number) => (
+                <div key={f.month} className="bg-white p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between border border-slate-100 hover:shadow-md transition-shadow gap-4">
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                         <Calendar size={18} />
+                      </div>
+                      <div className="overflow-hidden">
+                         <div className="text-[12px] sm:text-[13px] font-black text-slate-800 uppercase truncate">Facture {activeProvider.toUpperCase()} — {f.month}</div>
+                         <div className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Réduction Profil Activée</div>
+                      </div>
+                   </div>
+                   <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 pt-4 sm:pt-0">
+                      <div className="text-left sm:text-right">
+                         <div className="text-[14px] sm:text-[15px] font-black text-slate-900 font-mono">{f.cost.toLocaleString()} FCFA</div>
+                         <div className="flex items-center gap-1 sm:justify-end">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                            <span className="text-[9px] font-black text-green-600 uppercase">Payée</span>
+                         </div>
+                      </div>
+                      <button 
+                         className="p-3 bg-slate-50 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-all" 
+                         title="Télécharger reçu / facture"
+                         onClick={(e) => { 
+                            e.preventDefault(); 
+                            if (f.pdfUrl) {
+                               window.open(f.pdfUrl, "_blank");
+                            } else {
+                               toast.info(`Facture ${activeProvider.toUpperCase()} archivée au dossier.`);
+                            }
+                         }}
+                      >
+                         <Download size={16} />
+                      </button>
+                   </div>
+                </div>
+             ))}
+          </div>
+       </div>
 
-      {/* Advice Section */}
-      <div className="p-6 sm:p-8 bg-blue-50 rounded-[3rem] border border-blue-100 flex flex-col items-center sm:items-start md:flex-row gap-6 sm:gap-8">
-         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-[2rem] flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
-            <Info size={32} />
-         </div>
-         <div className="text-center sm:text-left">
-            <h4 className="text-lg font-black text-blue-900 uppercase tracking-tighter italic">Optimisez votre facture.</h4>
-            <p className="text-[11px] sm:text-[12px] font-medium text-blue-800/70 leading-relaxed max-w-2xl mt-1">
-               Votre consommation de pointe se situe entre 19h et 22h. En décalant certains usages vers les heures creuses, vous pourriez économiser jusqu'à <span className="text-blue-900 font-bold">4 500 FCFA</span>/mois.
-            </p>
-         </div>
-         <button className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-blue-900/20 whitespace-nowrap md:ml-auto" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
-            Astuces
-         </button>
+       {/* Advice Section */}
+       <div className="p-6 sm:p-8 bg-blue-50 rounded-[3rem] border border-blue-100 flex flex-col items-center sm:items-start md:flex-row gap-6 sm:gap-8">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-[2rem] flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
+             <Info size={32} />
+          </div>
+          <div className="text-center sm:text-left">
+             <h4 className="text-lg font-black text-blue-900 uppercase tracking-tighter italic">Optimisez votre facture.</h4>
+             <p className="text-[11px] sm:text-[12px] font-medium text-blue-800/70 leading-relaxed max-w-2xl mt-1">
+                Votre consommation de pointe se situe entre 19h et 22h. En décalant certains usages vers les heures creuses, vous pourriez économiser jusqu'à <span className="text-blue-900 font-bold">4 500 FCFA</span>/mois.
+             </p>
+          </div>
+          <button 
+             className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-blue-900/20 whitespace-nowrap md:ml-auto" 
+             onClick={(e) => { 
+                e.preventDefault(); 
+                toast.info("Astuce CIE/SODECI : Activez le mode économique sur vos climatiseurs à 24°C pour réduire votre consommation de 15%.");
+             }}
+          >
+             Astuces
+          </button>
       </div>
     </div>
   );
