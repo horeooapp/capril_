@@ -55,8 +55,8 @@ export default async function LeaseContractViewPage({ params }: { params: Promis
                 </span>
             </div>
 
-            {/* Document Imprimable Officiel */}
-            <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden print:shadow-none print:m-0 print:rounded-none">
+            {/* Document Imprimable Officiel — Strictement Isolé à l'impression */}
+            <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden print:shadow-none print:m-0 print:p-0 print:rounded-none print:border-none print:bg-transparent">
                 <PrintableLeaseContract lease={lease} />
             </div>
 
