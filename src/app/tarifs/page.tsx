@@ -6,8 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import {
-  Check, X, ShieldCheck, Zap, HelpCircle, ArrowRight,
-  Sparkles, Building2, Users, Briefcase, Award, CreditCard
+  Check, X, ShieldCheck, HelpCircle, ArrowRight,
+  Sparkles, Building2, Users, Briefcase, Gift, FileText, CreditCard
 } from "lucide-react";
 
 const fadeUp = {
@@ -19,14 +19,13 @@ const fadeUp = {
 };
 
 export default function TarifsPage() {
-  const [annual, setAnnual] = useState(true);
 
   const PLANS = [
     {
       id: "locataire",
       badge: "Locataires",
-      name: "Locataire Sérénité",
-      desc: "Idéal pour tous les locataires souhaitant formaliser leur bail et payer sans contrainte.",
+      name: "Locataire",
+      desc: "Tout ce dont un locataire a besoin pour sécuriser son logement et prouver ses paiements.",
       price: "0",
       period: "Gratuit à vie",
       highlight: false,
@@ -35,67 +34,62 @@ export default function TarifsPage() {
         "Signature de bail par OTP SMS certifié",
         "Paiement sans surcoût via Wave, Orange, MTN, Moov",
         "Quittances PDF horodatées illimitées avec QR code",
-        "Historique de paiement téléchargeable pour dossier visa/banque",
-        "Calcul et valorisation de votre Score ICL",
+        "Historique de paiement téléchargeable (visa, banque)",
+        "Score ICL (Indice de Confiance Locative)",
         "Support client 7j/7",
       ],
-      notIncluded: [
-        "Gestion multi-biens",
-        "Exports comptables fiscaux",
-        "Garantie contentieux bailleur",
-      ],
+      notIncluded: [],
       ctaText: "Créer mon Espace Locataire",
       ctaLink: "/mon-espace-locataire/login",
     },
     {
       id: "bailleur",
-      badge: "Le plus populaire",
-      name: "Bailleur Sérénité",
-      desc: "Pour les propriétaires gérant de 1 à 20 logements en Côte d'Ivoire ou depuis la diaspora.",
-      price: annual ? "2 000" : "2 500",
-      period: "XOF / bien / mois",
-      note: annual ? "Facturé annuellement (24 000 XOF/an)" : "Sans engagement de durée",
+      badge: "⭐ Totalement gratuit",
+      name: "Propriétaire",
+      desc: "Gérez tous vos biens, signez vos baux et encaissez vos loyers. QAPRIL est 100 % gratuit pour les propriétaires.",
+      price: "0",
+      period: "Gratuit — sans limite de biens",
+      note: "Seul coût : l'enregistrement du contrat aux impôts (DGI), selon la loi ivoirienne.",
       highlight: true,
       accent: "#F59E0B",
       features: [
-        "Premier bien 100 % GRATUIT pour tester",
+        "Biens illimités sans frais",
         "Rédaction et signature de baux certifiés illimités",
-        "Encaissement direct Mobile Money (Wave, Orange, MTN, Moov)",
+        "Encaissement Mobile Money (Wave, Orange, MTN, Moov)",
         "Génération et envoi automatique des quittances",
-        "Vérification des locataires via le Score ICL",
-        "Relances automatiques par SMS & WhatsApp avant impayé",
+        "Vérification locataires via le Score ICL",
+        "Relances automatiques SMS & WhatsApp avant impayé",
         "Export des états locatifs certifiés pour la DGI",
         "Assistance juridique litiges locatifs",
+        "Tableau de bord multi-biens complet",
       ],
-      notIncluded: [
-        "Gestion multi-utilisateurs pour collaborateurs d'agence",
-      ],
-      ctaText: "Commencer avec 1 bien gratuit",
+      notIncluded: [],
+      ctaText: "Commencer gratuitement",
       ctaLink: "/dashboard/login",
     },
     {
       id: "agence",
       badge: "Agences & Cabinets",
       name: "Agence & Mandataire",
-      desc: "Conçu pour les administrateurs de biens, agences immobilières agréées et notaires.",
-      price: annual ? "24 000" : "29 000",
-      period: "XOF / mois (jusqu'à 30 lots)",
-      note: "Lots supplémentaires dégressifs à 700 XOF/mois",
+      desc: "Pour les administrateurs de biens, agences immobilières agréées et notaires. Contactez-nous pour un devis adapté.",
+      price: "Sur devis",
+      period: "",
+      note: "Volume, fonctionnalités blanches et API disponibles",
       highlight: false,
       accent: "#7C3AED",
       features: [
-        "Toutes les fonctionnalités Bailleur Sérénité",
+        "Toutes les fonctionnalités Propriétaire",
         "Espace multi-gestionnaires avec gestion des droits",
         "Gestion centralisée des mandats de gestion",
         "Personnalisation avec le logo de votre agence",
         "Rapports de gérance mensuels pour chaque propriétaire",
-        "Séquestre officiel et comparateur d'état des lieux photo",
+        "Séquestre officiel et comparateur EDL photo",
         "Accompagnement et formation de votre équipe",
         "Ligne téléphonique prioritaire dédiée",
       ],
       notIncluded: [],
-      ctaText: "Ouvrir un compte Agence",
-      ctaLink: "/dashboard/login",
+      ctaText: "Contacter l'équipe",
+      ctaLink: "/contact",
     },
   ];
 
@@ -103,12 +97,14 @@ export default function TarifsPage() {
     { cat: "Général & Accès", rows: [
       { f: "Plateforme web mobile (aucun téléchargement requis)", l: true, b: true, a: true },
       { f: "Archivage sécurisé à vie des contrats", l: true, b: true, a: true },
-      { f: "Application de conformité au droit ivoirien", l: true, b: true, a: true },
+      { f: "Conformité au droit ivoirien (Loi N° 2019-576)", l: true, b: true, a: true },
+      { f: "Biens illimités", l: false, b: true, a: true },
     ]},
     { cat: "Baux & Signatures", rows: [
       { f: "Signature électronique certifiée par OTP SMS", l: true, b: true, a: true },
       { f: "Scellement cryptographique et QR Code officiel", l: true, b: true, a: true },
       { f: "Modèles personnalisés avec logo d'agence", l: false, b: false, a: true },
+      { f: "Enregistrement du bail auprès de la DGI (impôts)", l: "À la charge du proprio", b: "À la charge du proprio", a: "Accompagnement inclus" },
     ]},
     { cat: "Paiements & Quittances", rows: [
       { f: "Paiement Wave, Orange Money, MTN MoMo, Moov", l: true, b: true, a: true },
@@ -126,20 +122,28 @@ export default function TarifsPage() {
 
   const TARIF_FAQS = [
     {
+      q: "QAPRIL est-il vraiment gratuit pour les propriétaires ?",
+      a: "Oui, totalement. QAPRIL est 100 % gratuit pour les propriétaires et les locataires. Aucun abonnement, aucune commission sur les loyers, aucun frais caché. La seule dépense légale reste l'enregistrement du contrat de bail auprès du service des impôts (DGI), conformément à la Loi N° 2019-576 sur le bail d'habitation en Côte d'Ivoire.",
+    },
+    {
+      q: "Combien coûte l'enregistrement du bail auprès des impôts (DGI) ?",
+      a: "Le coût d'enregistrement est fixé par la loi ivoirienne : en général, 1 % du loyer annuel. QAPRIL vous guide dans cette démarche et génère tous les documents nécessaires (contrat conforme, état des lieux, etc.) pour faciliter votre passage aux impôts.",
+    },
+    {
       q: "Y a-t-il des frais cachés ou des commissions sur les loyers ?",
-      a: "Non. QAPRIL ne prend aucune commission en pourcentage sur vos loyers. Le locataire paie exactement le montant de son loyer, et le propriétaire souscrit à un abonnement fixe clair sans aucune surprise.",
+      a: "Non. QAPRIL ne prend aucune commission sur vos loyers. Le locataire paie exactement le montant de son loyer, et le propriétaire ne paie rien à QAPRIL. Nos revenus proviennent des offres Agence & Mandataire destinées aux professionnels.",
     },
     {
-      q: "Puis-je tester gratuitement avant de m'engager ?",
-      a: "Oui, chaque nouveau propriétaire peut enregistrer son premier bien et signer son premier bail à 0 XOF. Vous ne payez que si vous ajoutez d'autres biens et êtes pleinement satisfait du service.",
+      q: "Quels opérateurs de paiement sont supportés ?",
+      a: "Wave CI, Orange Money CI, MTN MoMo CI et Moov Money CI. Les paiements sont traités sans surcoût : le locataire paie le montant exact du loyer indiqué dans son contrat.",
     },
     {
-      q: "Quels sont les moyens de paiement acceptés pour l'abonnement ?",
-      a: "Vous pouvez régler votre abonnement via Wave, Orange Money, MTN MoMo, Moov Money ou par carte bancaire (Visa / Mastercard).",
+      q: "Puis-je gérer plusieurs biens gratuitement ?",
+      a: "Oui, sans aucune limite. Qu'il s'agisse d'un seul appartement ou d'une dizaine de villas, toutes vos propriétés sont gérées gratuitement sur QAPRIL.",
     },
     {
       q: "Puis-je résilier à tout moment ?",
-      a: "Oui. Pour la formule mensuelle, la résiliation s'effectue en un clic depuis votre espace sans frais ni préavis. Vos contrats et quittances passés restent accessibles à vie.",
+      a: "QAPRIL est gratuit, donc il n'y a aucun abonnement à résilier. Vos contrats et quittances restent accessibles à vie même si vous cessez d'utiliser la plateforme.",
     },
   ];
 
@@ -163,45 +167,64 @@ export default function TarifsPage() {
           <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
               <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 text-[11px] font-black uppercase tracking-[0.3em] mb-10 text-amber-400" style={{ background: "rgba(245,158,11,0.08)" }}>
-                <CreditCard className="w-3.5 h-3.5" />
-                Tarification Transparente · 0 Frais Cachés
+                <Gift className="w-3.5 h-3.5" />
+                100 % Gratuit · 0 Commission · 0 Frais Cachés
               </span>
               <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.95] tracking-tighter mb-8 uppercase">
-                Nos Tarifs <br />
-                <span style={{ color: "var(--mango)" }}>Simples & Clairs</span>
+                QAPRIL est <br />
+                <span style={{ color: "var(--mango)" }}>Totalement Gratuit</span>
               </h1>
-              <p className="text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: "rgba(255,255,255,0.6)" }}>
-                Gratuit pour les locataires. Formules abordables et flexibles pour les propriétaires et professionnels en Côte d&apos;Ivoire.
+              <p className="text-lg md:text-xl font-medium max-w-3xl mx-auto leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.7)" }}>
+                Propriétaires et locataires accèdent à toutes les fonctionnalités sans payer QAPRIL.
+                La seule charge légale : l&apos;enregistrement de votre contrat de bail auprès du
+                <strong className="text-amber-400"> service des impôts (DGI)</strong>, conformément à la loi ivoirienne.
               </p>
-
-              {/* Monthly / Annual toggle */}
-              <div className="inline-flex items-center gap-3 p-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl">
-                <button
-                  onClick={() => setAnnual(false)}
-                  className={`px-5 py-2 rounded-full text-xs font-black transition-all ${
-                    !annual ? "bg-white text-black shadow-md" : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  Mensuel
-                </button>
-                <button
-                  onClick={() => setAnnual(true)}
-                  className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-black transition-all ${
-                    annual ? "bg-[#F59E0B] text-black shadow-md" : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  <span>Annuel</span>
-                  <span className="px-2 py-0.5 rounded-full bg-black/20 text-[10px] font-extrabold uppercase">
-                    -20%
-                  </span>
-                </button>
-              </div>
+              <p className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Loi N° 2019-576 portant Code de la Construction et de l&apos;Habitat · Côte d&apos;Ivoire
+              </p>
             </motion.div>
           </div>
         </section>
 
-        {/* ─── PRICING CARDS ─── */}
+        {/* ─── BANNER GRATUIT ─── */}
+        <section className="bg-emerald-600 py-5 px-6">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+            <ShieldCheck className="w-6 h-6 text-white shrink-0" />
+            <p className="text-white font-bold text-sm sm:text-base">
+              <span className="font-black">QAPRIL ne prend aucune commission sur vos loyers.</span>{" "}
+              Le locataire paie exactement le montant de son loyer. Le propriétaire ne paie rien.
+            </p>
+          </div>
+        </section>
+
         <section className="max-w-6xl mx-auto px-6 py-20">
+
+          {/* ─── NOTE DGI ─── */}
+          <motion.div
+            custom={0}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="bg-amber-50 border border-amber-200 rounded-3xl p-8 mb-16 flex flex-col sm:flex-row gap-6 items-start"
+          >
+            <div className="p-3 rounded-2xl bg-amber-100 shrink-0">
+              <FileText className="w-7 h-7 text-amber-700" />
+            </div>
+            <div>
+              <h3 className="font-black text-lg text-amber-900 mb-2">
+                L&apos;unique coût pour le propriétaire : l&apos;enregistrement aux impôts
+              </h3>
+              <p className="text-sm text-amber-800 leading-relaxed">
+                En Côte d&apos;Ivoire, la loi N° 2019-576 oblige tout bailleur à enregistrer son contrat de bail
+                auprès du <strong>service des impôts (DGI)</strong>. Ce frais légal — généralement
+                <strong> 1 % du loyer annuel</strong> — est indépendant de QAPRIL et ne lui est pas reversé.
+                QAPRIL vous génère automatiquement tous les documents conformes pour simplifier cette démarche.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* ─── PRICING CARDS ─── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-24">
             {PLANS.map((plan, i) => (
               <motion.div
@@ -218,7 +241,7 @@ export default function TarifsPage() {
                 }`}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-[#F59E0B] text-black font-black text-[11px] uppercase tracking-widest shadow-md">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-[#F59E0B] text-black font-black text-[11px] uppercase tracking-widest shadow-md whitespace-nowrap">
                     {plan.badge}
                   </div>
                 )}
@@ -234,17 +257,20 @@ export default function TarifsPage() {
 
                   {/* Price Block */}
                   <div className="py-6 border-y border-black/5 mb-6">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl sm:text-5xl font-[1000] text-ink tracking-tight">
-                        {plan.price}
-                      </span>
-                      <span className="text-xs font-bold text-ink3">
-                        {plan.period}
-                      </span>
+                    <div className="flex items-baseline gap-2">
+                      {plan.price === "Sur devis" ? (
+                        <span className="text-3xl font-[1000] text-ink tracking-tight">Sur devis</span>
+                      ) : (
+                        <>
+                          <span className="text-5xl font-[1000] text-emerald-600 tracking-tight">{plan.price}</span>
+                          <span className="text-sm font-black text-emerald-700">XOF</span>
+                        </>
+                      )}
                     </div>
+                    <p className="text-xs font-bold text-ink/60 mt-1">{plan.period}</p>
                     {plan.note && (
-                      <p className="text-[11px] text-amber-700 font-semibold mt-1">
-                        {plan.note}
+                      <p className="text-[11px] text-amber-700 font-semibold mt-2 leading-snug">
+                        ⚠️ {plan.note}
                       </p>
                     )}
                   </div>
@@ -295,7 +321,7 @@ export default function TarifsPage() {
                 Comparatif Exhaustif
               </span>
               <h3 className="text-2xl sm:text-4xl font-black text-ink tracking-tight uppercase">
-                Grille des fonctionnalités par offre
+                Grille des fonctionnalités par profil
               </h3>
             </div>
 
@@ -305,7 +331,7 @@ export default function TarifsPage() {
                   <tr className="border-b-2 border-black/10">
                     <th className="py-4 px-4 text-xs font-black uppercase tracking-wider text-ink/40 w-1/2">Fonctionnalité</th>
                     <th className="py-4 px-4 text-xs font-black uppercase tracking-wider text-emerald-600 text-center">Locataire</th>
-                    <th className="py-4 px-4 text-xs font-black uppercase tracking-wider text-amber-600 text-center">Bailleur Sérénité</th>
+                    <th className="py-4 px-4 text-xs font-black uppercase tracking-wider text-amber-600 text-center">Propriétaire</th>
                     <th className="py-4 px-4 text-xs font-black uppercase tracking-wider text-purple-600 text-center">Agence</th>
                   </tr>
                 </thead>
@@ -364,7 +390,7 @@ export default function TarifsPage() {
                 Transparence
               </span>
               <h3 className="text-3xl font-black text-ink tracking-tight uppercase">
-                Questions fréquentes sur la facturation
+                Questions fréquentes
               </h3>
             </div>
 
@@ -395,17 +421,18 @@ export default function TarifsPage() {
           >
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
               <h3 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase">
-                Testez sans aucun risque
+                Commencez gratuitement,<br />
+                <span style={{ color: "var(--mango)" }}>dès maintenant</span>
               </h3>
               <p className="text-white/60 text-base leading-relaxed">
-                Votre premier bien est 100 % gratuit pour toujours. Profitez de toute la puissance de QAPRIL dès aujourd&apos;hui.
+                Aucune carte bancaire. Aucun abonnement. QAPRIL est gratuit pour les propriétaires et les locataires.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <Link
                   href="/dashboard/login"
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#F59E0B] hover:bg-[#D97706] text-black font-black text-sm uppercase tracking-wider transition-all shadow-lg hover:scale-105"
                 >
-                  Ajouter mon premier bien gratuit
+                  Créer mon compte gratuit
                 </Link>
                 <Link
                   href="/contact"
