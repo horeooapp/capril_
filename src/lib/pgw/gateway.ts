@@ -5,19 +5,25 @@ import { detectPaymentCanal } from "./router";
 import { PaymentInitiateRequest, PaymentInitiateResponse, PgwAdapter } from "./adapters/base";
 import { SMSDeclaratifAdapter } from "./adapters/sms-declaratif";
 import { WaveAdapter } from "./adapters/wave";
-import { OrangeAdapter } from "./adapters/orange";
-import { MtnAdapter } from "./adapters/mtn";
+import { FeexpayAdapter } from "./adapters/feexpay";
 
 /**
  * QAPRIL Payment Gateway Service
  * Point d'entrée unique pour tous les paiements QAPRIL.
+ *
+ * Canal coverage :
+ * - WAVE     → Wave Business API directe
+ * - MTN      → FeexPay (requesttopay/mtn_ci)
+ * - ORANGE   → FeexPay (requesttopay/orange_ci)
+ * - MOOV     → FeexPay (requesttopay/moov_ci)
  */
 export class PaymentGateway {
   private static adapters: Partial<Record<PaymentCanal, PgwAdapter>> = {
     SMS_DECLARATIF: new SMSDeclaratifAdapter(),
     WAVE: new WaveAdapter(),
-    ORANGE: new OrangeAdapter(),
-    MTN: new MtnAdapter(),
+    MTN: new FeexpayAdapter("MTN"),
+    ORANGE: new FeexpayAdapter("ORANGE"),
+    MOOV: new FeexpayAdapter("MOOV"),
   };
 
   /**
@@ -94,12 +100,11 @@ export class PaymentGateway {
       leaseId: payment.leaseId,
       periodMonth: monthKey,
       rentAmount: payment.montant,
-      chargesAmount: 0, // A affiner si le paiement inclut des charges
+      chargesAmount: 0,
       paymentChannel: payment.canal,
       paymentReference: operatorRef,
       receiptType: "RENT",
     });
-
 
     return updatedPayment;
   }
