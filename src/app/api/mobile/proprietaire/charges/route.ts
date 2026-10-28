@@ -84,7 +84,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             charges:      formatted,
             totalCharges: total,
-            currency:     'FCFA',
+            currency:     'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/charges GET error:', error);
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
             message: 'Charge enregistrée sur le bail.',
             leaseId,
             amount:  Number(amount),
-            currency: 'FCFA',
+            currency: 'XOF',
         }, { status: 201 });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/charges POST error:', error);

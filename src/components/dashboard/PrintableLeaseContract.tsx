@@ -119,7 +119,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
       <div className="text-justify mb-4 text-xs md:text-sm">
         <p>Le montant du loyer est fixé en tenant compte de la valeur du marché de l’immeuble ou du local.</p>
         <p className="mt-2">
-            Le présent bail est consenti et accepté moyennant un loyer mensuel de (en lettres) <strong>{numberToFrenchWords(rentAmount)}</strong> francs CFA (en chiffres) <strong>{rentAmount.toLocaleString()} FCFA</strong> payable par mois et d’avance au plus tard le <strong>{lease.paymentDay || 5}</strong> du mois en cours, en espèce ou par transfert à l’ordre du BAILLEUR.
+            Le présent bail est consenti et accepté moyennant un loyer mensuel de (en lettres) <strong>{numberToFrenchWords(rentAmount)}</strong> francs CFA (en chiffres) <strong>{rentAmount.toLocaleString()} XOF</strong> payable par mois et d’avance au plus tard le <strong>{lease.paymentDay || 5}</strong> du mois en cours, en espèce ou par transfert à l’ordre du BAILLEUR.
         </p>
         <p className="mt-2">Le BAILLEUR est tenu de délivrer une quittance au LOCATAIRE pour faire la preuve du paiement du loyer.</p>
         <p className="mt-2">En cas de non-respect de l’obligation de délivrance de quittance de paiement de loyer par le BAILLEUR, le LOCATAIRE pourra faire la preuve du paiement du loyer par tous moyens.</p>
@@ -134,7 +134,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
 
       <h3 className="font-bold underline mt-6 mb-2 text-sm md:text-base">ARTICLE 4 - DEPOT DE GARANTIE (ou CAUTION)</h3>
       <div className="text-justify mb-4 text-xs">
-        <p>Le PRENEUR verse entre les mains du BAILLEUR, la somme de (en lettres) <strong>{numberToFrenchWords(depositAmount)}</strong> Francs CFA (en chiffres) <strong>{depositAmount.toLocaleString()} FCFA</strong> en guise de dépôt de garantie (ou caution).</p>
+        <p>Le PRENEUR verse entre les mains du BAILLEUR, la somme de (en lettres) <strong>{numberToFrenchWords(depositAmount)}</strong> Francs CFA (en chiffres) <strong>{depositAmount.toLocaleString()} XOF</strong> en guise de dépôt de garantie (ou caution).</p>
         <p className="mt-2">Ce montant ne peut excéder deux (02) mois de loyer. Il garantit l'exécution des obligations du PRENEUR en fin de contrat notamment les dégradations, les impayés ainsi que les divers manquements qui pourraient survenir de son fait.</p>
         <p className="mt-2">En cas de stipulation d'une garantie locative, un état des lieux écrit et contradictoire doit être signé entre les parties, au plus tard le jour de l'entrée en jouissance des lieux par le LOCATAIRE, et également le dernier jour de location, en fin de contrat.</p>
         <p className="mt-2 font-bold">Le dépôt de garantie n'est pas productif d'intérêt. Le LOCATAIRE ne peut se servir de dépôt de garantie au paiement des loyers, même en fin de contrat.</p>
@@ -146,7 +146,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
       <div className="text-justify mb-4 text-xs md:text-sm">
         {avanceAmount > 0 ? (
             <>
-                <p>Le PRENEUR verse entre les mains du BAILLEUR, à titre de loyers d'avance la somme de (en lettres) <strong>{numberToFrenchWords(avanceAmount)}</strong> Francs CFA (en chiffres) <strong>{avanceAmount.toLocaleString()} FCFA</strong> contre remise de quittance.</p>
+                <p>Le PRENEUR verse entre les mains du BAILLEUR, à titre de loyers d'avance la somme de (en lettres) <strong>{numberToFrenchWords(avanceAmount)}</strong> Francs CFA (en chiffres) <strong>{avanceAmount.toLocaleString()} XOF</strong> contre remise de quittance.</p>
                 <p className="mt-2">Cette somme représente les loyers des mois de <strong>{avanceMonthsStr}</strong>.</p>
                 <p className="mt-2 font-bold text-xs">Ce montant ne peut excéder deux (02) mois de loyer (Loi ivoirienne).</p>
             </>

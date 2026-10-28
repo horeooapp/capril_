@@ -76,8 +76,8 @@ export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: 
                         ></div>
                     </div>
                     <div className="flex justify-between w-full mt-2 text-[10px] font-bold text-qtext-mid">
-                        <span>{totalCollected.toLocaleString()} FCFA</span>
-                        <span>{totalExpected.toLocaleString()} FCFA</span>
+                        <span>{totalCollected.toLocaleString()} XOF</span>
+                        <span>{totalExpected.toLocaleString()} XOF</span>
                     </div>
                     <div className="mt-4">
                         <span className={`inline-flex items-center px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${
@@ -108,7 +108,7 @@ export default function ColocDashboardBox({ leaseId, colocataires, synthesis }: 
                                             {coloc.role}
                                         </span>
                                         <span className="text-[8px] font-black uppercase tracking-widest text-qorange bg-qorange-pale px-2 py-0.5 rounded border border-qorange/10">
-                                            {coloc.pctLoyer ? `${coloc.pctLoyer}%` : `${coloc.partLoyer} FCFA`}
+                                            {coloc.pctLoyer ? `${coloc.pctLoyer}%` : `${coloc.partLoyer} XOF`}
                                         </span>
                                     </div>
                                 </div>

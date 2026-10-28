@@ -61,7 +61,7 @@ export async function POST(
 
     return NextResponse.json({ 
       success: true, 
-      message: `La caution a été restituée avec succès (Montant final re-crédité : ${finalMontantRestitue} FCFA).` 
+      message: `La caution a été restituée avec succès (Montant final re-crédité : ${finalMontantRestitue} XOF).` 
     });
 
   } catch (error: any) {

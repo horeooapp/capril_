@@ -98,7 +98,7 @@ export async function validateMigrationSession(sessionId: string) {
                 if (isNaN(loyer) || loyer <= 0) {
                     errors.push(`Loyer invalide : ${data.loyer}`)
                 } else if (loyer > 2000000) {
-                    warnings.push(`Loyer élevé (> 2M FCFA) à confirmer.`)
+                    warnings.push(`Loyer élevé (> 2M XOF) à confirmer.`)
                 }
             }
 

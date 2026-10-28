@@ -60,7 +60,7 @@ export default function MonthlyReportCard({ report }: MonthlyReportCardProps) {
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Encaissement Total</p>
               <div className="flex items-baseline gap-1">
                  <span className="text-2xl font-black text-gray-900">{metrics.totalEncaisse.toLocaleString()}</span>
-                 <span className="text-[10px] font-bold text-gray-500 uppercase">FCFA</span>
+                 <span className="text-[10px] font-bold text-gray-500 uppercase">XOF</span>
               </div>
            </div>
            <div>

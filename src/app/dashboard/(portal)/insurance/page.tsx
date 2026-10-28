@@ -183,7 +183,7 @@ export default function InsuranceDashboardPage() {
                                         <div className="flex items-center gap-4">
                                             <div className="text-right">
                                                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Estimée</p>
-                                                <p className="font-black text-[14px] text-emerald-600">{estPremium.toLocaleString()} FCFA/an</p>
+                                                <p className="font-black text-[14px] text-emerald-600">{estPremium.toLocaleString()} XOF/an</p>
                                             </div>
                                             <button onClick={() => { setSelectedLeaseId(lease.id); setIsSubscribingModalOpen(true); }} className="bg-slate-900 text-white px-4 py-2 rounded-[8px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors">
                                                 Souscrire

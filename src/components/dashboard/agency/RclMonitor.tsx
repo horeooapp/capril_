@@ -182,7 +182,7 @@ export const RclMonitor: React.FC = () => {
               <div className="space-y-4">
                  <div className="flex justify-between items-center text-[12px]">
                     <span className="font-bold text-slate-400 uppercase">Volume Projeté</span>
-                    <span className="font-black text-slate-800">+1,250,000 FCFA</span>
+                    <span className="font-black text-slate-800">+1,250,000 XOF</span>
                  </div>
                  <div className="flex justify-between items-center text-[12px]">
                     <span className="font-bold text-slate-400 uppercase">Risque Auto-clôture</span>

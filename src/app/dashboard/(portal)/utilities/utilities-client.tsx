@@ -100,7 +100,7 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                     </div>
                     <div>
                         <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Factures CIE en cours</h3>
-                        <p className="text-2xl font-black text-slate-800">{totalCIE.toLocaleString()} <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
+                        <p className="text-2xl font-black text-slate-800">{totalCIE.toLocaleString()} <span className="text-sm text-gray-400 font-bold">XOF</span></p>
                     </div>
                 </div>
                 <div className="glass-panel p-6 rounded-[1.5rem] bg-white border border-gray-100 shadow-sm flex items-center gap-4">
@@ -109,7 +109,7 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                     </div>
                     <div>
                         <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Factures SODECI en cours</h3>
-                        <p className="text-2xl font-black text-slate-800">{totalSODECI.toLocaleString()} <span className="text-sm text-gray-400 font-bold">FCFA</span></p>
+                        <p className="text-2xl font-black text-slate-800">{totalSODECI.toLocaleString()} <span className="text-sm text-gray-400 font-bold">XOF</span></p>
                     </div>
                 </div>
                 <div className="glass-panel p-6 rounded-[1.5rem] bg-slate-900 border border-slate-800 shadow-xl flex items-center gap-4 text-white relative overflow-hidden">
@@ -163,7 +163,7 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                                             </div>
                                         </td>
                                         <td className="p-5 font-black text-slate-800">
-                                            {Number(fac.montantGlobal).toLocaleString()} <span className="text-xs text-gray-400">FCFA</span>
+                                            {Number(fac.montantGlobal).toLocaleString()} <span className="text-xs text-gray-400">XOF</span>
                                         </td>
                                         <td className="p-5">
                                             <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Montant Global de la facture (FCFA)</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Montant Global de la facture (XOF)</label>
                                 <input 
                                     type="number" 
                                     placeholder="Ex: 54000"

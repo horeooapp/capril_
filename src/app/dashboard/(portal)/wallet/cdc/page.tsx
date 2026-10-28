@@ -58,7 +58,7 @@ export default async function CDCGlobalDashboard() {
                             <ShieldCheck size={14} className="text-emerald-400" /> Total Consigné Sécurisé
                         </span>
                         <div className="text-4xl font-black tracking-tighter">
-                            {totalConsigned.toLocaleString()} <span className="text-[14px] opacity-70 font-bold">FCFA</span>
+                            {totalConsigned.toLocaleString()} <span className="text-[14px] opacity-70 font-bold">XOF</span>
                         </div>
                         <p className="text-[11px] text-slate-400 mt-4 leading-relaxed font-medium">
                             Ces montants sont stockés sur les comptes séquestres étatiques et génèrent des intérêts de sécurité.
@@ -94,7 +94,7 @@ export default async function CDCGlobalDashboard() {
                                                     <p className="text-[11px] font-medium text-slate-500">{d.lease.tenant ? (d.lease.tenant as any).fullName || (d.lease.tenant as any).name : 'En attente'}</p>
                                                 </td>
                                                 <td className="py-4">
-                                                    <span className="font-black text-slate-800 text-[14px]">{d.amount.toLocaleString()} FCFA</span>
+                                                    <span className="font-black text-slate-800 text-[14px]">{d.amount.toLocaleString()} XOF</span>
                                                 </td>
                                                 <td className="py-4">
                                                     {d.status === 'CONSIGNED' && <Badge color="green">Consigné</Badge>}

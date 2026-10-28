@@ -91,7 +91,7 @@ export async function POST(req: Request) {
             const qrToken = generateQRToken();
             const paidAt = new Date();
             // [SEC-FIX F-07] Le montant est lu depuis la DB, jamais depuis le client
-            // Cela empêche le price tampering (envoyer amount: 1 pour un loyer de 150 000 FCFA)
+            // Cela empêche le price tampering (envoyer amount: 1 pour un loyer de 150 000 XOF)
             const totalAmount = lease.rentAmount + (lease.chargesAmount || 0);
 
             const receiptHash = await calculateReceiptHash({

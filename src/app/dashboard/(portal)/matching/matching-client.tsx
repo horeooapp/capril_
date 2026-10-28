@@ -420,7 +420,7 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Loyer Mensuel (FCFA) *</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Loyer Mensuel (XOF) *</label>
                                     <input 
                                         type="number"
                                         required
@@ -450,7 +450,7 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Charges (FCFA)</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Charges (XOF)</label>
                                     <input 
                                         type="number"
                                         min={0}

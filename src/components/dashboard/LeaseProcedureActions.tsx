@@ -148,7 +148,7 @@ export default function LeaseProcedureActions({ leaseId, currentStatus }: { leas
                             value={clemencyDetails}
                             onChange={(e) => setClemencyDetails(e.target.value)}
                             className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none min-h-[120px]"
-                            placeholder="Ex: Le locataire s&apos;engage à payer 50.000 FCFA supplémentaire chaque mois pendant 4 mois..."
+                            placeholder="Ex: Le locataire s&apos;engage à payer 50.000 XOF supplémentaire chaque mois pendant 4 mois..."
                         />
                         <div className="mt-6 flex space-x-3">
                             <button

@@ -488,7 +488,7 @@ export default function NewPropertyClient() {
                                 <div className="border-l border-sky-200 pl-4">
                                     <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider block">Revenu total mensuel</span>
                                     <span className="text-lg font-black text-sky-700">
-                                        {totalBuildingRent.toLocaleString("fr-FR")} <span className="text-xs font-bold text-sky-600">FCFA</span>
+                                        {totalBuildingRent.toLocaleString("fr-FR")} <span className="text-xs font-bold text-sky-600">XOF</span>
                                     </span>
                                 </div>
                             </div>
@@ -515,7 +515,7 @@ export default function NewPropertyClient() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Loyer de base indicatif (FCFA)</label>
+                                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Loyer de base indicatif (XOF)</label>
                                     <input 
                                         type="number" 
                                         min="0"
@@ -594,11 +594,11 @@ export default function NewPropertyClient() {
                                             </select>
                                         </div>
 
-                                        {/* Loyer spécifique (FCFA) */}
+                                        {/* Loyer spécifique (XOF) */}
                                         <div className="w-full md:w-44">
                                             <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
                                                 <span>Loyer mensuel</span>
-                                                <span className="text-[9px] text-sky-600 font-bold">FCFA</span>
+                                                <span className="text-[9px] text-sky-600 font-bold">XOF</span>
                                             </label>
                                             <input 
                                                 type="number" 
@@ -657,7 +657,7 @@ export default function NewPropertyClient() {
                                         onClick={() => handleApplyRentToAll(customUnits[0].rent)}
                                         className="text-xs text-slate-500 hover:text-slate-800 underline underline-offset-4"
                                     >
-                                        Harmoniser tous les loyers à {customUnits[0].rent.toLocaleString("fr-FR")} FCFA
+                                        Harmoniser tous les loyers à {customUnits[0].rent.toLocaleString("fr-FR")} XOF
                                     </button>
                                 )}
                             </div>
@@ -802,7 +802,7 @@ export default function NewPropertyClient() {
                                         className="w-full px-4 py-3 bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-[#FF8200] outline-none text-base font-black text-slate-900 placeholder:text-slate-400" 
                                     />
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">
-                                        FCFA / mois
+                                        XOF / mois
                                     </span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 mt-2">

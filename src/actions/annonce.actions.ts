@@ -111,7 +111,7 @@ export async function soumettreCandidat(data: {
             <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Candidat :</strong> ${nomCandidat}</p>
             <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Téléphone :</strong> ${data.telephone}</p>
             ${data.employeur ? `<p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Employeur / Métier :</strong> ${data.employeur}</p>` : ""}
-            ${data.revenuMensuel ? `<p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Revenu mensuel déclaré :</strong> ${data.revenuMensuel.toLocaleString()} FCFA</p>` : ""}
+            ${data.revenuMensuel ? `<p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Revenu mensuel déclaré :</strong> ${data.revenuMensuel.toLocaleString()} XOF</p>` : ""}
             ${tauxEffort ? `<p style="margin: 0; font-size: 14px;"><strong>Taux d'effort estimé :</strong> ${tauxEffort}%</p>` : ""}
           </div>
 
@@ -135,7 +135,7 @@ export async function soumettreCandidat(data: {
       if (destinataire.phone) {
         const { sendOpenWAMessage } = await import("@/lib/openwa");
         const { sendSMS } = await import("@/lib/sms");
-        const waText = `*QAPRIL — Nouvelle Candidature*\n\nBonjour ${destinataire.name || "Bailleur"},\n\n*${nomCandidat}* vient de postuler pour votre bien *${bienTitre}*.\n\n📱 Téléphone : ${data.telephone}\n💼 Employeur : ${data.employeur || "Non renseigné"}\n💰 Revenu : ${data.revenuMensuel ? `${data.revenuMensuel.toLocaleString()} FCFA` : "Non précisé"}\n\nPour valider le dossier, introduire le contrat de bail ou demander des compléments, connectez-vous : ${matchingUrl}`;
+        const waText = `*QAPRIL — Nouvelle Candidature*\n\nBonjour ${destinataire.name || "Bailleur"},\n\n*${nomCandidat}* vient de postuler pour votre bien *${bienTitre}*.\n\n📱 Téléphone : ${data.telephone}\n💼 Employeur : ${data.employeur || "Non renseigné"}\n💰 Revenu : ${data.revenuMensuel ? `${data.revenuMensuel.toLocaleString()} XOF` : "Non précisé"}\n\nPour valider le dossier, introduire le contrat de bail ou demander des compléments, connectez-vous : ${matchingUrl}`;
 
         const waRes = await sendOpenWAMessage(destinataire.phone, waText).catch(() => ({ success: false }));
         if (!waRes?.success) {

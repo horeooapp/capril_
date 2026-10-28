@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const PRESTATAIRE_LEAD_PRICE = 2000; // 2,000 FCFA per lead
+const PRESTATAIRE_LEAD_PRICE = 2000; // 2,000 XOF per lead
 
 export async function getPrestataires() {
     try {
@@ -40,7 +40,7 @@ export async function assignPrestataireToTicket(ticketId: string, prestataireId:
             }, 0);
 
             if (balance < PRESTATAIRE_LEAD_PRICE) {
-                throw new Error(`Solde insuffisant pour accepter cette mission. Coût du Lead: ${PRESTATAIRE_LEAD_PRICE} FCFA.`);
+                throw new Error(`Solde insuffisant pour accepter cette mission. Coût du Lead: ${PRESTATAIRE_LEAD_PRICE} XOF.`);
             }
 
             // Debit Wallet

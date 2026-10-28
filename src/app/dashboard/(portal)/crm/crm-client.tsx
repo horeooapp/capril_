@@ -182,7 +182,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                                             <div key={i} className="p-4 bg-indigo-50/50 border border-indigo-100 rounded-[10px] flex justify-between items-center transition-colors hover:bg-indigo-50">
                                                <div>
                                                   <p className="text-[13px] font-bold text-indigo-900">{l.property?.propertyCode || 'Propriété Générique'} - {l.property?.commune || l.leaseReference}</p>
-                                                  <p className="text-[10.5px] font-bold text-indigo-600 uppercase tracking-widest mt-1">LOYER : {l.rentAmount?.toLocaleString()} FCFA/Mois</p>
+                                                  <p className="text-[10.5px] font-bold text-indigo-600 uppercase tracking-widest mt-1">LOYER : {l.rentAmount?.toLocaleString()} XOF/Mois</p>
                                                </div>
                                                <Badge color="blue">{l.status}</Badge>
                                             </div>

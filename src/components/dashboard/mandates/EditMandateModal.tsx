@@ -380,7 +380,7 @@ export default function EditMandateModal({
                                         type="number"
                                         value={commissionFixed || ""}
                                         onChange={(e) => setCommissionFixed(e.target.value ? Number(e.target.value) : null)}
-                                        placeholder="Ex: 0 ou 10000 FCFA"
+                                        placeholder="Ex: 0 ou 10000 XOF"
                                         className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500"
                                     />
                                     <p className="text-[11px] text-slate-400 mt-1">
@@ -392,20 +392,20 @@ export default function EditMandateModal({
                             {/* Simulation Card */}
                             <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/60 rounded-2xl p-4">
                                 <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-2 flex items-center gap-1.5">
-                                    <Sparkles size={14} className="text-amber-500" /> Simulation sur le loyer indicatif du bien ({rentAmount.toLocaleString()} FCFA/mois)
+                                    <Sparkles size={14} className="text-amber-500" /> Simulation sur le loyer indicatif du bien ({rentAmount.toLocaleString()} XOF/mois)
                                 </p>
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                     <div className="bg-white p-3 rounded-xl border border-amber-200 shadow-2xs">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Honoraires Agence</p>
                                         <p className="text-base font-black text-amber-600 mt-0.5">
-                                            {fraisGestionMensuels.toLocaleString()} FCFA
+                                            {fraisGestionMensuels.toLocaleString()} XOF
                                         </p>
                                         <p className="text-[10px] text-slate-400">par mois encaissé</p>
                                     </div>
                                     <div className="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs">
                                         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Net Reversé au Propriétaire</p>
                                         <p className="text-base font-black text-emerald-600 mt-0.5">
-                                            {netProprietaire.toLocaleString()} FCFA
+                                            {netProprietaire.toLocaleString()} XOF
                                         </p>
                                         <p className="text-[10px] text-slate-400">versé directement</p>
                                     </div>

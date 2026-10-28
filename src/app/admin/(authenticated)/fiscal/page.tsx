@@ -69,9 +69,9 @@ export default async function DGIDashboardPage() {
                                             <span className="font-mono text-[var(--ci-orange)]">{reg.lease.leaseReference}</span>
                                         </td>
                                         <td className="text-gray-400">{reg.lease.property.commune}</td>
-                                        <td>{reg.loyerMensuel.toLocaleString()} FCFA</td>
+                                        <td>{reg.loyerMensuel.toLocaleString()} XOF</td>
                                         <td>
-                                            <span className="text-[var(--ci-vert-light)] font-bold">{reg.totalDgi.toLocaleString()} FCFA</span>
+                                            <span className="text-[var(--ci-vert-light)] font-bold">{reg.totalDgi.toLocaleString()} XOF</span>
                                         </td>
                                     </tr>
                                 ))}

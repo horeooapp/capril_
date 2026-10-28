@@ -26,7 +26,7 @@ export default function ApiKeysPage() {
     }
 
     const handleGenerate = async () => {
-        if (!confirm("Attention: Générer de nouvelles clés invalidera les précédentes et vous serez facturé de 50 000 FCFA. Continuer ?")) {
+        if (!confirm("Attention: Générer de nouvelles clés invalidera les précédentes et vous serez facturé de 50 000 XOF. Continuer ?")) {
             return;
         }
 
@@ -73,7 +73,7 @@ export default function ApiKeysPage() {
                             <div>
                                 <h2 className="text-[16px] font-black uppercase tracking-widest text-slate-200">Abonnement API Premium</h2>
                                 <p className="text-emerald-400 font-bold text-[13px] mt-1 flex items-center gap-2">
-                                    <CheckCircle size={14} /> 50 000 FCFA / mois
+                                    <CheckCircle size={14} /> 50 000 XOF / mois
                                 </p>
                             </div>
                             <Shield className="text-slate-700" size={48} />

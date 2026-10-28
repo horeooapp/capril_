@@ -63,7 +63,7 @@ export default function CDCRestitutionBox({ leaseId, deposit }: CDCRestitutionBo
                     Gestion de la Caution (M18)
                 </h3>
                 <span className="text-[10px] bg-white/20 text-white px-2 py-1 rounded font-bold uppercase tracking-widest">
-                    Consigné: {deposit.amount.toLocaleString()} FCFA
+                    Consigné: {deposit.amount.toLocaleString()} XOF
                 </span>
             </div>
 
@@ -85,7 +85,7 @@ export default function CDCRestitutionBox({ leaseId, deposit }: CDCRestitutionBo
                                         onChange={(e) => setAmountToReturn(Number(e.target.value))}
                                         className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#FF8200] outline-none font-bold"
                                     />
-                                    <span className="absolute right-4 top-3.5 text-gray-400 text-sm font-bold">FCFA</span>
+                                    <span className="absolute right-4 top-3.5 text-gray-400 text-sm font-bold">XOF</span>
                                 </div>
                             </div>
                             <div className="space-y-1">
@@ -115,7 +115,7 @@ export default function CDCRestitutionBox({ leaseId, deposit }: CDCRestitutionBo
                         </div>
                         <div>
                             <h4 className="font-bold text-gray-900">Demande en cours d'arbitrage</h4>
-                            <p className="text-sm text-gray-500 mt-1">Le locataire et les services de la CDC-CI examinent votre proposition de restitution de {amountToReturn.toLocaleString()} FCFA.</p>
+                            <p className="text-sm text-gray-500 mt-1">Le locataire et les services de la CDC-CI examinent votre proposition de restitution de {amountToReturn.toLocaleString()} XOF.</p>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-lg flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                             <span className="w-2 h-2 bg-orange-400 rounded-full"></span>

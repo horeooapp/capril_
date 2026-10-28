@@ -77,7 +77,7 @@ export async function GET(request: Request) {
                 superficieM2: a.property?.superficieM2 ? Number(a.property.superficieM2) : null,
                 imageUrl:     a.property?.images?.[0]?.s3Key ?? null,
             },
-            currency: 'FCFA',
+            currency: 'XOF',
         }));
 
         return NextResponse.json({

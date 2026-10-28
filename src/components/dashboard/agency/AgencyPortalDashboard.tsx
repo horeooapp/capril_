@@ -127,7 +127,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
                               </div>
                             </div>
                             <div className="text-right">
-                               <div className="text-lg font-black text-red-600 font-mono">-{lease.rentAmount?.toLocaleString()} FCFA</div>
+                               <div className="text-lg font-black text-red-600 font-mono">-{lease.rentAmount?.toLocaleString()} XOF</div>
                                <div className="text-[8px] font-black text-red-400 uppercase tracking-widest mt-1">Dossier #PR-0{idx+1}</div>
                             </div>
                           </Link>

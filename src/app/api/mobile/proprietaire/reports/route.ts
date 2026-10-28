@@ -111,7 +111,7 @@ export async function GET(request: Request) {
                 totalNetPayout,
                 periodsCount: reports.length,
             },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/reports GET error:', error);

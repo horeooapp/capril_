@@ -78,7 +78,7 @@ export async function handleStripeWebhookMock(userId: string, invoiceId: string,
                 }
             });
 
-            // Conversion rate Mock EUR to FCFA
+            // Conversion rate Mock EUR to XOF
             const tauxChange = 655.957;
             const montantFcfa = amountEur * tauxChange;
 

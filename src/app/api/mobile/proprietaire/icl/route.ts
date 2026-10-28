@@ -77,7 +77,7 @@ export async function GET(request: Request) {
                             )
                         ).toISOString()
                         : null,
-                    currency: 'FCFA',
+                    currency: 'XOF',
                 };
             }
         }

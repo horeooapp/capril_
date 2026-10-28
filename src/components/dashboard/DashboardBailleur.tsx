@@ -44,9 +44,9 @@ export default function DashboardBailleur({ data }: Props) {
             <div className="flex items-center gap-2">
               <span className="text-xl">⚠</span>
               <div>
-                <div className="text-xs font-semibold text-[#5A3A00]">Wallet sous le seuil {seuil.toLocaleString("fr-FR")} FCFA</div>
+                <div className="text-xs font-semibold text-[#5A3A00]">Wallet sous le seuil {seuil.toLocaleString("fr-FR")} XOF</div>
                 <div className="text-[10px] text-[#B87000] mt-0.5">
-                  Solde : {data.walletBalance.toLocaleString("fr-FR")} FCFA · Besoin : {(data.biensActifs * 90).toLocaleString("fr-FR")} FCFA/mois
+                  Solde : {data.walletBalance.toLocaleString("fr-FR")} XOF · Besoin : {(data.biensActifs * 90).toLocaleString("fr-FR")} XOF/mois
                 </div>
               </div>
             </div>
@@ -58,7 +58,7 @@ export default function DashboardBailleur({ data }: Props) {
         <div className="grid grid-cols-4 gap-2.5 mb-3">
           {[
             { val: data.biensActifs, lbl: "Biens", sub: `${data.biensVacants} vacants`, color: QAPRIL_COLORS.navy },
-            { val: data.loyersMensuels.toLocaleString("fr-FR"), lbl: "Loyers/mois", sub: "FCFA", color: QAPRIL_COLORS.orange },
+            { val: data.loyersMensuels.toLocaleString("fr-FR"), lbl: "Loyers/mois", sub: "XOF", color: QAPRIL_COLORS.orange },
             { val: data.tauxRecouvrement + "%", lbl: "Recouvrement", sub: "Ce mois", color: QAPRIL_COLORS.green },
             { val: data.quittancesGenerees, lbl: "Quittances", sub: "Ce mois", color: QAPRIL_COLORS.blue },
           ].map((k,i) => (
@@ -101,7 +101,7 @@ export default function DashboardBailleur({ data }: Props) {
                     {bienOuvert === b.id && (
                       <div className={Q.accDetail + " !rounded-none border-x-0"}>
                         <div className={Q.infoRow}><span className={Q.rowLabel}>Reference</span><span className={Q.rowValue + " font-mono"}>{b.leaseReference ?? "-"}</span></div>
-                        <div className={Q.infoRow}><span className={Q.rowLabel}>Loyer</span><span className={Q.rowValue}>{b.rentAmount?.toLocaleString("fr-FR")} FCFA</span></div>
+                        <div className={Q.infoRow}><span className={Q.rowLabel}>Loyer</span><span className={Q.rowValue}>{b.rentAmount?.toLocaleString("fr-FR")} XOF</span></div>
                         <div className={Q.infoRow}><span className={Q.rowLabel}>Commune</span><span className={Q.rowValue}>{b.commune}</span></div>
                       </div>
                     )}
@@ -118,8 +118,8 @@ export default function DashboardBailleur({ data }: Props) {
             {/* Wallet */}
             <div className={Q.walletCard}>
               <div className="text-[10px] text-[#7A9AC0] font-semibold uppercase tracking-wide mb-1">Wallet QAPRIL</div>
-              <div className="text-[26px] font-bold text-white font-mono mb-1">{data.walletBalance.toLocaleString("fr-FR")} FCFA</div>
-              <div className="text-xs text-[#7A9AC0] mb-2.5">{data.biensActifs} baux · Besoin : {(data.biensActifs * 90).toLocaleString("fr-FR")} FCFA/mois</div>
+              <div className="text-[26px] font-bold text-white font-mono mb-1">{data.walletBalance.toLocaleString("fr-FR")} XOF</div>
+              <div className="text-xs text-[#7A9AC0] mb-2.5">{data.biensActifs} baux · Besoin : {(data.biensActifs * 90).toLocaleString("fr-FR")} XOF/mois</div>
               <div className="bg-white/10 rounded-full h-1.5 mb-1 overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#CC2020] to-[#F5A800] rounded-full transition-all" style={{width:`${pct}%`}} />
               </div>
@@ -148,7 +148,7 @@ export default function DashboardBailleur({ data }: Props) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-white">{OP_COLORS[opWallet].label}</div>
-                    <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger 2 000 FCFA</div>
+                    <div className="text-[10px] text-[#F5A800] font-mono">→ Recharger 2 000 XOF</div>
                   </div>
                   <Link href={`/dashboard/billing?operator=${opWallet}`} className="border-none px-2.5 py-1.5 rounded-md text-xs font-bold cursor-pointer transition-all inline-block"
                     style={{background:OP_COLORS[opWallet].bg, color:OP_COLORS[opWallet].text}}>

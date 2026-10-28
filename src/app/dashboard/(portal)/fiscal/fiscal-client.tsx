@@ -47,7 +47,7 @@ export default function FiscalDashboardClient({ initialStats }: { initialStats: 
                     </div>
                     <h2 className="text-3xl font-black tracking-tight mb-4 text-white">Base Imposable Cumulée</h2>
                     <div className="text-5xl font-black tracking-tighter mb-2 text-sky-400">
-                        {(initialStats?.stats?.totalBaseImposable || 0).toLocaleString()} <span className="text-[20px] opacity-80">FCFA</span>
+                        {(initialStats?.stats?.totalBaseImposable || 0).toLocaleString()} <span className="text-[20px] opacity-80">XOF</span>
                     </div>
                     <p className="text-slate-300 text-[14px] font-medium leading-relaxed mb-4">
                         Chaque quittance générée sur QAPRIL ventile automatiquement la base imposable. En fin d'année, votre liasse IFU est prête à être envoyée à la DGI.
@@ -70,7 +70,7 @@ export default function FiscalDashboardClient({ initialStats }: { initialStats: 
                                  <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">Immobilier Commercial</p>
                              </div>
                              <div className="text-right">
-                                <p className="font-black text-[15px] text-slate-900">{(initialStats?.stats?.totalTvaCollectee || 0).toLocaleString()} <span className="text-[11px] text-slate-500 font-bold">FCFA</span></p>
+                                <p className="font-black text-[15px] text-slate-900">{(initialStats?.stats?.totalTvaCollectee || 0).toLocaleString()} <span className="text-[11px] text-slate-500 font-bold">XOF</span></p>
                                 <span className="text-[10px] font-bold uppercase text-sky-600 mt-1 inline-flex items-center gap-1 group-hover:underline">Consulter <ArrowRight size={10} /></span>
                              </div>
                          </div>

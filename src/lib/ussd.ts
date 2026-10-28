@@ -39,7 +39,7 @@ export async function processUSSDRequest(phone: string, text: string, _sessionId
             if (!activeLease) return "END Vous n'avez aucun bail actif.";
             const pending = activeLease.receipts.length;
             if (pending === 0) return "END Tous vos loyers sont payés. Merci !";
-            return `CON Loyer: ${activeLease.rentAmount} FCFA\n${pending} mois impayés.\nConfirmer le paiement ?\n1. Oui\n2. Non`;
+            return `CON Loyer: ${activeLease.rentAmount} XOF\n${pending} mois impayés.\nConfirmer le paiement ?\n1. Oui\n2. Non`;
         }
 
         case "2": {
@@ -47,7 +47,7 @@ export async function processUSSDRequest(phone: string, text: string, _sessionId
                 (acc: number, l) => acc + (l.receipts?.length || 0) * (l.rentAmount || 0),
                 0
             );
-            return `END Votre solde total dû est de ${totalDue} FCFA.`;
+            return `END Votre solde total dû est de ${totalDue} XOF.`;
         }
 
         case "3": {
@@ -69,7 +69,7 @@ export async function processUSSDRequest(phone: string, text: string, _sessionId
             
             // In a real USSD push scenario, we would call CinetPay's Direct Pay API here
             // For now, we simulate the request being sent
-            return `END Demande de paiement de ${activeLease.rentAmount} FCFA envoyée sur votre mobile.\nVeuillez valider avec votre code secret.`;
+            return `END Demande de paiement de ${activeLease.rentAmount} XOF envoyée sur votre mobile.\nVeuillez valider avec votre code secret.`;
         }
 
         default:

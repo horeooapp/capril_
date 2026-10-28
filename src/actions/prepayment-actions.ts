@@ -52,7 +52,7 @@ export async function requestPrepayment(input: RequestPrepaymentInput) {
         await sendNotification({
             userId: lease.landlordId,
             title: "📩 Nouvelle demande de paiement anticipé",
-            content: `Le locataire du bien ${lease.property.name || lease.property.propertyCode} souhaite payer ${input.monthsCount} mois d'avance (${totalAmount.toLocaleString()} FCFA).`,
+            content: `Le locataire du bien ${lease.property.name || lease.property.propertyCode} souhaite payer ${input.monthsCount} mois d'avance (${totalAmount.toLocaleString()} XOF).`,
             channels: ['PUSH', 'EMAIL']
         });
 
@@ -102,7 +102,7 @@ export async function handlePrepaymentApproval(requestId: string, approved: bool
             userId: request.tenantId,
             title: approved ? "✅ Paiement anticipé approuvé" : "❌ Paiement anticipé refusé",
             content: approved 
-                ? `Votre demande pour payer ${request.monthsCount} mois (${request.totalAmount.toLocaleString()} FCFA) a été acceptée par le propriétaire.`
+                ? `Votre demande pour payer ${request.monthsCount} mois (${request.totalAmount.toLocaleString()} XOF) a été acceptée par le propriétaire.`
                 : `Votre demande pour payer ${request.monthsCount} mois a été refusée. Motif : ${rejectionReason || 'Non spécifié'}.`,
             channels: ['PUSH', 'SMS']
         });

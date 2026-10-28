@@ -107,7 +107,7 @@ export async function GET(request: Request) {
                 total: receiptsCount,
                 pages: Math.ceil(receiptsCount / limit),
             },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/wallet GET error:', error);

@@ -53,7 +53,7 @@ export async function POST(req: Request) {
             const limit = isPro ? 2000000 : 500000;
             if (amount > limit) {
                 return NextResponse.json({ 
-                    error: `Le montant dépasse votre limite de retrait autorisée (${limit.toLocaleString('fr-FR')} FCFA).` 
+                    error: `Le montant dépasse votre limite de retrait autorisée (${limit.toLocaleString('fr-FR')} XOF).` 
                 }, { status: 400 });
             }
 

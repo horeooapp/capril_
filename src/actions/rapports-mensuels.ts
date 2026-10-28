@@ -107,8 +107,8 @@ export async function generateOwnerMonthlyReport(ownerId: string, month: number,
     await NotificationService.envoyerNotification(ownerId, "RAPPORT_MENSUEL", {
        referenceId: report.id,
        payload: {
-         parameters: [periodStr, `${totalEncaisse} FCFA`, `${tauxRecouvrement}%`],
-         smsText: `[QAPRIL] Votre rapport de ${periodStr} est prêt. Encaissement: ${totalEncaisse.toLocaleString()} FCFA (${tauxRecouvrement}%).`
+         parameters: [periodStr, `${totalEncaisse} XOF`, `${tauxRecouvrement}%`],
+         smsText: `[QAPRIL] Votre rapport de ${periodStr} est prêt. Encaissement: ${totalEncaisse.toLocaleString()} XOF (${tauxRecouvrement}%).`
        }
     });
 

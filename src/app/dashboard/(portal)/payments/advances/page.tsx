@@ -98,7 +98,7 @@ export default function LandlordAdvancesPage() {
                                     <div className="mt-3 text-[11px] font-bold uppercase bg-white px-3 py-1.5 rounded-[8px] border border-amber-200 inline-block text-amber-700 shadow-sm">
                                         Demande : {req.monthsCount} Mois d'Avance
                                     </div>
-                                    <p className="mt-3 text-2xl font-black text-slate-900">{req.totalAmount.toLocaleString()} <span className="text-[14px] text-slate-500 font-bold">FCFA</span></p>
+                                    <p className="mt-3 text-2xl font-black text-slate-900">{req.totalAmount.toLocaleString()} <span className="text-[14px] text-slate-500 font-bold">XOF</span></p>
                                     {req.reason && <p className="text-[13px] italic text-slate-500 mt-2 bg-white/50 p-2 rounded-[8px] border border-amber-100">"{req.reason}"</p>}
                                 </div>
 
@@ -152,7 +152,7 @@ export default function LandlordAdvancesPage() {
                             <div key={req.id} className="p-4 rounded-[12px] border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                 <div>
                                     <p className="font-bold text-[14px] text-slate-800">{req.tenant.firstName} {req.tenant.lastName} <span className="text-slate-400 font-medium">- {req.monthsCount} Mois</span></p>
-                                    <p className="text-[13px] text-slate-600 font-medium mt-1">{req.totalAmount.toLocaleString()} FCFA</p>
+                                    <p className="text-[13px] text-slate-600 font-medium mt-1">{req.totalAmount.toLocaleString()} XOF</p>
                                 </div>
                                 <div>
                                     {req.status === 'APPROVED' && <Badge color="green">Approuvé</Badge>}

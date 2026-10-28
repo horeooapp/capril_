@@ -53,8 +53,8 @@ export default function TarifsPage() {
       name: "Bailleur Sérénité",
       desc: "Pour les propriétaires gérant de 1 à 20 logements en Côte d'Ivoire ou depuis la diaspora.",
       price: annual ? "2 000" : "2 500",
-      period: "FCFA / bien / mois",
-      note: annual ? "Facturé annuellement (24 000 FCFA/an)" : "Sans engagement de durée",
+      period: "XOF / bien / mois",
+      note: annual ? "Facturé annuellement (24 000 XOF/an)" : "Sans engagement de durée",
       highlight: true,
       accent: "#F59E0B",
       features: [
@@ -79,8 +79,8 @@ export default function TarifsPage() {
       name: "Agence & Mandataire",
       desc: "Conçu pour les administrateurs de biens, agences immobilières agréées et notaires.",
       price: annual ? "24 000" : "29 000",
-      period: "FCFA / mois (jusqu'à 30 lots)",
-      note: "Lots supplémentaires dégressifs à 700 FCFA/mois",
+      period: "XOF / mois (jusqu'à 30 lots)",
+      note: "Lots supplémentaires dégressifs à 700 XOF/mois",
       highlight: false,
       accent: "#7C3AED",
       features: [
@@ -131,7 +131,7 @@ export default function TarifsPage() {
     },
     {
       q: "Puis-je tester gratuitement avant de m'engager ?",
-      a: "Oui, chaque nouveau propriétaire peut enregistrer son premier bien et signer son premier bail à 0 FCFA. Vous ne payez que si vous ajoutez d'autres biens et êtes pleinement satisfait du service.",
+      a: "Oui, chaque nouveau propriétaire peut enregistrer son premier bien et signer son premier bail à 0 XOF. Vous ne payez que si vous ajoutez d'autres biens et êtes pleinement satisfait du service.",
     },
     {
       q: "Quels sont les moyens de paiement acceptés pour l'abonnement ?",

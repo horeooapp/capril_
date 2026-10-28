@@ -261,7 +261,7 @@ export default function AdminManualPage() {
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Dans le menu principal, appuyez sur 'Mes biens' puis 'Ajouter un logement'</li>
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Choisissez le type : Chambre · Appartement · Studio · Villa · Local commercial</li>
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Entrez l'adresse ou décrivez le logement (ex : 'Chambre 3 · Cour Bamba · Niangon')</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 4. Entrez le loyer mensuel en FCFA</li>
+                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 4. Entrez le loyer mensuel en XOF</li>
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 5. Appuyez sur 'Enregistrer'</li>
                                 </ul>
                             </div>
@@ -291,11 +291,11 @@ export default function AdminManualPage() {
                                         </thead>
                                         <tbody>
                                             <tr className="bg-green-50/50 border-b"><td className="px-4 py-3 font-bold">Bail Déclaratif (cours communes)</td><td className="px-4 py-3 font-black text-green-600">GRATUIT</td><td className="px-4 py-3 font-black text-green-600">GRATUIT</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">Moins de 50 000 FCFA/mois</td><td className="px-4 py-3">3 000 FCFA TTC</td><td className="px-4 py-3">1 500 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">50 001 – 150 000 FCFA/mois</td><td className="px-4 py-3">5 000 FCFA TTC</td><td className="px-4 py-3">2 500 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">150 001 – 400 000 FCFA/mois</td><td className="px-4 py-3">8 000 FCFA TTC</td><td className="px-4 py-3">4 000 FCFA TTC</td></tr>
-                                            <tr className="border-b"><td className="px-4 py-3">400 001 – 1 000 000 FCFA/mois</td><td className="px-4 py-3">15 000 FCFA TTC</td><td className="px-4 py-3">7 500 FCFA TTC</td></tr>
-                                            <tr><td className="px-4 py-3">Plus de 1 000 000 FCFA/mois</td><td className="px-4 py-3">25 000 FCFA TTC</td><td className="px-4 py-3">12 500 FCFA TTC</td></tr>
+                                            <tr className="border-b"><td className="px-4 py-3">Moins de 50 000 XOF/mois</td><td className="px-4 py-3">3 000 XOF TTC</td><td className="px-4 py-3">1 500 XOF TTC</td></tr>
+                                            <tr className="border-b"><td className="px-4 py-3">50 001 – 150 000 XOF/mois</td><td className="px-4 py-3">5 000 XOF TTC</td><td className="px-4 py-3">2 500 XOF TTC</td></tr>
+                                            <tr className="border-b"><td className="px-4 py-3">150 001 – 400 000 XOF/mois</td><td className="px-4 py-3">8 000 XOF TTC</td><td className="px-4 py-3">4 000 XOF TTC</td></tr>
+                                            <tr className="border-b"><td className="px-4 py-3">400 001 – 1 000 000 XOF/mois</td><td className="px-4 py-3">15 000 XOF TTC</td><td className="px-4 py-3">7 500 XOF TTC</td></tr>
+                                            <tr><td className="px-4 py-3">Plus de 1 000 000 XOF/mois</td><td className="px-4 py-3">25 000 XOF TTC</td><td className="px-4 py-3">12 500 XOF TTC</td></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -324,12 +324,12 @@ export default function AdminManualPage() {
                                 <p className="text-sm mb-4">Votre portefeuille interne pour payer les frais de service (quittances, enregistrement) sans transfert Mobile Money à chaque fois.</p>
                                 <ul className="space-y-2 text-sm font-medium mb-6">
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 1. Dans le menu, appuyez sur 'Mon Wallet' et 'Recharger'</li>
-                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Choisissez le montant (min 1 000 FCFA) et votre réseau (Wave, Orange, etc.)</li>
+                                    <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 2. Choisissez le montant (min 1 000 XOF) et votre réseau (Wave, Orange, etc.)</li>
                                     <li className="flex gap-3"><ChevronRight className="shrink-0 text-ivoire-dark mt-1" size={16} /> 3. Confirmez le paiement sur votre téléphone</li>
                                 </ul>
                                 <div className="p-4 bg-green-50 text-green-800 rounded-xl text-sm font-medium flex gap-3">
                                     <CheckCircle className="shrink-0 mt-0.5" size={18} />
-                                    <p>✅ Conseil : rechargez 5 000 FCFA une fois par trimestre pour couvrir vos quittances sans y penser. QAPRIL vous alerte par SMS quand votre Wallet est bas.</p>
+                                    <p>✅ Conseil : rechargez 5 000 XOF une fois par trimestre pour couvrir vos quittances sans y penser. QAPRIL vous alerte par SMS quand votre Wallet est bas.</p>
                                 </div>
                             </div>
 
@@ -383,9 +383,9 @@ export default function AdminManualPage() {
                             <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">L'application Android Agent fonctionne offline. Saisissez baux et confirmations terrain, tout se synchronise dès que le réseau revient.</p>
                             <p className="text-sm text-gray-600 font-bold mb-2">Commissions Agent :</p>
                             <ul className="text-sm text-gray-600 space-y-1 ml-4 border-l-2 border-ivoire-dark/30 pl-3">
-                                <li>Enregistrement bail : 1 000 FCFA</li>
-                                <li>Confirmation BDQ : 250 FCFA</li>
-                                <li>Formalisation BDQ : 500 FCFA</li>
+                                <li>Enregistrement bail : 1 000 XOF</li>
+                                <li>Confirmation BDQ : 250 XOF</li>
+                                <li>Formalisation BDQ : 500 XOF</li>
                             </ul>
                         </div>
 
@@ -393,7 +393,7 @@ export default function AdminManualPage() {
                             <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
                                 <Building className="text-ivoire-dark print:hidden"/> 6. Guide Agence
                             </h2>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">Des abonnements adaptés à votre taille, de gratuit à PRO (15 000 FCFA/mois) avec quittances illimitées.</p>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-4 print:text-black">Des abonnements adaptés à votre taille, de gratuit à PRO (15 000 XOF/mois) avec quittances illimitées.</p>
                             <p className="text-sm text-gray-600 leading-relaxed">Possibilité de migrer vos données existantes via un tableau Excel QAPRIL (gratuit pour membres CDAIM).</p>
                         </div>
                     </div>
@@ -451,7 +451,7 @@ export default function AdminManualPage() {
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
                             <FileCheck className="text-ivoire-dark print:hidden" size={32} /> 8. Module M17 DGI
                         </h2>
-                        <p className="text-gray-600 leading-relaxed print:text-black">Enregistrement de votre bail à la Direction Générale des Impôts. Facultatif mais recommandé. Le paiement des frais DGI et des frais de service QAPRIL (ex: 3000 FCFA pour loyer &lt; 50k) est intégré, le récépissé est obtenu en 48-72h.</p>
+                        <p className="text-gray-600 leading-relaxed print:text-black">Enregistrement de votre bail à la Direction Générale des Impôts. Facultatif mais recommandé. Le paiement des frais DGI et des frais de service QAPRIL (ex: 3000 XOF pour loyer &lt; 50k) est intégré, le récépissé est obtenu en 48-72h.</p>
                     </div>
 
                     {/* SECTION 9 */}
@@ -464,7 +464,7 @@ export default function AdminManualPage() {
                                 { q: "Est-ce que QAPRIL est légal ?", a: "Oui. Conforme à la loi n°2019-576 du 26 juin 2019. Les quittances sont valables devant les tribunaux." },
                                 { q: "Le locataire doit-il payer ?", a: "Non, réception, historique et score sont entièrement gratuits pour le locataire." },
                                 { q: "Si le locataire n'a pas de smartphone ?", a: "Il est alerté par SMS basique et peut utiliser l'USSD *144*PSDP#." },
-                                { q: "Que se passe-t-il si mon Wallet QAPRIL est vide ?", a: "QAPRIL émet vos quittances en mode crédit jusqu'à -1500 FCFA, puis suspend les émissions." },
+                                { q: "Que se passe-t-il si mon Wallet QAPRIL est vide ?", a: "QAPRIL émet vos quittances en mode crédit jusqu'à -1500 XOF, puis suspend les émissions." },
                                 { q: "Le BDQ a-t-il la même valeur qu'un bail signé ?", a: "Non. Le Bail Déclaratif QAPRIL a valeur de commencement de preuve, opposable en médiation mais moins fort qu'un bail complet." },
                             ].map((faq, i) => (
                                 <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">

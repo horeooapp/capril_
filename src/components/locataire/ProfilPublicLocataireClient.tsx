@@ -107,11 +107,11 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                                 className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                             >
                                 <option value="">Choisir...</option>
-                                <option value="0-50K">0 - 50k FCFA</option>
-                                <option value="50K-150K">50k - 150k FCFA</option>
-                                <option value="150K-300K">150k - 300k FCFA</option>
-                                <option value="300K-500K">300k - 500k FCFA</option>
-                                <option value="500K+">500k+ FCFA</option>
+                                <option value="0-50K">0 - 50k XOF</option>
+                                <option value="50K-150K">50k - 150k XOF</option>
+                                <option value="150K-300K">150k - 300k XOF</option>
+                                <option value="300K-500K">300k - 500k XOF</option>
+                                <option value="500K+">500k+ XOF</option>
                             </select>
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
 
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Budget Max Loyer (FCFA)</label>
+                            <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Budget Max Loyer (XOF)</label>
                             <input 
                                 type="number"
                                 value={formData.budgetMaxFcfa}

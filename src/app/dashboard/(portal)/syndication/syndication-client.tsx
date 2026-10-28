@@ -129,7 +129,7 @@ export default function SyndicationDashboardClient({ annonces }: { annonces: any
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{ann.logement?.nom || ann.logement?.adresse || 'Sans lot'}</p>
                                     </td>
                                     <td className="p-5">
-                                        <p className="font-black text-[14px] text-slate-900">{ann.loyerDemande.toLocaleString()} <span className="text-[10px] text-slate-400">FCFA</span></p>
+                                        <p className="font-black text-[14px] text-slate-900">{ann.loyerDemande.toLocaleString()} <span className="text-[10px] text-slate-400">XOF</span></p>
                                         <p className="text-[11px] font-bold text-slate-500 mt-1">{ann.nbVisites} Vues • <span className="text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-[4px]">{ann.nbContacts} Leads CRM</span></p>
                                     </td>
                                     {/* Jumia Toggle */}

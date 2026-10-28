@@ -49,7 +49,7 @@ export async function subscribeInsurance(leaseId: string, provider: string = "NS
         }, 0);
 
         if (balance < premiumAmount) {
-            throw new Error(`Solde insuffisant. La prime annuelle est de ${premiumAmount} FCFA.`);
+            throw new Error(`Solde insuffisant. La prime annuelle est de ${premiumAmount} XOF.`);
         }
 
         await tx.walletTransaction.create({

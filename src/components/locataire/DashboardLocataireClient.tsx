@@ -299,7 +299,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                                     </div>
                                     <div className="text-right flex items-center gap-6">
                                         <div className="hidden sm:block">
-                                            <p className="font-black text-slate-800">{Number(q.totalAmount).toLocaleString()} FCFA</p>
+                                            <p className="font-black text-slate-800">{Number(q.totalAmount).toLocaleString()} XOF</p>
                                             <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Payé</span>
                                         </div>
                                         <Link href={`/receipts/${q.id}`} target="_blank" className="p-2 bg-gray-50 rounded-xl hover:bg-slate-800 hover:text-white transition-colors">

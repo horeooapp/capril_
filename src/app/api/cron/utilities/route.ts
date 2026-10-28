@@ -64,7 +64,7 @@ export async function GET(req: Request) {
 
             if (shouldRemind && facture.lease?.tenant) {
                 // Simuler l'envoi de notification
-                const msg = `QAPRIL - Facture ${facture.typeUtility} (${facture.montantTotal} FCFA) à régler avant le ${dueDate.toLocaleDateString()}. Date Limite ${diffDays > 0 ? `dans ${diffDays} jours` : 'DÉPASSÉE'}.`;
+                const msg = `QAPRIL - Facture ${facture.typeUtility} (${facture.montantTotal} XOF) à régler avant le ${dueDate.toLocaleDateString()}. Date Limite ${diffDays > 0 ? `dans ${diffDays} jours` : 'DÉPASSÉE'}.`;
                 
                 // await ReminderService.sendSMS(facture.lease.tenant.phone, msg);
                 // On log dans la table ReminderLog pour le suivi UI Dashboard

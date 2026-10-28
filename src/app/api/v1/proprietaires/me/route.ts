@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       wallet: {
         solde: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
         decouvert: -1500, // Fixed rule ADD-07 v3
-        devise: 'FCFA',
+        devise: 'XOF',
         statut: (((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0) < 0 ? 'Débiteur' : 'Actif'
       },
       stats: {

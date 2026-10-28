@@ -83,7 +83,7 @@ export async function GET(request: Request) {
                 leaseRef:       d.lease?.leaseReference,
                 property:       d.lease?.property?.name ?? d.lease?.property?.address ?? 'Bien',
             })),
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/fiscal GET error:', error);

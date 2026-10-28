@@ -84,12 +84,12 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                 />
                 <StatCard 
                     label="Caisse Commune" 
-                    value={<>{tr.toLocaleString()} <span className="text-xs font-bold text-slate-400">FCFA</span></>} 
+                    value={<>{tr.toLocaleString()} <span className="text-xs font-bold text-slate-400">XOF</span></>} 
                     sub="Fonds disponibles pour l'entretien"
                 />
                 <StatCard 
                     label="Cotisations en Attente" 
-                    value={<>{Math.abs(arrears).toLocaleString()} <span className="text-xs font-bold text-slate-400">FCFA</span></>} 
+                    value={<>{Math.abs(arrears).toLocaleString()} <span className="text-xs font-bold text-slate-400">XOF</span></>} 
                     sub="Cotisations restantes à percevoir"
                     trend={arrears > 0 ? "down" : undefined}
                 />
@@ -119,7 +119,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                                     </td>
                                     <td className="p-4 text-xs font-black">
                                         <span className={s.treasuryBalance >= 0 ? "text-emerald-600" : "text-rose-600"}>
-                                            {s.treasuryBalance.toLocaleString()} FCFA
+                                            {s.treasuryBalance.toLocaleString()} XOF
                                         </span>
                                     </td>
                                     <td className="p-4">
@@ -233,7 +233,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 mb-1.5 block">
-                                        Fonds en caisse (FCFA)
+                                        Fonds en caisse (XOF)
                                     </label>
                                     <input 
                                         type="number" 

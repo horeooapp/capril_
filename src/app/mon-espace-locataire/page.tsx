@@ -151,7 +151,7 @@ export default function LocataireDashboardPage() {
                                             <div className="p-4 bg-slate-50 rounded-2xl space-y-3">
                                                 <div className="flex justify-between">
                                                     <span className="text-[9px] font-black uppercase text-slate-400">Loyer</span>
-                                                    <span className="text-sm font-black text-qnavy">{bdq.loyerDeclareMensuel.toLocaleString()} FCFA</span>
+                                                    <span className="text-sm font-black text-qnavy">{bdq.loyerDeclareMensuel.toLocaleString()} XOF</span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span className="text-[9px] font-black uppercase text-slate-400">Bailleur</span>
@@ -336,7 +336,7 @@ export default function LocataireDashboardPage() {
                             <span className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-none italic whitespace-nowrap text-[#FF8200]">
                                 {lease.rentAmount.toLocaleString()}
                             </span>
-                            <span className="text-sm sm:text-xl font-medium opacity-70 uppercase tracking-widest italic text-[#FF8200]/80">FCFA</span>
+                            <span className="text-sm sm:text-xl font-medium opacity-70 uppercase tracking-widest italic text-[#FF8200]/80">XOF</span>
                         </div>
                         <p className="text-[10px] sm:text-xs font-bold text-qgreen-light mt-4 max-w-xs uppercase tracking-widest">
                             Date limite : <span className="font-black text-white px-2 py-0.5 bg-qgreen/20 rounded-lg mx-1 whitespace-nowrap">

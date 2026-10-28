@@ -248,7 +248,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           {bail.statut==="Impayé"&&(
             <div style={{margin:"14px 16px 0",background:T.redPale,border:`1px solid ${T.red}25`,borderRadius:13,padding:"12px 14px"}}>
               <div style={{fontSize:12,fontWeight:800,color:T.red,marginBottom:4}}>⚠ Loyer Mars 2026 — J+{bail.retard}</div>
-              <div style={{fontSize:10,color:T.textMid,marginBottom:10}}>{fmt(bail.loyer)} FCFA non encaissé. Si vous avez payé, soumettez votre justificatif.</div>
+              <div style={{fontSize:10,color:T.textMid,marginBottom:10}}>{fmt(bail.loyer)} XOF non encaissé. Si vous avez payé, soumettez votre justificatif.</div>
               <div style={{display:"flex",gap:7}}>
                 <button onClick={()=>{go("droits");setDsec("rcl");setRclCode("RCL-02");}} style={{flex:1,background:T.red,border:"none",borderRadius:9,padding:"7px",fontSize:10,fontWeight:700,color:T.white,cursor:"pointer"}}>Signaler un problème</button>
                 <button onClick={()=>go("quitt")} style={{flex:1,background:T.white,border:`1px solid ${T.red}30`,borderRadius:9,padding:"7px",fontSize:10,fontWeight:700,color:T.red,cursor:"pointer"}}>Mes quittances</button>
@@ -289,7 +289,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
               <SecTitle label="Dernière quittance" right={<button onClick={()=>go("quitt")} style={{background:"none",border:"none",fontSize:10,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
               <div onClick={()=>{go("quitt");setQSel(q);}} style={{background:T.greenPale,border:`1px solid ${T.green}20`,borderLeft:`4px solid ${T.green}`,borderRadius:12,padding:"10px 12px",cursor:"pointer"}}>
                 <div style={{display:"flex",justifyContent:"space-between"}}>
-                  <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.mois} — {fmt(q.montant)} FCFA</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.ref}</div></div>
+                  <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.mois} — {fmt(q.montant)} XOF</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.ref}</div></div>
                   <Badge label="✓ Certifiée" color={T.green} bg={T.white}/>
                 </div>
               </div>
@@ -304,7 +304,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
                   <div style={{fontSize:18,marginBottom:2}}>{a.icon}</div>
                   <div style={{fontSize:10,fontWeight:700,color:a.color}}>{a.type}</div>
                   <div style={{fontSize:13,fontWeight:900,color:T.text,fontFamily:"monospace"}}>{fmt(a.montant)}</div>
-                  <div style={{fontSize:8,color:T.textLight}}>FCFA · {a.mois}</div>
+                  <div style={{fontSize:8,color:T.textLight}}>XOF · {a.mois}</div>
                   <div style={{marginTop:4}}><Badge label={a.statut} color={T.green} bg={T.greenPale} size={8}/></div>
                 </div>
               ))}
@@ -343,7 +343,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
               {bail.statut==="Impayé"?<Badge label={`J+${bail.retard}`} color={T.white} bg={T.red}/>:<Badge label="À jour" color={T.green} bg={T.greenPale}/>}
             </div>
             <div style={{display:"flex",gap:8}}>
-              {[{l:"Loyer",v:fmt(bail.loyer)+" FCFA"},{l:"Début",v:bail.debut},{l:"Fin",v:bail.fin}].map((k,i)=>(
+              {[{l:"Loyer",v:fmt(bail.loyer)+" XOF"},{l:"Début",v:bail.debut},{l:"Fin",v:bail.fin}].map((k,i)=>(
                 <div key={i} style={{flex:1,background:T.white,borderRadius:9,padding:"6px 5px",textAlign:"center"}}>
                   <div style={{fontSize:9,color:T.textLight,marginBottom:2}}>{k.l}</div>
                   <div style={{fontSize:10,fontWeight:800,color:T.textMid}}>{k.v}</div>
@@ -353,7 +353,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           </div>
           <Row label="Référence" value={bail.ref}/>
           <Row label="Type de bail" value={bail.type} color={bail.type==="BDQ"?T.green:T.navy}/>
-          <Row label="Loyer mensuel" value={fmt(bail.loyer)+" FCFA"} color={T.navy}/>
+          <Row label="Loyer mensuel" value={fmt(bail.loyer)+" XOF"} color={T.navy}/>
           <Row label="Échéance" value={`Le ${bail.echeanceJour}er de chaque mois`}/>
           <Row label="Fin de bail" value={bail.fin}/>
           {/* bloc bailleur */}
@@ -408,7 +408,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           {quittances.map((q,i)=>(
             <div key={i} onClick={()=>setQSel(q)} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${q.statut==="Certifiée"?T.green:T.red}`,borderRadius:12,padding:"10px 12px",marginBottom:8,cursor:"pointer"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.mois} — {fmt(q.montant)} FCFA</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.ref} · {q.date}</div></div>
+                <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.mois} — {fmt(q.montant)} XOF</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.ref} · {q.date}</div></div>
                 <Badge label={q.statut} color={q.statut==="Certifiée"?T.green:T.red} bg={q.statut==="Certifiée"?T.greenPale:T.redPale}/>
               </div>
             </div>
@@ -422,7 +422,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           <div style={{margin:"0 16px 10px",padding:14,background:qSel.statut==="Certifiée"?T.greenPale:T.redPale,borderRadius:14,border:`1px solid ${qSel.statut==="Certifiée"?T.green:T.red}20`}}>
             <div style={{display:"flex",justifyContent:"space-between"}}>
               <div><div style={{fontSize:13,fontWeight:800,color:T.text}}>{qSel.mois}</div><div style={{fontSize:10,color:T.textLight,marginTop:2,fontFamily:"monospace"}}>{qSel.ref}</div><div style={{fontSize:10,color:T.textLight}}>{qSel.date}</div></div>
-              <div style={{textAlign:"right"}}><div style={{fontSize:24,fontWeight:900,color:qSel.statut==="Certifiée"?T.green:T.red,fontFamily:"monospace"}}>{fmt(qSel.montant)}</div><div style={{fontSize:9,color:T.textLight}}>FCFA</div><div style={{marginTop:4}}><Badge label={qSel.statut} color={qSel.statut==="Certifiée"?T.green:T.red} bg={T.white}/></div></div>
+              <div style={{textAlign:"right"}}><div style={{fontSize:24,fontWeight:900,color:qSel.statut==="Certifiée"?T.green:T.red,fontFamily:"monospace"}}>{fmt(qSel.montant)}</div><div style={{fontSize:9,color:T.textLight}}>XOF</div><div style={{marginTop:4}}><Badge label={qSel.statut} color={qSel.statut==="Certifiée"?T.green:T.red} bg={T.white}/></div></div>
             </div>
           </div>
           {qSel.sha&&(
@@ -465,7 +465,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
                 </div>
                 <div style={{textAlign:"right"}}>
                   <div style={{fontSize:16,fontWeight:900,color:a.color,fontFamily:"monospace"}}>{fmt(a.montant)}</div>
-                  <div style={{fontSize:9,color:T.textLight}}>FCFA</div>
+                  <div style={{fontSize:9,color:T.textLight}}>XOF</div>
                 </div>
               </div>
               {/* mini graphe */}
@@ -488,7 +488,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
               <div><div style={{fontSize:14,fontWeight:800,color:T.text}}>{aSel.label}</div><div style={{fontSize:10,color:T.textLight}}>N° {aSel.compteur}</div></div>
             </div>
             <div style={{display:"flex",gap:8,marginTop:10}}>
-              {[{l:"Dernière facture",v:fmt(aSel.montant)+" FCFA"},{l:"Statut",v:aSel.statut},{l:"Mode",v:aSel.mode}].map((k,i)=>(
+              {[{l:"Dernière facture",v:fmt(aSel.montant)+" XOF"},{l:"Statut",v:aSel.statut},{l:"Mode",v:aSel.mode}].map((k,i)=>(
                 <div key={i} style={{flex:1,background:T.white+"CC",borderRadius:9,padding:"6px 5px",textAlign:"center"}}>
                   <div style={{fontSize:8,color:T.textLight,marginBottom:1}}>{k.l}</div>
                   <div style={{fontSize:10,fontWeight:800,color:T.textMid}}>{k.v}</div>
@@ -541,7 +541,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
                     <div style={{fontSize:11,fontWeight:700,color:T.text}}>{t.label}</div>
                     <div style={{fontSize:9,color:T.textLight,marginTop:1}}>Soumis le {t.date} · {t.heures || 0}h restantes</div>
                   </div>
-                  <div style={{textAlign:"right"}}><div style={{fontSize:15,fontWeight:900,color:T.orange,fontFamily:"monospace"}}>{fmt(t.montant||0)}</div><div style={{fontSize:8,color:T.textLight}}>FCFA</div></div>
+                  <div style={{textAlign:"right"}}><div style={{fontSize:15,fontWeight:900,color:T.orange,fontFamily:"monospace"}}>{fmt(t.montant||0)}</div><div style={{fontSize:8,color:T.textLight}}>XOF</div></div>
                 </div>
                 {/* barre progression délai */}
                 <div style={{marginBottom:8}}>
@@ -599,7 +599,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           </div>
           <div style={{padding:"0 16px"}}>
             <Row label="Ticket N°" value={tSel.id}/>
-            <Row label="Montant concerné" value={fmt(tSel.montant||0)+" FCFA"}/>
+            <Row label="Montant concerné" value={fmt(tSel.montant||0)+" XOF"}/>
             <Row label="Résolution" value={tSel.resolution||''} color={T.green}/>
           </div>
           <div style={{padding:"10px 16px 0"}}>
@@ -725,9 +725,9 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
             <div style={{fontSize:12,fontWeight:800,color:T.orange,marginBottom:4}}>✏️ Demande de modification de loyer</div>
             <div style={{fontSize:10,color:T.textMid,lineHeight:1.6}}>Règle MRL-01 — votre consentement est obligatoire. Vous disposez de <strong>5 jours</strong> pour répondre.</div>
           </div>
-          <Row label="Loyer actuel" value={fmt(bail.loyer)+" FCFA / mois"}/>
-          <Row label="Nouveau loyer proposé" value={fmt(165000)+" FCFA / mois"} color={T.orange}/>
-          <Row label="Hausse" value="+15 000 FCFA (+10%)" color={T.red}/>
+          <Row label="Loyer actuel" value={fmt(bail.loyer)+" XOF / mois"}/>
+          <Row label="Nouveau loyer proposé" value={fmt(165000)+" XOF / mois"} color={T.orange}/>
+          <Row label="Hausse" value="+15 000 XOF (+10%)" color={T.red}/>
           <Row label="Date d'effet proposée" value="01/06/2026"/>
           <Row label="Délai de réponse" value="5 jours — avant le 01/04/2026"/>
           {!mrlChoice?(
@@ -743,7 +743,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
               <div style={{fontSize:36,marginBottom:8}}>{mrlChoice==="oui"?"✅":"❌"}</div>
               <div style={{fontSize:14,fontWeight:800,color:mrlChoice==="oui"?T.green:T.red,marginBottom:8}}>{mrlChoice==="oui"?"Modification acceptée":"Modification refusée"}</div>
               <div style={{fontSize:11,color:T.textMid,lineHeight:1.7,marginBottom:16}}>
-                {mrlChoice==="oui"?"Votre accord a été enregistré. Le nouveau loyer de 165 000 FCFA sera effectif le 01/06/2026.":"Votre refus a été enregistré. Votre loyer reste à 150 000 FCFA. Ticket de médiation ouvert."}
+                {mrlChoice==="oui"?"Votre accord a été enregistré. Le nouveau loyer de 165 000 XOF sera effectif le 01/06/2026.":"Votre refus a été enregistré. Votre loyer reste à 150 000 XOF. Ticket de médiation ouvert."}
               </div>
               <button onClick={()=>{setMrlChoice(null);setDsec(null);}} style={{background:T.navy,border:"none",borderRadius:12,padding:"10px 20px",fontSize:11,fontWeight:700,color:T.white,cursor:"pointer"}}>Retour à mes droits</button>
             </div>
@@ -879,8 +879,8 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
     {/* Notifications */}
     <Sheet open={O.notifs} onClose={()=>cl("notifs")} title="🔔  Notifications">
       {[
-        {icon:"🔴",t:`Loyer Mars 2026 — J+${bail.retard}`,s:`${fmt(bail.loyer)} FCFA · Ticket RCL-002 en cours`,bg:T.redPale},
-        {icon:"🟢",t:"Quittance certifiée — Fév. 2026",s:`${fmt(bail.loyer)} FCFA · SHA-256 · SMS + WhatsApp envoyés`,bg:T.greenPale},
+        {icon:"🔴",t:`Loyer Mars 2026 — J+${bail.retard}`,s:`${fmt(bail.loyer)} XOF · Ticket RCL-002 en cours`,bg:T.redPale},
+        {icon:"🟢",t:"Quittance certifiée — Fév. 2026",s:`${fmt(bail.loyer)} XOF · SHA-256 · SMS + WhatsApp envoyés`,bg:T.greenPale},
         {icon:"🟣",t:"Ticket TKT-001 résolu",s:"Bailleur a répondu dans les 144h · Quittance émise",bg:T.purplePale},
         {icon:"🔵",t:"Renouvellement bail dans 270 jours",s:`${bail.ref} · Fin : ${bail.fin}`,bg:T.navyPale},
       ].map((n,i)=>(
@@ -939,10 +939,10 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
     <Sheet open={O.caution} onClose={()=>cl("caution")} title="🔒  Ma caution CDC">
       <div style={{background:T.orangePale,border:`1px solid ${T.orange}20`,borderRadius:11,padding:"12px 13px",marginBottom:12}}>
         <div style={{fontSize:12,fontWeight:800,color:T.orange,marginBottom:4}}>Non consignée</div>
-        <div style={{fontSize:11,color:T.textMid}}>Montant attendu : {fmt(300000)} FCFA</div>
+        <div style={{fontSize:11,color:T.textMid}}>Montant attendu : {fmt(300000)} XOF</div>
       </div>
       <div style={{background:T.navyPale,borderRadius:10,padding:"10px 12px",fontSize:10,color:T.textMid,lineHeight:1.7}}>
-        💡 <strong>Modèle CDC — 0 FCFA de frais.</strong> Si votre caution est consignée à la CDC-CI, vous récupérez 100% en fin de bail. Demandez à votre bailleur de procéder via QAPRIL.
+        💡 <strong>Modèle CDC — 0 XOF de frais.</strong> Si votre caution est consignée à la CDC-CI, vous récupérez 100% en fin de bail. Demandez à votre bailleur de procéder via QAPRIL.
       </div>
       <button onClick={()=>cl("caution")} style={{width:"100%",background:T.navy,border:"none",borderRadius:10,padding:"10px",fontSize:11,fontWeight:700,color:T.white,cursor:"pointer",marginTop:12}}>Fermer</button>
     </Sheet>

@@ -93,7 +93,7 @@ export default function InstitutionalDashboardPage() {
                     </div>
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">CA Licences</p>
-                        <h2 className="text-3xl font-black text-slate-900">{totalRevenue.toLocaleString()} FCFA</h2>
+                        <h2 className="text-3xl font-black text-slate-900">{totalRevenue.toLocaleString()} XOF</h2>
                     </div>
                 </div>
 
@@ -206,7 +206,7 @@ export default function InstitutionalDashboardPage() {
                                 <div className="bg-slate-100 rounded-[16px] p-5 mt-4 border border-slate-200">
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest">Tarif Annuel</span>
-                                        <span className="text-[18px] font-black text-indigo-600">5 000 000 FCFA</span>
+                                        <span className="text-[18px] font-black text-indigo-600">5 000 000 XOF</span>
                                     </div>
                                     <p className="text-[11px] text-slate-500">Le montant sera déduit de votre Wallet QAPRIL immédiatement.</p>
                                 </div>

@@ -125,11 +125,11 @@ export default function TenantLeasesPage() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
                                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Loyer Mensuel</p>
-                                            <p className="text-xl sm:text-2xl font-black text-gray-900">{Number(lease.rentAmount).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                            <p className="text-xl sm:text-2xl font-black text-gray-900">{Number(lease.rentAmount).toLocaleString()} <span className="text-xs">XOF</span></p>
                                         </div>
                                         <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
                                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Caution Gérée</p>
-                                            <p className="text-xl sm:text-2xl font-black text-primary">{(Number(lease.depositAmount) || 0).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                            <p className="text-xl sm:text-2xl font-black text-primary">{(Number(lease.depositAmount) || 0).toLocaleString()} <span className="text-xs">XOF</span></p>
                                         </div>
                                     </div>
 

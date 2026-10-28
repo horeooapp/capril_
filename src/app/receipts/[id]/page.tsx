@@ -132,7 +132,7 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant total réglé</p>
                                 <p className="text-4xl font-black text-gray-900">
-                                    {Number(receipt.totalAmount || 0).toLocaleString()} <span className="text-lg">FCFA</span>
+                                    {Number(receipt.totalAmount || 0).toLocaleString()} <span className="text-lg">XOF</span>
                                 </p>
                                 <p className="text-[10px] text-[#FF8200] font-black mt-2 uppercase tracking-[0.2em] bg-orange-50 px-3 py-1 rounded-full w-fit mx-auto">
                                     {receipt.paymentMethod?.replace('_', ' ')}

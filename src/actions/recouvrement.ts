@@ -55,7 +55,7 @@ export async function applyLateFees(leaseId: string) {
 
         const penaltyAmount = Math.floor(lease.rentAmount * 0.02)
         
-        console.log(`[RECOUVREMENT] Application de ${penaltyAmount} FCFA de frais pour le bail ${leaseId}`)
+        console.log(`[RECOUVREMENT] Application de ${penaltyAmount} XOF de frais pour le bail ${leaseId}`)
         
         // Créer une transaction de frais de retard
         await (prisma as any).paymentPgw.create({

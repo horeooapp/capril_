@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json({
             receipts: receipts,
-            currency: 'FCFA'
+            currency: 'XOF'
         });
 
     } catch (error: any) {

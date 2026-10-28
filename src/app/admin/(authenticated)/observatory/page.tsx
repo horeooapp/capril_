@@ -112,7 +112,7 @@ export default function ObservatoryPage() {
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <div className="flex items-center gap-1.5">
-                                                <span className="text-xs font-mono font-black text-white">{stat.avgRent.toLocaleString()} FCFA</span>
+                                                <span className="text-xs font-mono font-black text-white">{stat.avgRent.toLocaleString()} XOF</span>
                                                 {stat.trend === "up" ? (
                                                     <ChevronUp size={12} className="text-emerald-500" />
                                                 ) : (

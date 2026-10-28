@@ -205,15 +205,15 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Loyer Net</p>
-                                <p className="text-xl font-black text-slate-900">{Number(tLease.rentAmount).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.rentAmount).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">XOF</span></p>
                             </div>
                             <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Charges</p>
-                                <p className="text-xl font-black text-slate-900">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.chargesAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">XOF</span></p>
                             </div>
                             <div className="p-5 bg-slate-50 rounded-[16px] border border-slate-100">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Caution</p>
-                                <p className="text-xl font-black text-slate-900">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">FCFA</span></p>
+                                <p className="text-xl font-black text-slate-900">{Number(tLease.depositAmount || 0).toLocaleString()} <span className="text-[10px] text-slate-500 font-bold">XOF</span></p>
                             </div>
                             <div className="p-5">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cycle de vie</p>
@@ -343,7 +343,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                     <div className="p-5 bg-white/5 rounded-[16px] border border-white/10 backdrop-blur-sm">
                                         <div className="flex justify-between items-center mb-3">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caution</p>
-                                            <span className="text-[12px] font-black">{Number(tLease.depositAmount || 0).toLocaleString()} FCFA</span>
+                                            <span className="text-[12px] font-black">{Number(tLease.depositAmount || 0).toLocaleString()} XOF</span>
                                         </div>
                                         
                                         {tLease.cdcDeposits?.[0] ? (

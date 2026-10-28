@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     const { amount, operator, method } = await req.json();
 
     if (!amount || amount < 100) {
-      return NextResponse.json({ error: 'Montant invalide (min 100 FCFA)' }, { status: 400 });
+      return NextResponse.json({ error: 'Montant invalide (min 100 XOF)' }, { status: 400 });
     }
 
     const transactionId = `WAL-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;

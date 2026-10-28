@@ -65,12 +65,12 @@ export default async function ReversalsAdminPage() {
                                     </td>
                                     <td>
                                         <span className="text-[14px] font-black text-white">
-                                            {Number(payment.montant || 0).toLocaleString()} <span className="text-[10px] text-gray-500">FCFA</span>
+                                            {Number(payment.montant || 0).toLocaleString()} <span className="text-[10px] text-gray-500">XOF</span>
                                         </span>
                                     </td>
                                     <td>
                                         <span className="text-[12px] font-bold text-[var(--ci-orange)]">
-                                            {payment.honorairesAgence ? `${Number(payment.honorairesAgence).toLocaleString()} FCFA` : "---"}
+                                            {payment.honorairesAgence ? `${Number(payment.honorairesAgence).toLocaleString()} XOF` : "---"}
                                         </span>
                                     </td>
                                     <td>

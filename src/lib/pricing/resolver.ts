@@ -56,7 +56,7 @@ export async function resolveQuittancePrice(userId: string): Promise<number> {
         where: { cle: "quittance_ttc" }
     })
 
-    const basePrice = configTarif ? Number(configTarif.valeur) : 75 // 75 FCFA par défaut
+    const basePrice = configTarif ? Number(configTarif.valeur) : 75 // 75 XOF par défaut
 
     return basePrice
 }

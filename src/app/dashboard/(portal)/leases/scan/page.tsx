@@ -145,7 +145,7 @@ export default function ScanLeasePage() {
             
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Loyer Mensuel (FCFA)</label>
+                <label className="block text-sm font-medium text-gray-700">Loyer Mensuel (XOF)</label>
                 <input
                   type="number"
                   value={champs.loyer}

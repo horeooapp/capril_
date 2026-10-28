@@ -89,7 +89,7 @@ export default async function AdminCandidatesPage() {
                                             {c.logement?.propertyCode} • {c.logement?.commune}
                                         </td>
                                         <td className="px-8 py-6 text-sm font-mono text-indigo-600">
-                                            {c.revenuMensuel?.toLocaleString()} FCFA
+                                            {c.revenuMensuel?.toLocaleString()} XOF
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className="text-lg font-black font-mono text-emerald-600">{c.scoreQapril || "---"}</span>

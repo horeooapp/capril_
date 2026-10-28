@@ -110,12 +110,12 @@ export default function RentRanking() {
                     <RankingList 
                         title="Top 5 Communes (Luxe/Affaires)"
                         items={rawCommuneData}
-                        unit="FCFA / Mois"
+                        unit="XOF / Mois"
                     />
                     <RankingList 
                         title="Top 5 Villes Nationales"
                         items={rawCityData}
-                        unit="FCFA / Mois"
+                        unit="XOF / Mois"
                     />
                 </div>
             </div>

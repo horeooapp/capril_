@@ -104,7 +104,7 @@ export async function GET(
                 rentAmount: u.leases[0] ? Number(u.leases[0].rentAmount) : 0,
             })),
             activeAnnonce: property.annonces[0] ?? null,
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/properties/[id] GET error:', error);

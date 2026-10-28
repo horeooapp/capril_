@@ -82,7 +82,7 @@ export default function WalletDashboard() {
                   <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/50 mb-1">Solde Disponible</h3>
                   <div className="flex items-baseline gap-2">
                      <p className="text-4xl font-black tracking-tight mt-1">{solde.toLocaleString()}</p>
-                     <span className="text-sm font-medium text-white/70">FCFA</span>
+                     <span className="text-sm font-medium text-white/70">XOF</span>
                   </div>
                   {isOverdrawn && (
                     <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-white/20 rounded-[4px] text-[10px] font-bold uppercase tracking-widest">
@@ -93,7 +93,7 @@ export default function WalletDashboard() {
                <div className="mt-6 flex justify-between items-end border-t border-white/10 pt-4">
                   <div>
                     <p className="text-[10px] uppercase text-white/40 tracking-widest mb-0.5">Moyenne Mensuelle</p>
-                    <p className="text-[13px] font-semibold">{stats.consoMensuelle.toLocaleString()} FCFA</p>
+                    <p className="text-[13px] font-semibold">{stats.consoMensuelle.toLocaleString()} XOF</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] uppercase text-white/40 tracking-widest mb-0.5">Autonomie</p>

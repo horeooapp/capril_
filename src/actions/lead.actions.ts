@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-const DEFAULT_LEAD_PRICE = 10000; // 10,000 FCFA par défaut
+const DEFAULT_LEAD_PRICE = 10000; // 10,000 XOF par défaut
 
 /**
  * Récupère les leads disponibles à l'achat pour une agence.

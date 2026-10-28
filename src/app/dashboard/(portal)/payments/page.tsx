@@ -36,7 +36,7 @@ async function PrepaymentHistory() {
                                     {req.lease?.property?.name || "Contrat Immobilière"}
                                 </div>
                                 <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
-                                    {req.monthsCount} mois • {req.totalAmount.toLocaleString()} FCFA
+                                    {req.monthsCount} mois • {req.totalAmount.toLocaleString()} XOF
                                 </div>
                             </div>
                         </div>

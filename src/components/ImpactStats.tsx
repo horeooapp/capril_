@@ -9,7 +9,7 @@ function Counter({ value, isCurrency = false }: { value: number, isCurrency?: bo
     const inView = useInView(ref, { once: true })
     const spring = useSpring(0, { mass: 1, stiffness: 100, damping: 30 })
     const display = useTransform(spring, (latest) => 
-        Math.floor(latest).toLocaleString() + (isCurrency ? " FCFA" : "")
+        Math.floor(latest).toLocaleString() + (isCurrency ? " XOF" : "")
     )
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function ImpactStats({ stats }: ImpactStatsProps) {
         {
             label: "Patrimoine Sécurisé (CDC)",
             value: stats.totalSecuredFunds,
-            unit: "FCFA",
+            unit: "XOF",
             icon: ShieldCheck,
             color: "text-blue-600",
             bg: "bg-blue-50",
@@ -62,7 +62,7 @@ export default function ImpactStats({ stats }: ImpactStatsProps) {
         {
             label: "Recettes Fiscales (DGI)",
             value: stats.totalFiscal,
-            unit: "FCFA",
+            unit: "XOF",
             icon: Banknote,
             color: "text-amber-600",
             bg: "bg-amber-50",

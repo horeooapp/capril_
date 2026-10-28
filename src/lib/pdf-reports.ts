@@ -52,7 +52,7 @@ export async function generateMonthlyReportPDF(data: ReportData): Promise<Buffer
   page.drawRectangle({ x: 50, y: currentY - 20, width: width - 100, height: 20, color: COLORS.NAVY });
   page.drawText('ADRESSE DU BIEN', { x: 60, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
   page.drawText('STATUT', { x: 350, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
-  page.drawText('MONTANT (FCFA)', { x: width - 150, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
+  page.drawText('MONTANT (XOF)', { x: width - 150, y: currentY - 14, size: 8, font: fontBold, color: COLORS.WHITE });
   currentY -= 40;
 
   data.details.forEach((item, idx) => {
@@ -101,15 +101,15 @@ export async function generateYearlyBilanPDF(data: YearlyBilanData): Promise<Buf
   currentY -= 60;
 
   const colW = (width - 130) / 3;
-  drawInfoBox(page, 50, currentY, colW, 70, 'Revenu Brut', `${data.totalIncome.toLocaleString()} F`, fontBold, font, COLORS.SUCCESS);
-  drawInfoBox(page, 65 + colW, currentY, colW, 70, 'Charges', `${data.totalMaintenance.toLocaleString()} F`, fontBold, font, COLORS.DANGER);
-  drawInfoBox(page, 80 + (colW * 2), currentY, colW, 70, 'AIRSI Estimé', `${data.estimatedTaxAirsi.toLocaleString()} F`, fontBold, font, COLORS.MANGO);
+  drawInfoBox(page, 50, currentY, colW, 70, 'Revenu Brut', `${data.totalIncome.toLocaleString()} XOF`, fontBold, font, COLORS.SUCCESS);
+  drawInfoBox(page, 65 + colW, currentY, colW, 70, 'Charges', `${data.totalMaintenance.toLocaleString()} XOF`, fontBold, font, COLORS.DANGER);
+  drawInfoBox(page, 80 + (colW * 2), currentY, colW, 70, 'AIRSI Estimé', `${data.estimatedTaxAirsi.toLocaleString()} XOF`, fontBold, font, COLORS.MANGO);
   currentY -= 110;
 
   // 3. Final Result Banner
   page.drawRectangle({ x: 50, y: currentY - 50, width: width - 100, height: 50, color: COLORS.NAVY });
   page.drawText('RÉSULTAT NET APRÈS CHARGES ET FISCALITÉ', { x: 70, y: currentY - 20, size: 9, font: fontBold, color: rgb(0.8, 0.9, 1) });
-  page.drawText(`${data.finalResult.toLocaleString()} FCFA`, { x: width - 250, y: currentY - 40, size: 22, font: fontBold, color: COLORS.WHITE });
+  page.drawText(`${data.finalResult.toLocaleString()} XOF`, { x: width - 250, y: currentY - 40, size: 22, font: fontBold, color: COLORS.WHITE });
   currentY -= 100;
 
   // 4. Performance per Property
@@ -119,7 +119,7 @@ export async function generateYearlyBilanPDF(data: YearlyBilanData): Promise<Buf
   // Header
   page.drawRectangle({ x: 50, y: currentY - 15, width: width - 100, height: 20, color: COLORS.LIGHT_GRAY });
   page.drawText('DÉSIGNATION DU BIEN', { x: 60, y: currentY - 9, size: 8, font: fontBold });
-  page.drawText('ENCAISSEMENT ANNUEL (FCFA)', { x: width - 200, y: currentY - 9, size: 8, font: fontBold });
+  page.drawText('ENCAISSEMENT ANNUEL (XOF)', { x: width - 200, y: currentY - 9, size: 8, font: fontBold });
   currentY -= 30;
 
   data.propertyBreakdown.forEach((p, idx) => {

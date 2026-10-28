@@ -110,15 +110,15 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                                 <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Résumé Financier</h3>
                                 <div className="flex justify-between items-center">
                                     <span className="text-xs font-bold text-gray-500 uppercase">Loyer Principal</span>
-                                    <span className="font-black text-gray-900">{lease.rentAmount.toLocaleString()} FCFA</span>
+                                    <span className="font-black text-gray-900">{lease.rentAmount.toLocaleString()} XOF</span>
                                 </div>
                                 <div className="flex justify-between items-center text-gray-500">
                                     <span className="text-xs font-bold uppercase">Charges</span>
-                                    <span className="font-bold">{lease.charges.toLocaleString()} FCFA</span>
+                                    <span className="font-bold">{lease.charges.toLocaleString()} XOF</span>
                                 </div>
                                 <div className="pt-4 border-t border-gray-200 flex justify-between items-center text-primary">
                                     <span className="text-xs font-black uppercase">Total Mensuel</span>
-                                    <span className="text-xl font-black">{(lease.rentAmount + lease.charges).toLocaleString()} FCFA</span>
+                                    <span className="text-xl font-black">{(lease.rentAmount + lease.charges).toLocaleString()} XOF</span>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +131,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                             <div className="flex justify-between items-end">
                                 <div>
                                     <p className="text-[10px] font-bold text-blue-600 uppercase">Montant Consigné</p>
-                                    <p className="text-lg font-black text-blue-900">{lease.deposit.toLocaleString()} FCFA</p>
+                                    <p className="text-lg font-black text-blue-900">{lease.deposit.toLocaleString()} XOF</p>
                                 </div>
                                 <span className="bg-blue-600 text-white text-[8px] px-2 py-1 rounded font-black uppercase">Sécurisé</span>
                             </div>

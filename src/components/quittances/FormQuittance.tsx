@@ -114,7 +114,7 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
                 </div>
               </div>
             )}
-            <div className={Q.infoBox}>💰 Prix quittance QAPRIL : 90 FCFA débités de votre Wallet à la confirmation.</div>
+            <div className={Q.infoBox}>💰 Prix quittance QAPRIL : 90 XOF débités de votre Wallet à la confirmation.</div>
             <button onClick={() => canSubmit && setVue("preview")}
               className={Q.btnAmber + ` w-full ${!canSubmit ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={!canSubmit}>
@@ -132,9 +132,9 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
                 ["Locataire", tenantName],
                 ["Bien", bienName],
                 ["Mois concerné", mois],
-                ["Montant", `${rentAmount.toLocaleString("fr-FR")} FCFA`],
+                ["Montant", `${rentAmount.toLocaleString("fr-FR")} XOF`],
                 ["Mode paiement", mode],
-                ["Frais QAPRIL", "90 FCFA · Wallet"],
+                ["Frais QAPRIL", "90 XOF · Wallet"],
               ].map(([l,v],i) => (
                 <div key={i} className={`flex justify-between px-3 py-2.5 text-xs border-b border-[#D0DFF5] last:border-none ${i%2===0?"bg-[#F0F5FF]":"bg-white"}`}>
                   <span className="text-[#4A6A8A]">{l}</span>

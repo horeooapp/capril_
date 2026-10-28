@@ -139,7 +139,7 @@ export default function CommissionsClient() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">Plancher (FCFA)</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Plancher (XOF)</label>
               <input 
                 type="number" 
                 value={formData.montantMin} 
@@ -148,7 +148,7 @@ export default function CommissionsClient() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1">Plafond (FCFA)</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Plafond (XOF)</label>
               <input 
                 type="number" 
                 value={formData.montantMax || ''} 
@@ -223,10 +223,10 @@ export default function CommissionsClient() {
                     {config.tauxPourcent}%
                   </td>
                   <td className="px-6 py-4 text-right">
-                    {config.montantMin} FCFA
+                    {config.montantMin} XOF
                   </td>
                   <td className="px-6 py-4 text-right">
-                    {config.montantMax ? `${config.montantMax} FCFA` : <span className="text-slate-400">-</span>}
+                    {config.montantMax ? `${config.montantMax} XOF` : <span className="text-slate-400">-</span>}
                   </td>
                   <td className="px-6 py-4 text-center">
                     {config.actif ? (

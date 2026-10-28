@@ -41,7 +41,7 @@ export default async function FloatPoolDetailsPage({ params }: { params: Promise
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Solde Total Cantonné</h3>
                     <div className="text-3xl font-bold text-gray-900">
-                        {pool.soldeTotal.toLocaleString("fr-FR")} <span className="text-xl text-gray-500">FCFA</span>
+                        {pool.soldeTotal.toLocaleString("fr-FR")} <span className="text-xl text-gray-500">XOF</span>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
@@ -108,10 +108,10 @@ export default async function FloatPoolDetailsPage({ params }: { params: Promise
                                         </td>
                                         <td className={`px-6 py-4 text-right font-semibold ${movement.type === "SORTIE" ? "text-red-600" : "text-green-600"}`}>
                                             {movement.type === "SORTIE" ? "-" : "+"}
-                                            {movement.montant.toLocaleString("fr-FR")} FCFA
+                                            {movement.montant.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 text-right text-gray-900 font-medium">
-                                            {movement.soldeApres.toLocaleString("fr-FR")} FCFA
+                                            {movement.soldeApres.toLocaleString("fr-FR")} XOF
                                         </td>
                                     </tr>
                                 ))

@@ -77,7 +77,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             receipts: formatted,
             pagination: { total, page, limit, pages: Math.ceil(total / limit) },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/receipts GET error:', error);
@@ -185,7 +185,7 @@ export async function POST(request: Request) {
             receiptId:  receipt.id,
             receiptRef: receipt.receiptRef,
             sha256:     sha256Hash,
-            currency:   'FCFA',
+            currency:   'XOF',
         }, { status: 201 });
 
     } catch (error: any) {

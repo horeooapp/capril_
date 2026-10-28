@@ -65,8 +65,8 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
                      <p className="text-3xl font-black text-slate-800 mt-1">{recons.reduce((acc, r)=> acc + r.nbTransactionsQapril, 0)}</p>
                  </div>
                  <div className="bg-green-50 border border-green-200 rounded-3xl p-6 shadow-sm">
-                     <p className="text-[10px] uppercase tracking-widest font-black text-green-700">Volume Total (FCFA)</p>
-                     <p className="text-2xl font-black text-green-700 mt-1">{recons.reduce((acc, r)=> acc + r.montantTotalQapril, 0).toLocaleString()} <span className="text-sm">FCFA</span></p>
+                     <p className="text-[10px] uppercase tracking-widest font-black text-green-700">Volume Total (XOF)</p>
+                     <p className="text-2xl font-black text-green-700 mt-1">{recons.reduce((acc, r)=> acc + r.montantTotalQapril, 0).toLocaleString()} <span className="text-sm">XOF</span></p>
                  </div>
                  <div className="bg-red-50 border border-red-200 rounded-3xl p-6 shadow-sm">
                      <p className="text-[10px] uppercase tracking-widest font-black text-red-700">Écarts à régulariser (Anomalies)</p>

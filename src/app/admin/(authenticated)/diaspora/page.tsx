@@ -34,7 +34,7 @@ export default async function AdminDiasporaPage() {
                 </div>
                 <div className="glass-panel p-6 rounded-[2rem] border border-white/20 bg-emerald-50/30">
                     <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Revenus Diaspora</p>
-                    <p className="text-3xl font-black text-emerald-900">-- FCFA</p>
+                    <p className="text-3xl font-black text-emerald-900">-- XOF</p>
                 </div>
                 <div className="glass-panel p-6 rounded-[2rem] border border-white/20">
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Taux de Rétention</p>

@@ -101,7 +101,7 @@ export async function POST(req: Request) {
                 success: true,
                 data: {
                     greeting: `Bonjour, ${fallbackName}`,
-                    balanceDue: totalArrears > 0 ? `${totalArrears.toLocaleString('fr-FR')} FCFA` : "À jour",
+                    balanceDue: totalArrears > 0 ? `${totalArrears.toLocaleString('fr-FR')} XOF` : "À jour",
                     totalArrears,
                     nextDueDate,
                     recentReceipts: activeLease.receipts.map(r => ({
@@ -180,7 +180,7 @@ export async function POST(req: Request) {
                         id: prop.id,
                         name: prop.name || prop.propertyCode,
                         status: hasLease ? "Loué" : "Vacant",
-                        rent: hasLease ? `${prop.leases[0].rentAmount || 0} FCFA` : `${prop.declaredRentFcfa || 0} FCFA`,
+                        rent: hasLease ? `${prop.leases[0].rentAmount || 0} XOF` : `${prop.declaredRentFcfa || 0} XOF`,
                         tenantName,
                         tenantId: hasLease ? prop.leases[0].tenantId : null,
                         leaseId: hasLease ? prop.leases[0].id : null
@@ -206,7 +206,7 @@ export async function POST(req: Request) {
                                 id: unit.id,
                                 name: `${prop.name || prop.propertyCode} - ${unit.unitLabel || "Unité"}`,
                                 status: unitHasLease ? "Loué" : "Vacant",
-                                rent: unitHasLease ? `${unit.leases[0].rentAmount || 0} FCFA` : `${unit.declaredRentFcfa || 0} FCFA`,
+                                rent: unitHasLease ? `${unit.leases[0].rentAmount || 0} XOF` : `${unit.declaredRentFcfa || 0} XOF`,
                                 tenantName,
                                 tenantId: unitHasLease ? unit.leases[0].tenantId : null,
                                 leaseId: unitHasLease ? unit.leases[0].id : null
@@ -217,7 +217,7 @@ export async function POST(req: Request) {
                             id: prop.id,
                             name: prop.name || prop.propertyCode,
                             status: "Vide/Config",
-                            rent: "0 FCFA",
+                            rent: "0 XOF",
                             tenantName: 'Configuration'
                         });
                     }
@@ -308,7 +308,7 @@ export async function POST(req: Request) {
                 data: {
                     userId: user.id,
                     greeting: `Bonjour, ${fallbackName}`,
-                    totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} FCFA`,
+                    totalRevenue: `${totalRevenue.toLocaleString('fr-FR')} XOF`,
                     occupancyRate: `${occupancyRate}%`,
                     properties: propertiesMobile,
                     totalProperties,

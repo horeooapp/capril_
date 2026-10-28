@@ -40,7 +40,7 @@ export class SMSDeclaratifAdapter extends PgwAdapter {
     });
 
     // TODO: Intégration SMS Gateway (Infobip) pour envoyer le SMS au propriétaire :
-    // "QAPRIL : [PRENOM_LOCATAIRE] a-t-il payé son loyer de [MONTANT] FCFA ce mois ? Répondez OUI ou NON"
+    // "QAPRIL : [PRENOM_LOCATAIRE] a-t-il payé son loyer de [MONTANT] XOF ce mois ? Répondez OUI ou NON"
     console.log(`[PGW] SMS de demande envoyé au bailleur (${lease.landlord.phone}) pour le paiement ${payment.id}`);
 
     return {

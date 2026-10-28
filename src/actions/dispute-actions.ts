@@ -223,7 +223,7 @@ export async function getDisputeTimeline(disputeId: string) {
             type: 'PAYMENT',
             date: r.paidAt || r.createdAt,
             title: `Loyer payé - ${r.month}/${r.year}`,
-            content: `Montant: ${r.amount} FCFA`
+            content: `Montant: ${r.amount} XOF`
         });
     });
 

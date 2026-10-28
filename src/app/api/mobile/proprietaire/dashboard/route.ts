@@ -82,7 +82,7 @@ export async function GET(request: Request) {
             pendingLeasesCount,
             pendingLeaseId: pendingLeases.length > 0 ? pendingLeases[0].id : null,
             incidentsCount,
-            currency: 'FCFA'
+            currency: 'XOF'
         });
 
     } catch (error: any) {

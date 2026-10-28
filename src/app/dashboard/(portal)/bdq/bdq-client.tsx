@@ -86,7 +86,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                 <StatCard 
                     label="Coût Estimé LLM"
                     value={costFcfa.toLocaleString()}
-                    sub="FCFA"
+                    sub="XOF"
                 />
             </div>
 

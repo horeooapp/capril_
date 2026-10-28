@@ -260,7 +260,7 @@ export async function executerRechercheHybride(
     } else if (annonces.length === 0 && criteres.loyer_max && criteres.loyer_max < 75000) {
       // Proposition d'élargissement si aucun résultat (RG-IA-03)
       const budgetElargi = Math.round(criteres.loyer_max * 1.25);
-      question = `Aucun bien trouvé sous ${criteres.loyer_max.toLocaleString("fr-FR")} FCFA. Souhaitez-vous voir les offres jusqu'à ${budgetElargi.toLocaleString("fr-FR")} FCFA ?`;
+      question = `Aucun bien trouvé sous ${criteres.loyer_max.toLocaleString("fr-FR")} XOF. Souhaitez-vous voir les offres jusqu'à ${budgetElargi.toLocaleString("fr-FR")} XOF ?`;
       besoinPrecision = true;
     }
 

@@ -92,7 +92,7 @@ export default async function AdminDeclarationsPage() {
                                             </div>
                                         </td>
                                         <td className="p-6 font-black text-gray-900">
-                                            {Number(dec.montantDeclare).toLocaleString()} <span className="text-[10px] text-gray-400">FCFA</span>
+                                            {Number(dec.montantDeclare).toLocaleString()} <span className="text-[10px] text-gray-400">XOF</span>
                                         </td>
                                         <td className="p-6 text-xs font-bold uppercase text-gray-500 tracking-widest">
                                             {dec.canal}

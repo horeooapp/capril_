@@ -64,7 +64,7 @@ export default async function LeadsB2BPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Revenus Générés (Top 10)</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{revenue.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{revenue.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@ export default async function LeadsB2BPage() {
                                             {lead.commune || "Non spécifié"}
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-gray-900">
-                                            {lead.budgetMax?.toLocaleString("fr-FR")} FCFA
+                                            {lead.budgetMax?.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export default async function LeadsB2BPage() {
                                             {tx.agenceId}
                                         </td>
                                         <td className="px-6 py-4 text-right font-semibold text-green-600">
-                                            +{tx.montantPaye.toLocaleString("fr-FR")} FCFA
+                                            +{tx.montantPaye.toLocaleString("fr-FR")} XOF
                                         </td>
                                     </tr>
                                 ))

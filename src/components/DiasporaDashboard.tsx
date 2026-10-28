@@ -227,7 +227,7 @@ const Topbar = ({selBien, setSelBien, bp, setSideOpen, tab, user, data, devise, 
     </div>
     <div className="flex items-center gap-6">
       <div className="bg-gray-50 p-1.5 rounded-[1.25rem] border border-gray-100 flex gap-2">
-        {["FCFA","EUR"].map(d=>(
+        {["XOF","EUR"].map(d=>(
           <button key={d} onClick={()=>setDevise(d)} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${d===devise ? 'bg-primary text-white shadow-lg shadow-orange-500/20' : 'text-gray-400 hover:text-gray-600'}`}>
             {d==="EUR"?"€ EUR":"XOF"}
           </button>
@@ -304,7 +304,7 @@ const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA,
             <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
               <div style={{fontSize:10,fontWeight:700,color:T.textLight,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Performance annuelle</div>
               <div style={{fontSize:32,fontWeight:940,color:T.navy,marginBottom:8}}>{affMontant(totalFCFA * 12)}</div>
-              <div style={{fontSize:11,color:T.textMid,fontWeight:700}}>{fmt(totalFCFA)} FCFA / mois · Taux 0% QAPRIL</div>
+              <div style={{fontSize:11,color:T.textMid,fontWeight:700}}>{fmt(totalFCFA)} XOF / mois · Taux 0% QAPRIL</div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
               <BtnPrim label="Configurer virements SEPA" onClick={()=>goTab("virements")} icon={<Euro size={16}/>}/>
@@ -491,7 +491,7 @@ const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA,
         <div style={{maxWidth:600}}>
           <SecTitle label="⚙️ Préférences de compte" />
           <Card style={{display:"flex",flexDirection:"column",gap:16}}>
-            <RowData label="Devise préférée" value={data.settings?.devise || "FCFA"} />
+            <RowData label="Devise préférée" value={data.settings?.devise || "XOF"} />
             <RowData label="Fuseau Horaire" value={data.settings?.fuseau || "Europe/Paris"} />
             <RowData label="Pays de résidence" value={data.settings?.pays || "France"} />
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0"}}>
@@ -514,7 +514,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   const [tab,setTab]           = useState("dashboard");
   const [selBien,setSelBien]   = useState<any>(null);
   const [sideOpen,setSideOpen] = useState(false);
-  const [devise, setDevise]    = useState((user.diasporaProfile?.diasporaDevise || "FCFA") || "FCFA");
+  const [devise, setDevise]    = useState((user.diasporaProfile?.diasporaDevise || "XOF") || "XOF");
   const [O,setO] = useState({
     notifs:false,inviter:false,sla:false,virement:false,
     addBien:false,deleguer:false,selBienId:null as string | null,
@@ -553,8 +553,8 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   const alertesSLA = properties.filter((b: any) => b.isHorsSLA).length;
   const impayesN = properties.filter((b: any) => b.isImpaye).length;
 
-  const affMontant = (fcfa: number) => devise === "EUR" ? `${fmtE(fcfa)} €` : `${fmt(fcfa)} FCFA`;
-  const fmtDual = (fcfa: number) => `${fmt(fcfa)} FCFA  ≈  ${fmtE(fcfa)} €`;
+  const affMontant = (fcfa: number) => devise === "EUR" ? `${fmtE(fcfa)} €` : `${fmt(fcfa)} XOF`;
+  const fmtDual = (fcfa: number) => `${fmt(fcfa)} XOF  ≈  ${fmtE(fcfa)} €`;
 
   const DialogComp = bp.isMobile ? MobileDialog : Modal;
 
@@ -597,7 +597,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
             <div key={i} style={{padding:16,background:T.grey1,borderRadius:12,display:"flex",gap:12,alignItems:"center"}}>
               <div style={{width:40,height:40,borderRadius:10,background:T.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🔔</div>
               <div>
-                <div style={{fontSize:12,fontWeight:800,color:T.navy}}>{w.op} : Recouvrement {w.montant.toLocaleString()} FCFA</div>
+                <div style={{fontSize:12,fontWeight:800,color:T.navy}}>{w.op} : Recouvrement {w.montant.toLocaleString()} XOF</div>
                 <div style={{fontSize:10,color:T.textLight}}>{w.date} · {w.emetteur} · {w.bien}</div>
               </div>
             </div>

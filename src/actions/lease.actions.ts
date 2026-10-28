@@ -150,7 +150,7 @@ export async function createLease(data: {
         if ((data.avanceLoyer || 0) > maxLoyerAvanceCaution) throw new Error("Avances illégales : maximum 2 mois autorisés (Art. 415 CCH).");
         if ((data.depositAmount || 0) > maxLoyerAvanceCaution) throw new Error("Caution illégale : maximum 2 mois autorisés (Art. 416 CCH).");
 
-        // 5. Certification Fee (2000 FCFA)
+        // 5. Certification Fee (2000 XOF)
         const CERTIFICATION_FEE = 2000;
         const currentWallet = await prisma.userWalletConfig.findUnique({
             where: { userId: ownerId },
@@ -249,7 +249,7 @@ export async function createLease(data: {
         // b) WhatsApp & SMS Notification to Tenant
         if (data.tenantPhone) {
             const tenantPhoneNorm = normalizePhone(data.tenantPhone);
-            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} FCFA/mois).\n\nVotre contrat est accessible directement sur votre tableau de bord pour consultation et signature électronique sécurisée :\n👉 ${appUrl}/mon-espace-locataire/leases/${lease.id}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
+            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} XOF/mois).\n\nVotre contrat est accessible directement sur votre tableau de bord pour consultation et signature électronique sécurisée :\n👉 ${appUrl}/mon-espace-locataire/leases/${lease.id}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
 
             const waRes = await sendOpenWAMessage(tenantPhoneNorm, waMsg).catch(() => ({ success: false }));
             if (!waRes?.success) {
@@ -268,8 +268,8 @@ export async function createLease(data: {
                 
                 <div style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 20px; margin: 20px 0;">
                     <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Référence du Bail :</strong> ${leaseRef}</p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Loyer mensuel :</strong> ${data.rentAmount.toLocaleString('fr-FR')} FCFA</p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Dépôt de garantie :</strong> ${(data.depositAmount || 0).toLocaleString('fr-FR')} FCFA</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Loyer mensuel :</strong> ${data.rentAmount.toLocaleString('fr-FR')} XOF</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Dépôt de garantie :</strong> ${(data.depositAmount || 0).toLocaleString('fr-FR')} XOF</p>
                     <p style="margin: 0; font-size: 14px; color: #065F46;">Ce bail est certifié conforme au Code de la Construction et de l'Habitation (CCH) et sécurisé par empreinte numérique SHA-256.</p>
                 </div>
 
@@ -321,7 +321,7 @@ export async function createLease(data: {
                 
                 <div style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 20px; margin: 20px 0;">
                     <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Statut :</strong> En attente de signature électronique du locataire</p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Loyer convenu :</strong> ${data.rentAmount.toLocaleString('fr-FR')} FCFA / mois</p>
+                    <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Loyer convenu :</strong> ${data.rentAmount.toLocaleString('fr-FR')} XOF / mois</p>
                     <p style="margin: 0; font-size: 14px;">Le logement a été automatiquement verrouillé et marqué comme <strong>LOUÉ</strong> sur le marketplace.</p>
                 </div>
 
@@ -730,7 +730,7 @@ export async function createBDQ(data: any) {
 
         // [SEC-FIX F-03] OTP cryptographiquement sécurisé
         const otp = randomInt(100000, 999999).toString();
-        await sendSMS(data.telephoneLocataire, `QAPRIL : Confirmation requise pour ${data.descriptionLogement} (${data.loyerMensuel} FCFA). Code : ${otp}`);
+        await sendSMS(data.telephoneLocataire, `QAPRIL : Confirmation requise pour ${data.descriptionLogement} (${data.loyerMensuel} XOF). Code : ${otp}`);
 
         return { success: true, bdqId: bdq.id };
     } catch (error: any) {

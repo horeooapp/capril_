@@ -118,7 +118,7 @@ export async function getDiasporaDashboard() {
     return { 
         success: true, 
         data: { 
-            stats: { totalRentFcfa: 0, totalRentDevise: 0, currency: "FCFA", totalAssets: 0, occupancyRate: 0 },
+            stats: { totalRentFcfa: 0, totalRentDevise: 0, currency: "XOF", totalAssets: 0, occupancyRate: 0 },
             properties: [],
             mandats: [],
             mobileMoney: [],

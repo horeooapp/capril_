@@ -75,7 +75,7 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         <div className="space-y-4">
                             <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl">
                                 <span className="text-xs font-bold text-gray-500 uppercase">Loyer</span>
-                                <span className="font-black text-slate-800">{Number(property.declaredRentFcfa).toLocaleString()} FCFA</span>
+                                <span className="font-black text-slate-800">{Number(property.declaredRentFcfa).toLocaleString()} XOF</span>
                             </div>
                             <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl">
                                 <span className="text-xs font-bold text-gray-500 uppercase">Statut</span>

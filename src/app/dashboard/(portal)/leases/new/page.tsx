@@ -336,7 +336,7 @@ function LeaseRegistrationForm() {
                                             <option value="">-- Choisir un logement dans votre compte --</option>
                                             {properties.map(p => (
                                                 <option key={p.id} value={p.id} disabled={p.isOccupied && p.id !== propertyId}>
-                                                    {p.propertyCode} - {p.name || p.address} ({p.commune || "Abidjan"}) {p.isOccupied ? "— [DÉJÀ LOUÉ]" : `— ${p.declaredRentFcfa?.toLocaleString()} FCFA/mois`}
+                                                    {p.propertyCode} - {p.name || p.address} ({p.commune || "Abidjan"}) {p.isOccupied ? "— [DÉJÀ LOUÉ]" : `— ${p.declaredRentFcfa?.toLocaleString()} XOF/mois`}
                                                 </option>
                                             ))}
                                         </select>
@@ -450,7 +450,7 @@ function LeaseRegistrationForm() {
                                     {/* Rent */}
                                     <div className="space-y-2 md:col-span-2">
                                         <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                                            <span>Loyer mensuel principal (FCFA) <span className="text-rose-500">*</span></span>
+                                            <span>Loyer mensuel principal (XOF) <span className="text-rose-500">*</span></span>
                                             <span className="text-[11px] font-normal text-slate-400">Montant payé chaque mois</span>
                                         </label>
                                         <div className="relative">
@@ -463,14 +463,14 @@ function LeaseRegistrationForm() {
                                                 placeholder="Ex: 250000"
                                                 className="w-full px-5 py-4 bg-orange-50/20 border border-orange-200 rounded-2xl text-2xl font-black text-slate-900 focus:ring-2 focus:ring-[#FF8200] outline-none" 
                                             />
-                                            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">FCFA / mois</span>
+                                            <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">XOF / mois</span>
                                         </div>
                                     </div>
 
                                     {/* Charges */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-slate-700 block">
-                                            Charges mensuelles communes (FCFA)
+                                            Charges mensuelles communes (XOF)
                                         </label>
                                         <input 
                                             type="number" 
@@ -494,8 +494,8 @@ function LeaseRegistrationForm() {
                                             onChange={(e) => setDepositMonths(parseInt(e.target.value) || 0)} 
                                             className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-base outline-none focus:ring-2 focus:ring-[#FF8200]"
                                         >
-                                            <option value={1}>1 mois de caution ({rentAmount.toLocaleString()} FCFA)</option>
-                                            <option value={2}>2 mois de caution ({(2 * rentAmount).toLocaleString()} FCFA)</option>
+                                            <option value={1}>1 mois de caution ({rentAmount.toLocaleString()} XOF)</option>
+                                            <option value={2}>2 mois de caution ({(2 * rentAmount).toLocaleString()} XOF)</option>
                                         </select>
                                         <p className="text-[11px] text-slate-500">
                                             Somme conservée en garantie et restituée au locataire lors de sa sortie s'il n'y a pas de dégâts.
@@ -513,8 +513,8 @@ function LeaseRegistrationForm() {
                                             onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} 
                                             className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-bold text-base outline-none focus:ring-2 focus:ring-[#FF8200]"
                                         >
-                                            <option value={1}>1 mois d'avance ({rentAmount.toLocaleString()} FCFA)</option>
-                                            <option value={2}>2 mois d'avance ({(2 * rentAmount).toLocaleString()} FCFA)</option>
+                                            <option value={1}>1 mois d'avance ({rentAmount.toLocaleString()} XOF)</option>
+                                            <option value={2}>2 mois d'avance ({(2 * rentAmount).toLocaleString()} XOF)</option>
                                         </select>
                                         <p className="text-[11px] text-slate-500">
                                             Paiement anticipé couvrant les tout premiers mois d'occupation du locataire.
@@ -550,19 +550,19 @@ function LeaseRegistrationForm() {
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-2 text-xs">
                                         <div className="space-y-1">
                                             <span className="text-slate-400">Caution ({depositMonths} mois)</span>
-                                            <p className="text-sm font-bold text-white">{depositTotal.toLocaleString()} FCFA</p>
+                                            <p className="text-sm font-bold text-white">{depositTotal.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">
                                             <span className="text-slate-400">Avance ({advanceMonths} mois)</span>
-                                            <p className="text-sm font-bold text-white">{advanceTotal.toLocaleString()} FCFA</p>
+                                            <p className="text-sm font-bold text-white">{advanceTotal.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">
                                             <span className="text-slate-400">Charges du 1er mois</span>
-                                            <p className="text-sm font-bold text-white">{chargesAmount.toLocaleString()} FCFA</p>
+                                            <p className="text-sm font-bold text-white">{chargesAmount.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">
                                             <span className="text-slate-400">Frais de dossier</span>
-                                            <p className="text-sm font-bold text-white">{agencyFees.toLocaleString()} FCFA</p>
+                                            <p className="text-sm font-bold text-white">{agencyFees.toLocaleString()} XOF</p>
                                         </div>
                                     </div>
 
@@ -572,7 +572,7 @@ function LeaseRegistrationForm() {
                                             <p className="text-[11px] text-slate-400">Caution + Avance + Charges + Frais</p>
                                         </div>
                                         <div className="text-2xl sm:text-3xl font-black text-[#FF8200]">
-                                            {totalInitialPayable.toLocaleString()} <span className="text-sm text-white font-normal">FCFA</span>
+                                            {totalInitialPayable.toLocaleString()} <span className="text-sm text-white font-normal">XOF</span>
                                         </div>
                                     </div>
                                 </div>

@@ -588,7 +588,7 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            Taux Horaire Indicatif (FCFA/h)
+                                            Taux Horaire Indicatif (XOF/h)
                                         </label>
                                         <input
                                             type="number"
@@ -597,12 +597,12 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
                                             onChange={e => setTauxHoraire(Number(e.target.value))}
                                             className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-amber-500"
                                         />
-                                        <span className="text-[10px] text-slate-400">Tarif standard recommandé : 10 000 à 25 000 FCFA/h</span>
+                                        <span className="text-[10px] text-slate-400">Tarif standard recommandé : 10 000 à 25 000 XOF/h</span>
                                     </div>
 
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                            Forfait Déplacement / Diagnostic (FCFA)
+                                            Forfait Déplacement / Diagnostic (XOF)
                                         </label>
                                         <input
                                             type="number"
@@ -751,7 +751,7 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
                                             <span>Gestion des Fuites & Dégâts des Eaux</span>
                                         </div>
                                         <p className="text-[11px] text-slate-600 leading-relaxed">
-                                            Une fuite non traitée sous 2h cause en moyenne 450 000 FCFA de sinistres indirects (plafonds, peintures voisines). Privilégiez des artisans équipés de détecteurs acoustiques ou caméras d'inspection.
+                                            Une fuite non traitée sous 2h cause en moyenne 450 000 XOF de sinistres indirects (plafonds, peintures voisines). Privilégiez des artisans équipés de détecteurs acoustiques ou caméras d'inspection.
                                         </p>
                                     </div>
 

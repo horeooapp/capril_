@@ -81,7 +81,7 @@ export async function GET(request: Request) {
                 email:     l.tenant.email,
             } : null,
             lastReceipt: l.receipts[0] ?? null,
-            currency: 'FCFA',
+            currency: 'XOF',
         }));
 
         return NextResponse.json({

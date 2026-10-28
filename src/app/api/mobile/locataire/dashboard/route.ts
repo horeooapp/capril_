@@ -106,7 +106,7 @@ export async function GET(request: Request) {
             propertyName: propertyName,
             currentRentAmount: currentRentAmount,
             rentStatus: rentStatus,
-            currency: 'FCFA',
+            currency: 'XOF',
             recentReceipts: mappedReceipts,
             openMaintenanceCount: openMaintenanceCount,
             nextPaymentDate: nextPaymentDate.toISOString(),

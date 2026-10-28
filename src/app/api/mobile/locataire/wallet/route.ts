@@ -88,7 +88,7 @@ export async function GET(request: Request) {
                 total: totalPaidQuery._count.id,
                 pages: Math.ceil(totalPaidQuery._count.id / limit),
             },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] locataire/wallet GET error:', error);

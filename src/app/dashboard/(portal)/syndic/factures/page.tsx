@@ -44,7 +44,7 @@ export default async function SyndicFacturesPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Montant Total Appelé</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{totalExpected.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{totalExpected.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
 
@@ -54,7 +54,7 @@ export default async function SyndicFacturesPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Montant Recouvré</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{totalPaid.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{totalPaid.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
             </div>
@@ -96,10 +96,10 @@ export default async function SyndicFacturesPage() {
                                             {facture.nbLots} lots
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">
-                                            {facture.montantParLot.toLocaleString("fr-FR")} FCFA
+                                            {facture.montantParLot.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-gray-900">
-                                            {facture.montantTotal.toLocaleString("fr-FR")} FCFA
+                                            {facture.montantTotal.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${facture.statut === "PAYEE" ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}`}>

@@ -28,7 +28,7 @@ export async function notifyPaymentConfirmed(userId: string, amount: number, ref
     await sendNotification({
         userId,
         title: "✅ Paiement Confirmé",
-        content: `Votre paiement de ${amount.toLocaleString()} FCFA (Réf: ${ref}) a été confirmé. Merci !`,
+        content: `Votre paiement de ${amount.toLocaleString()} XOF (Réf: ${ref}) a été confirmé. Merci !`,
         channels: ['PUSH', 'SMS']
     });
 }

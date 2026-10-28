@@ -44,7 +44,7 @@ export async function calculateSuggestedRecharge(userId: string): Promise<Rechar
 
     const besoinBrut = (nbBails * PRIX_QUITTANCE * MOIS_COUVERTURE) - soldeActuel;
     
-    // Arrondi au 500 FCFA supérieur (Strategie Zéro Friction 2026)
+    // Arrondi au 500 XOF supérieur (Strategie Zéro Friction 2026)
     const vMinimum = Math.max(500, Math.ceil(besoinBrut / 500) * 500);
     
     return {

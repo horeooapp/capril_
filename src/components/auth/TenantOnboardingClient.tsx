@@ -251,7 +251,7 @@ function ProfessionalStep({ data, update }: any) {
                     </select>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Revenu Mensuel (FCFA)</label>
+                    <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Revenu Mensuel (XOF)</label>
                     <div className="relative">
                         <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <select 
@@ -296,7 +296,7 @@ function SearchCriteriaStep({ data, update }: any) {
                 ))}
             </div>
             <div className="space-y-2 pt-4">
-                <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Budget Max Mensuel (FCFA)</label>
+                <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Budget Max Mensuel (XOF)</label>
                 <input 
                     type="range" 
                     min="50000" 
@@ -307,7 +307,7 @@ function SearchCriteriaStep({ data, update }: any) {
                     className="w-full accent-[#1F4E79]"
                 />
                 <div className="text-right font-black text-slate-800 text-xl tracking-tighter">
-                    {data.budgetMaxFcfa.toLocaleString()} FCFA
+                    {data.budgetMaxFcfa.toLocaleString()} XOF
                 </div>
             </div>
         </div>

@@ -195,7 +195,7 @@ export const EdlComparator: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-end mt-2">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">QAPRIL Estimate</span>
-                    <span className="text-[15px] font-black text-slate-900 font-mono tracking-tighter">{d.cost.toLocaleString()} FCFA</span>
+                    <span className="text-[15px] font-black text-slate-900 font-mono tracking-tighter">{d.cost.toLocaleString()} XOF</span>
                   </div>
                 </div>
               ))}
@@ -206,7 +206,7 @@ export const EdlComparator: React.FC = () => {
                   e.preventDefault(); 
                   const nom = prompt("Désignation de la dégradation constatée :");
                   if (nom) {
-                    const montantStr = prompt("Montant estimatif de la remise en état (FCFA) :", "25000");
+                    const montantStr = prompt("Montant estimatif de la remise en état (XOF) :", "25000");
                     const montant = parseInt(montantStr || "0", 10);
                     if (!isNaN(montant) && montant > 0) {
                       setDegradations(prev => [...prev, {
@@ -229,15 +229,15 @@ export const EdlComparator: React.FC = () => {
             <div className="mt-12 space-y-4 pt-8 border-t border-slate-100">
                <div className="flex justify-between items-center text-[12px] font-black text-slate-500 uppercase tracking-widest">
                   <span>Caution Consignée (CDC)</span>
-                  <span>{cautionConsignee.toLocaleString()} FCFA</span>
+                  <span>{cautionConsignee.toLocaleString()} XOF</span>
                </div>
                <div className="flex justify-between items-center text-[12px] font-black text-red-500 uppercase tracking-widest">
                   <span>Total Retenues</span>
-                  <span>-{totalRetenue.toLocaleString()} FCFA</span>
+                  <span>-{totalRetenue.toLocaleString()} XOF</span>
                </div>
                <div className="p-6 bg-amber-600 text-white rounded-[2rem] mt-4 shadow-xl shadow-orange-900/10">
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-80 text-center">Reste à restituer</div>
-                  <div className="text-3xl font-black text-center tracking-tighter font-mono">{soldeRestituer.toLocaleString()} FCFA</div>
+                  <div className="text-3xl font-black text-center tracking-tighter font-mono">{soldeRestituer.toLocaleString()} XOF</div>
                </div>
                
                <p className="text-[9px] font-bold text-slate-400 italic text-center leading-relaxed mt-4">
@@ -249,7 +249,7 @@ export const EdlComparator: React.FC = () => {
                  className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-slate-700 transition-all flex items-center justify-center gap-3 mt-6" 
                  onClick={(e) => { 
                    e.preventDefault(); 
-                   toast.success(`Solde de ${soldeRestituer.toLocaleString()} FCFA validé et transmis pour déconsignation CDC.`);
+                   toast.success(`Solde de ${soldeRestituer.toLocaleString()} XOF validé et transmis pour déconsignation CDC.`);
                  }}
                >
                   Valider le solde

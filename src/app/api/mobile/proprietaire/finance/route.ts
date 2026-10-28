@@ -49,7 +49,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             transactions: transactions,
             balance: totalReceived,
-            currency: 'FCFA'
+            currency: 'XOF'
         });
 
     } catch (error: any) {

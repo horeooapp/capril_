@@ -292,7 +292,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                             <span className="font-extrabold text-[13px] text-slate-900">
                                                 {(l.rentAmount || l.loyerDeclareMensuel || 0).toLocaleString('fr-FR')}
                                             </span>
-                                            <span className="text-[10.5px] text-slate-500 font-semibold ml-1">FCFA</span>
+                                            <span className="text-[10.5px] text-slate-500 font-semibold ml-1">XOF</span>
                                         </td>
 
                                         {/* Statut */}
@@ -575,7 +575,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                                        Loyer mensuel (FCFA) <span className="text-rose-500">*</span>
+                                        Loyer mensuel (XOF) <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="number"
@@ -589,7 +589,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                     />
                                     {editRent > 0 && (
                                         <p className="text-[11px] text-emerald-600 font-semibold mt-1">
-                                            {editRent.toLocaleString('fr-FR')} FCFA / mois
+                                            {editRent.toLocaleString('fr-FR')} XOF / mois
                                         </p>
                                     )}
                                 </div>
@@ -688,7 +688,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
                                     <p className="font-bold text-slate-400 uppercase text-[10px] tracking-wider">Loyer Mensuel</p>
                                     <p className="text-base font-extrabold text-slate-900">
-                                        {(viewingBdq.rentAmount || viewingBdq.loyerDeclareMensuel || 0).toLocaleString('fr-FR')} FCFA
+                                        {(viewingBdq.rentAmount || viewingBdq.loyerDeclareMensuel || 0).toLocaleString('fr-FR')} XOF
                                     </p>
                                 </div>
                                 <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
@@ -811,7 +811,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                             </p>
                             <p className="text-slate-500">
                                 Loyer : <span className="font-bold text-slate-800">
-                                    {(deletingLease.rentAmount || deletingLease.loyerDeclareMensuel || 0).toLocaleString('fr-FR')} FCFA / mois
+                                    {(deletingLease.rentAmount || deletingLease.loyerDeclareMensuel || 0).toLocaleString('fr-FR')} XOF / mois
                                 </span>
                             </p>
                             <p className="text-slate-500 truncate">

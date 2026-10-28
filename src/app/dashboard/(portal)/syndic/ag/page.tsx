@@ -96,7 +96,7 @@ export default async function SyndicAGPage() {
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">
                                             {ag.montantFacture > 0 ? (
-                                                <span className="font-semibold text-gray-900">{ag.montantFacture.toLocaleString("fr-FR")} FCFA</span>
+                                                <span className="font-semibold text-gray-900">{ag.montantFacture.toLocaleString("fr-FR")} XOF</span>
                                             ) : (
                                                 "-"
                                             )}

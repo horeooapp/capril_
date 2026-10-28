@@ -118,7 +118,7 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
 
             <div className="space-y-8">
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Revenu Mensuel Net (FCFA)</label>
+                <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Revenu Mensuel Net (XOF)</label>
                 <div className="relative">
                    <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
                    <input 
@@ -214,7 +214,7 @@ export default function CandidatureForm({ logementId, loyerLoyer, onSuccess }: C
                </div>
                <div className="flex justify-between items-center pb-6 border-b border-gray-800">
                   <span className="text-xs text-gray-500 font-bold uppercase">Revenus</span>
-                  <span className="text-sm font-black text-white">{formData.revenuMensuel.toLocaleString()} FCFA</span>
+                  <span className="text-sm font-black text-white">{formData.revenuMensuel.toLocaleString()} XOF</span>
                </div>
                <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500 font-bold uppercase">Certification</span>

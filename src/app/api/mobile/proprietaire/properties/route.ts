@@ -61,7 +61,7 @@ export async function GET(request: Request) {
             };
         });
 
-        return NextResponse.json({ properties: formatted, currency: 'FCFA' });
+        return NextResponse.json({ properties: formatted, currency: 'XOF' });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/properties GET error:', error);
         return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });

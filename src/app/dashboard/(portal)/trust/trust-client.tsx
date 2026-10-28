@@ -77,7 +77,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                     </div>
                     <div className="relative z-10">
                         <p className="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-1 shadow-sm">Bloqué à la CDC-CI (Sécurisé)</p>
-                        <p className="text-4xl font-black">{totalConsigne.toLocaleString()} <span className="text-[13px] text-slate-400 font-bold">FCFA</span></p>
+                        <p className="text-4xl font-black">{totalConsigne.toLocaleString()} <span className="text-[13px] text-slate-400 font-bold">XOF</span></p>
                     </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                     </div>
                     <div>
                         <p className={`text-[11px] font-bold uppercase tracking-widest mb-1 ${totalRisque > 0 ? 'text-rose-600' : 'text-slate-400'}`}>Cautions en Risque Judiciaire</p>
-                        <p className={`text-4xl font-black ${totalRisque > 0 ? 'text-rose-500' : 'text-slate-900'}`}>{totalRisque.toLocaleString()} <span className={`text-[13px] ${totalRisque > 0 ? 'text-rose-400' : 'text-slate-500'} font-bold`}>FCFA</span></p>
+                        <p className={`text-4xl font-black ${totalRisque > 0 ? 'text-rose-500' : 'text-slate-900'}`}>{totalRisque.toLocaleString()} <span className={`text-[13px] ${totalRisque > 0 ? 'text-rose-400' : 'text-slate-500'} font-bold`}>XOF</span></p>
                     </div>
                 </div>
 
@@ -97,7 +97,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                     </div>
                     <div>
                         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Cautions Restituées (Fin de Bail)</p>
-                        <p className="text-4xl font-black text-slate-900">{cautions.filter(c => c.status === "RESTITUEE").reduce((acc, c) => acc + c.amount, 0).toLocaleString()} <span className="text-[13px] text-slate-500 font-bold">FCFA</span></p>
+                        <p className="text-4xl font-black text-slate-900">{cautions.filter(c => c.status === "RESTITUEE").reduce((acc, c) => acc + c.amount, 0).toLocaleString()} <span className="text-[13px] text-slate-500 font-bold">XOF</span></p>
                     </div>
                 </div>
             </div>
@@ -145,7 +145,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                                         </div>
                                     </td>
                                     <td className="p-5 font-black text-[14px] text-slate-900">
-                                        {c.amount.toLocaleString()} <span className="text-[10px] font-bold text-slate-400">FCFA</span>
+                                        {c.amount.toLocaleString()} <span className="text-[10px] font-bold text-slate-400">XOF</span>
                                     </td>
                                     <td className="p-5">
                                         {c.status === 'A_TRANSFERER' ? (

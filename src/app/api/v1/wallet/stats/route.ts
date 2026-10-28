@@ -32,19 +32,19 @@ export async function GET(req: Request) {
 
     const history = await WalletService.getHistory(user.id, 10);
     
-    // Projections QAPRIL (Standard 75 FCFA/quittance pour particuliers, 10% estimation pour pros)
+    // Projections QAPRIL (Standard 75 XOF/quittance pour particuliers, 10% estimation pour pros)
     const nbBails = fullUser._count.leasesAsLandlord;
     const isPro = fullUser.role === 'LANDLORD_PRO' || fullUser.role === 'AGENCY';
     
     // Estimation conso mensuelle : 
-    // Pour les particuliers : nb bails * 75 FCFA
+    // Pour les particuliers : nb bails * 75 XOF
     // Pour les pros : nb bails * (Loyer Moyen estimé à 150k * 10%)
     const consoMensuelle = isPro ? (nbBails * 15000) : (nbBails * 75);
     const decouvertMax = isPro ? -5000 : -1500;
 
     return NextResponse.json({
       solde: ((fullUser?.walletConfig?.walletBalance || 0) || 0) || 0,
-      devise: 'FCFA',
+      devise: 'XOF',
       role: fullUser.role,
       seuilAlerte: fullUser?.walletConfig?.walletSeuilAlerte || 500,
       decouvertMax,

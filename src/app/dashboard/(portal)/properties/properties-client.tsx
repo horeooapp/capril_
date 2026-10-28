@@ -203,7 +203,7 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                     <div className="p-6 bg-slate-800 rounded-[12px] text-white relative shadow-sm overflow-hidden">
                         <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
                         <h3 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Revenu Mensuel (Est.)</h3>
-                        <p className="text-3xl font-black tracking-tight mt-1">{(properties.reduce((acc, p) => acc + (p.declaredRentFcfa || 0), 0) || 0).toLocaleString()} <span className="text-sm font-medium text-slate-300">FCFA</span></p>
+                        <p className="text-3xl font-black tracking-tight mt-1">{(properties.reduce((acc, p) => acc + (p.declaredRentFcfa || 0), 0) || 0).toLocaleString()} <span className="text-sm font-medium text-slate-300">XOF</span></p>
                         
                         <div className="mt-8">
                             <p className="text-[11px] font-medium text-slate-300 flex justify-between">

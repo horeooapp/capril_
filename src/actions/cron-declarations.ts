@@ -44,7 +44,7 @@ export async function processPendingDeclarations() {
                 if (dec.tenant.phone) {
                     await sendSMS(
                         dec.tenant.phone, 
-                        `QAPRIL : Votre déclaration de ${Number(dec.montantDeclare).toLocaleString()} FCFA a expiré car elle n'a pas été confirmée par le bailleur. Veuillez recommencer.`
+                        `QAPRIL : Votre déclaration de ${Number(dec.montantDeclare).toLocaleString()} XOF a expiré car elle n'a pas été confirmée par le bailleur. Veuillez recommencer.`
                     )
                 }
                 continue
@@ -57,7 +57,7 @@ export async function processPendingDeclarations() {
                 const recipients = managers.length > 0 ? managers.map((m: any) => m.user) : [dec.lease.property.owner]
                 
                 const tenantName = (dec.tenant.firstName ? dec.tenant.firstName + " " : "") + (dec.tenant.lastName || "") || dec.tenant.phone
-                const reminderMsg = `QAPRIL (RAPPEL) : ${tenantName} attend la confirmation de son paiement (${Number(dec.montantDeclare).toLocaleString()} FCFA). Répondez OUI ou NON.`
+                const reminderMsg = `QAPRIL (RAPPEL) : ${tenantName} attend la confirmation de son paiement (${Number(dec.montantDeclare).toLocaleString()} XOF). Répondez OUI ou NON.`
 
                 for (const recipient of recipients) {
                     if (recipient.phone) {

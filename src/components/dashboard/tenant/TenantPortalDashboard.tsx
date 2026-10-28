@@ -188,7 +188,7 @@ export function TenantPortalDashboard({
               {bail?.statut==="LOYER_IMPAYE"&&(
                 <div style={{margin:"14px 16px 0",background:T.redPale,border:`1px solid ${T.red}25`,borderRadius:13,padding:"12px 14px"}}>
                   <div style={{fontSize:12,fontWeight:800,color:T.red,marginBottom:4}}>⚠ Loyer en retard</div>
-                  <div style={{fontSize:10,color:T.textMid,marginBottom:10}}>{fmt(bail?.loyer || 0)} FCFA non encaissé. Veuillez régulariser.</div>
+                  <div style={{fontSize:10,color:T.textMid,marginBottom:10}}>{fmt(bail?.loyer || 0)} XOF non encaissé. Veuillez régulariser.</div>
                   <div style={{display:"flex",gap:7}}>
                     <button onClick={()=>{go("droits");setDsec("rcl");setRclCode("RCL-02");}} style={{flex:1,background:T.red,border:"none",borderRadius:9,padding:"7px",fontSize:10,fontWeight:700,color:T.white,cursor:"pointer"}}>Signaler un problème</button>
                     <button onClick={()=>go("quitt")} style={{flex:1,background:T.white,border:`1px solid ${T.red}30`,borderRadius:9,padding:"7px",fontSize:10,fontWeight:700,color:T.red,cursor:"pointer"}}>Mes quittances</button>
@@ -197,7 +197,7 @@ export function TenantPortalDashboard({
               )}
 
                 <Sheet open={O.pay} onClose={()=>cl("pay")} title="Lancer le paiement">
-                    <p style={{fontSize:12,color:T.textMid,marginBottom:20}}>Souhaitez-vous payer votre loyer de {bail?.rentAmount||bail?.loyer||'--'} FCFA via {selNum?.operator||'Mobile Money'} ?</p>
+                    <p style={{fontSize:12,color:T.textMid,marginBottom:20}}>Souhaitez-vous payer votre loyer de {bail?.rentAmount||bail?.loyer||'--'} XOF via {selNum?.operator||'Mobile Money'} ?</p>
                     <button 
                       onClick={() => {
                         window.location.href = `/mon-espace-locataire/payment?leaseId=${bail?.id || ''}&operator=${encodeURIComponent(selNum?.operator || 'WAVE')}`;
@@ -276,7 +276,7 @@ export function TenantPortalDashboard({
                   <SecTitle label="Dernière quittance" right={<button onClick={()=>go("quitt")} style={{background:"none",border:"none",fontSize:10,fontWeight:700,color:T.teal,cursor:"pointer"}}>Tout voir →</button>}/>
                   <div onClick={()=>{go("quitt");setQSel(q);}} style={{background:T.greenPale,border:`1px solid ${T.green}20`,borderLeft:`4px solid ${T.green}`,borderRadius:12,padding:"10px 12px",cursor:"pointer"}}>
                     <div style={{display:"flex",justifyContent:"space-between"}}>
-                      <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.period} — {fmt(q.amount)} FCFA</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.reference}</div></div>
+                      <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.period} — {fmt(q.amount)} XOF</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.reference}</div></div>
                       <Badge label="✓ Certifiée" color={T.green} bg={T.white}/>
                     </div>
                   </div>
@@ -298,7 +298,7 @@ export function TenantPortalDashboard({
                 </div>
               </div>
               <Row label="Référence" value={bail?.ref}/>
-              <Row label="Loyer mensuel" value={fmt(bail?.loyer || 0)+" FCFA"} color={T.navy}/>
+              <Row label="Loyer mensuel" value={fmt(bail?.loyer || 0)+" XOF"} color={T.navy}/>
               <Row label="Échéance" value={`Le ${bail?.paymentDay || 1}er du mois`}/>
               {/* bloc bailleur */}
               <div style={{marginTop:10,background:T.grey1,borderRadius:12,padding:"11px 12px",marginBottom:10}}>
@@ -315,7 +315,7 @@ export function TenantPortalDashboard({
                {quittances?.map((q,i)=>(
                 <div key={i} onClick={()=>setQSel(q)} style={{background:T.white,border:`1px solid ${T.grey2}`,borderLeft:`4px solid ${T.green}`,borderRadius:12,padding:"10px 12px",marginBottom:8,cursor:"pointer"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.period} — {fmt(q.amount)} FCFA</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.reference}</div></div>
+                    <div><div style={{fontSize:11,fontWeight:700,color:T.text}}>{q.period} — {fmt(q.amount)} XOF</div><div style={{fontSize:9,color:T.textLight,marginTop:1,fontFamily:"monospace"}}>{q.reference}</div></div>
                     <Badge label="Certifiée" color={T.green} bg={T.greenPale}/>
                   </div>
                 </div>

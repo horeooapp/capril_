@@ -103,7 +103,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                                                 Occupé par <span className="font-bold text-gray-900">{(lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || lease.tenant.email}</span>
                                                             </p>
                                                             <p className="text-xs text-gray-400 mt-1">
-                                                                Loyer : <span className="font-bold text-primary">{lease.rentAmount.toLocaleString()} FCFA</span>
+                                                                Loyer : <span className="font-bold text-primary">{lease.rentAmount.toLocaleString()} XOF</span>
                                                             </p>
                                                         </div>
                                                         <div className="text-right text-xs whitespace-nowrap text-gray-500">
@@ -155,7 +155,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                             {record.provider && <p className="text-[10px] text-gray-400 italic">Par : {record.provider}</p>}
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-black text-primary">{record.cost?.toLocaleString() || 0} FCFA</p>
+                                            <p className="text-xs font-black text-primary">{record.cost?.toLocaleString() || 0} XOF</p>
                                             <p className="text-[10px] text-gray-400">{new Date(record.date).toLocaleDateString()}</p>
                                         </div>
                                     </div>
@@ -210,7 +210,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <p className="text-[10px] text-gray-400 uppercase font-bold">Investissement Maintenance</p>
                                 <p className="text-xl font-black text-gray-800">
-                                    {((property as any).maintenanceRecords?.reduce((acc: number, r: any) => acc + (r.cost || 0), 0))?.toLocaleString() || 0} <span className="text-[10px]">FCFA</span>
+                                    {((property as any).maintenanceRecords?.reduce((acc: number, r: any) => acc + (r.cost || 0), 0))?.toLocaleString() || 0} <span className="text-[10px]">XOF</span>
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg">

@@ -57,7 +57,7 @@ export default async function TenantPaymentPage() {
                             <p className="text-3xl font-black text-qnavy-dark tracking-tighter">
                                 {(arrears > 0 ? arrears : lease.rentAmount).toLocaleString()}
                             </p>
-                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">FCFA</p>
+                            <p className="text-[10px] font-black text-qtext-light uppercase tracking-widest">XOF</p>
                         </div>
                     </div>
 

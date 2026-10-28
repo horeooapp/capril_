@@ -66,9 +66,9 @@ export async function POST(request: Request) {
         page.drawText(`Adresse : ${property.address || 'Adresse inconnue'}`, { x: 50, y: height - 280, size: 12, font });
 
         page.drawText('CONDITIONS FINANCIÈRES :', { x: 50, y: height - 320, size: 14, font: boldFont });
-        page.drawText(`Loyer mensuel : ${rentAmount} FCFA`, { x: 50, y: height - 340, size: 12, font });
-        page.drawText(`Dépôt de garantie (Caution) : ${finalDeposit} FCFA (Max 2 mois)`, { x: 50, y: height - 360, size: 12, font });
-        page.drawText(`Avance sur loyer : ${finalAdvance} FCFA (Max 2 mois)`, { x: 50, y: height - 380, size: 12, font });
+        page.drawText(`Loyer mensuel : ${rentAmount} XOF`, { x: 50, y: height - 340, size: 12, font });
+        page.drawText(`Dépôt de garantie (Caution) : ${finalDeposit} XOF (Max 2 mois)`, { x: 50, y: height - 360, size: 12, font });
+        page.drawText(`Avance sur loyer : ${finalAdvance} XOF (Max 2 mois)`, { x: 50, y: height - 380, size: 12, font });
 
         page.drawText('SIGNATURES', { x: 50, y: height - 440, size: 14, font: boldFont });
         page.drawText('Le Propriétaire', { x: 50, y: height - 480, size: 12, font });

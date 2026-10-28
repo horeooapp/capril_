@@ -19,9 +19,9 @@ export async function calculateTenantScore(tenantId: string) {
             
             // 1. Income Factor
             if (tenant.salary && tenant.salary > 0) {
-                // If they earn > 300k FCFA, +100
+                // If they earn > 300k XOF, +100
                 if (tenant.salary >= 300000) score += 100;
-                // If they earn > 500k FCFA, +150
+                // If they earn > 500k XOF, +150
                 if (tenant.salary >= 500000) score += 50;
             } else {
                 score -= 100;

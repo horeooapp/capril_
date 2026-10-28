@@ -128,10 +128,10 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-colors"
                     >
                         <option value={1000000}>Tous les prix</option>
-                        <option value={200000}>Moins de 200 000 FCFA</option>
-                        <option value={400000}>Moins de 400 000 FCFA</option>
-                        <option value={600000}>Moins de 600 000 FCFA</option>
-                        <option value={800000}>Moins de 800 000 FCFA</option>
+                        <option value={200000}>Moins de 200 000 XOF</option>
+                        <option value={400000}>Moins de 400 000 XOF</option>
+                        <option value={600000}>Moins de 600 000 XOF</option>
+                        <option value={800000}>Moins de 800 000 XOF</option>
                     </select>
                 </div>
 
@@ -178,7 +178,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                                         )}
                                     </div>
                                     <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-black border border-white/20 shadow-md">
-                                        {annonce.loyerDemande.toLocaleString()} FCFA / mois
+                                        {annonce.loyerDemande.toLocaleString()} XOF / mois
                                     </div>
                                 </div>
 
@@ -243,7 +243,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                             <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-300 block mb-1">Dossier de candidature</span>
                             <h3 className="text-2xl font-black line-clamp-1">{selectedAnnonce.titre}</h3>
                             <p className="text-sm font-semibold text-emerald-400 mt-1">
-                                Loyer : {selectedAnnonce.loyerDemande.toLocaleString()} FCFA / mois
+                                Loyer : {selectedAnnonce.loyerDemande.toLocaleString()} XOF / mois
                             </p>
                         </div>
 
@@ -291,7 +291,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-1 flex items-center gap-1"><DollarSign size={14} className="text-slate-400"/> Revenu Mensuel (FCFA) *</label>
+                                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-1 flex items-center gap-1"><DollarSign size={14} className="text-slate-400"/> Revenu Mensuel (XOF) *</label>
                                     <input
                                         type="number"
                                         required

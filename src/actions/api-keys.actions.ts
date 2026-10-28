@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import crypto from "crypto"
 
-const API_PREMIUM_PRICE = 50000; // 50,000 FCFA
+const API_PREMIUM_PRICE = 50000; // 50,000 XOF
 
 export async function getAgencyApiKeys() {
     const session = await auth()
@@ -36,7 +36,7 @@ export async function generateApiKeys() {
             }, 0);
 
             if (balance < API_PREMIUM_PRICE) {
-                throw new Error(`Solde insuffisant dans votre Wallet. L'abonnement Premium coûte ${API_PREMIUM_PRICE} FCFA.`);
+                throw new Error(`Solde insuffisant dans votre Wallet. L'abonnement Premium coûte ${API_PREMIUM_PRICE} XOF.`);
             }
 
             await tx.walletTransaction.create({

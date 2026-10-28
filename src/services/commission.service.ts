@@ -87,7 +87,7 @@ export class CommissionService {
       }
     });
 
-    console.log(`[COMMISSION] Prélevé ${montantComm} FCFA sur le paiement ${payment.refInterne} (Net à reverser: ${montantNet} FCFA)`);
+    console.log(`[COMMISSION] Prélevé ${montantComm} XOF sur le paiement ${payment.refInterne} (Net à reverser: ${montantNet} XOF)`);
 
     return {
       commissionTransactionId: commissionTransaction.id,

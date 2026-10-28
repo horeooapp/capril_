@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         await new Promise(resolve => setTimeout(resolve, 2000)); // Attente de 2s
 
         // 2. Extraire (ou simuler) les infos
-        const extractedAmount = Math.floor(Math.random() * 80000 + 40000); // Ex: 40k -> 120k FCFA
+        const extractedAmount = Math.floor(Math.random() * 80000 + 40000); // Ex: 40k -> 120k XOF
         const paymentDate = new Date().toISOString();
 
         // Plus tard : on peut utiliser Prisma pour créer un historique dans la table Transaction 

@@ -36,14 +36,14 @@ export default function AgencyKpiDash({ data }: { data: KpiData }) {
     },
     { 
       label: "Collecte (Mensuelle)", 
-      value: `${data.collectedRent.toLocaleString()} FCFA`, 
+      value: `${data.collectedRent.toLocaleString()} XOF`, 
       subValue: `Sur ${data.expectedRent.toLocaleString()} attendus`,
       icon: <DollarSign className="text-blue-500" />, 
       color: "blue"
     },
     { 
       label: "Arriérés Totaux", 
-      value: `${data.outstandingArrears.toLocaleString()} FCFA`, 
+      value: `${data.outstandingArrears.toLocaleString()} XOF`, 
       icon: <ShieldAlert className="text-red-500" />, 
       trend: "-5%", 
       trendUp: true,
@@ -51,7 +51,7 @@ export default function AgencyKpiDash({ data }: { data: KpiData }) {
     },
     { 
       label: "Commissions Agence", 
-      value: `${data.monthlyFees.toLocaleString()} FCFA`, 
+      value: `${data.monthlyFees.toLocaleString()} XOF`, 
       icon: <BarChart3 className="text-purple-500" />, 
       color: "purple"
     },

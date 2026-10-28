@@ -59,7 +59,7 @@ export async function generateReceiptPDF(receiptData: {
   // Table Header
   page.drawRectangle({ x: 50, y: currentY - 20, width: width - 100, height: 20, color: COLORS.NAVY });
   page.drawText('DESCRIPTION', { x: 60, y: currentY - 14, size: 9, font: fontBold, color: COLORS.WHITE });
-  page.drawText('MONTANT (FCFA)', { x: width - 180, y: currentY - 14, size: 9, font: fontBold, color: COLORS.WHITE });
+  page.drawText('MONTANT (XOF)', { x: width - 180, y: currentY - 14, size: 9, font: fontBold, color: COLORS.WHITE });
   currentY -= 45;
 
   // Loyer
@@ -76,7 +76,7 @@ export async function generateReceiptPDF(receiptData: {
   page.drawLine({ start: { x: 50, y: currentY }, end: { x: width - 50, y: currentY }, thickness: 1, color: COLORS.LIGHT_GRAY });
   currentY -= 25;
   page.drawText('TOTAL PAYÉ', { x: 60, y: currentY, size: 14, font: fontBold, color: COLORS.NAVY });
-  page.drawText(`${receiptData.totalAmount.toLocaleString()} FCFA`, { x: width - 180, y: currentY, size: 14, font: fontBold, color: COLORS.NAVY });
+  page.drawText(`${receiptData.totalAmount.toLocaleString()} XOF`, { x: width - 180, y: currentY, size: 14, font: fontBold, color: COLORS.NAVY });
   currentY -= 50;
 
   // 4. Verification & Metadata
@@ -277,11 +277,11 @@ export async function generateLeasePDF(data: {
     // Financials
     drawSectionTitle(page, fontBold, 'CONDITIONS FINANCIÈRES', currentY);
     currentY -= 25;
-    page.drawText(`LOYER MENSUEL : ${data.rentAmount.toLocaleString()} FCFA`, { x: 50, y: currentY, size: 11, font: fontBold });
+    page.drawText(`LOYER MENSUEL : ${data.rentAmount.toLocaleString()} XOF`, { x: 50, y: currentY, size: 11, font: fontBold });
     currentY -= 15;
-    page.drawText(`CHARGES : 0 FCFA (Incluses)`, { x: 50, y: currentY, size: 10, font });
+    page.drawText(`CHARGES : 0 XOF (Incluses)`, { x: 50, y: currentY, size: 10, font });
     currentY -= 15;
-    page.drawText(`DÉPÔT DE GARANTIE : ${data.depositAmount.toLocaleString()} FCFA`, { x: 50, y: currentY, size: 10, font });
+    page.drawText(`DÉPÔT DE GARANTIE : ${data.depositAmount.toLocaleString()} XOF`, { x: 50, y: currentY, size: 10, font });
     currentY -= 40;
 
     // Signature Status

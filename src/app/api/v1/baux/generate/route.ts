@@ -4,7 +4,7 @@ import { getAuthUser } from '@/lib/jwt';
 
 /**
  * POST /api/v1/baux/generate
- * Generates a digital lease and deducts 3000 FCFA (or 10000 FCFA for a whole courtyard)
+ * Generates a digital lease and deducts 3000 XOF (or 10000 XOF for a whole courtyard)
  */
 export async function POST(req: Request) {
   try {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
     if ((landlordConfig.walletBalance || 0) < cout) {
       return NextResponse.json({ 
-          error: `Solde insuffisant. Le bail nécessite ${cout} FCFA, mais votre solde est de ${landlordConfig.walletBalance || 0} FCFA.` 
+          error: `Solde insuffisant. Le bail nécessite ${cout} XOF, mais votre solde est de ${landlordConfig.walletBalance || 0} XOF.` 
       }, { status: 402 });
     }
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
         success: true, 
-        message: `Bail numérique ${ref} généré avec succès. ${cout} FCFA ont été débités de votre Wallet.`,
+        message: `Bail numérique ${ref} généré avec succès. ${cout} XOF ont été débités de votre Wallet.`,
         reference: ref,
         cout
     });

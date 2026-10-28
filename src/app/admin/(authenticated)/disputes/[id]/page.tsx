@@ -66,7 +66,7 @@ export default async function DisputeDetailPage({ params }: { params: Promise<{ 
                             {dispute.amountInDispute && (
                                 <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
                                     <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Enjeu Financier</p>
-                                    <p className="text-2xl font-black text-red-600">{dispute.amountInDispute.toLocaleString()} FCFA</p>
+                                    <p className="text-2xl font-black text-red-600">{dispute.amountInDispute.toLocaleString()} XOF</p>
                                 </div>
                             )}
 

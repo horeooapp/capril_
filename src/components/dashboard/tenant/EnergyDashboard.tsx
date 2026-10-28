@@ -148,7 +148,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Coût Prévisionnel</div>
             <div className="flex items-end gap-2">
                 <span className="text-3xl sm:text-4xl font-black text-amber-600 tracking-tighter">{hasData ? filteredData[0].cost.toLocaleString() : "0"}</span>
-               <span className="text-lg font-black text-slate-400 uppercase mb-1">FCFA</span>
+               <span className="text-lg font-black text-slate-400 uppercase mb-1">XOF</span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-[10px] font-bold text-green-600">
                <ShieldCheck size={12} />
@@ -200,7 +200,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                <div key={i} className="flex-grow flex flex-col items-center group relative h-full justify-end">
                   {/* Tooltip */}
                   <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 shadow-xl pointer-events-none">
-                     {d.cost.toLocaleString()} FCFA
+                     {d.cost.toLocaleString()} XOF
                   </div>
                   
                   {/* Bar */}
@@ -254,7 +254,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                    </div>
                    <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-0 pt-4 sm:pt-0">
                       <div className="text-left sm:text-right">
-                         <div className="text-[14px] sm:text-[15px] font-black text-slate-900 font-mono">{f.cost.toLocaleString()} FCFA</div>
+                         <div className="text-[14px] sm:text-[15px] font-black text-slate-900 font-mono">{f.cost.toLocaleString()} XOF</div>
                          <div className="flex items-center gap-1 sm:justify-end">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                             <span className="text-[9px] font-black text-green-600 uppercase">Payée</span>
@@ -288,7 +288,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
           <div className="text-center sm:text-left">
              <h4 className="text-lg font-black text-blue-900 uppercase tracking-tighter italic">Optimisez votre facture.</h4>
              <p className="text-[11px] sm:text-[12px] font-medium text-blue-800/70 leading-relaxed max-w-2xl mt-1">
-                Votre consommation de pointe se situe entre 19h et 22h. En décalant certains usages vers les heures creuses, vous pourriez économiser jusqu'à <span className="text-blue-900 font-bold">4 500 FCFA</span>/mois.
+                Votre consommation de pointe se situe entre 19h et 22h. En décalant certains usages vers les heures creuses, vous pourriez économiser jusqu'à <span className="text-blue-900 font-bold">4 500 XOF</span>/mois.
              </p>
           </div>
           <button 

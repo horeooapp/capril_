@@ -96,7 +96,7 @@ export default function LandlordStatement({ data }: { data: StatementData }) {
                   <span className="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">{sec.label}</span>
                 </div>
                 <span className={`font-mono font-black ${sec.type === "PLUS" ? 'text-white' : 'text-gray-600'}`}>
-                  {sec.amount.toLocaleString()} <span className="text-[10px] font-medium opacity-50">FCFA</span>
+                  {sec.amount.toLocaleString()} <span className="text-[10px] font-medium opacity-50">XOF</span>
                 </span>
               </motion.div>
             ))}
@@ -109,7 +109,7 @@ export default function LandlordStatement({ data }: { data: StatementData }) {
                 </div>
                 <div>
                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest block mb-1">Net à reverser</span>
-                   <h4 className="text-3xl font-black text-white tracking-tight">{data.netToPay.toLocaleString()} <span className="text-sm font-medium opacity-50">FCFA</span></h4>
+                   <h4 className="text-3xl font-black text-white tracking-tight">{data.netToPay.toLocaleString()} <span className="text-sm font-medium opacity-50">XOF</span></h4>
                 </div>
              </div>
              <ArrowDownCircle className="w-10 h-10 text-indigo-500/20" />

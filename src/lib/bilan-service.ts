@@ -218,7 +218,7 @@ export class BilanService {
         agencyCommission,
         maintenanceCost,
         netToOwner,
-        currency: "FCFA",
+        currency: "XOF",
         netToOwnerEur: lease.property.owner?.diasporaProfile ? netToOwner / EXCHANGE_RATE_EUR_FCFA : undefined
     };
   }

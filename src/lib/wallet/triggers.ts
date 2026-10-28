@@ -151,16 +151,16 @@ async function sendRechargeNotification(userId: string, trigger: "SOLDE_BAS" | "
 
   switch (trigger) {
     case "SOLDE_BAS":
-      message = `⚠️ ${name}, votre Wallet QAPRIL est presque vide (${balance} FCFA). Rechargez en 1 clic pour ne pas bloquer vos quittances :\n👉 Recharger ${amount} FCFA : ${trackerUrl}`;
+      message = `⚠️ ${name}, votre Wallet QAPRIL est presque vide (${balance} XOF). Rechargez en 1 clic pour ne pas bloquer vos quittances :\n👉 Recharger ${amount} XOF : ${trackerUrl}`;
       break;
     case "FIN_DE_MOIS":
-      message = `📅 ${name}, préparez le mois prochain. Vos ${user._count.leasesAsLandlord} baux arrivent à échéance.\n👉 Provisionner ${amount} FCFA : ${trackerUrl}`;
+      message = `📅 ${name}, préparez le mois prochain. Vos ${user._count.leasesAsLandlord} baux arrivent à échéance.\n👉 Provisionner ${amount} XOF : ${trackerUrl}`;
       break;
     case "CREDIT_GENERE":
-      message = `🚀 Quittance générée en mode CRÉDIT ! Votre solde est de ${balance} FCFA. Régularisez d'un clic pour maintenir votre service :\n👉 Recharger ${amount} FCFA : ${trackerUrl}`;
+      message = `🚀 Quittance générée en mode CRÉDIT ! Votre solde est de ${balance} XOF. Régularisez d'un clic pour maintenir votre service :\n👉 Recharger ${amount} XOF : ${trackerUrl}`;
       break;
     case "RAPPEL_MENSUEL":
-      message = `📆 Rappel mensuel QAPRIL. Maintenez votre provision pour une gestion sereine. Solde : ${balance} FCFA.\n👉 Recharger ${amount} FCFA : ${trackerUrl}`;
+      message = `📆 Rappel mensuel QAPRIL. Maintenez votre provision pour une gestion sereine. Solde : ${balance} XOF.\n👉 Recharger ${amount} XOF : ${trackerUrl}`;
       break;
   }
 

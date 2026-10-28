@@ -44,7 +44,7 @@ export default function SolutionsPage() {
       accent: "#D97706",
       keyMetrics: [
         { val: "99.2%", label: "Loyers payés à bonne date" },
-        { val: "0 FCFA", label: "Commission sur le montant du loyer" },
+        { val: "0 XOF", label: "Commission sur le montant du loyer" },
         { val: "15 min", label: "Pour faire un bail complet" },
         { val: "100%", label: "Conforme à la loi N° 2019-576" }
       ],
@@ -79,7 +79,7 @@ export default function SolutionsPage() {
       badgeColor: "bg-sky-50 text-[#0284C7] border-sky-200",
       accent: "#0284C7",
       keyMetrics: [
-        { val: "0 FCFA", label: "Frais de dossier locataire" },
+        { val: "0 XOF", label: "Frais de dossier locataire" },
         { val: "2 mois", label: "Caution max légale en Côte d'Ivoire" },
         { val: "48h", label: "Remboursement rapide de la caution" },
         { val: "Score ICL", label: "Votre carnet de bon payeur à vie" }
@@ -153,7 +153,7 @@ export default function SolutionsPage() {
       keyMetrics: [
         { val: "24/7", label: "Accès en direct depuis l'étranger" },
         { val: "Zéro", label: "Dépendance envers les intermédiaires" },
-        { val: "FCFA / EUR", label: "Suivi clair des montants" },
+        { val: "XOF / EUR", label: "Suivi clair des montants" },
         { val: "Photos HD", label: "États des lieux visibles à distance" }
       ],
       features: [

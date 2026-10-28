@@ -293,7 +293,7 @@ export function OwnerPortalDashboard({
                 <div className="h-full rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${tauxEncaissement}%`, background: tauxEncaissement === 100 ? T.green : tauxEncaissement >= 80 ? T.teal : T.orange }} />
               </div>
-              <p className="text-[10px] font-bold text-gray-500 mt-6 uppercase tracking-widest">{fmt(stats.encaisse)} FCFA encaissés • Objectif {fmt(stats.totalLoyers)} FCFA</p>
+              <p className="text-[10px] font-bold text-gray-500 mt-6 uppercase tracking-widest">{fmt(stats.encaisse)} XOF encaissés • Objectif {fmt(stats.totalLoyers)} XOF</p>
             </div>
           </Link>
         </section>
@@ -335,7 +335,7 @@ export function OwnerPortalDashboard({
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-2xl font-black text-gray-900 tracking-tighter">{fmt(s.loyers)}</p>
-                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">FCFA / mois</p>
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">XOF / mois</p>
                     </div>
                     <ChevronRight size={18} className={`text-gray-300 transition-transform ${selectedEntite?.id === e.id ? "rotate-90" : ""}`} />
                   </div>

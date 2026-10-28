@@ -111,7 +111,7 @@ export async function GET(request: Request) {
                     objet:     r.objet,
                     createdAt: r.createdAt?.toISOString() ?? null,
                 })),
-                currency: 'FCFA',
+                currency: 'XOF',
             };
         });
 

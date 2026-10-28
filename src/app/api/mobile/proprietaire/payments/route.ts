@@ -85,7 +85,7 @@ export async function GET(request: Request) {
             payments,
             totalReceived: Number(totalReceivedQuery._sum.totalAmount ?? 0),
             pagination: { total, page, limit, pages: Math.ceil(total / limit) },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/payments GET error:', error);
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
             message:    'Paiement enregistré manuellement.',
             receiptId:  receipt.id,
             receiptRef: receipt.receiptRef,
-            currency:   'FCFA',
+            currency:   'XOF',
         }, { status: 201 });
 
     } catch (error: any) {

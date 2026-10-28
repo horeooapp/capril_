@@ -97,7 +97,7 @@ async function createReversal(paymentId: string, recipientId: string, amount: nu
     }
   });
 
-  console.log(`[REVERSAL] Sent ${amount} FCFA to ${recipientId} (${type}). Ref: ${refPgw}`);
+  console.log(`[REVERSAL] Sent ${amount} XOF to ${recipientId} (${type}). Ref: ${refPgw}`);
 }
 
 /**

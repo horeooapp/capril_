@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
             // Notifications
             await sendSMS(from, `QAPRIL : Paiement confirmé. Quittance ${receiptRef} générée.`)
             if (declaration.tenant.phone) {
-                await sendSMS(declaration.tenant.phone, `QAPRIL : Votre paiement de ${amount.toLocaleString()} FCFA est confirmé. Votre quittance est prête !`)
+                await sendSMS(declaration.tenant.phone, `QAPRIL : Votre paiement de ${amount.toLocaleString()} XOF est confirmé. Votre quittance est prête !`)
             }
 
         } else {

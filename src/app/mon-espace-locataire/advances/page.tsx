@@ -126,7 +126,7 @@ export default function TenantAdvancesPage() {
 
                         <div className="p-4 bg-qnavy-pale rounded-xl border border-qnavy/10 flex flex-col items-center justify-center text-center">
                             <p className="text-[10px] font-black uppercase text-qnavy tracking-widest mb-1">Montant Projeté</p>
-                            <p className="text-3xl font-black text-qnavy-dark">{projectedAmount.toLocaleString()} <span className="text-sm">FCFA</span></p>
+                            <p className="text-3xl font-black text-qnavy-dark">{projectedAmount.toLocaleString()} <span className="text-sm">XOF</span></p>
                         </div>
 
                         <div className="space-y-2">
@@ -174,7 +174,7 @@ export default function TenantAdvancesPage() {
                                             {req.status}
                                         </span>
                                     </div>
-                                    <p className="text-lg font-black text-qnavy">{req.totalAmount.toLocaleString()} FCFA</p>
+                                    <p className="text-lg font-black text-qnavy">{req.totalAmount.toLocaleString()} XOF</p>
                                     {req.status === 'REJECTED' && req.rejectionReason && (
                                         <p className="mt-2 text-xs text-qred bg-qred-pale p-2 rounded-md italic">"{req.rejectionReason}"</p>
                                     )}

@@ -58,7 +58,7 @@ function SimulatorContent() {
                     </div>
                     <div className="flex justify-between text-[10px] font-black uppercase tracking-wider">
                         <span className="text-gray-400">Montant</span>
-                        <span className="text-gray-900 font-black">{amount} FCFA</span>
+                        <span className="text-gray-900 font-black">{amount} XOF</span>
                     </div>
                 </div>
 

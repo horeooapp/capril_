@@ -127,7 +127,7 @@ function GrilleView({ data, onRefresh }: { data: any[], onRefresh: () => void })
                                     {editingCle === item.cle ? (
                                         <input type="number" value={editVal} onChange={e => setEditVal(Number(e.target.value))} className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#1F4E79]" />
                                     ) : (
-                                        <span className="font-black text-lg text-amber-600">{Number(item.valeur).toLocaleString()} <span className="text-[10px] uppercase text-gray-400 tracking-widest">FCFA</span></span>
+                                        <span className="font-black text-lg text-amber-600">{Number(item.valeur).toLocaleString()} <span className="text-[10px] uppercase text-gray-400 tracking-widest">XOF</span></span>
                                     )}
                                 </td>
                                 <td className="p-4 text-xs font-medium text-gray-400">{new Date(item.modifieAt || item.dateEffet).toLocaleDateString('fr-FR')}</td>
@@ -226,7 +226,7 @@ function OffresView({ data, onRefresh }: { data: any[], onRefresh: () => void })
                             
                             <div className="mb-6">
                                 <span className="text-3xl font-black text-amber-600">{Number(offre.prixBaseTtc).toLocaleString()}</span>
-                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">FCFA / mois</span>
+                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">XOF / mois</span>
                             </div>
                             <div className="space-y-3 mb-6 bg-gray-50 rounded-2xl p-4">
                                 <div className="flex justify-between items-center text-sm font-bold text-slate-800">
@@ -234,7 +234,7 @@ function OffresView({ data, onRefresh }: { data: any[], onRefresh: () => void })
                                 </div>
                                 {offre.quittancesInclus > 0 && (
                                     <div className="flex justify-between items-center text-xs font-semibold text-gray-500">
-                                        <span>Dépassement:</span><span>{Number(offre.prixUniteTtc)} FCFA/u</span>
+                                        <span>Dépassement:</span><span>{Number(offre.prixUniteTtc)} XOF/u</span>
                                     </div>
                                 )}
                             </div>
@@ -294,7 +294,7 @@ function PromosView({ data, onRefresh }: { data: any[], onRefresh: () => void })
                         <div>
                             <label className="text-xs font-bold text-gray-500">Type de Remise</label>
                             <select name="typeRemise" className="w-full p-2 border rounded-lg text-sm bg-white" required>
-                                <option value="POURCENTAGE">Pourcentage (%)</option><option value="MONTANT_FIXE">Montant Fixe (FCFA)</option>
+                                <option value="POURCENTAGE">Pourcentage (%)</option><option value="MONTANT_FIXE">Montant Fixe (XOF)</option>
                             </select>
                         </div>
                         <div><label className="text-xs font-bold text-gray-500">Valeur Remise</label><input type="number" name="valeurRemise" className="w-full p-2 border rounded-lg text-sm" required /></div>
@@ -408,7 +408,7 @@ function NegociesView({ data, onRefresh }: { data: any[], onRefresh: () => void 
                                 <span className="bg-blue-100 text-blue-800 text-[10px] font-black uppercase px-2 py-1 rounded-md">{item.type}</span>
                                 <span className="font-bold text-gray-600">Client ID: <span className="font-normal text-gray-400">{item.userId}</span></span>
                             </div>
-                            <p className="text-sm font-semibold text-slate-800">Prix Forcé : <span className="text-xl block font-black text-amber-600">{Number(item.prixNegocieTtc).toLocaleString()} FCFA</span></p>
+                            <p className="text-sm font-semibold text-slate-800">Prix Forcé : <span className="text-xl block font-black text-amber-600">{Number(item.prixNegocieTtc).toLocaleString()} XOF</span></p>
                             <p className="text-xs text-gray-400 mt-2 max-w-lg italic">Raison: "{item.note}"</p>
                         </div>
                         <div className="text-right">

@@ -16,10 +16,10 @@ export async function generateApiAccess(agenceId: string, tier: string = "BASIC"
 
         if (tier === "PREMIUM") {
             requestsPerDay = 1000;
-            montantMensuel = 25000; // 25,000 FCFA
+            montantMensuel = 25000; // 25,000 XOF
         } else if (tier === "ENTERPRISE") {
             requestsPerDay = 10000;
-            montantMensuel = 100000; // 100,000 FCFA
+            montantMensuel = 100000; // 100,000 XOF
         }
 
         const access = await prisma.agenceApiAccess.upsert({

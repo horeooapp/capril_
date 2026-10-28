@@ -110,7 +110,7 @@ export default function ExpertiseClient({ stats }: ExpertiseClientProps) {
                 {stats.slice(0, 3).map((s: any, i: number) => (
                   <div key={i} className="bg-white p-10 rounded-3xl border border-gray-100 shadow-xl">
                     <div className="text-primary font-black text-sm uppercase tracking-widest mb-4">{s.commune}</div>
-                    <div className="text-5xl font-black text-gray-900 mb-2">{s.avgRent.toLocaleString()} <span className="text-sm">FCFA</span></div>
+                    <div className="text-5xl font-black text-gray-900 mb-2">{s.avgRent.toLocaleString()} <span className="text-sm">XOF</span></div>
                     <div className="text-xs font-bold text-gray-400 uppercase">Loyer Moyen • {s.propertyType}</div>
                     <div className={`mt-6 inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase ${s.trendPct >= 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                       {s.trendPct >= 0 ? '↑' : '↓'} {Math.abs(s.trendPct)}% vs période précédente

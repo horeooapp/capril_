@@ -113,7 +113,7 @@ export async function broadcastNotification(
  */
 export async function sendPaymentReminder(userId: string, rentAmount: number, month: string): Promise<void> {
     const title = "⚠️ RAPPEL DE PAIEMENT QAPRIL";
-    const content = `Votre loyer de ${rentAmount.toLocaleString()} FCFA pour le mois de ${month} est en attente. Merci de régulariser au plus vite sur votre portail locataire.`;
+    const content = `Votre loyer de ${rentAmount.toLocaleString()} XOF pour le mois de ${month} est en attente. Merci de régulariser au plus vite sur votre portail locataire.`;
     
     await sendNotification({
         userId,

@@ -120,7 +120,7 @@ export default function CandidatManager({ initialCandidatures, loyerLoyer }: Can
                  </div>
                  <div className="p-6 bg-gray-950 border border-gray-800 rounded-3xl">
                     <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-1 block">Revenus Déclarés</span>
-                    <p className="text-lg font-black text-green-500">{selectedCandidature.revenuMensuel.toLocaleString()} FCFA</p>
+                    <p className="text-lg font-black text-green-500">{selectedCandidature.revenuMensuel.toLocaleString()} XOF</p>
                  </div>
               </div>
 

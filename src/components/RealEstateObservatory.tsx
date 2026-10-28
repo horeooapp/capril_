@@ -60,7 +60,7 @@ export default function RealEstateObservatory() {
                         <TrendChart 
                             title="Loyer Moyen Résidentiel (Abidjan)"
                             data={stats.residential} 
-                            unit="FCFA / Mois"
+                            unit="XOF / Mois"
                             color="#C55A11"
                         />
                     </motion.div>
@@ -74,7 +74,7 @@ export default function RealEstateObservatory() {
                         <TrendChart 
                             title="Bureaux & Commerces (m²)"
                             data={stats.commercial} 
-                            unit="FCFA / m²"
+                            unit="XOF / m²"
                             color="#1F4E79"
                         />
                     </motion.div>
@@ -88,7 +88,7 @@ export default function RealEstateObservatory() {
                         <TrendChart 
                             title="Terrains Péri-urbains (Bingerville)"
                             data={stats.land} 
-                            unit="FCFA / m²"
+                            unit="XOF / m²"
                             color="#375623"
                         />
                     </motion.div>

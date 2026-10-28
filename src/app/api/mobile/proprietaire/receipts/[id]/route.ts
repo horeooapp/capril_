@@ -66,7 +66,7 @@ export async function GET(
                 landlord: isLandlord ? receipt.lease.landlord : undefined,
                 tenant:   receipt.lease.tenant,
             },
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/receipts/[id] GET error:', error);

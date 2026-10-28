@@ -160,10 +160,10 @@ export default function ProviderDetailModal({
                             </h4>
                             <div className="space-y-1 text-xs">
                                 <p className="text-slate-600">
-                                    Taux horaire indicatif : <strong>{meta.tauxHoraire ? `${Number(meta.tauxHoraire).toLocaleString('fr-FR')} FCFA/h` : "Sur devis"}</strong>
+                                    Taux horaire indicatif : <strong>{meta.tauxHoraire ? `${Number(meta.tauxHoraire).toLocaleString('fr-FR')} XOF/h` : "Sur devis"}</strong>
                                 </p>
                                 <p className="text-slate-600">
-                                    Forfait diagnostic / déplacement : <strong>{meta.forfaitDeplacement ? `${Number(meta.forfaitDeplacement).toLocaleString('fr-FR')} FCFA` : "10 000 FCFA"}</strong>
+                                    Forfait diagnostic / déplacement : <strong>{meta.forfaitDeplacement ? `${Number(meta.forfaitDeplacement).toLocaleString('fr-FR')} XOF` : "10 000 XOF"}</strong>
                                 </p>
                             </div>
                         </div>

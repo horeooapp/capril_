@@ -140,7 +140,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
                 </div>
                 <div>
                   <p className="text-[12px] text-slate-500 font-medium">Loyer à régler avant le {mainBail?.paymentDay || 5}</p>
-                  <p className="text-xl font-bold text-slate-800">{fmt(mainBail?.rentAmount)} FCFA</p>
+                  <p className="text-xl font-bold text-slate-800">{fmt(mainBail?.rentAmount)} XOF</p>
                 </div>
               </div>
               <div className="mt-4">

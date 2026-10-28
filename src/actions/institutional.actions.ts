@@ -142,7 +142,7 @@ export async function generateMarketReport(commune: string | null, periode: stri
                 periode,
                 typeRapport: "MARCHÉ",
                 contenuJson,
-                prixFcfa: 100000, // 100k FCFA
+                prixFcfa: 100000, // 100k XOF
                 actif: true
             }
         });
@@ -155,7 +155,7 @@ export async function generateMarketReport(commune: string | null, periode: stri
 
 import { auth } from "@/auth"
 
-const DATA_LICENSE_PRICE = 5000000; // 5,000,000 FCFA / an
+const DATA_LICENSE_PRICE = 5000000; // 5,000,000 XOF / an
 
 export async function getInstitutionalLicenses() {
     const session = await auth()
@@ -186,7 +186,7 @@ export async function purchaseDataLicense(clientNom: string, clientType: string,
             }, 0);
 
             if (balance < DATA_LICENSE_PRICE) {
-                throw new Error(`Solde insuffisant. La licence annuelle est de ${DATA_LICENSE_PRICE.toLocaleString()} FCFA.`);
+                throw new Error(`Solde insuffisant. La licence annuelle est de ${DATA_LICENSE_PRICE.toLocaleString()} XOF.`);
             }
 
             await tx.walletTransaction.create({

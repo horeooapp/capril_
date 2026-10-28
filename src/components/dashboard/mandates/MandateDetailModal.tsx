@@ -192,7 +192,7 @@ export default function MandateDetailModal({
                             </p>
                             {property.declaredRentFcfa && (
                                 <p className="text-xs text-emerald-700 font-bold mt-1">
-                                    Loyer indicatif : {property.declaredRentFcfa.toLocaleString()} FCFA/mois
+                                    Loyer indicatif : {property.declaredRentFcfa.toLocaleString()} XOF/mois
                                 </p>
                             )}
                         </div>

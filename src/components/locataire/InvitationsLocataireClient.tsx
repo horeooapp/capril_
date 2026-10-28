@@ -96,7 +96,7 @@ export function InvitationsLocataireClient({ initialInvitations }: InvitationsLo
                                 </div>
                                 <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100/50">
                                     <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest mb-1">Loyer Proposé</p>
-                                    <p className="text-xl font-black text-slate-800">{Number(inv.loyerPropose).toLocaleString()} FCFA</p>
+                                    <p className="text-xl font-black text-slate-800">{Number(inv.loyerPropose).toLocaleString()} XOF</p>
                                 </div>
 
                                 {inv.messageInvitant && (

@@ -11,7 +11,7 @@ export const DIASPORA_CURRENCIES: Record<string, { symbol: string, rate: number,
   CAD: { symbol: "CAD$", rate: 0.00225, name: "Dollar Canadien" },
   GBP: { symbol: "£", rate: 0.0013, name: "Livre Sterling" },
   CHF: { symbol: "CHF", rate: 0.00145, name: "Franc Suisse" },
-  FCFA: { symbol: "FCFA", rate: 1, name: "Franc CFA" },
+  XOF: { symbol: "XOF", rate: 1, name: "Franc CFA (XOF)" },
 };
 
 export class DiasporaService {
@@ -23,7 +23,7 @@ export class DiasporaService {
   }
 
   /**
-   * Convertit un montant FCFA vers la devise de résidence
+   * Convertit un montant XOF vers la devise de résidence
    */
   static async convertFromFcfa(amount: number, currency: string): Promise<number> {
     const rate = await this.getExchangeRate(currency);
@@ -34,7 +34,7 @@ export class DiasporaService {
    * Formate un montant dans la devise cible
    */
   static formatCurrency(amount: number, currency: string): string {
-    const config = DIASPORA_CURRENCIES[currency] || DIASPORA_CURRENCIES.FCFA;
+    const config = DIASPORA_CURRENCIES[currency] || DIASPORA_CURRENCIES.XOF;
     return `${amount.toLocaleString('fr-FR')} ${config.symbol}`;
   }
 
@@ -108,7 +108,7 @@ export class DiasporaService {
 
     if (!user) throw new Error("Utilisateur non trouvé");
 
-    const currency = (user.diasporaProfile?.diasporaDevise || "FCFA") || "FCFA";
+    const currency = (user.diasporaProfile?.diasporaDevise || "XOF") || "XOF";
     const rate = await this.getExchangeRate(currency);
 
     let totalRentFcfa = 0;

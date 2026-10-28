@@ -1,6 +1,6 @@
 /**
  * QAPRIL - Tarification Officielle 2026 (ADD-05)
- * Toutes les valeurs sont exprimées en FCFA TTC.
+ * Toutes les valeurs sont exprimées en XOF TTC.
  */
 
 export const PRICING = {

@@ -62,20 +62,20 @@ export class DossierDgiService {
     drawLine("Objet du contrat", lease.property?.title);
     drawLine("Localisation", lease.property?.address);
     drawLine("Durée Contractuelle", `${lease.dureeMoisBail || 0} mois`);
-    drawLine("Loyer Mensuel", `${lease.rentAmount?.toLocaleString()} FCFA`);
+    drawLine("Loyer Mensuel", `${lease.rentAmount?.toLocaleString()} XOF`);
     
     y -= 20;
     page.drawText("DÉCOMPTE FISCAL (ARTICLE 550 CGI)", { x: 50, y, size: 14, font: fontBold });
     y -= 30;
     
-    drawLine("Base de calcul", `${lease.loyerTotalFcfa?.toLocaleString()} FCFA`);
-    drawLine("Droits (2,5%)", `${lease.droitsEnregistrement?.toLocaleString()} FCFA`);
-    drawLine("Timbre (500/page)", `${lease.fraisTimbre?.toLocaleString()} FCFA (${lease.nbPagesBail} pages)`);
+    drawLine("Base de calcul", `${lease.loyerTotalFcfa?.toLocaleString()} XOF`);
+    drawLine("Droits (2,5%)", `${lease.droitsEnregistrement?.toLocaleString()} XOF`);
+    drawLine("Timbre (500/page)", `${lease.fraisTimbre?.toLocaleString()} XOF (${lease.nbPagesBail} pages)`);
     
     y -= 10;
     page.drawRectangle({ x: 45, y: y - 10, width: width - 90, height: 40, color: rgb(0.95, 0.95, 0.95) });
     page.drawText("TOTAL À PAYER :", { x: 50, y, size: 14, font: fontBold });
-    page.drawText(`${lease.totalFiscalBail?.toLocaleString()} FCFA`, { x: 200, y, size: 16, font: fontBold, color: rgb(0.8, 0, 0) });
+    page.drawText(`${lease.totalFiscalBail?.toLocaleString()} XOF`, { x: 200, y, size: 16, font: fontBold, color: rgb(0.8, 0, 0) });
 
     const pdfBytes = await pdfDoc.save();
     return Buffer.from(pdfBytes);

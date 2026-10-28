@@ -42,7 +42,7 @@ export async function POST(
         leaseId: lease.id,
         locataireId: lease.tenantId || lease.landlordId, // Locataire cible
         categorie: "MRL-01" as any,
-        description: `Modification Loyer. Ancien: ${lease.rentAmount} FCFA -> Nouveau: ${newRentAmount} FCFA. Motif: ${reason}`,
+        description: `Modification Loyer. Ancien: ${lease.rentAmount} XOF -> Nouveau: ${newRentAmount} XOF. Motif: ${reason}`,
         statut: "EN_ATTENTE",
         urgence: "NORMALE"
       }

@@ -12,15 +12,22 @@ export const EXCHANGE_RATES = {
 };
 
 /**
- * Convert EUR to FCFA (XOF) using the mandatory fixed rate.
+ * Convert EUR to XOF (XOF) using the mandatory fixed rate.
  */
 export function convertEurToXof(amountEur: number): number {
   return Math.round(amountEur * EXCHANGE_RATES.EUR_TO_XOF);
 }
 
 /**
- * Convert FCFA (XOF) to EUR using the reverse fixed rate.
+ * Convert XOF (XOF) to EUR using the reverse fixed rate.
  */
 export function convertXofToEur(amountXof: number): number {
   return Number((amountXof / EXCHANGE_RATES.EUR_TO_XOF).toFixed(2));
+}
+
+/**
+ * Format any amount in XOF standard (e.g. "150 000 XOF")
+ */
+export function formatXOF(amount: number): string {
+  return `${Math.round(amount || 0).toLocaleString('fr-FR')} XOF`;
 }

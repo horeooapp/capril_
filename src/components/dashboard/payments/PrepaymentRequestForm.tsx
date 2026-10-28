@@ -114,7 +114,7 @@ export default function PrepaymentRequestForm() {
                                         {selectedLeaseId === lease.id && <CheckCircle2 className="text-primary" size={18} />}
                                     </div>
                                     <div className="font-black text-gray-900 uppercase tracking-tight mb-1 truncate">{lease.property?.name || lease.property?.propertyCode}</div>
-                                    <div className="text-[12px] font-bold text-gray-400">{lease.rentAmount.toLocaleString()} FCFA / mois</div>
+                                    <div className="text-[12px] font-bold text-gray-400">{lease.rentAmount.toLocaleString()} XOF / mois</div>
                                 </div>
                             ))
                         )}
@@ -145,9 +145,9 @@ export default function PrepaymentRequestForm() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/40 transition-colors"></div>
                         <div className="relative z-10">
                             <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 opacity-80">Total Estimation</div>
-                            <div className="text-4xl font-black tracking-tighter mb-2">{totalAmount.toLocaleString()} <span className="text-sm">FCFA</span></div>
+                            <div className="text-4xl font-black tracking-tighter mb-2">{totalAmount.toLocaleString()} <span className="text-sm">XOF</span></div>
                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                {monthsCount} mois × {selectedLease?.rentAmount?.toLocaleString() || 0} FCFA
+                                {monthsCount} mois × {selectedLease?.rentAmount?.toLocaleString() || 0} XOF
                             </div>
                         </div>
                     </div>

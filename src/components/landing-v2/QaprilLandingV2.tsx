@@ -697,11 +697,11 @@ export default function QaprilLandingV2({
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Loyers encaissés ce mois</span>
-                      <span className="text-[#059669] font-bold">4 250 000 FCFA (100% à jour)</span>
+                      <span className="text-[#059669] font-bold">4 250 000 XOF (100% à jour)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Cautions gardées en sécurité</span>
-                      <span className="text-[#0284C7] font-bold">8 500 000 FCFA (CDC-CI)</span>
+                      <span className="text-[#0284C7] font-bold">8 500 000 XOF (CDC-CI)</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Dernier reçu délivré</span>
@@ -762,11 +762,11 @@ export default function QaprilLandingV2({
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Prochaine échéance</span>
-                      <span className="text-slate-900 font-bold">05 Novembre · 180 000 FCFA</span>
+                      <span className="text-slate-900 font-bold">05 Novembre · 180 000 XOF</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Caution protégée</span>
-                      <span className="text-[#D97706] font-bold">360 000 FCFA à la CDC-CI</span>
+                      <span className="text-[#D97706] font-bold">360 000 XOF à la CDC-CI</span>
                     </div>
                     <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
                       <span className="text-slate-500">Mes reçus de loyer</span>

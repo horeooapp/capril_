@@ -22,7 +22,7 @@ export default async function DiasporaAdminPage() {
         take: 50
     });
 
-    const mrr = profiles.length * 25000; // Mock: 25k FCFA per month
+    const mrr = profiles.length * 25000; // Mock: 25k XOF per month
     const totalPayments = payments.reduce((acc, p) => acc + p.montant, 0);
 
     return (
@@ -52,7 +52,7 @@ export default async function DiasporaAdminPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">MRR (Revenu Récurrent)</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{mrr.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{mrr.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
 
@@ -62,7 +62,7 @@ export default async function DiasporaAdminPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Volume Total Encaissé</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{totalPayments.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{totalPayments.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
             </div>
@@ -148,7 +148,7 @@ export default async function DiasporaAdminPage() {
                                             {tx.stripeSessionId}
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-gray-900">
-                                            {tx.montant.toLocaleString("fr-FR")} FCFA
+                                            {tx.montant.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.statut === "PAID" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>

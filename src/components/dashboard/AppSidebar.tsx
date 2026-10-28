@@ -190,7 +190,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             {/* Footer */}
             <div className="px-4 py-3 border-t border-slate-800 shrink-0 space-y-2">
                 <div className="text-slate-500 text-[10px] flex items-center justify-between">
-                    <span>Côte d'Ivoire · FCFA</span>
+                    <span>Côte d'Ivoire · XOF</span>
                 </div>
                 <Link href="/" className="w-full h-8 flex items-center justify-center gap-2 text-[10px] uppercase font-bold tracking-widest transition-colors bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-[6px]">
                     <Home size={12} />

@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
     // Création d'un ticket pour la facture CIE/SODECI (Suivi rigoureux)
     const ticketRef = `FAC-${fournisseur.substring(0, 3).toUpperCase()}-${Date.now().toString().slice(-5)}`;
-    const description = `Facture ${fournisseur} de ${montant} FCFA pour la période ${periode || 'en cours'}. Date limite: ${deadline || 'N/A'}`;
+    const description = `Facture ${fournisseur} de ${montant} XOF pour la période ${periode || 'en cours'}. Date limite: ${deadline || 'N/A'}`;
 
     const factureTicket = await prisma.ticketMaintenance.create({
       data: {
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ 
       success: true, 
-      message: `La facture ${fournisseur} (${montant} FCFA) a été soumise au locataire avec succès.` 
+      message: `La facture ${fournisseur} (${montant} XOF) a été soumise au locataire avec succès.` 
     });
 
   } catch (error: any) {

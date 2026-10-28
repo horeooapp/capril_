@@ -54,7 +54,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  <div className={`bg-white border ${currentTier === 'ESSENTIEL' || currentTier === 'LOCATAIRE' ? 'border-emerald-500 border-2' : 'border-slate-200'} rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative`}>
                      {(currentTier === 'ESSENTIEL' || currentTier === 'LOCATAIRE') && <div className="absolute -top-4 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Plan Actuel</div>}
                      <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Propriétaire</h3>
-                     <div className="text-4xl font-black text-slate-900 mb-6">0 <span className="text-[13.5px] text-slate-500 font-bold">FCFA / mois</span></div>
+                     <div className="text-4xl font-black text-slate-900 mb-6">0 <span className="text-[13.5px] text-slate-500 font-bold">XOF / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-600">
                          <p className="flex items-center gap-3"><Check size={16} className="text-emerald-500 shrink-0"/> Jusqu'à 10 baux</p>
@@ -72,7 +72,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  <div className={`bg-gradient-to-br from-slate-800 to-slate-900 border ${currentTier === 'PRO' ? 'border-emerald-500 border-2' : 'border-slate-700'} rounded-[16px] p-8 shadow-lg flex flex-col items-center text-center relative transform md:-translate-y-4`}>
                      <div className="absolute -top-4 bg-amber-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Recommandé</div>
                      <h3 className="text-[15px] font-black text-sky-400 uppercase tracking-widest mb-2">Agence Intermédiaire</h3>
-                     <div className="text-4xl font-black text-white mb-6">0 <span className="text-[13.5px] text-slate-400 font-bold">FCFA / mois</span></div>
+                     <div className="text-4xl font-black text-white mb-6">0 <span className="text-[13.5px] text-slate-400 font-bold">XOF / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-300">
                          <p className="flex items-center gap-3"><Check size={16} className="text-amber-500 shrink-0"/> Baux illimités</p>
@@ -99,7 +99,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  <div className={`bg-white border text-slate-900 ${currentTier === 'PREMIUM' ? 'border-emerald-500 border-2' : 'border-slate-200'} rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative`}>
                      {currentTier === 'PREMIUM' && <div className="absolute -top-4 bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Plan Actuel</div>}
                      <h3 className="text-[15px] font-black text-slate-500 uppercase tracking-widest mb-2">Diaspora VIP</h3>
-                     <div className="text-4xl font-black text-slate-900 mb-6">2 500 <span className="text-[13.5px] text-slate-500 font-bold">FCFA / mois</span></div>
+                     <div className="text-4xl font-black text-slate-900 mb-6">2 500 <span className="text-[13.5px] text-slate-500 font-bold">XOF / mois</span></div>
                      
                      <div className="space-y-4 mb-8 w-full text-left text-[13px] font-medium text-slate-600">
                          <p className="flex items-center gap-3"><Check size={16} className="text-slate-800 shrink-0"/> Tableau de bord VIP</p>

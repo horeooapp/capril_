@@ -102,7 +102,7 @@ export class ReminderService {
       leaseReference: lease.leaseReference,
       amount: lease.rentAmount,
       timing,
-      smsText: `QAPRIL: Rappel paiement loyer ${lease.property.propertyCode} (${timing}). Montant: ${lease.rentAmount} FCFA.`,
+      smsText: `QAPRIL: Rappel paiement loyer ${lease.property.propertyCode} (${timing}). Montant: ${lease.rentAmount} XOF.`,
       parameters: [(lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || 'Client', lease.property.propertyCode, String(lease.rentAmount)]
     };
 

@@ -70,7 +70,7 @@ export async function GET(request: Request) {
             id:          `auto-${l.id}`,
             type:        'ECHEANCE_LOYER',
             title:       `Loyer à encaisser — ${l.leaseReference}`,
-            description: `${l.tenant ? `${l.tenant.firstName ?? ''} ${l.tenant.lastName ?? ''}`.trim() : 'Locataire'} · ${Number(l.rentAmount).toLocaleString('fr-FR')} FCFA`,
+            description: `${l.tenant ? `${l.tenant.firstName ?? ''} ${l.tenant.lastName ?? ''}`.trim() : 'Locataire'} · ${Number(l.rentAmount).toLocaleString('fr-FR')} XOF`,
             date:        nextPaymentDate.toISOString(),
             isAuto:      true,
             leaseId:     l.id,

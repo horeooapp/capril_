@@ -65,7 +65,7 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
                         {c.employeur || "Candidat"}
                       </span>
                       <span className="text-[12px] font-black text-indigo-600 uppercase tracking-widest">
-                        MAX {fmt(c.revenuMensuel ? Math.round(c.revenuMensuel / 3.3) : 0)} FCFA
+                        MAX {fmt(c.revenuMensuel ? Math.round(c.revenuMensuel / 3.3) : 0)} XOF
                       </span>
                     </div>
                   </div>

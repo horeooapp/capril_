@@ -167,7 +167,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                                 </div>
                                 {selectedProp.declaredRentFcfa && (
                                     <span className="text-xs font-bold text-[#FF8200] bg-white px-3 py-1 rounded-full border border-orange-200">
-                                        Loyer de base : {selectedProp.declaredRentFcfa.toLocaleString()} FCFA
+                                        Loyer de base : {selectedProp.declaredRentFcfa.toLocaleString()} XOF
                                     </span>
                                 )}
                             </div>
@@ -200,7 +200,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 mb-2 block">
-                                        Loyer mensuel demandé (FCFA) <span className="text-rose-500">*</span>
+                                        Loyer mensuel demandé (XOF) <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <input 
@@ -212,7 +212,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                                             className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FF8200] focus:bg-white transition-all"
                                             required
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">FCFA</span>
+                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">XOF</span>
                                     </div>
                                 </div>
 
@@ -389,7 +389,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                         <div className="p-5 space-y-3">
                             <div className="flex items-baseline justify-between">
                                 <span className="text-xl font-black text-[#FF8200]">
-                                    {form.loyerDemande ? Number(form.loyerDemande).toLocaleString() : "---"} <span className="text-xs text-slate-600 font-bold">FCFA/mois</span>
+                                    {form.loyerDemande ? Number(form.loyerDemande).toLocaleString() : "---"} <span className="text-xs text-slate-600 font-bold">XOF/mois</span>
                                 </span>
                             </div>
 

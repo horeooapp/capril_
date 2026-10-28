@@ -98,7 +98,7 @@ export default function ComparatifPage() {
     },
     {
       titre: "Frais et commissions de gestion",
-      traditionnel: "Agences qui prennent 8 % à 10 % sur chaque loyer chaque mois (ex: 300 000 FCFA par an pour un loyer de 250 000 FCFA).",
+      traditionnel: "Agences qui prennent 8 % à 10 % sur chaque loyer chaque mois (ex: 300 000 XOF par an pour un loyer de 250 000 XOF).",
       qapril: "Zéro commission en pourcentage sur vos loyers. Votre loyer vous revient à 100 % (1er bien gratuit pour tester).",
       status: "win"
     },
@@ -214,7 +214,7 @@ export default function ComparatifPage() {
                   <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-2">
                     <span>Loyer mensuel moyen par bien :</span>
                     <span className="text-sm font-black text-[#D97706] bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                      {loyerMoyen.toLocaleString("fr-FR")} FCFA
+                      {loyerMoyen.toLocaleString("fr-FR")} XOF
                     </span>
                   </div>
                   <input
@@ -227,9 +227,9 @@ export default function ComparatifPage() {
                     className="w-full accent-[#D97706] cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
-                    <span>50 000 FCFA</span>
-                    <span>750 000 FCFA</span>
-                    <span>1 500 000 FCFA</span>
+                    <span>50 000 XOF</span>
+                    <span>750 000 XOF</span>
+                    <span>1 500 000 XOF</span>
                   </div>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function ComparatifPage() {
                   Économie Réalisée par An
                 </span>
                 <div className="text-3xl sm:text-4xl font-[1000] text-white tracking-tight mb-2">
-                  +{economieAnnuelle.toLocaleString("fr-FR")} <span className="text-lg text-amber-400">FCFA</span>
+                  +{economieAnnuelle.toLocaleString("fr-FR")} <span className="text-lg text-amber-400">XOF</span>
                 </div>
                 <p className="text-xs text-white/70 leading-relaxed mb-6">
                   Par rapport aux 10% prélevés par une agence classique, tout en conservant une protection juridique totale.
@@ -346,7 +346,7 @@ export default function ComparatifPage() {
               className="text-base sm:text-lg mb-8 leading-relaxed max-w-xl mx-auto"
               style={{ color: "rgba(255,255,255,0.7)" }}
             >
-              Testez gratuitement avec votre premier bien et premier bail à 0 FCFA. Sans engagement.
+              Testez gratuitement avec votre premier bien et premier bail à 0 XOF. Sans engagement.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link

@@ -71,7 +71,7 @@ export default function SyndicPaywall() {
                     
                     <div className="relative z-10 text-center">
                         <p className="text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-2">Abonnement Mensuel</p>
-                        <h2 className="text-4xl font-black mb-2">25 000 <span className="text-xl">FCFA</span></h2>
+                        <h2 className="text-4xl font-black mb-2">25 000 <span className="text-xl">XOF</span></h2>
                         <p className="text-[11px] text-slate-400 mb-8">Débité automatiquement depuis votre Wallet QAPRIL.</p>
 
                         <button 

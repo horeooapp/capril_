@@ -165,7 +165,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Montant Consigné</p>
-                                <p className="text-3xl font-black text-slate-800">{Number(caution.montantFcfa).toLocaleString()} <span className="text-lg">FCFA</span></p>
+                                <p className="text-3xl font-black text-slate-800">{Number(caution.montantFcfa).toLocaleString()} <span className="text-lg">XOF</span></p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Date de Versement</p>

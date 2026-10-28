@@ -66,7 +66,7 @@ export default function ColocationClient({ bails }: { bails: any[] }) {
                             required
                         >
                             {bails.map((b: any) => (
-                                <option key={b.id} value={b.id}>{b.property?.name || b.leaseReference} - Loyer: {b.rentAmount} FCFA</option>
+                                <option key={b.id} value={b.id}>{b.property?.name || b.leaseReference} - Loyer: {b.rentAmount} XOF</option>
                             ))}
                         </select>
                     </div>

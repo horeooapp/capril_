@@ -39,7 +39,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
              <DollarSign className="w-8 h-8 text-indigo-500/20" />
           </div>
           <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-1 block">Provision Mensuelle</span>
-          <h3 className="text-3xl font-black text-white">{provision.toLocaleString()} <span className="text-sm font-medium text-gray-500">FCFA</span></h3>
+          <h3 className="text-3xl font-black text-white">{provision.toLocaleString()} <span className="text-sm font-medium text-gray-500">XOF</span></h3>
           <button 
             onClick={() => setShowSetup(true)}
             className="mt-6 flex items-center gap-2 text-[10px] font-black text-indigo-500 hover:text-indigo-400 uppercase tracking-widest transition-all"
@@ -57,7 +57,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
              </div>
           </div>
           <h3 className={`text-2xl font-black ${delta >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {delta >= 0 ? '+' : ''}{delta.toLocaleString()} FCFA
+            {delta >= 0 ? '+' : ''}{delta.toLocaleString()} XOF
           </h3>
           <p className="text-[10px] text-gray-500 mt-1 font-medium">{delta >= 0 ? 'Surplus pour le locataire' : 'Régularisation à percevoir'}</p>
         </div>
@@ -106,7 +106,7 @@ export default function ChargesManager({ leaseId, provisionMontant = 0 }: Charge
                         {cat.icon}
                         <span className="text-[10px] font-black uppercase tracking-widest">{cat.label}</span>
                      </div>
-                     <p className="text-white font-bold">{((idx + 1) * 25000).toLocaleString()} FCFA</p>
+                     <p className="text-white font-bold">{((idx + 1) * 25000).toLocaleString()} XOF</p>
                   </div>
                 ))}
             </div>

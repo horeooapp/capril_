@@ -9,7 +9,7 @@ export const QAPRIL_COLORS = {
   amber:   "#F5A800",   // Accent - badges, highlights, wallet
   green:   "#007A4D",   // Succes - statuts payes, confirmations
   red:     "#CC2020",   // Erreur - alertes, impayés, urgence
-  orange:  "#C05000",   // Montants FCFA
+  orange:  "#C05000",   // Montants XOF
   blue:    "#1B5AAA",   // Info - liens, délégation
   bg:      "#EEF3FB",   // Fond de page
   border:  "#D0DFF5",   // Bordures cards

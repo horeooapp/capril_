@@ -96,7 +96,7 @@ export async function GET(request: Request) {
                     phone:     activeLease.landlord.phone,
                 } : null,
             } : null,
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] locataire/profile GET error:', error);

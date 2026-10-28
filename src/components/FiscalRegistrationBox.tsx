@@ -70,11 +70,11 @@ export default function FiscalRegistrationBox({ dossier, leaseReference }: Props
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
                                 <span className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Droits DGI</span>
-                                <span className="text-xl font-black text-gray-900">{dossier.totalDgi.toLocaleString()} FCFA</span>
+                                <span className="text-xl font-black text-gray-900">{dossier.totalDgi.toLocaleString()} XOF</span>
                             </div>
                             <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
                                 <span className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Service QAPRIL</span>
-                                <span className="text-xl font-black text-gray-900">{dossier.fraisQapril.toLocaleString()} FCFA</span>
+                                <span className="text-xl font-black text-gray-900">{dossier.fraisQapril.toLocaleString()} XOF</span>
                             </div>
                         </div>
 
@@ -86,7 +86,7 @@ export default function FiscalRegistrationBox({ dossier, leaseReference }: Props
                                     </svg>
                                     <span className="text-xs font-bold uppercase tracking-tight">Pénalité de retard incluse</span>
                                 </div>
-                                <span className="text-xs font-black text-red-700">+{dossier.penaltyAmount.toLocaleString()} FCFA</span>
+                                <span className="text-xs font-black text-red-700">+{dossier.penaltyAmount.toLocaleString()} XOF</span>
                             </div>
                         )}
 
@@ -96,7 +96,7 @@ export default function FiscalRegistrationBox({ dossier, leaseReference }: Props
                                 disabled={loading}
                                 className="w-full py-5 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl shadow-gray-200 active:scale-[0.98] disabled:opacity-50"
                             >
-                                {loading ? "Initialisation..." : `Payer ${dossier.totalBailleur.toLocaleString()} FCFA via CinetPay`}
+                                {loading ? "Initialisation..." : `Payer ${dossier.totalBailleur.toLocaleString()} XOF via CinetPay`}
                             </button>
                             <p className="text-[9px] text-gray-400 text-center font-medium leading-relaxed">
                                 Conformément à l'Art. 550 du CGI, l'enregistrement doit être effectué avant le <span className="text-gray-900 font-bold">{new Date(dossier.dateLimiteLegale).toLocaleDateString('fr-FR')}</span>.

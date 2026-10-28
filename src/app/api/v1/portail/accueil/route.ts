@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       hero: {
         titre_principal: "Le premier portail immobilier de confiance vérifiée en Côte d'Ivoire",
         sous_titre: "Zéro fausse annonce. Zéro bien déjà loué. Uniquement des agences agréées CPRAIMA-CI.",
-        placeholder_recherche: "Décrivez votre logement en langage naturel (ex: Studio propre à Yopougon sous 60 000 FCFA près d'un marché)...",
+        placeholder_recherche: "Décrivez votre logement en langage naturel (ex: Studio propre à Yopougon sous 60 000 XOF près d'un marché)...",
         canal_conversationnel: {
           nom: "Recherche WhatsApp IA",
           numero: "+225 07 00 00 00 00",

@@ -157,7 +157,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                     </div>
                     <div className="relative z-10">
                         <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-1 shadow-sm">Total Réparti (En cours)</p>
-                        <p className="text-2xl font-black text-white">{totalReparti.toLocaleString()} <span className="text-[13px] opacity-80 font-bold">FCFA</span></p>
+                        <p className="text-2xl font-black text-white">{totalReparti.toLocaleString()} <span className="text-[13px] opacity-80 font-bold">XOF</span></p>
                     </div>
                 </div>
             </div>
@@ -209,7 +209,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                                                 <p className="font-bold text-[13px] text-slate-700">{f.leaseId?.substring(0, 8)}...</p>
                                             </td>
                                             <td className="p-4 font-black text-[14px] text-slate-900">
-                                                {f.montantCharge?.toLocaleString()} <span className="text-[10px] text-slate-400 opacity-80 font-bold">FCFA</span>
+                                                {f.montantCharge?.toLocaleString()} <span className="text-[10px] text-slate-400 opacity-80 font-bold">XOF</span>
                                             </td>
                                         </tr>
                                     ))}
@@ -257,7 +257,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
 
                                 {/* Montant Global */}
                                 <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Montant Global Reçu (FCFA)</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Montant Global Reçu (XOF)</label>
                                     <input 
                                         type="number" 
                                         value={simAmount || ''}
@@ -408,13 +408,13 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                                         {scanResult && (
                                             <div className="bg-emerald-50 p-4 rounded-[12px] border border-emerald-200">
                                                 <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1"><CheckCircle2 size={12}/> Lecture OCR Complète</p>
-                                                <p className="text-2xl font-black text-emerald-700">{scanResult.montant.toLocaleString()} <span className="text-[12px] opacity-80">FCFA</span></p>
+                                                <p className="text-2xl font-black text-emerald-700">{scanResult.montant.toLocaleString()} <span className="text-[12px] opacity-80">XOF</span></p>
                                             </div>
                                         )}
                                     </>
                                 ) : (
                                     <div>
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Montant Facturé (FCFA)</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block">Montant Facturé (XOF)</label>
                                         <input 
                                             type="number" 
                                             value={manualAmount}

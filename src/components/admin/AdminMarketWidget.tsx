@@ -59,7 +59,7 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                         <span className="text-[9px] font-black text-ci-orange uppercase tracking-widest">LOYER MOYEN NATIONAL (ILI)</span>
                         <div className="flex items-baseline gap-2 mt-2">
                             <span className="text-3xl font-black">{data.nationalAvg.toLocaleString()}</span>
-                            <span className="text-xs font-bold text-gray-500">FCFA</span>
+                            <span className="text-xs font-bold text-gray-500">XOF</span>
                         </div>
                         <div className="flex items-center gap-2 mt-4 text-[10px] text-ci-vert font-bold">
                             <TrendingUp className="w-3 h-3" />

@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 /**
  * POST /api/v1/quittances/generate
- * Generates an SHA-256 Quittance and deducts 90 FCFA from the landlord's wallet.
+ * Generates an SHA-256 Quittance and deducts 90 XOF from the landlord's wallet.
  */
 export async function POST(req: Request) {
   try {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     if ((payerConfig.walletBalance || 0) < cout) {
       return NextResponse.json({ 
-          error: `Solde Wallet insuffisant. Émettre une quittance coûte ${cout} FCFA.` 
+          error: `Solde Wallet insuffisant. Émettre une quittance coûte ${cout} XOF.` 
       }, { status: 402 });
     }
 

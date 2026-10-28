@@ -47,7 +47,7 @@ export async function purchaseLead(agenceId: string, leadId: string) {
 
             // TODO: Here we would deduct `lead.prixLead` from `agence.Wallet` 
             // OR initiate a payment via Stripe/Mobile Money.
-            const montantPaye = lead.prixLead || 5000; // default to 5000 FCFA
+            const montantPaye = lead.prixLead || 5000; // default to 5000 XOF
 
             // 3. Mark Lead as sold
             const updatedLead = await tx.lead.update({
@@ -85,7 +85,7 @@ export async function scoreLead(leadId: string) {
         if (!lead) throw new Error("Lead introuvable");
 
         let score = 0;
-        let basePrice = 2000; // Base 2000 FCFA
+        let basePrice = 2000; // Base 2000 XOF
 
         // Has budget defined?
         if (lead.budgetDeclare && lead.budgetDeclare > 0) {

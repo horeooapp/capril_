@@ -672,10 +672,10 @@
 
     "notifications": {
       "loyer_attendu": "Rappel : votre loyer du mois de {{mois}} est attendu avant le {{date}}.",
-      "loyer_recu": "Votre paiement de {{montant}} FCFA pour le mois de {{mois}} a bien été reçu.",
+      "loyer_recu": "Votre paiement de {{montant}} XOF pour le mois de {{mois}} a bien été reçu.",
       "loyer_impaye": "Votre loyer du mois de {{mois}} n'a pas encore été reçu.",
-      "caution_consignee": "Votre caution de {{montant}} FCFA a bien été consignée à la CDC-CI.",
-      "caution_restituee": "Votre caution de {{montant}} FCFA vous a été restituée.",
+      "caution_consignee": "Votre caution de {{montant}} XOF a bien été consignée à la CDC-CI.",
+      "caution_restituee": "Votre caution de {{montant}} XOF vous a été restituée.",
       "bail_signe": "Le bail a été signé avec succès. Bienvenue dans votre nouveau logement !",
       "bail_expire_bientot": "Attention : votre bail arrive à terme dans {{jours}} jours.",
       "etat_lieux_planifie": "Votre état des lieux est prévu le {{date}} à {{heure}}.",

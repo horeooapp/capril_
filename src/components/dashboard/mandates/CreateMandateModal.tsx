@@ -420,10 +420,10 @@ export default function CreateMandateModal({
                                         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
                                             <div>
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                                                    Loyer Mensuel Estimé (FCFA)
+                                                    Loyer Mensuel Estimé (XOF)
                                                 </p>
                                                 <p className="text-base font-black text-slate-900">
-                                                    {Number(selectedProperty.declaredRentFcfa || 0).toLocaleString('fr-FR')} FCFA / mois
+                                                    {Number(selectedProperty.declaredRentFcfa || 0).toLocaleString('fr-FR')} XOF / mois
                                                 </p>
                                             </div>
                                             <p className="text-[11px] text-slate-400 font-medium mt-1">
@@ -587,7 +587,7 @@ export default function CreateMandateModal({
                                         onChange={(e) => setSeuilTravauxAccord(Number(e.target.value))}
                                         className="w-32 p-2 bg-white border border-slate-300 rounded-xl text-xs font-black text-right"
                                     />
-                                    <span className="text-xs font-bold text-slate-600">FCFA</span>
+                                    <span className="text-xs font-bold text-slate-600">XOF</span>
                                 </div>
                             </div>
                         </div>
@@ -623,7 +623,7 @@ export default function CreateMandateModal({
                                             Loyer Mensuel Estimé
                                         </p>
                                         <p className="text-lg font-black text-white">
-                                            {activeRent.toLocaleString('fr-FR')} FCFA
+                                            {activeRent.toLocaleString('fr-FR')} XOF
                                         </p>
                                         <p className="text-[10px] text-slate-400 mt-0.5">Payé par le locataire</p>
                                     </div>
@@ -633,7 +633,7 @@ export default function CreateMandateModal({
                                             Frais de Gestion ({commissionPct}%)
                                         </p>
                                         <p className="text-lg font-black text-amber-400">
-                                            - {fraisGestionMensuels.toLocaleString('fr-FR')} FCFA
+                                            - {fraisGestionMensuels.toLocaleString('fr-FR')} XOF
                                         </p>
                                         <p className="text-[10px] text-slate-400 mt-0.5">Rémunération du gestionnaire</p>
                                     </div>
@@ -643,7 +643,7 @@ export default function CreateMandateModal({
                                             Net dans votre poche
                                         </p>
                                         <p className="text-xl font-black text-emerald-400">
-                                            {revenuNetProprietaire.toLocaleString('fr-FR')} FCFA
+                                            {revenuNetProprietaire.toLocaleString('fr-FR')} XOF
                                         </p>
                                         <p className="text-[10px] text-emerald-200 mt-0.5">Reversé chaque mois</p>
                                     </div>

@@ -172,7 +172,7 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                                     <td className="py-4 px-5">
                                         {d.amountInDispute ? (
                                             <div>
-                                                <p className="font-black text-xs text-rose-600">{Number(d.amountInDispute).toLocaleString()} FCFA</p>
+                                                <p className="font-black text-xs text-rose-600">{Number(d.amountInDispute).toLocaleString()} XOF</p>
                                                 {d.monthsDefeated > 0 && (
                                                     <p className="text-[10px] text-slate-400">{d.monthsDefeated} mois en retard</p>
                                                 )}

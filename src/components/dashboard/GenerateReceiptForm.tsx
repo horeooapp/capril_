@@ -122,7 +122,7 @@ export default function GenerateReceiptForm({
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant perçu (FCFA)</label>
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant perçu (XOF)</label>
                                         <input 
                                             type="number" 
                                             required 

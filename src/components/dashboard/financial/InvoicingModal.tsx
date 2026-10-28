@@ -76,7 +76,7 @@ export default function InvoicingModal({ isOpen, onClose, lease }: { isOpen: boo
                             <div className="flex gap-2">
                                 <input 
                                     type="number" 
-                                    placeholder="Montant (FCFA)" 
+                                    placeholder="Montant (XOF)" 
                                     value={newAmount}
                                     onChange={(e) => setNewAmount(e.target.value)}
                                     className="flex-1 p-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-bold"
@@ -101,7 +101,7 @@ export default function InvoicingModal({ isOpen, onClose, lease }: { isOpen: boo
                             <div key={item.id} className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
                                 <div>
                                     <p className="text-sm font-bold text-slate-700 uppercase">{item.description}</p>
-                                    <p className="text-[10px] text-slate-400 font-bold">{item.amount.toLocaleString()} FCFA</p>
+                                    <p className="text-[10px] text-slate-400 font-bold">{item.amount.toLocaleString()} XOF</p>
                                 </div>
                                 <button onClick={() => removeItem(item.id)} className="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-colors">
                                     <Trash2 size={16} />
@@ -114,7 +114,7 @@ export default function InvoicingModal({ isOpen, onClose, lease }: { isOpen: boo
                 <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-4">
                     <div className="flex justify-between items-center px-2">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total à régler</span>
-                        <span className="text-2xl font-black text-slate-800">{total.toLocaleString()} FCFA</span>
+                        <span className="text-2xl font-black text-slate-800">{total.toLocaleString()} XOF</span>
                     </div>
                     
                     <div className="flex gap-3">

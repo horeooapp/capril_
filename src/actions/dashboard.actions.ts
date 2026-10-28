@@ -76,7 +76,7 @@ export async function getDashboardBailleur(landlordId: string) {
   const alertes = [];
   const seuil   = user?.walletConfig?.walletSeuilAlerte ?? SEUIL_WALLET;
   if (((user?.walletConfig?.walletBalance || 0) ?? 0) < seuil) {
-    alertes.push({ type: "WALLET", message: `Wallet sous seuil ${seuil} FCFA`,
+    alertes.push({ type: "WALLET", message: `Wallet sous seuil ${seuil} XOF`,
       details: { solde: (user?.walletConfig?.walletBalance || 0), seuil } });
   }
 

@@ -184,7 +184,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                     <div className="flex flex-wrap gap-4 pt-2">
                                         <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
                                             <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Budget Max</span>
-                                            <span className="font-black text-slate-800">{Number(searchResult.revenuFourchette || 0).toLocaleString()} FCFA</span>
+                                            <span className="font-black text-slate-800">{Number(searchResult.revenuFourchette || 0).toLocaleString()} XOF</span>
                                         </div>
                                         <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
                                             <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-0.5">Score ICL</span>
@@ -231,7 +231,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input 
                                     type="number" 
-                                    placeholder="Budget Max (FCFA)" 
+                                    placeholder="Budget Max (XOF)" 
                                     value={criteriaData.budgetMax}
                                     onChange={(e) => setCriteriaData({...criteriaData, budgetMax: e.target.value})}
                                     className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#1F4E79]/20 font-bold text-gray-700"
@@ -287,7 +287,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                     <div className="space-y-2 mb-6">
                                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
                                             <span className="text-xs font-bold text-gray-500">Budget Max</span>
-                                            <span className="font-black text-amber-600">{Number(profil.budget || 0).toLocaleString()} FCFA</span>
+                                            <span className="font-black text-amber-600">{Number(profil.budget || 0).toLocaleString()} XOF</span>
                                         </div>
                                         <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg truncate">
                                             <span className="text-xs font-bold text-gray-500">Zones</span>
@@ -357,7 +357,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                            <CreditCard size={14} /> Loyer (FCFA)
+                                            <CreditCard size={14} /> Loyer (XOF)
                                         </label>
                                         <input 
                                             type="number" 

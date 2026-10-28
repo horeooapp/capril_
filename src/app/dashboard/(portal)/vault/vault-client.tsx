@@ -57,7 +57,7 @@ export default function VaultClient({ data }: { data: any }) {
                             </p>
                             <div className="flex items-end gap-1 mb-4">
                                 <p className="text-3xl font-black text-white">{data.totalSecuredFcfa.toLocaleString()}</p>
-                                <span className="text-xs text-emerald-500 font-bold mb-1.5">FCFA</span>
+                                <span className="text-xs text-emerald-500 font-bold mb-1.5">XOF</span>
                             </div>
                             
                             <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 mt-6 border-t border-slate-700 pt-4 flex items-center gap-2">
@@ -65,7 +65,7 @@ export default function VaultClient({ data }: { data: any }) {
                             </p>
                             <div className="flex items-end gap-1">
                                 <p className="text-xl font-black text-slate-300">{data.totalPendingFcfa.toLocaleString()}</p>
-                                <span className="text-[10px] text-slate-500 font-bold mb-1">FCFA</span>
+                                <span className="text-[10px] text-slate-500 font-bold mb-1">XOF</span>
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@ export default function VaultClient({ data }: { data: any }) {
                                             </div>
                                         </td>
                                         <td className="p-5">
-                                            <p className="font-black text-slate-800">{caution.montant.toLocaleString()} <span className="text-xs text-slate-400 font-bold">FCFA</span></p>
+                                            <p className="font-black text-slate-800">{caution.montant.toLocaleString()} <span className="text-xs text-slate-400 font-bold">XOF</span></p>
                                             {caution.hash && (
                                                 <p className="text-[9px] font-mono font-bold text-emerald-500 mt-1 flex items-center gap-1">
                                                     <Key size={10} /> {caution.hash}
@@ -175,7 +175,7 @@ export default function VaultClient({ data }: { data: any }) {
                             <div className="p-8 space-y-6">
                                 <div className="text-center space-y-2">
                                     <p className="text-sm font-bold text-slate-500">Montant de la caution à consigner</p>
-                                    <p className="text-4xl font-black text-slate-900">{selectedCaution.montant.toLocaleString()} <span className="text-lg text-slate-400">FCFA</span></p>
+                                    <p className="text-4xl font-black text-slate-900">{selectedCaution.montant.toLocaleString()} <span className="text-lg text-slate-400">XOF</span></p>
                                 </div>
 
                                 <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4">

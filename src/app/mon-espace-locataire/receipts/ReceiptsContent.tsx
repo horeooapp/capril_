@@ -48,7 +48,7 @@ export default function ReceiptsContent({ receipts, lease }: any) {
                         <div className="bg-qred-pale p-5 rounded-[1.5rem] shadow-sm border border-qred/20 flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto">
                             <div className="text-left sm:text-right">
                                 <p className="text-[9px] font-black text-qred uppercase tracking-widest">Solde Dû</p>
-                                <p className="text-lg sm:text-xl font-black text-qred-dark whitespace-nowrap">{lease.totalArrears.toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                <p className="text-lg sm:text-xl font-black text-qred-dark whitespace-nowrap">{lease.totalArrears.toLocaleString()} <span className="text-xs">XOF</span></p>
                             </div>
                             <Link href="/mon-espace-locataire/payment" className="bg-qred hover:bg-qred-dark text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] tracking-widest transition-all shadow-md shadow-qred/30 shrink-0">
                                 Payer Maintenant →
@@ -106,7 +106,7 @@ export default function ReceiptsContent({ receipts, lease }: any) {
                             <div className="flex items-center justify-between md:justify-end gap-6 border-t border-qgrey-2 md:border-0 pt-4 md:pt-0">
                                 <div className="text-left md:text-right">
                                     <p className="text-[9px] font-black text-qtext-light uppercase tracking-widest mb-1">Total Payé</p>
-                                    <p className="text-lg sm:text-xl font-black text-qnavy-dark whitespace-nowrap">{Number(receipt.totalAmount).toLocaleString()} <span className="text-xs">FCFA</span></p>
+                                    <p className="text-lg sm:text-xl font-black text-qnavy-dark whitespace-nowrap">{Number(receipt.totalAmount).toLocaleString()} <span className="text-xs">XOF</span></p>
                                 </div>
                                 <Link 
                                     href={`/receipts/${receipt.id}`} 

@@ -173,8 +173,8 @@ export async function processMMWebhook(payload: {
                         {
                             referenceId: intent.id,
                             payload: {
-                                smsText: `QAPRIL: Le paiement de ${intent.amount} FCFA a bien été reçu pour votre bien.`,
-                                html: `<p>Un paiement de ${intent.amount} FCFA a été reçu avec succès via Mobile Money.</p>`
+                                smsText: `QAPRIL: Le paiement de ${intent.amount} XOF a bien été reçu pour votre bien.`,
+                                html: `<p>Un paiement de ${intent.amount} XOF a été reçu avec succès via Mobile Money.</p>`
                             }
                         }
                     ).catch(err => console.error("[NOTIF_TRIGGER] Failed PAIEMENT_RECU Owner", err));
@@ -187,8 +187,8 @@ export async function processMMWebhook(payload: {
                         {
                             referenceId: intent.id,
                             payload: {
-                                smsText: `QAPRIL: Votre paiement de ${intent.amount} FCFA a été traité avec succès. Merci.`,
-                                html: `<p>Votre paiement de <strong>${intent.amount} FCFA</strong> a été traité avec succès.</p>`
+                                smsText: `QAPRIL: Votre paiement de ${intent.amount} XOF a été traité avec succès. Merci.`,
+                                html: `<p>Votre paiement de <strong>${intent.amount} XOF</strong> a été traité avec succès.</p>`
                             }
                         }
                     ).catch(err => console.error("[NOTIF_TRIGGER] Failed PAIEMENT_RECU Tenant", err));

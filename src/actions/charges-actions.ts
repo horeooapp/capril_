@@ -37,7 +37,7 @@ export async function recordExpense(data: {
   try {
     // Note: On pourrait créer un modèle spécifique 'Depense' ou utiliser TicketMaintenance clôturé
     // Pour l'instant, on simule l'enregistrement pour la compta
-    console.log(`[CHARGES] Dépense enregistrée: ${data.label} - ${data.montant} FCFA`);
+    console.log(`[CHARGES] Dépense enregistrée: ${data.label} - ${data.montant} XOF`);
     return { success: true };
   } catch (error) {
     return { success: false };

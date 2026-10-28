@@ -31,7 +31,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
     {
       icon: "💰",
       label: "Loyers théoriques",
-      value: `${fmt(totalLoyers)} FCFA`,
+      value: `${fmt(totalLoyers)} XOF`,
       sub: "Avril 2026",
       color: T.navy,
       bg: T.navyPale,
@@ -40,7 +40,7 @@ export const AgencyKpiCards: React.FC<{ properties: any[] }> = ({ properties }) 
     {
       icon: "✅",
       label: "Encaissé",
-      value: `${fmt(encaisse)} FCFA`,
+      value: `${fmt(encaisse)} XOF`,
       sub: totalLoyers > 0 ? `${Math.round((encaisse / totalLoyers) * 100)}% du portefeuille` : "0% du portefeuille",
       color: T.green,
       bg: T.greenPale,

@@ -182,7 +182,7 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
                     ) : (
                         <form onSubmit={handleManualSubmit} className="space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-qtext-mid">Montant Total (FCFA)</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-qtext-mid">Montant Total (XOF)</label>
                                 <input 
                                     type="number" 
                                     value={manualAmount}
@@ -227,7 +227,7 @@ export default function UploadFactureOCR({ leaseId }: { leaseId: string }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div className="bg-white p-4 rounded-xl border border-qgreen/10">
                             <p className="text-[9px] sm:text-[10px] font-black text-qtext-light uppercase tracking-widest">Montant Exigé</p>
-                            <p className="text-xl sm:text-2xl font-black text-qnavy-dark mt-1">{result.amount.toLocaleString()} <span className="text-sm">FCFA</span></p>
+                            <p className="text-xl sm:text-2xl font-black text-qnavy-dark mt-1">{result.amount.toLocaleString()} <span className="text-sm">XOF</span></p>
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-qgreen/10">
                             <p className="text-[9px] sm:text-[10px] font-black text-qtext-light uppercase tracking-widest">Limite de Paiement</p>

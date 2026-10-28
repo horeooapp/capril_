@@ -96,25 +96,25 @@ export default function LeaseAgreement({ lease }: LeaseAgreementProps) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="border-l-4 border-orange-500 pl-4">
                                 <p className="text-[10px] uppercase font-bold text-gray-400 font-sans">Loyer Mensuel</p>
-                                <p className="text-xl font-black">{lease.rentAmount.toLocaleString()} FCFA</p>
+                                <p className="text-xl font-black">{lease.rentAmount.toLocaleString()} XOF</p>
                             </div>
                             <div className="border-l-4 border-gray-300 pl-4">
                                 <p className="text-[10px] uppercase font-bold text-gray-400 font-sans">Charges</p>
-                                <p className="text-xl font-black">{lease.charges.toLocaleString()} FCFA</p>
+                                <p className="text-xl font-black">{lease.charges.toLocaleString()} XOF</p>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm font-sans">
                             <div className="bg-blue-50 p-3 rounded border border-blue-100">
                                 <p className="font-bold text-blue-800">Caution (CDC)</p>
-                                <p>{lease.deposit.toLocaleString()} FCFA</p>
+                                <p>{lease.deposit.toLocaleString()} XOF</p>
                             </div>
                             <div className="bg-gray-50 p-3 rounded border border-gray-100">
                                 <p className="font-bold">Avance</p>
-                                <p>{lease.advancePayment.toLocaleString()} FCFA</p>
+                                <p>{lease.advancePayment.toLocaleString()} XOF</p>
                             </div>
                             <div className="bg-gray-50 p-3 rounded border border-gray-100">
                                 <p className="font-bold">Frais Agence</p>
-                                <p>{lease.agencyFee.toLocaleString()} FCFA</p>
+                                <p>{lease.agencyFee.toLocaleString()} XOF</p>
                             </div>
                         </div>
                     </div>

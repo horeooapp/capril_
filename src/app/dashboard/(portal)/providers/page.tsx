@@ -58,7 +58,7 @@ export default function ProvidersDashboardPage() {
     const handleAssign = async (ticketId: string) => {
         if (!selectedProviderForTicket) return
         
-        if (!confirm(`Attention: Assigner ce ticket coûte 2 000 FCFA de frais de mise en relation (Lead). Ce montant sera débité de votre Wallet. Confirmer ?`)) {
+        if (!confirm(`Attention: Assigner ce ticket coûte 2 000 XOF de frais de mise en relation (Lead). Ce montant sera débité de votre Wallet. Confirmer ?`)) {
             return
         }
 
@@ -447,7 +447,7 @@ export default function ProvidersDashboardPage() {
                                         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 font-medium flex items-center gap-2">
                                             <ShieldAlert size={16} className="text-amber-600 flex-shrink-0" />
                                             <span>
-                                                Frais de lead : <strong>2 000 FCFA</strong> prélevés sur votre Wallet QAPRIL à l&apos;envoi du bon à l&apos;artisan.
+                                                Frais de lead : <strong>2 000 XOF</strong> prélevés sur votre Wallet QAPRIL à l&apos;envoi du bon à l&apos;artisan.
                                             </span>
                                         </div>
 

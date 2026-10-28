@@ -191,7 +191,7 @@ export function OwnerPortalDashboardV2({
               {entities.flatMap((e: any) => e.unites).map((u: any, i: number) => (
                 <tr key={u.id || i} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
                   <td className="p-3.5 font-bold text-xs text-slate-900">{u.name || u.label}</td>
-                  <td className="p-3.5 font-semibold text-xs text-slate-700">{fmt(u.loyer)} FCFA</td>
+                  <td className="p-3.5 font-semibold text-xs text-slate-700">{fmt(u.loyer)} XOF</td>
                   <td className="p-3.5">
                     <Badge color={u.statut === "occupé" ? "green" : "gray"}>
                       {u.statut === "occupé" ? "Loué" : "Vacant"}

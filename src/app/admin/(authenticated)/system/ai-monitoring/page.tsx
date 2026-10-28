@@ -79,7 +79,7 @@ export default async function AiMonitoringPage() {
                 />
                 <StatCard 
                     title="Coût Estimé Total" 
-                    value={`${totalCost.toLocaleString()} FCFA`} 
+                    value={`${totalCost.toLocaleString()} XOF`} 
                     icon={<DollarSign size={28} />} 
                     color="amber"
                     trend={`${totalTokens.toLocaleString()} Tokens`}
@@ -87,7 +87,7 @@ export default async function AiMonitoringPage() {
                 />
                 <StatCard 
                     title="Moyenne / Conversation" 
-                    value={totalConv > 0 ? `${Math.round(totalCost / totalConv)} FCFA` : "0 FCFA"} 
+                    value={totalConv > 0 ? `${Math.round(totalCost / totalConv)} XOF` : "0 XOF"} 
                     icon={<Clock size={28} />} 
                     color="blue"
                     trend="Efficience"
@@ -128,7 +128,7 @@ export default async function AiMonitoringPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <span className="text-xs font-black text-gray-700">{Number(conv.coutEstimeFcfa).toLocaleString()} <span className="text-[8px] text-gray-400 uppercase">FCFA</span></span>
+                                            <span className="text-xs font-black text-gray-700">{Number(conv.coutEstimeFcfa).toLocaleString()} <span className="text-[8px] text-gray-400 uppercase">XOF</span></span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             {conv.bdqCree ? (
@@ -188,8 +188,8 @@ export default async function AiMonitoringPage() {
                                     <div className="h-full bg-indigo-400 w-1/4"></div>
                                 </div>
                                 <div className="flex justify-between mt-2 text-[9px] font-bold text-white/40">
-                                    <span>0 FCFA</span>
-                                    <span>500k FCFA</span>
+                                    <span>0 XOF</span>
+                                    <span>500k XOF</span>
                                 </div>
                             </div>
                         </div>

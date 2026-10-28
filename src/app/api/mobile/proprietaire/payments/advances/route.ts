@@ -67,7 +67,7 @@ export async function GET(request: Request) {
         return NextResponse.json({
             advances,
             totalAdvances: advances.reduce((acc, a) => acc + a.avanceLoyer, 0),
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/payments/advances GET error:', error);
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
         const maxLegal = Number(lease.rentAmount) * 2;
         if (Number(amount) > maxLegal) {
             return NextResponse.json(
-                { error: `Avance illégale. Maximum autorisé : ${maxLegal} FCFA (2 mois de loyer — Art. 415 CCH).`, code: 'AVANCE_ILLEGALE' },
+                { error: `Avance illégale. Maximum autorisé : ${maxLegal} XOF (2 mois de loyer — Art. 415 CCH).`, code: 'AVANCE_ILLEGALE' },
                 { status: 422 }
             );
         }
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
             message:     'Avance enregistrée sur le bail.',
             leaseId:     updated.id,
             avanceLoyer: Number(updated.avanceLoyer),
-            currency:    'FCFA',
+            currency:    'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/payments/advances POST error:', error);

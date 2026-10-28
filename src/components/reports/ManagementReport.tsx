@@ -67,7 +67,7 @@ export default function ManagementReport({ data }: ManagementReportProps) {
         </div>
         <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col justify-center text-center">
           <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Reversement Net Effectué</h3>
-          <p className="text-2xl md:text-3xl font-black text-primary">{data.financials.netToLandlord.toLocaleString()} FCFA</p>
+          <p className="text-2xl md:text-3xl font-black text-primary">{data.financials.netToLandlord.toLocaleString()} XOF</p>
           <div className="mt-2 text-[9px] font-bold text-green-600 uppercase">Transfert Automatique Wave OK</div>
         </div>
       </div>
@@ -83,8 +83,8 @@ export default function ManagementReport({ data }: ManagementReportProps) {
             <thead className="bg-slate-900 text-white">
               <tr>
                 <th className="p-4 text-left text-[10px] font-bold uppercase tracking-widest">Désignation</th>
-                <th className="p-4 text-right text-[10px] font-bold uppercase tracking-widest">Débit (FCFA)</th>
-                <th className="p-4 text-right text-[10px] font-bold uppercase tracking-widest">Crédit (FCFA)</th>
+                <th className="p-4 text-right text-[10px] font-bold uppercase tracking-widest">Débit (XOF)</th>
+                <th className="p-4 text-right text-[10px] font-bold uppercase tracking-widest">Crédit (XOF)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 border-b border-gray-100">
@@ -113,7 +113,7 @@ export default function ManagementReport({ data }: ManagementReportProps) {
               <tr className="bg-primary/5">
                 <td className="p-4 font-black uppercase text-primary">Solde Net à Reverser</td>
                 <td className="p-4 text-right font-black text-primary" colSpan={2}>
-                    {data.financials.netToLandlord.toLocaleString()} FCFA
+                    {data.financials.netToLandlord.toLocaleString()} XOF
                 </td>
               </tr>
             </tfoot>

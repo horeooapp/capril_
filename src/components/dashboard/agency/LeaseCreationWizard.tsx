@@ -232,7 +232,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                     <div className="space-y-6">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 flex items-center gap-2">
-                           <Wallet size={12} /> Loyer Mensuel (FCFA)
+                           <Wallet size={12} /> Loyer Mensuel (XOF)
                         </label>
                         <input 
                           type="number" 
@@ -243,7 +243,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4 flex items-center gap-2">
-                           <ShieldCheck size={12} /> Dépôt de Garantie (FCFA)
+                           <ShieldCheck size={12} /> Dépôt de Garantie (XOF)
                         </label>
                         <input 
                           type="number" 
@@ -297,7 +297,7 @@ export const LeaseCreationWizard: React.FC<{ properties: any[] }> = ({ propertie
                      </div>
                      <div className="p-6 bg-slate-50 rounded-[2rem] text-left border border-slate-100">
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Droits d'Enregistrement</div>
-                        <div className="text-xl font-black text-slate-800 font-mono">12,500 FCFA</div>
+                        <div className="text-xl font-black text-slate-800 font-mono">12,500 XOF</div>
                         <div className="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">Inclus dans les frais QAPRIL</div>
                      </div>
                   </div>

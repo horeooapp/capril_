@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const SYNDIC_SAAS_PRICE = 25000; // 25,000 FCFA / month
+const SYNDIC_SAAS_PRICE = 25000; // 25,000 XOF / month
 
 /**
  * Subscribes a user to the Syndic SaaS module
@@ -23,7 +23,7 @@ export async function subscribeSyndicSaaS() {
             }, 0);
 
             if (balance < SYNDIC_SAAS_PRICE) {
-                throw new Error(`Solde insuffisant pour l'abonnement SaaS. Coût: ${SYNDIC_SAAS_PRICE} FCFA/mois.`);
+                throw new Error(`Solde insuffisant pour l'abonnement SaaS. Coût: ${SYNDIC_SAAS_PRICE} XOF/mois.`);
             }
 
             // Debit Wallet

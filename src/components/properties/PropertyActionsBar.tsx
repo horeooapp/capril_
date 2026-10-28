@@ -224,7 +224,7 @@ export default function PropertyActionsBar({ property, isOwner }: PropertyAction
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1">Loyer déclaré (FCFA/mois)</label>
+                  <label className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1">Loyer déclaré (XOF/mois)</label>
                   <input
                     type="number"
                     value={rent || ""}

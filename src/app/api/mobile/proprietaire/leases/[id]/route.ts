@@ -92,7 +92,7 @@ export async function GET(
                 totalAmount: Number(r.totalAmount ?? 0),
                 paidAt:      r.paidAt?.toISOString() ?? null,
             })),
-            currency: 'FCFA',
+            currency: 'XOF',
         });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/leases/[id] GET error:', error);

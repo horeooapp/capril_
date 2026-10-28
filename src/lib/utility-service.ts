@@ -93,7 +93,7 @@ export class UtilityService {
             {
               payload: {
                 titre: `Nouvelle facture ${data.typeUtility}`,
-                message: `Votre quote-part pour la facture ${data.typeUtility} est de ${quotePart.toLocaleString()} FCFA.`,
+                message: `Votre quote-part pour la facture ${data.typeUtility} est de ${quotePart.toLocaleString()} XOF.`,
                 factureId: facture.id,
                 montant: quotePart
               }

@@ -118,7 +118,7 @@ export default async function ScoringDashboardPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">
-                                            {score.revenusMoyens.toLocaleString("fr-FR")} FCFA / mois
+                                            {score.revenusMoyens.toLocaleString("fr-FR")} XOF / mois
                                         </td>
                                     </tr>
                                 ))

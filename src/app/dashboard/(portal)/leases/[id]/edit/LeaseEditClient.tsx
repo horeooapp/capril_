@@ -233,22 +233,22 @@ export default function LeaseEditClient({ initialLease }: { initialLease: any })
                                 <h3 className="text-[13px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><span>2.</span> Conditions Financières</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8 bg-slate-50 border border-slate-200 rounded-[20px]">
                                     <div className="md:col-span-2 space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Loyer mensuel (FCFA)</label>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Loyer mensuel (XOF)</label>
                                         <input required type="number" value={rentAmount || ''} onChange={(e) => setRentAmount(parseInt(e.target.value) || 0)} className="w-full px-6 py-5 bg-white border border-slate-200 rounded-[12px] text-2xl font-black text-slate-900 shadow-[inset_0_2px_8px_rgba(0,0,0,0.02)] focus:ring-1 focus:ring-amber-500 outline-none" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Charges Incluses (FCFA)</label>
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Charges Incluses (XOF)</label>
                                         <input type="number" value={chargesAmount || ''} onChange={(e) => setChargesAmount(parseInt(e.target.value) || 0)} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-[10px] font-bold text-[14px] text-slate-900 focus:ring-1 focus:ring-amber-500 outline-none" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caution Fixée (Mois)</label>
                                         <input required type="number" min={0} max={2} value={depositMonths || ''} onChange={(e) => setDepositMonths(parseInt(e.target.value) || 0)} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-[10px] font-bold text-[14px] text-slate-900 focus:ring-1 focus:ring-amber-500 outline-none" placeholder="Max 2 mois" />
-                                        <p className="text-[10px] font-bold text-slate-500 text-right mt-1 font-mono">{(depositMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
+                                        <p className="text-[10px] font-bold text-slate-500 text-right mt-1 font-mono">{(depositMonths * rentAmount).toLocaleString("fr-FR")} XOF</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Avance (Mois)</label>
                                         <input required type="number" min={0} max={2} value={advanceMonths || ''} onChange={(e) => setAdvanceMonths(parseInt(e.target.value) || 0)} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-[10px] font-bold text-[14px] text-slate-900 focus:ring-1 focus:ring-amber-500 outline-none" placeholder="Max 2 mois" />
-                                        <p className="text-[10px] font-bold text-slate-500 text-right mt-1 font-mono">{(advanceMonths * rentAmount).toLocaleString("fr-FR")} FCFA</p>
+                                        <p className="text-[10px] font-bold text-slate-500 text-right mt-1 font-mono">{(advanceMonths * rentAmount).toLocaleString("fr-FR")} XOF</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Frais d'agence estimés</label>

@@ -59,8 +59,8 @@ async function main() {
   // 3. Initialisation des Configurations Tarifaires (ADD-12 / ADD-07 v3)
   console.log('\n--- Seeding des ConfigTarifs (Calculs 2026) ---')
   const defaultTarifs = [
-    { cle: "quittance_ttc", valeur: 75, description: "Prix unitaire d'une quittance certifiée (FCFA)" },
-    { cle: "wallet_seuil_alerte_defaut", valeur: 500, description: "Seuil critique de déclencheur recharge (FCFA)" },
+    { cle: "quittance_ttc", valeur: 75, description: "Prix unitaire d'une quittance certifiée (XOF)" },
+    { cle: "wallet_seuil_alerte_defaut", valeur: 500, description: "Seuil critique de déclencheur recharge (XOF)" },
     { cle: "wallet_mois_couverture", valeur: 2, description: "Nombre de mois suggérés lors d'une recharge" },
     { cle: "wallet_rappel_defaut_jour", valeur: 1, description: "Jour du mois par défaut pour le rappel wallet" },
     { cle: "wallet_alerte_max_par_jour", valeur: 3, description: "Nombre max de notifications auto par 24h" },

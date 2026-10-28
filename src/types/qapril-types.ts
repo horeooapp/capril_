@@ -202,9 +202,14 @@ export function tarifBail(estCourEntiere: boolean): number {
   return estCourEntiere ? 10000 : 2000;
 }
 
-/** Formater montant en FCFA */
+/** Formater montant en XOF (anciennement formatFCFA) */
 export function formatFCFA(n: number): string {
-  return (n || 0).toLocaleString('fr-FR') + ' FCFA';
+  return (n || 0).toLocaleString('fr-FR') + ' XOF';
+}
+
+/** Formater montant en XOF */
+export function formatXOF(n: number): string {
+  return (n || 0).toLocaleString('fr-FR') + ' XOF';
 }
 
 /** Formater date en français */

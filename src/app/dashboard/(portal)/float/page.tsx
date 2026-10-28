@@ -42,7 +42,7 @@ export default async function FloatDashboardPage() {
                     </div>
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Cantonné (Float)</p>
-                        <h2 className="text-2xl font-bold text-gray-900">{totalFloat.toLocaleString("fr-FR")} FCFA</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{totalFloat.toLocaleString("fr-FR")} XOF</h2>
                     </div>
                 </div>
 
@@ -104,10 +104,10 @@ export default async function FloatDashboardPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right font-semibold text-gray-900">
-                                            {pool.soldeTotal.toLocaleString("fr-FR")} FCFA
+                                            {pool.soldeTotal.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 text-right text-gray-500">
-                                            {pool.soldeDisponible.toLocaleString("fr-FR")} FCFA
+                                            {pool.soldeDisponible.toLocaleString("fr-FR")} XOF
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <Link 

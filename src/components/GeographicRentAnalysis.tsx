@@ -52,7 +52,7 @@ export default function GeographicRentAnalysis() {
                         <BarChart 
                             title="Loyers par Commune (Abidjan)"
                             data={communeData}
-                            unit="FCFA"
+                            unit="XOF"
                             color="#C55A11"
                         />
                     </motion.div>
@@ -66,7 +66,7 @@ export default function GeographicRentAnalysis() {
                         <BarChart 
                             title="Loyers par Ville (Moyenne)"
                             data={cityData}
-                            unit="FCFA"
+                            unit="XOF"
                             color="#1F4E79"
                         />
                     </motion.div>
@@ -80,7 +80,7 @@ export default function GeographicRentAnalysis() {
                         <BarChart 
                             title="Loyers par Région"
                             data={regionData}
-                            unit="FCFA"
+                            unit="XOF"
                             color="#375623"
                         />
                     </motion.div>

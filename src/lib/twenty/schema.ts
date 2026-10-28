@@ -42,7 +42,7 @@ export const TWENTY_SCHEMA_DEFINITIONS: Record<string, CustomObjectDefinition> =
       { name: "commune", type: "TEXT", label: "Commune", description: "Commune d'implantation (ex: Cocody, Yopougon...)" },
       { name: "adresse", type: "TEXT", label: "Adresse", description: "Adresse physique complète" },
       { name: "nombrePieces", type: "NUMBER", label: "Nombre de Pièces", description: "Nombre total de pièces du logement" },
-      { name: "loyerDeclare", type: "CURRENCY", label: "Loyer Déclaré (FCFA)", description: "Montant mensuel du loyer hors charges en FCFA" },
+      { name: "loyerDeclare", type: "CURRENCY", label: "Loyer Déclaré (XOF)", description: "Montant mensuel du loyer hors charges en XOF" },
       { name: "superficieM2", type: "NUMBER", label: "Superficie (m²)", description: "Superficie habitable en mètres carrés" },
       {
         name: "statutBien",
@@ -128,7 +128,7 @@ export const TWENTY_SCHEMA_DEFINITIONS: Record<string, CustomObjectDefinition> =
       { name: "externalQaprilId", type: "TEXT", label: "ID Externe QAPRIL", description: "ID de l'enregistrement dans QAPRIL" },
       { name: "reference", type: "TEXT", label: "Référence Paiement", description: "Référence unique de quittance ou de transaction" },
       { name: "moisConcerne", type: "TEXT", label: "Mois Concerné", description: "Période quittancée au format YYYY-MM" },
-      { name: "montant", type: "CURRENCY", label: "Montant (FCFA)", description: "Montant payé en FCFA" },
+      { name: "montant", type: "CURRENCY", label: "Montant (XOF)", description: "Montant payé en XOF" },
       {
         name: "canal",
         type: "SELECT",
@@ -208,7 +208,7 @@ export const TWENTY_SCHEMA_DEFINITIONS: Record<string, CustomObjectDefinition> =
         description: "Statut actuel de résolution",
         options: ["OPEN", "WAITING_RESPONSE", "IN_MEDIATION", "RESOLVED", "ESCALATED", "CLOSED"]
       },
-      { name: "montantEnJeu", type: "CURRENCY", label: "Montant en Jeu", description: "Montant litigieux en FCFA" },
+      { name: "montantEnJeu", type: "CURRENCY", label: "Montant en Jeu", description: "Montant litigieux en XOF" },
       { name: "resolution", type: "TEXT", label: "Résolution", description: "Notes de clôture ou accord trouvé" }
     ]
   }
