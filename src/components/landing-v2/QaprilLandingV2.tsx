@@ -204,7 +204,7 @@ export default function QaprilLandingV2({
 
               <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
                 Gérez vos maisons et vos loyers en toute confiance,{" "}
-                <span className="text-[#D97706]">sans palabre.</span>
+                <span className="text-[#D97706]">sans friction.</span>
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed mb-8 max-w-2xl">
