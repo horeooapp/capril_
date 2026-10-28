@@ -238,13 +238,26 @@ export async function getGlobalAuditLogs() {
 /**
  * Création d'un utilisateur par l'admin
  */
-export async function createUserByAdmin(data: { phone: string, email: string, fullName: string, role: Role, password?: string }) {
+export async function createUserByAdmin(data: { 
+    phone: string
+    email: string
+    fullName?: string
+    firstName?: string
+    lastName?: string
+    role: Role
+    password?: string 
+}) {
     await ensureAdmin()
     
     try {
-        const existing = await prisma.user.findUnique({ where: { phone: data.phone } })
-        if (existing) return { error: "Un utilisateur avec ce numéro de téléphone existe déjà." }
+        const existingPhone = await prisma.user.findUnique({ where: { phone: data.phone } })
+        if (existingPhone) return { error: "Un utilisateur avec ce numéro de téléphone existe déjà." }
         
+        if (data.email) {
+            const existingEmail = await prisma.user.findUnique({ where: { email: data.email } })
+            if (existingEmail) return { error: "Un utilisateur avec cette adresse email existe déjà." }
+        }
+
         // Hash password if provided, otherwise leave null (can be set later)
         let hashedPassword = undefined
         if (data.password) {
@@ -252,11 +265,22 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
             hashedPassword = await hash(data.password, 10)
         }
 
-        const { password, ...userData } = data;
+        // Extraire ou découper le prénom et le nom
+        let firstName = data.firstName || ""
+        let lastName = data.lastName || ""
+        if (data.fullName && (!firstName && !lastName)) {
+            const nameParts = data.fullName.trim().split(" ")
+            firstName = nameParts[0] || ""
+            lastName = nameParts.slice(1).join(" ") || ""
+        }
 
         await prisma.user.create({
             data: {
-                ...userData,
+                phone: data.phone,
+                email: data.email,
+                firstName: firstName || null,
+                lastName: lastName || null,
+                role: data.role,
                 password: hashedPassword,
                 status: 'ACTIVE',
                 isCertified: true,
@@ -267,8 +291,11 @@ export async function createUserByAdmin(data: { phone: string, email: string, fu
         
         revalidatePath("/admin/users")
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("[ACTION] createUserByAdmin error:", error)
+        if (error?.code === 'P2002') {
+            return { error: "Un compte avec ces coordonnées (téléphone ou email) existe déjà." }
+        }
         return { error: error instanceof Error ? error.message : "Erreur lors de la création de l'utilisateur." }
     }
 }
