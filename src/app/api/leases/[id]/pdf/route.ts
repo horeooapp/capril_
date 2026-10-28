@@ -12,7 +12,7 @@ export async function GET(
         const session = await auth();
 
         // 1. Tenter la recherche sur le modèle Lease (Bail écrit / standard)
-        let lease = await prisma.lease.findUnique({
+        const lease = await prisma.lease.findUnique({
             where: { id: leaseId },
             include: {
                 property: true,
