@@ -47,10 +47,18 @@ export default function IclDashboardClient({ initialProfile }: { initialProfile:
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button onClick={() => toast.info("Le lien unique public a été copié dans votre presse-papier.")} className="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+                    <button 
+                        onClick={() => {
+                            if (typeof window !== "undefined") {
+                                navigator.clipboard.writeText(window.location.href);
+                                toast.success("Lien sécurisé de votre CV locatif copié dans le presse-papier !");
+                            }
+                        }} 
+                        className="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+                    >
                         <Share2 size={16} /> Partager CV
                     </button>
-                    <button onClick={handleCompute} disabled={isPending} className="bg-slate-900 text-white px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-slate-800 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
+                    <button onClick={handleCompute} disabled={isPending} className="bg-slate-900 text-white px-6 py-3 rounded-[12px] font-bold text-[12px] uppercase tracking-widest hover:bg-slate-800 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50 cursor-pointer">
                         <Zap size={16} /> {isPending ? 'Scoring...' : 'Rafraîchir Score'}
                     </button>
                 </div>

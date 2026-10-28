@@ -134,9 +134,20 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                              <div className="flex gap-2">
-                                <button type="button" className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 transition-colors" onClick={() => { toast.info('Module de caméra en cours de synchronisation.'); }}>
+                                <label className="p-3 bg-gray-50 text-gray-400 hover:text-slate-800 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer flex items-center justify-center">
                                     <Camera size={20} />
-                                </button>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        capture="environment" 
+                                        className="hidden" 
+                                        onChange={(e) => {
+                                            if (e.target.files?.[0]) {
+                                                toast.success(`Photo sélectionnée : ${e.target.files[0].name}`);
+                                            }
+                                        }}
+                                    />
+                                </label>
                              </div>
                              <button 
                                 type="submit"
@@ -185,7 +196,12 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 border-t md:border-t-0 pt-4 md:pt-0">
-                                    <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-gray-400 hover:text-slate-800 transition-colors" onClick={() => { toast.info("Ouverture des détails..."); }}>
+                                    <button 
+                                        className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-[12px] font-black uppercase tracking-widest text-slate-700 hover:text-slate-900 hover:border-slate-300 transition-colors cursor-pointer" 
+                                        onClick={() => { 
+                                            alert(`Détails du Signalement #${sig.id.substring(0,8)}\nCatégorie: ${sig.categorie}\nStatut: ${sig.statut}\nUrgence: ${sig.urgence}\nDate: ${new Date(sig.createdAt).toLocaleDateString()}\nDescription: ${sig.description}`); 
+                                        }}
+                                    >
                                         Voir Détails
                                     </button>
                                     {sig.statut !== "RESOLU" && (

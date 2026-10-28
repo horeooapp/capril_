@@ -230,3 +230,90 @@ export async function createManualUtilityBill(data: {
   }
 }
 
+/**
+ * Créer et répartir une facture collective d'immeuble (UTL-06)
+ */
+export async function createPropertyUtilityBill(data: {
+  propertyId: string;
+  typeUtility: UtilityType;
+  montantTotal: number;
+  moisFacture: string;
+  modeRepartition: string;
+}) {
+  const session = await ensureAuthenticated();
+
+  try {
+    // 1. Trouver un bail actif lié à cette propriété pour servir d'ancre
+    const lease = await prisma.lease.findFirst({
+      where: { propertyId: data.propertyId, status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } },
+      include: {
+        property: {
+          include: {
+            leases: {
+              where: { status: { in: ["ACTIVE", "ACTIVE_DECLARATIF"] } }
+            }
+          }
+        }
+      }
+    });
+
+    if (!lease) {
+      return { error: "Aucun bail actif trouvé sur ce bien pour appliquer la répartition." };
+    }
+
+    const activeLeases = lease.property?.leases || [lease];
+    const nbLeases = Math.max(1, activeLeases.length);
+    const quotePart = Math.round(data.montantTotal / nbLeases);
+
+    // 2. Création de la facture principale
+    const facture = await prisma.factureUtility.create({
+      data: {
+        leaseId: lease.id,
+        acteurId: session.user.id,
+        roleActeur: session.user.role === 'TENANT' ? 'LOCATAIRE' : 'PROPRIO',
+        typeUtility: data.typeUtility,
+        identifiantCompteur: `COMPT-${data.typeUtility}-${Date.now().toString().slice(-6)}`,
+        moisFacture: data.moisFacture,
+        montantTotal: data.montantTotal,
+        dateLimitePaiement: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        statut: "EN_COURS",
+        source: "GESTION_CHARGES",
+        modeUtilities: "PARTAGÉ_PROPRIO" as any
+      }
+    });
+
+    // 3. Répartition automatique entre chaque locataire actif
+    for (const l of activeLeases) {
+      if (l.tenantId) {
+        await (prisma as any).repartitionUtility.create({
+          data: {
+            factureId: facture.id,
+            leaseLocataireId: l.id,
+            locataireId: l.tenantId,
+            montantQuotePart: quotePart,
+            modeleApplique: (data.modeRepartition as any) || "PRORATA_CHAMBRE",
+            statutPaiement: "EN_ATTENTE",
+            dateNotification: new Date()
+          }
+        });
+      }
+    }
+
+    revalidatePath("/dashboard/utilities");
+
+    await writeAuditLog({
+      userId: session.user.id,
+      action: "PROPERTY_UTILITY_BILL_CREATED",
+      module: "UTILITY",
+      entityId: facture.id,
+      newValues: { amount: data.montantTotal, type: data.typeUtility, propertyId: data.propertyId }
+    });
+
+    return { success: true, factureId: facture.id, repartitionCount: activeLeases.length };
+  } catch (error: any) {
+    console.error("Erreur createPropertyUtilityBill:", error);
+    return { error: error.message || "Impossible d'enregistrer la facture." };
+  }
+}
+
+

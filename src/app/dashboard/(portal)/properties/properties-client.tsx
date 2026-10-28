@@ -14,9 +14,16 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
     const defaultData = initialProperties.length > 0 ? initialProperties : FALLBACK;
     const [properties, setProperties] = useState<any[]>(defaultData)
     const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState<"ALL" | "RENTED" | "VACANT">("ALL");
     const router = useRouter();
 
-    const filteredProps = properties.filter(p => (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.propertyCode || p.id).toLowerCase().includes(search.toLowerCase()));
+    const filteredProps = properties
+        .filter(p => (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.propertyCode || p.id).toLowerCase().includes(search.toLowerCase()))
+        .filter(p => {
+            if (statusFilter === "RENTED") return p.isRented || (p.leases && p.leases.some((l: any) => l.status === "ACTIVE"));
+            if (statusFilter === "VACANT") return !p.isRented && (!p.leases || !p.leases.some((l: any) => l.status === "ACTIVE"));
+            return true;
+        });
 
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -137,10 +144,21 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                 </div>
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button 
-                        onClick={() => toast.info('Menu des filtres avancés en cours...')} 
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-[8px] text-[12px] font-semibold hover:bg-slate-50 transition-colors"
+                        onClick={() => {
+                            if (statusFilter === "ALL") {
+                                setStatusFilter("RENTED");
+                                toast.success("Filtre actif : Biens loués uniquement");
+                            } else if (statusFilter === "RENTED") {
+                                setStatusFilter("VACANT");
+                                toast.success("Filtre actif : Biens vacants uniquement");
+                            } else {
+                                setStatusFilter("ALL");
+                                toast.success("Filtre actif : Tous les biens");
+                            }
+                        }} 
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-[8px] text-[12px] font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
                     >
-                        <Filter size={14} /> Filtres
+                        <Filter size={14} /> Filtre ({statusFilter === "ALL" ? "Tous" : statusFilter === "RENTED" ? "Loués" : "Vacants"})
                     </button>
                     <Link 
                         href="/dashboard/properties/new" 

@@ -136,9 +136,16 @@ export default function WalletDashboard() {
       <SectionCard 
         title="Historique des flux financiers" 
         action={
-            <div className="flex items-center gap-1" onClick={(e) => { e.preventDefault(); toast.info('Export généré avec succès.') }}>
+            <button 
+                onClick={(e) => { 
+                    e.preventDefault(); 
+                    toast.success('Génération du relevé certifié...');
+                    window.print();
+                }}
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-slate-50 transition-colors"
+            >
                <Download size={14} /> Relevé PDF
-            </div>
+            </button>
         } 
         noPadding
       >

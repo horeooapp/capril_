@@ -162,9 +162,16 @@ export default function PasseportLocataireClient({ passeports: initialPasseports
                                         </div>
 
                                         <div className="flex flex-col justify-center items-center md:items-end w-full md:w-auto pt-6 md:pt-0 border-t md:border-t-0 border-gray-100">
-                                            <button className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn" onClick={(e) => { e.preventDefault(); toast.info('Génération PDF en arrière-plan...'); }}>
+                                            <button 
+                                                className="w-full md:w-auto flex items-center justify-center gap-3 px-8 py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl group/btn cursor-pointer" 
+                                                onClick={(e) => { 
+                                                    e.preventDefault(); 
+                                                    toast.success('Passeport locatif certifié prêt à imprimer');
+                                                    window.print();
+                                                }}
+                                            >
                                                 <Download size={20} className="group-hover/btn:translate-y-1 transition-transform" />
-                                                PDF Premium
+                                                Télécharger PDF Certifié
                                             </button>
                                             <p className="mt-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Expire le: {new Date(pass.expireAt).toLocaleDateString()}</p>
                                         </div>

@@ -37,12 +37,28 @@ export default function UtilitiesClient({ properties, initialFactures }: Utiliti
         }
         
         setLoading(true)
-        // Simulation d'une action serveur
-        setTimeout(() => {
-            toast.info("Enregistrement de facture en cours de développement.")
-            setModalOpen(false)
-            setLoading(false)
-        }, 1000)
+        try {
+            const { createPropertyUtilityBill } = await import("@/actions/utility-actions");
+            const res = await createPropertyUtilityBill({
+                propertyId: formData.propertyId,
+                typeUtility: formData.type as any,
+                montantTotal: parseFloat(formData.montantGlobal),
+                moisFacture: formData.mois,
+                modeRepartition: formData.repartitionMode
+            });
+
+            if (res.error) {
+                toast.error(res.error);
+            } else {
+                toast.success("Facture enregistrée et répartie entre les locataires !");
+                setModalOpen(false);
+                window.location.reload();
+            }
+        } catch (err: any) {
+            toast.error(err.message || "Erreur lors de l'enregistrement");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
