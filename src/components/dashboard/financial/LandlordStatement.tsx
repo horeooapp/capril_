@@ -40,9 +40,36 @@ export default function LandlordStatement({ data }: { data: StatementData }) {
         </div>
         
         <div className="flex gap-3">
-          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}><Printer className="w-5 h-5" /></button>
-          <button className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}><Share2 className="w-5 h-5" /></button>
-          <button className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-600/20 transition-all" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+          <button 
+            className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" 
+            title="Imprimer"
+            onClick={(e) => { 
+              e.preventDefault(); 
+              window.print();
+            }}
+          >
+            <Printer className="w-5 h-5" />
+          </button>
+          <button 
+            className="p-4 bg-gray-900 border border-gray-800 hover:border-indigo-500 text-white rounded-2xl transition-all" 
+            title="Partager le lien"
+            onClick={(e) => { 
+              e.preventDefault(); 
+              if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("Lien copié dans le presse-papier");
+              }
+            }}
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+          <button 
+            className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-600/20 transition-all" 
+            onClick={(e) => { 
+              e.preventDefault(); 
+              window.print();
+            }}
+          >
             Télécharger PDF <Download className="w-4 h-4" />
           </button>
         </div>

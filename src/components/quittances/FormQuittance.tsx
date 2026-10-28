@@ -162,7 +162,15 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
               <span className="text-[9px] text-white/40 font-mono truncate">{result.sha256}</span>
             </div>
             <div className="flex gap-2 mt-3">
-              <button className={Q.btnPrimary + " flex-1"} onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>⬇ Télécharger PDF</button>
+              <button 
+                className={Q.btnPrimary + " flex-1"} 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  window.open(`/api/receipts/${result.receiptRef}/pdf`, "_blank");
+                }}
+              >
+                ⬇ Télécharger PDF
+              </button>
               <button onClick={() => { setVue("form"); setMois(""); }} className={Q.btnSecond + " flex-1"}>+ Nouvelle quittance</button>
             </div>
           </div>

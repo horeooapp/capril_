@@ -388,7 +388,7 @@ model Lease {
   droitsEnregistrement      Float?                  @map("droits_enregistrement")
   fraisTimbre               Float?                  @map("frais_timbre")
   totalFiscalBail           Float?                  @map("total_fiscal_bail")
-  statutFiscal              String                  @default("NON_CALCULÉ") @map("statut_fiscal")
+  statutFiscal              String                  @default("NON_CALCULE") @map("statut_fiscal")
   recuFiscalUrl             String?                 @map("recu_fiscal_url")
   recuFiscalHash            String?                 @map("recu_fiscal_hash")
   deadlineEnregistrement    DateTime?               @map("deadline_enregistrement")
@@ -537,6 +537,7 @@ model Receipt {
 
   @@index([leaseId])
   @@index([periodMonth])
+  @@unique([leaseId, periodMonth])
   @@map("receipts")
 }
 
@@ -551,6 +552,7 @@ model LeaseArrear {
   lease     Lease    @relation(fields: [leaseId], references: [id])
 
   @@index([dueDate, status])
+  @@unique([leaseId, dueDate])
   @@map("lease_arrears")
 }
 

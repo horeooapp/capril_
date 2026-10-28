@@ -113,7 +113,13 @@ export default function FiscalRegistrationBox({ dossier, leaseReference }: Props
                             </svg>
                             <span className="font-black uppercase tracking-widest text-sm">Bail Enregistré Fiscalement</span>
                         </div>
-                        <button className="w-full py-5 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-green-700 transition-all shadow-xl shadow-green-100 active:scale-[0.98]" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r, 800)), {loading: 'Exécution du module...', success: 'Interface synchronisée avec succès.'}) }}>
+                        <button 
+                            className="w-full py-5 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-green-700 transition-all shadow-xl shadow-green-100 active:scale-[0.98]" 
+                            onClick={(e) => { 
+                                e.preventDefault(); 
+                                window.open(`/api/fiscal/dossier/${dossier.id}/certificate`, "_blank");
+                            }}
+                        >
                             Télécharger le Certificat DGI
                         </button>
                     </div>
