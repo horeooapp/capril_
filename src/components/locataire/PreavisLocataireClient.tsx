@@ -72,58 +72,77 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
             </div>
 
             {isCreating && (
-                <div className="glass-panel p-8 md:p-10 rounded-[2.5rem] border-2 border-amber-600/20 bg-white/80 shadow-2xl animate-in zoom-in-95 duration-300">
-                     <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-8 italic">Notice de départ</h2>
+                <div className="bg-white p-8 md:p-10 rounded-[32px] border border-amber-200/80 shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="flex items-center gap-3.5 mb-6 pb-5 border-b border-slate-100">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
+                            <Clock size={22} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black text-slate-900 tracking-tight">Déclarer mon Préavis de Départ</h2>
+                            <p className="text-xs font-semibold text-slate-500">Procédure officielle et sécurisée de congé locatif</p>
+                        </div>
+                    </div>
                      
-                     <form onSubmit={handleSubmit} className="space-y-8">
-                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-4">
-                             <Clock size={20} className="text-blue-500 mt-1 flex-shrink-0" />
-                             <p className="text-[13px] text-blue-700 font-medium">
-                                En émettant ce préavis, vous vous engagez à libérer le logement à la date indiquée. Le délai légal ivoirien est généralement de 3 mois pour le locataire (modulé selon votre bail). QAPRIL impose un minimum de 30 jours pour la validation numérique.
-                             </p>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="p-4 bg-amber-50/70 border border-amber-200/70 rounded-2xl flex items-start gap-3.5">
+                            <Clock size={20} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                            <div className="text-xs text-amber-950 font-medium leading-relaxed">
+                                <span className="font-bold block mb-0.5">Rappel légal (Loi ivoirienne CCH) :</span>
+                                Le délai normal de préavis donné par le locataire est de <strong>3 mois</strong> avant la date souhaitée de départ (ou selon les clauses particulières de votre bail). Cette démarche officielle avertit immédiatement votre propriétaire et programme la date de restitution des clés.
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Date de départ prévue</label>
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Date effective de libération des lieux
+                                </label>
                                 <input 
                                     type="date"
                                     required
-                                    className="w-full px-6 py-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-black text-slate-800"
+                                    className="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 outline-none font-bold text-slate-800 text-sm shadow-sm transition-all"
                                     value={formData.dateDepartPrevue}
                                     onChange={(e) => setFormData({...formData, dateDepartPrevue: e.target.value})}
                                 />
+                                <p className="text-[10px] text-slate-400 font-medium mt-1.5">
+                                    Jour où vous remettrez les clés et réaliserez l'état des lieux de sortie.
+                                </p>
                             </div>
                             <div>
-                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Motif (Optionnel)</label>
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Motif du départ (Facultatif mais utile)
+                                </label>
                                 <input 
                                     type="text"
-                                    className="w-full px-6 py-4 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-gray-700"
-                                    placeholder="Ex: Mutation, Achat, etc."
+                                    placeholder="Ex: Mutation professionnelle, achat d'un bien..."
+                                    className="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 outline-none font-semibold text-slate-800 text-sm shadow-sm transition-all"
                                     value={formData.motif}
                                     onChange={(e) => setFormData({...formData, motif: e.target.value})}
                                 />
+                                <p className="text-[10px] text-slate-400 font-medium mt-1.5">
+                                    Permet de conserver une relation cordiale avec le propriétaire.
+                                </p>
                             </div>
                         </div>
 
-                        <div className="flex gap-4 pt-6 border-t border-gray-100">
-                             <button 
-                                type="submit"
-                                disabled={loading}
-                                className="flex-1 py-5 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
-                             >
-                                <Send size={18} />
-                                {loading ? "Certification en cours..." : "Signer et envoyer le préavis"}
-                             </button>
-                             <button 
+                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                            <button 
                                 type="button"
                                 onClick={() => setIsCreating(false)}
-                                className="px-8 py-5 bg-white border border-gray-100 rounded-2xl text-[14px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors"
-                             >
+                                className="px-6 py-3.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all uppercase tracking-wider"
+                            >
                                 Annuler
-                             </button>
+                            </button>
+                            <button 
+                                type="submit"
+                                disabled={loading || !formData.dateDepartPrevue}
+                                className="px-8 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs shadow-lg shadow-amber-600/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                            >
+                                <Send size={16} />
+                                {loading ? "Certification en cours..." : "Transmettre mon préavis officiel"}
+                            </button>
                         </div>
-                     </form>
+                    </form>
                 </div>
             )}
 

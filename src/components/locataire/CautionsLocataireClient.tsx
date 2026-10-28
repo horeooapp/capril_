@@ -83,16 +83,19 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Status Section */}
                 {!caution ? (
-                    <div className="glass-panel p-8 md:p-10 rounded-[2.5rem] border border-white/40 shadow-xl bg-white space-y-8">
-                        <div className="flex items-center gap-4 p-4 bg-orange-50 border border-orange-100 rounded-2xl">
-                           <AlertCircle size={24} className="text-amber-600" />
-                           <p className="text-[13px] font-bold text-amber-600">Votre caution n'est pas encore certifiée dans le système QAPRIL Secure.</p>
+                    <div className="bg-white p-8 md:p-10 rounded-[32px] border border-slate-200/80 shadow-xl space-y-6">
+                        <div className="flex items-start gap-3.5 p-4 bg-emerald-50/70 border border-emerald-200/60 rounded-2xl">
+                           <ShieldCheck size={22} className="text-emerald-600 mt-0.5 shrink-0" />
+                           <div className="text-xs text-emerald-950 font-medium leading-relaxed">
+                               <span className="font-bold block mb-0.5">Protection légale de votre caution :</span>
+                               En Côte d'Ivoire (Code de la Construction et de l'Habitation), le dépôt de garantie est plafonné à <strong>2 mois de loyer</strong>. Cet enregistrement certifié garantit vos droits à une restitution sous 30 jours après remise des clés.
+                           </div>
                         </div>
 
-                        <form onSubmit={handleCertify} className="space-y-6">
+                        <form onSubmit={handleCertify} className="space-y-5">
                              <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant (FCFA)</label>
+                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant versé (XOF)</label>
                                     <input 
                                         type="number"
                                         required
@@ -116,14 +119,14 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                              </div>
 
                              <div>
-                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Destination du dépôt</label>
+                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Où est conservée la caution ?</label>
                                 <select 
                                     className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 outline-none font-bold text-slate-800"
                                     value={formData.destination}
                                     onChange={(e) => setFormData({...formData, destination: e.target.value})}
                                 >
-                                    <option value="PROPRIETAIRE">Entre les mains du Propriétaire</option>
-                                    <option value="CDC_CI">Consigné à la CDC-CI (Conseillé)</option>
+                                    <option value="PROPRIETAIRE">Chez le Propriétaire / Mandataire</option>
+                                    <option value="CDC_CI">Consignée à la Caisse des Dépôts (CDC-CI - Sécurisée)</option>
                                 </select>
                              </div>
 
@@ -144,7 +147,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                                 className="w-full py-5 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] hover:bg-black transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                              >
                                 <Lock size={18} />
-                                {loading ? "Certification..." : "Certifier mon dépôt"}
+                                {loading ? "Certification..." : "Enregistrer et certifier mon dépôt de caution"}
                              </button>
                         </form>
                     </div>

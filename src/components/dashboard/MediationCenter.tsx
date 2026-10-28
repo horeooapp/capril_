@@ -75,38 +75,60 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
 
     if (showInitForm) {
         return (
-            <div className="p-6 bg-blue-50 border border-blue-100 rounded-2xl animate-in fade-in zoom-in duration-300">
-                <h3 className="text-xl font-black text-blue-900 mb-2 uppercase tracking-tight">Ouvrir une Médiation Numérique</h3>
-                <p className="text-sm text-blue-800 mb-6 font-medium leading-relaxed">
-                    Un litige ? Entamez une médiation sécurisée et horodatée sur QAPRIL. 
-                    Tous les échanges ont une valeur probante devant les autorités compétentes.
-                </p>
-                <form onSubmit={handleInitMediation} className="space-y-4">
+            <div className="p-6 sm:p-8 bg-gradient-to-br from-indigo-50/60 via-white to-blue-50/40 border border-indigo-100 rounded-[24px] shadow-sm animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-start gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
+                        <span className="text-xl">🤝</span>
+                    </div>
                     <div>
-                        <label className="block text-[10px] font-black uppercase text-blue-400 tracking-widest mb-1 ml-1">Sujet du litige</label>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                            Demander une Médiation Amiable
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+                            Un désaccord, un retard ou un malentendu ? Résolvez-le sereinement. QAPRIL intervient en tiers de confiance neutre pour faciliter un arrangement écrit avant toute démarche contentieuse.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-amber-50/80 border border-amber-200/60 rounded-2xl mb-6 flex items-start gap-3">
+                    <span className="text-base text-amber-600">💡</span>
+                    <div className="text-xs text-amber-800 font-medium leading-relaxed">
+                        <strong>Protection juridique garantie :</strong> Tous les échanges dans cet espace sont certifiés, horodatés et archivés en toute confidentialité pour servir de preuve de bonne foi.
+                    </div>
+                </div>
+
+                <form onSubmit={handleInitMediation} className="space-y-5">
+                    <div>
+                        <label className="block text-[11px] font-bold uppercase text-slate-700 tracking-wider mb-2">
+                            Objet du désaccord (en quelques mots simples)
+                        </label>
                         <input
                             type="text"
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border-2 border-blue-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-blue-900 placeholder-blue-300 shadow-sm"
-                            placeholder="Ex: Retard de loyer (Mois d&apos;Octobre)"
+                            className="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-semibold text-slate-800 placeholder-slate-300 text-sm shadow-sm"
+                            placeholder="Ex: Demande d'échelonnement du loyer ou Réparation fuite d'eau"
                             required
                         />
+                        <p className="text-[10px] text-slate-400 font-medium mt-1.5">
+                            Ce titre sera visible par les deux parties ainsi que par le conseiller QAPRIL.
+                        </p>
                     </div>
-                    <div className="flex space-x-3">
+
+                    <div className="flex items-center gap-3 pt-2">
                         <button
                             type="button"
                             onClick={() => setShowInitForm(false)}
-                            className="flex-1 px-4 py-3 text-sm font-bold text-blue-500 hover:text-blue-700 transition-colors uppercase tracking-widest"
+                            className="px-5 py-3.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all uppercase tracking-wider"
                         >
                             Annuler
                         </button>
                         <button
                             type="submit"
                             disabled={loading || !subject.trim()}
-                            className="flex-1 px-4 py-3 bg-blue-600 text-white text-sm font-black rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 disabled:opacity-50 transition-all active:scale-95 uppercase tracking-widest"
+                            className="flex-1 py-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer"
                         >
-                            {loading ? "Ouverture..." : "Ouvrir le Litige"}
+                            {loading ? "Ouverture en cours..." : "Démarrer le dialogue amiable"}
                         </button>
                     </div>
                 </form>

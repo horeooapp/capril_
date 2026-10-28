@@ -192,30 +192,115 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
             </div>
 
             {isCreateOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[20px] w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-violet-50/50">
-                            <h2 className="text-xl font-black text-violet-900 flex items-center gap-2"><SmartphoneNfc size={20} className="text-violet-600"/> Nouvelle Saisie BDQ</h2>
-                            <button onClick={() => setIsCreateOpen(false)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors border border-slate-200"><X size={16}/></button>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col border border-slate-100 animate-in zoom-in-95 duration-200">
+                        {/* Header Premium */}
+                        <div className="p-6 sm:p-7 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-violet-50 via-indigo-50/40 to-white">
+                            <div className="flex items-center gap-3.5">
+                                <div className="w-12 h-12 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-500/20">
+                                    <SmartphoneNfc size={22} />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                                        Formaliser un Bail Verbal (BDQ)
+                                    </h2>
+                                    <p className="text-xs font-semibold text-violet-700">
+                                        Enquête amiable automatisée par WhatsApp
+                                    </p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setIsCreateOpen(false)} 
+                                className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors border border-slate-200 shadow-sm"
+                            >
+                                <X size={18}/>
+                            </button>
                         </div>
-                        <form onSubmit={handleCreateBDQ} className="p-6 space-y-4">
-                            <div>
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Numéro WhatsApp Locataire</label>
-                                <input required type="text" value={formData.telephoneLocataire} onChange={e => setFormData({...formData, telephoneLocataire: e.target.value})} placeholder="ex: 2250102030405" className="w-full border border-slate-200 p-3 rounded-[10px] text-[13px] font-bold focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-colors" />
+
+                        {/* Guide Pédagogique */}
+                        <div className="px-6 sm:px-7 pt-5">
+                            <div className="p-4 bg-violet-50/70 border border-violet-100 rounded-2xl flex items-start gap-3">
+                                <Bot size={20} className="text-violet-600 shrink-0 mt-0.5" />
+                                <div className="text-xs text-slate-600 leading-relaxed font-medium">
+                                    <span className="font-bold text-violet-900 block mb-0.5">Comment ça fonctionne ?</span>
+                                    Vous n'avez pas de contrat papier ? Notre assistant WhatsApp contacte courtoisement le locataire pour convenir ensemble du montant du loyer et des dates, puis rédige automatiquement un <strong>Bail Déclaratif QAPRIL conforme à la loi ivoirienne</strong>.
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Formulaire */}
+                        <form onSubmit={handleCreateBDQ} className="p-6 sm:p-7 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Nom ou Pseudo</label>
-                                <input required type="text" value={formData.nomLocataire} onChange={e => setFormData({...formData, nomLocataire: e.target.value})} placeholder="ex: Tantie Affou" className="w-full border border-slate-200 p-3 rounded-[10px] text-[13px] font-bold focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-colors" />
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+                                    <span>Numéro WhatsApp du Locataire</span>
+                                    <span className="text-[10px] text-violet-600 font-bold lowercase">Requis (avec indicatif)</span>
+                                </label>
+                                <div className="relative">
+                                    <input 
+                                        required 
+                                        type="tel" 
+                                        value={formData.telephoneLocataire} 
+                                        onChange={e => setFormData({...formData, telephoneLocataire: e.target.value})} 
+                                        placeholder="Ex: 2250708091011 ou 0708091011" 
+                                        className="w-full border-2 border-slate-200 focus:border-violet-600 focus:ring-4 focus:ring-violet-500/10 p-3.5 rounded-xl text-sm font-bold outline-none transition-all placeholder:text-slate-300 text-slate-900 shadow-sm" 
+                                    />
+                                </div>
+                                <p className="text-[10px] text-slate-400 font-medium mt-1">
+                                    Le locataire recevra un message interactif WhatsApp officiel pour confirmer les modalités.
+                                </p>
                             </div>
+
                             <div>
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Description Brève Logement</label>
-                                <input required type="text" value={formData.descriptionLogement} onChange={e => setFormData({...formData, descriptionLogement: e.target.value})} placeholder="ex: Entrer Coucher Yopougon" className="w-full border border-slate-200 p-3 rounded-[10px] text-[13px] font-bold focus:ring-1 focus:ring-violet-500 focus:border-violet-500 outline-none transition-colors" />
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+                                    <span>Nom complet ou prénom usuel</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">Pour l'interpeller</span>
+                                </label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    value={formData.nomLocataire} 
+                                    onChange={e => setFormData({...formData, nomLocataire: e.target.value})} 
+                                    placeholder="Ex: M. Kouassi Jean ou Tantie Affou" 
+                                    className="w-full border-2 border-slate-200 focus:border-violet-600 focus:ring-4 focus:ring-violet-500/10 p-3.5 rounded-xl text-sm font-bold outline-none transition-all placeholder:text-slate-300 text-slate-900 shadow-sm" 
+                                />
                             </div>
-                            <div className="pt-4">
-                                <button type="submit" disabled={isCreating} className="w-full py-3.5 rounded-[10px] bg-violet-600 text-white font-bold text-[12px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-violet-700 disabled:opacity-50 transition-colors shadow-sm cursor-pointer">
-                                    {isCreating ? <Loader2 className="animate-spin" size={16}/> : <Plus size={16}/>}
-                                    Déployer Agent IA
+
+                            <div>
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center justify-between">
+                                    <span>Adresse ou description du logement</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">Quartier & type</span>
+                                </label>
+                                <input 
+                                    required 
+                                    type="text" 
+                                    value={formData.descriptionLogement} 
+                                    onChange={e => setFormData({...formData, descriptionLogement: e.target.value})} 
+                                    placeholder="Ex: 2 pièces à Yopougon Maroc près de la pharmacie" 
+                                    className="w-full border-2 border-slate-200 focus:border-violet-600 focus:ring-4 focus:ring-violet-500/10 p-3.5 rounded-xl text-sm font-bold outline-none transition-all placeholder:text-slate-300 text-slate-900 shadow-sm" 
+                                />
+                            </div>
+
+                            <div className="pt-3">
+                                <button 
+                                    type="submit" 
+                                    disabled={isCreating} 
+                                    className="w-full py-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2.5 disabled:opacity-50 transition-all shadow-lg shadow-violet-500/25 cursor-pointer active:scale-[0.98]"
+                                >
+                                    {isCreating ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={18}/>
+                                            Lancement de l'enquête...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Bot size={18}/>
+                                            Envoyer l'Assistant WhatsApp
+                                        </>
+                                    )}
                                 </button>
+                                <p className="text-[11px] text-slate-400 text-center font-medium mt-2.5">
+                                    Conforme aux exigences du Code de la Construction et de l'Habitation (CCH).
+                                </p>
                             </div>
                         </form>
                     </div>
