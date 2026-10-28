@@ -70,7 +70,22 @@ export async function submitEdlToTenant(edlId: string) {
       }
     });
 
-    // TODO: Déclencher notification WhatsApp/Email (ADD-09)
+    // Notification SMS au locataire pour signature/confirmation
+    try {
+      const lease = await prisma.lease.findUnique({
+        where: { id: edl.leaseId },
+        include: { tenant: true }
+      });
+      if (lease?.tenant?.phone) {
+        const { sendSMS } = await import("@/lib/sms");
+        await sendSMS(
+          lease.tenant.phone,
+          `[QAPRIL] Un État des Lieux (${edl.typeEdl}) a été soumis pour votre logement. Vous avez 48h pour le valider ou émettre vos réserves sur votre espace locataire : https://qapril.net/mon-espace-locataire`
+        );
+      }
+    } catch (notifErr) {
+      console.error("[EDL] Notification locataire warning:", notifErr);
+    }
     
     revalidatePath(`/dashboard/edl/${edlId}`);
     revalidatePath(`/dashboard/leases/${edl.leaseId}`);

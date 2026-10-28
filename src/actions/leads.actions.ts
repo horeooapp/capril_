@@ -19,8 +19,21 @@ export async function capturerLead(data: {
   const lead = await prisma.lead.create({
     data: { ...data, statut: "NOUVEAU" }
   });
-  // TODO : notifier equipe commerciale QAPRIL sur WhatsApp
-  // TODO: Notifier l'équipe commerciale QAPRIL via WhatsApp API (WhatsApp Business Cloud API)
+
+  // Notification de l'équipe commerciale QAPRIL
+  try {
+    const commercialPhone = process.env.COMMERCIAL_PHONE || "0700000000";
+    if (commercialPhone && commercialPhone !== "0700000000") {
+      const { sendSMS } = await import("@/lib/sms");
+      await sendSMS(
+        commercialPhone,
+        `[QAPRIL LEAD] Nouveau prospect : ${data.telephone} - Profil: ${data.profilDeclare || "AUTRE"}`
+      );
+    }
+  } catch (err) {
+    console.error("[Leads] Commercial alert error:", err);
+  }
+
   return { success: true, lead, duplicate: false };
 }
 

@@ -41,8 +41,22 @@ export class ReclamationService {
       },
     });
 
-    // TODO: Notify Landlord via WhatsApp/Email (ADD-09 integration)
-    // Landlord notification to be implemented.
+    // Notification du propriétaire/gestionnaire pour prise en charge
+    try {
+      const ownerId = reclamation.lease?.property?.ownerUserId || reclamation.lease?.ownerId;
+      if (ownerId) {
+        const owner = await prisma.user.findUnique({ where: { id: ownerId } });
+        if (owner?.phone) {
+          const { sendSMS } = await import("@/lib/sms");
+          await sendSMS(
+            owner.phone,
+            `[QAPRIL] Une réclamation (${data.type}) a été déclarée pour le bien ${reclamation.lease.property?.address || ""}. Consultez les détails sur votre dashboard.`
+          );
+        }
+      }
+    } catch (notifErr) {
+      console.error("[Reclamation] Notification bailleur warning:", notifErr);
+    }
 
     return reclamation;
   }
