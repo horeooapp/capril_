@@ -39,6 +39,9 @@ export default function AdminWhatsAppPage() {
       const res = await fetch("/api/admin/whatsapp", { cache: "no-store" });
       const json = await res.json();
       setData(json);
+      if (json.phone && testPhone === "+2250707334770") {
+        setTestPhone(`+${json.phone}`);
+      }
     } catch (err: any) {
       setData({
         connected: false,

@@ -152,25 +152,56 @@ app.post(['/sendText', '/api/sessions/:sessionId/messages/send-text'], async (re
     return res.status(400).json({ error: 'chatId et content requis' });
   }
 
-  try {
-    const wahaRes = await requestWaha('/api/sendText', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        session: SESSION_NAME,
-        chatId: chatId.includes('@') ? chatId : `${chatId}@c.us`,
-        text: messageContent
-      })
-    });
+  // Nettoyage et préparation des cibles
+  let rawId = chatId.replace(/@.*$/, '').replace(/[^\d]/g, '');
+  let candidates = [];
 
-    const data = await wahaRes.json();
-    if (wahaRes.ok) {
-      return res.json({ success: true, response: data, id: data?.id, messageId: data?.id });
+  // Cas numéro Côte d'Ivoire (indicatif 225)
+  if (rawId.startsWith('225')) {
+    const local = rawId.slice(3);
+    candidates.push(`${rawId}@c.us`); // Format 1: tel quel
+    // Si format 10 chiffres avec 0 (ex: 225 07 07 33 47 70)
+    if (local.length === 10 && local.startsWith('0')) {
+      // Format 2: sans le premier 0 (ancien format 8 chiffres: 225 07 33 47 70)
+      candidates.push(`225${local.slice(2)}@c.us`);
+      // Format 3: sans le préfixe 0 (ex: 225 7 07 33 47 70)
+      candidates.push(`225${local.slice(1)}@c.us`);
     }
-    return res.status(wahaRes.status).json({ success: false, error: data?.message || 'Erreur WAHA' });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } else {
+    candidates.push(chatId.includes('@') ? chatId : `${chatId}@c.us`);
   }
+
+  // Dédupliquer
+  candidates = Array.from(new Set(candidates));
+
+  let lastError = null;
+  for (const targetChatId of candidates) {
+    try {
+      console.log(`[BRIDGE] Tentative d'envoi vers ${targetChatId}...`);
+      const wahaRes = await requestWaha('/api/sendText', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session: SESSION_NAME,
+          chatId: targetChatId,
+          text: messageContent
+        })
+      });
+
+      const data = await wahaRes.json();
+      if (wahaRes.ok) {
+        console.log(`[BRIDGE] ✅ Succès d'envoi vers ${targetChatId}`);
+        return res.json({ success: true, response: data, id: data?.id, messageId: data?.id, targetChatId });
+      }
+
+      lastError = data?.exception?.message || data?.message || data?.error || 'Erreur WAHA';
+      console.warn(`[BRIDGE] ⚠️ Échec pour ${targetChatId}: ${lastError}`);
+    } catch (err) {
+      lastError = err.message;
+    }
+  }
+
+  return res.status(500).json({ success: false, error: lastError || 'Échec de distribution WhatsApp' });
 });
 
 app.post('/reset', async (req, res) => {
