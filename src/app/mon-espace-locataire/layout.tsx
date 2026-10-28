@@ -18,12 +18,8 @@ export default async function LocataireLayout({
 }) {
     const session = await auth()
 
-    if (!session?.user) {
-        redirect("/mon-espace-locataire/login")
-    }
-
-    let computedRole = (session.user as any)?.chosenRole || session.user.role;
-    if (session.user) {
+    let computedRole = (session?.user as any)?.chosenRole || session?.user?.role;
+    if (session?.user) {
         const dbUser = await prisma.user.findUnique({
              where: { id: session.user.id },
              select: { capaciteActive: true }
