@@ -56,7 +56,8 @@ export default function LocataireDashboardPage() {
 
     useEffect(() => {
         if (status === "unauthenticated") {
-            redirect("/mon-espace-locataire/login")
+            router.replace("/mon-espace-locataire/login")
+            return
         }
 
         async function loadData() {

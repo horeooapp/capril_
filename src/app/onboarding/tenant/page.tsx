@@ -12,7 +12,10 @@ export default async function TenantOnboardingPage() {
         redirect("/mon-espace-locataire/login")
     }
 
-    if (session.user.role !== "TENANT") {
+    const userRole = (session.user as any)?.capaciteActive || (session.user as any)?.chosenRole || session.user.role
+    const isTenant = userRole === "TENANT" || session.user.role === "TENANT" || (session.user as any)?.eligibleRoles?.includes("TENANT")
+
+    if (!isTenant) {
         redirect("/dashboard")
     }
 

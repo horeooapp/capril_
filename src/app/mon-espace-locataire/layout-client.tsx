@@ -45,17 +45,9 @@ export default function LocataireLayoutClient({
 
                 {/* Main Content */}
                 <main className={session ? "flex-1 w-full max-w-7xl mx-auto pt-12 pb-32 px-4 sm:px-6 lg:px-8" : "flex-1"}>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={session ? "authenticated" : "public"}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                        >
-                            {children}
-                        </motion.div>
-                    </AnimatePresence>
+                    <div className="w-full">
+                        {children}
+                    </div>
 
                     {session && (
                         <BottomNav items={[

@@ -17,8 +17,13 @@ export default async function LocataireLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
-    let computedRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    if (session?.user) {
+
+    if (!session?.user) {
+        redirect("/mon-espace-locataire/login")
+    }
+
+    let computedRole = (session.user as any)?.chosenRole || session.user.role;
+    if (session.user) {
         const dbUser = await prisma.user.findUnique({
              where: { id: session.user.id },
              select: { capaciteActive: true }
@@ -36,15 +41,26 @@ export default async function LocataireLayout({
         }
 
         // Si l'utilisateur consulte son espace locataire, basculer sa capacité active sur TENANT
-        const isTenant = computedRole === "TENANT" || (session.user as any).role === "TENANT";
+        const isTenant = computedRole === "TENANT" || (session.user as any).role === "TENANT" || (session.user as any)?.eligibleRoles?.includes("TENANT");
         if (computedRole !== "TENANT") {
-            // Vérifier s'il a un bail locataire actif ou le rôle tenant
+            // Vérifier s'il a un bail locataire actif ou une déclaration M-SIGN
             const hasTenantLease = await prisma.lease.findFirst({
                 where: { tenantId: session.user.id },
                 select: { id: true }
             });
 
-            if (hasTenantLease || isTenant) {
+            let hasPendingBdq = false;
+            if (!hasTenantLease && session.user.phone) {
+                const { normalizePhone } = await import("@/lib/phone");
+                const norm = normalizePhone(session.user.phone);
+                const bdq = await prisma.bailDeclaratif.findFirst({
+                    where: { telephoneLocataire: norm },
+                    select: { id: true }
+                });
+                hasPendingBdq = !!bdq;
+            }
+
+            if (hasTenantLease || hasPendingBdq || isTenant) {
                 computedRole = "TENANT";
                 await prisma.user.update({
                     where: { id: session.user.id },
