@@ -40,6 +40,7 @@ const eslintConfig = defineConfig([
     "server.js",
     "prisma/*.js",
     "prisma/*.mjs",
+    "openwa-server/**",
     "*.py",
     "*.docx",
   ]),
