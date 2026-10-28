@@ -9,12 +9,13 @@ export default function NotificationCenter() {
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    const unreadCount = notifications.filter(n => !n.read).length
+    const safeNotifications = Array.isArray(notifications) ? notifications : []
+    const unreadCount = safeNotifications.filter(n => !n?.read).length
 
     async function loadNotifications() {
         setLoading(true)
         const data = await getRecentNotifications()
-        setNotifications(data)
+        setNotifications(Array.isArray(data) ? data : [])
         setLoading(false)
     }
 

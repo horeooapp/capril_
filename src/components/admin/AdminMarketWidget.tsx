@@ -6,15 +6,18 @@ import { Map, BarChart2, Globe, TrendingUp, Locate, ArrowRight } from "lucide-re
 
 interface MarketStats {
     nationalAvg: number;
-    cities: any[];
-    regions: any[];
-    lastUpdated: Date;
+    cities?: any[];
+    regions?: any[];
+    lastUpdated?: Date;
 }
 
 export default function AdminMarketWidget({ data }: { data: MarketStats }) {
     const [activeTab, setActiveTab] = useState<'national' | 'regions' | 'abidjan'>('national');
 
     if (!data) return null;
+
+    const safeCities = Array.isArray(data.cities) ? data.cities : [];
+    const safeRegions = Array.isArray(data.regions) ? data.regions : [];
 
     return (
         <div className="panel market-widget mt-8 overflow-hidden relative">
@@ -89,21 +92,21 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                                 Comparatif Grandes Villes
                             </h3>
                             <div className="space-y-5 flex-1">
-                                {data.cities.slice(0, 5).map((city, idx) => (
-                                    <div key={city.name} className="flex flex-col gap-2">
-                                        <div className="flex justify-between items-center text-[11px] font-bold">
-                                            <span className="uppercase">{city.name}</span>
-                                            <span className="text-ci-orange">{city.avgRent.toLocaleString()} F</span>
-                                        </div>
-                                        <div className="h-2 bg-ci-nuit rounded-full overflow-hidden">
-                                            <motion.div 
-                                                initial={{ width: 0 }} 
-                                                animate={{ width: `${(city.avgRent / 1000000) * 100}%` }} 
-                                                className={`h-full ${idx === 0 ? 'bg-gradient-to-r from-ci-orange to-ci-or' : 'bg-white/20'}`}
-                                            ></motion.div>
-                                        </div>
-                                    </div>
-                                ))}
+                                {safeCities.slice(0, 5).map((city, idx) => (
+                                     <div key={city.name} className="flex flex-col gap-2">
+                                         <div className="flex justify-between items-center text-[11px] font-bold">
+                                             <span className="uppercase">{city.name}</span>
+                                             <span className="text-ci-orange">{city.avgRent?.toLocaleString?.() || city.avgRent} F</span>
+                                         </div>
+                                         <div className="h-2 bg-ci-nuit rounded-full overflow-hidden">
+                                             <motion.div 
+                                                 initial={{ width: 0 }} 
+                                                 animate={{ width: `${(city.avgRent / 1000000) * 100}%` }} 
+                                                 className={`h-full ${idx === 0 ? 'bg-gradient-to-r from-ci-orange to-ci-or' : 'bg-white/20'}`}
+                                             ></motion.div>
+                                         </div>
+                                     </div>
+                                 ))}
                             </div>
                         </motion.div>
                     )}
@@ -119,19 +122,19 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                                 Segmentation par Zones Géographiques
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {data.regions.map((region) => (
-                                    <div key={region.name} className="p-4 rounded-xl bg-ci-nuit border border-white/5 flex flex-col justify-between group hover:border-ci-vert/30 transition-all">
-                                        <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-ci-vert">{region.name}</span>
-                                        <div className="mt-4 flex justify-between items-end">
-                                            <div className="flex flex-col">
-                                                <span className="text-lg font-black">{region.avgRent.toLocaleString()} F</span>
-                                                <span className="text-[9px] text-gray-500">{region.sampleCount} échantillons</span>
-                                            </div>
-                                            <button className="p-2 rounded-lg bg-white/5 group-hover:bg-ci-vert group-hover:text-black transition-all">
-                                                <ArrowRight className="w-3 h-3" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                {safeRegions.map((region) => (
+                                     <div key={region.name} className="p-4 rounded-xl bg-ci-nuit border border-white/5 flex flex-col justify-between group hover:border-ci-vert/30 transition-all">
+                                         <span className="text-[10px] font-black uppercase text-gray-400 group-hover:text-ci-vert">{region.name}</span>
+                                         <div className="mt-4 flex justify-between items-end">
+                                             <div className="flex flex-col">
+                                                 <span className="text-lg font-black">{region.avgRent?.toLocaleString?.() || region.avgRent} F</span>
+                                                 <span className="text-[9px] text-gray-500">{region.sampleCount} échantillons</span>
+                                             </div>
+                                             <button className="p-2 rounded-lg bg-white/5 group-hover:bg-ci-vert group-hover:text-black transition-all">
+                                                 <ArrowRight className="w-3 h-3" />
+                                             </button>
+                                         </div>
+                                     </div>
                                 ))}
                             </div>
                         </motion.div>
@@ -148,16 +151,16 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                                 Focus Communes les plus actives (Abidjan)
                             </h3>
                             <div className="flex-1 grid grid-cols-2 gap-6">
-                                {data.cities.filter(c => ["Cocody", "Marcory", "Plateau", "Yopougon"].includes(c.name)).map(commune => (
-                                    <div key={commune.name} className="relative p-6 rounded-2xl bg-gradient-to-br from-ci-nuit to-ci-nuit2 border border-white/5">
-                                        <div className="absolute top-4 right-4 text-[10px] text-ci-or font-black">TOP</div>
-                                        <div className="text-[10px] font-black text-gray-500 uppercase">{commune.name}</div>
-                                        <div className="text-2xl font-black mt-2">{commune.avgRent.toLocaleString()} F</div>
-                                        <div className="mt-4 flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-ci-vert animate-pulse"></div>
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Données Certifiées</span>
-                                        </div>
-                                    </div>
+                                {safeCities.filter(c => ["Cocody", "Marcory", "Plateau", "Yopougon"].includes(c?.name)).map(commune => (
+                                     <div key={commune.name} className="relative p-6 rounded-2xl bg-gradient-to-br from-ci-nuit to-ci-nuit2 border border-white/5">
+                                         <div className="absolute top-4 right-4 text-[10px] text-ci-or font-black">TOP</div>
+                                         <div className="text-[10px] font-black text-gray-500 uppercase">{commune.name}</div>
+                                         <div className="text-2xl font-black mt-2">{commune.avgRent?.toLocaleString?.() || commune.avgRent} F</div>
+                                         <div className="mt-4 flex items-center gap-2">
+                                             <div className="w-2 h-2 rounded-full bg-ci-vert animate-pulse"></div>
+                                             <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Données Certifiées</span>
+                                         </div>
+                                     </div>
                                 ))}
                             </div>
                         </motion.div>
