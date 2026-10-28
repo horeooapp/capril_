@@ -33,17 +33,17 @@ export default async function FinancialReportPage({ params }: { params: Promise<
                 <div className="grid grid-cols-3 gap-6 mb-16">
                     <div className="bg-slate-900 p-6 rounded-2xl text-white">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Revenus Fonciers</div>
-                        <div className="text-2xl font-black">{stats.yearlyIncome.toLocaleString()} <span className="text-xs">F</span></div>
+                        <div className="text-2xl font-black">{stats.yearlyIncome.toLocaleString()} <span className="text-xs">XOF</span></div>
                         <div className="text-[10px] text-emerald-400 font-bold mt-2">Cumul Annuel</div>
                     </div>
                     <div className="bg-white p-6 rounded-2xl border-2 border-slate-100">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Charger & Frais</div>
-                        <div className="text-2xl font-black text-slate-900">{stats.yearlyExpenses.toLocaleString()} <span className="text-xs">F</span></div>
+                        <div className="text-2xl font-black text-slate-900">{stats.yearlyExpenses.toLocaleString()} <span className="text-xs">XOF</span></div>
                         <div className="text-[10px] text-red-500 font-bold mt-2">Prélevés via Wallet</div>
                     </div>
                     <div className="bg-emerald-50 p-6 rounded-2xl border-2 border-emerald-100">
                         <div className="text-[10px] font-bold text-emerald-800/60 uppercase tracking-widest mb-2">Bénéfice Net</div>
-                        <div className="text-2xl font-black text-emerald-900">{stats.net.toLocaleString()} <span className="text-xs">F</span></div>
+                        <div className="text-2xl font-black text-emerald-900">{stats.net.toLocaleString()} <span className="text-xs">XOF</span></div>
                         <div className="text-[10px] text-emerald-600 font-bold mt-2">Performance {year}</div>
                     </div>
                 </div>
