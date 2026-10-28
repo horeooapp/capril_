@@ -54,7 +54,7 @@ export default async function LeasesDashboardPage() {
                     status: { not: "archived" },
                     deletedAt: null
                 },
-                select: { id: true, name: true, address: true, commune: true, propertyCode: true, unitLabel: true, rentAmount: true },
+                select: { id: true, name: true, address: true, commune: true, propertyCode: true, unitLabel: true, declaredRentFcfa: true },
                 orderBy: { name: "asc" }
             });
 

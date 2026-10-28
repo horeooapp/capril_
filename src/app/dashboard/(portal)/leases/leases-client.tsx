@@ -516,8 +516,9 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                         const p = properties.find(prop => prop.id === e.target.value);
                                         if (p) {
                                             setEditDescription(p.name || p.address || "");
-                                            if (p.rentAmount && editRent <= 0) {
-                                                setEditRent(Number(p.rentAmount));
+                                            const rentVal = p.declaredRentFcfa || p.rentAmount;
+                                            if (rentVal && editRent <= 0) {
+                                                setEditRent(Number(rentVal));
                                             }
                                         }
                                     }}
