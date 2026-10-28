@@ -12,7 +12,7 @@ import { LeaseStatus } from "@prisma/client"
 import FiscalRegistrationBox from "@/components/FiscalRegistrationBox"
 import { getOrCreateFiscalDossier } from "@/actions/fiscal-actions"
 import { isFeatureEnabled } from "@/lib/features"
-import { AlertCircle, FileText, Download, Edit3, ShieldAlert, CheckCircle2, ShieldCheck } from "lucide-react"
+import { AlertCircle, FileText, Download, Edit3, ShieldAlert, CheckCircle2, ShieldCheck, Printer } from "lucide-react"
 import { getLeaseProceduralState } from "@/lib/arrears-engine"
 import ArrearsProceduralBox from "@/components/ArrearsProceduralBox"
 import CDCRestitutionBox from "@/components/CDCRestitutionBox"
@@ -105,20 +105,40 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     </h1>
                     <p className="text-sm font-bold text-amber-600 uppercase tracking-widest mt-2">{tLease.leaseReference}</p>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2.5">
+                    {/* Bouton de lecture et impression officielle du bail */}
+                    <Link
+                        href={`/dashboard/leases/${tLease.id}/contract`}
+                        title="Consulter et imprimer le contrat de bail officiel conforme CCH"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-900 shadow-sm text-[11px] font-black rounded-[10px] text-white bg-slate-900 hover:bg-slate-800 transition-all uppercase tracking-widest"
+                    >
+                        <Printer size={15}/> Imprimer / Lire le Bail
+                    </Link>
+
+                    {/* Téléchargement direct PDF */}
+                    <a
+                        href={`/api/leases/${tLease.id}/pdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Télécharger le fichier PDF certifié du bail"
+                        className="inline-flex items-center gap-2 px-3.5 py-2.5 border border-emerald-300 shadow-sm text-[11px] font-bold rounded-[10px] text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-all uppercase tracking-widest"
+                    >
+                        <Download size={15}/> PDF
+                    </a>
+
                     {(tLease.status === "DRAFT" || tLease.status === "PENDING_SIGNATURE" || tLease.status === "PENDING_CONFIRMATION") && (
                         <Link
                             href={`/dashboard/leases/${tLease.id}/edit`}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
                         >
-                            <Edit3 size={16}/> Éditer Intégralement
+                            <Edit3 size={15}/> Éditer
                         </Link>
                     )}
                     <Link
                         href={`/dashboard/certificates/${tLease.id}`}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 shadow-sm text-[11px] font-bold rounded-[10px] text-slate-700 bg-white hover:bg-slate-50 transition-all uppercase tracking-widest"
                     >
-                        <Download size={16}/> Certificat
+                        <FileText size={15}/> Certificat
                     </Link>
                     <GenerateReceiptForm leaseId={tLease.id} monthlyRentFcfa={tLease.rentAmount} />
                 </div>

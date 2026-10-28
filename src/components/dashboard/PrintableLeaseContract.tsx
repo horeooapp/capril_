@@ -14,7 +14,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
   const landlord = lease.landlord;
   const tenant = lease.tenant;
   const rentAmount = lease.rentAmount || 0;
-  const depositAmount = lease.deposit || 0;
+  const depositAmount = lease.depositAmount ?? lease.deposit ?? 0;
   const avanceAmount = lease.avanceLoyer || 0;
   
   const landlordName = landlord.fullName || (landlord.firstName ? (landlord.firstName + " " + (landlord.lastName || "")).trim() : "[Nom non renseigné]");
@@ -85,8 +85,8 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
             Le BAILLEUR donne à bail à titre d’habitation, pour une durée, sous les conditions et le prix ci-après indiqués au PRENEUR qui accepte, les biens immobiliers dont la désignation suit :
         </p>
         <div className="p-3 md:p-4 my-2 border border-gray-300 bg-gray-50 rounded italic whitespace-pre-wrap text-sm">
-            {property.title} — {property.address}
-            {"\n"}{property.description}
+            {property.title || property.name || property.address || "Logement QAPRIL"} — {property.address || property.commune || "Abidjan, Côte d'Ivoire"}
+            {property.description ? `\n${property.description}` : ""}
         </div>
         
         <p className="mt-4">

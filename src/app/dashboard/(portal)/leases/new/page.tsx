@@ -167,7 +167,12 @@ function LeaseRegistrationForm() {
             if (result.error) {
                 setError(result.error)
             } else {
-                router.push("/dashboard/leases")
+                const targetId = result.leaseId || result.bdqId;
+                if (targetId) {
+                    router.push(`/dashboard/leases/${targetId}/contract`)
+                } else {
+                    router.push("/dashboard/leases")
+                }
                 router.refresh()
             }
         })
@@ -757,7 +762,11 @@ function LeaseModeSelector() {
             <div className="h-[calc(100vh-140px)]">
                 <AgentBailDeclaratif
                   onSuccess={({ bail }) => {
-                    router.push(`/dashboard/leases`);
+                    if (bail?.id) {
+                      router.push(`/dashboard/leases/${bail.id}/contract`);
+                    } else {
+                      router.push(`/dashboard/leases`);
+                    }
                     router.refresh();
                   }}
                   onCancel={() => setMode("choix")}

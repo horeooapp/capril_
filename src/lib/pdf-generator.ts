@@ -247,25 +247,31 @@ export async function generateLeasePDF(data: {
     currentY -= 30;
 
     // Landlord
-    const landlordName = (data.landlord.firstName + ' ' + (data.landlord.lastName || '')).trim();
+    const landlordName = data.landlord?.fullName || 
+        ((data.landlord?.firstName ? data.landlord.firstName + ' ' : '') + (data.landlord?.lastName || '')).trim() || 
+        data.landlord?.name || 
+        'Bailleur / Propriétaire';
     page.drawText(`BAILLEUR : ${landlordName}`, { x: 50, y: currentY, size: 12, font: fontBold, color: COLORS.NAVY });
     currentY -= 15;
-    page.drawText(`Tél: ${data.landlord.phone || 'Non renseigné'} | Email: ${data.landlord.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
+    page.drawText(`Tél: ${data.landlord?.phone || 'Non renseigné'} | Email: ${data.landlord?.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
     currentY -= 25;
 
     // Tenant
-    const tenantName = (data.tenant.firstName + ' ' + (data.tenant.lastName || '')).trim();
+    const tenantName = data.tenant?.fullName || 
+        ((data.tenant?.firstName ? data.tenant.firstName + ' ' : '') + (data.tenant?.lastName || '')).trim() || 
+        data.tenant?.name || 
+        'Locataire (Preneur)';
     page.drawText(`LOCATAIRE : ${tenantName}`, { x: 50, y: currentY, size: 12, font: fontBold, color: COLORS.NAVY });
     currentY -= 15;
-    page.drawText(`Tél: ${data.tenant.phone || 'Non renseigné'} | Email: ${data.tenant.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
+    page.drawText(`Tél: ${data.tenant?.phone || 'Non renseigné'} | Email: ${data.tenant?.email || 'Non renseigné'}`, { x: 50, y: currentY, size: 9, font });
     currentY -= 35;
 
     // Property
     drawSectionTitle(page, fontBold, 'DÉSIGNATION DU BIEN', currentY);
     currentY -= 20;
-    page.drawText(data.property.name || 'Logement QAPRIL', { x: 50, y: currentY, size: 11, font: fontBold });
+    page.drawText(data.property?.name || data.property?.address || 'Logement QAPRIL', { x: 50, y: currentY, size: 11, font: fontBold });
     currentY -= 15;
-    page.drawText(data.property.address || 'Adresse non spécifiée', { x: 50, y: currentY, size: 10, font });
+    page.drawText(data.property?.address || data.property?.commune || 'Adresse non spécifiée', { x: 50, y: currentY, size: 10, font });
     currentY -= 40;
 
     // Financials

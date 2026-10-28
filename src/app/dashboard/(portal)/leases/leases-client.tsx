@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { ClipboardList, Search, Plus, Key, Filter, Edit3, Trash2, Eye, Calendar, Home, Phone, User, X, Check, AlertTriangle, ShieldCheck, Clock, RefreshCw } from "lucide-react"
+import { ClipboardList, Search, Plus, Key, Filter, Edit3, Trash2, Eye, Calendar, Home, Phone, User, X, Check, AlertTriangle, ShieldCheck, Clock, RefreshCw, Printer, Download } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner";
 import { renewLeaseAction, deleteLeaseAction } from "@/actions/lease.actions";
@@ -335,6 +335,28 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                                         <span className="hidden md:inline">Détails</span>
                                                     </Link>
                                                 )}
+
+                                                {/* Imprimer / Lire le Contrat Officiel */}
+                                                <Link
+                                                    href={`/dashboard/leases/${l.id}/contract`}
+                                                    title="Lire et imprimer le contrat de bail officiel (format papier ou PDF)"
+                                                    className="inline-flex items-center gap-1 text-[11.5px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-300 px-2.5 py-1.5 rounded-lg transition-colors"
+                                                >
+                                                    <Printer size={13} className="text-slate-600" />
+                                                    <span className="hidden lg:inline">Contrat</span>
+                                                </Link>
+
+                                                {/* Télécharger PDF direct */}
+                                                <a
+                                                    href={`/api/leases/${l.id}/pdf`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title="Télécharger le fichier PDF certifié du bail"
+                                                    className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 border border-emerald-200 px-2 py-1.5 rounded-lg transition-colors"
+                                                >
+                                                    <Download size={13} />
+                                                    <span className="hidden xl:inline">PDF</span>
+                                                </a>
 
                                                 {/* Modifier (pour Bail Déclaratif ou Bail Classique modifiable) */}
                                                 {l.isBdq ? (
@@ -701,24 +723,44 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const bdq = viewingBdq;
-                                    setViewingBdq(null);
-                                    openEditModal(bdq);
-                                }}
-                                className="px-3.5 py-2 border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
-                            >
-                                <Edit3 size={13} />
-                                Modifier ce bail
-                            </button>
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-slate-100">
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href={`/dashboard/leases/${viewingBdq.id}/contract`}
+                                    className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                                >
+                                    <Printer size={13} />
+                                    Imprimer Contrat
+                                </Link>
+
+                                <a
+                                    href={`/api/leases/${viewingBdq.id}/pdf`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                                >
+                                    <Download size={13} />
+                                    PDF
+                                </a>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const bdq = viewingBdq;
+                                        setViewingBdq(null);
+                                        openEditModal(bdq);
+                                    }}
+                                    className="px-3 py-2 border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+                                >
+                                    <Edit3 size={13} />
+                                    Modifier
+                                </button>
+                            </div>
 
                             <button
                                 type="button"
                                 onClick={() => setViewingBdq(null)}
-                                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors"
+                                className="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-bold transition-colors"
                             >
                                 Fermer
                             </button>
