@@ -1,7 +1,6 @@
 /* ══════════════════════════════════════════════════════════════════
-   QAPRIL — DESIGN SYSTEM PREMIUM LUMINEUX (SANS GLASSMORPHISM)
-   Style: Architectural Haute-Précision / FinTech Institutionnelle
-   Palette: Blanc Épuré / Ardoise Titanium / Or Ambré Chaud
+   QAPRIL — DESIGN SYSTEM ELEVATION (APPLE / META INSPIRED)
+   Style: Pure Precision FinTech · Ivory & Solar Gold · Multi-layer Lighting
    ══════════════════════════════════════════════════════════════════ */
 
 :root, .landing-v2-wrapper {
@@ -9,16 +8,16 @@
   --qp-bg-surface:    #FFFFFF;
   --qp-bg-surface-2:  #F1F5F9;
   --qp-bg-surface-3:  #E2E8F0;
-  --qp-border:        #E2E8F0;
-  --qp-border-subtle: #F1F5F9;
-  --qp-border-active: #CBD5E1;
+  --qp-border:        rgba(15, 23, 42, 0.08);
+  --qp-border-subtle: rgba(15, 23, 42, 0.04);
+  --qp-border-active: #D97706;
 
   --qp-gold:          #D97706;
   --qp-gold-hover:    #B45309;
   --qp-gold-bg:       #FEF3C7;
   --qp-gold-border:   #FDE68A;
 
-  --qp-text-primary:  #0F172A;
+  --qp-text-primary:  #090D16;
   --qp-text-secondary:#334155;
   --qp-text-muted:    #64748B;
   
@@ -28,22 +27,22 @@
   --qp-blue-bg:       #E0F2FE;
 
   /* Variables héritées pour les sections hero sombres et pages publiques */
-  --ink:              #09090B;
-  --ink2:             #18181B;
-  --ink3:             #52525B;
-  --ink4:             #A1A1AA;
+  --ink:              #090D16;
+  --ink2:             #141A29;
+  --ink3:             #475569;
+  --ink4:             #94A3B8;
   --white:            #FFFFFF;
-  --cream:            #FFFBF5;
-  --cream2:           #FFF5E8;
-  --mango:            #FF8B00;
-  --mango-l:          #FFF0D6;
-  --mango-d:          #CC6E00;
-  --sky:              #00B4D8;
-  --sky-l:            #D0F4FC;
-  --coral:            #FF4E50;
-  --coral-l:          #FFE8E8;
-  --teal:             #00C896;
-  --teal-l:           #CCFAEE;
+  --cream:            #FAFAF9;
+  --cream2:           #F5F5F4;
+  --mango:            #F59E0B;
+  --mango-l:          #FEF3C7;
+  --mango-d:          #D97706;
+  --sky:              #0284C7;
+  --sky-l:            #E0F2FE;
+  --coral:            #EF4444;
+  --coral-l:          #FEE2E2;
+  --teal:             #10B981;
+  --teal-l:           #D1FAE5;
 }
 
 /* Utilitaires de couleur explicites pour compatibilité Tailwind/Landing */
@@ -54,7 +53,6 @@
 .bg-cream { background-color: var(--cream) !important; }
 .bg-cream2 { background-color: var(--cream2) !important; }
 .bg-ink { background-color: var(--ink) !important; }
-
 
 .landing-v2-wrapper {
   background-color: var(--qp-bg-main);
@@ -67,23 +65,30 @@
 /* ── Grille fine d'architecture en filigrane (vectoriel net, fond clair) ── */
 .qp-grid-pattern-light {
   background-image: 
-    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(217, 119, 6, 0.08), transparent),
+    linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
 }
 
-/* ── Cartes opaques architecturales (strictement sans glassmorphism) ── */
+/* ── Cartes Apple / Meta Craft : Double bordure fine & ombre d'ambiance ── */
 .qp-card-light {
   background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 4px 16px -2px rgba(15, 23, 42, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qp-card-light:hover {
-  border-color: #94A3B8;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  border-color: rgba(217, 119, 6, 0.3);
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 
+    0 20px 40px -12px rgba(15, 23, 42, 0.08),
+    0 8px 16px -6px rgba(217, 119, 6, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 /* ── Ticker partenaires & protocoles ── */
@@ -94,7 +99,7 @@
 
 .qp-ticker-track-light {
   display: flex;
-  animation: qp-marquee 30s linear infinite;
+  animation: qp-marquee 28s linear infinite;
   width: max-content;
 }
 
@@ -102,45 +107,59 @@
   animation-play-state: paused;
 }
 
-/* ── Boutons haute-définition ── */
+/* ── Boutons haute-définition (FinTech Touch) ── */
 .qp-btn-gold-solid {
-  background-color: #D97706;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
   color: #FFFFFF;
   font-weight: 800;
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 1px 2px rgba(217, 119, 6, 0.2),
+    0 4px 12px rgba(217, 119, 6, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qp-btn-gold-solid:hover {
-  background-color: #B45309;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #D97706 0%, #B45309 100%);
+  box-shadow: 
+    0 6px 20px rgba(217, 119, 6, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-1.5px);
 }
 
 .qp-btn-dark-solid {
-  background-color: #0F172A;
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
   color: #FFFFFF;
-  font-weight: 700;
-  transition: all 0.2s ease;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 8px 24px -4px rgba(15, 23, 42, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qp-btn-dark-solid:hover {
-  background-color: #1E293B;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #334155 0%, #1E293B 100%);
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.4);
+  transform: translateY(-1.5px);
 }
 
 .qp-btn-outline-light {
   background-color: #FFFFFF;
   color: #0F172A;
-  border: 1px solid #CBD5E1;
+  border: 1px solid rgba(15, 23, 42, 0.12);
   font-weight: 700;
-  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qp-btn-outline-light:hover {
   background-color: #F8FAFC;
-  border-color: #94A3B8;
+  border-color: rgba(15, 23, 42, 0.25);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* ── Reveal scroll ── */
@@ -168,4 +187,3 @@
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
-

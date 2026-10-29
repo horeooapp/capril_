@@ -211,53 +211,68 @@ export default function QaprilLandingV2({
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution à la Caisse des Dépôts (CDC-CI). Tout est clair, rapide et protégé.
               </p>
 
-              {/* 3 Portails Métiers Directs (Cartes Claires Opaques) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              {/* 3 Portails Métiers Directs (Cartes Apple/Meta Design) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-8">
                 <button
                   onClick={() => handleLogin("BAILLEUR")}
-                  className="qp-card-light p-4 text-left rounded-lg group transition-all"
+                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(217,119,6,0.15)] hover:border-amber-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <Building2 className="w-5 h-5 text-[#D97706]" />
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#D97706] group-hover:translate-x-1 transition-all" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="flex items-center justify-between mb-3 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-600 shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-amber-600 group-hover:bg-amber-50 transition-all">
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
                   </div>
-                  <div className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
                     Propriétaires
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Suivez vos maisons & touchez vos loyers sans vous déplacer.
+                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                    Gérez vos biens, encaissez vos loyers et suivez vos quittances.
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleLogin("LOCATAIRE")}
-                  className="qp-card-light p-4 text-left rounded-lg group transition-all"
+                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(2,132,199,0.15)] hover:border-sky-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <Users className="w-5 h-5 text-[#0284C7]" />
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0284C7] group-hover:translate-x-1 transition-all" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="flex items-center justify-between mb-3 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200/60 flex items-center justify-center text-sky-600 shadow-sm group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-sky-600 group-hover:bg-sky-50 transition-all">
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
                   </div>
-                  <div className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
                     Locataires
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Payez par Wave/Mobile Money & recevez votre reçu immédiat.
+                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                    Payez par Wave/Mobile Money et recevez votre reçu immédiat.
                   </p>
                 </button>
 
                 <Link
                   href="/dashboard/login/agency"
-                  className="qp-card-light p-4 text-left rounded-lg group transition-all block"
+                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(5,150,105,0.15)] hover:border-emerald-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer block overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <Layers className="w-5 h-5 text-[#059669]" />
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#059669] group-hover:translate-x-1 transition-all" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="flex items-center justify-between mb-3 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-center text-emerald-600 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-all">
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
                   </div>
-                  <div className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                    Agences & Démarcheurs
+                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
+                    Agences & Mandats
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Gérez vos mandats, portefeuilles & commissions en toute clarté.
+                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                    Pilotez vos mandats, portefeuilles et commissions en toute sérénité.
                   </p>
                 </Link>
               </div>

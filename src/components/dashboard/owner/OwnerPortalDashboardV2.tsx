@@ -5,7 +5,22 @@ import Link from "next/link"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
-import { Bell, Wallet, Building2, ClipboardList, Receipt, MapPin, Scale, ChevronRight, FileSignature, Users, BarChart3, Store, ToggleLeft, ToggleRight } from "lucide-react"
+import { 
+  Building2, 
+  Plus, 
+  Receipt, 
+  MapPin, 
+  ChevronRight, 
+  ArrowUpRight, 
+  CheckCircle2, 
+  Store, 
+  ToggleLeft, 
+  ToggleRight,
+  ShieldCheck,
+  AlertCircle,
+  FileText,
+  UserCheck
+} from "lucide-react"
 import { toast } from "sonner"
 import { togglePropertyMarketplaceStatus } from "@/actions/marketplace-actions"
 
@@ -32,6 +47,7 @@ export function OwnerPortalDashboardV2({
           code: p.propertyCode || `ENT-${p.id}`,
           nom: p.name || p.address || "Propriété sans nom", 
           adresse: p.address || "Adresse inconnue", 
+          commune: p.commune || p.city || "Abidjan",
           unites: []
         };
       }
@@ -80,127 +96,267 @@ export function OwnerPortalDashboardV2({
     });
   };
 
+  const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : "Propriétaire";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
       
-      {/* STATS RAPIDES */}
+      {/* ── TOP HEADER / GREETING & QUICK ACTIONS (Apple / FinTech Precision) ── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+              Espace Propriétaire · Gestion Directe
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Bonjour, <span className="text-emerald-700">{displayName}</span>
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            Supervisez votre patrimoine immobilier, vos quittances certifiées et vos flux locatifs en temps réel.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link 
+            href="/dashboard/leases/new" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <Plus size={15} />
+            <span>Nouveau Bail</span>
+          </Link>
+          <Link 
+            href="/dashboard/properties/new" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <Building2 size={15} className="text-slate-400" />
+            <span>Ajouter un Bien</span>
+          </Link>
+          <Link 
+            href="/dashboard/receipts" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <Receipt size={15} className="text-slate-500" />
+            <span>Quittances</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── STATS CARDS (FinTech High Contrast) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-            label="Biens actifs" 
-            value={(aggregates?.activeLeasesCount || 0).toString()} 
-            sub={`Occupation : ${aggregates?.occupancyRate || 0}%`} 
+          label="Biens Actifs" 
+          value={(aggregates?.activeLeasesCount || 0).toString()} 
+          sub={`Taux d'occupation : ${aggregates?.occupancyRate || 0}%`} 
         />
         <StatCard 
-            label="Loyer Mensuel (Portefeuille)" 
-            value={`${fmt(aggregates?.totalPortfolioValue || 0)} XOF`} 
-            sub="Revenu brut estimé" 
-            trend="up" 
+          label="Loyer Mensuel Portefeuille" 
+          value={`${fmt(aggregates?.totalPortfolioValue || 0)} XOF`} 
+          sub="Revenu locatif brut estimé" 
+          trend="up" 
         />
         <StatCard 
-            label="Alertes actives" 
-            value={(aggregates?.pendingReclamationsCount || 0).toString()} 
-            sub="Réclamations & Litiges" 
-            trend={(aggregates?.pendingReclamationsCount || 0) > 0 ? "down" : undefined} 
+          label="Alertes & Réclamations" 
+          value={(aggregates?.pendingReclamationsCount || 0).toString()} 
+          sub={(aggregates?.pendingReclamationsCount || 0) === 0 ? "Tout est à jour" : "Action requise"} 
+          trend={(aggregates?.pendingReclamationsCount || 0) > 0 ? "down" : undefined} 
         />
         <StatCard 
-            label="Wallet QAPRIL" 
-            value={`${fmt(walletBalance)} XOF`} 
-            sub="Solde disponible" 
+          label="Wallet QAPRIL" 
+          value={`${fmt(walletBalance)} XOF`} 
+          sub="Solde disponible immédiat" 
         />
       </div>
 
-
-
-      {/* BIFURCATION ETATS */}
+      {/* ── BIFURCATION ETATS : BIENS & DERNIERS FLUX ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* BIENS & ETAT LOCATIF */}
         <SectionCard 
           title="Biens & État Locatif" 
+          icon={<Building2 size={18} className="text-slate-500" />}
           action={
-            <div className="flex gap-4">
-              <Link href="/dashboard/leases/new" className="text-slate-500 hover:text-slate-900 transition-colors">Bail</Link>
-              <Link href="/dashboard/properties/new" className="text-emerald-600 hover:text-emerald-700 transition-colors">Nouveau Bien</Link>
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard/properties" className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors">
+                Voir tout ({entities.flatMap((e: any) => e.unites).length})
+              </Link>
             </div>
           }
         >
-          <div className="overflow-x-auto -mx-1 px-1">
-            <div className="min-w-[300px]">
-              {entities.flatMap((e: any) => e.unites).slice(0, 5).map((u: any, i: number) => (
-                <div key={i} className="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0 text-[12.5px]">
-                  <span className="text-slate-700 font-medium truncate max-w-[55%]">{u.name || u.label}</span>
-                  <div className="flex items-center gap-3">
-                    <Badge color={u.statut === "occupé" ? "green" : "gray"}>{u.statut === "occupé" ? "ACTIVE" : "VACANT"}</Badge>
-                    <span className="font-semibold text-slate-800 w-[70px] text-right">{fmt(u.loyer)} XOF</span>
+          <div className="space-y-3">
+            {entities.flatMap((e: any) => e.unites).slice(0, 5).map((u: any, i: number) => (
+              <div 
+                key={i} 
+                className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/40 hover:bg-white transition-all duration-200 group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-600 font-bold shrink-0 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition-colors">
+                    <Building2 size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">
+                      {u.name || u.label}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate flex items-center gap-1 mt-0.5">
+                      <MapPin size={11} className="shrink-0" />
+                      <span>{u.commune || "Abidjan"}</span>
+                      {u.tenantName && u.tenantName !== "Anonyme" && (
+                        <>
+                          <span className="text-slate-300">·</span>
+                          <span className="text-slate-600 font-medium">{u.tenantName}</span>
+                        </>
+                      )}
+                    </p>
                   </div>
                 </div>
-              ))}
-              {entities.length === 0 && (
-                <div className="text-[12px] text-slate-400 py-4 text-center">Aucun bien rattaché à ce espace.</div>
-              )}
-            </div>
+
+                <div className="flex items-center gap-3 shrink-0 ml-3">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    u.statut === "occupé" 
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60" 
+                      : "bg-slate-100 text-slate-600 border border-slate-200/60"
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${u.statut === "occupé" ? "bg-emerald-500" : "bg-slate-400"}`}></span>
+                    {u.statut === "occupé" ? "Occupé" : "Vacant"}
+                  </span>
+                  <span className="text-xs font-black text-slate-900 font-mono w-[85px] text-right">
+                    {fmt(u.loyer)} <span className="text-[10px] font-normal text-slate-400">XOF</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            {entities.length === 0 && (
+              <div className="text-xs text-slate-400 py-8 text-center flex flex-col items-center justify-center gap-2">
+                <Building2 size={28} className="text-slate-300" />
+                <p>Aucun bien rattaché pour le moment.</p>
+                <Link href="/dashboard/properties/new" className="text-emerald-600 font-bold hover:underline text-xs">
+                  + Ajouter mon premier bien
+                </Link>
+              </div>
+            )}
           </div>
         </SectionCard>
 
+        {/* DERNIERS FLUX VERIFIES */}
         <SectionCard 
           title="Derniers flux vérifiés (Quittances)"
-          action={<Link href="/dashboard/receipts" className="text-slate-500 hover:text-slate-900 transition-colors">Voir tout</Link>}
+          icon={<Receipt size={18} className="text-slate-500" />}
+          action={
+            <Link href="/dashboard/receipts" className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1">
+              Historique complet <ChevronRight size={13} />
+            </Link>
+          }
         >
-          <div className="overflow-x-auto -mx-1 px-1">
-            <div className="min-w-[300px]">
-              {recentPayments.length === 0 ? (
-                <div className="text-[12px] text-slate-400 py-4 text-center">Aucun flux récent enregistré.</div>
-              ) : recentPayments.map((p, i) => (
-                <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0 text-[12.5px]">
-                  <div>
-                    <div className="font-medium text-slate-700">{p.locataire}</div>
-                    <div className="text-[11px] text-slate-400">{p.mois} · Pmt {p.mode}</div>
+          <div className="space-y-3">
+            {recentPayments.length === 0 ? (
+              <div className="text-xs text-slate-400 py-8 text-center flex flex-col items-center justify-center gap-2">
+                <Receipt size={28} className="text-slate-300" />
+                <p>Aucun flux récent enregistré.</p>
+                <p className="text-[11px] text-slate-400">Les quittances certifiées apparaîtront ici dès encaissement.</p>
+              </div>
+            ) : (
+              recentPayments.slice(0, 5).map((p, i) => (
+                <div 
+                  key={i} 
+                  className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/40 hover:bg-white transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs shrink-0">
+                      {p.locataire ? p.locataire.charAt(0).toUpperCase() : "L"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 truncate">
+                        {p.locataire || "Locataire"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        {p.mois} · Mode : <span className="font-medium text-slate-600">{p.mode || "Mobile Money"}</span>
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-slate-800">{p.montant}</div>
-                    <Badge color={p.color as any}>{p.statut}</Badge>
+
+                  <div className="text-right shrink-0 ml-3">
+                    <div className="text-xs font-black text-slate-900 font-mono">
+                      {p.montant}
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 mt-0.5">
+                      <CheckCircle2 size={11} /> {p.statut || "Réglé"}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
         </SectionCard>
       </div>
 
-      <SectionCard title="Gestion de la Marketplace (Mise en location)">
-        <div className="px-4 pt-1 text-xs font-semibold text-slate-500">Publiez ou retirez vos biens du store locatif public en un clic</div>
-        <div className="overflow-x-auto mt-2 relative">
+      {/* ── GESTION DE LA MARKETPLACE (Mise en Location Directe) ── */}
+      <SectionCard 
+        title="Marketplace Locative QAPRIL"
+        icon={<Store size={18} className="text-slate-500" />}
+        action={
+          <span className="text-[11px] font-medium text-slate-500">
+            Visibilité publique instantanée
+          </span>
+        }
+      >
+        <div className="mb-4 text-xs text-slate-500 font-medium">
+          Publiez ou retirez vos logements de la marketplace publique en un clic. Les candidats certifiés ICL peuvent postuler directement.
+        </div>
+
+        <div className="overflow-x-auto relative rounded-xl border border-slate-200/70">
           {/* Skeleton Overlay */}
           {isPending && (
-            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
+            <div className="absolute inset-0 z-10 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-xs font-medium text-slate-600">Mise à jour...</span>
+                <span className="text-xs font-bold text-slate-700">Actualisation de la Marketplace...</span>
               </div>
             </div>
           )}
-          <table className={`w-full text-left border-collapse min-w-[600px] transition-opacity ${isPending ? 'opacity-40' : ''}`}>
+
+          <table className={`w-full text-left border-collapse min-w-[620px] transition-opacity ${isPending ? 'opacity-40' : ''}`}>
             <thead>
-              <tr className="border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50/50">
+              <tr className="border-b border-slate-200/70 text-[10px] font-black uppercase tracking-wider text-slate-400 bg-slate-50/70">
                 <th className="p-3.5">Bien Immobilier</th>
                 <th className="p-3.5">Loyer Demandé</th>
-                <th className="p-3.5">Statut Occupation</th>
-                <th className="p-3.5">Visibilité Marketplace</th>
+                <th className="p-3.5">État Locatif</th>
+                <th className="p-3.5">Visibilité Store</th>
                 <th className="p-3.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 text-xs">
               {entities.flatMap((e: any) => e.unites).map((u: any, i: number) => (
-                <tr key={u.id || i} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
-                  <td className="p-3.5 font-bold text-xs text-slate-900">{u.name || u.label}</td>
-                  <td className="p-3.5 font-semibold text-xs text-slate-700">{fmt(u.loyer)} XOF</td>
-                  <td className="p-3.5">
-                    <Badge color={u.statut === "occupé" ? "green" : "gray"}>
-                      {u.statut === "occupé" ? "Loué" : "Vacant"}
-                    </Badge>
+                <tr key={u.id || i} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="p-3.5 font-bold text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <Building2 size={14} className="text-slate-400 shrink-0" />
+                      <span>{u.name || u.label}</span>
+                    </div>
+                  </td>
+                  <td className="p-3.5 font-black text-slate-800 font-mono">
+                    {fmt(u.loyer)} <span className="text-[10px] text-slate-400 font-normal">XOF</span>
                   </td>
                   <td className="p-3.5">
-                    <Badge color={u.isOnline ? "purple" : "amber"}>
-                      {u.isOnline ? "En Ligne (Store)" : "Hors Ligne"}
-                    </Badge>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      u.statut === "occupé" 
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200/50" 
+                        : "bg-slate-100 text-slate-600 border border-slate-200/50"
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${u.statut === "occupé" ? "bg-emerald-500" : "bg-slate-400"}`}></span>
+                      {u.statut === "occupé" ? "Loué" : "Vacant"}
+                    </span>
+                  </td>
+                  <td className="p-3.5">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      u.isOnline 
+                        ? "bg-purple-50 text-purple-700 border border-purple-200/50" 
+                        : "bg-amber-50 text-amber-700 border border-amber-200/50"
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${u.isOnline ? "bg-purple-500" : "bg-amber-500"}`}></span>
+                      {u.isOnline ? "En Ligne" : "Hors Ligne"}
+                    </span>
                   </td>
                   <td className="p-3.5 text-right">
                     <button
@@ -208,19 +364,21 @@ export function OwnerPortalDashboardV2({
                       onClick={() => handleToggleMarketplace(u.id.replace('E-', ''), !u.isOnline, u.name || u.label)}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
                         u.isOnline 
-                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200" 
-                          : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 hover:-translate-y-0.5" 
+                          : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 hover:-translate-y-0.5"
                       }`}
                     >
-                      {u.isOnline ? <ToggleRight size={18} className="text-rose-500"/> : <ToggleLeft size={18} className="text-slate-400"/>}
-                      {u.isOnline ? "Retirer" : "Mettre en ligne"}
+                      {u.isOnline ? <ToggleRight size={17} className="text-rose-500"/> : <ToggleLeft size={17} className="text-slate-400"/>}
+                      {u.isOnline ? "Retirer" : "Publier"}
                     </button>
                   </td>
                 </tr>
               ))}
               {entities.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-xs text-slate-400 py-6 text-center">Aucun bien disponible pour la mise en ligne.</td>
+                  <td colSpan={5} className="text-xs text-slate-400 py-8 text-center">
+                    Aucun bien disponible pour la mise en ligne.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -228,14 +386,25 @@ export function OwnerPortalDashboardV2({
         </div>
       </SectionCard>
 
-      <SectionCard title="Alertes & Actions Requises" action="Tout archiver">
+      {/* ── ALERTES & ACTIONS REQUISES ── */}
+      <SectionCard 
+        title="Alertes & Événements Prioritaires"
+        icon={<AlertCircle size={18} className="text-slate-500" />}
+        action="Tout marquer comme vu"
+      >
          {activeAlerts.length === 0 ? (
-           <div className="text-[12px] text-slate-400 py-4 text-center">Aucune alerte en cours.</div>
+           <div className="text-xs text-slate-400 py-6 text-center flex items-center justify-center gap-2">
+             <ShieldCheck size={18} className="text-emerald-500" />
+             <span>Toutes les formalités, quittances et déclarations sont à jour.</span>
+           </div>
          ) : activeAlerts.map((a: any, i: number) => (
-           <div key={i} className="flex justify-between items-center p-2 mb-2 bg-slate-50 rounded-[7px] text-[12.5px]">
-             <span className="text-slate-700 font-medium">{a.icon} {a.text}</span>
-             <button className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-medium text-slate-700 hover:text-sky-600 hover:border-sky-200 hover:bg-sky-50 transition-colors">
-               {a.btn}
+           <div key={i} className="flex justify-between items-center p-3 mb-2.5 bg-slate-50/80 border border-slate-100 rounded-xl text-xs">
+             <span className="text-slate-700 font-medium flex items-center gap-2">
+               <span>{a.icon || "🔔"}</span>
+               <span>{a.text}</span>
+             </span>
+             <button className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-colors">
+               {a.btn || "Traiter"}
              </button>
            </div>
          ))}
