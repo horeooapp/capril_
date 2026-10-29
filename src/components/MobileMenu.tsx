@@ -285,7 +285,11 @@ export default function MobileMenu({
                             <button 
                                 onClick={async () => {
                                     setIsOpen(false);
-                                    if (onLogout) await onLogout();
+                                    if (onLogout) {
+                                        await onLogout();
+                                    } else {
+                                        window.location.href = '/api/auth/signout';
+                                    }
                                 }}
                                 className="w-full flex items-center justify-center gap-2 bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-sm"
                             >
@@ -296,9 +300,9 @@ export default function MobileMenu({
                     ) : (
                         <div className="space-y-2">
                             <Link 
-                                href="/dashboard/login"
+                                href="/login"
                                 onClick={() => setIsOpen(false)}
-                                className="w-full block text-center py-2.5 px-4 rounded-xl bg-[#FF8200] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-md"
+                                className="w-full block text-center py-2.5 px-4 rounded-xl bg-[#FF8200] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-md hover:bg-amber-500 transition-colors"
                             >
                                 Se Connecter
                             </Link>

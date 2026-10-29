@@ -6,6 +6,8 @@ import { choisirTypeConnexion } from "@/actions/auth.actions";
 import InteractiveShowcase from "./InteractiveShowcase";
 import InteractiveModulesGrid from "./InteractiveModulesGrid";
 import InteractiveMarketChart from "./InteractiveMarketChart";
+import { signOut } from "next-auth/react";
+import MobileMenu from "@/components/MobileMenu";
 import {
   FileText,
   CreditCard,
@@ -28,7 +30,12 @@ import {
   FolderArchive,
   BarChart4,
   BadgeCheck,
-  Sparkles
+  Sparkles,
+  Home,
+  LogOut,
+  MessageSquare,
+  Receipt,
+  LayoutDashboard
 } from "lucide-react";
 
 const SLIDES = [
@@ -78,6 +85,19 @@ export default function QaprilLandingV2({
 
   const isAdmin = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN";
   const dashUrl = isAdmin ? "/admin" : session?.user?.role === "TENANT" ? "/mon-espace-locataire" : "/dashboard";
+
+  const landingNavLinks = [
+    { href: "/", label: "Accueil", icon: <Home size={18} /> },
+    { href: "/piliers", label: "Piliers QAPRIL", icon: <ShieldCheck size={18} /> },
+    { href: "/solutions", label: "Nos Solutions", icon: <LayoutDashboard size={18} /> },
+    { href: "/services", label: "Services & Garanties", icon: <Building2 size={18} /> },
+    { href: "/comparatif", label: "Comparatif", icon: <Scale size={18} /> },
+    { href: "/tarifs", label: "Tarifs & Formules", icon: <Receipt size={18} /> },
+    { href: "/contact", label: "Contact & Support", icon: <MessageSquare size={18} /> },
+    ...(session?.user ? [
+      { href: dashUrl, label: "Mon Espace Dédié", icon: <ArrowRight size={18} /> }
+    ] : [])
+  ];
 
   // Auto rotation du slide
   useEffect(() => {
@@ -171,23 +191,43 @@ export default function QaprilLandingV2({
             </Link>
           </nav>
 
-          {/* Actions Droite sur Une Seule Ligne — Bouton Unique Connexion */}
-          <div className="flex items-center gap-2.5 shrink-0 whitespace-nowrap">
+          {/* Actions Droite sur Une Seule Ligne — Bouton Connexion/Espace & Menu Mobile */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 whitespace-nowrap">
             {session?.user ? (
-              <Link
-                href={dashUrl}
-                className="qp-btn-gold-solid px-4 py-2 rounded text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-              >
-                Mon Espace <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <>
+                <Link
+                  href={dashUrl}
+                  className="qp-btn-gold-solid px-3.5 sm:px-4 py-2 rounded text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap font-bold"
+                >
+                  Mon Espace <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="hidden sm:flex p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Déconnexion"
+                >
+                  <LogOut size={16} />
+                </button>
+              </>
             ) : (
               <Link
                 href="/login"
-                className="qp-btn-gold-solid px-4 sm:px-5 py-2 rounded text-xs sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                className="qp-btn-gold-solid px-3 sm:px-5 py-2 rounded text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
               >
                 Connexion <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             )}
+
+            {/* Menu Hamburger Mobile visible sur mobile/tablette (< 1024px) */}
+            <div className="flex lg:hidden text-slate-800 ml-0.5">
+              <MobileMenu 
+                links={landingNavLinks} 
+                session={session} 
+                variant="dark"
+                activeRole={session?.user ? (session?.user?.role || "MEMBRE") : "PORTAIL"}
+                onLogout={() => signOut({ callbackUrl: "/" })}
+              />
+            </div>
           </div>
         </div>
       </header>
