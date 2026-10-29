@@ -1,12 +1,38 @@
- 
 "use client"
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { User } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { 
+    Home, 
+    LogOut, 
+    User, 
+    LayoutDashboard, 
+    Building2, 
+    ClipboardList, 
+    FileText, 
+    Receipt, 
+    Zap, 
+    Store, 
+    Handshake, 
+    Wrench, 
+    ShieldAlert, 
+    BookOpen, 
+    Settings, 
+    Wallet, 
+    CalendarDays, 
+    MessageSquare, 
+    Scale, 
+    Users, 
+    Landmark,
+    X,
+    Menu,
+    ChevronRight,
+    ArrowLeft
+} from 'lucide-react'
 import RoleSwitcher from './dashboard/RoleSwitcher'
 
-interface NavLink {
+export interface NavLink {
     href: string
     label: string
     icon?: React.ReactNode
@@ -17,11 +43,14 @@ interface Session {
         id?: string | null;
         email?: string | null;
         role?: string | null;
+        firstName?: string | null;
+        lastName?: string | null;
+        eligibleRoles?: string[] | null;
     };
 }
 
 interface MobileMenuProps {
-    links: NavLink[]
+    links?: NavLink[]
     session?: Session | null
     logoSrc?: string
     brandName?: string
@@ -35,196 +64,248 @@ export default function MobileMenu({
     session, 
     logoSrc = "/logo.png", 
     brandName = "QAPRIL", 
-    variant = 'light',
+    variant = 'dark',
     onLogout,
     activeRole
 }: MobileMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const pathname = usePathname()
     const displayRole = activeRole || session?.user?.role || 'CLIENT';
 
     const toggleMenu = () => setIsOpen(!isOpen)
 
-    const variantStyles = {
-        light: {
-            button: "text-gray-900 hover:text-primary",
-            menu: "bg-white text-gray-900",
-            link: "text-gray-500 hover:bg-gray-50 hover:text-gray-900",
-            activeLink: "bg-primary/10 text-primary font-bold",
-            border: "border-gray-100",
-            footer: "bg-gray-50/50"
-        },
-        dark: {
-            button: "text-white/80 hover:text-white",
-            menu: "bg-gray-900 text-white",
-            link: "text-gray-400 hover:bg-white/5 hover:text-white",
-            activeLink: "bg-white/10 text-white font-bold",
-            border: "border-white/5",
-            footer: "bg-black/20"
-        },
-        primary: {
-            button: "text-white/80 hover:text-white",
-            menu: "bg-primary text-white",
-            link: "text-white/80 hover:bg-white/10 hover:text-white",
-            activeLink: "bg-white/20 text-white font-bold",
-            border: "border-white/10",
-            footer: "bg-black/10"
-        }
-    }
+    // Si aucun lien n'est fourni, générer les liens complets selon le rôle actif
+    const getComputedLinks = (): NavLink[] => {
+        if (links && links.length > 0) return links;
 
-    const s = variantStyles[variant]
+        if (displayRole === 'TENANT' || displayRole === 'LOCATAIRE') {
+            return [
+                { href: "/mon-espace-locataire", label: "Mon Logement", icon: <LayoutDashboard size={18} /> },
+                { href: "/mon-espace-locataire/receipts", label: "Mes Loyers & Quittances", icon: <Receipt size={18} /> },
+                { href: "/mon-espace-locataire/leases", label: "Documents & Baux", icon: <FileText size={18} /> },
+                { href: "/mon-espace-locataire/cie-sodeci", label: "Factures CIE / SODECI", icon: <Zap size={18} /> },
+                { href: "/mon-espace-locataire/marketplace", label: "Marketplace QAPRIL", icon: <Store size={18} /> },
+                { href: "/mon-espace-locataire/profil-public", label: "Matching Locatif", icon: <Handshake size={18} /> },
+                { href: "/mon-espace-locataire/rights", label: "Signalements & Litiges", icon: <Wrench size={18} /> },
+                { href: "/mon-espace-locataire/cautions", label: "Caution CDC", icon: <ShieldAlert size={18} /> },
+                { href: "/mon-espace-locataire/profile", label: "Mon Profil", icon: <User size={18} /> },
+                { href: "/mon-espace-locataire/manual", label: "Guide & Manuel", icon: <BookOpen size={18} /> },
+            ];
+        }
+
+        if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(displayRole)) {
+            return [
+                { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
+                { href: "/dashboard/mandates", label: "Mandats Prospection", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/matching", label: "Candidatures Locataires", icon: <User size={18} /> },
+                { href: "/dashboard/marketplace", label: "Marketplace & Annonces", icon: <Store size={18} /> },
+                { href: "/dashboard/properties", label: "Biens Confiés", icon: <Building2 size={18} /> },
+                { href: "/dashboard/agenda", label: "Visites & Agenda", icon: <CalendarDays size={18} /> },
+                { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} /> },
+                { href: "/dashboard/receipts", label: "Mes Commissions", icon: <Receipt size={18} /> },
+                { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
+                { href: "/dashboard/profile", label: "Paramètres Profil", icon: <Settings size={18} /> },
+                { href: "/dashboard/manual", label: "Manuel Démarcheur", icon: <BookOpen size={18} /> },
+            ];
+        }
+
+        if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(displayRole)) {
+            return [
+                { href: "/dashboard", label: "Tableau de Bord", icon: <LayoutDashboard size={18} /> },
+                { href: "/dashboard/mandates", label: "Mandats Gestion", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/properties", label: "Biens en Gestion", icon: <Building2 size={18} /> },
+                { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} /> },
+                { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
+                { href: "/dashboard/matching", label: "Candidatures", icon: <User size={18} /> },
+                { href: "/dashboard/receipts", label: "Comptabilité & Quittances", icon: <Receipt size={18} /> },
+                { href: "/dashboard/wallet", label: "Wallet & Reversements", icon: <Wallet size={18} /> },
+                { href: "/dashboard/reports", label: "CRG Mensuels", icon: <FileText size={18} /> },
+                { href: "/dashboard/disputes", label: "Contentieux & Alertes", icon: <Scale size={18} /> },
+                { href: "/dashboard/team", label: "Mon Équipe", icon: <Users size={18} /> },
+                { href: "/dashboard/fiscal", label: "Fiscalité & DGI", icon: <Landmark size={18} /> },
+                { href: "/dashboard/profile", label: "Paramètres Agence", icon: <Settings size={18} /> },
+                { href: "/dashboard/manual", label: "Manuel Officiel", icon: <BookOpen size={18} /> },
+            ];
+        }
+
+        // Par défaut : Propriétaire / Bailleur
+        return [
+            { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
+            { href: "/dashboard/properties", label: "Mes Biens & Immeubles", icon: <Building2 size={18} /> },
+            { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} /> },
+            { href: "/dashboard/receipts", label: "Quittances & Loyers", icon: <Receipt size={18} /> },
+            { href: "/dashboard/disputes", label: "Contentieux & Recouvrement", icon: <Scale size={18} /> },
+            { href: "/dashboard/matching", label: "Candidatures Locataires", icon: <User size={18} /> },
+            { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
+            { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
+            { href: "/dashboard/fiscal", label: "Fiscalité & DGI", icon: <Landmark size={18} /> },
+            { href: "/dashboard/profile", label: "Paramètres du Compte", icon: <Settings size={18} /> },
+            { href: "/dashboard/manual", label: "Guide Propriétaire", icon: <BookOpen size={18} /> },
+        ];
+    };
+
+    const effectiveLinks = getComputedLinks();
 
     return (
-        <div className="xl:hidden flex items-center">
+        <div className="flex items-center">
+            {/* Bouton Hamburger déclencheur */}
             <button 
                 onClick={toggleMenu}
-                className={`p-2.5 rounded-2xl ${s.button} transition-all active:scale-90 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none relative z-[110]`}
-                aria-label="Toggle menu"
+                className="p-2 rounded-xl text-slate-700 hover:text-slate-950 hover:bg-slate-100 active:scale-90 transition-all focus:outline-none"
+                aria-label="Ouvrir le menu mobile"
+                title="Menu"
             >
-                {isOpen ? (
-                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                ) : (
-                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
-                    </svg>
-                )}
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
 
             {/* Backdrop */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] transition-opacity duration-500 animate-in fade-in"
+                    className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[110] transition-opacity duration-300 animate-in fade-in"
                     onClick={toggleMenu}
-                ></div>
+                />
             )}
 
-            {/* Menu Drawer */}
-            <div className={`fixed top-0 right-0 h-full w-[310px] ${s.menu} shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] z-[101] transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className={`p-8 flex items-center justify-between border-b ${s.border}`}>
-                        <div className="flex items-center space-x-3">
-                            <img src={logoSrc} alt="Logo" className="h-10 w-auto" />
-                            <div className="flex flex-col">
-                                <span className="font-black text-xl tracking-tighter uppercase leading-none whitespace-nowrap">{brandName}</span>
-                                <span className="text-[12px] font-bold uppercase tracking-[0.3em] text-slate-800 mt-0.5 whitespace-nowrap">Navigation</span>
-                            </div>
+            {/* Tiroir Mobile (Drawer) */}
+            <aside 
+                className={`fixed top-0 right-0 h-full w-[85vw] max-w-[340px] bg-slate-900 text-white shadow-2xl z-[120] transform transition-transform duration-300 ease-out flex flex-col ${
+                    isOpen ? 'translate-x-0' : 'translate-x-full'
+                }`}
+            >
+                {/* En-tête du tiroir avec Logo & Fermeture */}
+                <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60 shrink-0">
+                    <Link 
+                        href="/" 
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-3 group"
+                    >
+                        <img src={logoSrc} alt={brandName} className="h-8 w-auto object-contain" />
+                        <div>
+                            <span className="font-black text-lg tracking-tight uppercase leading-none block text-white">{brandName}</span>
+                            <span className="text-[10px] font-bold text-[#FF8200] uppercase tracking-wider block mt-0.5">Menu Mobile</span>
                         </div>
-                    </div>
+                    </Link>
 
-                    {/* Navigation */}
-                    <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto">
-                        {links.map((link) => (
+                    <button 
+                        onClick={toggleMenu}
+                        className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                        aria-label="Fermer le menu"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {/* Bouton Accès Rapide : RETOUR VERS L'ACCUEIL */}
+                <div className="p-3 bg-slate-950/40 border-b border-slate-800 shrink-0">
+                    <Link 
+                        href="/" 
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF8200]/20 to-amber-500/10 hover:from-[#FF8200]/30 hover:to-amber-500/20 border border-[#FF8200]/40 text-amber-200 font-bold text-xs transition-all active:scale-95"
+                    >
+                        <span className="flex items-center gap-2">
+                            <Home size={16} className="text-[#FF8200]" />
+                            <span>Retour à la page d'accueil</span>
+                        </span>
+                        <ChevronRight size={14} className="text-amber-400" />
+                    </Link>
+                </div>
+
+                {/* Liste des Liens de Navigation */}
+                <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto overscroll-contain">
+                    <p className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                        Navigation • {displayRole}
+                    </p>
+
+                    {effectiveLinks.map((link) => {
+                        const isActive = pathname === link.href;
+                        return (
                             <Link 
                                 key={link.href} 
                                 href={link.href}
                                 onClick={() => setIsOpen(false)}
-                                className={`flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-200 group ${s.link}`}
+                                className={`flex items-center justify-between px-3.5 py-3 rounded-xl transition-all duration-150 ${
+                                    isActive 
+                                        ? 'bg-[#FF8200] text-slate-950 font-bold shadow-md' 
+                                        : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
+                                }`}
                             >
-                                <span className="text-2xl group-hover:scale-110 transition-transform">
-                                    {link.icon || <span className="w-2 h-2 rounded-full bg-slate-800/40"></span>}
-                                </span>
-                                <span className="text-[16px] font-bold uppercase tracking-widest whitespace-nowrap">{link.label}</span>
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <span className={isActive ? 'text-slate-950' : 'text-[#FF8200]'}>
+                                        {link.icon || <span className="w-2 h-2 rounded-full bg-[#FF8200]" />}
+                                    </span>
+                                    <span className="text-[13px] font-medium truncate">{link.label}</span>
+                                </div>
+                                <ChevronRight size={14} className={isActive ? 'text-slate-950' : 'text-slate-600'} />
                             </Link>
-                        ))}
-                    </nav>
+                        );
+                    })}
+                </nav>
 
-                    {/* Footer / User Space */}
-                    <div className={`p-6 border-t ${s.border} ${s.footer}`}>
-                        {session?.user ? (
-                            <div className="space-y-4">
-                                <div className="px-6 py-6 bg-white/50 backdrop-blur-xl dark:bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/10 shadow-inner">
-                                    <p className="text-[12px] uppercase font-black text-gray-400 tracking-[0.3em] mb-3 italic">Identité Certifiée</p>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-slate-800/10 flex items-center justify-center text-slate-800 font-black text-sm border border-slate-800/20 flex-shrink-0">
-                                            {displayRole.charAt(0)}
-                                        </div>
-                                        <div className="flex flex-col min-w-0 flex-1">
-                                            <p className="text-[14px] font-black truncate text-gray-900 dark:text-white leading-none mb-1">{session.user.email}</p>
-                                            <div className="flex items-center justify-between mt-1">
-                                                <div className="flex items-center">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 shadow-[0_0_8px_rgba(34,197,94,0.5)] flex-shrink-0"></span>
-                                                    <span className="text-[12px] font-black uppercase tracking-widest text-slate-800 italic leading-none truncate">{displayRole}</span>
-                                                </div>
-                                                <Link 
-                                                    href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
-                                                    onClick={() => setIsOpen(false)}
-                                                    className="bg-qnavy/10 text-qnavy p-2 rounded-lg hover:bg-qnavy hover:text-white transition-all scale-90"
-                                                >
-                                                    <User size={14} />
-                                                </Link>
-                                            </div>
-                                        </div>
+                {/* Pied du tiroir : Profil, Rôles et BOUTON DÉCONNEXION */}
+                <div className="p-4 border-t border-slate-800 bg-slate-950/80 shrink-0 space-y-3">
+                    {session?.user ? (
+                        <>
+                            {/* Carte Utilisateur */}
+                            <div className="p-3 bg-slate-800/70 rounded-xl border border-slate-700/60 flex items-center justify-between">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="w-8 h-8 rounded-full bg-[#FF8200] text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
+                                        {(session.user.firstName || session.user.email || 'U').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-bold text-white truncate leading-tight">
+                                            {session.user.firstName ? `${session.user.firstName} ${session.user.lastName || ''}` : session.user.email}
+                                        </p>
+                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
+                                            ● {displayRole}
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <Link 
-                                        href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
-                                        onClick={() => setIsOpen(false)}
-                                        className="flex items-center justify-center bg-qnavy text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-qnavy/20 col-span-2"
-                                    >
-                                        Gérer mon profil
-                                    </Link>
-                                    <Link 
-                                        href={displayRole === 'TENANT' ? "/mon-espace-locataire" : (displayRole === 'ADMIN' || displayRole === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}
-                                        onClick={() => setIsOpen(false)}
-                                        className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
-                                    >
-                                        Espace
-                                    </Link>
-                                    <Link 
-                                        href="/"
-                                        onClick={() => setIsOpen(false)}
-                                        className="flex items-center justify-center bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
-                                    >
-                                        Accueil
-                                    </Link>
-                                    <div className="col-span-2">
-                                        <RoleSwitcher 
-                                            currentRole={activeRole || (session.user as any).chosenRole || session.user.role} 
-                                            eligibleRoles={(session.user as any).eligibleRoles} 
-                                        />
-                                    </div>
-                                    <button 
-                                        onClick={() => {
-                                            setIsOpen(false);
-                                            if (onLogout) onLogout();
-                                        }}
-                                        className="flex items-center justify-center bg-white dark:bg-gray-800 text-red-500 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-red-100 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all active:scale-95"
-                                    >
-                                        Quitter
-                                    </button>
+
+                                <Link 
+                                    href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
+                                    onClick={() => setIsOpen(false)}
+                                    className="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-colors"
+                                    title="Mon Profil"
+                                >
+                                    <Settings size={14} />
+                                </Link>
+                            </div>
+
+                            {/* Sélecteur de rôle si multi-rôles */}
+                            {session.user.eligibleRoles && session.user.eligibleRoles.length > 1 && (
+                                <div className="pt-1">
+                                    <RoleSwitcher 
+                                        currentRole={displayRole} 
+                                        eligibleRoles={session.user.eligibleRoles} 
+                                    />
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                <Link 
-                                    href="/mon-espace-locataire/login"
-                                    onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-white/5 text-emerald-400 border border-emerald-500/30 py-4 rounded-2xl font-black text-[13px] uppercase tracking-widest hover:bg-emerald-500/10 active:scale-95 transition-all"
-                                >
-                                    Connexion Locataire
-                                </Link>
-                                <Link 
-                                    href="/dashboard/login"
-                                    onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-700 text-white py-4 rounded-2xl font-black text-[13px] uppercase tracking-widest shadow-xl shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all"
-                                >
-                                    Connexion Propriétaire
-                                </Link>
-                                <Link 
-                                    href="/dashboard/login/agency"
-                                    onClick={() => setIsOpen(false)}
-                                    className="block w-full text-center bg-sky-600 text-white py-4 rounded-2xl font-black text-[13px] uppercase tracking-widest shadow-xl shadow-sky-600/20 hover:scale-[1.02] active:scale-95 transition-all"
-                                >
-                                    Agences & Démarcheurs
-                                </Link>
-                            </div>
-                        )}
-                    </div>
+                            )}
+
+                            {/* BOUTON DÉCONNEXION PLEINE LARGEUR */}
+                            <button 
+                                onClick={async () => {
+                                    setIsOpen(false);
+                                    if (onLogout) await onLogout();
+                                }}
+                                className="w-full flex items-center justify-center gap-2 bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-sm"
+                            >
+                                <LogOut size={16} />
+                                <span>Déconnexion Sécurisée</span>
+                            </button>
+                        </>
+                    ) : (
+                        <div className="space-y-2">
+                            <Link 
+                                href="/dashboard/login"
+                                onClick={() => setIsOpen(false)}
+                                className="w-full block text-center py-2.5 px-4 rounded-xl bg-[#FF8200] text-slate-950 font-bold text-xs uppercase tracking-wider shadow-md"
+                            >
+                                Se Connecter
+                            </Link>
+                        </div>
+                    )}
                 </div>
-            </div>
+            </aside>
         </div>
     )
 }

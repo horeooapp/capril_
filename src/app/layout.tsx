@@ -5,6 +5,7 @@ import "./globals.css";
 import "./landing-v2.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 import CookieConsent from "@/components/CookieConsent";
+import PwaInstallPrompt from "@/components/pwa/PwaInstallPrompt";
 import SEOInit from "@/components/SEOInit";
 
 export const metadata: Metadata = {
@@ -47,9 +48,14 @@ export const metadata: Metadata = {
     creator: "@qapril_ci",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon.png",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -113,6 +119,7 @@ export default function RootLayout({
           }}
         />
         <CookieConsent />
+        <PwaInstallPrompt />
       </body>
     </html>
   );

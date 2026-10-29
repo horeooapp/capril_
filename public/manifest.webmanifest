@@ -1,34 +1,38 @@
 {
-  "name": "QAPRIL — Gestion Immobilière",
+  "name": "QAPRIL — Gestion Immobilière Intelligente",
   "short_name": "QAPRIL",
-  "description": "Simplifiez la gestion de vos biens immobiliers avec QAPRIL",
+  "description": "Plateforme immobilière certifiée : gestion de baux, loyers, quittances et patrimoine en Côte d'Ivoire",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#FCB10F",
+  "background_color": "#0C2742",
   "theme_color": "#FCB10F",
   "lang": "fr",
   "scope": "/",
   "categories": ["business", "productivity", "finance"],
   "icons": [
-    { "src": "/assets/icons/icon-48.webp",  "sizes": "48x48",   "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-72.webp",  "sizes": "72x72",   "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-96.webp",  "sizes": "96x96",   "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-128.webp", "sizes": "128x128", "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-192.webp", "sizes": "192x192", "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-256.webp", "sizes": "256x256", "type": "image/webp", "purpose": "maskable any" },
-    { "src": "/assets/icons/icon-512.webp", "sizes": "512x512", "type": "image/webp", "purpose": "maskable any" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/icons/icon-192.webp", "sizes": "192x192", "type": "image/webp", "purpose": "any" },
+    { "src": "/assets/icons/icon-512.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any" }
   ],
   "shortcuts": [
     {
       "name": "Mon tableau de bord",
       "url": "/dashboard",
-      "icons": [{ "src": "/assets/icons/icon-96.webp", "sizes": "96x96", "type": "image/webp" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Espace Locataire",
+      "url": "/mon-espace-locataire",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Mes propriétés",
       "url": "/dashboard/properties",
-      "icons": [{ "src": "/assets/icons/icon-96.webp", "sizes": "96x96", "type": "image/webp" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
