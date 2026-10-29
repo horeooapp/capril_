@@ -191,182 +191,191 @@ export default function QaprilLandingV2({
 
       <main className="pt-24">
         {/* ══════════════════════════════════════════════════════════════════
-            2. HERO SECTION LUMINEUSE AVEC SLIDE D'IMAGES CLAIR ET VISIBLE
+            2. HERO SECTION IMMERSIVE AVEC SLIDES EN ARRIÈRE-PLAN (STYLE PREMIUM ÉPURÉ)
         ══════════════════════════════════════════════════════════════════ */}
-        <section className="px-4 sm:px-6 py-12 lg:py-20 max-w-7xl mx-auto border-b border-slate-200">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Colonne Gauche : Pitch Institutionnel */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-6">
-                <BadgeCheck className="w-4 h-4 text-[#D97706]" />
+        <section className="relative overflow-hidden bg-slate-950 text-white min-h-[660px] lg:min-h-[720px] flex flex-col justify-between border-b border-slate-800">
+
+          {/* SLIDESHOW D'ARCHITECTURES EN ARRIÈRE-PLAN */}
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+            {SLIDES.map((slide, idx) => (
+              <div
+                key={idx}
+                className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                style={{
+                  opacity: currentSlide === idx ? 1 : 0,
+                  zIndex: currentSlide === idx ? 1 : 0,
+                }}
+              >
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className={`w-full h-full object-cover object-center transition-transform duration-[4500ms] ease-out ${
+                    currentSlide === idx ? "scale-105" : "scale-100"
+                  }`}
+                />
+              </div>
+            ))}
+
+            {/* OVERLAY SOUVERAIN ÉLÉGANT & MULTI-COUCHE (HAUTE LISIBILITÉ & AMBIANCE LUXE) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/65 z-10" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_25%,rgba(217,119,6,0.18),transparent_70%)] z-10" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-10" />
+          </div>
+
+          {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-8 lg:pt-16 lg:pb-10 w-full flex-1 flex flex-col justify-between">
+
+            {/* Haut : Pitch Institutionnel & Titre Épuré */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
+                <BadgeCheck className="w-4 h-4 text-amber-400" />
                 Conforme à la loi sur le bail d'habitation · Côte d'Ivoire
               </div>
 
-              <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
+              <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6 max-w-4xl">
                 Gérez vos maisons et vos loyers en toute confiance,{" "}
-                <span className="text-[#D97706]">sans friction.</span>
+                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+                  sans friction.
+                </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed mb-8 max-w-2xl">
+              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-10 max-w-3xl">
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution à la Caisse des Dépôts (CDC-CI). Tout est clair, rapide et protégé.
               </p>
 
-              {/* 3 Portails Métiers Directs (Cartes Apple/Meta Design) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-8">
+              {/* 3 Portails Métiers Directs (Cartes Apple/Meta Design Frosted) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <button
                   onClick={() => handleLogin("BAILLEUR")}
-                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(217,119,6,0.15)] hover:border-amber-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-amber-400/70 shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-600 shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shadow-sm group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300">
                       <Building2 className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-amber-600 group-hover:bg-amber-50 transition-all">
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-amber-300 group-hover:bg-amber-500/20 transition-all">
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
+                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
                     Propriétaires
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
                     Gérez vos biens, encaissez vos loyers et suivez vos quittances.
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleLogin("LOCATAIRE")}
-                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(2,132,199,0.15)] hover:border-sky-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-sky-400/70 shadow-lg hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200/60 flex items-center justify-center text-sky-600 shadow-sm group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-all duration-300">
                       <Users className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-sky-600 group-hover:bg-sky-50 transition-all">
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-sky-300 group-hover:bg-sky-500/20 transition-all">
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
+                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
                     Locataires
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
                     Payez par Wave/Mobile Money et recevez votre reçu immédiat.
                   </p>
                 </button>
 
                 <Link
                   href="/dashboard/login/agency"
-                  className="relative p-5 text-left rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] hover:shadow-[0_12px_28px_-6px_rgba(5,150,105,0.15)] hover:border-emerald-400/80 hover:-translate-y-1 transition-all duration-300 group cursor-pointer block overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-emerald-400/70 shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer block overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-center text-emerald-600 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-sm group-hover:bg-emerald-400 group-hover:text-slate-950 transition-all duration-300">
                       <Layers className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 transition-all">
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-emerald-300 group-hover:bg-emerald-500/20 transition-all">
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-slate-900 uppercase tracking-wider relative z-10">
+                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
                     Agences & Mandats
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-1 leading-snug relative z-10">
+                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
                     Pilotez vos mandats, portefeuilles et commissions en toute sérénité.
                   </p>
                 </Link>
               </div>
-
-              {/* Barre de Chiffres Clés */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-200">
-                <div>
-                  <div className="text-2xl font-black text-slate-900">4 800+</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Baux Signés</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-[#059669]">99.4 %</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Loyers à Jour</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-[#0284C7]">2 Mois</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Caution Max Légale</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-[#D97706]">0 Litige</div>
-                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sans Solution</div>
-                </div>
-              </div>
             </div>
 
-            {/* Colonne Droite : VRAI SLIDE D'IMAGES CLAIR & TRÈS VISIBLE */}
-            <div className="lg:col-span-5">
-              <div className="qp-card-light rounded-xl p-2.5 bg-white border border-slate-300 shadow-md">
-                {/* Cadre de l'image du slide */}
-                <div className="relative h-80 sm:h-96 w-full rounded-lg overflow-hidden bg-slate-900">
-                  {SLIDES.map((slide, idx) => (
-                    <img
-                      key={idx}
-                      src={slide.image}
-                      alt={slide.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
-                      style={{
-                        opacity: currentSlide === idx ? 1 : 0,
-                        zIndex: currentSlide === idx ? 1 : 0,
-                      }}
+            {/* Bas du Hero : Chiffres Clés & Ticker Minimaliste du Slide Actif */}
+            <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+              {/* Chiffres Clés */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-10">
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-white font-mono">4 800+</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Baux Signés</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">99.4 %</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Loyers à Jour</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-sky-400 font-mono">2 Mois</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Caution Max Légale</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0 Litige</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Sans Solution</div>
+                </div>
+              </div>
+
+              {/* Ticker & Navigation Minimaliste du Slide (Style Apple/Luxury Architectural) */}
+              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 self-start md:self-auto">
+                <div className="text-right">
+                  <p className="text-[11px] font-bold text-white truncate max-w-[200px]">
+                    {SLIDES[currentSlide].title}
+                  </p>
+                  <p className="text-[9px] font-mono text-amber-400 uppercase tracking-wider">
+                    {SLIDES[currentSlide].location}
+                  </p>
+                </div>
+                <div className="h-4 w-px bg-white/20" />
+                <div className="flex items-center gap-1">
+                  {SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentSlide(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
+                        currentSlide === i ? "w-6 bg-amber-400" : "w-1.5 bg-white/40 hover:bg-white/60"
+                      }`}
                     />
                   ))}
-
-                  {/* Boutons précédent / suivant */}
+                </div>
+                <div className="flex items-center gap-1 ml-1">
                   <button
                     onClick={prevSlide}
                     aria-label="Diapositive précédente"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-md transition-all cursor-pointer"
+                    className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={nextSlide}
                     aria-label="Diapositive suivante"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-900 flex items-center justify-center shadow-md transition-all cursor-pointer"
+                    className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
-
-                  {/* Badge descriptif de la photo en bas */}
-                  <div className="absolute bottom-0 inset-x-0 z-20 p-4 bg-slate-900/85 text-white">
-                    <div className="flex items-center justify-between text-xs font-mono text-[#F59E0B] mb-1">
-                      <span>{SLIDES[currentSlide].location}</span>
-                      <span>0{currentSlide + 1} / 0{SLIDES.length}</span>
-                    </div>
-                    <div className="font-bold text-sm text-white">
-                      {SLIDES[currentSlide].title}
-                    </div>
-                    <div className="text-[11px] text-slate-300">
-                      {SLIDES[currentSlide].subtitle}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Indicateurs de diapositives cliquables */}
-                <div className="flex items-center justify-between pt-3 px-2">
-                  <div className="flex items-center gap-1.5">
-                    {SLIDES.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentSlide(i)}
-                        aria-label={`Slide ${i + 1}`}
-                        className={`h-2 transition-all duration-300 rounded-full cursor-pointer ${
-                          currentSlide === i ? "w-7 bg-[#D97706]" : "w-2 bg-slate-300 hover:bg-slate-400"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    Maisons, appartements & résidences en Côte d'Ivoire
-                  </span>
                 </div>
               </div>
+
             </div>
+
           </div>
         </section>
 
