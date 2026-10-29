@@ -99,9 +99,9 @@ export function ChurnRiskList({ risks }: { risks: ChurnRisk[] }) {
       </div>
 
       <div className="p-10 bg-white/5 border-t border-white/5 text-center">
-        <button className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em] hover:text-white transition-all hover:tracking-[0.5em]">
+        <a href="/dashboard/disputes" className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em] hover:text-white transition-all hover:tracking-[0.5em] inline-block">
           Accéder au centre de médiation client
-        </button>
+        </a>
       </div>
     </div>
   );

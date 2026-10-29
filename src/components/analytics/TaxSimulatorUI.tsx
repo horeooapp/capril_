@@ -79,10 +79,10 @@ export function TaxSimulatorUI({ simulation }: { simulation: TaxSimulation }) {
             <p className="text-gray-500 text-xs italic max-w-md">
                 "Selon nos algorithmes, basculer vers le régime BIC vous permettrait de maximiser votre cash-flow dès le mois prochain."
             </p>
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-black px-8 py-4 rounded-2xl transition-all group">
+            <a href="/dashboard/fiscal" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-black px-8 py-4 rounded-2xl transition-all group">
                 ÉDITER MON DOSSIER FISCAL
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </a>
         </div>
       </div>
     </div>

@@ -387,7 +387,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
             <div style={{fontSize:9,color:T.textLight,fontFamily:"monospace"}}>{bail.sha}</div>
           </div>
           <SecTitle label="Actions"/>
-          <ACard icon="📄" label="Télécharger mon bail PDF" sub="SHA-256 · archivé dans votre espace" color={T.navy} bg={T.navyPale} onClick={()=>{}}/>
+          <ACard icon="📄" label="Télécharger mon bail PDF" sub="SHA-256 · archivé dans votre espace" color={T.navy} bg={T.navyPale} onClick={() => { if (bail?.ref) { window.open(`/api/leases/${bail.ref.replace("BDQ-", "")}/pdf`, "_blank"); } else { window.open("/dashboard/leases", "_blank"); } }}/>
           <ACard icon="🚪" label="Initier un préavis de sortie" sub="Délai légal 1 mois CI · formalisé QAPRIL" color={T.orange} bg={T.orangePale} onClick={()=>{go("droits");setDsec("preavis");}}/>
           <ACard icon="⚠️" label="Contester une modification de loyer" sub="Règle MRL-01 — votre consentement est obligatoire" color={T.red} bg={T.redPale} onClick={()=>{go("droits");setDsec("mrl");}}/>
         </div>
@@ -514,11 +514,11 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           </div>
           <div style={{padding:"0 16px"}}>
             {[
-              {icon:"📄",label:"Télécharger la dernière facture",color:aSel.color,bg:aSel.bg},
-              {icon:"📲",label:"Payer en ligne",sub:`Orange Money · Wave · MTN`,color:T.green,bg:T.greenPale},
-              {icon:"🔔",label:"Activer les rappels de facture",sub:"SMS + WhatsApp avant la date de relevé",color:T.navy,bg:T.navyPale},
-              {icon:"📊",label:"Exporter l'historique 12 mois",color:T.purple,bg:T.purplePale},
-            ].map((a,i)=><ACard key={i} icon={a.icon} label={a.label} sub={a.sub} color={a.color} bg={a.bg} onClick={()=>{}}/>)}
+              {icon:"📄",label:"Télécharger la dernière facture",color:aSel.color,bg:aSel.bg,act:()=>{ window.open(`/mon-espace-locataire/cie-sodeci`, "_blank"); }},
+              {icon:"📲",label:"Payer en ligne",sub:`Orange Money · Wave · MTN`,color:T.green,bg:T.greenPale,act:()=>{ window.location.href = `/mon-espace-locataire/payment`; }},
+              {icon:"🔔",label:"Activer les rappels de facture",sub:"SMS + WhatsApp avant la date de relevé",color:T.navy,bg:T.navyPale,act:()=>{ window.location.href = `/mon-espace-locataire/preferences`; }},
+              {icon:"📊",label:"Exporter l'historique 12 mois",color:T.purple,bg:T.purplePale,act:()=>{ window.location.href = `/mon-espace-locataire/receipts`; }},
+            ].map((a: any,i)=><ACard key={i} icon={a.icon} label={a.label} sub={a.sub} color={a.color} bg={a.bg} onClick={a.act}/>)}
           </div>
         </div>
       )}

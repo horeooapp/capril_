@@ -403,9 +403,9 @@ export function OwnerPortalDashboardV2({
                <span>{a.icon || "🔔"}</span>
                <span>{a.text}</span>
              </span>
-             <button className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-colors">
+             <Link href="/dashboard/disputes" className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-bold text-slate-700 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 transition-colors inline-block">
                {a.btn || "Traiter"}
-             </button>
+             </Link>
            </div>
          ))}
       </SectionCard>

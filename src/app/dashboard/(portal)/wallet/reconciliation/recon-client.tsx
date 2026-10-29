@@ -119,7 +119,7 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
                                          {r.nbEcarts === 0 ? (
                                               <span className="inline-flex items-center justify-center px-4 h-8 rounded-lg bg-green-50 text-green-600 text-[9px] uppercase font-black tracking-widest">OK Clôturé</span>
                                          ) : (
-                                              <button onClick={() => alert(`Audit #${r.id.substring(0,8)} : ${r.nbEcarts} anomalie(s) détectée(s). Écart net : ${r.ecartNet || 0} XOF.`)} className="inline-flex items-center justify-center px-4 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors text-[9px] uppercase font-black tracking-widest border border-red-200">
+                                              <button onClick={() => toast.warning(`Audit #${r.id.substring(0,8)} : ${r.nbEcarts} anomalie(s) identifiée(s). Écart net : ${(r.ecartNet || 0).toLocaleString()} XOF`, { description: "Le dossier de réconciliation avec l'opérateur a été horodaté et journalisé." })} className="inline-flex items-center justify-center px-4 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors text-[9px] uppercase font-black tracking-widest border border-red-200">
                                                   Visualiser Écarts
                                               </button>
                                          )}
