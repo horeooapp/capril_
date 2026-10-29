@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { choisirTypeConnexion } from "@/actions/auth.actions";
+import InteractiveShowcase from "./InteractiveShowcase";
+import InteractiveModulesGrid from "./InteractiveModulesGrid";
+import InteractiveMarketChart from "./InteractiveMarketChart";
 import {
   FileText,
   CreditCard,
@@ -488,122 +491,8 @@ export default function QaprilLandingV2({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Pilier 1 */}
-            <div className="qp-card-light p-8 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706]">
-                    <FileText className="w-6 h-6" />
-                  </div>
-                  <span className="text-xs font-mono text-slate-400 font-bold">PILIER 01</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Contrat de bail clair & signature facile par SMS
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Remplissez votre contrat de bail d'habitation ou de commerce en quelques minutes. Les deux parties signent simplement avec un code secret reçu par SMS, sans avoir besoin de se déplacer. Le document est officiel et valable devant la loi.
-                </p>
-              </div>
-              <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Contrat 100 % conforme à la loi ivoirienne (Loi 2019-576)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Signature facile par SMS sur votre téléphone sans vous déplacer
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Votre contrat est conservé en lieu sûr et disponible à tout moment
-                </li>
-              </ul>
-            </div>
-
-            {/* Pilier 2 */}
-            <div className="qp-card-light p-8 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#059669]">
-                    <CreditCard className="w-6 h-6" />
-                  </div>
-                  <span className="text-xs font-mono text-slate-400 font-bold">PILIER 02</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Paiement Wave & Mobile Money avec reçu officiel
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Payez le loyer en quelques secondes avec Wave, Orange Money, MTN ou Moov. Dès réception du paiement, le locataire reçoit aussitôt son reçu officiel avec code QR, et le propriétaire est immédiatement notifié. Fini les querelles et les reçus papier perdus.
-                </p>
-              </div>
-              <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Reçu de loyer officiel avec QR Code reconnu par les banques et services
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> L'argent arrive directement sur le compte ou le numéro du propriétaire
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Historique propre et sans contestation de chaque mois payé
-                </li>
-              </ul>
-            </div>
-
-            {/* Pilier 3 */}
-            <div className="qp-card-light p-8 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-[#0284C7]">
-                    <ShieldCheck className="w-6 h-6" />
-                  </div>
-                  <span className="text-xs font-mono text-slate-400 font-bold">PILIER 03</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Caution de 2 mois protégée à la Caisse des Dépôts (CDC-CI)
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Respect strict de la loi ivoirienne : 2 mois de caution au maximum. L'argent est gardé en toute sécurité auprès de la Caisse des Dépôts et Consignations (CDC-CI). À la fin du contrat, la caution est reversée au locataire sans tracasserie si la maison est bien entretenue.
-                </p>
-              </div>
-              <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Plafonnement respecté : 2 mois de loyer au maximum
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Caution gardée en sécurité par l'institution publique (CDC-CI)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Remboursement rapide à la sortie des lieux sans rétention injustifiée
-                </li>
-              </ul>
-            </div>
-
-            {/* Pilier 4 */}
-            <div className="qp-card-light p-8 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706]">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <span className="text-xs font-mono text-slate-400 font-bold">PILIER 04</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5">
-                  Carnet de confiance & profil locataire sérieux
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  Chaque loyer payé à bonne date améliore la réputation du locataire. Ce carnet de confiance permet aux locataires sérieux de trouver facilement une nouvelle maison, et aux propriétaires de choisir des locataires fiables sans stress.
-                </p>
-              </div>
-              <ul className="space-y-2 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Niveau de confiance clair (du Grade A+ au Grade C)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Moins de risques d'impayés pour les propriétaires
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-[#059669]" /> Attestation facile à présenter pour trouver un nouveau logement
-                </li>
-              </ul>
-            </div>
+          <div className="mt-8">
+            <InteractiveShowcase />
           </div>
         </section>
 
@@ -954,115 +843,16 @@ export default function QaprilLandingV2({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {/* Module 1 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706] mb-4">
-                  <Wrench className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  État des lieux sur téléphone avec photos
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Prenez des photos de chaque pièce à l'entrée et à la sortie. Tout le monde est d'accord sur l'état de la maison, ce qui évite les palabres au moment de rendre la caution.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Protection de la caution · Photos datées
-              </div>
-            </div>
-
-            {/* Module 2 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#059669] mb-4">
-                  <Scale className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  Entente & règlement à l'amiable
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  En cas de retard de paiement ou de réparation à faire, un échange simple et encadré permet de trouver une solution rapide sans passer par de longues démarches au tribunal.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Résolution sans palabre
-              </div>
-            </div>
-
-            {/* Module 3 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-[#0284C7] mb-4">
-                  <Droplets className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  Suivi des factures CIE & SODECI
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Suivi clair des compteurs d'eau et d'électricité (compteurs partagés ou individuels) pour savoir exactement ce que chacun consomme sans surfacturation.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Compteurs d'eau et d'électricité
-              </div>
-            </div>
-
-            {/* Module 4 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706] mb-4">
-                  <FolderArchive className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  Classeur numérique sécurisé
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Gardez vos pièces d'identité, attestations de propriété (ACD, CMP) et contrats de bail bien rangés et protégés sur votre compte, accessibles à tout moment.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Documents protégés & confidentiels
-              </div>
-            </div>
-
-            {/* Module 5 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#059669] mb-4">
-                  <BarChart4 className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  Vrais prix des loyers par quartier
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Consultez les prix moyens pratiqués quartier par quartier à Abidjan et à l'intérieur (Cocody, Yopougon, Marcory, Plateau, Riviera, etc.) pour fixer le juste loyer.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Repères du marché ivoirien
-              </div>
-            </div>
-
-            {/* Module 6 */}
-            <div className="qp-card-light p-6 rounded-xl flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-[#0284C7] mb-4">
-                  <Smartphone className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-black text-slate-900 mb-2">
-                  Rappels par SMS & WhatsApp
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Recevez vos rappels de loyer, confirmations de paiement et messages importants directement sur votre WhatsApp ou par SMS classique sans connexion requise.
-                </p>
-              </div>
-              <div className="mt-5 pt-3.5 border-t border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Orange, MTN, Moov, Wave
-              </div>
-            </div>
+          <div className="mt-8">
+            <InteractiveModulesGrid />
           </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            ANIMATION GRAPHIQUE & OBSERVATOIRE INTERACTIF DU MARCHÉ (STYLE META/APPLE)
+        ══════════════════════════════════════════════════════════════════ */}
+        <section id="observatoire-marche" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
+          <InteractiveMarketChart />
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
