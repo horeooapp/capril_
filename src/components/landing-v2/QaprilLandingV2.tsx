@@ -193,7 +193,7 @@ export default function QaprilLandingV2({
         {/* ══════════════════════════════════════════════════════════════════
             2. HERO SECTION IMMERSIVE AVEC SLIDES EN ARRIÈRE-PLAN (STYLE PREMIUM ÉPURÉ)
         ══════════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-slate-950 text-white min-h-[660px] lg:min-h-[720px] flex flex-col justify-between border-b border-slate-800">
+        <section className="relative overflow-hidden bg-slate-950 text-white min-h-[800px] lg:min-h-[870px] flex flex-col justify-between border-b border-slate-800">
 
           {/* SLIDESHOW D'ARCHITECTURES EN ARRIÈRE-PLAN */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -223,7 +223,7 @@ export default function QaprilLandingV2({
           </div>
 
           {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
-          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-12 pb-8 lg:pt-16 lg:pb-10 w-full flex-1 flex flex-col justify-between">
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-12 lg:pt-24 lg:pb-16 w-full flex-1 flex flex-col justify-between">
 
             {/* Haut : Pitch Institutionnel & Titre Épuré */}
             <div>
