@@ -60,8 +60,17 @@ export default async function AdminLayout({
             <PushRegistration />
 
             <style dangerouslySetInnerHTML={{__html: `
-              body {
+              html, body {
                 background: #F8FAFC !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+              }
+              html::-webkit-scrollbar,
+              body::-webkit-scrollbar,
+              *::-webkit-scrollbar {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
               }
             `}} />
         </div>

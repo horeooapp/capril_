@@ -540,3 +540,27 @@
     min-width: 600px;
   }
 }
+
+/* HIDE VERTICAL & HORIZONTAL SCROLLBAR FOR ADMIN PORTAL */
+html:has(.admin-v2),
+body:has(.admin-v2),
+.admin-v2,
+.admin-v2 .main-content,
+.admin-v2 .content,
+.admin-v2 .nav {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+html:has(.admin-v2)::-webkit-scrollbar,
+body:has(.admin-v2)::-webkit-scrollbar,
+.admin-v2::-webkit-scrollbar,
+.admin-v2 .main-content::-webkit-scrollbar,
+.admin-v2 .content::-webkit-scrollbar,
+.admin-v2 .nav::-webkit-scrollbar,
+.admin-v2 *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
