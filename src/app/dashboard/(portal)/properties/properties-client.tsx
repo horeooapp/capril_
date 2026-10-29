@@ -59,20 +59,25 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
 
                         {/* Miniature Photo */}
                         <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 bg-slate-100 border border-slate-200 shadow-xs flex items-center justify-center">
-                            {p.images && p.images.length > 0 ? (
-                                <img 
-                                    src={(p.images.find((img: any) => img.isMain) || p.images[0]).s3Key} 
-                                    alt={p.name || "Photo du bien"} 
-                                    className="w-full h-full object-cover" 
-                                    onError={(e) => {
-                                        (e.target as HTMLElement).style.display = 'none';
-                                    }}
-                                />
-                            ) : (
-                                <div className="text-slate-400 flex flex-col items-center justify-center">
-                                    {p.typeStructure === 'IMMEUBLE' ? <Building2 size={16} /> : <Home size={16} />}
-                                </div>
-                            )}
+                            {(() => {
+                                const directImg = p.images && p.images.length > 0 ? (p.images.find((img: any) => img.isMain) || p.images[0]).s3Key : null;
+                                const parentImg = p.parentProperty?.images && p.parentProperty.images.length > 0 ? (p.parentProperty.images.find((img: any) => img.isMain) || p.parentProperty.images[0]).s3Key : null;
+                                const effectiveImg = directImg || parentImg;
+                                return effectiveImg ? (
+                                    <img 
+                                        src={effectiveImg} 
+                                        alt={p.name || "Photo du bien"} 
+                                        className="w-full h-full object-cover" 
+                                        onError={(e) => {
+                                            (e.target as HTMLElement).style.display = 'none';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="text-slate-400 flex flex-col items-center justify-center">
+                                        {p.typeStructure === 'IMMEUBLE' ? <Building2 size={16} /> : <Home size={16} />}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         <div>

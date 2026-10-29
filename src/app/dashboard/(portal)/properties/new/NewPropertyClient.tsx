@@ -83,29 +83,56 @@ export default function NewPropertyClient() {
     const [previews, setPreviews] = useState<string[]>([])
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || [])
+        const input = e.target
+        const files = Array.from(input.files || [])
+        if (!files.length) return
+
         if (images.length + files.length > 5) {
             setError("Vous pouvez ajouter jusqu'à 5 photos au maximum.")
+            input.value = ""
             return
         }
 
-        const newImages = [...images, ...files]
-        setImages(newImages)
+        // Convertir en Data URL base64 pour un aperçu instantané et garanti sans problème de CSP ni de révocation de Blob
+        const filePromises = files.map(file => {
+            return new Promise<string>((resolve) => {
+                const reader = new FileReader()
+                reader.onload = () => {
+                    resolve(reader.result as string)
+                }
+                reader.onerror = () => {
+                    try {
+                        resolve(URL.createObjectURL(file))
+                    } catch {
+                        resolve("")
+                    }
+                }
+                reader.readAsDataURL(file)
+            })
+        })
 
-        const newPreviews = files.map(file => URL.createObjectURL(file))
-        setPreviews([...previews, ...newPreviews])
-        setError("")
+        Promise.all(filePromises).then(newPreviews => {
+            const validPreviews = newPreviews.filter(Boolean)
+            setImages(prev => [...prev, ...files])
+            setPreviews(prev => [...prev, ...validPreviews])
+            setError("")
+            input.value = ""
+        })
     }
 
     const removeImage = (index: number) => {
-        const newImages = [...images]
-        newImages.splice(index, 1)
-        setImages(newImages)
-
-        const newPreviews = [...previews]
-        URL.revokeObjectURL(newPreviews[index])
-        newPreviews.splice(index, 1)
-        setPreviews(newPreviews)
+        setImages(prev => prev.filter((_, i) => i !== index))
+        setPreviews(prev => {
+            const target = prev[index]
+            if (target && target.startsWith("blob:")) {
+                try {
+                    URL.revokeObjectURL(target)
+                } catch (e) {
+                    // Ignore
+                }
+            }
+            return prev.filter((_, i) => i !== index)
+        })
     }
 
     const toggleAmenity = (id: string) => {
@@ -752,18 +779,37 @@ export default function NewPropertyClient() {
                         // Localisation héritée de l'immeuble parent
                         selectedParentId && (
                             <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5">
-                                <p className="text-xs font-black text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <p className="text-xs font-black text-emerald-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                                     <MapPin size={16} className="text-emerald-600" />
-                                    Adresse héritée automatiquement de l'immeuble
+                                    Adresse et coordonnées héritées de l'immeuble
                                 </p>
                                 {(() => {
                                     const p = parents.find(x => x.id === selectedParentId)
+                                    const parentImage = p?.images?.find((img: any) => img.isMain)?.s3Key || p?.images?.[0]?.s3Key
                                     return (
-                                        <div className="text-sm text-slate-800 space-y-1">
-                                            <p className="font-bold">{p?.name || 'Immeuble'}</p>
-                                            <p className="text-slate-600">{p?.address}, {p?.commune}</p>
-                                            <input type="hidden" name="addressLine1" value={p?.address || ''} />
-                                            <input type="hidden" name="commune" value={p?.commune || ''} />
+                                        <div className="flex items-center gap-4">
+                                            {parentImage ? (
+                                                <img 
+                                                    src={parentImage} 
+                                                    alt={p?.name || "Photo de l'immeuble"} 
+                                                    className="w-16 h-16 rounded-xl object-cover border border-emerald-300 shadow-xs flex-shrink-0"
+                                                />
+                                            ) : (
+                                                <div className="w-16 h-16 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                                                    <Building2 size={24} />
+                                                </div>
+                                            )}
+                                            <div className="text-sm text-slate-800 space-y-0.5">
+                                                <p className="font-bold text-emerald-950">{p?.name || 'Immeuble'}</p>
+                                                <p className="text-slate-600 text-xs">{p?.address}, {p?.commune}</p>
+                                                <input type="hidden" name="addressLine1" value={p?.address || ''} />
+                                                <input type="hidden" name="commune" value={p?.commune || ''} />
+                                                {parentImage && (
+                                                    <p className="text-[11px] text-emerald-700 font-medium">
+                                                        ✓ Photo principale de l'immeuble associée
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                     )
                                 })()}
@@ -917,17 +963,20 @@ export default function NewPropertyClient() {
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                         {previews.map((preview, index) => (
-                            <div key={index} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 shadow-sm group">
+                            <div key={index} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 shadow-sm group bg-slate-100">
                                 <img 
                                     src={preview} 
                                     alt={`Aperçu ${index + 1}`} 
-                                    className="w-full h-full object-cover" 
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                                    onError={(e) => {
+                                        console.warn("Échec d'affichage aperçu photo", index);
+                                    }}
                                 />
                                 <button 
                                     type="button" 
                                     onClick={() => removeImage(index)}
                                     title="Supprimer cette photo"
-                                    className="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full shadow-md opacity-90 hover:opacity-100 transition-opacity"
+                                    className="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full shadow-md opacity-90 hover:opacity-100 transition-opacity z-10"
                                 >
                                     <X size={14} />
                                 </button>
@@ -940,8 +989,12 @@ export default function NewPropertyClient() {
                         ))}
 
                         {images.length < 5 && (
-                            <label className="aspect-square border-2 border-dashed border-slate-300 hover:border-[#FF8200] hover:bg-orange-50/30 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all text-slate-400 hover:text-[#FF8200] group p-3 text-center">
+                            <label 
+                                htmlFor="property-image-upload"
+                                className="aspect-square border-2 border-dashed border-slate-300 hover:border-[#FF8200] hover:bg-orange-50/30 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all text-slate-400 hover:text-[#FF8200] group p-3 text-center"
+                            >
                                 <input 
+                                    id="property-image-upload"
                                     type="file" 
                                     accept="image/png, image/jpeg, image/jpg, image/webp" 
                                     multiple 
@@ -958,6 +1011,29 @@ export default function NewPropertyClient() {
                             </label>
                         )}
                     </div>
+
+                    {structureCategory === 'ENFANT' && selectedParentId && (() => {
+                        const p = parents.find(x => x.id === selectedParentId)
+                        const parentImage = p?.images?.find((img: any) => img.isMain)?.s3Key || p?.images?.[0]?.s3Key
+                        if (!parentImage) return null
+                        return (
+                            <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200 text-xs text-emerald-800 flex items-center gap-4">
+                                <img 
+                                    src={parentImage} 
+                                    alt={p?.name || "Bâtiment parent"} 
+                                    className="w-16 h-16 rounded-xl object-cover border border-emerald-300 shadow-xs flex-shrink-0"
+                                />
+                                <div>
+                                    <p className="font-bold text-emerald-950 text-sm">🏢 Photo du bâtiment parent : {p?.name}</p>
+                                    <p className="text-emerald-700 text-xs mt-0.5">
+                                        {images.length === 0 
+                                            ? "Aucune photo spécifique n'a été ajoutée ci-dessus. Cette photo de l'immeuble sera automatiquement utilisée pour ce logement."
+                                            : "Vous avez ajouté des photos spécifiques ci-dessus qui seront privilégiées pour ce logement."}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                    })()}
 
                     <div className="p-4 bg-amber-50/60 rounded-xl border border-amber-200/80 text-xs text-amber-800 leading-relaxed flex items-start gap-2.5">
                         <Info size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />

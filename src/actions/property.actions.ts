@@ -95,7 +95,7 @@ export async function getProperties() {
                         }
                     }
                 },
-                parentProperty: true,
+                parentProperty: { include: { images: true } },
                 leases: {
                     include: {
                         tenant: { select: { firstName: true, lastName: true, phone: true } },
@@ -361,6 +361,7 @@ export async function getPropertyById(id: string) {
             where: { id },
             include: { 
                 images: true,
+                parentProperty: { include: { images: true } },
                 leases: { include: { tenant: { select: { firstName: true, lastName: true, phone: true } } } } 
             }
         });
@@ -628,7 +629,17 @@ export async function getMyParentStructures() {
   const session = await ensureAuthenticated();
   return prisma.property.findMany({
     where: { ownerUserId: session.user.id, typeStructure: { in: ["COUR_COMMUNE", "IMMEUBLE", "RESIDENCE"] }, status: { not: "archived" } },
-    select: { id: true, name: true, typeStructure: true, propertyCode: true, commune: true, address: true },
+    select: { 
+      id: true, 
+      name: true, 
+      typeStructure: true, 
+      propertyCode: true, 
+      commune: true, 
+      address: true,
+      images: {
+        select: { s3Key: true, isMain: true }
+      }
+    },
     orderBy: { createdAt: "desc" }
   });
 }
