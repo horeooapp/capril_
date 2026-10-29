@@ -16,13 +16,17 @@ export const dynamic = "force-dynamic"
 export default async function DashboardPage() {
     const session = await auth();
     const user = await getCurrentUser();
-    
+
     if (!user || !session?.user) {
         redirect("/dashboard/login");
     }
 
-    // [FIX DÉFINITIF] Prioritize DB preference (capaciteActive) over Session because cookie updates can lag behind UI.
-    const activeRole = (user as any).capaciteActive || (session.user as any).chosenRole || user.role;
+    // RÔLE ACTIF : Priorité absolue au rôle de la session (page de connexion choisie)
+    const activeRole = (session.user as any).chosenRole || session.user.role || (user as any).capaciteActive;
+
+    if (['TENANT', 'LOCATAIRE'].includes(activeRole)) {
+        redirect("/mon-espace-locataire");
+    }
 
     const [properties, reports, diasporaData, intermData, agencyData, dashboardAggregates] = await Promise.all([
         getProperties() as Promise<any[]>,
@@ -36,8 +40,8 @@ export default async function DashboardPage() {
     const latestReport = reports[0] || null
 
     return (
-        <DashboardOverviewClient 
-            user={user} 
+        <DashboardOverviewClient
+            user={user}
             activeRole={activeRole}
             session={session!}
             properties={properties || []}

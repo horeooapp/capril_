@@ -49,8 +49,7 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                 const { verifyAdmin2FA } = await import("@/actions/auth")
                 const result = await verifyAdmin2FA(email, password, otp)
                 if (result.success) {
-                    router.push(redirectPath)
-                    router.refresh()
+                    window.location.href = redirectPath;
                 } else {
                     setError(result.error || "Code WhatsApp incorrect ou expiré.")
                 }
@@ -73,8 +72,8 @@ export default function AdminLoginForm({ redirectPath, title, subtitle }: AdminL
                         </h2>
                     </div>
                     <p className="text-sm text-slate-500 font-medium">
-                        {step === 'OTP' 
-                            ? `Saisissez le code de sécurité envoyé sur votre WhatsApp au ${maskedPhone}` 
+                        {step === 'OTP'
+                            ? `Saisissez le code de sécurité envoyé sur votre WhatsApp au ${maskedPhone}`
                             : subtitle}
                     </p>
                 </div>

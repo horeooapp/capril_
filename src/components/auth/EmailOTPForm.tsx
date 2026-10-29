@@ -43,10 +43,9 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
             try {
                 const result = await loginWithOTP(email, otp, role)
                 if (!result || result.success) {
-                    // Determine redirection based on onboarding status (default to redirectPath if unknown)
-                    const finalPath = result?.onboardingComplete === false ? "/onboarding" : redirectPath
-                    router.push(finalPath)
-                    router.refresh()
+                    // Redirection immédiate et nette vers le dashboard du rôle choisi
+                    const finalPath = (result?.onboardingComplete === false && role === 'LANDLORD') ? "/onboarding" : redirectPath;
+                    window.location.href = finalPath;
                 } else {
                     setError(result.error || "Code incorrect ou expiré.")
                 }
@@ -114,14 +113,14 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
             {/* Opaque Architectural White Card */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 sm:p-10 relative">
                 <div className="mb-8 text-center">
-                    <motion.h2 
+                    <motion.h2
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`text-2xl sm:text-3xl font-black tracking-tight uppercase leading-tight mb-2.5 ${theme.primaryText}`}
                     >
                         {title}
                     </motion.h2>
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -133,7 +132,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
 
                 <AnimatePresence mode="wait">
                     {error && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
@@ -147,7 +146,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
 
                 <AnimatePresence mode="wait">
                     {step === 'EMAIL' ? (
-                        <motion.form 
+                        <motion.form
                             key="email-step"
                             variants={containerVariants}
                             initial="hidden"
@@ -208,7 +207,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                             </motion.button>
                         </motion.form>
                     ) : (
-                        <motion.form 
+                        <motion.form
                             key="otp-step"
                             variants={containerVariants}
                             initial="hidden"
@@ -249,7 +248,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                 >
                                     {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Vérifier et me connecter"}
                                 </motion.button>
-                                
+
                                 <button
                                     type="button"
                                     onClick={() => setStep('EMAIL')}
@@ -264,8 +263,8 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                 </AnimatePresence>
 
                 <div className="mt-8 pt-5 border-t border-slate-100 flex flex-col items-center gap-2">
-                    <Link 
-                        href="/" 
+                    <Link
+                        href="/"
                         className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors"
                     >
                         <Home className="w-3.5 h-3.5" />

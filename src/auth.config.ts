@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth"
 import type { Role } from "@prisma/client"
 
 export const authConfig = {
-    session: { 
+    session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
     },
@@ -15,14 +15,18 @@ export const authConfig = {
     callbacks: {
         async jwt({ token, user, trigger, session }) {
             if (trigger === "update" && session?.user) {
-                // Merge dynamically updated token fields (e.g. onboardingComplete)
                 Object.assign(token, session.user);
+                if (session.user.role) token.role = session.user.role;
+                if (session.user.chosenRole) token.chosenRole = session.user.chosenRole;
             }
             if (user) {
+                const activeRole = (user as any).chosenRole || (user as any).capaciteActive || user.role || 'TENANT';
                 token.id = user.id
                 token.email = user.email
                 token.phone = user.phone
-                token.role = user.role as Role
+                token.role = activeRole as Role
+                token.chosenRole = activeRole
+                token.capaciteActive = activeRole
                 token.profileType = (user as any).profileType
                 token.status = user.status
                 token.firstName = (user as any).firstName;
@@ -30,22 +34,21 @@ export const authConfig = {
                 token.onboardingComplete = (user as any).onboardingComplete
                 token.diasporaAbonnement = (user as any).diasporaAbonnement
                 token.eligibleRoles = (user as any).eligibleRoles
-                token.requiresRoleSelection = (user as any).requiresRoleSelection
-                token.capaciteActive = (user as any).capaciteActive
+                token.requiresRoleSelection = false
                 token.capacites = (user as any).capacites
-                
-                // PRIORITY: If we have a choice from the DB, it's our chosenRole
-                token.chosenRole = (user as any).capaciteActive || (user as any).chosenRole || null
             }
 
             return token
         },
         async session({ session, token }) {
             if (session.user) {
+                const activeRole = ((token.chosenRole as string) || (token.role as string) || 'TENANT') as Role;
                 session.user.id = token.id as string
                 session.user.email = token.email as string
                 session.user.phone = token.phone as string
-                session.user.role = (token.role as Role) || 'TENANT'
+                session.user.role = activeRole;
+                (session.user as any).chosenRole = activeRole;
+                (session.user as any).capaciteActive = activeRole
                 session.user.status = token.status as any
                 (session.user as any).firstName = token.firstName as string;
                 (session.user as any).lastName = token.lastName as string;
@@ -53,9 +56,7 @@ export const authConfig = {
                 (session.user as any).profileType = token.profileType as string;
                 (session.user as any).diasporaAbonnement = token.diasporaAbonnement as boolean;
                 (session.user as any).eligibleRoles = token.eligibleRoles as string[];
-                (session.user as any).chosenRole = token.chosenRole as string;
-                (session.user as any).requiresRoleSelection = token.requiresRoleSelection as boolean;
-                (session.user as any).capaciteActive = token.capaciteActive as string | null;
+                (session.user as any).requiresRoleSelection = false;
                 (session.user as any).capacites = token.capacites as string[] || [];
             }
             return session
@@ -63,10 +64,10 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const pathname = nextUrl.pathname;
-            const role = auth?.user?.role;
+            const activeRole = String((auth?.user as any)?.chosenRole || auth?.user?.role || (auth?.user as any)?.capaciteActive || '').toUpperCase();
 
-            // 1. PUBLIC PATHS
-            const isPublic = 
+            // 1. CHEMINS PUBLICS
+            const isPublic =
                 pathname === "/" ||
                 pathname.includes("/login") ||
                 pathname.startsWith("/api/webhooks") ||
@@ -77,88 +78,51 @@ export const authConfig = {
                 pathname.startsWith("/uploads/") ||
                 ["/impact", "/expertise", "/a-propos", "/faq", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif"].includes(pathname);
 
-            if (isPublic) {
-                if (isLoggedIn && pathname.includes("/login")) {
-                    const onboardingFait = (auth?.user as any)?.onboardingComplete;
-                    const chosenRole = (auth?.user as any)?.chosenRole;
-                    const capaciteActive = (auth?.user as any)?.capaciteActive;
-                    const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
-                    
-                    if (requiresRoleSelection && !chosenRole && !capaciteActive) {
-                        return Response.redirect(new URL("/auth/choose-role", nextUrl));
-                    }
-                    
-                    const effectiveRole = capaciteActive || chosenRole || role;
-
-                    if (effectiveRole === 'ADMIN' || effectiveRole === 'SUPER_ADMIN') return Response.redirect(new URL("/admin", nextUrl));
-                    if (effectiveRole === 'TENANT') return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
-                    
-                    // LANDLORD / PROPRIETAIRE
-                    if (!onboardingFait) {
-                         return Response.redirect(new URL("/onboarding", nextUrl));
-                    }
-                    return Response.redirect(new URL("/dashboard", nextUrl));
-                }
-                return true;
+            // Redirection intelligente si déjà connecté sur /login générique
+            if (isLoggedIn && pathname === "/login") {
+                if (['ADMIN', 'SUPER_ADMIN'].includes(activeRole)) return Response.redirect(new URL("/admin", nextUrl));
+                if (['TENANT', 'LOCATAIRE'].includes(activeRole)) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                return Response.redirect(new URL("/dashboard", nextUrl));
             }
 
-            // 2. PROTECTED ROUTES
+            if (isPublic) return true;
+
+            // 2. CHEMINS PROTÉGÉS - UTILISATEUR NON CONNECTÉ
             if (!isLoggedIn) {
                 if (pathname.startsWith("/admin")) return Response.redirect(new URL("/admin/login", nextUrl));
                 if (pathname.startsWith("/mon-espace-locataire")) return Response.redirect(new URL("/mon-espace-locataire/login", nextUrl));
                 return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
-            // 3. ROLE-BASED ACCESS CONTROL (ENFORCEMENT)
-            const onboardingFait = (auth?.user as any)?.onboardingComplete;
-            const chosenRole = (auth?.user as any)?.chosenRole;
-            const capaciteActive = (auth?.user as any)?.capaciteActive;
-            const capacites = ((auth?.user as any)?.capacites as string[]) || [];
-            const rawEligible = ((auth?.user as any)?.eligibleRoles as string[]) || [role];
-            const allRoles = [...rawEligible, ...capacites, capaciteActive, chosenRole, role].filter(Boolean);
+            // 3. CONTRÔLE D'ACCÈS STRICT SELON LE RÔLE ACTIF (RBAC)
+            const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(activeRole);
+            const isTenant = ['TENANT', 'LOCATAIRE'].includes(activeRole);
 
-            const requiresRoleSelection = (auth?.user as any)?.requiresRoleSelection;
-
-            // Enforce role selection if needed
-            if (requiresRoleSelection && !chosenRole && !capaciteActive && !pathname.startsWith("/auth/choose-role") && !pathname.startsWith("/api/auth")) {
-                return Response.redirect(new URL("/auth/choose-role", nextUrl));
-            }
-
-            // 4. PATH-BASED ACCESS CONTROL
-            const isAdmin = allRoles.some((r: string) => ['ADMIN', 'SUPER_ADMIN'].includes(r.toUpperCase()));
-            const isTenant = allRoles.some((r: string) => ['TENANT', 'LOCATAIRE'].includes(r.toUpperCase()));
-            const hasDashAccess = allRoles.some((r: string) => 
-                ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'BAILLEUR', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE'].includes(r.toUpperCase())
-            );
-
-            // Access to Dashboard (Bailleurs, Agencies, Diaspora)
-            if (pathname.startsWith("/dashboard")) {
-                if (!hasDashAccess && !isAdmin) {
-                    if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
-                    return Response.redirect(new URL("/", nextUrl));
-                }
-                if (!onboardingFait && hasDashAccess && !pathname.startsWith("/onboarding")) {
-                     return Response.redirect(new URL("/onboarding", nextUrl));
-                }
-            }
-            
-            // Access to Locataire
-            if (pathname.startsWith("/mon-espace-locataire")) {
-                if (!isTenant && !isAdmin) {
-                    if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
-                    return Response.redirect(new URL("/", nextUrl));
-                }
-            }
-
-            // Access to Admin
+            // Route Admin
             if (pathname.startsWith("/admin")) {
                 if (!isAdmin) {
-                    if (!pathname.startsWith("/api") && !pathname.startsWith("/_next")) {
-                         if (hasDashAccess) return Response.redirect(new URL("/dashboard", nextUrl));
-                         if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
-                         return Response.redirect(new URL("/", nextUrl));
-                    }
+                    if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                    return Response.redirect(new URL("/dashboard", nextUrl));
                 }
+                return true;
+            }
+
+            // Route Espace Locataire (/mon-espace-locataire)
+            if (pathname.startsWith("/mon-espace-locataire")) {
+                if (!isTenant && !isAdmin) {
+                    // Un propriétaire/agence connecté ne peut pas naviguer dans l'espace locataire
+                    return Response.redirect(new URL("/dashboard", nextUrl));
+                }
+                return true;
+            }
+
+            // Route Dashboard Gestionnaire/Propriétaire (/dashboard)
+            if (pathname.startsWith("/dashboard")) {
+                if (isTenant && !isAdmin) {
+                    // Un locataire connecté ne peut JAMAIS être devant le dashboard propriétaire
+                    return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                }
+                return true;
             }
 
             return true;

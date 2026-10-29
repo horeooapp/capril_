@@ -28,37 +28,24 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    // CRITICAL: Determine effective active role
-    let activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role;
+    // RÔLE ACTIF STRICT : priorité absolue au rôle de session choisi à la connexion
+    const activeRole = (session.user as any).chosenRole || session.user.role || (dbUser as any).capaciteActive;
 
-    // Check if user has landlord/agency capabilities
-    const userCapacites = ((dbUser as any).capacites as string[]) || [];
-    const canAccessDashboard = ['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'DIASPORA', 'PROPRIETAIRE', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE'].includes(dbUser.role) ||
-        userCapacites.some((c: string) => ['PROPRIETAIRE', 'LANDLORD', 'LANDLORD_PRO', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'INTERMEDIAIRE', 'AGENCY'].includes(c.toUpperCase()));
-
-    // If activeRole is TENANT but user has landlord capabilities, switch activeRole automatically to PROPRIETAIRE
-    if (activeRole === "TENANT" && canAccessDashboard) {
-        activeRole = "PROPRIETAIRE";
-        await prisma.user.update({
-            where: { id: dbUser.id },
-            data: { capaciteActive: "PROPRIETAIRE" }
-        }).catch(() => {});
+    // Si le rôle actif est Locataire, redirection stricte vers l'espace locataire
+    if (activeRole === "TENANT" || activeRole === "LOCATAIRE") {
+        redirect("/mon-espace-locataire");
     }
 
-    // Role Enforcement: Only redirect to tenant space if user is strictly a tenant with no dashboard capabilities
-    if (activeRole === "TENANT" && !canAccessDashboard) {
-        redirect("/mon-espace-locataire")
-    }
-
+    // Si le rôle actif est Admin, redirection vers la console admin
     if (activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") {
-        redirect("/admin")
+        redirect("/admin");
     }
 
     // [RÈGLE 3 & 4] RBAC SERVER-SIDE ENFORCEMENT : Empêcher l'accès par URL directe non autorisée
     const profile = normalizeProfileRole(activeRole);
     const headersList = await headers();
     const currentPath = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
-    
+
     if (currentPath && currentPath.startsWith("/dashboard") && currentPath !== "/dashboard") {
         if (!isRouteAllowedForProfile(currentPath, profile)) {
             console.warn(`[RBAC] Accès direct refusé: profil ${profile} a tenté d'accéder à ${currentPath}`);

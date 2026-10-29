@@ -18,53 +18,19 @@ export default async function LocataireLayout({
 }) {
     const session = await auth()
 
-    let computedRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    if (session?.user) {
-        const dbUser = await prisma.user.findUnique({
-             where: { id: session.user.id },
-             select: { capaciteActive: true }
-        });
-        
-        // CRITICAL (Rule R-01): Standardized Role Identification
-        computedRole = (dbUser as any)?.capaciteActive || (session.user as any).chosenRole || session.user.role;
+    if (!session?.user) {
+        redirect("/mon-espace-locataire/login");
+    }
 
-        // CRITICAL: Verify Global Role Concurrency Lock
-        const isGloballyActive = await isRoleGloballyActive(session.user.id, computedRole);
-        if (!isGloballyActive) {
-            // Just sync redis with DB to self-heal
-            const { redis } = await import("@/lib/redis");
-            if (redis) await redis.set(`user:active_role:${session.user.id}`, computedRole);
-        }
+    // RÔLE ACTIF : Priorité absolue au rôle de session choisi à la connexion
+    const computedRole = (session?.user as any)?.chosenRole || session?.user?.role;
 
-        // Si l'utilisateur consulte son espace locataire, basculer sa capacité active sur TENANT
-        const isTenant = computedRole === "TENANT" || (session.user as any).role === "TENANT" || (session.user as any)?.eligibleRoles?.includes("TENANT");
-        if (computedRole !== "TENANT") {
-            // Vérifier s'il a un bail locataire actif ou une déclaration M-SIGN
-            const hasTenantLease = await prisma.lease.findFirst({
-                where: { tenantId: session.user.id },
-                select: { id: true }
-            });
-
-            let hasPendingBdq = false;
-            if (!hasTenantLease && session.user.phone) {
-                const { normalizePhone } = await import("@/lib/phone");
-                const norm = normalizePhone(session.user.phone);
-                const bdq = await prisma.bailDeclaratif.findFirst({
-                    where: { telephoneLocataire: norm },
-                    select: { id: true }
-                });
-                hasPendingBdq = !!bdq;
-            }
-
-            if (hasTenantLease || hasPendingBdq || isTenant) {
-                computedRole = "TENANT";
-                await prisma.user.update({
-                    where: { id: session.user.id },
-                    data: { capaciteActive: "TENANT" }
-                }).catch(() => {});
-            } else {
-                redirect("/dashboard");
-            }
+    // Si le rôle actif n'est pas Locataire, renvoyer immédiatement vers le dashboard propriétaire ou admin
+    if (computedRole && !['TENANT', 'LOCATAIRE'].includes(computedRole)) {
+        if (['ADMIN', 'SUPER_ADMIN'].includes(computedRole)) {
+            redirect("/admin");
+        } else {
+            redirect("/dashboard");
         }
     }
 
@@ -103,8 +69,8 @@ export default async function LocataireLayout({
     }
 
     return (
-        <LocataireLayoutClient 
-            session={session} 
+        <LocataireLayoutClient
+            session={session}
             onLogout={handleLogout}
             dbActiveRole={computedRole}
         >

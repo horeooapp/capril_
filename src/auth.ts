@@ -132,13 +132,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         if (isDiaspora) eligibleRolesSet.add('DIASPORA');
                         if (isAdmin) eligibleRolesSet.add('ADMIN');
 
-                        // ADD MISSING CAPACITIES FROM DATABASE 
+                        // ADD MISSING CAPACITIES FROM DATABASE
                         if (user.capacites && user.capacites.length > 0) {
                             user.capacites.forEach((c: any) => {
                                 const cap = c.capacite.toUpperCase();
                                 if (cap === 'PROPRIETAIRE' || cap === 'LANDLORD' || cap === 'LANDLORD_PRO') eligibleRolesSet.add('LANDLORD');
                                 else if (cap === 'LOCATAIRE' || cap === 'TENANT') eligibleRolesSet.add('TENANT');
-                                else if (cap === 'AGENCE_AGREE' || cap === 'AGENCY') { 
+                                else if (cap === 'AGENCE_AGREE' || cap === 'AGENCY') {
                                     eligibleRolesSet.add('AGENCY');
                                     eligibleRolesSet.add('AGENCE_AGREE');
                                 }
@@ -164,7 +164,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         // ASSOUPLISSEMENT DES RÈGLES : Un utilisateur peut cumuler Locataire et Propriétaire
                         const isDashboardRequest = ['LANDLORD', 'AGENCY', 'NON_CERTIFIED_AGENT', 'INTERMEDIARY', 'DIASPORA'].includes(reqRole);
-                        
+
                         if (isDashboardRequest) {
                             const hasAnyDashboardRole = Array.from(eligibleRolesSet).some(r => ['LANDLORD', 'AGENCY', 'NON_CERTIFIED_AGENT', 'INTERMEDIARY', 'DIASPORA'].includes(r));
                             if (!hasAnyDashboardRole) {
@@ -178,52 +178,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             }
                         }
 
-                        const eligibleRoles = Array.from(eligibleRolesSet);
+                        // ────────────────────────────────────────────────────────
+                        // RÔLE ACTIF = STRICTEMENT CELUI DEMANDÉ À LA CONNEXION (reqRole)
+                        // Une session = Un utilisateur + Un rôle actif choisi à la connexion.
+                        // ────────────────────────────────────────────────────────
+                        const activeRole = reqRole;
 
-                        if (eligibleRoles.length === 0) {
-                             throw new CustomAuthError("no_valid_role");
+                        if (!eligibleRolesSet.has(activeRole)) {
+                            eligibleRolesSet.add(activeRole);
                         }
 
-                        // PRIORITY: Determine chosen role based on Database State (V4)
-                        let finalChosenRole = (user as any).capaciteActive || null;
-                        let requiresSelection = false;
-
-                        // If explicitly requested Tenant, respect it
-                        if (reqRole === 'TENANT' && eligibleRoles.includes('TENANT')) {
-                            finalChosenRole = 'TENANT';
-                            requiresSelection = false;
-                        } 
-                        // If no DB choice but multiple options exist, force selection
-                        else if (!finalChosenRole && eligibleRoles.length > 1) {
-                            requiresSelection = true;
-                        } 
-                        // If only one choice, use it
-                        else if (!finalChosenRole && eligibleRoles.length === 1) {
-                            finalChosenRole = eligibleRoles[0];
-                        }
+                        // Mettre à jour en base de données pour aligner les requêtes Prisma ultérieures
+                        await prisma.user.update({
+                            where: { id: user.id },
+                            data: { capaciteActive: activeRole }
+                        }).catch((err: any) => console.error("[AUTH] Could not update capaciteActive:", err));
 
                         return {
                             id: user.id,
                             email: user.email,
                             phone: user.phone,
-                            role: user.role,
+                            role: activeRole, // Le rôle actif de la session
                             status: user.status as any,
                             fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
-                            capaciteActive: (user as any).capaciteActive,
-                            capacites: (user as any).capacites.map((c: any) => c.capacite),
-                            eligibleRoles: eligibleRoles,
-                            chosenRole: finalChosenRole,
-                            requiresRoleSelection: requiresSelection
+                            capaciteActive: activeRole,
+                            capacites: Array.from(eligibleRolesSet),
+                            eligibleRoles: Array.from(eligibleRolesSet),
+                            chosenRole: activeRole,
+                            requiresRoleSelection: false
                         } as any;
                     }
 
                     if (!user) {
-                        const { cookies } = await import("next/headers");
-                        const cookieStore = await cookies();
-                        const typeChoisi = cookieStore.get("qapril_type")?.value ?? "TENANT";
-                        const roleBase = typeChoisi === "ADMIN" ? "ADMIN" : typeChoisi === "LOCATAIRE" ? "TENANT" : "LANDLORD";
+                        const roleBase = requestedRoleNormalise === "ADMIN"
+                            ? "ADMIN"
+                            : requestedRoleNormalise === "LANDLORD"
+                                ? "LANDLORD"
+                                : requestedRoleNormalise === "AGENCY"
+                                    ? "AGENCY"
+                                    : "TENANT";
 
                         const newUser = await prisma.user.create({
                             data: {
@@ -231,22 +226,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 role: roleBase,
                                 status: 'PENDING_PROFILE',
                                 phone: `PENDING_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
-                                onboardingComplete: typeChoisi === "LOCATAIRE",
-                                capaciteActive: typeChoisi === "LOCATAIRE" ? null : roleBase === "LANDLORD" ? "PROPRIETAIRE" : roleBase
+                                onboardingComplete: roleBase === "TENANT",
+                                capaciteActive: roleBase
                             }
                         });
-                        
+
                         return {
                             id: newUser.id,
                             email: newUser.email,
                             phone: newUser.phone,
-                            role: newUser.role,
+                            role: roleBase,
                             status: newUser.status,
                             fullName: (newUser.firstName ? newUser.firstName + " " : "") + (newUser.lastName || ""),
                             onboardingComplete: newUser.onboardingComplete,
-                            capaciteActive: (newUser as any).capaciteActive,
-                            capacites: [],
+                            capaciteActive: roleBase,
+                            capacites: [roleBase],
                             eligibleRoles: [roleBase],
+                            chosenRole: roleBase,
                             requiresRoleSelection: false
                         } as any;
                     }
@@ -341,7 +337,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     } as any;
                 } catch (error: any) {
                     console.error("[AUTH-ERROR] Admin failure:", error.message || error);
-                    throw error; 
+                    throw error;
                 }
             }
         })
