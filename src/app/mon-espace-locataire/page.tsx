@@ -34,6 +34,7 @@ import {
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import { confirmBDQFromDashboard } from "@/actions/lease.actions"
+import PendingLeaseValidationCard from "@/components/tenant/PendingLeaseValidationCard"
 
 // Badge component defined outside to avoid ReferenceError in early returns
 const Badge = ({ label, color, bg, size = 10 }: any) => (
@@ -107,6 +108,7 @@ export default function LocataireDashboardPage() {
 
     if (!dashboardData.hasLease) {
         const pending = dashboardData.pendingDeclarations || [];
+        const pendingLease = dashboardData.pendingSignatureLease;
 
         return (
             <div className="flex flex-col items-center justify-center min-h-[85vh] text-center px-4 relative overflow-hidden py-16">
@@ -116,8 +118,14 @@ export default function LocataireDashboardPage() {
                     initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative z-10 w-full max-w-3xl"
+                    className="relative z-10 w-full max-w-3xl space-y-8"
                 >
+                    {/* Carte Prioritaire : Signature de Bail Détectée */}
+                    {pendingLease && (
+                        <div className="text-left">
+                            <PendingLeaseValidationCard lease={pendingLease} onSuccess={() => window.location.reload()} />
+                        </div>
+                    )}
                     {pending.length > 0 ? (
                         <div className="space-y-8">
                              <div className="space-y-3">
@@ -221,17 +229,18 @@ export default function LocataireDashboardPage() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link 
+                                    href="/valider-bail" 
+                                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                                >
+                                    <span>Valider un code de bail reçu</span>
+                                    <Key size={14} />
+                                </Link>
+                                <Link 
                                     href="/onboarding/tenant" 
                                     className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs"
                                 >
                                     Compléter mon profil
                                 </Link>
-                                <button 
-                                    onClick={() => router.push('/contact')} 
-                                    className="bg-white border border-slate-200 text-slate-700 font-bold px-8 py-3.5 rounded-xl hover:bg-slate-50 transition-all text-xs"
-                                >
-                                    Centre d'aide & FAQ
-                                </button>
                             </div>
                         </div>
                     )}
@@ -311,6 +320,16 @@ export default function LocataireDashboardPage() {
                     </div>
                 </div>
             </header>
+
+            {/* Carte Prioritaire : Signature de Bail en Attente */}
+            {(dashboardData.pendingSignatureLease || ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'DRAFT'].includes(lease?.status) || !lease?.isSignedElectronically) && (
+                <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                    <PendingLeaseValidationCard 
+                        lease={dashboardData.pendingSignatureLease || lease} 
+                        onSuccess={() => window.location.reload()} 
+                    />
+                </div>
+            )}
 
             {/* 2. The Bento Grid */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-min">

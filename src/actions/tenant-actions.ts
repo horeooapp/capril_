@@ -147,12 +147,37 @@ export async function getTenantDashboard() {
             }
         }) : [];
 
+        // Détecter un éventuel contrat de bail en attente de signature
+        const pendingSignatureLease = await prisma.lease.findFirst({
+            where: {
+                OR: [
+                    { tenantId: userId },
+                    ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                    ...(user.email ? [{ tenant: { email: user.email } }] : [])
+                ],
+                status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] }
+            },
+            include: {
+                property: true,
+                landlord: { 
+                    select: { 
+                        lastName: true, 
+                        firstName: true, 
+                        phone: true,
+                        walletConfig: { select: { landlordCode: true } }
+                    } 
+                }
+            },
+            orderBy: { createdAt: "desc" }
+        });
+
         if (!activeLease) {
             return serializeObject({ 
                 success: true, 
                 hasLease: false, 
                 user,
-                pendingDeclarations: pendingDeclarations 
+                pendingDeclarations: pendingDeclarations,
+                pendingSignatureLease: pendingSignatureLease ? serializeLease(pendingSignatureLease) : null
             })
         }
 
@@ -195,7 +220,8 @@ export async function getTenantDashboard() {
             },
             utilities,
             score: locataireProfile?.scoreActuel || 750,
-            pendingDeclarations
+            pendingDeclarations,
+            pendingSignatureLease: pendingSignatureLease ? serializeLease(pendingSignatureLease) : null
         })
 
     } catch (error: any) {

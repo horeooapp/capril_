@@ -164,9 +164,11 @@ export async function createLease(data: {
             update: { walletBalance: newBal }
         });
 
-        // 6. Security Hash
+        // 6. Security Hash & Validation OTP
         const leaseRef = await generateLeaseRef(data.leaseType);
         const sha256 = await generateProofHash({ leaseRef, propertyId: data.propertyId, landlordId: ownerId, rent: data.rentAmount });
+        const signingOtp = randomInt(100000, 999999).toString();
+        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours de validité
 
         // 7. DB Save: Set status to PENDING_SIGNATURE for direct tenant review & signature
         const lease = await prisma.lease.create({
@@ -190,6 +192,8 @@ export async function createLease(data: {
                 commercialData: data.commercialData as Prisma.InputJsonValue,
                 sha256Hash: sha256,
                 sha256CalculeLe: new Date(),
+                signingOtp: signingOtp,
+                signingOtpExpiresAt: otpExpiresAt,
                 status: data.typeBail === TypeBail.DECLARATIF_BDQ ? LeaseStatus.PENDING_CONFIRMATION : LeaseStatus.PENDING_SIGNATURE,
                 deadlineEnregistrement: new Date(new Date(data.startDate).getTime() + (30 * 24 * 60 * 60 * 1000))
             }
@@ -233,34 +237,37 @@ export async function createLease(data: {
         const tenantDisplayName = finalTenantName || "Locataire";
 
         // 10. Multi-Channel Notifications to Locataire (Tenant)
+        const signatureUrl = `${appUrl}/mon-espace-locataire/leases/${lease.id}/signature`;
+        const dashboardUrl = `${appUrl}/mon-espace-locataire`;
+
         // a) In-App Notification
         if (tenantId) {
             await prisma.notification.create({
                 data: {
                     userId: tenantId,
                     title: "🎉 Contrat de bail prêt à signer !",
-                    message: `Le propriétaire a validé votre choix pour ${bienNom} et vous a transmis le contrat de bail (${leaseRef}).`,
+                    message: `Le propriétaire a validé votre bail (${leaseRef}). Votre code de signature électronique est : ${signingOtp}.`,
                     type: "BAIL_CREE",
-                    link: `/mon-espace-locataire/leases/${lease.id}`
+                    link: signatureUrl
                 }
             }).catch(() => null);
         }
 
-        // b) WhatsApp & SMS Notification to Tenant
+        // b) WhatsApp & SMS Notification to Tenant with OTP Code
         if (data.tenantPhone) {
             const tenantPhoneNorm = normalizePhone(data.tenantPhone);
-            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} XOF/mois).\n\nVotre contrat est accessible directement sur votre tableau de bord pour consultation et signature électronique sécurisée :\n👉 ${appUrl}/mon-espace-locataire/leases/${lease.id}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
+            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} XOF/mois).\n\n🔑 *Votre Code de Signature Électronique :* *${signingOtp}*\n\n👉 *Pour valider et signer votre contrat dès maintenant :*\n${signatureUrl}\n\nVous pouvez également saisir ce code directement depuis votre Espace Locataire (${dashboardUrl}) pour sceller votre bail.\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
 
             const waRes = await sendOpenWAMessage(tenantPhoneNorm, waMsg).catch(() => ({ success: false }));
             if (!waRes?.success) {
                 await sendSMS(
                     tenantPhoneNorm,
-                    `QAPRIL : Votre contrat de bail pour ${bienNom} est prêt. Connectez-vous sur ${appUrl}/mon-espace-locataire/leases/${lease.id} pour le signer.`
+                    `QAPRIL : Votre contrat pour ${bienNom} est prêt. Votre code de signature est : ${signingOtp}. Validez sur : ${signatureUrl}`
                 ).catch(() => null);
             }
         }
 
-        // c) Email Notification to Tenant
+        // c) Email Notification to Tenant with OTP Box
         if (tenantEmail) {
             const emailHtml = `
                 <p style="margin: 0 0 16px 0;">Bonjour <strong>${tenantDisplayName}</strong>,</p>
@@ -273,18 +280,24 @@ export async function createLease(data: {
                     <p style="margin: 0; font-size: 14px; color: #065F46;">Ce bail est certifié conforme au Code de la Construction et de l'Habitation (CCH) et sécurisé par empreinte numérique SHA-256.</p>
                 </div>
 
-                <p style="margin: 0 0 24px 0;">Veuillez cliquer sur le bouton ci-dessous pour relire attentivement votre contrat et procéder à votre signature électronique sécurisée :</p>
+                <div style="background-color: #FEF3C7; border: 2px dashed #F59E0B; border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+                    <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #92400E; text-transform: uppercase; letter-spacing: 1px;">Votre Code de Validation / Signature</p>
+                    <p style="margin: 0; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #B45309; font-family: monospace;">${signingOtp}</p>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #78350F;">Ce code à usage unique est nécessaire pour signer électroniquement et certifier votre contrat.</p>
+                </div>
+
+                <p style="margin: 0 0 24px 0;">Cliquez sur le bouton ci-dessous pour relire attentivement votre contrat et saisir votre code de validation :</p>
 
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="${appUrl}/mon-espace-locataire/leases/${lease.id}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; display: inline-block;">
-                        Consulter & Signer mon Bail →
+                    <a href="${signatureUrl}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; display: inline-block;">
+                        Valider & Signer mon Bail avec ce Code →
                     </a>
                 </div>
             `;
 
             await sendEmail({
                 to: tenantEmail,
-                subject: `🎉 Félicitations ! Votre contrat de bail pour ${bienNom} est prêt - QAPRIL`,
+                subject: `🔑 [Code: ${signingOtp}] Votre contrat de bail pour ${bienNom} est prêt - QAPRIL`,
                 html: wrapInPremiumTemplate(emailHtml, "Validation de Bail & Signature")
             }).catch(err => console.error("[Tenant Acceptance Email Error]", err));
         }
@@ -766,17 +779,59 @@ export async function requestSignatureOTP(leaseId: string) {
         const risk = await evaluateTransactionRisk({ userId: session.user.id, action: "SIGNATURE" });
         if (!risk.isSafe) throw new Error(`Risque détecté : ${risk.reason}`);
 
-        const lease = await prisma.lease.findUnique({ where: { id: leaseId }, include: { tenant: true } });
-        if (!lease || !lease.tenant) throw new Error("Bail ou locataire introuvable.");
+        const lease = await prisma.lease.findUnique({ 
+            where: { id: leaseId }, 
+            include: { tenant: true, property: true } 
+        });
+        if (!lease) throw new Error("Bail introuvable.");
 
         // [SEC-FIX F-03] OTP cryptographiquement sécurisé
         const otp = randomInt(100000, 999999).toString();
-        await prisma.lease.update({ where: { id: leaseId }, data: { signingOtp: otp } });
+        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours de validité
 
-        if (lease.tenant.phone) {
-            const { sendOpenWAOTP } = await import("@/lib/openwa");
-            await sendOpenWAOTP(lease.tenant.phone, otp, "Signature de contrat de bail");
+        await prisma.lease.update({ 
+            where: { id: leaseId }, 
+            data: { 
+                signingOtp: otp,
+                signingOtpExpiresAt: otpExpiresAt 
+            } as any
+        });
+
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qapril.net";
+        const signatureUrl = `${appUrl}/mon-espace-locataire/leases/${lease.id}/signature`;
+        const targetPhone = lease.tenant?.phone || (session.user as any).phone;
+        const targetEmail = lease.tenant?.email || session.user.email;
+
+        if (targetPhone) {
+            const { sendOpenWAMessage } = await import("@/lib/openwa");
+            const phoneNorm = normalizePhone(targetPhone);
+            const waMsg = `🔑 *QAPRIL — Code de Signature de Bail*\n\nVotre code de validation/signature pour le contrat *${lease.leaseReference}* est : *${otp}*.\n\n👉 Cliquez ici pour valider directement votre bail :\n${signatureUrl}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
+            const waRes = await sendOpenWAMessage(phoneNorm, waMsg).catch(() => ({ success: false }));
+            if (!waRes?.success) {
+                await sendSMS(phoneNorm, `QAPRIL : Votre code de signature pour ${lease.leaseReference} est : ${otp}. Validez sur : ${signatureUrl}`).catch(() => null);
+            }
         }
+
+        if (targetEmail) {
+            const { sendEmail, wrapInPremiumTemplate } = await import("@/lib/email");
+            await sendEmail({
+                to: targetEmail,
+                subject: `🔑 [${otp}] Votre code de validation de bail QAPRIL`,
+                html: wrapInPremiumTemplate(`
+                    <p>Bonjour,</p>
+                    <p>Voici votre code de validation pour signer votre contrat de bail <strong>${lease.leaseReference}</strong> :</p>
+                    <div style="background-color: #FEF3C7; border: 2px dashed #F59E0B; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+                        <span style="font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #B45309; font-family: monospace;">${otp}</span>
+                    </div>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="${signatureUrl}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800;">
+                            Accéder à la signature →
+                        </a>
+                    </div>
+                `, "Code de Signature Électronique")
+            }).catch(() => null);
+        }
+
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -789,44 +844,130 @@ export async function requestSignatureOTP(leaseId: string) {
 export async function signLease(leaseId: string, otp: string) {
     try {
         const session = await ensureAuthenticated();
+        const userId = session.user.id;
+        const cleanOtp = (otp || "").trim();
+
+        if (!cleanOtp) throw new Error("Veuillez saisir votre code de validation à 6 chiffres.");
+
         const lease = await prisma.lease.findUnique({ 
             where: { id: leaseId },
-            include: { tenant: true }
+            include: { tenant: true, property: true }
         });
-        if (!lease || (lease as any).signingOtp !== otp) throw new Error("Code OTP invalide.");
+        if (!lease) throw new Error("Contrat de bail introuvable.");
 
+        // Check user identity: user is tenantId or user phone/email matches tenant
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { phone: true, email: true }
+        });
+        const isAuthorizedTenant = lease.tenantId === userId || 
+            (user?.phone && lease.tenant?.phone && normalizePhone(user.phone) === normalizePhone(lease.tenant.phone)) ||
+            (user?.email && lease.tenant?.email && user.email.toLowerCase() === lease.tenant.email.toLowerCase());
+
+        const isAdmin = session.user.role === Role.ADMIN || session.user.role === Role.SUPER_ADMIN;
+        if (!isAuthorizedTenant && !isAdmin) {
+            throw new Error("Vous n'êtes pas autorisé à signer ce contrat de bail.");
+        }
+
+        // Verify OTP
+        if ((lease as any).signingOtp !== cleanOtp) {
+            throw new Error("Code de validation incorrect ou expiré. Veuillez vérifier le code reçu par WhatsApp / Email.");
+        }
+
+        // Update lease to ACTIVE and link tenantId if needed
         await prisma.lease.update({
             where: { id: leaseId },
             data: {
+                tenantId: userId,
                 isSignedElectronically: true,
                 signedAt: new Date(),
                 signingOtp: null,
-                status: "ACTIVE"
+                signingOtpExpiresAt: null,
+                status: LeaseStatus.ACTIVE
             } as any
         });
         await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });
         
         // --- [ORCHESTRATION] P1 Transitions ---
         try {
-            // 1. Initialise la synthèse de loyer du mois en cours
             await LoyerService.initLeaseSynthesis(leaseId);
-            
-            // 2. Initialise le dossier fiscal (DGI)
             if (lease.typeBail === TypeBail.ECRIT) {
                 await FiscalService.getOrCreateDossier(leaseId);
             }
-            
-            // 3. Notification aux parties
-            await sendSMS(lease.tenant?.phone || "", `Félicitations ! Votre bail QAPRIL est actif. Votre quittance du mois sera disponible bientôt.`);
+            if (lease.tenant?.phone) {
+                await sendSMS(lease.tenant.phone, `Félicitations ! Votre bail QAPRIL (${lease.leaseReference}) est désormais validé et actif.`);
+            }
         } catch (orchestrationError) {
             console.error("[ORCHESTRATION_ERROR] Post-signature logic failed:", orchestrationError);
-            // On ne bloque pas la signature si le câblage échoue, mais on log
         }
 
         revalidatePath(`/dashboard/leases/${leaseId}`);
+        revalidatePath("/mon-espace-locataire");
+        revalidatePath("/mon-espace-locataire/leases");
+        revalidatePath(`/mon-espace-locataire/leases/${leaseId}`);
+        revalidatePath(`/mon-espace-locataire/leases/${leaseId}/signature`);
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
+    }
+}
+
+/**
+ * [LEA-07b] Validation directe d'un bail via code OTP
+ */
+export async function validateLeaseWithCode(otp: string, leaseId?: string) {
+    try {
+        const session = await ensureAuthenticated();
+        const userId = session.user.id;
+        const cleanOtp = (otp || "").trim();
+
+        if (!cleanOtp) return { success: false, error: "Veuillez entrer le code à 6 chiffres." };
+
+        let lease: any;
+        if (leaseId) {
+            lease = await prisma.lease.findUnique({
+                where: { id: leaseId },
+                include: { tenant: true, property: true }
+            });
+        } else {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { phone: true, email: true }
+            });
+            const phoneNorm = user?.phone ? normalizePhone(user.phone) : null;
+
+            lease = await prisma.lease.findFirst({
+                where: {
+                    signingOtp: cleanOtp,
+                    status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] },
+                    OR: [
+                        { tenantId: userId },
+                        ...(phoneNorm ? [{ tenant: { phone: phoneNorm } }] : []),
+                        ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+                    ]
+                },
+                include: { tenant: true, property: true }
+            });
+
+            // Fallback global par code OTP si unique
+            if (!lease) {
+                lease = await prisma.lease.findFirst({
+                    where: {
+                        signingOtp: cleanOtp,
+                        status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] }
+                    },
+                    include: { tenant: true, property: true }
+                });
+            }
+        }
+
+        if (!lease) {
+            return { success: false, error: "Code de validation incorrect ou aucun contrat de bail correspondant en attente." };
+        }
+
+        return await signLease(lease.id, cleanOtp);
+    } catch (error: any) {
+        return { success: false, error: error.message || "Erreur lors de la validation." };
     }
 }
 
