@@ -20,18 +20,31 @@
   ],
   "shortcuts": [
     {
-      "name": "Mon tableau de bord",
-      "url": "/dashboard",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
       "name": "Espace Locataire",
+      "short_name": "Locataire",
+      "description": "Accéder à mes baux, quittances certifiées CDC et paiements",
       "url": "/mon-espace-locataire",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
-      "name": "Mes propriétés",
-      "url": "/dashboard/properties",
+      "name": "Espace Propriétaire",
+      "short_name": "Propriétaire",
+      "description": "Gérer mes biens, mes locataires et mes loyers encaissés",
+      "url": "/dashboard/owner",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Espace Agence",
+      "short_name": "Agence",
+      "description": "Piloter le portefeuille de gestion locative et les mandats",
+      "url": "/dashboard/agency",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Espace Intermédiaire",
+      "short_name": "Intermédiaire",
+      "description": "Suivre les mandats d'apporteur d'affaires et commissions",
+      "url": "/dashboard/agent",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
