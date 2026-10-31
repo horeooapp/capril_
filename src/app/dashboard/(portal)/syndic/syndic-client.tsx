@@ -51,8 +51,13 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <div className="mb-2 bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
-                        <Landmark size={13} className="text-sky-600" /> Vie de l'Immeuble & Copropriété
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <div className="bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
+                            <Landmark size={13} className="text-sky-600" /> Vie de l'Immeuble & Copropriété
+                        </div>
+                        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
+                            <ShieldCheck size={13} className="text-emerald-600" /> 100% Inclus & Gratuit
+                        </div>
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                         Gestion Syndic & Copropriété
