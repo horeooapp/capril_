@@ -188,15 +188,15 @@ export default function MobileMenu({
     }
 
     return (
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
             {/* Bouton Hamburger déclencheur */}
             <button 
                 onClick={toggleMenu}
-                className="p-2 rounded-xl text-slate-700 hover:text-slate-950 hover:bg-slate-100 active:scale-90 transition-all focus:outline-none"
+                className="p-2 sm:p-2.5 rounded-xl bg-slate-100/95 hover:bg-slate-200 text-slate-900 border border-slate-300/80 active:scale-90 transition-all focus:outline-none shrink-0 flex items-center justify-center shadow-xs"
                 aria-label="Ouvrir le menu mobile"
                 title="Menu"
             >
-                {isOpen ? <X size={22} /> : <Menu size={22} />}
+                {isOpen ? <X size={22} className="text-slate-950 stroke-[2.2]" /> : <Menu size={22} className="text-slate-950 stroke-[2.2]" />}
             </button>
 
             {/* Backdrop */}

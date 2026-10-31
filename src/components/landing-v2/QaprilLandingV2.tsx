@@ -155,15 +155,15 @@ export default function QaprilLandingV2({
             : "bg-white/95 border-slate-200"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between gap-4 flex-nowrap">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
           {/* Logo & Identité */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 whitespace-nowrap">
-            <img src="/logo.png" alt="QAPRIL" className="h-9 w-auto object-contain shrink-0" />
-            <div className="border-l border-slate-200 pl-2.5 leading-tight">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 whitespace-nowrap">
+            <img src="/logo.png" alt="QAPRIL" className="h-8 sm:h-9 w-auto object-contain shrink-0" />
+            <div className="border-l border-slate-200 pl-2 sm:pl-2.5 leading-tight">
               <span className="block text-xs font-black tracking-wider text-slate-900 uppercase">
                 QAPRIL
               </span>
-              <span className="block text-[9px] text-[#D97706] font-bold uppercase tracking-wider">
+              <span className="hidden sm:block text-[9px] text-[#D97706] font-bold uppercase tracking-wider">
                 Gestion Locative Simple
               </span>
             </div>
@@ -192,14 +192,14 @@ export default function QaprilLandingV2({
           </nav>
 
           {/* Actions Droite sur Une Seule Ligne — Bouton Connexion/Espace & Menu Mobile */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
             {session?.user ? (
               <>
                 <Link
                   href={dashUrl}
-                  className="qp-btn-gold-solid px-3.5 sm:px-4 py-2 rounded text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap font-bold"
+                  className="qp-btn-gold-solid px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs uppercase tracking-wider flex items-center gap-1 shrink-0 font-bold"
                 >
-                  Mon Espace <ArrowRight className="w-3.5 h-3.5" />
+                  <span className="hidden xs:inline">Mon </span>Espace <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
@@ -212,14 +212,15 @@ export default function QaprilLandingV2({
             ) : (
               <Link
                 href="/login"
-                className="qp-btn-gold-solid px-3 sm:px-5 py-2 rounded text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                className="qp-btn-gold-solid px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1 shrink-0"
               >
-                Connexion <ArrowRight className="w-3.5 h-3.5" />
+                <span>Connexion</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             )}
 
             {/* Menu Hamburger Mobile visible sur mobile/tablette (< 1024px) */}
-            <div className="flex lg:hidden text-slate-800 ml-0.5">
+            <div className="flex lg:hidden shrink-0 ml-1">
               <MobileMenu 
                 links={landingNavLinks} 
                 session={session} 
