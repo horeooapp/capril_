@@ -1,3 +1,4 @@
+import { verifyCronAuth } from "@/lib/security";
 import { NextResponse } from 'next/server';
 import { processWalletTriggers } from '@/lib/wallet/triggers';
 

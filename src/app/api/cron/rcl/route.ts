@@ -1,3 +1,4 @@
+import { verifyCronAuth } from "@/lib/security";
 import { NextResponse } from "next/server";
 import { RclService } from "@/lib/rcl-service";
 import { RentProposalService } from "@/lib/rent-proposal-service";

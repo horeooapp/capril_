@@ -1,3 +1,4 @@
+import { verifyCronAuth } from "@/lib/security";
 import { NextResponse } from 'next/server';
 import { ReminderService } from '@/lib/reminder-service';
 

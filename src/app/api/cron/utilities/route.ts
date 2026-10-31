@@ -1,13 +1,12 @@
+import { verifyCronAuth } from "@/lib/security";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ReminderService } from "@/lib/reminder-service"; // Supposant l'existence d'un service de relance existant
 
 export async function GET(req: Request) {
-    // Dans un environnement Vercel, on vérifie l'en-tête Authorization CRON_SECRET
-    // const authHeader = req.headers.get('authorization');
-    // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    //     return new Response('Unauthorized', { status: 401 });
-    // }
+    if (!verifyCronAuth(req)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     try {
         const today = new Date();

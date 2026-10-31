@@ -66,13 +66,11 @@ export const authConfig = {
             const pathname = nextUrl.pathname;
             const activeRole = String((auth?.user as any)?.chosenRole || auth?.user?.role || (auth?.user as any)?.capaciteActive || '').toUpperCase();
 
-            // 1. CHEMINS PUBLICS
+            // 1. CHEMINS PUBLICS (Les API gèrent leur propre sécurité/tokens)
             const isPublic =
                 pathname === "/" ||
                 pathname.includes("/login") ||
-                pathname.startsWith("/api/webhooks") ||
-                pathname.startsWith("/api/public") ||
-                pathname.startsWith("/api/system") ||
+                pathname.startsWith("/api/") ||
                 pathname.startsWith("/auth/") ||
                 pathname.startsWith("/setup") ||
                 pathname.startsWith("/uploads/") ||

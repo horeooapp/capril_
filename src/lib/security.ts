@@ -95,3 +95,19 @@ export async function checkWebhookSignature(
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
     return expected === signature;
 }
+
+/**
+ * Strict authorization check for background CRON endpoints.
+ * Requires an explicit Authorization: Bearer <CRON_SECRET> header.
+ * Rejects requests if CRON_SECRET is not configured or if there is a mismatch.
+ */
+export function verifyCronAuth(request: Request): boolean {
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret || cronSecret.trim().length === 0) {
+        console.warn("[SECURITY CRON] CRON_SECRET non configuré dans l'environnement. Accès refusé par défaut.");
+        return false;
+    }
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) return false;
+    return authHeader.trim() === `Bearer ${cronSecret.trim()}`;
+}

@@ -1,3 +1,4 @@
+import { verifyCronAuth } from "@/lib/security";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -6,6 +7,9 @@ import { prisma } from "@/lib/prisma";
  * Une mesure demandée pour libérer le patrimoine foncier si le processus traîne.
  */
 export async function GET(req: Request) {
+    if (!verifyCronAuth(req)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const fiveDaysAgo = new Date();
         fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);

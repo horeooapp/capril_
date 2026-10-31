@@ -87,6 +87,6 @@ export default auth(async (req) => {
 export const config = {
     // Protect all routes globally except static assets, images and uploads
     matcher: [
-        '/((?!api|_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|images|uploads|slider|assets|logos|logo.png|hero_.*\\.png|.*\\.svg|icon-.*\\.png).*)'
+        '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|images|uploads|slider|assets|logos|logo.png|hero_.*\\.png|.*\\.svg|icon-.*\\.png).*)'
     ]
 }

@@ -50,6 +50,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
         }
 
+        // [SEC-FIX F-07] Validation stricte du montant contre le loyer contractuel
+        const totalExpected = lease.rentAmount + (lease.chargesAmount || 0);
+        if (Number(amount) < totalExpected) {
+            return NextResponse.json({ 
+                error: `Montant invalide. Le montant requis pour ce loyer est de ${totalExpected.toLocaleString('fr-FR')} XOF.` 
+            }, { status: 400 });
+        }
+
         // 2. RG-QUI-02: Vérification Wallet Bailleur (Comme sur le web)
         const walletBalance = lease.landlord.walletConfig?.walletBalance || 0;
         if (walletBalance < -1500) {
