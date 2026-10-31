@@ -149,28 +149,28 @@ export default function QaprilLandingV2({
           1. HEADER NAVIGATION : ÉLÉMENTS STRICTEMENT SUR UNE SEULE LIGNE
       ══════════════════════════════════════════════════════════════════ */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 border-b ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
           scrolled
-            ? "bg-white border-slate-200 shadow-sm"
-            : "bg-white/95 border-slate-200"
+            ? "bg-white/95 backdrop-blur-md border-slate-200 shadow-sm"
+            : "bg-slate-950/70 backdrop-blur-md border-white/10"
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
           {/* Logo & Identité */}
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 whitespace-nowrap">
             <img src="/logo.png" alt="QAPRIL" className="h-8 sm:h-9 w-auto object-contain shrink-0" />
-            <div className="border-l border-slate-200 pl-2 sm:pl-2.5 leading-tight">
-              <span className="block text-xs font-black tracking-wider text-slate-900 uppercase">
+            <div className={`border-l pl-2 sm:pl-2.5 leading-tight transition-colors ${scrolled ? 'border-slate-200' : 'border-white/20'}`}>
+              <span className={`block text-xs font-black tracking-wider uppercase transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
                 QAPRIL
               </span>
-              <span className="hidden sm:block text-[9px] text-[#D97706] font-bold uppercase tracking-wider">
+              <span className="hidden sm:block text-[9px] text-[#FF8200] font-bold uppercase tracking-wider">
                 Gestion Locative Simple
               </span>
             </div>
           </Link>
 
           {/* Navigation Centrale sur Une Seule Ligne */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-xs xl:text-sm font-semibold text-slate-700 whitespace-nowrap shrink-0">
+          <nav className={`hidden lg:flex items-center gap-5 xl:gap-7 text-xs xl:text-sm font-semibold whitespace-nowrap shrink-0 transition-colors ${scrolled ? 'text-slate-700' : 'text-slate-200'}`}>
             <Link href="/piliers" className="hover:text-[#D97706] transition-colors">
               Piliers
             </Link>
@@ -233,11 +233,11 @@ export default function QaprilLandingV2({
         </div>
       </header>
 
-      <main className="pt-24">
+      <main className="pt-0">
         {/* ══════════════════════════════════════════════════════════════════
-            2. HERO SECTION IMMERSIVE AVEC SLIDES EN ARRIÈRE-PLAN (STYLE PREMIUM ÉPURÉ)
+            2. HERO SECTION IMMERSIVE AVEC SLIDES EN ARRIÈRE-PLAN (FULLSCREEN)
         ══════════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-slate-950 text-white min-h-[800px] lg:min-h-[870px] flex flex-col justify-between border-b border-slate-800">
+        <section className="relative overflow-hidden bg-slate-950 text-white min-h-[100dvh] lg:h-[100dvh] flex flex-col justify-between border-b border-slate-800">
 
           {/* SLIDESHOW D'ARCHITECTURES EN ARRIÈRE-PLAN */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -267,7 +267,7 @@ export default function QaprilLandingV2({
           </div>
 
           {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
-          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-12 lg:pt-24 lg:pb-16 w-full flex-1 flex flex-col justify-between">
+          <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 lg:pt-26 pb-6 sm:pb-8 lg:pb-10 w-full flex-1 flex flex-col justify-between">
 
             {/* Haut : Pitch Institutionnel & Titre Épuré */}
             <div>
