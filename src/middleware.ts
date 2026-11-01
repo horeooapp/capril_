@@ -8,7 +8,10 @@ import { checkRateLimit } from "./lib/security"
 const { auth } = NextAuth(authConfig)
 
 export default auth(async (req) => {
-    const ip = req.headers.get("x-forwarded-for")?.split(',')[0] || "anonymous";
+    const ip = req.headers.get("cf-connecting-ip")
+        || req.headers.get("x-real-ip")
+        || req.headers.get("x-forwarded-for")?.split(',')[0]?.trim()
+        || "anonymous";
     const path = req.nextUrl.pathname;
 
     // 0. URL Normalization (Prevent double slashes)
@@ -19,9 +22,9 @@ export default auth(async (req) => {
         return NextResponse.redirect(url, 301);
     }
 
-    // 1. Limitation générale pour /api et /dashboard
-    if (path.startsWith("/api") || path.startsWith("/dashboard")) {
-        const withinLimit = await checkRateLimit(`gen:${ip}`, 100, 60); // 100 par minute
+    // 1. Limitation API générale (protège les endpoints /api contre le scraping abusif, sans bloquer la navigation UI du dashboard)
+    if (path.startsWith("/api") && !path.startsWith("/api/auth")) {
+        const withinLimit = await checkRateLimit(`gen:${ip}`, 300, 60); // 300 par minute pour les API
         if (!withinLimit) {
             return new NextResponse("Too Many Requests", { status: 429 });
         }
