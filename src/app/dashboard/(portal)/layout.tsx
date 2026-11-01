@@ -32,12 +32,29 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
-    // RÔLE ACTIF STRICT : priorité absolue au rôle de session choisi à la connexion
-    const activeRole = (session.user as any).chosenRole || session.user.role || (dbUser as any).capaciteActive;
+    // RÔLE ACTIF STRICT : priorité à la capacité active choisie en base par l'utilisateur
+    let activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
 
-    // Si le rôle actif est Locataire, redirection stricte vers l'espace locataire
+    // Si le rôle calculé est Locataire, vérifier si l'utilisateur possède une capacité propriétaire active ou des biens
     if (activeRole === "TENANT" || activeRole === "LOCATAIRE") {
-        redirect("/mon-espace-locataire");
+        const userCapacites = await (prisma as any).userCapacite.findMany({
+            where: { userId: session.user.id, actif: true }
+        }).catch(() => []);
+        
+        const hasLandlordCap = userCapacites.some((c: any) => 
+            ['LANDLORD', 'PROPRIETAIRE', 'BAILLEUR', 'AGENCY'].includes(c.capacite.toUpperCase())
+        );
+
+        if (hasLandlordCap) {
+            // L'utilisateur a accédé au Dashboard : on active le profil propriétaire
+            activeRole = 'LANDLORD';
+            await (prisma as any).user.update({
+                where: { id: session.user.id },
+                data: { capaciteActive: 'LANDLORD', role: 'LANDLORD' }
+            }).catch(() => {});
+        } else {
+            redirect("/mon-espace-locataire");
+        }
     }
 
     // Si le rôle actif est Admin, redirection vers la console admin

@@ -38,7 +38,12 @@ export default function SwitchCapacite() {
       await switchCapacite(newVal);
       // Force NextAuth JWT refresh (v5 spec for DB update)
       if (typeof update === 'function') {
-        await update({ capaciteActive: newVal }).catch(() => {});
+        await update({ 
+            capaciteActive: newVal,
+            chosenRole: newVal,
+            role: newVal,
+            user: { capaciteActive: newVal, chosenRole: newVal, role: newVal }
+        }).catch(() => {});
       } 
       
       // Force la redirection racine vers la base dashboard pour charger les bonnes donnees

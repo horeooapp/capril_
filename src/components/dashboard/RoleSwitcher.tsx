@@ -41,14 +41,26 @@ export default function RoleSwitcher({ currentRole, eligibleRoles }: RoleSwitche
         try {
             const res = await setChosenRole(role)
             if (res.success) {
-                toast.success(`Profil ${role} activé`)
+                const targetRole = res.chosenRole || role;
+                toast.success(`Profil ${targetRole} activé`)
+                
                 // Update local session if available
                 if (typeof update === 'function') {
-                    await update({ chosenRole: role }).catch(() => {})
+                    await update({ 
+                        chosenRole: targetRole,
+                        role: targetRole,
+                        capaciteActive: targetRole,
+                        user: {
+                            chosenRole: targetRole,
+                            role: targetRole,
+                            capaciteActive: targetRole
+                        }
+                    }).catch(() => {})
                 }
-                // Redirect and refresh
-                router.push(res.redirectUrl || "/dashboard")
-                router.refresh()
+                
+                // Redirection physique pour forcer le rafraîchissement des cookies et du layout serveur
+                const destination = res.redirectUrl || (targetRole === 'TENANT' ? "/mon-espace-locataire" : "/dashboard");
+                window.location.href = destination;
             } else if (res.error) {
                 toast.error(res.error)
             }

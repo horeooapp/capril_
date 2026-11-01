@@ -5,8 +5,24 @@ import EmailOTPForm from "@/components/auth/EmailOTPForm"
 import { Home, Sparkles, ShieldCheck, ArrowLeft } from "lucide-react"
 import { motion } from "framer-motion"
 import UnifiedLoginPage from "@/components/auth/UnifiedLoginPage"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function TenantLoginPage() {
+    const { data: session, status } = useSession()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            const role = String((session.user as any)?.chosenRole || session.user.role || '').toUpperCase();
+            if (['TENANT', 'LOCATAIRE'].includes(role)) {
+                router.replace("/mon-espace-locataire");
+            } else {
+                router.replace("/dashboard");
+            }
+        }
+    }, [status, session, router])
     return (
         <>
             {/* Version Web Desktop — Split 50/50 Architectural Exécutif Lumineux */}

@@ -14,10 +14,23 @@ export const authConfig = {
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {
-            if (trigger === "update" && session?.user) {
-                Object.assign(token, session.user);
-                if (session.user.role) token.role = session.user.role;
-                if (session.user.chosenRole) token.chosenRole = session.user.chosenRole;
+            if (trigger === "update" && session) {
+                const updateData = session.user ? session.user : session;
+                if (updateData.chosenRole) {
+                    token.chosenRole = updateData.chosenRole;
+                    token.role = updateData.chosenRole as Role;
+                    token.capaciteActive = updateData.chosenRole;
+                }
+                if (updateData.role) {
+                    token.role = updateData.role as Role;
+                    token.chosenRole = updateData.role;
+                }
+                if (updateData.capaciteActive) {
+                    token.capaciteActive = updateData.capaciteActive;
+                    token.chosenRole = updateData.capaciteActive;
+                    token.role = updateData.capaciteActive as Role;
+                }
+                Object.assign(token, updateData);
             }
             if (user) {
                 const activeRole = (user as any).chosenRole || (user as any).capaciteActive || user.role || 'TENANT';
@@ -113,11 +126,14 @@ export const authConfig = {
             // 3. CONTRÔLE D'ACCÈS STRICT SELON LE RÔLE ACTIF (RBAC)
             const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(activeRole);
             const isTenant = ['TENANT', 'LOCATAIRE'].includes(activeRole);
+            const eligibleRoles: string[] = (auth?.user as any)?.eligibleRoles || [];
+            const hasDashboardRole = eligibleRoles.some(r => ['LANDLORD', 'PROPRIETAIRE', 'BAILLEUR', 'AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT', 'INTERMEDIARY', 'DIASPORA'].includes(String(r).toUpperCase()));
+            const hasTenantRole = eligibleRoles.some(r => ['TENANT', 'LOCATAIRE'].includes(String(r).toUpperCase()));
 
             // Route Admin
             if (pathname.startsWith("/admin")) {
                 if (!isAdmin) {
-                    if (isTenant) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                    if (isTenant && !hasDashboardRole) return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                     return Response.redirect(new URL("/dashboard", nextUrl));
                 }
                 return true;
@@ -125,8 +141,8 @@ export const authConfig = {
 
             // Route Espace Locataire (/mon-espace-locataire)
             if (pathname.startsWith("/mon-espace-locataire")) {
-                if (!isTenant && !isAdmin) {
-                    // Un propriétaire/agence connecté ne peut pas naviguer dans l'espace locataire
+                if (!isTenant && !isAdmin && !hasTenantRole) {
+                    // Uniquement si l'utilisateur n'a aucun profil locataire
                     return Response.redirect(new URL("/dashboard", nextUrl));
                 }
                 return true;
@@ -135,8 +151,11 @@ export const authConfig = {
             // Route Dashboard Gestionnaire/Propriétaire (/dashboard)
             if (pathname.startsWith("/dashboard")) {
                 if (isTenant && !isAdmin) {
-                    // Un locataire connecté ne peut JAMAIS être devant le dashboard propriétaire
-                    return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                    // Si le profil actuel est TENANT, mais qu'il possède la capacité Propriétaire/Gestionnaire,
+                    // on autorise l'accès pour permettre le basculement direct sur /dashboard
+                    if (!hasDashboardRole) {
+                        return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                    }
                 }
                 return true;
             }

@@ -9,7 +9,6 @@ export async function switchCapacite(nouvelleCapacite: string) {
   if (!session?.user?.id) throw new Error("Non connecte");
 
   // 1. Verifier que l'utilisateur a vraiment cette capacite
-  // On ne peut pas skipper ca sinon n'importe qui force son acces.
   const verif = await prisma.userCapacite.findUnique({
     where: {
       userId_capacite: {
@@ -23,13 +22,25 @@ export async function switchCapacite(nouvelleCapacite: string) {
     throw new Error("Capacite non autorisee");
   }
 
-  // 2. Mettre a jour la BDD
+  // 2. Mettre a jour la BDD et Redis
+  const roleEnum = ['LANDLORD', 'TENANT', 'AGENCY', 'NON_CERTIFIED_AGENT'].includes(nouvelleCapacite)
+    ? nouvelleCapacite
+    : (nouvelleCapacite === 'PROPRIETAIRE' ? 'LANDLORD' : (nouvelleCapacite === 'AGENCE_AGREE' ? 'AGENCY' : undefined));
+
   await prisma.user.update({
     where: { id: session.user.id },
-    data:  { capaciteActive: nouvelleCapacite }
+    data: { 
+      capaciteActive: nouvelleCapacite,
+      ...(roleEnum ? { role: roleEnum as any } : {})
+    }
   });
 
-  // NextAuth v5 resync la session au prochain reload
-  // puisque token() interroge le JWT (mais via PrismaAdapter, la base d'abord ou getSession cote client)
+  try {
+    const { redis } = await import("@/lib/redis");
+    if (redis) {
+      await redis.set(`user:active_role:${session.user.id}`, nouvelleCapacite).catch(() => {});
+    }
+  } catch (e) {}
+
   return { success: true };
 }
