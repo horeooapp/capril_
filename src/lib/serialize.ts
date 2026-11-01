@@ -146,10 +146,22 @@ export const serializeReceipt = (receipt: RawReceipt | null) => {
  */
 export const serializeUser = (user: any) => {
     if (!user) return null
+    const individualFullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim()
+    const agencyName = user.agenceProfile?.nomAgence 
+        || user.legalEntity?.companyName 
+        || (user.agencyConfig as any)?.agencyName 
+        || (user.agencyConfig as any)?.name 
+        || null
+
     return {
         id: user.id,
         phone: user.phone,
-        fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullName: individualFullName || (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
+        agencyName,
+        nomAgence: user.agenceProfile?.nomAgence || null,
+        agencyConfig: user.agencyConfig,
         email: user.email,
         role: user.role,
         kycLevel: user.kycLevel ? Number(user.kycLevel) : 0,

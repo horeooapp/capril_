@@ -11,7 +11,11 @@ declare module "next-auth" {
             status?: string
             kycLevel: number
             kycStatus: string
+            firstName?: string | null
+            lastName?: string | null
             fullName?: string | null
+            agencyName?: string | null
+            displayName?: string | null
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
@@ -30,7 +34,11 @@ declare module "next-auth" {
         status?: string | null
         kycLevel?: number
         kycStatus?: string
+        firstName?: string | null
+        lastName?: string | null
         fullName?: string | null
+        agencyName?: string | null
+        displayName?: string | null
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
@@ -51,7 +59,11 @@ declare module "next-auth/jwt" {
         status?: string
         kycLevel?: number
         kycStatus?: string
+        firstName?: string | null
+        lastName?: string | null
         fullName?: string | null
+        agencyName?: string | null
+        displayName?: string | null
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
@@ -73,7 +85,11 @@ declare module "@auth/core/types" {
             status?: string
             kycLevel: number
             kycStatus: string
+            firstName?: string | null
+            lastName?: string | null
             fullName?: string | null
+            agencyName?: string | null
+            displayName?: string | null
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
@@ -92,7 +108,11 @@ declare module "@auth/core/types" {
         status?: string | null
         kycLevel?: number
         kycStatus?: string
+        firstName?: string | null
+        lastName?: string | null
         fullName?: string | null
+        agencyName?: string | null
+        displayName?: string | null
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean
@@ -114,7 +134,11 @@ declare module "@auth/core" {
             status?: string
             kycLevel: number
             kycStatus: string
+            firstName?: string | null
+            lastName?: string | null
             fullName?: string | null
+            agencyName?: string | null
+            displayName?: string | null
             onboardingComplete?: boolean
             profileType?: string | null
             diasporaAbonnement?: boolean
@@ -135,7 +159,11 @@ declare module "@auth/core/adapters" {
         status?: string | null
         kycLevel?: number
         kycStatus?: string
+        firstName?: string | null
+        lastName?: string | null
         fullName?: string | null
+        agencyName?: string | null
+        displayName?: string | null
         onboardingComplete?: boolean
         profileType?: string | null
         diasporaAbonnement?: boolean

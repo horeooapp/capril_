@@ -299,7 +299,7 @@ export default function LocataireDashboardPage() {
                         </span>
                     </div>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-                        Bonjour, <span className="text-emerald-700">{dashboardData.user?.firstName || 'Locataire'}</span>
+                        Bonjour, <span className="text-emerald-700">{[dashboardData.user?.firstName, dashboardData.user?.lastName].filter(Boolean).join(" ").trim() || ([session?.user?.firstName, session?.user?.lastName].filter(Boolean).join(" ").trim()) || session?.user?.name || 'Locataire'}</span>
                     </h1>
                     <p className="text-xs text-slate-500 mt-1 font-medium">
                         Suivez votre loyer, vos quittances officielles et votre score de confiance ICL.

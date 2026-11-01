@@ -38,9 +38,50 @@ export function BrokerPortalDashboard({
     const pendingCandidatures = (candidatures || []).filter(c => c.status === "PENDING" || c.status === "VERIFIED").length;
     const activeProperties = properties.length;
 
+    const brokerDisplayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() 
+        || user?.fullName 
+        || user?.displayName 
+        || user?.name 
+        || "Intermédiaire";
+
     return (
         <div className="space-y-6">
             
+            {/* ── TOP BANNER DÉMARCHEUR / INTERMÉDIAIRE AVEC NOM & PRÉNOM ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+                <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-2 h-2 rounded-full bg-violet-600 animate-pulse"></span>
+                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                            Espace Professionnel · Démarcheur & Intermédiaire Mandaté
+                        </span>
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                        Bonjour, <span className="text-violet-700">{brokerDisplayName}</span>
+                    </h1>
+                    <p className="text-xs text-slate-500 mt-1 font-medium">
+                        Gérez vos mandats de prospection, qualifiez les dossiers locataires et suivez vos commissions d'apport.
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <Link 
+                        href="/dashboard/mandates" 
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                        <ClipboardList size={15} />
+                        <span>Nouveau Mandat</span>
+                    </Link>
+                    <Link 
+                        href="/dashboard/matching" 
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                        <Users size={15} className="text-slate-400" />
+                        <span>Candidatures</span>
+                    </Link>
+                </div>
+            </div>
+
             {/* Header / Navigation Métier Démarcheur */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 {[

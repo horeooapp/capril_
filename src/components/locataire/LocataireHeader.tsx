@@ -86,7 +86,9 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[12px] font-black text-gray-400 uppercase tracking-tighter leading-none">Connecté</span>
-                                    <span className="text-[14px] font-bold text-slate-800 truncate max-w-[120px]">{session.user.email}</span>
+                                    <span className="text-[14px] font-bold text-slate-800 truncate max-w-[170px]" title={[session.user.firstName, session.user.lastName].filter(Boolean).join(" ").trim() || session.user.name || session.user.email || ""}>
+                                        {[session.user.firstName, session.user.lastName].filter(Boolean).join(" ").trim() || session.user.name || session.user.email}
+                                    </span>
                                 </div>
                             </div>
                         )}

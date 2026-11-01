@@ -13,7 +13,11 @@ export async function getCurrentUser() {
         if (!userId) return null
 
         const user = await prisma.user.findUnique({
-            where: { id: userId }
+            where: { id: userId },
+            include: {
+                agenceProfile: true,
+                legalEntity: true
+            }
         })
         
         return serializeObject(serializeUser(user))

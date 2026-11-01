@@ -52,6 +52,10 @@ interface Session {
         role?: string | null;
         firstName?: string | null;
         lastName?: string | null;
+        fullName?: string | null;
+        name?: string | null;
+        agencyName?: string | null;
+        displayName?: string | null;
         eligibleRoles?: string[] | null;
         chosenRole?: string | null;
     };
@@ -364,61 +368,69 @@ export default function MobileMenu({
 
                 {/* Pied du tiroir : Profil, Rôles et BOUTON DÉCONNEXION */}
                 <div className="p-4 border-t border-slate-800 bg-slate-900/90 shrink-0 space-y-2.5">
-                    {session?.user ? (
-                        <>
-                            {/* Carte Utilisateur */}
-                            <div className="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-8 h-8 rounded-full bg-[#FF8200] text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
-                                        {(session.user.firstName || session.user.email || 'U').charAt(0).toUpperCase()}
+                    {session?.user ? (() => {
+                        const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(displayRole || '');
+                        const userAgencyName = (session.user as any).agencyName || (session.user as any).nomAgence || "Mon Agence";
+                        const userFullName = [(session.user as any).firstName, (session.user as any).lastName].filter(Boolean).join(" ").trim() || session.user.name || session.user.email;
+                        const cardDisplayName = isAgencyRole ? userAgencyName : userFullName;
+                        const cardInitial = (cardDisplayName || 'U').charAt(0).toUpperCase();
+
+                        return (
+                            <>
+                                {/* Carte Utilisateur */}
+                                <div className="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="w-8 h-8 rounded-full bg-[#FF8200] text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
+                                            {cardInitial}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-bold text-white truncate leading-tight" title={cardDisplayName}>
+                                                {cardDisplayName}
+                                            </p>
+                                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block truncate">
+                                                ● {isAgencyRole ? "Agence Immobilière" : displayRole}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-xs font-bold text-white truncate leading-tight">
-                                            {session.user.firstName ? `${session.user.firstName} ${session.user.lastName || ''}` : session.user.email}
-                                        </p>
-                                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                                            ● {displayRole}
-                                        </span>
-                                    </div>
+
+                                    <Link 
+                                        href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
+                                        onClick={() => setIsOpen(false)}
+                                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors shrink-0"
+                                        title="Mon Profil"
+                                    >
+                                        <Settings size={14} />
+                                    </Link>
                                 </div>
 
-                                <Link 
-                                    href={displayRole === 'TENANT' ? "/mon-espace-locataire/profile" : "/dashboard/profile"}
-                                    onClick={() => setIsOpen(false)}
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                                    title="Mon Profil"
+                                {/* Sélecteur de rôle si multi-rôles */}
+                                {session.user.eligibleRoles && session.user.eligibleRoles.length > 1 && (
+                                    <div className="pt-0.5">
+                                        <RoleSwitcher 
+                                            currentRole={displayRole} 
+                                            eligibleRoles={session.user.eligibleRoles} 
+                                        />
+                                    </div>
+                                )}
+
+                                {/* BOUTON DÉCONNEXION PLEINE LARGEUR */}
+                                <button 
+                                    onClick={async () => {
+                                        setIsOpen(false);
+                                        if (onLogout) {
+                                            await onLogout();
+                                        } else {
+                                            window.location.href = '/api/auth/signout';
+                                        }
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-sm"
                                 >
-                                    <Settings size={14} />
-                                </Link>
-                            </div>
-
-                            {/* Sélecteur de rôle si multi-rôles */}
-                            {session.user.eligibleRoles && session.user.eligibleRoles.length > 1 && (
-                                <div className="pt-0.5">
-                                    <RoleSwitcher 
-                                        currentRole={displayRole} 
-                                        eligibleRoles={session.user.eligibleRoles} 
-                                    />
-                                </div>
-                            )}
-
-                            {/* BOUTON DÉCONNEXION PLEINE LARGEUR */}
-                            <button 
-                                onClick={async () => {
-                                    setIsOpen(false);
-                                    if (onLogout) {
-                                        await onLogout();
-                                    } else {
-                                        window.location.href = '/api/auth/signout';
-                                    }
-                                }}
-                                className="w-full flex items-center justify-center gap-2 bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-sm"
-                            >
-                                <LogOut size={15} />
-                                <span>Déconnexion Sécurisée</span>
-                            </button>
-                        </>
-                    ) : (
+                                    <LogOut size={15} />
+                                    <span>Déconnexion Sécurisée</span>
+                                </button>
+                            </>
+                        );
+                    })() : (
                         <div className="space-y-2">
                             <Link 
                                 href="/dashboard/login"

@@ -101,3 +101,4 @@ export function resolvePwaRole(userRole?: string | null, pathname?: string | nul
     // Défaut
     return 'landlord';
 }
+

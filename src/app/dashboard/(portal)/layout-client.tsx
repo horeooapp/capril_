@@ -35,11 +35,17 @@ export default function DashboardLayoutClient({
     session,
     dbActiveRole,
     agencyConfig,
+    agencyName,
+    userFirstName,
+    userLastName,
 }: {
     children: React.ReactNode
     session: any
     dbActiveRole?: string
     agencyConfig?: any
+    agencyName?: string | null
+    userFirstName?: string | null
+    userLastName?: string | null
 }) {
     const pathname = usePathname()
 
@@ -56,7 +62,22 @@ export default function DashboardLayoutClient({
     };
 
     const theme = getThemeAndAccent();
-    const initials = session?.user?.firstName ? session.user.firstName.charAt(0).toUpperCase() : (session?.user?.email?.charAt(0).toUpperCase() || 'U');
+
+    // Règle d'affichage à la connexion :
+    // - Pour une Agence : Nom de l'Agence
+    // - Pour Propriétaire / Locataire / Intermédiaire : Prénom et Nom
+    const isAgency = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole || '');
+    const resolvedAgencyName = agencyName || (session?.user as any)?.agencyName || (session?.user as any)?.nomAgence || 'Mon Agence';
+    const resolvedIndividualName = [
+        userFirstName ?? (session?.user as any)?.firstName,
+        userLastName ?? (session?.user as any)?.lastName
+    ].filter(Boolean).join(' ').trim() || session?.user?.fullName || session?.user?.name || session?.user?.email?.split('@')[0];
+
+    const displayName = isAgency ? resolvedAgencyName : resolvedIndividualName;
+
+    const initials = isAgency 
+        ? (resolvedAgencyName.charAt(0).toUpperCase() || 'A')
+        : ((userFirstName || (session?.user as any)?.firstName || session?.user?.name || session?.user?.email || 'U').charAt(0).toUpperCase());
 
     const getPageMeta = () => {
         const path = pathname.split('?')[0];
@@ -86,7 +107,7 @@ export default function DashboardLayoutClient({
                 <AppSidebar 
                     role={activeRole} 
                     onLogout={() => signOut()} 
-                    userName={(session.user.firstName ? session.user.firstName + " " : "") + (session.user.lastName || "") || session.user.email?.split('@')[0]}
+                    userName={displayName}
                     themeId={theme.id}
                     diasporaAbonnement={session.user.diasporaAbonnement || activeRole === 'DIASPORA'}
                     agencyConfig={agencyConfig}
@@ -131,12 +152,22 @@ export default function DashboardLayoutClient({
                         </div>
 
                         {session?.user && (
-                            <div className="flex items-center gap-1.5 sm:gap-2">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                {/* Affichage du Nom / Agence à la connexion */}
+                                <div className="hidden sm:flex flex-col text-right min-w-0 max-w-[190px]">
+                                    <span className="text-[12.5px] font-bold text-slate-800 leading-tight truncate" title={displayName}>
+                                        {displayName}
+                                    </span>
+                                    <span className="text-[10px] font-medium text-slate-400 leading-none mt-0.5 truncate">
+                                        {isAgency ? "Agence Immobilière" : (activeRole === 'LANDLORD' ? "Propriétaire" : (activeRole === 'INTERMEDIARY' ? "Intermédiaire" : activeRole))}
+                                    </span>
+                                </div>
+
                                 {/* Profile Avatar configured with Accent Color */}
                                 <Link 
                                     href="/dashboard/profile" 
-                                    className={`w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-full ${theme.bg} flex items-center justify-center text-white font-bold text-[12px] sm:text-[13px] hover:shadow-md transition-all`}
-                                    title="Mon Profil"
+                                    className={`w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-full ${theme.bg} flex items-center justify-center text-white font-bold text-[12px] sm:text-[13px] hover:shadow-md transition-all shrink-0`}
+                                    title={`Mon Profil (${displayName})`}
                                 >
                                     {initials}
                                 </Link>
@@ -144,7 +175,7 @@ export default function DashboardLayoutClient({
                                 {/* Bouton Déconnexion Mobile & Desktop */}
                                 <button 
                                     onClick={() => signOut({ callbackUrl: "/dashboard/login" })}
-                                    className="flex items-center justify-center w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 active:scale-95 transition-all"
+                                    className="flex items-center justify-center w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 active:scale-95 transition-all shrink-0"
                                     title="Déconnexion"
                                     aria-label="Déconnexion"
                                 >

@@ -156,14 +156,16 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
     return (
         <aside className="fixed left-0 top-0 bottom-0 w-[220px] z-[60] hidden lg:flex flex-col bg-slate-900 font-sans shadow-xl overflow-hidden">
             {/* Header / Logo */}
-            <div className="p-[20px_16px_12px] border-b border-slate-700 shrink-0">
-                <Link href={role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard"} className="flex items-center gap-2 group">
-                    <div className={`w-8 h-8 rounded-lg ${getThemeIconColor()} flex items-center justify-center text-[14px] font-bold text-white shadow-md group-hover:scale-105 transition-transform`}>
+            <div className="p-[16px_14px_12px] border-b border-slate-700/80 shrink-0">
+                <Link href={role === 'TENANT' ? "/mon-espace-locataire" : "/dashboard"} className="flex items-center gap-2.5 group">
+                    <div className={`w-8 h-8 rounded-lg ${getThemeIconColor()} flex items-center justify-center text-[14px] font-bold text-white shadow-md group-hover:scale-105 transition-transform shrink-0`}>
                         Q
                     </div>
-                    <div>
-                        <div className="text-white font-bold text-[14px] leading-none">QAPRIL</div>
-                        <div className="text-slate-400 text-[10px] mt-1 font-medium">{getRoleLabel()}</div>
+                    <div className="min-w-0 flex-1">
+                        <div className="text-white font-bold text-[13px] leading-tight truncate" title={userName || "QAPRIL"}>
+                            {userName || "QAPRIL"}
+                        </div>
+                        <div className="text-slate-400 text-[10px] mt-0.5 font-medium truncate">{getRoleLabel()}</div>
                     </div>
                 </Link>
             </div>

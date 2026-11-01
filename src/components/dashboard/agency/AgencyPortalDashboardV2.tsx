@@ -29,9 +29,53 @@ export function AgencyPortalDashboardV2({
   const pendingCands = candidatures.filter(c => c.status === "PENDING" || c.status === "VERIFIED").length;
   const totalPortfolioValue = aggregates?.totalPortfolioValue || 0;
 
+  const agencyDisplayName = user?.agencyName 
+    || user?.nomAgence 
+    || (user?.agencyConfig as any)?.agencyName 
+    || (user?.agencyConfig as any)?.name 
+    || user?.companyName 
+    || user?.displayName 
+    || user?.name 
+    || "Mon Agence";
+
   return (
     <div className="space-y-6">
       
+      {/* ── TOP BANNER AGENCE AVEC NOM OFFICIEL DE L'AGENCE ── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+              Espace Professionnel · Agence Immobilière
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Bonjour, <span className="text-sky-700">{agencyDisplayName}</span>
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            Pilotez vos mandats, quittances certifiées et le suivi de vos portefeuilles clients.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link 
+            href="/dashboard/mandates" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <Building2 size={15} />
+            <span>Mes Mandats</span>
+          </Link>
+          <Link 
+            href="/dashboard/matching" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <Users size={15} className="text-slate-400" />
+            <span>Candidatures</span>
+          </Link>
+        </div>
+      </div>
+
       {/* HEADER / NAVIGATION INTÉGRÉE SI BESOIN */}
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {[

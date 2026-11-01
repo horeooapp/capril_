@@ -77,6 +77,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         include: {
                             diasporaProfile: true,
                             capacites: { where: { actif: true } },
+                            agenceProfile: { select: { nomAgence: true } },
+                            legalEntity: { select: { companyName: true } },
                             _count: {
                                 select: {
                                     propertiesOwned: true,
@@ -194,13 +196,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             data: { capaciteActive: activeRole }
                         }).catch((err: any) => console.error("[AUTH] Could not update capaciteActive:", err));
 
+                        // Détermination du nom officiel affiché selon le rôle à la connexion :
+                        // 1. Pour les agences : Le nom de l'agence (nomAgence ou companyName)
+                        // 2. Pour les propriétaires, locataires, intermédiaires : Prénom et Nom de famille
+                        const agencyName = (user as any).agenceProfile?.nomAgence 
+                            || (user as any).legalEntity?.companyName 
+                            || (user as any).agencyConfig?.agencyName 
+                            || (user as any).agencyConfig?.name 
+                            || null;
+
+                        const individualFullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+                        const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(activeRole);
+                        const computedDisplayName = isAgencyRole 
+                            ? (agencyName || individualFullName || "Mon Agence") 
+                            : (individualFullName || user.email?.split('@')[0] || "Utilisateur");
+
                         return {
                             id: user.id,
                             email: user.email,
                             phone: user.phone,
                             role: activeRole, // Le rôle actif de la session
                             status: user.status as any,
-                            fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            fullName: individualFullName || (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
+                            agencyName: agencyName,
+                            displayName: computedDisplayName,
+                            name: computedDisplayName,
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
                             capaciteActive: activeRole,
@@ -231,13 +253,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             }
                         });
 
+                        const defaultDisplayName = roleBase === "AGENCY" ? "Mon Agence" : (newUser.email?.split('@')[0] || "Nouvel Utilisateur");
+
                         return {
                             id: newUser.id,
                             email: newUser.email,
                             phone: newUser.phone,
                             role: roleBase,
                             status: newUser.status,
+                            firstName: newUser.firstName,
+                            lastName: newUser.lastName,
                             fullName: (newUser.firstName ? newUser.firstName + " " : "") + (newUser.lastName || ""),
+                            agencyName: null,
+                            displayName: defaultDisplayName,
+                            name: defaultDisplayName,
                             onboardingComplete: newUser.onboardingComplete,
                             capaciteActive: roleBase,
                             capacites: [roleBase],
@@ -321,13 +350,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }).catch(e => console.error("Failed to auto-disable landing page:", e));
                     }
 
+                    const adminFullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || "Administrateur";
+
                     return {
                         id: user.id,
                         email: user.email,
                         phone: user.phone,
                         role: role,
                         status: user.status,
-                        fullName: (user.firstName ? user.firstName + " " : "") + (user.lastName || ""),
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        fullName: adminFullName,
+                        displayName: adminFullName,
+                        name: adminFullName,
                         onboardingComplete: true,
                         eligibleRoles: [role, 'ADMIN', 'SUPER_ADMIN'],
                         chosenRole: role,

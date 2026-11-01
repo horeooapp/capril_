@@ -96,7 +96,7 @@ export function OwnerPortalDashboardV2({
     });
   };
 
-  const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : "Propriétaire";
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() || user?.fullName || "Propriétaire";
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">

@@ -31,12 +31,27 @@ export const authConfig = {
                 token.status = user.status
                 token.firstName = (user as any).firstName;
                 token.lastName = (user as any).lastName;
+                token.agencyName = (user as any).agencyName;
                 token.onboardingComplete = (user as any).onboardingComplete
                 token.diasporaAbonnement = (user as any).diasporaAbonnement
                 token.eligibleRoles = (user as any).eligibleRoles
                 token.requiresRoleSelection = false
                 token.capacites = (user as any).capacites
             }
+
+            // Calcul systématique du displayName selon le rôle actif :
+            // Pour Agence : Nom de l'Agence
+            // Pour Propriétaire, Locataire, Intermédiaire : Prénom et Nom
+            const currentRole = String(token.chosenRole || token.role || '').toUpperCase();
+            const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(currentRole);
+            const individualFullName = [token.firstName, token.lastName].filter(Boolean).join(" ").trim();
+
+            if (isAgencyRole) {
+                token.displayName = ((token.agencyName as string) || individualFullName || "Mon Agence");
+            } else {
+                token.displayName = (individualFullName || (token.displayName as string) || (token.email as string)?.split('@')[0] || "Utilisateur");
+            }
+            token.name = (token.displayName as string) || undefined;
 
             return token
         },
@@ -52,6 +67,9 @@ export const authConfig = {
                 session.user.status = token.status as any
                 (session.user as any).firstName = token.firstName as string;
                 (session.user as any).lastName = token.lastName as string;
+                (session.user as any).agencyName = token.agencyName as string;
+                (session.user as any).displayName = token.displayName as string;
+                session.user.name = token.displayName as string;
                 session.user.onboardingComplete = token.onboardingComplete as boolean;
                 (session.user as any).profileType = token.profileType as string;
                 (session.user as any).diasporaAbonnement = token.diasporaAbonnement as boolean;

@@ -22,7 +22,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
         <div>
           <p className="text-[11px] font-bold text-sky-600 uppercase tracking-widest mb-1">Espace Locataire</p>
           <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-            Bonjour, {session?.user?.name?.split(" ")[0] || "Locataire"}.
+            Bonjour, {session?.user?.name || "Locataire"}.
           </h1>
           <p className="text-sm font-medium text-slate-500 mt-1">
             Bail {mainBail?.leaseReference || "—"} · {mainBail?.property?.name || "—"}

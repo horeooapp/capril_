@@ -43,7 +43,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                     <div className="relative z-10">
                         <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tighter uppercase mb-4">
-                            Bonjour, {session?.user?.name?.split(' ')[0] || 'Locataire'}.
+                            Bonjour, {session?.user?.name || 'Locataire'}.
                         </h1>
                         <p className="text-gray-500 font-medium mb-8 max-w-md">
                             Votre espace personnel QAPRIL est à jour. Suivez vos paiements, certifiez votre caution et valorisez votre sérieux.

@@ -21,7 +21,11 @@ export default async function DashboardLayout({
 
     // CRITICAL: Verify if user still exists in DB
     const dbUser = await prisma.user.findUnique({
-        where: { id: session.user.id }
+        where: { id: session.user.id },
+        include: {
+            agenceProfile: true,
+            legalEntity: true
+        }
     });
 
     if (!dbUser) {
@@ -63,8 +67,22 @@ export default async function DashboardLayout({
         }
     }
 
+    const agencyName = (dbUser as any).agenceProfile?.nomAgence 
+        || (dbUser as any).legalEntity?.companyName 
+        || ((dbUser as any).agencyConfig as any)?.agencyName 
+        || ((dbUser as any).agencyConfig as any)?.name 
+        || (session.user as any)?.agencyName 
+        || null;
+
     return (
-        <DashboardLayoutClient session={session} dbActiveRole={activeRole} agencyConfig={(dbUser as any).agencyConfig}>
+        <DashboardLayoutClient 
+            session={session} 
+            dbActiveRole={activeRole} 
+            agencyConfig={(dbUser as any).agencyConfig}
+            agencyName={agencyName}
+            userFirstName={dbUser.firstName}
+            userLastName={dbUser.lastName}
+        >
             {children}
         </DashboardLayoutClient>
     )
