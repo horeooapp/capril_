@@ -19,6 +19,52 @@ interface Props {
     agencyName?: string;
 }
 
+function computeGrandLivreDetails(
+    entries: SyscohadaEntryLine[],
+    selectedAccountNum: string,
+    sensNormal: 'DEBITEUR' | 'CREDITEUR'
+) {
+    const matching = entries.filter(
+        e => e.compteDebit === selectedAccountNum || e.compteCredit === selectedAccountNum
+    ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    let accBal = 0;
+    let totalD = 0;
+    let totalC = 0;
+    const list = [];
+
+    for (const e of matching) {
+        const isDebit = e.compteDebit === selectedAccountNum;
+        const debit = isDebit ? e.montant : 0;
+        const credit = !isDebit ? e.montant : 0;
+        const contrepartie = isDebit ? e.compteCredit : e.compteDebit;
+
+        totalD += debit;
+        totalC += credit;
+
+        if (sensNormal === 'DEBITEUR') {
+            accBal += (debit - credit);
+        } else {
+            accBal += (credit - debit);
+        }
+
+        list.push({
+            ...e,
+            debit,
+            credit,
+            contrepartie,
+            soldeProgressif: accBal
+        });
+    }
+
+    return {
+        computedGLMovements: list,
+        totalGLDebit: totalD,
+        totalGLCredit: totalC,
+        runningBal: accBal
+    };
+}
+
 export default function AgencySyscohadaAccountingClient({ initialData, agencyName }: Props) {
     const [data, setData] = useState<SyscohadaAccountingData>(initialData);
     const [activeTab, setActiveTab] = useState<'SYNTHESE' | 'JOURNAL' | 'GRAND_LIVRE' | 'BALANCE' | 'RESULTAT_BILAN' | 'PLAN_OHADA'>('SYNTHESE');
@@ -123,45 +169,9 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
         categorie: 'ACTIF' as const
     };
 
-    const grandLivreMovements = data.entries.filter(
-        e => e.compteDebit === selectedAccountNum || e.compteCredit === selectedAccountNum
-    ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
     const { computedGLMovements, totalGLDebit, totalGLCredit, runningBal } = useMemo(() => {
-        let accBal = 0;
-        let totalD = 0;
-        let totalC = 0;
-        const list = grandLivreMovements.map(e => {
-            const isDebit = e.compteDebit === selectedAccountNum;
-            const debit = isDebit ? e.montant : 0;
-            const credit = !isDebit ? e.montant : 0;
-            const contrepartie = isDebit ? e.compteCredit : e.compteDebit;
-
-            totalD += debit;
-            totalC += credit;
-
-            if (grandLivreAccount.sensNormal === 'DEBITEUR') {
-                accBal += (debit - credit);
-            } else {
-                accBal += (credit - debit);
-            }
-
-            return {
-                ...e,
-                debit,
-                credit,
-                contrepartie,
-                soldeProgressif: accBal
-            };
-        });
-
-        return {
-            computedGLMovements: list,
-            totalGLDebit: totalD,
-            totalGLCredit: totalC,
-            runningBal: accBal
-        };
-    }, [grandLivreMovements, selectedAccountNum, grandLivreAccount.sensNormal]);
+        return computeGrandLivreDetails(data.entries, selectedAccountNum, grandLivreAccount.sensNormal);
+    }, [data.entries, selectedAccountNum, grandLivreAccount.sensNormal]);
 
     const exportToCSV = () => {
         const headers = ["ID", "Date", "Journal", "N Piece", "Compte Debit", "Compte Credit", "Libelle", "Montant (FCFA)", "Origine"];
