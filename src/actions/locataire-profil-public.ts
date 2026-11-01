@@ -10,26 +10,61 @@ import { serializeObject } from "@/lib/serialize"
 
 export async function getPublicProfile(userId: string) {
     try {
-        const profil = await (prisma as any).locataireProfilPublic.findUnique({
+        let profil = await (prisma as any).locataireProfilPublic.findUnique({
             where: { userId },
             include: {
                 user: {
                     select: {
-                        firstName: true, lastName: true,
+                        firstName: true,
+                        lastName: true,
                         phone: true,
-                        kycLevel: true
+                        kycLevel: true,
+                        neighborhood: true,
+                        email: true
                     }
                 }
             }
         })
 
+        if (!profil) {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    phone: true,
+                    kycLevel: true,
+                    neighborhood: true,
+                    email: true
+                }
+            });
+
+            if (user) {
+                profil = {
+                    userId,
+                    user,
+                    statutRecherche: "EN_RECHERCHE",
+                    statutPro: "SALARIE_CDI",
+                    revenuFourchette: "250K_500K",
+                    employeurType: "",
+                    city: "Abidjan · Cocody",
+                    communesSouhaitees: user.neighborhood ? [user.neighborhood] : ["Angré (8e Tranche, Djibi, Soleil)"],
+                    budgetMaxFcfa: 250000,
+                    typeLogement: ["2 Pièces (1 chambre)", "3 Pièces (2 chambres)"],
+                    disponibleAPartir: null,
+                    visibilite: "TOUS",
+                    nbInvitationsRecues: 0,
+                    nbConsultationsProfil: 0
+                };
+            }
+        }
+
         if (profil) {
-            // Arrays are natively supported in Postgres. Ensure they are arrays.
             if (!Array.isArray(profil.communesSouhaitees)) profil.communesSouhaitees = [];
             if (!Array.isArray(profil.typeLogement)) profil.typeLogement = [];
         }
 
-        return profil
+        return serializeObject(profil)
     } catch (error) {
         console.error("Error fetching public profile:", error)
         throw new Error("Erreur lors de la récupération du profil")
@@ -38,11 +73,16 @@ export async function getPublicProfile(userId: string) {
 
 export async function upsertPublicProfile(userId: string, data: any) {
     try {
-        // Postgres natively supports String[]
-        const profilDataToSave = {
-            ...data,
-            communesSouhaitees: Array.isArray(data.communesSouhaitees) ? data.communesSouhaitees : [],
-            typeLogement: Array.isArray(data.typeLogement) ? data.typeLogement : []
+        const profilDataToSave: any = {
+            statutRecherche: data.statutRecherche || "EN_RECHERCHE",
+            statutPro: data.statutPro || null,
+            revenuFourchette: data.revenuFourchette || null,
+            employeurType: data.employeurType || null,
+            city: data.city || null,
+            budgetMaxFcfa: data.budgetMaxFcfa ? Math.round(Number(data.budgetMaxFcfa)) : null,
+            disponibleAPartir: data.disponibleAPartir ? new Date(data.disponibleAPartir) : null,
+            communesSouhaitees: Array.isArray(data.communesSouhaitees) ? data.communesSouhaitees.filter(Boolean) : [],
+            typeLogement: Array.isArray(data.typeLogement) ? data.typeLogement.filter(Boolean) : []
         }
 
         const profil = await (prisma as any).locataireProfilPublic.upsert({
@@ -55,8 +95,19 @@ export async function upsertPublicProfile(userId: string, data: any) {
                 ...profilDataToSave
             }
         })
+
+        // Mettre à jour neighborhood de l'utilisateur avec la localisation principale
+        const mainLoc = data.city || (data.communesSouhaitees && data.communesSouhaitees[0]);
+        if (mainLoc) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: { neighborhood: mainLoc }
+            }).catch(() => {});
+        }
+
         revalidatePath("/mon-espace-locataire/profil-public")
-        return profil
+        revalidatePath("/mon-espace-locataire")
+        return serializeObject(profil)
     } catch (error) {
         console.error("Error upserting public profile:", error)
         throw new Error("Erreur lors de la mise à jour du profil")
