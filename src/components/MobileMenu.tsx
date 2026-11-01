@@ -38,6 +38,7 @@ import {
 import RoleSwitcher from './dashboard/RoleSwitcher'
 import { PWA_ROLES, PwaRoleId, resolvePwaRole } from './pwa/pwa-roles'
 import { usePwaInstall } from './pwa/usePwaInstall'
+import { SessionProvider } from "next-auth/react"
 
 export interface NavLink {
     href: string
@@ -406,10 +407,12 @@ export default function MobileMenu({
                                 {/* Sélecteur de rôle si multi-rôles */}
                                 {session.user.eligibleRoles && session.user.eligibleRoles.length > 1 && (
                                     <div className="pt-0.5">
-                                        <RoleSwitcher 
-                                            currentRole={displayRole} 
-                                            eligibleRoles={session.user.eligibleRoles} 
-                                        />
+                                        <SessionProvider session={session as any}>
+                                            <RoleSwitcher 
+                                                currentRole={displayRole} 
+                                                eligibleRoles={session.user.eligibleRoles} 
+                                            />
+                                        </SessionProvider>
                                     </div>
                                 )}
 

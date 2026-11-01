@@ -6,7 +6,9 @@ import { useSession } from "next-auth/react";
 import { switchCapacite } from "@/actions/capacite.actions";
 
 export default function SwitchCapacite() {
-  const { data: session, update } = useSession();
+  const sessionCtx = useSession();
+  const session    = sessionCtx?.data;
+  const update     = sessionCtx?.update;
   const [loading, setLoading]     = useState(false);
 
   // Fallback si pas de donnees NextAuth
@@ -35,7 +37,9 @@ export default function SwitchCapacite() {
       setLoading(true);
       await switchCapacite(newVal);
       // Force NextAuth JWT refresh (v5 spec for DB update)
-      await update({ capaciteActive: newVal }); 
+      if (typeof update === 'function') {
+        await update({ capaciteActive: newVal }).catch(() => {});
+      } 
       
       // Force la redirection racine vers la base dashboard pour charger les bonnes donnees
       window.location.href = "/dashboard";

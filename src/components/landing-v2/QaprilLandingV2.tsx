@@ -6,7 +6,7 @@ import { choisirTypeConnexion } from "@/actions/auth.actions";
 import InteractiveShowcase from "./InteractiveShowcase";
 import InteractiveModulesGrid from "./InteractiveModulesGrid";
 import InteractiveMarketChart from "./InteractiveMarketChart";
-import { signOut } from "next-auth/react";
+import { signOut, SessionProvider } from "next-auth/react";
 import MobileMenu from "@/components/MobileMenu";
 import {
   FileText,
@@ -144,6 +144,7 @@ export default function QaprilLandingV2({
   };
 
   return (
+    <SessionProvider session={session}>
     <div className="landing-v2-wrapper qp-grid-pattern-light min-h-screen text-slate-900 bg-[#F8FAFC] antialiased selection:bg-[#D97706] selection:text-white">
       {/* ══════════════════════════════════════════════════════════════════
           1. HEADER NAVIGATION : ÉLÉMENTS STRICTEMENT SUR UNE SEULE LIGNE
@@ -1297,5 +1298,6 @@ export default function QaprilLandingV2({
         </div>
       </footer>
     </div>
+    </SessionProvider>
   );
 }

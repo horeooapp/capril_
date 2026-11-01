@@ -29,7 +29,8 @@ export default function RoleSwitcher({ currentRole, eligibleRoles }: RoleSwitche
     const [isOpen, setIsOpen] = useState(false)
     const [switchingTo, setSwitchingTo] = useState<string | null>(null)
     const router = useRouter()
-    const { update } = useSession()
+    const sessionCtx = useSession()
+    const update = sessionCtx?.update
 
     const currentMeta = ROLE_INFO[currentRole] || { title: currentRole, icon: User, color: "slate" }
 
@@ -41,8 +42,10 @@ export default function RoleSwitcher({ currentRole, eligibleRoles }: RoleSwitche
             const res = await setChosenRole(role)
             if (res.success) {
                 toast.success(`Profil ${role} activé`)
-                // Update local session
-                await update({ chosenRole: role })
+                // Update local session if available
+                if (typeof update === 'function') {
+                    await update({ chosenRole: role }).catch(() => {})
+                }
                 // Redirect and refresh
                 router.push(res.redirectUrl || "/dashboard")
                 router.refresh()
