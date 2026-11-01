@@ -1,6 +1,5 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { headers } from "next/headers"
 
 export const dynamic = "force-dynamic"
 import { logout } from "@/actions/auth"
@@ -13,26 +12,10 @@ export default async function LocataireLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
-    const headersList = await headers()
-    const currentPath = headersList.get("x-pathname") || ""
 
-    // Si on est sur la page de connexion de l'espace locataire
-    if (currentPath.startsWith("/mon-espace-locataire/login")) {
-        if (session?.user) {
-            // Déjà connecté : renvoyer vers l'espace actif
-            const active = (session.user as any).chosenRole || session.user.role;
-            if (active && !['TENANT', 'LOCATAIRE'].includes(active)) {
-                return redirect("/dashboard");
-            }
-            return redirect("/mon-espace-locataire");
-        }
-        // Non connecté sur la page login : afficher la page de connexion épurée sans le layout dashboard
-        return <>{children}</>;
-    }
-
-    // Si l'utilisateur n'est pas connecté et n'est pas sur la page login
+    // Si l'utilisateur n'est pas connecté, afficher les pages publiques sans le shell du dashboard (ex: /mon-espace-locataire/login)
     if (!session?.user) {
-        return redirect("/mon-espace-locataire/login");
+        return <>{children}</>;
     }
 
     // RÔLE ACTIF : Récupérer la capacité active en base pour les comptes multi-profils
