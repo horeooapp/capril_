@@ -85,6 +85,7 @@ export default function DashboardLayoutClient({
         if (path.includes('/properties')) return { title: 'Mes biens', subtitle: 'Propriétés & unités en gestion' };
         if (path.includes('/leases')) return { title: 'Baux et Contrats', subtitle: 'Suivi des contrats locatifs' };
         if (path.includes('/receipts')) return { title: 'Comptabilité', subtitle: 'Quittances et loyers' };
+        if (path.includes('/comptabilite')) return { title: 'Comptabilité Générale', subtitle: 'Plan Comptable SYSCOHADA Révisé' };
         if (path.includes('/disputes')) return { title: 'Contentieux', subtitle: 'Impayés et alertes légales' };
         if (path.includes('/matching')) return { title: 'Candidatures', subtitle: 'Dossiers locataires' };
         if (path.includes('/fiscal')) return { title: 'Fiscal & DGI', subtitle: 'Déclarations et impôts' };

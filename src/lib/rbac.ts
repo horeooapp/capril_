@@ -48,6 +48,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
         '/dashboard/agenda',
         '/dashboard/communications',
         '/dashboard/profile',
+        '/dashboard/comptabilite',
         '/dashboard/manual',
     ],
 
@@ -58,6 +59,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
         '/dashboard/properties',
         '/dashboard/leases',
         '/dashboard/receipts',
+        '/dashboard/comptabilite',
         '/dashboard/matching',
         '/dashboard/agenda',
         '/dashboard/communications',

@@ -79,6 +79,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 { href: "/dashboard/matching", label: "Candidatures", icon: <User size={18} />, id: "MANAGE_TENANTS" },
                 { href: "/dashboard/communications", label: "Messagerie", icon: <MessageSquare size={18} />, id: "MANAGE_TENANTS" },
                 { href: "/dashboard/receipts", label: "Comptabilité & Quittances", icon: <BarChart3 size={18} />, id: "MANAGE_ACCOUNTING" },
+                { href: "/dashboard/comptabilite", label: "Comptabilité SYSCOHADA", icon: <Calculator size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/wallet", label: "Wallet & Reversements", icon: <Wallet size={18} />, id: "MANAGE_ACCOUNTING" },
                 { href: "/dashboard/reports", label: "CRG Mensuels", icon: <FileText size={18} />, id: "READ_DASHBOARD" },
                 { href: "/dashboard/certificates", label: "Certificats DGI", icon: <FileBadge size={18} />, id: "MANAGE_MANDATES" },
