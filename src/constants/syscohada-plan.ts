@@ -383,3 +383,4 @@ export const JOURNAUX_COMPTABLES = [
     { code: "ACHATS", libelle: "Journal des Achats & Fournisseurs", compteTresorerie: null },
     { code: "OD", libelle: "Journal des Opérations Diverses", compteTresorerie: null }
 ];
+

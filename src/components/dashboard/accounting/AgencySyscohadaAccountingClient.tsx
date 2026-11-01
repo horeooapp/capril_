@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useMemo } from "react";
 import { 
     Calculator, FileText, BookOpen, Scale, ArrowDownRight, ArrowUpRight, 
     Plus, Trash2, Printer, Download, Search, CheckCircle2, AlertTriangle, 
@@ -127,27 +127,41 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
         e => e.compteDebit === selectedAccountNum || e.compteCredit === selectedAccountNum
     ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    let runningBal = 0;
-    const computedGLMovements = grandLivreMovements.map(e => {
-        const isDebit = e.compteDebit === selectedAccountNum;
-        const debit = isDebit ? e.montant : 0;
-        const credit = !isDebit ? e.montant : 0;
-        const contrepartie = isDebit ? e.compteCredit : e.compteDebit;
+    const { computedGLMovements, totalGLDebit, totalGLCredit, runningBal } = useMemo(() => {
+        let accBal = 0;
+        let totalD = 0;
+        let totalC = 0;
+        const list = grandLivreMovements.map(e => {
+            const isDebit = e.compteDebit === selectedAccountNum;
+            const debit = isDebit ? e.montant : 0;
+            const credit = !isDebit ? e.montant : 0;
+            const contrepartie = isDebit ? e.compteCredit : e.compteDebit;
 
-        if (grandLivreAccount.sensNormal === 'DEBITEUR') {
-            runningBal += (debit - credit);
-        } else {
-            runningBal += (credit - debit);
-        }
+            totalD += debit;
+            totalC += credit;
+
+            if (grandLivreAccount.sensNormal === 'DEBITEUR') {
+                accBal += (debit - credit);
+            } else {
+                accBal += (credit - debit);
+            }
+
+            return {
+                ...e,
+                debit,
+                credit,
+                contrepartie,
+                soldeProgressif: accBal
+            };
+        });
 
         return {
-            ...e,
-            debit,
-            credit,
-            contrepartie,
-            soldeProgressif: runningBal
+            computedGLMovements: list,
+            totalGLDebit: totalD,
+            totalGLCredit: totalC,
+            runningBal: accBal
         };
-    });
+    }, [grandLivreMovements, selectedAccountNum, grandLivreAccount.sensNormal]);
 
     const exportToCSV = () => {
         const headers = ["ID", "Date", "Journal", "N Piece", "Compte Debit", "Compte Credit", "Libelle", "Montant (FCFA)", "Origine"];
@@ -633,10 +647,10 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
                                 <tr>
                                     <td colSpan={5} className="py-3 px-4 text-right">TOTAL COMPTE {selectedAccountNum} :</td>
                                     <td className="py-3 px-3 text-right font-mono text-emerald-800">
-                                        {fmt(computedGLMovements.reduce((acc, m) => acc + m.debit, 0))}
+                                        {fmt(totalGLDebit)}
                                     </td>
                                     <td className="py-3 px-3 text-right font-mono text-blue-800">
-                                        {fmt(computedGLMovements.reduce((acc, m) => acc + m.credit, 0))}
+                                        {fmt(totalGLCredit)}
                                     </td>
                                     <td className="py-3 px-4 text-right font-mono font-black text-emerald-900">
                                         {fmt(runningBal)} FCFA
@@ -1052,3 +1066,4 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
         </div>
     );
 }
+
