@@ -27,7 +27,6 @@ export default async function AgencyComptabilitePage() {
             firstName: true,
             lastName: true,
             agencyConfig: true,
-            userCapacite: true,
             role: true
         }
     });

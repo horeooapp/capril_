@@ -152,7 +152,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
         // 1. Récupérer l'utilisateur agence et ses configurations
         const user = await (prisma as any).user.findUnique({
             where: { id: agencyId },
-            select: { id: true, agencyConfig: true, role: true, userCapacite: true }
+            select: { id: true, agencyConfig: true, role: true }
         });
 
         if (!user) {
@@ -167,7 +167,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
         // 2. Récupérer les biens gérés par l'agence
         const directProperties = await (prisma as any).property.findMany({
             where: { OR: [{ ownerUserId: agencyId }, { managedByUserId: agencyId }] },
-            select: { id: true, propertyCode: true, title: true }
+            select: { id: true, propertyCode: true, name: true }
         }).catch(() => []);
 
         const accesses = await (prisma as any).propertyAccess.findMany({
@@ -189,7 +189,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
                 ]
             },
             include: {
-                property: { select: { id: true, propertyCode: true, title: true } }
+                property: { select: { id: true, propertyCode: true, name: true } }
             }
         }).catch(() => []);
 
@@ -221,7 +221,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
                         pieceRef: `CAUTION-${lease.leaseReference}`,
                         compteDebit: "521200", // Banque Séquestre Mandants
                         compteCredit: "165100", // Dépôts de garantie reçus des locataires
-                        libelle: `Dépôt caution séquestre - Bail ${lease.leaseReference} (${lease.property?.title || 'Bien'})`,
+                        libelle: `Dépôt caution séquestre - Bail ${lease.leaseReference} (${lease.property?.name || lease.property?.propertyCode || 'Bien'})`,
                         montant: Math.round(Number(lease.depositAmount)),
                         source: "AUTO_LEASE",
                         metadata: { leaseId: lease.id, leaseRef: lease.leaseReference }
