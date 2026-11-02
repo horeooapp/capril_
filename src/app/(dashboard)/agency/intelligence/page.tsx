@@ -111,9 +111,9 @@ export default async function IntelligenceDashboardPage() {
       <footer className="pt-24 pb-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40">
         <div className="text-[10px] font-black tracking-[0.3em] uppercase">QAPRIL AI ORCHESTRATOR © 2026</div>
         <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
-            <a href="#" className="hover:text-blue-400">Documentation API</a>
-            <a href="#" className="hover:text-blue-400">Compliance DGI</a>
-            <a href="#" className="hover:text-blue-400">Support</a>
+            <a href="/dashboard/agency" className="hover:text-blue-400">Documentation API</a>
+            <a href="/dashboard/fiscal" className="hover:text-blue-400">Compliance DGI</a>
+            <a href="mailto:contact@qapril.net" className="hover:text-blue-400">Support</a>
         </div>
       </footer>
     </div>

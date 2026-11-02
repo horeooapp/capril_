@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
     Search,
@@ -49,6 +49,7 @@ export default function DashboardLayoutClient({
     userLastName?: string | null
 }) {
     const pathname = usePathname()
+    const router = useRouter()
 
     const activeRole = dbActiveRole || session?.user?.chosenRole || session?.user?.role;
     
@@ -144,7 +145,7 @@ export default function DashboardLayoutClient({
                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         {/* Desktop Search & Notifs */}
                         <div className="hidden lg:flex items-center gap-3 pr-4 border-r border-slate-200">
-                            <button className="text-slate-400 hover:text-slate-700 transition-colors p-1.5" title="Rechercher">
+                            <button onClick={() => router.push("/dashboard/properties")} className="text-slate-400 hover:text-slate-700 transition-colors p-1.5" title="Rechercher des biens">
                                 <Search size={18} />
                             </button>
                             <div className="text-slate-400 hover:text-slate-700 transition-colors relative cursor-pointer p-1.5">

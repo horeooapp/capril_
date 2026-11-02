@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 "use client"
 
 import { useState } from "react"
@@ -69,7 +70,7 @@ export default function DiasporaClient({ data }: { data: any }) {
                                 <li className="flex items-center gap-2 text-slate-400"><X size={16} /> Inspections vidéo trimestrielles</li>
                                 <li className="flex items-center gap-2 text-slate-400"><X size={16} /> Gestion fiscale DGI</li>
                             </ul>
-                            <button className="w-full py-4 mt-auto bg-slate-100 text-slate-800 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">
+                            <button onClick={() => setIsSubscribed(true)} className="w-full py-4 mt-auto bg-slate-100 text-slate-800 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">
                                 Choisir Sérénité
                             </button>
                         </div>
@@ -163,7 +164,7 @@ export default function DiasporaClient({ data }: { data: any }) {
                                         <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{report.status}</p>
                                     </div>
                                 </div>
-                                <button className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
+                                <button onClick={() => toast.info(`Consultation du rapport financier ${report.month}`)} className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
                                     <ArrowRight size={16} />
                                 </button>
                             </div>
@@ -180,7 +181,7 @@ export default function DiasporaClient({ data }: { data: any }) {
                     <p className="text-sm font-medium text-slate-500 max-w-sm">
                         Demandez à votre gestionnaire de filmer une visite détaillée de l'un de vos biens à Abidjan.
                     </p>
-                    <button className="px-6 py-3 bg-amber-50 text-amber-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-100 transition-colors mt-4">
+                    <button onClick={() => toast.success("Demande d'inspection vidéo enregistrée. Votre gestionnaire QAPRIL planifie la visite.")} className="px-6 py-3 bg-amber-50 text-amber-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-100 transition-colors mt-4">
                         Demander une visite
                     </button>
                 </div>

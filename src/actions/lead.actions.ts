@@ -35,6 +35,14 @@ export async function getAvailableLeads(agenceId: string) {
  */
 export async function purchaseLead(agenceId: string, leadId: string) {
     try {
+        let targetAgenceId = agenceId;
+        if (!targetAgenceId) {
+            const { auth } = await import("@/auth");
+            const session = await auth();
+            if (!session?.user?.id) throw new Error("Veuillez vous connecter pour acheter un lead.");
+            targetAgenceId = session.user.id;
+        }
+
         return await prisma.$transaction(async (tx) => {
             const lead = await tx.lead.findUnique({
                 where: { id: leadId }
@@ -46,7 +54,7 @@ export async function purchaseLead(agenceId: string, leadId: string) {
 
             // Vérifier le solde du Wallet
             const walletTransactions = await tx.walletTransaction.findMany({
-                where: { userId: agenceId, status: "COMPLETED" }
+                where: { userId: targetAgenceId, status: "COMPLETED" }
             });
 
             const balance = walletTransactions.reduce((acc, t) => {
@@ -60,7 +68,7 @@ export async function purchaseLead(agenceId: string, leadId: string) {
             // Débiter le wallet de l'agence
             await tx.walletTransaction.create({
                 data: {
-                    userId: agenceId,
+                    userId: targetAgenceId,
                     type: "DEBIT",
                     amount: price,
                     status: "COMPLETED",

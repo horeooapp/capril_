@@ -407,7 +407,7 @@ export async function getAgencyAccountingData(
         // C. Reversements de loyers aux bailleurs (Disbursements / Reversals)
         const reversals = await (prisma as any).reversalTransaction.findMany({
             where: {
-                status: { in: ["SUCCESS", "success", "CONFIRMED"] }
+                status: { in: ["SUCCESS", "REVERSED"] }
             },
             include: {
                 recipient: { select: { id: true, firstName: true, lastName: true } }

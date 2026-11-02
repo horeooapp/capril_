@@ -29,9 +29,9 @@ export default async function FloatDashboardPage() {
                     <p className="text-gray-500 mt-1">Gérez les pools de liquidités et cantonnez les dépôts de sécurité.</p>
                 </div>
                 {/* We could add a client component button here to Create a new Pool */}
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors">
-                    + Nouveau Pool
-                </button>
+                <Link href="/dashboard/wallet" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors inline-block">
+                    + Configurer Trésorerie
+                </Link>
             </div>
 
             {/* KPI Cards */}

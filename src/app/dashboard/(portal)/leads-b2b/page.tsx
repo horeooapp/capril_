@@ -1,6 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import { Users, Target, Zap, ShoppingCart } from "lucide-react";
+import { BuyLeadButton } from "@/components/dashboard/agency/BuyLeadButton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -116,10 +117,7 @@ export default async function LeadsB2BPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">
-                                                <ShoppingCart size={16} className="mr-1.5" />
-                                                Acheter
-                                            </button>
+                                            <BuyLeadButton leadId={lead.id} prix={lead.prixLead || 10000} />
                                         </td>
                                     </tr>
                                 ))

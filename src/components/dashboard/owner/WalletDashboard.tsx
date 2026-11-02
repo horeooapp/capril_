@@ -66,7 +66,7 @@ export default function WalletDashboard() {
                 <Zap size={16} /> Recharger
             </button>
             <Link 
-                href="/dashboard/wallet/settings"
+                href="/dashboard/wallet"
                 className="bg-white text-slate-700 border border-slate-200 px-4 sm:px-6 py-2.5 rounded-[10px] font-semibold text-[11px] sm:text-[12px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2 flex-1 sm:flex-none">
                 Configuration
             </Link>

@@ -26,7 +26,7 @@ export const AgencyCandidateList: React.FC<{ candidates?: any[] }> = ({ candidat
           <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Candidatures.</h2>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Suivi des dossiers M-CAND</p>
         </div>
-        <Link href="/dashboard/candidatures/new" className="px-4 py-2 bg-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-700 transition-colors inline-block">
+        <Link href="/dashboard/matching" className="px-4 py-2 bg-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-slate-700 transition-colors inline-block">
           Nouvelle Candidature
         </Link>
       </div>
