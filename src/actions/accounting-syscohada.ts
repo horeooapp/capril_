@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { PLAN_COMPTABLE_SYSCOHADA, JOURNAUX_COMPTABLES, CompteSyscohada } from "@/constants/syscohada-plan";
+import { PLAN_COMPTABLE_SYSCOHADA, CompteSyscohada } from "@/constants/syscohada-plan";
 
 export interface SyscohadaEntryLine {
     id: string;
@@ -137,61 +137,140 @@ function getAccountInfo(numero: string): CompteSyscohada {
 }
 
 /**
- * Récupère l'ensemble des données comptables SYSCOHADA pour l'agence connectée.
+ * Récupère la liste de toutes les agences pour le filtre administrateur.
  */
-export async function getAgencyAccountingData(filterYear?: number): Promise<{ success: boolean; data?: SyscohadaAccountingData; error?: string }> {
+export async function getAgenciesList(): Promise<{ id: string; name: string; email?: string }[]> {
+    try {
+        const agencies = await (prisma as any).user.findMany({
+            where: {
+                OR: [
+                    { role: "AGENCY" },
+                    { agencyConfig: { not: null } }
+                ]
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                agencyConfig: true
+            },
+            orderBy: { firstName: "asc" }
+        });
+
+        return agencies.map((a: any) => {
+            const config = (a.agencyConfig as any) || {};
+            const name = config.agencyName || 
+                (a.firstName ? `${a.firstName} ${a.lastName || ''}`.trim() : a.email);
+            return {
+                id: a.id,
+                name: name || "Agence Immobilière",
+                email: a.email
+            };
+        });
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Récupère l'ensemble des données comptables SYSCOHADA (pour une agence ou consolidé national).
+ */
+export async function getAgencyAccountingData(
+    filterYear?: number,
+    targetAgencyId?: string
+): Promise<{ success: boolean; data?: SyscohadaAccountingData; error?: string }> {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             return { success: false, error: "Non authentifié" };
         }
 
-        const agencyId = session.user.id;
+        const userRole = (session.user.role || "").toUpperCase();
+        const isAdmin = userRole === "ADMIN" || userRole === "SUPER_ADMIN";
+
+        // Si l'utilisateur est admin et qu'aucune agence n'est ciblée (ou targetAgencyId === "ALL"),
+        // alors on effectue une consolidation globale de TOUTE la plateforme !
+        const isGlobalAdminConsolidated = isAdmin && (!targetAgencyId || targetAgencyId === "ALL");
+        const effectiveAgencyId = isGlobalAdminConsolidated ? null : (isAdmin ? targetAgencyId : session.user.id);
         const currentYear = filterYear || new Date().getFullYear();
 
-        // 1. Récupérer l'utilisateur agence et ses configurations
-        const user = await (prisma as any).user.findUnique({
-            where: { id: agencyId },
-            select: { id: true, agencyConfig: true, role: true }
-        });
+        // 1. Récupérer les écritures manuelles et les configurations
+        let manualEntries: SyscohadaEntryLine[] = [];
+        let defaultCommissionRate = 10;
 
-        if (!user) {
-            return { success: false, error: "Agence introuvable" };
+        if (effectiveAgencyId) {
+            const user = await (prisma as any).user.findUnique({
+                where: { id: effectiveAgencyId },
+                select: { id: true, agencyConfig: true, role: true }
+            });
+            if (user) {
+                const conf = (user.agencyConfig as any) || {};
+                manualEntries = Array.isArray(conf.syscohadaEntries) ? conf.syscohadaEntries : [];
+                if (conf.defaultCommissionRate) defaultCommissionRate = conf.defaultCommissionRate;
+            }
+        } else if (isGlobalAdminConsolidated) {
+            // Consolidation de toutes les écritures manuelles créées par les agences ou admins
+            const agencyUsers = await (prisma as any).user.findMany({
+                where: { agencyConfig: { not: null } },
+                select: { agencyConfig: true }
+            }).catch(() => []);
+            for (const u of agencyUsers) {
+                const conf = (u.agencyConfig as any) || {};
+                if (Array.isArray(conf.syscohadaEntries)) {
+                    manualEntries.push(...conf.syscohadaEntries);
+                }
+            }
         }
 
-        const agencyConfig = (user.agencyConfig as any) || {};
-        const manualEntries: SyscohadaEntryLine[] = Array.isArray(agencyConfig.syscohadaEntries) 
-            ? agencyConfig.syscohadaEntries 
-            : [];
+        // 2. Récupérer les biens gérés
+        let directProperties: any[] = [];
+        let accesses: any[] = [];
 
-        // 2. Récupérer les biens gérés par l'agence
-        const directProperties = await (prisma as any).property.findMany({
-            where: { OR: [{ ownerUserId: agencyId }, { managedByUserId: agencyId }] },
-            select: { id: true, propertyCode: true, name: true }
-        }).catch(() => []);
+        if (effectiveAgencyId) {
+            directProperties = await (prisma as any).property.findMany({
+                where: { OR: [{ ownerUserId: effectiveAgencyId }, { managedByUserId: effectiveAgencyId }] },
+                select: { id: true, propertyCode: true, name: true }
+            }).catch(() => []);
 
-        const accesses = await (prisma as any).propertyAccess.findMany({
-            where: { userId: agencyId, revokedAt: null, statut: "ACTIF" },
-            select: { propertyId: true }
-        }).catch(() => []);
+            accesses = await (prisma as any).propertyAccess.findMany({
+                where: { userId: effectiveAgencyId, revokedAt: null, statut: "ACTIF" },
+                select: { propertyId: true }
+            }).catch(() => []);
+        } else {
+            // Consolidé global admin : tous les biens
+            directProperties = await (prisma as any).property.findMany({
+                select: { id: true, propertyCode: true, name: true }
+            }).catch(() => []);
+        }
 
         const propertyIds = Array.from(new Set([
             ...directProperties.map((p: any) => p.id),
             ...accesses.map((a: any) => a.propertyId)
         ]));
 
-        // 3. Récupérer les baux associés à l'agence
-        const leases = await (prisma as any).lease.findMany({
-            where: {
-                OR: [
-                    { agentId: agencyId },
-                    ...(propertyIds.length > 0 ? [{ propertyId: { in: propertyIds } }] : [])
-                ]
-            },
-            include: {
-                property: { select: { id: true, propertyCode: true, name: true } }
-            }
-        }).catch(() => []);
+        // 3. Récupérer les baux associés
+        let leases: any[] = [];
+        if (effectiveAgencyId) {
+            leases = await (prisma as any).lease.findMany({
+                where: {
+                    OR: [
+                        { agentId: effectiveAgencyId },
+                        ...(propertyIds.length > 0 ? [{ propertyId: { in: propertyIds } }] : [])
+                    ]
+                },
+                include: {
+                    property: { select: { id: true, propertyCode: true, name: true } }
+                }
+            }).catch(() => []);
+        } else {
+            // Consolidé global admin : tous les baux du parc
+            leases = await (prisma as any).lease.findMany({
+                include: {
+                    property: { select: { id: true, propertyCode: true, name: true } }
+                }
+            }).catch(() => []);
+        }
 
         const leaseIds = leases.map((l: any) => l.id);
 
@@ -209,7 +288,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
 
         // A. Cautions et dépôts de garantie des baux actifs
         leases.forEach((lease: any) => {
-            if (lease.depositAmount && lease.depositAmount > 0) {
+            if (lease.depositAmount && Number(lease.depositAmount) > 0) {
                 const leaseDate = lease.startDate ? new Date(lease.startDate).toISOString().slice(0, 10) : `${currentYear}-01-01`;
                 const entryYear = parseInt(leaseDate.slice(0, 4), 10);
                 
@@ -231,7 +310,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
         });
 
         // Taux de commission d'agence par défaut (10% TTC standard en CI)
-        const commissionRate = (agencyConfig.defaultCommissionRate || 10) / 100;
+        const commissionRate = defaultCommissionRate / 100;
         const tvaRate = 0.18; // TVA en Côte d'Ivoire / UEMOA (18%)
 
         // B. Encaissements de loyers et prélèvement d'honoraires
@@ -274,18 +353,13 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
             });
 
             // Écriture 2: Prélèvement des Honoraires de Gestion de l'Agence
-            // Commission TTC = totalAmount * commissionRate
-            // Commission HT = Commission TTC / (1 + tvaRate)
-            // TVA Collectée = Commission TTC - Commission HT
             const commissionTTC = Math.round(totalAmount * commissionRate);
             const commissionHT = Math.round(commissionTTC / (1 + tvaRate));
             const tvaCollectee = commissionTTC - commissionHT;
 
             if (commissionTTC > 0) {
                 // Débit 467100 Bailleurs Mandants (prélèvement sur les loyers dus)
-                // Crédit 706100 Honoraires de gestion locative (HT)
-                // Crédit 443100 État - TVA facturée sur prestations (18%)
-                // Pour maintenir un format simple 1 débit / 1 crédit par ligne, on scinde en deux lignes équilibrées :
+                // Crédit 706100 Honoraires de gestion HT
                 generatedEntries.push({
                     id: `auto-com-ht-${rcp.id}`,
                     date: entryDate,
@@ -330,7 +404,39 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
             }
         });
 
-        // 6. Fusionner avec les écritures manuelles créées par l'agence
+        // C. Reversements de loyers aux bailleurs (Disbursements / Reversals)
+        const reversals = await (prisma as any).reversalTransaction.findMany({
+            where: {
+                status: { in: ["SUCCESS", "success", "CONFIRMED"] }
+            },
+            include: {
+                recipient: { select: { id: true, firstName: true, lastName: true } }
+            }
+        }).catch(() => []);
+
+        reversals.forEach((rev: any) => {
+            const revDate = rev.createdAt ? new Date(rev.createdAt).toISOString().slice(0, 10) : `${currentYear}-01-01`;
+            const entryYear = parseInt(revDate.slice(0, 4), 10);
+            if (filterYear && entryYear !== currentYear) return;
+
+            const montant = Math.round(Number(rev.amount || 0));
+            if (montant <= 0) return;
+
+            generatedEntries.push({
+                id: `auto-rev-${rev.id}`,
+                date: revDate,
+                journalCode: "REV_BAIL",
+                pieceRef: rev.referencePgw || `REV-${rev.id.slice(0, 8)}`,
+                compteDebit: "467100", // Débit Bailleurs Mandants (apurement de la dette envers le bailleur)
+                compteCredit: "521200", // Crédit Banque Séquestre (décaissement des fonds)
+                libelle: `Reversement loyer net au bailleur ${rev.recipient?.firstName || ''} ${rev.recipient?.lastName || ''}`.trim(),
+                montant: montant,
+                source: "AUTO_REVERSAL",
+                metadata: { reversalId: rev.id, paymentId: rev.paymentId }
+            });
+        });
+
+        // 6. Fusionner avec les écritures manuelles
         const filteredManualEntries = filterYear 
             ? manualEntries.filter(e => parseInt(e.date.slice(0, 4), 10) === currentYear)
             : manualEntries;
@@ -534,7 +640,7 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
                     total: totalPassif,
                     items: passifItems
                 },
-                equilibre: totalActif - totalPassif
+                equilibre: Math.abs(totalActif - totalPassif)
             },
             rapprochementMandants: {
                 tresorerieMandants,
@@ -552,19 +658,19 @@ export async function getAgencyAccountingData(filterYear?: number): Promise<{ su
                 loyersEncaisses,
                 commissionsGestion,
                 totalEcritures: allEntries.length,
-                periode: `${currentYear}`
+                periode: filterYear ? `Exercice ${filterYear}` : `Exercice ${currentYear} (Cumul annuel)`
             }
         };
 
         return { success: true, data: accountingData };
     } catch (error: any) {
         console.error("Erreur getAgencyAccountingData:", error);
-        return { success: false, error: error.message || "Erreur de traitement comptable" };
+        return { success: false, error: error.message || "Erreur interne comptable" };
     }
 }
 
 /**
- * Ajoute une écriture comptable manuelle dans le journal de l'agence.
+ * Ajoute une écriture comptable manuelle.
  */
 export async function addCustomSyscohadaEntry(entryData: {
     date: string;
@@ -574,6 +680,7 @@ export async function addCustomSyscohadaEntry(entryData: {
     compteCredit: string;
     libelle: string;
     montant: number;
+    targetAgencyId?: string;
 }): Promise<{ success: boolean; error?: string }> {
     try {
         const session = await auth();
@@ -581,26 +688,17 @@ export async function addCustomSyscohadaEntry(entryData: {
             return { success: false, error: "Non authentifié" };
         }
 
-        if (!entryData.date || !entryData.journalCode || !entryData.compteDebit || !entryData.compteCredit || !entryData.libelle) {
-            return { success: false, error: "Tous les champs obligatoires doivent être renseignés" };
-        }
-
-        if (entryData.compteDebit === entryData.compteCredit) {
-            return { success: false, error: "Le compte au débit doit être différent du compte au crédit" };
-        }
-
-        const montant = Math.round(Number(entryData.montant));
-        if (isNaN(montant) || montant <= 0) {
-            return { success: false, error: "Le montant doit être un nombre strictement positif" };
-        }
+        const targetUserId = (entryData.targetAgencyId && entryData.targetAgencyId !== "ALL")
+            ? entryData.targetAgencyId
+            : session.user.id;
 
         const user = await (prisma as any).user.findUnique({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             select: { id: true, agencyConfig: true }
         });
 
         if (!user) {
-            return { success: false, error: "Utilisateur agence introuvable" };
+            return { success: false, error: "Utilisateur ou agence introuvable" };
         }
 
         const agencyConfig = (user.agencyConfig as any) || {};
@@ -612,18 +710,18 @@ export async function addCustomSyscohadaEntry(entryData: {
             id: `manual-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
             date: entryData.date,
             journalCode: entryData.journalCode,
-            pieceRef: entryData.pieceRef || `MAN-${Date.now().toString().slice(-6)}`,
+            pieceRef: entryData.pieceRef,
             compteDebit: entryData.compteDebit,
             compteCredit: entryData.compteCredit,
             libelle: entryData.libelle,
-            montant,
+            montant: Math.round(Number(entryData.montant)),
             source: 'MANUAL'
         };
 
         const updatedEntries = [newEntry, ...existingEntries];
 
         await (prisma as any).user.update({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             data: {
                 agencyConfig: {
                     ...agencyConfig,
@@ -633,6 +731,7 @@ export async function addCustomSyscohadaEntry(entryData: {
         });
 
         revalidatePath("/dashboard/comptabilite");
+        revalidatePath("/admin/reports");
         return { success: true };
     } catch (error: any) {
         console.error("Erreur addCustomSyscohadaEntry:", error);
@@ -643,15 +742,22 @@ export async function addCustomSyscohadaEntry(entryData: {
 /**
  * Supprime une écriture comptable manuelle.
  */
-export async function deleteCustomSyscohadaEntry(entryId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteCustomSyscohadaEntry(
+    entryId: string,
+    targetAgencyId?: string
+): Promise<{ success: boolean; error?: string }> {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             return { success: false, error: "Non authentifié" };
         }
 
+        const targetUserId = (targetAgencyId && targetAgencyId !== "ALL")
+            ? targetAgencyId
+            : session.user.id;
+
         const user = await (prisma as any).user.findUnique({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             select: { id: true, agencyConfig: true }
         });
 
@@ -667,7 +773,7 @@ export async function deleteCustomSyscohadaEntry(entryId: string): Promise<{ suc
         const updatedEntries = existingEntries.filter(e => e.id !== entryId);
 
         await (prisma as any).user.update({
-            where: { id: session.user.id },
+            where: { id: targetUserId },
             data: {
                 agencyConfig: {
                     ...agencyConfig,
@@ -677,6 +783,7 @@ export async function deleteCustomSyscohadaEntry(entryId: string): Promise<{ suc
         });
 
         revalidatePath("/dashboard/comptabilite");
+        revalidatePath("/admin/reports");
         return { success: true };
     } catch (error: any) {
         console.error("Erreur deleteCustomSyscohadaEntry:", error);
@@ -687,7 +794,11 @@ export async function deleteCustomSyscohadaEntry(entryId: string): Promise<{ suc
 /**
  * Extrait les mouvements du Grand Livre pour un compte spécifique.
  */
-export async function getGrandLivreForAccount(accountNumero: string, filterYear?: number): Promise<{
+export async function getGrandLivreForAccount(
+    accountNumero: string,
+    filterYear?: number,
+    targetAgencyId?: string
+): Promise<{
     account: CompteSyscohada;
     movements: GrandLivreMovement[];
     totalDebit: number;
@@ -695,7 +806,7 @@ export async function getGrandLivreForAccount(accountNumero: string, filterYear?
     soldeFinal: number;
     sensSolde: 'DEBITEUR' | 'CREDITEUR';
 }> {
-    const dataRes = await getAgencyAccountingData(filterYear);
+    const dataRes = await getAgencyAccountingData(filterYear, targetAgencyId);
     const accountInfo = getAccountInfo(accountNumero);
 
     if (!dataRes.success || !dataRes.data) {
