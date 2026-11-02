@@ -1,6 +1,6 @@
 "use server";
 
-import { sendSMS } from "@/lib/sms";
+import { sendSMSWithDetails, OrangeSMSService } from "@/lib/sms";
 import { sendEmail } from "@/lib/email";
 import { auth } from "@/auth";
 
@@ -9,14 +9,42 @@ export async function testSMSGateway(phone: string, message: string, forceProvid
     // if (!session?.user?.isAdmin) throw new Error("Accès refusé");
 
     try {
-        const success = await sendSMS(phone, message, forceProvider);
-        if (success) {
-            return { success: true, message: "SMS envoyé avec succès" };
+        const result = await sendSMSWithDetails(phone, message, forceProvider);
+        if (result.success) {
+            return {
+                success: true,
+                message: `SMS envoyé avec succès via ${result.provider} (ID: ${result.messageId || 'OK'})`,
+                provider: result.provider,
+                messageId: result.messageId
+            };
         } else {
-            return { success: false, error: "Toutes les tentatives d'envoi ont échoué" };
+            return {
+                success: false,
+                error: result.error || "Toutes les tentatives d'envoi ont échoué",
+                provider: result.provider
+            };
         }
     } catch (error: any) {
-        return { success: false, error: error.message };
+        return { success: false, error: error.message || "Erreur inattendue" };
+    }
+}
+
+export async function getOrangeSMSStatus() {
+    try {
+        const service = new OrangeSMSService();
+        const balance = await service.checkBalance();
+        return {
+            configured: true,
+            provider: process.env.SMS_GATEWAY_PROVIDER || "ORANGE",
+            senderNumber: process.env.ORANGE_SMS_SENDER_NUMBER || "tel:+22500000000",
+            senderName: process.env.ORANGE_SMS_SENDER_NAME || "QAPRIL",
+            ...balance
+        };
+    } catch (error: any) {
+        return {
+            configured: false,
+            error: error.message || "Impossible de récupérer le statut Orange SMS"
+        };
     }
 }
 

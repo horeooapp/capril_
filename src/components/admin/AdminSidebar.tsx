@@ -95,6 +95,10 @@ export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProp
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 00-6.07 10.5L1 15l3.63-.95A7 7 0 108 1zm0 12.6a5.57 5.57 0 01-2.84-.78l-.2-.12-2.11.55.56-2.06-.13-.21A5.6 5.6 0 118 13.6z" fill="currentColor"/></svg>
               Notifications WhatsApp
             </Link>
+            <Link href="/admin/sms" className={`nav-item ${pathname === '/admin/sms' ? 'active' : ''}`}>
+              <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12a1 1 0 011 1v7a1 1 0 01-1 1H4l-3 3V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+              Passerelle SMS Orange
+            </Link>
 
             <Link href="/" className="nav-item" style={{ marginTop: '10px' }}>
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 7v7h4v-4h4v4h4V7L8 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
