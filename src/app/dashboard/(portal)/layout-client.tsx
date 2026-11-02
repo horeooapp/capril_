@@ -26,9 +26,10 @@ import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
 import BottomNav from "@/components/BottomNav"
-import { signOut, SessionProvider } from "next-auth/react"
+import { SessionProvider } from "next-auth/react"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import PushRegistration from "@/components/admin/PushRegistration"
+import { executeLogout } from "@/lib/auth-logout"
 
 export default function DashboardLayoutClient({
     children,
@@ -107,7 +108,7 @@ export default function DashboardLayoutClient({
             {session?.user && (
                 <AppSidebar 
                     role={activeRole} 
-                    onLogout={() => signOut()} 
+                    onLogout={() => executeLogout("/dashboard/login")} 
                     userName={displayName}
                     themeId={theme.id}
                     diasporaAbonnement={session.user.diasporaAbonnement || activeRole === 'DIASPORA'}
@@ -175,7 +176,7 @@ export default function DashboardLayoutClient({
 
                                 {/* Bouton Déconnexion Mobile & Desktop */}
                                 <button 
-                                    onClick={() => signOut({ callbackUrl: "/dashboard/login" })}
+                                    onClick={() => executeLogout("/dashboard/login")}
                                     className="flex items-center justify-center w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 active:scale-95 transition-all shrink-0"
                                     title="Déconnexion"
                                     aria-label="Déconnexion"
@@ -190,7 +191,7 @@ export default function DashboardLayoutClient({
                             <MobileMenu 
                                 session={session} 
                                 variant="dark" 
-                                onLogout={() => signOut({ callbackUrl: "/dashboard/login" })}
+                                onLogout={() => executeLogout("/dashboard/login")}
                                 activeRole={activeRole} 
                             />
                         </div>

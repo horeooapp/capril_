@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { DiasporaDashboardData } from "@/types/diaspora";
 import { generateDiasporaInvite, simulateSepaVirement } from "@/actions/diaspora-actions";
+import { executeLogout } from "@/lib/auth-logout";
 import { 
   BarChart3, 
   Building2, 
@@ -500,7 +501,7 @@ const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA,
             </div>
             <div style={{marginTop:20,display:"flex",gap:12}}>
               <BtnPrim label="Sauvegarder les réglages" style={{flex:1}}/>
-              <BtnSec label="Déconnexion" color={T.red}/>
+              <BtnSec label="Déconnexion" color={T.red} onClick={() => executeLogout("/login")}/>
             </div>
           </Card>
         </div>

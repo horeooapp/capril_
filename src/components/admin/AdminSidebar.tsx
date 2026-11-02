@@ -2,9 +2,10 @@
 import React, { useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { executeLogout } from "@/lib/auth-logout"
 
 interface AdminSidebarProps {
-    onLogout: () => Promise<void>;
+    onLogout?: () => Promise<void> | void;
     sessionUser?: any;
 }
 
@@ -101,7 +102,7 @@ export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProp
             </Link>
 
             {/* Logout button mimicking a nav-item */}
-            <div className="nav-item cursor-pointer" onClick={onLogout} style={{ color: '#FF6600', marginTop: '5px' }}>
+            <div className="nav-item cursor-pointer" onClick={() => { if (onLogout) { try { onLogout(); } catch {} } executeLogout("/admin/login"); }} style={{ color: '#FF6600', marginTop: '5px' }}>
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a2 2 0 01-2-2V4a2 2 0 012-2h3M10 11l4-3-4-3M14 8H5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Déconnexion
             </div>

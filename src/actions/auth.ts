@@ -278,7 +278,7 @@ export async function loginWithAdminCredentials(email: string, password: string)
 
 export async function logout() {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "/";
-    await signOut({ redirectTo: baseUrl })
+    await signOut({ redirectTo: "/login" })
 }
 
 /**

@@ -7,10 +7,11 @@ import { Home, LayoutDashboard, FileText, ClipboardList, Star, LogOut, User, Sen
 import ProtectedLogo from "@/components/ProtectedLogo"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
 import MobileMenu from "@/components/MobileMenu"
+import { executeLogout } from "@/lib/auth-logout"
 
 interface LocataireHeaderProps {
     session: any
-    onLogout: () => Promise<void>
+    onLogout?: () => Promise<void> | void
 }
 
 export default function LocataireHeader({ session, onLogout }: LocataireHeaderProps) {
@@ -95,12 +96,21 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                     </div>
                     
                     <div className="flex items-center gap-2">
-                        <form action={async () => { await onLogout() }}>
-                            <button type="submit" className="hidden md:flex flex-col items-center justify-center h-12 w-12 rounded-2xl bg-white border border-gray-100 text-red-500 hover:bg-red-50 transition-all shadow-sm group">
-                                <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
-                            </button>
-                        </form>
-                        <MobileMenu links={navLinks} session={session} variant="light" onLogout={onLogout} />
+                        <button 
+                            type="button"
+                            onClick={() => {
+                                if (onLogout) {
+                                    try { onLogout(); } catch { executeLogout("/mon-espace-locataire/login"); }
+                                } else {
+                                    executeLogout("/mon-espace-locataire/login");
+                                }
+                            }}
+                            className="hidden md:flex flex-col items-center justify-center h-12 w-12 rounded-2xl bg-white border border-gray-100 text-red-500 hover:bg-red-50 transition-all shadow-sm group"
+                            title="Déconnexion"
+                        >
+                            <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+                        <MobileMenu links={navLinks} session={session} variant="light" onLogout={onLogout || (() => executeLogout("/mon-espace-locataire/login"))} />
                     </div>
                 </div>
             </motion.div>

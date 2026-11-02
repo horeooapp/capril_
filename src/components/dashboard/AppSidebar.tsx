@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { usePwaInstall } from "../pwa/usePwaInstall"
 import { resolvePwaRole } from "../pwa/pwa-roles"
+import { executeLogout } from "@/lib/auth-logout"
 
 interface AppSidebarProps {
     role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
@@ -212,7 +213,17 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                     </button>
                 )}
                 <button 
-                    onClick={onLogout}
+                    onClick={() => {
+                        if (onLogout) {
+                            try {
+                                onLogout();
+                            } catch {
+                                executeLogout(role === 'TENANT' ? '/mon-espace-locataire/login' : '/dashboard/login');
+                            }
+                        } else {
+                            executeLogout(role === 'TENANT' ? '/mon-espace-locataire/login' : '/dashboard/login');
+                        }
+                    }}
                     className="w-full h-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-[6px] flex items-center justify-center gap-2 text-[10px] font-medium transition-colors"
                 >
                     <LogOut size={12} />

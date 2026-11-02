@@ -10,11 +10,12 @@ import BottomNav from "@/components/BottomNav"
 import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake, Store } from "lucide-react"
 
 import { SessionProvider } from "next-auth/react"
+import { executeLogout } from "@/lib/auth-logout"
 
 interface LocataireLayoutClientProps {
     children: React.ReactNode
     session: any
-    onLogout: () => Promise<void>
+    onLogout?: () => Promise<void> | void
     dbActiveRole?: string
 }
 
@@ -25,6 +26,8 @@ export default function LocataireLayoutClient({
     dbActiveRole
 }: LocataireLayoutClientProps) {
     const activeRole = dbActiveRole || session?.user?.role;
+    const handleLogout = () => executeLogout("/mon-espace-locataire/login");
+
     return (
         <SessionProvider session={session}>
             <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-x-hidden">
@@ -36,7 +39,7 @@ export default function LocataireLayoutClient({
             {session?.user && (
                 <AppSidebar 
                     role="TENANT" 
-                    onLogout={onLogout}
+                    onLogout={handleLogout}
                     userName={session.user.email}
                     eligibleRoles={session.user.eligibleRoles}
                 />
@@ -69,7 +72,7 @@ export default function LocataireLayoutClient({
                         <div className="flex items-center gap-2 shrink-0">
                             {/* Bouton Déconnexion Direct Mobile */}
                             <button 
-                                onClick={() => onLogout()}
+                                onClick={handleLogout}
                                 className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 font-bold text-xs active:scale-95 transition-all"
                                 title="Se déconnecter"
                                 aria-label="Déconnexion"
@@ -82,7 +85,7 @@ export default function LocataireLayoutClient({
                             <MobileMenu 
                                 session={session} 
                                 variant="dark" 
-                                onLogout={onLogout}
+                                onLogout={handleLogout}
                                 activeRole="TENANT" 
                             />
                         </div>
@@ -108,7 +111,7 @@ export default function LocataireLayoutClient({
                             { href: "/mon-espace-locataire/passeport", label: "Passeport", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/cautions", label: "Caution", icon: <ShieldAlert size={24} /> },
                             { href: "/mon-espace-locataire/manual", label: "Manuel", icon: <BookOpen size={24} /> },
-                            { label: "Déconnexion", icon: <LogOut size={24} />, onClick: () => onLogout() },
+                            { label: "Déconnexion", icon: <LogOut size={24} />, onClick: handleLogout },
                         ]} />
                     )}
                 </main>

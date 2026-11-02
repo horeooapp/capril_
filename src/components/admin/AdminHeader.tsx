@@ -4,10 +4,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import NotificationCenter from "./NotificationCenter"
 import { Home, LogOut } from "lucide-react"
+import { executeLogout } from "@/lib/auth-logout"
 
 interface AdminHeaderProps {
     session: any
-    onLogout: () => Promise<void>
+    onLogout?: () => Promise<void> | void
 }
 
 export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
@@ -66,7 +67,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                 
                 {/* Bouton Déconnexion Direct Mobile & Desktop */}
                 <button 
-                    onClick={onLogout} 
+                    onClick={() => { if (onLogout) { try { onLogout(); } catch {} } executeLogout("/admin/login"); }} 
                     title="Déconnexion Sécurisée" 
                     className="top-btn"
                     style={{ 
