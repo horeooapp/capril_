@@ -33,7 +33,7 @@ export default async function DashboardLayout({
     }
 
     // RÔLE ACTIF STRICT : priorité à la capacité active choisie en base par l'utilisateur
-    let activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
+    const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
 
     // Règle stricte : Pas de bascule en cours de session. Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire sans se déconnecter.
     if (activeRole === "TENANT" || activeRole === "LOCATAIRE") {
