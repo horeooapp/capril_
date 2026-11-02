@@ -35,7 +35,6 @@ import {
     PlusSquare,
     CheckCircle2
 } from 'lucide-react'
-import RoleSwitcher from './dashboard/RoleSwitcher'
 import { PWA_ROLES, PwaRoleId, resolvePwaRole } from './pwa/pwa-roles'
 import { usePwaInstall } from './pwa/usePwaInstall'
 import { SessionProvider } from "next-auth/react"
@@ -403,18 +402,6 @@ export default function MobileMenu({
                                         <Settings size={14} />
                                     </Link>
                                 </div>
-
-                                {/* Sélecteur de rôle si multi-rôles */}
-                                {session.user.eligibleRoles && session.user.eligibleRoles.length > 1 && (
-                                    <div className="pt-0.5">
-                                        <SessionProvider session={session as any}>
-                                            <RoleSwitcher 
-                                                currentRole={displayRole} 
-                                                eligibleRoles={session.user.eligibleRoles} 
-                                            />
-                                        </SessionProvider>
-                                    </div>
-                                )}
 
                                 {/* BOUTON DÉCONNEXION PLEINE LARGEUR */}
                                 <button 

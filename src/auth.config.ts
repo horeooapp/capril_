@@ -141,8 +141,7 @@ export const authConfig = {
 
             // Route Espace Locataire (/mon-espace-locataire)
             if (pathname.startsWith("/mon-espace-locataire")) {
-                if (!isTenant && !isAdmin && !hasTenantRole) {
-                    // Uniquement si l'utilisateur n'a aucun profil locataire
+                if (!isTenant && !isAdmin) {
                     return Response.redirect(new URL("/dashboard", nextUrl));
                 }
                 return true;
@@ -151,11 +150,7 @@ export const authConfig = {
             // Route Dashboard Gestionnaire/Propriétaire (/dashboard)
             if (pathname.startsWith("/dashboard")) {
                 if (isTenant && !isAdmin) {
-                    // Si le profil actuel est TENANT, mais qu'il possède la capacité Propriétaire/Gestionnaire,
-                    // on autorise l'accès pour permettre le basculement direct sur /dashboard
-                    if (!hasDashboardRole) {
-                        return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
-                    }
+                    return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
                 }
                 return true;
             }

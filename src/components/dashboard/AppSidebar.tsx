@@ -14,8 +14,6 @@ import {
 import { usePwaInstall } from "../pwa/usePwaInstall"
 import { resolvePwaRole } from "../pwa/pwa-roles"
 
-import RoleSwitcher from "./RoleSwitcher"
-
 interface AppSidebarProps {
     role: 'ADMIN' | 'SUPER_ADMIN' | 'TENANT' | 'LANDLORD' | 'AGENCY' | 'NON_CERTIFIED_AGENT' | 'INTERMEDIARY' | 'DIASPORA' | 'AGENCE_AGREE' | 'AGENCE_NON_AGREE' | 'AGENCY_AGREE' | 'AGENCY_NON_AGREE'
     onLogout: () => void | Promise<void>
@@ -213,7 +211,6 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                         Installer l'App ({getRoleLabel()})
                     </button>
                 )}
-                <RoleSwitcher currentRole={role} eligibleRoles={eligibleRoles || []} />
                 <button 
                     onClick={onLogout}
                     className="w-full h-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-[6px] flex items-center justify-center gap-2 text-[10px] font-medium transition-colors"

@@ -35,31 +35,14 @@ export default async function DashboardLayout({
     // RÔLE ACTIF STRICT : priorité à la capacité active choisie en base par l'utilisateur
     let activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
 
-    // Si le rôle calculé est Locataire, vérifier si l'utilisateur possède une capacité propriétaire active ou des biens
+    // Règle stricte : Pas de bascule en cours de session. Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire sans se déconnecter.
     if (activeRole === "TENANT" || activeRole === "LOCATAIRE") {
-        const userCapacites = await (prisma as any).userCapacite.findMany({
-            where: { userId: session.user.id, actif: true }
-        }).catch(() => []);
-        
-        const hasLandlordCap = userCapacites.some((c: any) => 
-            ['LANDLORD', 'PROPRIETAIRE', 'BAILLEUR', 'AGENCY'].includes(c.capacite.toUpperCase())
-        );
-
-        if (hasLandlordCap) {
-            // L'utilisateur a accédé au Dashboard : on active le profil propriétaire
-            activeRole = 'LANDLORD';
-            await (prisma as any).user.update({
-                where: { id: session.user.id },
-                data: { capaciteActive: 'LANDLORD', role: 'LANDLORD' }
-            }).catch(() => {});
-        } else {
-            redirect("/mon-espace-locataire");
-        }
+        return redirect("/mon-espace-locataire");
     }
 
     // Si le rôle actif est Admin, redirection vers la console admin
     if (activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") {
-        redirect("/admin");
+        return redirect("/admin");
     }
 
     // [RÈGLE 3 & 4] RBAC SERVER-SIDE ENFORCEMENT : Empêcher l'accès par URL directe non autorisée
