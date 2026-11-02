@@ -105,6 +105,59 @@ export async function upsertPublicProfile(userId: string, data: any) {
             }).catch(() => {});
         }
 
+        // 🔔 NOTIFICATION AUTOMATIQUE : Vérifier les biens déjà disponibles correspondant aux critères
+        try {
+            const budget = data.budgetMaxFcfa ? Number(data.budgetMaxFcfa) : null;
+            const searchLocation = (mainLoc || '').split('·')[0].trim();
+
+            const matchingCount = await prisma.property.count({
+                where: {
+                    status: { not: "archived" },
+                    ...(budget ? {
+                        OR: [
+                            { declaredRentFcfa: { lte: budget } },
+                            { leases: { some: { rentAmount: { lte: budget } } } }
+                        ]
+                    } : {}),
+                    ...(searchLocation ? {
+                        OR: [
+                            { commune: { contains: searchLocation, mode: 'insensitive' } },
+                            { city: { contains: searchLocation, mode: 'insensitive' } },
+                            { address: { contains: searchLocation, mode: 'insensitive' } }
+                        ]
+                    } : {})
+                }
+            });
+
+            if (matchingCount > 0) {
+                await prisma.notification.create({
+                    data: {
+                        userId,
+                        channel: "PUSH",
+                        type: "MATCHING_ALERTE",
+                        title: "🏠 Biens disponibles selon vos critères !",
+                        content: `${matchingCount} bien(s) à ${mainLoc || 'Abidjan'} correspondent à votre budget (${(budget || 0).toLocaleString('fr-FR')} XOF). Consultez la Marketplace pour postuler.`,
+                        link: "/mon-espace-locataire/marketplace",
+                        status: "sent"
+                    }
+                }).catch(() => {});
+            } else {
+                await prisma.notification.create({
+                    data: {
+                        userId,
+                        channel: "PUSH",
+                        type: "MATCHING_ALERTE",
+                        title: "🔔 Alerte automatique activée",
+                        content: `Vos critères pour ${mainLoc || 'votre zone'} (budget max ${(budget || 0).toLocaleString('fr-FR')} XOF) sont enregistrés. Vous recevrez une notification automatique dès qu'un bien compatible sera publié.`,
+                        link: "/mon-espace-locataire/profil-public",
+                        status: "sent"
+                    }
+                }).catch(() => {});
+            }
+        } catch (notifErr) {
+            console.warn("[Matching Notification] Non-fatal notification error:", notifErr);
+        }
+
         revalidatePath("/mon-espace-locataire/profil-public")
         revalidatePath("/mon-espace-locataire")
         return serializeObject(profil)
@@ -231,5 +284,63 @@ export async function completeOnboarding(userId: string, data: any) {
             success: false, 
             error: error.message || "Erreur lors de la finalisation" 
         }
+    }
+}
+
+
+/**
+ * Alerte automatique : Notifie tous les locataires en recherche active dès qu'un nouveau bien est publié
+ */
+export async function notifyMatchingTenantsForProperty(propertyData: {
+    id: string;
+    name?: string;
+    commune?: string;
+    city?: string;
+    neighborhood?: string;
+    rentAmount: number;
+}) {
+    try {
+        if (!propertyData.rentAmount) return;
+
+        // Trouver les profils locataires actifs dont le budget max est >= loyer du bien
+        const activeProfiles = await (prisma as any).locataireProfilPublic.findMany({
+            where: {
+                statutRecherche: "EN_RECHERCHE",
+                budgetMaxFcfa: { gte: propertyData.rentAmount }
+            },
+            include: {
+                user: { select: { id: true, email: true, phone: true } }
+            }
+        });
+
+        if (!activeProfiles || activeProfiles.length === 0) return;
+
+        const propLoc = (propertyData.commune || propertyData.city || propertyData.neighborhood || '').toLowerCase();
+
+        for (const p of activeProfiles) {
+            // Vérifier correspondance géographique
+            const cityMatch = !p.city || p.city.toLowerCase().includes(propLoc) || propLoc.includes(p.city.toLowerCase());
+            const communeMatch = !p.communesSouhaitees || p.communesSouhaitees.length === 0 || p.communesSouhaitees.some((c: string) => {
+                const cLower = c.toLowerCase();
+                return propLoc.includes(cLower) || cLower.includes(propLoc);
+            });
+
+            if (cityMatch || communeMatch) {
+                // Création de la notification automatique pour le locataire
+                await prisma.notification.create({
+                    data: {
+                        userId: p.userId,
+                        channel: "PUSH",
+                        type: "MATCHING_ALERTE",
+                        title: `🏠 Nouveau bien disponible à ${propertyData.commune || propertyData.city || 'Abidjan'} !`,
+                        content: `Un logement (${propertyData.name || 'Bien vérifié'}) à ${propertyData.rentAmount.toLocaleString('fr-FR')} XOF/mois correspond exactement à vos critères. Soyez parmi les premiers à postuler !`,
+                        link: "/mon-espace-locataire/marketplace",
+                        status: "sent"
+                    }
+                }).catch(() => {});
+            }
+        }
+    } catch (err) {
+        console.error("[Matching Alert] Error notifying matching tenants:", err);
     }
 }

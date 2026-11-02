@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
+import { notifyMatchingTenantsForProperty } from "./locataire-profil-public"
 
 export async function getMarketplaceAnnonces() {
     const session = await auth()
@@ -63,7 +64,26 @@ export async function publishAnnonce(annonceId: string) {
             entityId: annonceId
         })
 
+        // Déclencher les alertes automatiques pour les locataires correspondants
+        try {
+            const ann = await prisma.annonce.findUnique({
+                where: { id: annonceId },
+                include: { logement: true }
+            });
+            if (ann && ann.logement) {
+                notifyMatchingTenantsForProperty({
+                    id: ann.logement.id,
+                    name: ann.titre || ann.logement.name,
+                    commune: ann.logement.commune,
+                    city: ann.logement.city,
+                    neighborhood: (ann.logement as any).neighborhood,
+                    rentAmount: Number(ann.loyerDemande)
+                }).catch(() => {});
+            }
+        } catch {}
+
         revalidatePath("/dashboard/marketplace")
+        revalidatePath("/mon-espace-locataire/marketplace")
         return { success: true }
     } catch (e) {
         return { error: "Erreur technique lors de la publication." }
@@ -163,6 +183,18 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
             })
         }
 
+        if (isOnline) {
+            const loyerFinal = property.declaredRentFcfa || (property.leases?.[0]?.rentAmount ? Number(property.leases[0].rentAmount) : 150000);
+            notifyMatchingTenantsForProperty({
+                id: property.id,
+                name: property.name,
+                commune: property.commune,
+                city: property.city,
+                neighborhood: (property as any).neighborhood,
+                rentAmount: Number(loyerFinal)
+            }).catch(() => {});
+        }
+
         revalidatePath("/dashboard/properties")
         revalidatePath("/dashboard")
         revalidatePath("/mon-espace-locataire/marketplace")
@@ -173,20 +205,38 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
     }
 }
 
-export async function getPublicMarketplaceAnnonces(filters?: { commune?: string, minPrice?: number, maxPrice?: number }) {
+export async function getPublicMarketplaceAnnonces(filters?: { 
+    commune?: string, 
+    minPrice?: number, 
+    maxPrice?: number,
+    sortBy?: 'price_asc' | 'price_desc' | 'recent'
+}) {
     try {
         const whereClause: any = {
             statut: { in: ["ACTIVE", "LOUE"] }
         }
 
-        if (filters?.commune && filters.commune !== "Toutes") {
-            whereClause.logement = { ...whereClause.logement, commune: { contains: filters.commune } }
+        if (filters?.commune && filters.commune !== "Toutes" && filters.commune !== "Toutes les localisations") {
+            whereClause.logement = { 
+                OR: [
+                    { commune: { contains: filters.commune, mode: 'insensitive' } },
+                    { city: { contains: filters.commune, mode: 'insensitive' } },
+                    { address: { contains: filters.commune, mode: 'insensitive' } }
+                ]
+            }
         }
 
         if (filters?.minPrice || filters?.maxPrice) {
             whereClause.loyerDemande = {}
             if (filters.minPrice) whereClause.loyerDemande.gte = filters.minPrice
             if (filters.maxPrice) whereClause.loyerDemande.lte = filters.maxPrice
+        }
+
+        let orderByClause: any = { publieeAt: 'desc' }
+        if (filters?.sortBy === 'price_asc') {
+            orderByClause = { loyerDemande: 'asc' }
+        } else if (filters?.sortBy === 'price_desc') {
+            orderByClause = { loyerDemande: 'desc' }
         }
 
         const data = await prisma.annonce.findMany({
@@ -207,7 +257,7 @@ export async function getPublicMarketplaceAnnonces(filters?: { commune?: string,
                     select: { firstName: true, lastName: true, phone: true, email: true }
                 }
             },
-            orderBy: { publieeAt: 'desc' }
+            orderBy: orderByClause
         })
 
         return data
