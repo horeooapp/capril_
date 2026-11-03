@@ -109,6 +109,7 @@ export default async function AdminUsersPage() {
                                                 currentUserId={session?.user?.id || ""}
                                                 currentKycLevel={user.kycLevel || 0}
                                                 currentKycStatus={user.kycStatus || 'unverified'}
+                                                identityDoc={(user as any).primaryIdentityDoc}
                                             />
                                         </div>
                                     </td>

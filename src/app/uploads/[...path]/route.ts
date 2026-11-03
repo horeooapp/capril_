@@ -35,7 +35,12 @@ export async function GET(
       const session = await auth();
       const role = String((session?.user as any)?.role || '').toUpperCase();
       const isOwner = !!session?.user?.id && pathSegments[1] === session.user.id;
-      const isStaff = ['ADMIN', 'SUPER_ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(role);
+      let isStaff = ['ADMIN', 'SUPER_ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(role);
+      if (!isOwner && !isStaff && session?.user?.id) {
+        const { prisma } = await import('@/lib/prisma');
+        const dbUser = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
+        isStaff = ['ADMIN', 'SUPER_ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(String(dbUser?.role || '').toUpperCase());
+      }
       if (!isOwner && !isStaff) {
         return new NextResponse('Forbidden', { status: 403 });
       }

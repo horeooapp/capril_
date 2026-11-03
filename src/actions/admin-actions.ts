@@ -44,14 +44,42 @@ export async function getAllUsers() {
                 kycStatus: true,
                 status: true,
                 createdAt: true,
-                phone: true
+                phone: true,
+                identityDocuments: {
+                    where: { docType: { notIn: ["DFE", "RCCM", "NIF", "AGREMENT", "SELFIE"] } },
+                    orderBy: { updatedAt: 'desc' },
+                    take: 1
+                }
             }
         })
 
-        return users.map(user => ({
-            ...user,
-            createdAt: user.createdAt.toISOString()
-        })) as any[]
+        return users.map(user => {
+            const doc = user.identityDocuments?.[0]
+            return {
+                ...user,
+                createdAt: user.createdAt.toISOString(),
+                primaryIdentityDoc: doc ? {
+                    id: doc.id,
+                    docType: doc.docType,
+                    docNumber: doc.docNumber,
+                    scanS3Key: doc.scanS3Key,
+                    versoUrl: ((doc.metadata as any)?.versoUrl as string | null) || null,
+                    status: doc.status,
+                    expiryDate: doc.expiryDate ? doc.expiryDate.toISOString() : null,
+                    rejectionReason: doc.rejectionReason,
+                    updatedAt: doc.updatedAt ? doc.updatedAt.toISOString() : null,
+                    user: {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        phone: user.phone,
+                        role: user.role,
+                        kycLevel: user.kycLevel
+                    }
+                } : null
+            }
+        }) as any[]
     } catch (error) {
         console.error("[getAllUsers] Critical Error:", error)
         return [] // Return empty list to prevent page crash
