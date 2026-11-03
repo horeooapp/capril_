@@ -20,11 +20,24 @@ function computeDateLimiteMois(annee: number, mois: number, limiteJour = 5): Dat
 export async function planifierAlertesBail(bailId: string, mois: number, annee: number) {
     const lease = await prisma.lease.findUnique({
         where: { id: bailId },
-        select: { id: true, tenantId: true, paymentDay: true },
+        select: { id: true, tenantId: true, paymentDay: true, dateReprise: true },
     })
 
     if (!lease || !lease.tenantId) {
         return { success: false, error: "Bail ou locataire introuvable" }
+    }
+
+    // Horloge de gestion : ne jamais planifier d'alertes pour une période antérieure à la date de reprise
+    if (lease.dateReprise) {
+        const targetPeriod = `${annee}-${String(mois).padStart(2, "0")}`
+        const reprisePeriod = `${lease.dateReprise.getFullYear()}-${String(lease.dateReprise.getMonth() + 1).padStart(2, "0")}`
+        if (targetPeriod < reprisePeriod) {
+            return {
+                success: false,
+                horsHorlogeGestion: true,
+                error: `Période (${targetPeriod}) antérieure à la date de reprise QAPRIL (${reprisePeriod}).`,
+            }
+        }
     }
 
     const dl = computeDateLimiteMois(annee, mois, lease.paymentDay || 5)
@@ -69,12 +82,25 @@ export async function planifierAlertesBail(bailId: string, mois: number, annee: 
 export async function verifierLoyerEnRetard(bailId: string, mois: number, annee: number, referenceDate?: Date) {
     const lease = await prisma.lease.findUnique({
         where: { id: bailId },
-        select: { id: true, paymentDay: true },
+        select: { id: true, paymentDay: true, dateReprise: true },
     })
 
     if (!lease) return { enRetard: false, paye: false }
 
     const periodStr = `${annee}-${String(mois).padStart(2, "0")}`
+
+    // Horloge de gestion : une échéance antérieure à dateReprise n'est jamais traitée comme retard de gestion QAPRIL
+    if (lease.dateReprise) {
+        const reprisePeriod = `${lease.dateReprise.getFullYear()}-${String(lease.dateReprise.getMonth() + 1).padStart(2, "0")}`
+        if (periodStr < reprisePeriod) {
+            return {
+                enRetard: false,
+                paye: false,
+                horsHorlogeGestion: true,
+                dateReprise: lease.dateReprise.toISOString().split("T")[0],
+            }
+        }
+    }
     const paidReceipt = await prisma.receipt.findFirst({
         where: {
             leaseId: bailId,

@@ -49,6 +49,7 @@ export async function declareUnpaidRent(leaseId: string) {
 
 /**
  * Phase 3: Mise en demeure
+ * Garde-fou Reprise de bail (Deux Horloges) : Aucune mise en demeure sur un arriéré d'ouverture non confirmé par les deux parties.
  */
 export async function sendFormalNotice(leaseId: string) {
     try {
@@ -56,6 +57,43 @@ export async function sendFormalNotice(leaseId: string) {
         const userId = session.user.id;
 
         await ensureLeaseAccess(leaseId, [Role.LANDLORD, Role.LANDLORD_PRO, Role.AGENCY]);
+
+        const existingLease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            include: {
+                openingState: true,
+                synthesesLoyer: { where: { status: { in: ["IMPAYE", "PARTIAL"] } } },
+            },
+        });
+
+        if (!existingLease) {
+            return { success: false, error: "Contrat de bail introuvable." };
+        }
+
+        if (existingLease.openingState && existingLease.openingState.statut !== "CONFIRME") {
+            const repriseMonthKey = existingLease.dateReprise
+                ? `${existingLease.dateReprise.getFullYear()}-${String(existingLease.dateReprise.getMonth() + 1).padStart(2, "0")}`
+                : "9999-12";
+            const hasConfirmedPostTakeoverDefault = existingLease.synthesesLoyer.some(
+                (s) => s.month >= repriseMonthKey
+            );
+
+            if (!hasConfirmedPostTakeoverDefault) {
+                await prisma.gardeFousLog.create({
+                    data: {
+                        userId,
+                        typeSignal: "BLOCAGE_MISE_EN_DEMEURE_ARRIERE_OUVERTURE_NON_CONFIRME",
+                        detail: `Tentative de mise en demeure bloquée sur le bail repris ${existingLease.leaseReference} : l'état d'ouverture est en statut ${existingLease.openingState.statut} et aucun impayé postérieur à la reprise (${repriseMonthKey}) n'est constaté.`,
+                        actionPrise: "REJET_MISE_EN_DEMEURE",
+                        traite: true,
+                    },
+                });
+                return {
+                    success: false,
+                    error: "Action bloquée par les garde-fous QAPRIL : aucune mise en demeure ne peut être émise sur un arriéré d'ouverture non confirmé contradictoirement par le locataire.",
+                };
+            }
+        }
 
         const lease = await prisma.lease.update({
             where: { id: leaseId },

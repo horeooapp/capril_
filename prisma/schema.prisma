@@ -424,6 +424,11 @@ model Lease {
   origineBail               String                  @default("GENERE") @map("origine_bail")
   scanFichierSha256         String?                 @map("scan_fichier_sha256")
   statutDgi                 String                  @default("NON_SOUMIS") @map("statut_dgi")
+  dateReprise               DateTime?               @map("date_reprise")
+  enReconductionTacite      Boolean                 @default(false) @map("en_reconduction_tacite")
+  prochaineEcheanceContractuelle DateTime?          @map("prochaine_echeance_contractuelle")
+  openingState              LeaseOpeningState?
+  historiqueLoyers          LeaseRentHistory[]
   abonnementsOperateurs     AbonnementOperateur[]
   agendaEvents              AgendaEvenement[]
   alertesLoyer              AlerteLoyer[]
@@ -533,6 +538,7 @@ model Receipt {
   qrCodeUrl          String?          @map("qr_code_url")
   sha256CalculeLe    DateTime?        @map("sha256_calcule_le")
   sha256Hash         String?          @map("sha256_hash")
+  niveauCertification String          @default("CERTIFIE_QAPRIL") @map("niveau_certification")
   ColocPayment       ColocPayment[]
   pgwPayments        PaymentPgw[]
   delivery           DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
@@ -545,18 +551,65 @@ model Receipt {
 }
 
 model LeaseArrear {
-  id        String   @id @default(uuid())
-  leaseId   String   @map("lease_id")
-  dueDate   DateTime @map("due_date")
-  amount    Int
-  status    String   @default("unpaid")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  lease     Lease    @relation(fields: [leaseId], references: [id])
+  id                     String   @id @default(uuid())
+  leaseId                String   @map("lease_id")
+  dueDate                DateTime @map("due_date")
+  amount                 Int
+  status                 String   @default("unpaid")
+  origineArriere         String   @default("GESTION_QAPRIL") @map("origine_arriere")
+  confirmeContradictoire Boolean  @default(true) @map("confirme_contradictoire")
+  openingStateId         String?  @map("opening_state_id")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+  lease                  Lease    @relation(fields: [leaseId], references: [id])
 
   @@index([dueDate, status])
   @@unique([leaseId, dueDate])
   @@map("lease_arrears")
+}
+
+model LeaseOpeningState {
+  id                    String    @id @default(uuid())
+  leaseId               String    @unique @map("lease_id")
+  dateReprise           DateTime  @map("date_reprise")
+  loyerEnVigueur        Int       @map("loyer_en_vigueur")
+  chargesEnVigueur      Int       @default(0) @map("charges_en_vigueur")
+  derniereRevisionAt    DateTime? @map("derniere_revision_at")
+  dernierMoisPaye       String?   @map("dernier_mois_paye")
+  soldeOuverture        Int       @default(0) @map("solde_ouverture")
+  sourcePreuves         Json?     @map("source_preuves")
+  clausesDerogatoires   Json?     @map("clauses_derogatoires")
+  confirmeBailleurAt    DateTime? @map("confirme_bailleur_at")
+  confirmeLocataireAt   DateTime? @map("confirme_locataire_at")
+  statut                String    @default("EN_ATTENTE")
+  motifContestation     String?   @map("motif_contestation")
+  hashSha256            String?   @map("hash_sha256")
+  version               Int       @default(1)
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  lease                 Lease     @relation(fields: [leaseId], references: [id])
+
+  @@map("lease_opening_states")
+}
+
+model LeaseRentHistory {
+  id                    String    @id @default(uuid()) @map("hist_loyer_id")
+  leaseId               String    @map("lease_id")
+  ancienLoyer           Int       @map("ancien_loyer")
+  nouveauLoyer          Int       @map("nouveau_loyer")
+  anciennesCharges      Int       @default(0) @map("anciennes_charges")
+  nouvellesCharges      Int       @default(0) @map("nouvelles_charges")
+  motif                 String?
+  sourceModification    String    @default("AVENANT") @map("source_modification")
+  confirmationLocataire Boolean?  @map("confirmation_locataire")
+  modifieParId          String?   @map("modifie_par")
+  effectiveLe           DateTime  @map("effective_le")
+  hashModification      String    @map("hash_modification")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  lease                 Lease     @relation(fields: [leaseId], references: [id])
+
+  @@index([leaseId, effectiveLe])
+  @@map("lease_rent_history")
 }
 
 model ProcedurePhase {

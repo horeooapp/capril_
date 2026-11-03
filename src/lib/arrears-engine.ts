@@ -70,8 +70,6 @@ export async function transitionArrearsPhase(leaseId: string, targetPhase: strin
             }
         });
 
-        // Impact reliability score (logic to be implemented in Part 13)
-        // For now, we log the intent
         console.log(`[ArrearsEngine] Lease ${leaseId} transitioned to ${targetPhase}`);
 
         return phase;
@@ -80,10 +78,10 @@ export async function transitionArrearsPhase(leaseId: string, targetPhase: strin
 
 /**
  * [ESC-01] Discover unpaid rents and trigger J3/J7/J15 escalations
+ * Respects the Management Clock (dateReprise) so pre-takeover months never trigger automated escalations.
  */
 export async function discoverAndEscalateArrears() {
     const now = new Date();
-    const currentDay = now.getDate();
     
     // 1. Get all pending or partial syntheses for current or past months
     const pendingSyntheses = await prisma.monthlyRentSynthesis.findMany({
@@ -92,7 +90,7 @@ export async function discoverAndEscalateArrears() {
         },
         include: {
             lease: {
-                include: { tenant: true }
+                include: { tenant: true, openingState: true }
             }
         }
     });
@@ -102,6 +100,14 @@ export async function discoverAndEscalateArrears() {
     for (const synthesis of pendingSyntheses) {
         const lease = synthesis.lease;
         if (!lease.tenantId || !lease.tenant) continue;
+
+        // Horloge de gestion (Deux Horloges) : QAPRIL n'escalade JAMAIS un mois antérieur à dateReprise
+        if (lease.dateReprise) {
+            const repriseMonthKey = `${lease.dateReprise.getFullYear()}-${String(lease.dateReprise.getMonth() + 1).padStart(2, "0")}`;
+            if (synthesis.month < repriseMonthKey) {
+                continue;
+            }
+        }
 
         // Calculate delay based on synthesis month and lease.paymentDay
         const [year, month] = synthesis.month.split('-').map(Number);
