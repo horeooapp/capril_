@@ -254,43 +254,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                 </div>
             </div>
 
-            {!isAgency ? (
-                <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] space-y-4">
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-2">
-                        <ShieldCheck size={16} /> Pièce d'Identité (Obligatoire KYC 2)
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Type de Document</label>
-                            <select 
-                                required
-                                disabled={isIdentityLocked}
-                                value={formData.docType}
-                                onChange={(e) => setFormData({...formData, docType: e.target.value})}
-                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-50"
-                            >
-                                <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
-                                <option value="PASS_CI">Passeport</option>
-                                    <option value="CARTE_RESIDENT">Carte de Résident</option>
-                                <option value="ATTESTATION">Attestation d'Identité</option>
-                                <option value="PERMIS">Permis de Conduire</option>
-                                <option value="CARTE_CONSULAIRE">Carte Consulaire</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Numéro de la pièce</label>
-                            <input 
-                                required 
-                                readOnly={isIdentityLocked}
-                                value={formData.docNumber}
-                                onChange={(e) => setFormData({...formData, docNumber: e.target.value})}
-                                className="w-full bg-white border border-gray-200 rounded-2xl p-4 font-bold text-gray-800 focus:ring-2 focus:ring-[#1F4E79] outline-none readOnly:opacity-60 readOnly:cursor-not-allowed readOnly:bg-gray-50" 
-                                placeholder="Ex: CI000000000"
-                            />
-                        </div>
-                    </div>
-                </div>
-            ) : (
+            {isAgency && (
                 <div className="p-8 bg-slate-800/5 border border-slate-800/10 rounded-[2.5rem] space-y-6">
                     <h4 className="text-[12px] font-black uppercase tracking-widest text-slate-800 flex items-center gap-3">
                         <ShieldCheck size={20} className="text-amber-600" /> 

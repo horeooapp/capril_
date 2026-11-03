@@ -92,21 +92,8 @@ export default async function OwnerProfilePage() {
                 </div>
             </div>
 
-            {/* Vérification d'identité (obligatoire pour valider le compte) */}
-            <div id="verification-identite">
-                <SectionCard title="Vérification d'identité" icon={<ShieldCheck size={18} className={isAccountVerified ? "text-emerald-500" : "text-amber-500"}/>}>
-                    <IdentityVerificationCard
-                        status={identityStatus}
-                        docType={primaryDoc?.docType}
-                        docNumber={primaryDoc?.docNumber}
-                        rejectionReason={primaryDoc?.rejectionReason}
-                        submittedAt={primaryDoc?.scanS3Key ? primaryDoc.updatedAt.toISOString() : null}
-                    />
-                </SectionCard>
-            </div>
-
             {/* Main Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 
                 {/* Profile Form */}
                 <SectionCard title="Mise à jour du Profil" icon={<Settings size={18} className="text-slate-400"/>}>
@@ -139,8 +126,20 @@ export default async function OwnerProfilePage() {
                     />
                 </SectionCard>
 
-                {/* Score & Trust Portfolio */}
+                {/* Right Column: Verification, Score, Security, Subscription */}
                 <div className="space-y-6">
+                    <div id="verification-identite">
+                        <SectionCard title="Validation du Compte (Pièce d'Identité)" icon={<ShieldCheck size={18} className={isAccountVerified ? "text-emerald-500" : "text-amber-500"}/>}>
+                            <IdentityVerificationCard
+                                status={identityStatus}
+                                docType={primaryDoc?.docType}
+                                docNumber={primaryDoc?.docNumber}
+                                rejectionReason={primaryDoc?.rejectionReason}
+                                submittedAt={primaryDoc?.scanS3Key ? primaryDoc.updatedAt.toISOString() : null}
+                            />
+                        </SectionCard>
+                    </div>
+
                     <SectionCard title="Indice de Confiance" icon={<Star size={18} className="text-sky-500"/>} className="bg-sky-50/50">
                         <div className="p-5 bg-white rounded-[8px] border border-sky-100 shadow-sm flex items-center justify-between mb-4">
                             <div>

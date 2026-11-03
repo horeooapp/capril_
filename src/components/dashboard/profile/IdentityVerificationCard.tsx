@@ -3,7 +3,19 @@
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { ShieldCheck, ShieldAlert, Clock, Upload, FileText, CreditCard, BookOpen, IdCard, X, Loader2, CheckCircle2 } from "lucide-react"
+import {
+    ShieldCheck,
+    ShieldAlert,
+    Clock,
+    Upload,
+    FileText,
+    X,
+    Loader2,
+    CheckCircle2,
+    ChevronDown,
+    Image as ImageIcon,
+    RefreshCw
+} from "lucide-react"
 
 type DocStatus = "none" | "pending" | "under_review" | "verified" | "rejected"
 
@@ -16,15 +28,30 @@ interface IdentityVerificationCardProps {
 }
 
 const DOC_OPTIONS = [
-    { value: "CNI_CI", label: "CNI", full: "Carte Nationale d'Identité", icon: CreditCard, needsVerso: true },
-    { value: "PASS_CI", label: "Passeport", full: "Passeport", icon: BookOpen, needsVerso: false },
-    { value: "CARTE_RESIDENT", label: "Carte de résident", full: "Carte de Résident", icon: IdCard, needsVerso: true },
+    { value: "CNI_CI", label: "Carte Nationale d'Identité (CNI)", needsVerso: true, placeholder: "Ex : CI004567891" },
+    { value: "PASS_CI", label: "Passeport", needsVerso: false, placeholder: "Ex : 20AB12345" },
+    { value: "CARTE_RESIDENT", label: "Carte de Résident", needsVerso: true, placeholder: "Ex : CR202600123" },
 ] as const
 
 const MAX_SIZE = 8 * 1024 * 1024
 const ACCEPT = "image/jpeg,image/png,image/webp,application/pdf"
 
-function FileDrop({ label, file, onChange }: { label: string; file: File | null; onChange: (f: File | null) => void }) {
+function formatFileSize(bytes: number): string {
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} Ko`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+}
+
+function FileUploadField({
+    label,
+    hint,
+    file,
+    onChange,
+}: {
+    label: string
+    hint: string
+    file: File | null
+    onChange: (f: File | null) => void
+}) {
     const inputRef = useRef<HTMLInputElement>(null)
     const preview = file && file.type.startsWith("image/") ? URL.createObjectURL(file) : null
 
@@ -36,20 +63,33 @@ function FileDrop({ label, file, onChange }: { label: string; file: File | null;
     }
 
     return (
-        <div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">{label}</p>
+        <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-1 block">
+                {label}
+            </label>
+
             {file ? (
-                <div className="relative h-32 rounded-[8px] border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center">
-                    {preview ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={preview} alt={label} className="w-full h-full object-contain" />
-                    ) : (
-                        <div className="flex flex-col items-center gap-1 text-slate-500">
-                            <FileText size={28} />
-                            <span className="text-[11px] font-semibold truncate max-w-[160px]">{file.name}</span>
-                        </div>
-                    )}
-                    <button type="button" onClick={() => onChange(null)} className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-rose-600" aria-label="Retirer">
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-emerald-200 bg-emerald-50/40">
+                    <div className="w-12 h-12 rounded-lg border border-slate-200 bg-white overflow-hidden flex items-center justify-center shrink-0">
+                        {preview ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={preview} alt={label} className="w-full h-full object-cover" />
+                        ) : (
+                            <FileText size={22} className="text-slate-600" />
+                        )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-bold text-slate-800 truncate">{file.name}</p>
+                        <p className="text-[10px] font-semibold text-emerald-700">
+                            {formatFileSize(file.size)} • Prêt à envoyer
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => onChange(null)}
+                        className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-rose-200 transition-colors shrink-0"
+                        title="Retirer le fichier"
+                    >
                         <X size={14} />
                     </button>
                 </div>
@@ -58,37 +98,71 @@ function FileDrop({ label, file, onChange }: { label: string; file: File | null;
                     type="button"
                     onClick={() => inputRef.current?.click()}
                     onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => { e.preventDefault(); handle(e.dataTransfer.files?.[0]) }}
-                    className="w-full h-32 rounded-[8px] border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 transition-colors flex flex-col items-center justify-center gap-1.5 text-slate-500"
+                    onDrop={(e) => {
+                        e.preventDefault()
+                        handle(e.dataTransfer.files?.[0])
+                    }}
+                    className="w-full p-3.5 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 hover:bg-slate-100/80 hover:border-slate-400 transition-all flex items-center gap-3 text-left group"
                 >
-                    <Upload size={22} />
-                    <span className="text-[12px] font-semibold">Cliquer ou glisser le fichier</span>
-                    <span className="text-[10px] text-slate-400">JPG, PNG, WEBP, PDF • 8 Mo max</span>
+                    <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 group-hover:text-slate-800 group-hover:border-slate-300 transition-colors shrink-0 shadow-xs">
+                        <Upload size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-bold text-slate-700 group-hover:text-slate-900">
+                             Cliquez pour importer un fichier
+                        </p>
+                        <p className="text-[10px] font-medium text-slate-400 truncate">
+                            {hint} (JPG, PNG, PDF • max 8 Mo)
+                        </p>
+                    </div>
                 </button>
             )}
-            <input ref={inputRef} type="file" accept={ACCEPT} capture="environment" className="hidden" onChange={(e) => { handle(e.target.files?.[0]); e.target.value = "" }} />
+
+            <input
+                ref={inputRef}
+                type="file"
+                accept={ACCEPT}
+                className="hidden"
+                onChange={(e) => {
+                    handle(e.target.files?.[0])
+                    e.target.value = ""
+                }}
+            />
         </div>
     )
 }
 
-export function IdentityVerificationCard({ status, docType, docNumber, rejectionReason, submittedAt }: IdentityVerificationCardProps) {
+export function IdentityVerificationCard({
+    status,
+    docType,
+    docNumber,
+    rejectionReason,
+    submittedAt,
+}: IdentityVerificationCardProps) {
     const router = useRouter()
     const [editing, setEditing] = useState(status === "none" || status === "rejected")
-    const [type, setType] = useState<string>(docType && DOC_OPTIONS.some(o => o.value === docType) ? docType : "CNI_CI")
+    const [type, setType] = useState<string>(
+        docType && DOC_OPTIONS.some((o) => o.value === docType) ? docType : "CNI_CI"
+    )
     const [number, setNumber] = useState(docNumber || "")
     const [expiry, setExpiry] = useState("")
     const [recto, setRecto] = useState<File | null>(null)
     const [verso, setVerso] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
 
-    const conf = DOC_OPTIONS.find(o => o.value === type)!
-    const currentLabel = DOC_OPTIONS.find(o => o.value === docType)?.full || docType
+    const conf = DOC_OPTIONS.find((o) => o.value === type) || DOC_OPTIONS[0]
+    const currentLabel = DOC_OPTIONS.find((o) => o.value === docType)?.label || docType
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (number.trim().length < 5) return toast.error("Veuillez saisir le numéro de votre pièce.")
-        if (!recto) return toast.error(conf.needsVerso ? "Le recto de la pièce est requis." : "Le scan de la page d'identité est requis.")
-        if (conf.needsVerso && !verso) return toast.error("Le verso de la pièce est requis.")
+        if (number.trim().length < 5) return toast.error("Veuillez saisir un numéro de pièce valide.")
+        if (!recto)
+            return toast.error(
+                conf.needsVerso
+                    ? "Veuillez joindre le recto de votre pièce."
+                    : "Veuillez joindre le scan de la page d'identité."
+            )
+        if (conf.needsVerso && !verso) return toast.error("Veuillez joindre le verso de votre pièce.")
 
         const fd = new FormData()
         fd.append("docType", type)
@@ -117,122 +191,173 @@ export function IdentityVerificationCard({ status, docType, docNumber, rejection
         }
     }
 
-    // Bandeau de statut
-    const banner = (() => {
-        if (status === "verified") return (
-            <div className="flex items-start gap-3 p-4 rounded-[8px] bg-emerald-50 border border-emerald-200">
-                <CheckCircle2 className="text-emerald-600 shrink-0" size={22} />
-                <div>
-                    <p className="text-[13px] font-bold text-emerald-800">Compte vérifié</p>
-                    <p className="text-[12px] text-emerald-700">{currentLabel} n° {docNumber} validée par l'équipe QAPRIL.</p>
+    return (
+        <div className="space-y-5">
+            {/* Bandeau de statut */}
+            {status === "verified" && (
+                <div className="flex items-center gap-3.5 p-4 rounded-xl bg-emerald-50/80 border border-emerald-200">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <CheckCircle2 size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[12.5px] font-black uppercase tracking-wide text-emerald-900">
+                            Identité vérifiée
+                        </p>
+                        <p className="text-[11.5px] font-medium text-emerald-700 truncate">
+                            {currentLabel} • N° {docNumber}
+                        </p>
+                    </div>
                 </div>
-            </div>
-        )
-        if (status === "pending" || status === "under_review") return (
-            <div className="flex items-start gap-3 p-4 rounded-[8px] bg-amber-50 border border-amber-200">
-                <Clock className="text-amber-600 shrink-0" size={22} />
-                <div>
-                    <p className="text-[13px] font-bold text-amber-800">Vérification en cours</p>
-                    <p className="text-[12px] text-amber-700">
-                        {currentLabel} n° {docNumber} déposée{submittedAt ? ` le ${new Date(submittedAt).toLocaleDateString("fr-FR")}` : ""}. Délai de traitement : 24 à 48h.
+            )}
+
+            {(status === "pending" || status === "under_review") && (
+                <div className="flex items-center gap-3.5 p-4 rounded-xl bg-amber-50/80 border border-amber-200">
+                    <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                        <Clock size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[12.5px] font-black uppercase tracking-wide text-amber-900">
+                            Vérification en cours (24h – 48h)
+                        </p>
+                        <p className="text-[11.5px] font-medium text-amber-700">
+                            {currentLabel} (N° {docNumber}) déposée
+                            {submittedAt ? ` le ${new Date(submittedAt).toLocaleDateString("fr-FR")}` : ""}.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {status === "rejected" && (
+                <div className="flex items-start gap-3.5 p-4 rounded-xl bg-rose-50/80 border border-rose-200">
+                    <div className="w-9 h-9 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <ShieldAlert size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-[12.5px] font-black uppercase tracking-wide text-rose-900">
+                            Pièce refusée
+                        </p>
+                        <p className="text-[11.5px] font-medium text-rose-700">
+                            Motif : {rejectionReason || "Document illisible ou non conforme"}. Veuillez soumettre un nouveau document.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {status === "none" && (
+                <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200/60 text-amber-600 flex items-center justify-center shrink-0">
+                        <ShieldAlert size={18} />
+                    </div>
+                    <p className="text-[12px] font-medium text-slate-600 leading-snug">
+                        Sélectionnez votre pièce officielle (<strong className="text-slate-800">CNI, Passeport ou Carte de Résident</strong>) et joignez son scan pour valider votre compte.
                     </p>
                 </div>
-            </div>
-        )
-        if (status === "rejected") return (
-            <div className="flex items-start gap-3 p-4 rounded-[8px] bg-rose-50 border border-rose-200">
-                <ShieldAlert className="text-rose-600 shrink-0" size={22} />
-                <div>
-                    <p className="text-[13px] font-bold text-rose-800">Pièce refusée</p>
-                    <p className="text-[12px] text-rose-700">Motif : {rejectionReason || "Document non conforme"}. Veuillez déposer une nouvelle pièce.</p>
-                </div>
-            </div>
-        )
-        return (
-            <div className="flex items-start gap-3 p-4 rounded-[8px] bg-sky-50 border border-sky-200">
-                <ShieldAlert className="text-sky-600 shrink-0" size={22} />
-                <div>
-                    <p className="text-[13px] font-bold text-sky-800">Compte non vérifié</p>
-                    <p className="text-[12px] text-sky-700">Déposez votre CNI, votre passeport ou votre carte de résident pour valider votre compte.</p>
-                </div>
-            </div>
-        )
-    })()
-
-    return (
-        <div className="space-y-4">
-            {banner}
+            )}
 
             {!editing && status !== "verified" && (
-                <button type="button" onClick={() => setEditing(true)} className="w-full py-2.5 bg-white border border-slate-200 rounded-[8px] text-[11px] font-bold text-slate-600 uppercase tracking-widest hover:bg-slate-50 transition-all">
-                    Remplacer la pièce déposée
+                <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
+                >
+                    <RefreshCw size={13} /> Remplacer le document envoyé
                 </button>
             )}
 
             {editing && status !== "verified" && (
                 <form onSubmit={submit} className="space-y-4">
-                    <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Type de pièce</p>
-                        <div className="grid grid-cols-3 gap-2">
-                            {DOC_OPTIONS.map(opt => {
-                                const Icon = opt.icon
-                                const active = type === opt.value
-                                return (
-                                    <button
-                                        key={opt.value}
-                                        type="button"
-                                        onClick={() => { setType(opt.value); setVerso(null) }}
-                                        className={`p-3 rounded-[8px] border-2 flex flex-col items-center gap-1.5 transition-all ${active ? "border-slate-800 bg-slate-50 text-slate-900" : "border-slate-200 text-slate-500 hover:border-slate-300"}`}
-                                    >
-                                        <Icon size={20} />
-                                        <span className="text-[11px] font-bold text-center leading-tight">{opt.label}</span>
-                                    </button>
-                                )
-                            })}
+                    {/* Liste déroulante du type de pièce */}
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-1 block">
+                            Type de pièce d&apos;identité *
+                        </label>
+                        <div className="relative">
+                            <select
+                                value={type}
+                                onChange={(e) => {
+                                    setType(e.target.value)
+                                    setVerso(null)
+                                }}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 pr-10 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#1F4E79] focus:border-transparent outline-none appearance-none cursor-pointer transition-all"
+                            >
+                                {DOC_OPTIONS.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown
+                                size={16}
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                            />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Numéro de la pièce *</label>
+                    {/* Numéro + Date d'expiration */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-1 block">
+                                Numéro de la pièce *
+                            </label>
                             <input
+                                required
                                 value={number}
                                 onChange={(e) => setNumber(e.target.value.toUpperCase())}
-                                placeholder={type === "PASS_CI" ? "Ex : 20AB12345" : "Ex : CI004567891"}
+                                placeholder={conf.placeholder}
                                 maxLength={20}
-                                className="w-full px-3 py-2.5 rounded-[8px] border border-slate-200 text-[13px] font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#1F4E79] focus:border-transparent outline-none transition-all"
                             />
                         </div>
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Date d'expiration</label>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-1 block">
+                                Date d&apos;expiration
+                            </label>
                             <input
                                 type="date"
                                 value={expiry}
                                 min={new Date().toISOString().slice(0, 10)}
                                 onChange={(e) => setExpiry(e.target.value)}
-                                className="w-full px-3 py-2.5 rounded-[8px] border border-slate-200 text-[13px] font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#1F4E79] focus:border-transparent outline-none transition-all"
                             />
                         </div>
                     </div>
 
-                    <div className={`grid gap-3 ${conf.needsVerso ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
-                        <FileDrop label={conf.needsVerso ? "Recto *" : "Page d'identité (photo) *"} file={recto} onChange={setRecto} />
-                        {conf.needsVerso && <FileDrop label="Verso *" file={verso} onChange={setVerso} />}
+                    {/* Zones d'upload Recto / Verso */}
+                    <div className={`grid gap-3.5 ${conf.needsVerso ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+                        <FileUploadField
+                            label={conf.needsVerso ? "Recto de la pièce *" : "Page d'identité (photo) *"}
+                            hint={conf.needsVerso ? "Face avant lisible en couleur" : "Page comportant votre photo"}
+                            file={recto}
+                            onChange={setRecto}
+                        />
+                        {conf.needsVerso && (
+                            <FileUploadField
+                                label="Verso de la pièce *"
+                                hint="Face arrière lisible en couleur"
+                                file={verso}
+                                onChange={setVerso}
+                            />
+                        )}
                     </div>
 
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                        La pièce doit être en cours de validité, lisible, en couleur et non recadrée. Vos documents sont stockés de manière privée et ne sont consultables que par l'équipe de vérification QAPRIL.
-                    </p>
-
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2.5 pt-1">
                         {status !== "none" && status !== "rejected" && (
-                            <button type="button" onClick={() => setEditing(false)} className="px-5 py-3 bg-white border border-slate-200 rounded-[8px] text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                            <button
+                                type="button"
+                                onClick={() => setEditing(false)}
+                                className="px-4 py-3 bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:bg-slate-50 transition-colors"
+                            >
                                 Annuler
                             </button>
                         )}
-                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-slate-900 text-white rounded-[8px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center gap-2">
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-                            {loading ? "Envoi en cours..." : "Soumettre pour validation"}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex-1 py-3 px-5 bg-[#1F4E79] hover:bg-[#163a5c] text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                        >
+                            {loading ? <Loader2 size={15} className="animate-spin" /> : <ShieldCheck size={15} />}
+                            {loading ? "Envoi en cours..." : "Valider et envoyer la pièce"}
                         </button>
                     </div>
                 </form>
@@ -240,4 +365,3 @@ export function IdentityVerificationCard({ status, docType, docNumber, rejection
         </div>
     )
 }
-
