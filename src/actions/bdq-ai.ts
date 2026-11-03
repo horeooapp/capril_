@@ -837,7 +837,7 @@ async function runLocalBdqAgentFallback(
     let loyer = conv.loyerExtrait != null ? Number(conv.loyerExtrait) : null
     let dateEntree = conv.dateEntreeExtraite ? new Date(conv.dateEntreeExtraite) : null
     let precisionDate = (conv.precisionDate as string) || "APPROXIMATIVE"
-    let champEnAttente = conv.champEnAttente as string | null
+    const champEnAttente = conv.champEnAttente as string | null
 
     // ADD-11 Section 4.2 : Détection automatique des requêtes locataires (Réclamation / Vérification / Ancienne quittance)
     if (
