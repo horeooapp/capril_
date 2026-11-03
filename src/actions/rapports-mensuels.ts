@@ -27,7 +27,7 @@ const MOIS_NOMS = [
 /**
  * ADD-15 Section 2.1 — Formatage exact du texte WhatsApp du Rapport Mensuel QAPRIL
  */
-export function formatRapportWhatsAppText(data: any): string {
+function formatRapportWhatsAppText(data: any): string {
     const detailLines = (data.detail_par_logement || [])
         .map((d: any) => {
             if (d.statut === "VACANT") {

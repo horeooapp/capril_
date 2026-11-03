@@ -2518,7 +2518,7 @@ model UserWalletConfig {
   version Int @default(0)
   landlordCode           String?  @unique @map("landlord_code")
   isConfidential         Boolean  @default(false) @map("is_confidential")
-  walletSeuilAlerte      Float?   @default(500) @map("wallet_seuil_alerte")
+  walletSeuilAlerte      Float?   @default(1000) @map("wallet_seuil_alerte")
   walletRappelActif      Boolean  @default(false) @map("wallet_rappel_actif")
   walletRappelJour       Int      @default(1) @map("wallet_rappel_jour")
   walletRappelMontant    Float?   @map("wallet_rappel_montant")

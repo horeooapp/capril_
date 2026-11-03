@@ -6,7 +6,7 @@ import { CommType, ProspectStatut } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { NotificationService } from "@/lib/notification-service"
 
-export const CHAMPION_COMMISSION_RATES: Record<CommType, number> = {
+const CHAMPION_COMMISSION_RATES: Record<CommType, number> = {
     BAIL_FORMEL: 1000,
     BDQ_CONFIRME: 250,
     FORMALISATION: 500,
