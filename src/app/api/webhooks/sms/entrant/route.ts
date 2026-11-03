@@ -28,7 +28,7 @@ function buildPhoneCandidates(rawPhone: string): string[] {
  * - QUITTANCE
  * - J'AI PAYE / JAI PAYE
  */
-export function parseTenantSmsDeclaration(
+function parseTenantSmsDeclaration(
   rawText: string,
   defaultRentAmount: number
 ): { valid: boolean; amount: number; keyword?: string } {

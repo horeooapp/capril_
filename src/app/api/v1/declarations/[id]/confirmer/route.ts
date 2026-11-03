@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/jwt";
-import { resolveSmsDeclaration } from "@/app/api/webhooks/sms/confirmation/route";
+import { resolveSmsDeclaration } from "@/lib/sms-declarations";
 
 /**
  * DCL-04 — POST /api/v1/declarations/[id]/confirmer
