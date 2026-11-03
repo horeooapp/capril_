@@ -679,6 +679,22 @@ export async function confirmBDQ(bdqId: string, otp: string, reponse: "OUI" | "N
             }
         });
 
+        // ADD-15 M-CHAMPION (A15-UAT-08): Si un Champion a accompagné ce BDQ, créditer 250 FCFA à la confirmation locataire
+        if (bdq.agentId) {
+            try {
+                const { recordChampionCommission } = await import("@/actions/champion.actions");
+                await recordChampionCommission({
+                    championUserId: bdq.agentId,
+                    typeAction: "BDQ_CONFIRME",
+                    referenceId: bdq.id,
+                    montantFcfa: 250,
+                    statut: "VALIDE"
+                });
+            } catch (commErr) {
+                console.warn("[M-CHAMPION] Auto-commission BDQ_CONFIRME warning:", commErr);
+            }
+        }
+
         revalidatePath("/dashboard/leases");
         return { success: true, status: "CONFIRME" };
     } catch (error: any) {
@@ -709,45 +725,94 @@ export async function confirmBDQFromDashboard(bdqId: string, reponse: "OUI" | "N
 }
 
 /**
- * [LEA-05c] Créer un Bail Déclaratif (BDQ)
+ * [LEA-05c] Créer un Bail Déclaratif (BDQ) — Compatible ADD-06 & ADD-08
  */
 export async function createBDQ(data: any) {
     try {
-        const session = await ensureAuthenticated();
-        const bailleurId = session.user.id;
-
-        // Normalize Telephone
-        let normalizedPhone = data.telephoneLocataire;
-        if (normalizedPhone) {
-            normalizedPhone = normalizedPhone.replace(/\s+/g, "");
-            if (normalizedPhone.startsWith("0") && normalizedPhone.length === 10) normalizedPhone = "+225 " + normalizedPhone;
-            data.telephoneLocataire = normalizedPhone;
+        let bailleurId = data.bailleurId || data.bailleur_id;
+        if (!bailleurId) {
+            const session = await ensureAuthenticated();
+            bailleurId = session.user.id;
         }
 
-        const hash = await generateProofHash({ bailleurId, nom: data.nomLocataire, tel: data.telephoneLocataire, date: new Date().toISOString() });
+        const nomLocataire = (data.nomLocataire || data.nom_locataire_declare || data.nom_locataire || "").trim();
+        const descriptionLogement = (data.descriptionLogement || data.description_logement || "Logement déclaré").trim();
+        const loyerMensuel = Number(data.loyerMensuel ?? data.loyer_declare_mensuel ?? 0);
+        const dateEntreeRaw = data.dateEntree || data.date_entree_estimee;
+        const dateEntree = dateEntreeRaw ? new Date(dateEntreeRaw) : new Date();
+        const precisionDateEntree = data.precisionDateEntree || data.precision_date_entree || "APPROXIMATIVE";
+        const identiteIncomplete = Boolean(data.identiteIncomplete ?? data.identite_incomplete ?? false);
+        const sourceCreation = data.sourceCreation || data.source_creation || "FORM";
+
+        // Normalize Telephone
+        let normalizedPhone = data.telephoneLocataire ?? data.telephone_locataire ?? "";
+        if (normalizedPhone && normalizedPhone !== "NON_FOURNI") {
+            const digits = String(normalizedPhone).replace(/[^0-9]/g, "");
+            if (digits.startsWith("225") && digits.length === 13) {
+                normalizedPhone = "+" + digits;
+            } else if (digits.length === 10) {
+                normalizedPhone = "+225" + digits;
+            } else if (digits.length === 8) {
+                normalizedPhone = "+2250" + digits;
+            } else {
+                normalizedPhone = normalizedPhone.trim();
+            }
+        } else {
+            normalizedPhone = "NON_FOURNI";
+        }
+
+        const hash = await generateProofHash({
+            bailleurId,
+            nom: nomLocataire,
+            tel: normalizedPhone,
+            loyer: loyerMensuel,
+            date: new Date().toISOString()
+        });
+
+        const shortToken = `BDQ-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
         const bdq = await prisma.bailDeclaratif.create({
             data: {
                 bailleurId,
-                propertyId: data.propertyId,
-                nomLocataireDeclare: data.nomLocataire,
-                prenomLocataireDeclare: data.prenomLocataire,
-                telephoneLocataire: data.telephoneLocataire,
-                descriptionLogement: data.descriptionLogement,
-                loyerDeclareMensuel: data.loyerMensuel,
-                dateEntreeEstimee: data.dateEntree,
+                propertyId: data.propertyId || data.logement_id || null,
+                nomLocataireDeclare: nomLocataire,
+                prenomLocataireDeclare: data.prenomLocataire || null,
+                telephoneLocataire: normalizedPhone,
+                descriptionLogement,
+                loyerDeclareMensuel: loyerMensuel,
+                dateEntreeEstimee: isNaN(dateEntree.getTime()) ? new Date() : dateEntree,
+                precisionDateEntree,
+                identiteIncomplete,
+                sourceCreation,
                 statut: BdqStatut.PENDING_LOCATAIRE,
                 hashDeclaration: hash,
+                qrToken: shortToken,
+                agentConfirmationMode: data.agent_visite_requise ? "VISITE_TERRAIN_REQUISE" : null,
             }
         });
 
-        // [SEC-FIX F-03] OTP cryptographiquement sécurisé
-        const otp = randomInt(100000, 999999).toString();
-        await sendSMS(data.telephoneLocataire, `QAPRIL : Confirmation requise pour ${data.descriptionLogement} (${data.loyerMensuel} XOF). Code : ${otp}`);
+        // Envoi SMS / WhatsApp au locataire si numéro fourni
+        if (normalizedPhone && normalizedPhone !== "NON_FOURNI") {
+            const otp = randomInt(100000, 999999).toString();
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qapril.net";
+            const smsMsg = `QAPRIL : Votre bailleur a déclaré votre bail (${descriptionLogement}, loyer ${loyerMensuel.toLocaleString("fr-FR")} FCFA/mois). Répondez OUI ou confirmez avec le code ${otp} sur ${appUrl}/bdq/${shortToken}`;
+            await sendSMS(normalizedPhone, smsMsg).catch(() => null);
 
-        return { success: true, bdqId: bdq.id };
+            await prisma.bdqSmsLog.create({
+                data: {
+                    bdqId: bdq.id,
+                    typeSms: "INVITATION_CONFIRMATION_LOCATAIRE",
+                    destinataire: normalizedPhone,
+                    roleDest: "LOCATAIRE",
+                    contenu: smsMsg,
+                    statutEnvoi: "ENVOYE"
+                }
+            }).catch(() => null);
+        }
+
+        return { success: true, bdqId: bdq.id, qrToken: shortToken, bdq };
     } catch (error: any) {
-        return { error: error.message };
+        return { success: false, error: error.message };
     }
 }
 

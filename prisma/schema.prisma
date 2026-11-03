@@ -174,6 +174,9 @@ model User {
   walletRechargeLinks         WalletRechargeLink[]
   walletTransactions          WalletTransaction[]
   coopGroups                  CoopGroup[]              @relation("CoopMembers")
+  championProfile             ChampionProfile?         @relation("UserChampionProfile")
+  championsSupervised         ChampionProfile[]        @relation("ChampionSupervisor")
+  prospectConversions         ChampionProspect[]       @relation("ProspectConvertedUser")
 
   @@index([phone])
   @@index([role])
@@ -3497,6 +3500,7 @@ enum NotifStatut {
 
 enum BienRole {
   OWNER
+  MANAGER
   INTERMEDIAIRE
   AGENCE
   FIELD_AGENT
@@ -3759,3 +3763,86 @@ model PasswordResetToken {
   @@index([expiresAt])
   @@map("password_reset_tokens")
 }
+
+// =============================================================================
+// ADD-15 MODULE 3 : M-CHAMPION — TABLEAU DE BORD QAPRIL CHAMPIONS
+// =============================================================================
+
+model ChampionProfile {
+  id                   String               @id @default(uuid()) @map("champion_id")
+  userId               String               @unique @map("user_id")
+  zonePrincipale       String               @map("zone_principale")
+  zonesSecondaires     String[]             @map("zones_secondaires")
+  superviseurId        String?              @map("superviseur_id")
+  statut               String               @default("ACTIF")
+  dateDebut            DateTime             @default(now()) @map("date_debut")
+  objectifMensuel      Int                  @default(30) @map("objectif_mensuel")
+  totalInscriptions    Int                  @default(0) @map("total_inscriptions")
+  totalCommissionsFcfa Float                @default(0) @map("total_commissions_fcfa")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  user                 User                 @relation("UserChampionProfile", fields: [userId], references: [id], onDelete: Cascade)
+  superviseur          User?                @relation("ChampionSupervisor", fields: [superviseurId], references: [id])
+  prospects            ChampionProspect[]
+  commissions          ChampionCommission[]
+
+  @@index([zonePrincipale])
+  @@map("champions_profiles")
+}
+
+model ChampionProspect {
+  id                 String          @id @default(uuid()) @map("prospect_id")
+  championId         String          @map("champion_id")
+  nom                String          @map("nom")
+  telephone          String?         @map("telephone")
+  quartier           String?         @map("quartier")
+  nbLogementsEstime  String?         @map("nb_logements_estime")
+  argumentCle        String?         @map("argument_cle")
+  statut             ProspectStatut  @default(A_RAPPELER)
+  dateDernierContact DateTime?       @default(now()) @map("date_dernier_contact")
+  dateRappelPrevu    DateTime?       @map("date_rappel_prevu")
+  note               String?         @map("note")
+  userIdInscrit      String?         @map("user_id_inscrit")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  champion           ChampionProfile @relation(fields: [championId], references: [id], onDelete: Cascade)
+  userInscrit        User?           @relation("ProspectConvertedUser", fields: [userIdInscrit], references: [id])
+
+  @@index([championId, statut])
+  @@index([dateRappelPrevu])
+  @@map("champions_prospects")
+}
+
+model ChampionCommission {
+  id           String          @id @default(uuid()) @map("commission_id")
+  championId   String          @map("champion_id")
+  typeAction   CommType        @map("type_action")
+  referenceId  String?         @map("reference_id")
+  montantFcfa  Float           @map("montant_fcfa")
+  statut       String          @default("EN_ATTENTE")
+  valideAt     DateTime?       @map("valide_at")
+  payeAt       DateTime?       @map("paye_at")
+  modePaiement String?         @map("mode_paiement")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  champion     ChampionProfile @relation(fields: [championId], references: [id], onDelete: Cascade)
+
+  @@index([championId, statut])
+  @@index([createdAt])
+  @@map("champions_commissions")
+}
+
+enum ProspectStatut {
+  A_RAPPELER
+  EN_DISCUSSION
+  INSCRIT
+  PAS_INTERESSE
+  PERDU
+}
+
+enum CommType {
+  BAIL_FORMEL
+  BDQ_CONFIRME
+  FORMALISATION
+  RECRUTEMENT
+  BONUS
+}
+
