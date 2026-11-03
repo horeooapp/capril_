@@ -6,8 +6,15 @@ import { User, Settings, ShieldCheck, ArrowLeft, Stamp, Bell } from "lucide-reac
 import { ProfileUpdateForm } from "@/components/dashboard/ProfileUpdateForm"
 import PreferencesLocataireClient from "@/components/locataire/PreferencesLocataireClient"
 import { DeleteAccountSection } from "@/components/dashboard/profile/DeleteAccountSection"
+import { IdentityVerificationCard } from "@/components/dashboard/profile/IdentityVerificationCard"
 
 export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: any) {
+    const identityStatus = (primaryDoc?.status === 'verified'
+        ? 'verified'
+        : primaryDoc?.scanS3Key
+            ? (['pending', 'under_review', 'rejected'].includes(primaryDoc.status) ? primaryDoc.status : 'pending')
+            : 'none') as "none" | "pending" | "under_review" | "verified" | "rejected";
+    const isAccountVerified = identityStatus === 'verified';
     const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
@@ -80,6 +87,30 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
                         )}
                     </div>
                 </div>
+            </motion.div>
+
+            {/* Vérification d'identité (CNI, Passeport, Carte de Résident) */}
+            <motion.div variants={itemVariants} id="verification-identite" className="bg-white p-6 sm:p-10 rounded-[2rem] border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.04)]">
+                <div className="flex items-center gap-3 border-b-2 border-qgrey-1 pb-6 mb-8">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center shrink-0">
+                        <ShieldCheck size={22} className={isAccountVerified ? "text-emerald-600" : "text-amber-600"} />
+                    </div>
+                    <div>
+                        <h3 className="text-lg sm:text-xl font-black text-qnavy-dark uppercase tracking-widest leading-none">
+                            Validation d'identité
+                        </h3>
+                        <p className="text-[9px] sm:text-[11px] font-bold text-qtext-light uppercase tracking-widest mt-1">
+                            CNI, Passeport ou Carte de Résident obligatoire
+                        </p>
+                    </div>
+                </div>
+                <IdentityVerificationCard
+                    status={identityStatus}
+                    docType={primaryDoc?.docType}
+                    docNumber={primaryDoc?.docNumber}
+                    rejectionReason={primaryDoc?.rejectionReason}
+                    submittedAt={primaryDoc?.scanS3Key ? new Date(primaryDoc.updatedAt).toISOString() : null}
+                />
             </motion.div>
 
             {/* Main Form Area */}

@@ -1,5 +1,6 @@
 import { User, Settings, ShieldCheck, CreditCard, Bell, LogOut, Star, Trash2 } from "lucide-react"
 import { DeleteAccountSection } from "@/components/dashboard/profile/DeleteAccountSection"
+import { IdentityVerificationCard } from "@/components/dashboard/profile/IdentityVerificationCard"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
@@ -34,11 +35,19 @@ export default async function OwnerProfilePage() {
 
     const agencyProfile = (user as any)?.agenceProfile;
 
-    const primaryDoc = user?.identityDocuments?.find(d => !['DFE','RCCM','NIF','AGREMENT'].includes(d.docType)) || user?.identityDocuments?.[0];
+    const primaryDoc = user?.identityDocuments?.find(d => !['DFE','RCCM','NIF','AGREMENT','SELFIE'].includes(d.docType)) || null;
     const dfeDoc = user?.identityDocuments?.find(d => d.docType === 'DFE');
     const rccmDoc = user?.identityDocuments?.find(d => d.docType === 'RCCM');
     const nifDoc = user?.identityDocuments?.find(d => d.docType === 'NIF');
     const agrementDoc = user?.identityDocuments?.find(d => d.docType === 'AGREMENT');
+
+    // Statut de vérification d'identité : une pièce sans scan n'est pas encore soumise
+    const identityStatus = (primaryDoc?.status === 'verified'
+        ? 'verified'
+        : primaryDoc?.scanS3Key
+            ? (['pending', 'under_review', 'rejected'].includes(primaryDoc.status) ? primaryDoc.status : 'pending')
+            : 'none') as "none" | "pending" | "under_review" | "verified" | "rejected";
+    const isAccountVerified = identityStatus === 'verified';
     
     const activeRole = (user as any).capaciteActive || (session.user as any)?.chosenRole || session.user.role;
     const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE', 'INTERMEDIARY'].includes(activeRole);
@@ -76,8 +85,24 @@ export default async function OwnerProfilePage() {
                         <span className="px-3 py-1 bg-slate-800 rounded-[6px] text-[10px] font-bold uppercase tracking-widest text-white">
                             {displayRole}
                         </span>
+                        <span className={`px-3 py-1 rounded-[6px] text-[10px] font-bold uppercase tracking-widest border ${isAccountVerified ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : identityStatus === 'none' || identityStatus === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                            {isAccountVerified ? 'Compte vérifié' : identityStatus === 'none' ? 'Identité non vérifiée' : identityStatus === 'rejected' ? 'Pièce refusée' : 'Vérification en cours'}
+                        </span>
                     </div>
                 </div>
+            </div>
+
+            {/* Vérification d'identité (obligatoire pour valider le compte) */}
+            <div id="verification-identite">
+                <SectionCard title="Vérification d'identité" icon={<ShieldCheck size={18} className={isAccountVerified ? "text-emerald-500" : "text-amber-500"}/>}>
+                    <IdentityVerificationCard
+                        status={identityStatus}
+                        docType={primaryDoc?.docType}
+                        docNumber={primaryDoc?.docNumber}
+                        rejectionReason={primaryDoc?.rejectionReason}
+                        submittedAt={primaryDoc?.scanS3Key ? primaryDoc.updatedAt.toISOString() : null}
+                    />
+                </SectionCard>
             </div>
 
             {/* Main Sections */}
@@ -87,6 +112,7 @@ export default async function OwnerProfilePage() {
                 <SectionCard title="Mise à jour du Profil" icon={<Settings size={18} className="text-slate-400"/>}>
                     <ProfileUpdateForm 
                         activeRole={activeRole}
+                        isIdentityLocked={isAccountVerified}
                         initialData={{
                             firstName: user?.firstName,
                             lastName: user?.lastName,

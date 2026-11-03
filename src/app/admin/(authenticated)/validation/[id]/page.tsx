@@ -83,14 +83,48 @@ export default async function DocumentValidationPage({ params }: { params: Promi
                             </div>
                         </div>
 
-                        {/* Document Preview Placeholder */}
-                        <div className="mt-12 aspect-[16/10] bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-4 group hover:bg-white hover:border-primary transition-all cursor-pointer">
-                            <div className="p-4 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <FileText className="text-gray-300 group-hover:text-primary" size={32} />
-                            </div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Visualiser le scan haute-définition</p>
-                            <p className="text-[10px] text-gray-300 font-bold italic">Stockage sécurisé AES-256</p>
-                        </div>
+                        {/* Scans de la pièce (recto / verso) */}
+                        {(() => {
+                            const scans = [
+                                { label: "Recto / Page d'identité", url: doc.scanS3Key as string | null },
+                                { label: "Verso", url: ((doc.metadata as any)?.versoUrl as string | null) || null },
+                            ].filter(s => !!s.url)
+                            if (!scans.length) {
+                                return (
+                                    <div className="mt-12 p-10 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
+                                        <FileText className="text-gray-300" size={32} />
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Aucun scan déposé</p>
+                                        <p className="text-[11px] text-gray-400">Seul le numéro de pièce a été déclaré. Ne pas valider sans scan.</p>
+                                    </div>
+                                )
+                            }
+                            return (
+                                <div className={`mt-12 grid gap-6 ${scans.length > 1 ? "md:grid-cols-2" : "grid-cols-1"}`}>
+                                    {scans.map(s => {
+                                        const isPdf = s.url!.toLowerCase().endsWith(".pdf")
+                                        return (
+                                            <div key={s.label} className="space-y-2">
+                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{s.label}</p>
+                                                <a href={s.url!} target="_blank" rel="noopener noreferrer" className="block rounded-[1.5rem] border border-gray-200 bg-gray-50 overflow-hidden hover:border-primary transition-all">
+                                                    {isPdf ? (
+                                                        <div className="aspect-[16/10] flex flex-col items-center justify-center gap-2 text-gray-500">
+                                                            <FileText size={36} />
+                                                            <span className="text-xs font-bold uppercase tracking-widest">Ouvrir le PDF</span>
+                                                        </div>
+                                                    ) : (
+                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                        <img src={s.url!} alt={s.label} className="w-full aspect-[16/10] object-contain bg-white" />
+                                                    )}
+                                                </a>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })()}
+                        {doc.rejectionReason && (
+                            <p className="mt-6 text-sm font-medium text-rose-600">Motif du dernier rejet : {doc.rejectionReason}</p>
+                        )}
                     </div>
                 </div>
 

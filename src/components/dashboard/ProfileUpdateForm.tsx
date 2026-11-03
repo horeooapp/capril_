@@ -271,6 +271,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                             >
                                 <option value="CNI_CI">Carte Nationale d'Identité (CNI)</option>
                                 <option value="PASS_CI">Passeport</option>
+                                    <option value="CARTE_RESIDENT">Carte de Résident</option>
                                 <option value="ATTESTATION">Attestation d'Identité</option>
                                 <option value="PERMIS">Permis de Conduire</option>
                                 <option value="CARTE_CONSULAIRE">Carte Consulaire</option>

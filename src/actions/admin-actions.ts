@@ -133,16 +133,40 @@ export async function approveDocument(docId: string) {
     const session = await auth()
     
     try {
-        await prisma.identityDocument.update({
+        const doc = await prisma.identityDocument.update({
             where: { id: docId },
             data: {
                 status: "verified",
+                rejectionReason: null,
                 verifiedAt: new Date(),
                 verifiedByUserId: session?.user?.id
             }
         })
+
+        // Pièce d'identité personnelle validée => compte vérifié (KYC niveau 3)
+        if (!["DFE", "RCCM", "NIF", "AGREMENT", "SELFIE"].includes(doc.docType)) {
+            const owner = await prisma.user.findUnique({ where: { id: doc.userId }, select: { kycLevel: true } })
+            await prisma.user.update({
+                where: { id: doc.userId },
+                data: { kycStatus: "verified", kycLevel: Math.max(owner?.kycLevel || 0, 3) }
+            })
+            await prisma.notification.create({
+                data: {
+                    userId: doc.userId,
+                    channel: "PUSH",
+                    type: "SUCCESS",
+                    title: "Compte vérifié",
+                    content: "Votre pièce d'identité a été validée. Votre compte QAPRIL est désormais vérifié.",
+                    link: "/dashboard/profile"
+                }
+            }).catch(() => null)
+        }
+
         revalidatePath("/admin")
+        revalidatePath("/admin/validation")
         revalidatePath(`/admin/validation/${docId}`)
+        revalidatePath("/dashboard/profile")
+        revalidatePath("/mon-espace-locataire/profile")
         return { success: true }
     } catch (error) {
         return { error: "Échec de l'approbation du document." }
@@ -156,15 +180,37 @@ export async function rejectDocument(docId: string, reason: string) {
     await ensureAdmin()
     
     try {
-        await prisma.identityDocument.update({
+        const doc = await prisma.identityDocument.update({
             where: { id: docId },
             data: {
                 status: "rejected",
-                rejectionReason: reason
+                rejectionReason: reason,
+                verifiedAt: null
             }
         })
+
+        if (!["DFE", "RCCM", "NIF", "AGREMENT", "SELFIE"].includes(doc.docType)) {
+            await prisma.user.update({
+                where: { id: doc.userId },
+                data: { kycStatus: "rejected" }
+            })
+            await prisma.notification.create({
+                data: {
+                    userId: doc.userId,
+                    channel: "PUSH",
+                    type: "WARNING",
+                    title: "Pièce d'identité refusée",
+                    content: `Votre pièce d'identité a été refusée : ${reason}. Merci d'en déposer une nouvelle depuis votre profil.`,
+                    link: "/dashboard/profile#verification-identite"
+                }
+            }).catch(() => null)
+        }
+
         revalidatePath("/admin")
+        revalidatePath("/admin/validation")
         revalidatePath(`/admin/validation/${docId}`)
+        revalidatePath("/dashboard/profile")
+        revalidatePath("/mon-espace-locataire/profile")
         return { success: true }
     } catch (error) {
         return { error: "Échec du rejet du document." }
