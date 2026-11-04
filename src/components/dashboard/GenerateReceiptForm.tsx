@@ -3,7 +3,18 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createReceipt } from "@/actions/receipt.actions"
-import CinetPayCheckout from "@/components/payment/CinetPayCheckout"
+import { toast } from "sonner"
+import {
+    FileCheck,
+    X,
+    Loader2,
+    CheckCircle2,
+    Receipt,
+    Calendar,
+    Wallet,
+    CreditCard,
+    AlertCircle
+} from "lucide-react"
 
 export default function GenerateReceiptForm({ 
     leaseId, 
@@ -18,182 +29,279 @@ export default function GenerateReceiptForm({
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     // Form inputs state
-    const [amountFcfa, setAmountFcfa] = useState<number>(Number(monthlyRentFcfa))
+    const [amountFcfa, setAmountFcfa] = useState<number>(Number(monthlyRentFcfa) || 0)
     const [receiptType, setReceiptType] = useState<string>("RENT")
     const [periodStr, setPeriodStr] = useState<string>(() => {
         const d = new Date()
         return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`
     })
-    const [paymentChannel, setPaymentChannel] = useState<string>("MOBILE_MONEY")
+    const [paymentChannel, setPaymentChannel] = useState<string>("WAVE")
     const [paymentReference, setPaymentReference] = useState<string>("")
+    const [notes, setNotes] = useState<string>("")
+
+    const handleOpen = () => {
+        setError(null)
+        setAmountFcfa(Number(monthlyRentFcfa) || 0)
+        setIsModalOpen(true)
+    }
+
+    const handleClose = () => {
+        if (isPending) return
+        setIsModalOpen(false)
+        setError(null)
+    }
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault()
         setError(null)
+
+        if (!periodStr) {
+            setError("Veuillez sélectionner le mois concerné par la quittance.")
+            return
+        }
+        if (!amountFcfa || amountFcfa <= 0) {
+            setError("Veuillez saisir un montant de loyer valide supérieur à 0.")
+            return
+        }
+
         setIsPending(true)
 
         try {
             const result = await createReceipt({
                 leaseId,
                 periodMonth: periodStr,
-                rentAmount: amountFcfa,
+                rentAmount: Number(amountFcfa),
                 chargesAmount: 0,
                 paymentMethod: paymentChannel,
-                paymentRef: paymentReference,
-                isDeposit: receiptType === "DEPOSIT"
+                paymentRef: paymentReference.trim() || undefined,
+                isDeposit: receiptType === "DEPOSIT",
+                status: "PAID",
+                paidAt: new Date(),
+                notes: notes.trim() || undefined
             })
 
             if (result.error) {
                 setError(result.error)
+                toast.error(result.error)
                 setIsPending(false)
                 return
             }
 
+            toast.success(`Quittance certifiée avec succès pour le mois ${periodStr} !`)
             setIsModalOpen(false)
             router.push(`/dashboard/receipts`)
             router.refresh()
         } catch (err: any) {
             console.error("[RECEIPT_GEN_ERROR]", err)
-            setError(err.message || "Une erreur inconnue est survenue au niveau du réseau ou du serveur.")
+            const msg = err?.message || "Une erreur inconnue est survenue au niveau du réseau ou du serveur."
+            setError(msg)
+            toast.error(msg)
             setIsPending(false)
         }
     }
 
-    if (!isModalOpen) {
-        return (
-            <button 
-                onClick={() => setIsModalOpen(true)}
-                className="bg-[#FF8200] hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all active:scale-95"
-            >
-                Générer Quittance
-            </button>
-        )
-    }
-
     return (
-        <div className="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" aria-hidden="true" onClick={() => setIsModalOpen(false)}></div>
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div className="inline-block align-bottom bg-white rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
-                    <form onSubmit={handleGenerate}>
-                        <div className="bg-white px-8 pt-10 pb-8">
-                            <div className="text-center sm:text-left w-full">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-2xl">
-                                        🧾
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-black text-gray-900 leading-tight">Nouvelle E-Quittance</h3>
-                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Certification de paiement v2.0</p>
-                                    </div>
+        <>
+            {/* Bouton déclencheur toujours visible et stable */}
+            <button 
+                type="button"
+                onClick={handleOpen}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#FF8200] hover:bg-orange-600 text-white rounded-[10px] font-black text-[11px] uppercase tracking-widest shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                title="Générer une quittance de loyer pour ce bail"
+            >
+                <FileCheck size={15} />
+                <span>Générer Quittance</span>
+            </button>
+
+            {/* Modale plein écran sécurisée avec backdrop cliquable et propagation bloquée */}
+            {isModalOpen && (
+                <div 
+                    className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+                    onClick={handleClose}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-title"
+                >
+                    <div 
+                        className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-200 relative z-10 flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* En-tête de la modale */}
+                        <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-6 text-white relative shrink-0">
+                            <button 
+                                type="button"
+                                onClick={handleClose}
+                                disabled={isPending}
+                                className="absolute top-5 right-5 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors cursor-pointer disabled:opacity-50"
+                                title="Fermer la fenêtre"
+                            >
+                                <X size={18} />
+                            </button>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-orange-200 block mb-1">
+                                Certification CCH • Loi 2019-576
+                            </span>
+                            <h3 id="modal-title" className="text-xl font-black flex items-center gap-2">
+                                <Receipt size={22} className="text-orange-200" />
+                                Émettre une Quittance de Loyer
+                            </h3>
+                            <p className="text-xs text-orange-100/90 mt-1 font-medium">
+                                Certifiez l&apos;encaissement du loyer pour générer la quittance officielle numérique avec QR code sécurisé.
+                            </p>
+                        </div>
+
+                        {/* Corps du formulaire défilable */}
+                        <form onSubmit={handleGenerate} className="p-6 space-y-4 overflow-y-auto flex-1">
+                            {error && (
+                                <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 flex items-start gap-2">
+                                    <AlertCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />
+                                    <span>{error}</span>
                                 </div>
-                                
-                                {error && (
-                                    <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-[10px] font-bold text-red-600 uppercase tracking-widest text-center">
-                                        ⚠️ {error}
-                                    </div>
-                                )}
+                            )}
 
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Type</label>
-                                            <select 
-                                                value={receiptType}
-                                                onChange={(e) => setReceiptType(e.target.value)}
-                                                className="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold focus:ring-2 focus:ring-[#FF8200] transition-all"
-                                            >
-                                                <option value="RENT">Loyer / LMNP</option>
-                                                <option value="DEPOSIT">Caution / Garantie</option>
-                                                <option value="ADVANCE">Avance / Provision</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Mois</label>
-                                            <input 
-                                                type="month" 
-                                                required 
-                                                value={periodStr}
-                                                onChange={(e) => setPeriodStr(e.target.value)}
-                                                className="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold focus:ring-2 focus:ring-[#FF8200] transition-all"
-                                            />
-                                        </div>
-                                    </div>
+                            {/* Type de quittance & Période */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                        Type de versement *
+                                    </label>
+                                    <select 
+                                        value={receiptType}
+                                        onChange={(e) => setReceiptType(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all cursor-pointer"
+                                    >
+                                        <option value="RENT">Loyer Mensuel</option>
+                                        <option value="DEPOSIT">Caution / Dépôt de garantie</option>
+                                        <option value="ADVANCE">Avance / Provision</option>
+                                    </select>
+                                </div>
 
-                                    <div>
-                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Montant perçu (XOF)</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                        Mois concerné *
+                                    </label>
+                                    <div className="relative">
                                         <input 
-                                            type="number" 
+                                            type="month" 
                                             required 
-                                            value={amountFcfa}
-                                            onChange={(e) => setAmountFcfa(parseFloat(e.target.value))}
-                                            min="1"
-                                            className="w-full bg-gray-50 border-none rounded-[1.25rem] py-4 px-6 text-xl font-black focus:ring-2 focus:ring-[#FF8200] transition-all"
+                                            value={periodStr}
+                                            onChange={(e) => setPeriodStr(e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all cursor-pointer"
                                         />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Canal</label>
-                                            <select 
-                                                value={paymentChannel}
-                                                onChange={(e) => setPaymentChannel(e.target.value)}
-                                                className="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold focus:ring-2 focus:ring-[#FF8200] transition-all"
-                                            >
-                                                <option value="MOBILE_MONEY">Mobile Money</option>
-                                                <option value="CASH">Espèces / Manuel</option>
-                                                <option value="BANK_TRANSFER">Virement</option>
-                                                <option value="CHEQUE">Chèque</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Réf. Transaction</label>
-                                            <input 
-                                                type="text" 
-                                                placeholder="OPTIONAL"
-                                                value={paymentReference}
-                                                onChange={(e) => setPaymentReference(e.target.value)}
-                                                className="w-full bg-gray-50 border-none rounded-2xl py-3 px-4 text-sm font-bold focus:ring-2 focus:ring-[#FF8200] transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="pt-4 border-t border-gray-100">
-                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">
-                                            — OU RÉGLER MAINTENANT —
-                                        </p>
-                                        <CinetPayCheckout 
-                                            leaseId={leaseId}
-                                            amount={amountFcfa}
-                                            monthsCount={Math.max(1, Math.round(amountFcfa / Number(monthlyRentFcfa)))}
-                                            onError={(msg) => setError(msg)}
-                                        />
-                                        <p className="mt-3 text-[8px] text-gray-400 text-center italic">
-                                            Le paiement par CinetPay validera automatiquement cette quittance.
-                                        </p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="bg-gray-50/50 px-8 py-6 flex flex-col sm:flex-row-reverse gap-3 border-t border-gray-100">
-                            <button 
-                                type="submit" 
-                                disabled={isPending}
-                                className="flex-1 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-black transition-all shadow-xl shadow-gray-200 disabled:opacity-50"
-                            >
-                                {isPending ? 'Certification...' : 'Certifier le Paiement'}
-                            </button>
-                            <button 
-                                type="button" 
-                                onClick={() => setIsModalOpen(false)}
-                                className="flex-1 bg-white border border-gray-200 text-gray-500 text-[10px] font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-gray-50 transition-all"
-                            >
-                                Abandonner
-                            </button>
-                        </div>
-                    </form>
+
+                            {/* Montant perçu */}
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                    Montant perçu (XOF / FCFA) *
+                                </label>
+                                <div className="relative">
+                                    <input 
+                                        type="number" 
+                                        required 
+                                        value={amountFcfa || ""}
+                                        onChange={(e) => setAmountFcfa(parseFloat(e.target.value) || 0)}
+                                        min="1"
+                                        step="1"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-lg font-black text-slate-900 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all"
+                                        placeholder="Ex : 150000"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">
+                                        XOF
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Canal d'encaissement & Réf transaction */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                        Mode de règlement *
+                                    </label>
+                                    <select 
+                                        value={paymentChannel}
+                                        onChange={(e) => setPaymentChannel(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all cursor-pointer"
+                                    >
+                                        <option value="WAVE">Wave</option>
+                                        <option value="ORANGE_MONEY">Orange Money</option>
+                                        <option value="MTN_MOMO">MTN MoMo</option>
+                                        <option value="MOOV_MONEY">Moov Money</option>
+                                        <option value="BANK_TRANSFER">Virement Bancaire</option>
+                                        <option value="CASH">Espèces (Reçu direct)</option>
+                                        <option value="CHEQUE">Chèque</option>
+                                    </select>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                        Réf. transaction (optionnel)
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Ex : WAV-98124 ou N° Chèque"
+                                        value={paymentReference}
+                                        onChange={(e) => setPaymentReference(e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Note interne optionnelle */}
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">
+                                    Commentaire ou précision (optionnel)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Ex : Paiement reçu en agence le 05 du mois"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[12px] font-medium text-slate-700 focus:bg-white focus:ring-2 focus:ring-[#FF8200] outline-none transition-all"
+                                />
+                            </div>
+
+                            {/* Bandeau d'information légale */}
+                            <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2.5">
+                                <CheckCircle2 size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                                <p className="text-[11px] font-medium text-amber-800 leading-snug">
+                                    La quittance portera une empreinte cryptographique SHA-256 et un QR code officiel consultable par le locataire dans son espace.
+                                </p>
+                            </div>
+
+                            {/* Boutons d'action */}
+                            <div className="pt-2 flex items-center gap-2.5">
+                                <button 
+                                    type="button" 
+                                    onClick={handleClose}
+                                    disabled={isPending}
+                                    className="px-4 py-3 bg-white border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    disabled={isPending}
+                                    className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-black uppercase tracking-widest py-3 px-5 rounded-xl transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    {isPending ? (
+                                        <>
+                                            <Loader2 size={15} className="animate-spin" />
+                                            <span>Certification en cours...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FileCheck size={15} className="text-orange-400" />
+                                            <span>Valider et Émettre la Quittance</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
+            )}
+        </>
     )
 }

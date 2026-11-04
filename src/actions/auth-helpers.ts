@@ -104,8 +104,22 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
         return lease
     }
 
-    if (allowedRoles && !allowedRoles.includes(userRole)) {
-        throw new Error(`Accès refusé pour le rôle ${userRole}.`)
+    const fullUser = await prisma.user.findUnique({ 
+        where: { id: userId }, 
+        select: { agencyConfig: true, capaciteActive: true, role: true } 
+    })
+    const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role || userRole
+
+    if (allowedRoles) {
+        const isAllowed = 
+            allowedRoles.includes(userRole) || 
+            allowedRoles.includes(activeRole as Role) ||
+            (userRole === Role.NON_CERTIFIED_AGENT && allowedRoles.includes(Role.AGENCY)) ||
+            (['LANDLORD', 'LANDLORD_PRO'].includes(activeRole) && (allowedRoles.includes(Role.LANDLORD) || allowedRoles.includes(Role.LANDLORD_PRO))) ||
+            (['AGENCY', 'AGENCE_AGREE', 'AGENCE_NON_AGREE'].includes(activeRole) && allowedRoles.includes(Role.AGENCY));
+        if (!isAllowed) {
+            throw new Error(`Accès refusé pour le rôle ${userRole}.`)
+        }
     }
 
     const lease = await prisma.lease.findUnique({
@@ -115,14 +129,15 @@ export async function ensureLeaseAccess(leaseId: string, allowedRoles?: Role[]) 
 
     if (!lease) throw new Error("Bail non trouvé.")
 
-    const fullUser = await prisma.user.findUnique({ where: { id: userId }, select: { agencyConfig: true } })
     const managerId = (fullUser?.agencyConfig as any)?.managerId
 
     const isParticipant = 
         lease.landlordId === userId || 
         lease.tenantId === userId || 
         lease.agentId === userId ||
-        (managerId && lease.agentId === managerId)
+        lease.property?.ownerUserId === userId ||
+        lease.property?.managedByUserId === userId ||
+        (managerId && (lease.agentId === managerId || lease.property?.managedByUserId === managerId))
 
     if (!isParticipant) {
         const pAccess = await prisma.propertyAccess.findFirst({
