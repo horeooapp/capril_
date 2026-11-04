@@ -157,6 +157,16 @@ export function AdminIdentityValidationList({
                                                         <Clock size={12} /> À vérifier
                                                     </span>
                                                 )}
+                                                {doc.bulletinsSalaireUrls && doc.bulletinsSalaireUrls.length > 0 && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                                        Bulletins ({doc.bulletinsSalaireUrls.length}/3)
+                                                    </span>
+                                                )}
+                                                {doc.quittanceLoyerUrl && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-800 border border-blue-200">
+                                                        Quittance loyer ✓
+                                                    </span>
+                                                )}
                                                 {!hasFile && (
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-gray-100 text-gray-600">
                                                         Aucun fichier joint

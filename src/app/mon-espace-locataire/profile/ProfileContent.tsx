@@ -110,6 +110,11 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
                     docNumber={primaryDoc?.docNumber}
                     rejectionReason={primaryDoc?.rejectionReason}
                     submittedAt={primaryDoc?.scanS3Key ? new Date(primaryDoc.updatedAt).toISOString() : null}
+                    bulletinsUrls={(primaryDoc?.metadata as any)?.bulletinsSalaireUrls || []}
+                    quittanceUrl={(primaryDoc?.metadata as any)?.quittanceLoyerUrl || null}
+                    scanUrl={primaryDoc?.scanS3Key || null}
+                    versoUrl={(primaryDoc?.metadata as any)?.versoUrl || null}
+                    isTenant={true}
                 />
             </motion.div>
 

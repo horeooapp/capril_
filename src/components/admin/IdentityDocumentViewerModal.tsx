@@ -28,6 +28,8 @@ export interface AdminIdentityDocItem {
     docNumber?: string | null
     scanS3Key?: string | null
     versoUrl?: string | null
+    bulletinsSalaireUrls?: string[] | null
+    quittanceLoyerUrl?: string | null
     status: string
     expiryDate?: string | null
     rejectionReason?: string | null
@@ -61,13 +63,18 @@ export function IdentityDocumentViewerModal({
 }) {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
-    const [activeTab, setActiveTab] = useState<"recto" | "verso" | "both">(
+    const [activeTab, setActiveTab] = useState<"recto" | "verso" | "both" | "bulletins" | "quittance">(
         doc.scanS3Key && doc.versoUrl ? "both" : "recto"
     )
+    const [selectedBulletinIdx, setSelectedBulletinIdx] = useState(0)
     const [zoom, setZoom] = useState(1)
     const [rejectMode, setRejectMode] = useState(false)
     const [reason, setReason] = useState(doc.rejectionReason || "")
     const [hasViewed, setHasViewed] = useState(true)
+
+    const bulletins = Array.isArray(doc.bulletinsSalaireUrls) ? doc.bulletinsSalaireUrls : []
+    const hasBulletins = bulletins.length > 0
+    const hasQuittance = Boolean(doc.quittanceLoyerUrl)
 
     const fullName =
         ((doc.user?.firstName ? doc.user.firstName + " " : "") + (doc.user?.lastName || "")).trim() ||
@@ -211,81 +218,133 @@ export function IdentityDocumentViewerModal({
                 </div>
 
                 {/* Toolbar (Tabs & Zoom) */}
-                {hasFile && (
-                    <div className="px-6 py-2.5 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 shrink-0">
-                        <div className="flex items-center gap-1.5">
-                            {doc.scanS3Key && doc.versoUrl && (
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab("both")}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
-                                        activeTab === "both"
-                                            ? "bg-slate-900 text-white"
-                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                    }`}
-                                >
-                                    <Columns size={14} /> Recto & Verso côte à côte
-                                </button>
-                            )}
-                            {doc.scanS3Key && (
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab("recto")}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                                        activeTab === "recto"
-                                            ? "bg-slate-900 text-white"
-                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                    }`}
-                                >
-                                    Recto / Page principale
-                                </button>
-                            )}
-                            {doc.versoUrl && (
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab("verso")}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                                        activeTab === "verso"
-                                            ? "bg-slate-900 text-white"
-                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                    }`}
-                                >
-                                    Verso
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
+                <div className="px-6 py-2.5 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        {doc.scanS3Key && doc.versoUrl && (
                             <button
                                 type="button"
-                                onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))}
-                                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100"
-                                title="Dézoomer"
+                                onClick={() => setActiveTab("both")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                                    activeTab === "both"
+                                        ? "bg-slate-900 text-white"
+                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                }`}
                             >
-                                <ZoomOut size={15} />
+                                <Columns size={14} /> Recto &amp; Verso
                             </button>
+                        )}
+                        {doc.scanS3Key && (
                             <button
                                 type="button"
-                                onClick={() => setZoom(1)}
-                                className="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] font-bold text-slate-700 hover:bg-slate-100"
+                                onClick={() => setActiveTab("recto")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                                    activeTab === "recto"
+                                        ? "bg-slate-900 text-white"
+                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                }`}
                             >
-                                {Math.round(zoom * 100)}%
+                                Recto ID
                             </button>
+                        )}
+                        {doc.versoUrl && (
                             <button
                                 type="button"
-                                onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
-                                className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100"
-                                title="Zoomer"
+                                onClick={() => setActiveTab("verso")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                                    activeTab === "verso"
+                                        ? "bg-slate-900 text-white"
+                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                }`}
                             >
-                                <ZoomIn size={15} />
+                                Verso ID
                             </button>
-                        </div>
+                        )}
+                        {hasBulletins && (
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab("bulletins")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                                    activeTab === "bulletins"
+                                        ? "bg-emerald-700 text-white"
+                                        : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
+                                }`}
+                            >
+                                📑 Bulletins de salaire ({bulletins.length}/3)
+                            </button>
+                        )}
+                        {hasQuittance && (
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab("quittance")}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                                    activeTab === "quittance"
+                                        ? "bg-blue-700 text-white"
+                                        : "bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200"
+                                }`}
+                            >
+                                🏠 Quittance / Attestation
+                            </button>
+                        )}
                     </div>
-                )}
+
+                    <div className="flex items-center gap-1.5">
+                        <button
+                            type="button"
+                            onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))}
+                            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100"
+                            title="Dézoomer"
+                        >
+                            <ZoomOut size={15} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setZoom(1)}
+                            className="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] font-bold text-slate-700 hover:bg-slate-100"
+                        >
+                            {Math.round(zoom * 100)}%
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
+                            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100"
+                            title="Zoomer"
+                        >
+                            <ZoomIn size={15} />
+                        </button>
+                    </div>
+                </div>
 
                 {/* Body: Document Preview */}
                 <div className="p-6 overflow-y-auto flex-1 space-y-4 bg-slate-50/50">
-                    {!hasFile ? (
+                    {activeTab === "bulletins" && hasBulletins ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200">
+                                <span className="text-xs font-bold text-slate-700">Sélectionner le bulletin :</span>
+                                <div className="flex items-center gap-2">
+                                    {bulletins.map((bUrl, idx) => (
+                                        <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => setSelectedBulletinIdx(idx)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${
+                                                selectedBulletinIdx === idx
+                                                    ? "bg-emerald-600 text-white shadow-sm"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            Bulletin M-{idx + 1}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            {renderFilePane(
+                                bulletins[selectedBulletinIdx] || bulletins[0],
+                                `Bulletin de salaire (Mois M-${selectedBulletinIdx + 1})`
+                            )}
+                        </div>
+                    ) : activeTab === "quittance" && hasQuittance && doc.quittanceLoyerUrl ? (
+                        renderFilePane(doc.quittanceLoyerUrl, "Dernière Quittance de Loyer / Attestation")
+                    ) : !hasFile ? (
                         <div className="p-12 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 text-center space-y-2">
                             <AlertTriangle size={36} className="mx-auto text-amber-500" />
                             <h3 className="text-sm font-black uppercase tracking-wider text-amber-900">

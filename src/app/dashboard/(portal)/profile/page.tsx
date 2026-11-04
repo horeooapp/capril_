@@ -136,6 +136,11 @@ export default async function OwnerProfilePage() {
                                 docNumber={primaryDoc?.docNumber}
                                 rejectionReason={primaryDoc?.rejectionReason}
                                 submittedAt={primaryDoc?.scanS3Key ? primaryDoc.updatedAt.toISOString() : null}
+                                bulletinsUrls={(primaryDoc?.metadata as any)?.bulletinsSalaireUrls || []}
+                                quittanceUrl={(primaryDoc?.metadata as any)?.quittanceLoyerUrl || null}
+                                scanUrl={primaryDoc?.scanS3Key || null}
+                                versoUrl={(primaryDoc?.metadata as any)?.versoUrl || null}
+                                isTenant={activeRole === "TENANT"}
                             />
                         </SectionCard>
                     </div>

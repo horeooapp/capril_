@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react"
 import { useRouter } from "next/navigation";
-import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check, MessageSquare, PlusCircle, AlertCircle, FileSignature } from "lucide-react"
+import { Users, X, Heart, Star, CheckCircle, ShieldAlert, Phone, Mail, Briefcase, FileText, ChevronRight, Check, MessageSquare, PlusCircle, AlertCircle, FileSignature, ExternalLink } from "lucide-react"
 import { toast } from "sonner";
 import { processCandidature } from "@/actions/matching-actions";
 import { Badge } from "@/components/dashboard/ui/Badge";
@@ -340,19 +340,113 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
                                 </div>
                             </div>
 
-                            {/* DOCUMENTS SOUMIS */}
+                            {/* DOCUMENTS SOUMIS ET VERIFIES */}
                             <div>
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Pièces justificatives vérifiées par QAPRIL</h4>
-                                <div className="space-y-2">
-                                    {['Pièce d\'identité (CNI / Passeport)', '3 derniers bulletins de salaire', 'Dernière quittance de loyer / Attestation'].map((doc, i) => (
-                                        <div key={i} className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl transition-colors">
-                                            <span className="text-xs font-bold text-slate-700 flex items-center gap-2">
-                                                <CheckCircle size={16} className="text-emerald-500"/> {doc}
-                                            </span>
-                                            <Badge color="emerald">Vérifié par IA</Badge>
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Pièces justificatives du dossier locataire</h4>
+                                {(() => {
+                                    const liveDoc = activeModalCandidate.candidat?.identityDocuments?.[0];
+                                    const liveMeta = (liveDoc?.metadata as any) || {};
+                                    const snapDoc = activeModalCandidate.docsJsonb || {};
+
+                                    const idDocStatus = liveDoc?.status || snapDoc.status || (liveDoc?.scanS3Key || snapDoc.scanS3Key ? "pending" : "none");
+                                    const idDocScanUrl = liveDoc?.scanS3Key || snapDoc.scanS3Key || null;
+
+                                    const bulletins: string[] = (Array.isArray(liveMeta.bulletinsSalaireUrls) && liveMeta.bulletinsSalaireUrls.length > 0)
+                                        ? liveMeta.bulletinsSalaireUrls
+                                        : (Array.isArray(snapDoc.bulletinsSalaireUrls) ? snapDoc.bulletinsSalaireUrls : []);
+
+                                    const quittanceUrl: string | null = liveMeta.quittanceLoyerUrl || snapDoc.quittanceLoyerUrl || null;
+
+                                    return (
+                                        <div className="space-y-2.5">
+                                            {/* 1. Pièce d'identité */}
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl gap-2 transition-colors">
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <CheckCircle size={16} className={idDocStatus === "verified" ? "text-emerald-500 shrink-0" : "text-amber-500 shrink-0"} />
+                                                    <span className="text-xs font-bold text-slate-800">
+                                                        Pièce d&apos;identité (CNI / Passeport / Résident)
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    {idDocScanUrl && (
+                                                        <a
+                                                            href={idDocScanUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[10px] font-bold text-[#1F4E79] hover:underline inline-flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-lg"
+                                                        >
+                                                            <ExternalLink size={10} /> Voir
+                                                        </a>
+                                                    )}
+                                                    {idDocStatus === "verified" ? (
+                                                        <Badge color="emerald">Identité certifiée ✓</Badge>
+                                                    ) : idDocScanUrl ? (
+                                                        <Badge color="amber">En cours d&apos;examen</Badge>
+                                                    ) : (
+                                                        <Badge color="gray">Non fournie</Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* 2. 3 derniers bulletins de salaire */}
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl gap-2 transition-colors">
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <CheckCircle size={16} className={bulletins.length >= 3 ? "text-emerald-500 shrink-0" : bulletins.length > 0 ? "text-amber-500 shrink-0" : "text-slate-400 shrink-0"} />
+                                                    <span className="text-xs font-bold text-slate-800">
+                                                        3 derniers bulletins de salaire
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                                                    {bulletins.length > 0 && bulletins.map((bUrl, idx) => (
+                                                        <a
+                                                            key={idx}
+                                                            href={bUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[9px] font-bold text-emerald-800 bg-white border border-slate-200 hover:border-emerald-300 px-2 py-0.5 rounded-lg inline-flex items-center gap-1"
+                                                        >
+                                                            M-{idx + 1} <ExternalLink size={9} />
+                                                        </a>
+                                                    ))}
+                                                    {bulletins.length >= 3 ? (
+                                                        <Badge color="emerald">Complet (3/3) ✓</Badge>
+                                                    ) : bulletins.length > 0 ? (
+                                                        <Badge color="amber">{bulletins.length}/3 Reçus</Badge>
+                                                    ) : (
+                                                        <Badge color="gray">Non fournis</Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* 3. Dernière quittance de loyer / Attestation */}
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-xl gap-2 transition-colors">
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <CheckCircle size={16} className={quittanceUrl ? "text-emerald-500 shrink-0" : "text-slate-400 shrink-0"} />
+                                                    <span className="text-xs font-bold text-slate-800">
+                                                        Dernière quittance de loyer / Attestation
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    {quittanceUrl && (
+                                                        <a
+                                                            href={quittanceUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[10px] font-bold text-blue-700 hover:underline inline-flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-lg"
+                                                        >
+                                                            <ExternalLink size={10} /> Voir
+                                                        </a>
+                                                    )}
+                                                    {quittanceUrl ? (
+                                                        <Badge color="emerald">Conforme ✓</Badge>
+                                                    ) : (
+                                                        <Badge color="gray">Non fournie</Badge>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    );
+                                })()}
                             </div>
 
                             {/* ACTIONS IF PENDING */}

@@ -65,22 +65,33 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const rectoErr = validateFile(recto, typeConf.needsVerso ? "recto" : "scan");
-        if (rectoErr) return NextResponse.json({ error: rectoErr }, { status: 400 });
-
-        const hasVerso = verso && typeof verso !== "string" && verso.size > 0;
-        if (typeConf.needsVerso || hasVerso) {
-            const versoErr = validateFile(verso, "verso");
-            if (versoErr) return NextResponse.json({ error: versoErr }, { status: 400 });
-        }
-
-        // Pièce déjà validée : on ne remplace pas
+        // Pièce déjà validée : on ne remplace pas si déjà vérifiée
         const existing = await prisma.identityDocument.findFirst({
             where: { userId, docType: { notIn: NON_IDENTITY_TYPES } },
             orderBy: { createdAt: "desc" },
         });
         if (existing?.status === "verified") {
             return NextResponse.json({ error: "Votre identité est déjà validée. Contactez le support pour toute modification." }, { status: 409 });
+        }
+
+        const hasExistingRecto = Boolean(existing?.scanS3Key);
+        const hasNewRecto = recto && typeof recto !== "string" && recto.size > 0;
+
+        if (!hasExistingRecto && !hasNewRecto) {
+            const rectoErr = validateFile(recto, typeConf.needsVerso ? "recto" : "scan");
+            if (rectoErr) return NextResponse.json({ error: rectoErr }, { status: 400 });
+        } else if (hasNewRecto) {
+            const rectoErr = validateFile(recto, typeConf.needsVerso ? "recto" : "scan");
+            if (rectoErr) return NextResponse.json({ error: rectoErr }, { status: 400 });
+        }
+
+        const existingMeta = (existing?.metadata as any) || {};
+        const hasNewVerso = verso && typeof verso !== "string" && verso.size > 0;
+        if (hasNewVerso) {
+            const versoErr = validateFile(verso, "verso");
+            if (versoErr) return NextResponse.json({ error: versoErr }, { status: 400 });
+        } else if (typeConf.needsVerso && !existingMeta.versoUrl && !hasExistingRecto) {
+            return NextResponse.json({ error: "Le verso de votre pièce est requis." }, { status: 400 });
         }
 
         // Anti-doublon inter-comptes
@@ -93,8 +104,46 @@ export async function POST(req: NextRequest) {
         }
 
         // Stockage privé (dossier kyc/<userId>, protégé par la route /uploads)
-        const rectoUrl = await savePhysicalFile(recto as File, `kyc/${userId}`);
-        const versoUrl = hasVerso ? await savePhysicalFile(verso as File, `kyc/${userId}`) : null;
+        const rectoUrl = hasNewRecto ? await savePhysicalFile(recto as File, `kyc/${userId}`) : (existing?.scanS3Key || "");
+        const versoUrl = hasNewVerso ? await savePhysicalFile(verso as File, `kyc/${userId}`) : (existingMeta.versoUrl || null);
+
+        // Traitement des 3 bulletins de salaire
+        let bulletinsSalaireUrls: string[] = Array.isArray(existingMeta.bulletinsSalaireUrls) ? [...existingMeta.bulletinsSalaireUrls] : [];
+        const bulletinFiles: (File | null)[] = [
+            form.get("bulletin1") as File | null,
+            form.get("bulletin2") as File | null,
+            form.get("bulletin3") as File | null,
+        ];
+        const extraBulletins = form.getAll("bulletins") as (File | string)[];
+        for (const eb of extraBulletins) {
+            if (eb && typeof eb !== "string" && eb.size > 0) {
+                bulletinFiles.push(eb);
+            }
+        }
+
+        for (let i = 0; i < bulletinFiles.length; i++) {
+            const bFile = bulletinFiles[i];
+            if (bFile && typeof bFile !== "string" && bFile.size > 0) {
+                const bErr = validateFile(bFile, `bulletin de salaire ${i + 1}`);
+                if (bErr) return NextResponse.json({ error: bErr }, { status: 400 });
+                const bUrl = await savePhysicalFile(bFile, `kyc/${userId}/bulletins`);
+                if (i < 3) {
+                    bulletinsSalaireUrls[i] = bUrl;
+                } else {
+                    bulletinsSalaireUrls.push(bUrl);
+                }
+            }
+        }
+        bulletinsSalaireUrls = bulletinsSalaireUrls.filter(Boolean).slice(0, 3);
+
+        // Traitement de la quittance de loyer / attestation d'hébergement
+        const quittanceFile = (form.get("quittance") as File | null) || (form.get("quittanceLoyer") as File | null);
+        let quittanceLoyerUrl: string | null = (existingMeta.quittanceLoyerUrl as string) || null;
+        if (quittanceFile && typeof quittanceFile !== "string" && quittanceFile.size > 0) {
+            const qErr = validateFile(quittanceFile, "quittance de loyer / attestation");
+            if (qErr) return NextResponse.json({ error: qErr }, { status: 400 });
+            quittanceLoyerUrl = await savePhysicalFile(quittanceFile, `kyc/${userId}/quittances`);
+        }
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -103,7 +152,10 @@ export async function POST(req: NextRequest) {
         const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || null;
         const docNumberHash = `${userId}_${docType}_${docNumber}`;
         const metadata = {
+            ...existingMeta,
             versoUrl,
+            bulletinsSalaireUrls,
+            quittanceLoyerUrl,
             source: "WEB_PROFILE",
             submittedAt: new Date().toISOString(),
         };
@@ -114,9 +166,8 @@ export async function POST(req: NextRequest) {
 
         const oldFiles: string[] = [];
         if (target) {
-            if (target.scanS3Key) oldFiles.push(target.scanS3Key);
-            const oldVerso = (target.metadata as any)?.versoUrl;
-            if (oldVerso) oldFiles.push(oldVerso);
+            if (hasNewRecto && target.scanS3Key && target.scanS3Key !== rectoUrl) oldFiles.push(target.scanS3Key);
+            if (hasNewVerso && existingMeta.versoUrl && existingMeta.versoUrl !== versoUrl) oldFiles.push(existingMeta.versoUrl);
         }
 
         const doc = target
@@ -170,14 +221,21 @@ export async function POST(req: NextRequest) {
                 take: 20,
             });
             if (admins.length) {
+                const hasBulletins = bulletinsSalaireUrls.length > 0;
+                const hasQuittance = Boolean(quittanceLoyerUrl);
+                const detailsParts = [typeConf.label];
+                if (hasBulletins) detailsParts.push(`${bulletinsSalaireUrls.length} bulletin(s)`);
+                if (hasQuittance) detailsParts.push("quittance de loyer");
+                const docSummary = detailsParts.join(" + ");
+
                 await prisma.notification.createMany({
                     data: admins.map((a) => ({
                         userId: a.id,
                         channel: "PUSH",
                         type: "WARNING",
-                        title: "Nouvelle pièce d'identité à valider",
-                        content: `${fullName || "Un utilisateur"} a déposé sa ${typeConf.label}.`,
-                        link: `/admin/validation/${doc.id}`,
+                        title: "Nouveau dossier KYC à valider",
+                        content: `${fullName || "Un utilisateur"} a déposé son dossier (${docSummary}).`,
+                        link: `/admin/validation`,
                     })),
                 });
             }

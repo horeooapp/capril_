@@ -33,7 +33,12 @@ export async function getPendingCandidatures() {
                 candidat: {
                     include: {
                         locataireProfile: true,
-                        reliabilityScores: true
+                        reliabilityScores: true,
+                        identityDocuments: {
+                            where: { docType: { notIn: ['DFE', 'RCCM', 'NIF', 'AGREMENT', 'SELFIE'] } },
+                            orderBy: { createdAt: 'desc' },
+                            take: 1
+                        }
                     }
                 }
             },
@@ -73,7 +78,12 @@ export async function getAcceptedCandidatures() {
                 candidat: {
                     include: {
                         locataireProfile: true,
-                        reliabilityScores: true
+                        reliabilityScores: true,
+                        identityDocuments: {
+                            where: { docType: { notIn: ['DFE', 'RCCM', 'NIF', 'AGREMENT', 'SELFIE'] } },
+                            orderBy: { createdAt: 'desc' },
+                            take: 1
+                        }
                     }
                 }
             },

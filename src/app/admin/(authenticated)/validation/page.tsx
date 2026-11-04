@@ -33,18 +33,23 @@ export default async function AdminValidationPage() {
         })
         .catch(() => [])
 
-    const identityDocs: AdminIdentityDocItem[] = rawDocs.map((d) => ({
-        id: d.id,
-        docType: d.docType,
-        docNumber: d.docNumber,
-        scanS3Key: d.scanS3Key,
-        versoUrl: ((d.metadata as any)?.versoUrl as string | null) || null,
-        status: d.status,
-        expiryDate: d.expiryDate ? d.expiryDate.toISOString() : null,
-        rejectionReason: d.rejectionReason,
-        updatedAt: d.updatedAt ? d.updatedAt.toISOString() : null,
-        user: d.user,
-    }))
+    const identityDocs: AdminIdentityDocItem[] = rawDocs.map((d) => {
+        const meta = (d.metadata as any) || {}
+        return {
+            id: d.id,
+            docType: d.docType,
+            docNumber: d.docNumber,
+            scanS3Key: d.scanS3Key,
+            versoUrl: (meta?.versoUrl as string | null) || null,
+            bulletinsSalaireUrls: Array.isArray(meta?.bulletinsSalaireUrls) ? meta.bulletinsSalaireUrls : [],
+            quittanceLoyerUrl: (meta?.quittanceLoyerUrl as string | null) || null,
+            status: d.status,
+            expiryDate: d.expiryDate ? d.expiryDate.toISOString() : null,
+            rejectionReason: d.rejectionReason,
+            updatedAt: d.updatedAt ? d.updatedAt.toISOString() : null,
+            user: d.user,
+        }
+    })
 
     return (
         <div className="space-y-8">

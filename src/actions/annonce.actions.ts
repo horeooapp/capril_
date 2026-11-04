@@ -77,6 +77,34 @@ export async function soumettreCandidat(data: {
     }
   }
 
+  let docsJsonb: any = null;
+  if (data.candidatId) {
+    try {
+      const candidateDoc = await prisma.identityDocument.findFirst({
+        where: {
+          userId: data.candidatId,
+          docType: { notIn: ["DFE", "RCCM", "NIF", "AGREMENT", "SELFIE"] }
+        },
+        orderBy: { createdAt: "desc" }
+      });
+      if (candidateDoc) {
+        const meta = (candidateDoc.metadata as any) || {};
+        docsJsonb = {
+          docId: candidateDoc.id,
+          docType: candidateDoc.docType,
+          docNumber: candidateDoc.docNumber,
+          scanS3Key: candidateDoc.scanS3Key,
+          versoUrl: meta.versoUrl || null,
+          bulletinsSalaireUrls: Array.isArray(meta.bulletinsSalaireUrls) ? meta.bulletinsSalaireUrls : [],
+          quittanceLoyerUrl: meta.quittanceLoyerUrl || null,
+          status: candidateDoc.status,
+        };
+      }
+    } catch (e) {
+      console.error("[POSTULER ANNONCE] Erreur snapshot docs:", e);
+    }
+  }
+
   const candidature = await prisma.candidature.create({
     data: { 
       logementId: data.logementId,
@@ -87,6 +115,7 @@ export async function soumettreCandidat(data: {
       revenuMensuel: data.revenuMensuel ?? null,
       employeur: data.employeur ?? null,
       tauxEffort, 
+      docsJsonb: docsJsonb ?? undefined,
       statut: "SOUMISE" 
     }
   });
