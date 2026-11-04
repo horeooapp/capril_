@@ -50,15 +50,15 @@ export async function getConversations(): Promise<{ success: boolean; conversati
     const leases = await (prisma as any).lease.findMany({
       where: isTenant
         ? { tenantId: userId, status: "ACTIVE" }
-        : { property: { landlordId: userId }, status: "ACTIVE" },
+        : { landlordId: userId, status: "ACTIVE" },
       include: {
         tenant: { select: { id: true, firstName: true, lastName: true, phone: true } },
         property: {
           select: {
             id: true,
-            title: true,
+            name: true,
             address: true,
-            landlord: { select: { id: true, firstName: true, lastName: true, phone: true } }
+            owner: { select: { id: true, firstName: true, lastName: true, phone: true } }
           }
         },
         messagesBail: {
@@ -74,15 +74,15 @@ export async function getConversations(): Promise<{ success: boolean; conversati
 
     const conversations: ConversationItem[] = leases.map((l: any) => {
       const otherName = isTenant
-        ? (l.property?.landlord ? `${l.property.landlord.firstName} ${l.property.landlord.lastName}` : "Bailleur")
+        ? (l.property?.owner ? `${l.property.owner.firstName} ${l.property.owner.lastName}` : "Bailleur")
         : (l.tenant ? `${l.tenant.firstName} ${l.tenant.lastName}` : "Locataire");
 
-      const otherPhone = isTenant ? l.property?.landlord?.phone : l.tenant?.phone;
+      const otherPhone = isTenant ? l.property?.owner?.phone : l.tenant?.phone;
       const lastMsg = l.messagesBail?.[0];
 
       return {
         leaseId: l.id,
-        propertyTitle: l.property?.title || "Logement",
+        propertyTitle: l.property?.name || "Logement",
         propertyAddress: l.property?.address || "Abidjan, Côte d'Ivoire",
         otherPartyName: otherName,
         otherPartyRole: isTenant ? "PROPRIETAIRE" : "LOCATAIRE",
