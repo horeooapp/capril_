@@ -34,6 +34,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
         if (role === 'TENANT') {
             return [
                 { href: "/mon-espace-locataire", label: "Mon logement", icon: <LayoutDashboard size={18} /> },
+                { href: "/mon-espace-locataire/messages", label: "Messagerie Bailleur", icon: <MessageSquare size={18} /> },
                 { href: "/mon-espace-locataire/leases", label: "Documents", icon: <FileText size={18} /> },
                 { href: "/mon-espace-locataire/receipts", label: "Mes loyers", icon: <Receipt size={18} /> },
                 { href: "/mon-espace-locataire/cie-sodeci", label: "Utilities", icon: <Zap size={18} /> },

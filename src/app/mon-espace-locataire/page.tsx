@@ -32,7 +32,8 @@ import {
     Sparkles,
     Droplets,
     Smartphone,
-    Wifi
+    Wifi,
+    MessageSquare
 } from "lucide-react"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -327,6 +328,13 @@ export default function LocataireDashboardPage() {
                                 : "En attente"}
                         </p>
                     </div>
+                    <Link
+                        href="/mon-espace-locataire/messages"
+                        className="p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/70 text-slate-700 transition-all flex items-center justify-center shadow-xs"
+                        title="Messagerie avec mon bailleur"
+                    >
+                        <MessageSquare size={18} className="text-slate-700" />
+                    </Link>
                     <div className="border-l border-slate-200 pl-3 relative z-50">
                         <NotificationCenter variant="tenant" />
                     </div>
@@ -474,16 +482,25 @@ export default function LocataireDashboardPage() {
                         </div>
                    </div>
 
-                   <div className="flex items-center gap-3 bg-white border border-slate-200/70 p-3 rounded-xl mt-5">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
-                            👤
+                   <div className="bg-white border border-slate-200/70 p-3 rounded-xl mt-5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
+                                👤
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Bailleur désigné</p>
+                                <p className="text-xs font-bold text-slate-800 truncate mt-0.5">
+                                    {lease.landlord?.firstName} {lease.landlord?.lastName}
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Bailleur désigné</p>
-                            <p className="text-xs font-bold text-slate-800 truncate mt-0.5">
-                                {lease.landlord?.firstName} {lease.landlord?.lastName}
-                            </p>
-                        </div>
+                        <Link 
+                            href="/mon-espace-locataire/messages" 
+                            className="mt-2.5 w-full py-1.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/70 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5"
+                        >
+                            <MessageSquare size={12} className="text-emerald-600" />
+                            <span>Envoyer un message</span>
+                        </Link>
                    </div>
                 </BentoItem>
 
@@ -626,22 +643,68 @@ export default function LocataireDashboardPage() {
                     </div>
                 </BentoItem>
 
-                {/* SMALL ACTION CARD: Receipts (3 cols) */}
-                <BentoItem className="md:col-span-3 p-7 flex flex-col justify-between hover:bg-slate-900 hover:text-white transition-colors duration-300 group" delay={0.4}>
-                    <div className="w-10 h-10 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center group-hover:bg-white/10 group-hover:text-white transition-all">
-                        <Receipt size={20} />
+                {/* MESSAGERIE BAILLEUR CARD (6 cols) */}
+                <BentoItem className="md:col-span-6 p-7 flex flex-col justify-between bg-white border border-slate-200/90 group" delay={0.4}>
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200/60 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                <MessageSquare size={12} className="text-amber-600" /> Messagerie Certifiée
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                Actif · Sécurisé
+                            </span>
+                        </div>
+                        <h3 className="text-base font-black text-slate-900 uppercase tracking-tight mb-1">
+                            Discussion avec mon Bailleur
+                        </h3>
+                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                            Échangez en direct avec {lease.landlord ? `${lease.landlord.firstName} ${lease.landlord.lastName}` : "votre bailleur"}. Tous vos messages et signalements sont horodatés et opposables.
+                        </p>
+                        <div className="mt-4 p-3 bg-slate-50/80 rounded-xl border border-slate-100 flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-900 text-amber-400 flex items-center justify-center font-black text-xs shrink-0">
+                                {(lease.landlord?.firstName?.[0] || 'B') + (lease.landlord?.lastName?.[0] || '')}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-slate-800 truncate">
+                                    {lease.landlord ? `${lease.landlord.firstName} ${lease.landlord.lastName}` : "Bailleur désigné"}
+                                </p>
+                                <p className="text-[10px] text-slate-400 truncate">
+                                    Canal ouvert · Reçus et encoches de lecture
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="my-4">
-                        <h3 className="text-sm font-black uppercase tracking-wider mb-1">Quittances</h3>
-                        <p className="text-xs opacity-70 leading-relaxed font-medium">
-                            Téléchargez vos reçus fiscaux et justificatifs horodatés.
+                    <Link 
+                        href="/mon-espace-locataire/messages" 
+                        className="mt-6 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        <MessageSquare size={14} className="text-amber-400" />
+                        <span>Ouvrir la messagerie</span>
+                        <ChevronRight size={14} />
+                    </Link>
+                </BentoItem>
+
+                {/* QUITTANCES CARD (6 cols) */}
+                <BentoItem className="md:col-span-6 p-7 flex flex-col justify-between bg-white border border-slate-200/90 group" delay={0.45}>
+                    <div>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center">
+                                <Receipt size={20} />
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-400">Reçus officiels</span>
+                        </div>
+                        <h3 className="text-base font-black uppercase tracking-wider mb-1 text-slate-900">
+                            Quittances & Justificatifs
+                        </h3>
+                        <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                            Consultez et téléchargez l'ensemble de vos quittances de loyer certifiées, conformes aux exigences administratives et fiscales ivoiriennes.
                         </p>
                     </div>
                     <Link 
                         href="/mon-espace-locataire/receipts" 
-                        className="inline-flex items-center gap-1.5 text-xs font-bold group-hover:text-amber-300 transition-colors"
+                        className="mt-6 w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
                     >
-                        <span>Accéder aux quittances</span>
+                        <span>Accéder à mes quittances</span>
                         <ChevronRight size={14} />
                     </Link>
                 </BentoItem>

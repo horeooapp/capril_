@@ -39,20 +39,21 @@ export async function getConversations(): Promise<{ success: boolean; conversati
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return { success: false, conversations: getDemoConversations("LANDLORD") };
+      return { success: false, conversations: [] };
     }
 
     const userId = session.user.id;
     const userRole = String((session.user as any)?.chosenRole || session.user.role || "").toUpperCase();
     const isTenant = userRole === "TENANT" || userRole === "LOCATAIRE";
 
-    // Trouver les baux rattachés à cet utilisateur
-    const leases = await (prisma as any).lease.findMany({
+    // 1. Trouver les baux rattachés à cet utilisateur
+    let leases = await (prisma as any).lease.findMany({
       where: isTenant
-        ? { tenantId: userId, status: "ACTIVE" }
-        : { landlordId: userId, status: "ACTIVE" },
+        ? { tenantId: userId, status: { notIn: ["CANCELLED", "ARCHIVED"] } }
+        : { landlordId: userId, status: { notIn: ["CANCELLED", "ARCHIVED"] } },
       include: {
         tenant: { select: { id: true, firstName: true, lastName: true, phone: true } },
+        landlord: { select: { id: true, firstName: true, lastName: true, phone: true } },
         property: {
           select: {
             id: true,
@@ -65,19 +66,55 @@ export async function getConversations(): Promise<{ success: boolean; conversati
           orderBy: { dateEnvoi: "desc" },
           take: 1
         }
-      }
+      },
+      orderBy: { updatedAt: "desc" }
     });
 
+    // 2. Si aucun bail avec le rôle présumé, chercher tous les baux où l'utilisateur est soit locataire soit bailleur
     if (!leases || leases.length === 0) {
-      return { success: true, conversations: getDemoConversations(isTenant ? "TENANT" : "LANDLORD") };
+      leases = await (prisma as any).lease.findMany({
+        where: {
+          OR: [
+            { tenantId: userId },
+            { landlordId: userId }
+          ],
+          status: { notIn: ["CANCELLED", "ARCHIVED"] }
+        },
+        include: {
+          tenant: { select: { id: true, firstName: true, lastName: true, phone: true } },
+          landlord: { select: { id: true, firstName: true, lastName: true, phone: true } },
+          property: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              owner: { select: { id: true, firstName: true, lastName: true, phone: true } }
+            }
+          },
+          messagesBail: {
+            orderBy: { dateEnvoi: "desc" },
+            take: 1
+          }
+        },
+        orderBy: { updatedAt: "desc" }
+      });
+    }
+
+    if (!leases || leases.length === 0) {
+      return { success: true, conversations: [] };
     }
 
     const conversations: ConversationItem[] = leases.map((l: any) => {
-      const otherName = isTenant
-        ? (l.property?.owner ? `${l.property.owner.firstName} ${l.property.owner.lastName}` : "Bailleur")
-        : (l.tenant ? `${l.tenant.firstName} ${l.tenant.lastName}` : "Locataire");
+      const userIsTenant = l.tenantId === userId || (isTenant && l.landlordId !== userId);
+      const otherUser = userIsTenant
+        ? (l.landlord || l.property?.owner)
+        : l.tenant;
 
-      const otherPhone = isTenant ? l.property?.owner?.phone : l.tenant?.phone;
+      const otherName = otherUser
+        ? `${otherUser.firstName || ''} ${otherUser.lastName || ''}`.trim() || (userIsTenant ? "Bailleur" : "Locataire")
+        : (userIsTenant ? "Bailleur" : "Locataire");
+
+      const otherPhone = otherUser?.phone;
       const lastMsg = l.messagesBail?.[0];
 
       return {
@@ -85,7 +122,7 @@ export async function getConversations(): Promise<{ success: boolean; conversati
         propertyTitle: l.property?.name || "Logement",
         propertyAddress: l.property?.address || "Abidjan, Côte d'Ivoire",
         otherPartyName: otherName,
-        otherPartyRole: isTenant ? "PROPRIETAIRE" : "LOCATAIRE",
+        otherPartyRole: userIsTenant ? "PROPRIETAIRE" : "LOCATAIRE",
         otherPartyPhone: otherPhone,
         lastMessage: lastMsg?.contenu || "Début de la conversation sécurisée",
         lastMessageDate: lastMsg?.dateEnvoi ? new Date(lastMsg.dateEnvoi).toISOString() : new Date().toISOString(),
@@ -97,8 +134,8 @@ export async function getConversations(): Promise<{ success: boolean; conversati
 
     return { success: true, conversations };
   } catch (error) {
-    console.warn("[MESSAGING] Fallback to demo conversations:", error);
-    return { success: true, conversations: getDemoConversations("LANDLORD") };
+    console.warn("[MESSAGING] Error in getConversations:", error);
+    return { success: false, conversations: [] };
   }
 }
 
@@ -109,8 +146,6 @@ export async function getBailMessages(leaseId: string): Promise<{ success: boole
   try {
     const session = await auth();
     const userId = session?.user?.id || "demo-user";
-    const userRole = String((session?.user as any)?.chosenRole || session?.user?.role || "LANDLORD").toUpperCase();
-    const isTenant = userRole === "TENANT" || userRole === "LOCATAIRE";
 
     const dbMessages = await (prisma as any).messagerieBail.findMany({
       where: { leaseId },
@@ -121,7 +156,12 @@ export async function getBailMessages(leaseId: string): Promise<{ success: boole
     });
 
     if (!dbMessages || dbMessages.length === 0) {
-      return { success: true, messages: getDemoMessages(leaseId, isTenant ? "TENANT" : "LANDLORD") };
+      // Si aucun message en base, vérifier si le bail existe
+      const leaseExists = await (prisma as any).lease.findUnique({ where: { id: leaseId } });
+      if (leaseExists) {
+        return { success: true, messages: [] };
+      }
+      return { success: true, messages: [] };
     }
 
     // Marquer les messages entrants comme LUS (dateLecture)
@@ -147,15 +187,15 @@ export async function getBailMessages(leaseId: string): Promise<{ success: boole
       statut: incomingUnread.some((u: any) => u.id === m.id) ? "LU" : (m.statut as any),
       dateEnvoi: new Date(m.dateEnvoi).toISOString(),
       dateReception: m.dateReception ? new Date(m.dateReception).toISOString() : null,
-      dateLecture: m.dateLecture ? new Date(m.dateLecture).toISOString() : null,
-      senderName: m.expediteur ? `${m.expediteur.firstName} ${m.expediteur.lastName}` : (m.roleExpediteur === "PROPRIO" ? "Bailleur" : "Locataire"),
+      dateLecture: incomingUnread.some((u: any) => u.id === m.id) ? new Date().toISOString() : (m.dateLecture ? new Date(m.dateLecture).toISOString() : null),
+      senderName: m.expediteur ? `${m.expediteur.firstName} ${m.expediteur.lastName}`.trim() : (m.roleExpediteur === "PROPRIO" ? "Bailleur" : "Locataire"),
       isMe: m.expediteurId === userId
     }));
 
     return { success: true, messages };
   } catch (error) {
-    console.warn("[MESSAGING] Fallback to demo messages for lease:", leaseId);
-    return { success: true, messages: getDemoMessages(leaseId, "LANDLORD") };
+    console.warn("[MESSAGING] Error in getBailMessages:", error);
+    return { success: false, messages: [] };
   }
 }
 
@@ -169,45 +209,59 @@ export async function sendBailMessage(leaseId: string, contenu: string): Promise
 
   try {
     const session = await auth();
-    const userId = session?.user?.id || "demo-sender";
-    const userRole = String((session?.user as any)?.chosenRole || session?.user?.role || "LANDLORD").toUpperCase();
+    const userId = session?.user?.id;
+    if (!userId) {
+      return { success: false, error: "Vous devez être connecté pour envoyer un message." };
+    }
+
+    const userRole = String((session?.user as any)?.chosenRole || session?.user?.role || "").toUpperCase();
     const isTenant = userRole === "TENANT" || userRole === "LOCATAIRE";
 
     // Vérifier si le bail existe en base
     let messageRecord: any = null;
-    try {
-      const lease = await (prisma as any).lease.findUnique({ where: { id: leaseId } });
-      if (lease) {
-        messageRecord = await (prisma as any).messagerieBail.create({
-          data: {
-            leaseId,
-            expediteurId: userId,
-            roleExpediteur: isTenant ? "LOCATAIRE" : "PROPRIO",
-            contenu: contenu.trim(),
-            statut: "RECU", // Directement distribué au serveur / boîte de réception (2 encoches grises)
-            dateReception: new Date()
-          }
-        });
+    const lease = await (prisma as any).lease.findUnique({
+      where: { id: leaseId },
+      select: { id: true, tenantId: true, landlordId: true }
+    });
+
+    const isLeaseTenant = lease ? lease.tenantId === userId : isTenant;
+
+    messageRecord = await (prisma as any).messagerieBail.create({
+      data: {
+        leaseId,
+        expediteurId: userId,
+        roleExpediteur: isLeaseTenant ? "LOCATAIRE" : "PROPRIO",
+        contenu: contenu.trim(),
+        statut: "RECU", // Directement distribué au serveur / boîte de réception (2 encoches grises)
+        dateReception: new Date()
+      },
+      include: {
+        expediteur: { select: { firstName: true, lastName: true } }
       }
-    } catch {}
+    });
+
+    const senderName = messageRecord.expediteur
+      ? `${messageRecord.expediteur.firstName} ${messageRecord.expediteur.lastName}`.trim()
+      : (isLeaseTenant ? "Moi (Locataire)" : "Moi (Propriétaire)");
 
     const formattedMessage: ChatMessage = {
-      id: messageRecord?.id || `msg-${Date.now()}`,
+      id: messageRecord.id,
       leaseId,
       expediteurId: userId,
-      roleExpediteur: isTenant ? "LOCATAIRE" : "PROPRIO",
-      contenu: contenu.trim(),
+      roleExpediteur: messageRecord.roleExpediteur,
+      contenu: messageRecord.contenu,
       statut: "RECU", // 2 encoches grises dès réception serveur
-      dateEnvoi: new Date().toISOString(),
-      dateReception: new Date().toISOString(),
+      dateEnvoi: new Date(messageRecord.dateEnvoi).toISOString(),
+      dateReception: new Date(messageRecord.dateReception).toISOString(),
       dateLecture: null,
-      senderName: isTenant ? "Moi (Locataire)" : "Moi (Propriétaire)",
+      senderName,
       isMe: true
     };
 
     revalidatePath("/dashboard/maintenance");
     revalidatePath("/dashboard/messages");
     revalidatePath("/mon-espace-locataire/messages");
+    revalidatePath("/mon-espace-locataire");
 
     return { success: true, message: formattedMessage };
   } catch (error: any) {

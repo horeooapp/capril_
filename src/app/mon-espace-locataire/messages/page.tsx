@@ -8,13 +8,11 @@ export const dynamic = "force-dynamic";
 
 export default async function LocataireMessagesPage() {
   const session = await auth();
-  const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
-  if (!session?.user || activeRole !== "TENANT") {
+  if (!session?.user) {
     redirect("/mon-espace-locataire/login");
   }
 
   const { conversations } = await getConversations();
 
-  return <LocataireMessagesClient conversations={conversations} />;
+  return <LocataireMessagesClient conversations={conversations || []} />;
 }
-

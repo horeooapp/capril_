@@ -112,6 +112,7 @@ export default function MobileMenu({
         if (displayRole === 'TENANT' || displayRole === 'LOCATAIRE') {
             return [
                 { href: "/mon-espace-locataire", label: "Mon Logement", icon: <LayoutDashboard size={18} /> },
+                { href: "/mon-espace-locataire/messages", label: "Messagerie Bailleur", icon: <MessageSquare size={18} /> },
                 { href: "/mon-espace-locataire/receipts", label: "Mes Loyers & Quittances", icon: <Receipt size={18} /> },
                 { href: "/mon-espace-locataire/leases", label: "Documents & Baux", icon: <FileText size={18} /> },
                 { href: "/mon-espace-locataire/cie-sodeci", label: "Factures CIE / SODECI", icon: <Zap size={18} /> },
