@@ -16,7 +16,15 @@ export async function getMarketplaceAnnonces() {
             include: { logement: true },
             orderBy: { publieeAt: 'desc' }
         })
-        return data
+        return data.map((a: any) => {
+            const directImgs = a.logement?.images?.map((i: any) => i.s3Key) || []
+            const parentImgs = a.logement?.parentProperty?.images?.map((i: any) => i.s3Key) || []
+            const combined = [...(a.photosUrls || []), ...directImgs, ...parentImgs].filter(Boolean)
+            return {
+                ...a,
+                photosUrls: combined.length > 0 ? combined : (a.photosUrls || [])
+            }
+        })
     } catch {
         return []
     }
@@ -151,17 +159,34 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
     try {
         const property = await prisma.property.findUnique({
             where: { id: propertyId },
-            include: { annonces: true, leases: true }
+            include: { 
+                annonces: true, 
+                leases: true,
+                images: true,
+                parentProperty: {
+                    include: { images: true }
+                }
+            }
         })
 
         if (!property) return { error: "Propriété introuvable" }
 
         if (isOnline) {
+            const directImages = property.images?.map((img: any) => img.s3Key) || []
+            const parentImages = property.parentProperty?.images?.map((img: any) => img.s3Key) || []
+            const propertyPhotos = [...directImages, ...parentImages].filter(Boolean)
+
             const existingAnnonce = property.annonces?.[0]
             if (existingAnnonce) {
                 await prisma.annonce.update({
                     where: { id: existingAnnonce.id },
-                    data: { statut: "ACTIVE", publieeAt: new Date() }
+                    data: { 
+                        statut: "ACTIVE", 
+                        publieeAt: new Date(),
+                        ...(propertyPhotos.length > 0 && (!existingAnnonce.photosUrls || existingAnnonce.photosUrls.length === 0) 
+                            ? { photosUrls: propertyPhotos } 
+                            : {})
+                    }
                 })
             } else {
                 await prisma.annonce.create({
@@ -171,6 +196,7 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
                         titre: property.name || `Logement ${property.propertyType || ''} à ${property.commune || 'Abidjan'}`.trim(),
                         description: `Superbe logement idéalement situé à ${property.commune || 'Abidjan'} avec ${property.rooms || 2} pièces.`,
                         loyerDemande: property.declaredRentFcfa || (property.leases?.[0]?.rentAmount ? Number(property.leases[0].rentAmount) : 150000),
+                        photosUrls: propertyPhotos,
                         statut: "ACTIVE",
                         publieeAt: new Date()
                     }
@@ -245,6 +271,9 @@ export async function getPublicMarketplaceAnnonces(filters?: {
                 logement: {
                     include: {
                         images: true,
+                        parentProperty: {
+                            include: { images: true }
+                        },
                         leases: {
                             where: {
                                 status: { in: ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'] }
@@ -260,7 +289,15 @@ export async function getPublicMarketplaceAnnonces(filters?: {
             orderBy: orderByClause
         })
 
-        return data
+        return data.map((a: any) => {
+            const directImgs = a.logement?.images?.map((i: any) => i.s3Key) || []
+            const parentImgs = a.logement?.parentProperty?.images?.map((i: any) => i.s3Key) || []
+            const combined = [...(a.photosUrls || []), ...directImgs, ...parentImgs].filter(Boolean)
+            return {
+                ...a,
+                photosUrls: combined.length > 0 ? combined : (a.photosUrls || [])
+            }
+        })
     } catch (e) {
         console.error("Error getPublicMarketplaceAnnonces:", e)
         return []

@@ -487,11 +487,27 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                                 className={`bg-white rounded-[28px] shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200/80 overflow-hidden flex flex-col group ${isLoue ? 'opacity-85' : ''}`}
                             >
                                 <div className="h-56 bg-slate-100 relative overflow-hidden">
-                                    <img 
-                                        src={annonce.photosUrls?.[0] || logement.images?.[0]?.url || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80"}
-                                        alt={annonce.titre}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
+                                    {(() => {
+                                        const mainImg = 
+                                            (annonce.photosUrls && annonce.photosUrls.length > 0 ? annonce.photosUrls[0] : null) ||
+                                            (logement.images && logement.images.length > 0 ? (logement.images.find((img: any) => img.isMain)?.s3Key || logement.images[0]?.s3Key || logement.images[0]?.url) : null) ||
+                                            (logement.parentProperty?.images && logement.parentProperty.images.length > 0 ? (logement.parentProperty.images.find((img: any) => img.isMain)?.s3Key || logement.parentProperty.images[0]?.s3Key) : null) ||
+                                            "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80";
+
+                                        return (
+                                            <img 
+                                                src={mainImg}
+                                                alt={annonce.titre}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    if (!target.src.includes("unsplash")) {
+                                                        target.src = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80";
+                                                    }
+                                                }}
+                                            />
+                                        );
+                                    })()}
                                     <div className="absolute top-4 left-4 flex items-center gap-2">
                                         {isLoue ? (
                                             <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-md">
@@ -567,10 +583,37 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                             <span className="text-[10px] font-black uppercase tracking-widest text-[#FF8200] block mb-1">
                                 Candidature Certifiée QAPRIL
                             </span>
-                            <h3 className="text-2xl font-black tracking-tight">{selectedAnnonce.titre}</h3>
-                            <p className="text-xs text-slate-300 mt-1 font-mono">
-                                Loyer : {formatXof(Number(selectedAnnonce.loyerDemande))} / mois
-                            </p>
+                            <div className="flex items-center gap-4 mt-2">
+                                {(() => {
+                                    const modalImg = 
+                                        (selectedAnnonce.photosUrls && selectedAnnonce.photosUrls.length > 0 ? selectedAnnonce.photosUrls[0] : null) ||
+                                        (selectedAnnonce.logement?.images && selectedAnnonce.logement.images.length > 0 ? (selectedAnnonce.logement.images.find((img: any) => img.isMain)?.s3Key || selectedAnnonce.logement.images[0]?.s3Key) : null) ||
+                                        (selectedAnnonce.logement?.parentProperty?.images && selectedAnnonce.logement.parentProperty.images.length > 0 ? (selectedAnnonce.logement.parentProperty.images.find((img: any) => img.isMain)?.s3Key || selectedAnnonce.logement.parentProperty.images[0]?.s3Key) : null) ||
+                                        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80";
+
+                                    return (
+                                        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white/10 shrink-0 border border-white/20">
+                                            <img 
+                                                src={modalImg} 
+                                                alt={selectedAnnonce.titre} 
+                                                className="w-full h-full object-cover" 
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    if (!target.src.includes("unsplash")) {
+                                                        target.src = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80";
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    );
+                                })()}
+                                <div>
+                                    <h3 className="text-xl font-black tracking-tight">{selectedAnnonce.titre}</h3>
+                                    <p className="text-xs text-slate-300 mt-0.5 font-mono">
+                                        Loyer : {formatXof(Number(selectedAnnonce.loyerDemande))} / mois
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <form onSubmit={handleApplySubmit} className="p-8 space-y-6">
