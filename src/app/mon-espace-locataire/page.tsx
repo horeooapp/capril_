@@ -302,7 +302,7 @@ export default function LocataireDashboardPage() {
             className="max-w-6xl mx-auto px-4 py-8 space-y-8"
         >
             {/* 1. Header & Quick Status */}
-            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)] relative z-40">
                 <div>
                     <div className="flex items-center gap-2 mb-1.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -327,7 +327,7 @@ export default function LocataireDashboardPage() {
                                 : "En attente"}
                         </p>
                     </div>
-                    <div className="border-l border-slate-200 pl-3">
+                    <div className="border-l border-slate-200 pl-3 relative z-50">
                         <NotificationCenter variant="tenant" />
                     </div>
                 </div>

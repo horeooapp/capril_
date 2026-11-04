@@ -60,7 +60,7 @@ export default function NotificationCenter({ variant = 'default' }: { variant?: 
     }
 
     return (
-        <div className="relative">
+        <div className="relative z-50">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`relative p-2 rounded-full transition-colors ${variant === 'tenant' ? 'text-qnavy hover:bg-qnavy/5' : 'text-white hover:bg-white/10'}`}
@@ -76,10 +76,10 @@ export default function NotificationCenter({ variant = 'default' }: { variant?: 
             {isOpen && (
                 <>
                     <div 
-                        className="fixed inset-0 z-10" 
+                        className="fixed inset-0 z-[999]" 
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl z-20 overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl z-[1000] overflow-hidden border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className={`${variant === 'tenant' ? 'bg-qnavy' : 'bg-orange-500'} p-4`}>
                             <h3 className="text-white font-black uppercase tracking-tight">Notifications</h3>
                         </div>
