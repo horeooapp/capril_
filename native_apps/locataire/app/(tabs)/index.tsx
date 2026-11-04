@@ -36,10 +36,17 @@ import {
   LogOut,
   User,
   Sparkles,
+  Zap,
+  Droplets,
+  Smartphone,
+  Wifi,
+  Check,
+  Copy,
 } from 'lucide-react-native';
 
 type LocScreen =
   | 'accueil'
+  | 'factures'
   | 'payer'
   | 'quittances'
   | 'caution'
@@ -50,6 +57,7 @@ type LocScreen =
 
 const MENU_ITEMS = [
   { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes CDC-CI', icon: Home },
+  { id: 'factures' as LocScreen, label: 'Régler mes factures', desc: 'Eau (SODECI), Élec (CIE), Téléphone, Internet', icon: Zap },
   { id: 'payer' as LocScreen, label: 'Payer mon loyer', desc: 'Wave, Orange, MTN, Moov et Carte bancaire', icon: CreditCard },
   { id: 'quittances' as LocScreen, label: 'Mes quittances', desc: 'Historique certifié et téléchargement PDF', icon: FileText },
   { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Séquestre CDC-CI et conformité légale', icon: ShieldCheck },
@@ -76,6 +84,21 @@ export default function LocatairePrototypeScreen() {
   const [shareRev, setShareRev] = useState(true);
   const [shareGarant, setShareGarant] = useState(true);
   const [shareScore, setShareScore] = useState(false);
+
+  // States for Utilities / Factures (Eau, Elec, Tel, Internet)
+  const [factureCat, setFactureCat] = useState<'EAU' | 'ELEC' | 'TEL' | 'NET'>('EAU');
+  const [factureElecMode, setFactureElecMode] = useState<'POSTPAYE' | 'PREPAYE'>('PREPAYE');
+  const [factureIdentifiant, setFactureIdentifiant] = useState('');
+  const [factureMontant, setFactureMontant] = useState(10000);
+  const [factureOp, setFactureOp] = useState<'Wave' | 'Orange Money' | 'MTN MoMo' | 'Moov'>('Wave');
+  const [facturePaying, setFacturePaying] = useState(false);
+  const [factureReceipt, setFactureReceipt] = useState<any>(null);
+  const [factureHistory, setFactureHistory] = useState<any[]>([
+    { id: 'f-1', cat: 'EAU', service: 'SODECI', ref: 'SOD-892301', montant: 14500, date: '02 Nov 2026', statut: 'PAYEE' },
+    { id: 'f-2', cat: 'ELEC', service: 'CIE Compteur Prépayé', ref: '1409281729', montant: 10000, date: '28 Oct 2026', statut: 'PAYEE', token: '4829-1029-4819-3019' },
+    { id: 'f-3', cat: 'NET', service: 'Orange Livebox Fibre', ref: 'BOX-99201', montant: 25000, date: '15 Oct 2026', statut: 'PAYEE' },
+  ]);
+  const [copiedToken, setCopiedToken] = useState(false);
 
   const router = useRouter();
 
@@ -291,6 +314,62 @@ export default function LocatairePrototypeScreen() {
                 </Pressable>
                 <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
                   <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            
+            {/* HERO FACTURES & FLUIDES (Eau, Électricité, Téléphone, Internet) */}
+            <View style={[styles.card, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', borderWidth: 1.5 }]}>
+              <View style={styles.rowBetween}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Zap color="#E67E22" size={16} />
+                  <Text style={[styles.label, { marginBottom: 0 }]}>RÈGLEMENT FACTURES & FLUIDES</Text>
+                </View>
+                <Pressable onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}>
+                  <Text style={[styles.cardSub, { color: '#2C3E6B', fontWeight: '700' }]}>Tout régler ›</Text>
+                </Pressable>
+              </View>
+
+              <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+                Réglez vos factures d'eau, d'électricité, recharges mobiles et box fibre.
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable
+                  style={[styles.factureQuickBtn, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}
+                  onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}
+                >
+                  <Droplets color="#0284C7" size={20} />
+                  <Text style={[styles.factureQuickLabel, { color: '#0369A1' }]}>Eau</Text>
+                  <Text style={styles.factureQuickSub}>SODECI</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.factureQuickBtn, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}
+                  onPress={() => { setFactureCat('ELEC'); setScreen('factures'); }}
+                >
+                  <Zap color="#D97706" size={20} />
+                  <Text style={[styles.factureQuickLabel, { color: '#B45309' }]}>Élec</Text>
+                  <Text style={styles.factureQuickSub}>CIE / Carte</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.factureQuickBtn, { backgroundColor: '#DCFCE7', borderColor: '#BBF7D0' }]}
+                  onPress={() => { setFactureCat('TEL'); setScreen('factures'); }}
+                >
+                  <Smartphone color="#16A34A" size={20} />
+                  <Text style={[styles.factureQuickLabel, { color: '#15803D' }]}>Mobile</Text>
+                  <Text style={styles.factureQuickSub}>Crédit/Pass</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.factureQuickBtn, { backgroundColor: '#EEF2FF', borderColor: '#E0E7FF' }]}
+                  onPress={() => { setFactureCat('NET'); setScreen('factures'); }}
+                >
+                  <Wifi color="#4F46E5" size={20} />
+                  <Text style={[styles.factureQuickLabel, { color: '#4338CA' }]}>Internet</Text>
+                  <Text style={styles.factureQuickSub}>Fibre / 4G</Text>
                 </Pressable>
               </View>
             </View>
@@ -1126,5 +1205,68 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 26,
     padding: 20,
     gap: 10,
+  },
+  factureQuickBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  factureQuickLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 4,
+  },
+  factureQuickSub: {
+    fontSize: 9,
+    color: '#6B7280',
+    marginTop: 1,
+  },
+  factureCatBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    borderRadius: 14,
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  factureCatBtnActive: {
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
+  },
+  factureCatLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#1A1D26',
+    marginTop: 4,
+  },
+  factureCatLabelActive: {
+    color: '#fff',
+  },
+  factureCatSub: {
+    fontSize: 9,
+    color: '#6B7280',
+    marginTop: 1,
+  },
+  factureCatSubActive: {
+    color: '#E5E7EB',
+  },
+  factureInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#1A1D26',
+    marginTop: 6,
+    fontFamily: 'monospace',
   },
 });
