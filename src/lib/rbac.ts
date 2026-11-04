@@ -29,9 +29,11 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
     // 1. Locataire : Redirigé systématiquement vers /mon-espace-locataire
     TENANT: [],
 
-    // 2. Propriétaire : Gestion patrimoniale directe uniquement
+    // 2. Propriétaire : Gestion patrimoniale directe et mandats confiés aux agences
     LANDLORD: [
         '/dashboard',
+        '/dashboard/mandates',
+        '/dashboard/biens-sous-mandat',
         '/dashboard/properties',
         '/dashboard/leases',
         '/dashboard/receipts',
@@ -52,9 +54,10 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
         '/dashboard/manual',
     ],
 
-    // 3. Agence Agréée : Gestion déléguée, mandats, CRG, équipe et observatoire
+    // 3. Agence Agréée : Gestion déléguée, biens sous mandat, CRG, équipe et observatoire
     AGENCY: [
         '/dashboard',
+        '/dashboard/biens-sous-mandat',
         '/dashboard/mandates',
         '/dashboard/properties',
         '/dashboard/leases',
@@ -82,6 +85,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
     // 4. Démarcheur / Intermédiaire : Mandats de prospection, candidatures, commissions
     BROKER: [
         '/dashboard',
+        '/dashboard/biens-sous-mandat',
         '/dashboard/mandates',
         '/dashboard/properties',
         '/dashboard/matching',

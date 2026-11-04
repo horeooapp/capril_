@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-// Comprehensive base cookie names
-const BASE_COOKIE_NAMES = [
+// Liste des cookies critiques d'authentification Auth.js / NextAuth
+const KNOWN_AUTH_COOKIE_PREFIXES = [
     "authjs.session-token",
     "__Secure-authjs.session-token",
     "next-auth.session-token",
@@ -15,48 +15,84 @@ const BASE_COOKIE_NAMES = [
     "next-auth.callback-url",
     "__Secure-authjs.callback-url",
     "__Secure-next-auth.callback-url",
-    "authjs.pkce.code_verifier",
-    "__Secure-authjs.pkce.code_verifier",
-    "authjs.state",
-    "__Secure-authjs.state",
-    "authjs.nonce",
-    "__Secure-authjs.nonce",
-    "qapril_type",
-    "userToken",
-    "userProfileRole",
-    "qapril_selected_profile",
-    "qapril_consent_answered",
-    "remember_role",
+    "qapril_session",
+    "session",
+    "token",
 ];
 
-// Generate all possible chunk variations (.0 to .9)
-function getAllCookieNamesToDelete(incomingNames: string[] = []): Set<string> {
+function getAllCookieNamesToDelete(incomingNames: string[]): string[] {
     const set = new Set<string>();
 
-    // Add all incoming cookies from the request
+    for (const prefix of KNOWN_AUTH_COOKIE_PREFIXES) {
+        set.add(prefix);
+        // NextAuth v5 chunked cookies (chunk 0 à 9)
+        for (let i = 0; i <= 9; i++) {
+            set.add(`${prefix}.${i}`);
+        }
+    }
+
+    // Ajouter tous les cookies reçus dans la requête qui correspondent à un motif d'auth
     for (const name of incomingNames) {
-        if (name && name.trim()) {
-            set.add(name.trim());
+        if (
+            KNOWN_AUTH_COOKIE_PREFIXES.some(prefix => name.startsWith(prefix)) ||
+            name.toLowerCase().includes("session") ||
+            name.toLowerCase().includes("auth") ||
+            name.toLowerCase().includes("csrf")
+        ) {
+            set.add(name);
         }
     }
 
-    // Add base names and chunk variations
-    for (const base of BASE_COOKIE_NAMES) {
-        set.add(base);
-        for (let i = 0; i < 10; i++) {
-            set.add(`${base}.${i}`);
-        }
-    }
-
-    return set;
+    return Array.from(set);
 }
 
-function purgeCookiesOnResponse(response: NextResponse, req: Request) {
-    // 1. En-têtes W3C de purge de session et cache navigateur
+function getPublicBaseUrl(req: Request): { baseUrl: string; hostname: string; isHttps: boolean } {
+    const forwardedHost = req.headers.get("x-forwarded-host");
+    const rawHost = forwardedHost || req.headers.get("host") || "";
+    const cleanHost = rawHost.split(":")[0];
+    const forwardedProto = req.headers.get("x-forwarded-proto");
+    const url = new URL(req.url);
+
+    // Si l'hôte est une adresse interne de conteneur Docker (ex: 0.0.0.0, 127.0.0.1)
+    const isInternal = !cleanHost || cleanHost === "0.0.0.0" || cleanHost === "127.0.0.1" || cleanHost === "localhost";
+    
+    let hostname = cleanHost;
+    let proto = forwardedProto || (url.protocol.startsWith("https") ? "https" : "http");
+    let port = "";
+
+    if (isInternal) {
+        // En production, utiliser l'URL publique de QAPRIL
+        if (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes("0.0.0.0")) {
+            const parsed = new URL(process.env.NEXTAUTH_URL);
+            hostname = parsed.hostname;
+            proto = parsed.protocol.replace(":", "");
+            port = parsed.port ? `:${parsed.port}` : "";
+        } else if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("0.0.0.0")) {
+            const parsed = new URL(process.env.NEXT_PUBLIC_APP_URL);
+            hostname = parsed.hostname;
+            proto = parsed.protocol.replace(":", "");
+            port = parsed.port ? `:${parsed.port}` : "";
+        } else {
+            hostname = "www.qapril.net";
+            proto = "https";
+            port = "";
+        }
+    } else {
+        if (rawHost.includes(":") && !["80", "443"].includes(rawHost.split(":")[1])) {
+            port = `:${rawHost.split(":")[1]}`;
+        }
+    }
+
+    const baseUrl = `${proto}://${hostname}${port}`;
+    return { baseUrl, hostname, isHttps: proto === "https" };
+}
+
+function purgeCookiesOnResponse(response: NextResponse, req: Request): NextResponse {
+    // En-tête officiel W3C pour vider le cache navigateur, le stockage et les cookies
     response.headers.set("Clear-Site-Data", '"cache", "cookies", "storage"');
     response.headers.set(
         "Cache-Control",
-        "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+        "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0"
     );
     response.headers.set("Pragma", "no-cache");
     response.headers.set("Expires", "0");
@@ -69,9 +105,7 @@ function purgeCookiesOnResponse(response: NextResponse, req: Request) {
         .filter(Boolean);
 
     const allNames = getAllCookieNamesToDelete(incomingNames);
-    const url = new URL(req.url);
-    const hostname = url.hostname;
-    const isHttps = url.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https";
+    const { hostname, isHttps } = getPublicBaseUrl(req);
 
     for (const name of allNames) {
         // Expiration standard (Host-only, requis pour les cookies __Host-)
@@ -107,7 +141,7 @@ function purgeCookiesOnResponse(response: NextResponse, req: Request) {
         });
 
         // Pour les domaines avec sous-domaines (ex: qapril.net et www.qapril.net)
-        if (!name.startsWith("__Host-") && hostname && hostname !== "localhost" && hostname !== "127.0.0.1") {
+        if (!name.startsWith("__Host-") && hostname && !hostname.includes("0.0.0.0") && hostname !== "localhost" && hostname !== "127.0.0.1") {
             const rootDomain = hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             try {
                 response.cookies.set(name, "", {
@@ -167,7 +201,10 @@ export async function GET(req: Request) {
 
     const url = new URL(req.url);
     const callbackUrl = url.searchParams.get("callbackUrl") || "/";
-    const redirectTarget = new URL(callbackUrl, req.url);
+    const { baseUrl } = getPublicBaseUrl(req);
+
+    // Détermination de l'URL absolue publique pour la redirection (jamais 0.0.0.0)
+    const redirectTarget = new URL(callbackUrl, baseUrl);
 
     // Redirection 303 See Other pour forcer un GET sans cache vers la cible
     const redirectResponse = NextResponse.redirect(redirectTarget, 303);

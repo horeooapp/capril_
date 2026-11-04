@@ -632,7 +632,10 @@ export default function BailleurAndAgencePrototypeScreen() {
             {bTab === 'mandats' && (
               <View style={styles.sectionGap}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.h1}>Mandats & Délégations</Text>
+                  <View style={{ flex: 1, paddingRight: 8 }}>
+                    <Text style={styles.h1}>Mes Mandats de Gestion</Text>
+                    <Text style={styles.subMuted}>Biens confiés en gestion locative aux agences agréées (Mandats donnés)</Text>
+                  </View>
                   <Pressable style={styles.pillGold} onPress={() => setMandatModal(true)}>
                     <Text style={styles.pillGoldText}>+ Confier un bien</Text>
                   </Pressable>
@@ -640,13 +643,13 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <View style={styles.card}>
                   <Text style={styles.boldText}>Agence Riviera · AGR-2021-0133 (Agence agréée)</Text>
                   <Text style={styles.subMuted}>
-                    Villa Marcory · Substitution totale et exclusive (RG-MAN-01). Vous êtes en lecture seule ; collaborateurs : code BAI-007.
+                    Villa Marcory · Substitution totale et exclusive (RG-MAN-01) · Honoraires 8 % sur loyers perçus. Vous êtes en lecture seule ; collaborateurs : code BAI-007.
                   </Text>
                 </View>
                 <View style={styles.card}>
                   <Text style={styles.boldText}>Kouadio Ferdinand · Intermédiaire (D-2026-022)</Text>
                   <Text style={styles.subMuted}>
-                    Cour Yopougon · Délégation partielle (quittances, encaissement, relances — jamais la modification du bail · RG-DEL-01).
+                    Cour Yopougon · Délégation partielle (quittances, encaissement, relances — jamais la modification du bail · RG-DEL-01) · Honoraires 8 %.
                   </Text>
                 </View>
               </View>

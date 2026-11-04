@@ -51,7 +51,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
         if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(role)) {
             return [
                 { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
-                { href: "/dashboard/mandates", label: "Mandats Prospection", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/biens-sous-mandat", label: "Biens sous mandat", icon: <Building2 size={18} /> },
                 { href: "/dashboard/matching", label: "Candidatures Locataires", icon: <User size={18} /> },
                 { href: "/dashboard/marketplace", label: "Marketplace & Annonces", icon: <Store size={18} /> },
                 { href: "/dashboard/properties", label: "Biens Confiés", icon: <Building2 size={18} /> },
@@ -71,7 +71,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
 
             const allLinks = [
                 { href: "/dashboard", label: "Tableau de bord", icon: <LayoutDashboard size={18} />, id: "READ_DASHBOARD" },
-                { href: "/dashboard/mandates", label: "Mandats gestion", icon: <ClipboardList size={18} />, id: "MANAGE_MANDATES" },
+                { href: "/dashboard/biens-sous-mandat", label: "Biens sous mandat", icon: <Building2 size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/properties", label: "Biens en gestion", icon: <Building2 size={18} />, id: "MANAGE_PROPERTIES" },
                 { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} />, id: "MANAGE_MANDATES" },
                 { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} />, id: "MANAGE_PROPERTIES" },
@@ -102,7 +102,8 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             { href: "/dashboard", label: "Synthèse", icon: <LayoutDashboard size={18} /> },
             { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
             { href: "/dashboard/properties", label: "Mes Biens", icon: <Building2 size={18} /> },
-            { href: "/dashboard/leases", label: "Mes Baux", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard/mandates", label: "Mes Mandats de Gestion", icon: <ClipboardList size={18} /> },
+            { href: "/dashboard/leases", label: "Mes Baux", icon: <FileText size={18} /> },
             { href: "/dashboard/receipts", label: "Loyers & Quittances", icon: <Receipt size={18} /> },
             { href: "/dashboard/disputes", label: "Impayés & Contentieux", icon: <Scale size={18} /> },
             { href: "/dashboard/inspections", label: "États des lieux (EDL)", icon: <MapPin size={18} /> },

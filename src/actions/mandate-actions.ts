@@ -57,13 +57,34 @@ export async function createMandate(input: CreateMandateInput) {
             return { error: "La commission de gestion ne peut excéder le plafond légal de 15%." };
         }
 
-        const mandateRef = await generateMandateRef(session.user.id);
+        // Vérification de la propriété du bien
+        const property = await prisma.property.findUnique({
+            where: { id: input.propertyId },
+            select: { id: true, ownerUserId: true, address: true }
+        });
+
+        if (!property) {
+            return { error: "Bien immobilier introuvable." };
+        }
+
+        const isOwner = property.ownerUserId === session.user.id;
+        const isAdmin = ADMIN_ROLES.includes(userRole);
+
+        // Déterminer l'agence / agent mandataire
+        let assignedAgentId: string | null = null;
+        if (input.agentId) {
+            assignedAgentId = input.agentId;
+        } else if (!isOwner) {
+            assignedAgentId = session.user.id;
+        }
+
+        const mandateRef = await generateMandateRef(assignedAgentId || session.user.id);
         
         const mandate = await prisma.mandate.create({
             data: {
                 mandateRef,
                 propertyId: input.propertyId,
-                agentUserId: session.user.id,
+                agentUserId: assignedAgentId,
                 mandateType: input.mandateType,
                 commissionPct: input.commissionPct !== undefined ? input.commissionPct : 8,
                 commissionFixed: input.commissionFixed ? Number(input.commissionFixed) : null,
@@ -76,7 +97,7 @@ export async function createMandate(input: CreateMandateInput) {
                 ],
                 startDate: new Date(input.startDate),
                 endDate: input.endDate ? new Date(input.endDate) : null,
-                status: MandateStatus.DRAFT
+                status: MandateStatus.ACTIVE
             }
         });
 
@@ -92,6 +113,7 @@ export async function createMandate(input: CreateMandateInput) {
         }).catch(() => {});
 
         revalidatePath(`/dashboard/mandates`);
+        revalidatePath(`/dashboard/biens-sous-mandat`);
         return { success: true, mandateId: mandate.id, mandateRef };
 
     } catch (error: unknown) {
@@ -467,3 +489,42 @@ export async function deleteMandate(mandateId: string) {
     }
 }
 
+
+
+/**
+ * Récupère les agences immobilières et intermédiaires certifiés disponibles pour mandat
+ */
+export async function getAvailableAgencies() {
+    try {
+        const agencies = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { role: Role.AGENCY },
+                    { role: Role.NON_CERTIFIED_AGENT }
+                ]
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                phone: true,
+                avatarUrl: true,
+                companyRegNumber: true,
+                isCertified: true,
+                legalEntity: {
+                    select: {
+                        companyName: true
+                    }
+                }
+            },
+            take: 50,
+            orderBy: { createdAt: "desc" }
+        });
+
+        return { success: true, agencies };
+    } catch (error) {
+        console.error("Erreur getAvailableAgencies:", error);
+        return { success: false, agencies: [] };
+    }
+}

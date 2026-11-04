@@ -127,7 +127,7 @@ export default function MobileMenu({
         if (['INTERMEDIARY', 'INTERMEDIAIRE', 'CHAMPION', 'NON_CERTIFIED_AGENT', 'AGENCE_NON_AGREE', 'AGENCY_NON_AGREE'].includes(displayRole)) {
             return [
                 { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
-                { href: "/dashboard/mandates", label: "Mandats Prospection", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/biens-sous-mandat", label: "Biens sous mandat", icon: <Building2 size={18} /> },
                 { href: "/dashboard/matching", label: "Candidatures Locataires", icon: <User size={18} /> },
                 { href: "/dashboard/marketplace", label: "Marketplace & Annonces", icon: <Store size={18} /> },
                 { href: "/dashboard/properties", label: "Biens Confiés", icon: <Building2 size={18} /> },
@@ -143,7 +143,7 @@ export default function MobileMenu({
         if (['AGENCY', 'AGENCE_AGREE', 'AGENCY_AGREE'].includes(displayRole)) {
             return [
                 { href: "/dashboard", label: "Tableau de Bord", icon: <LayoutDashboard size={18} /> },
-                { href: "/dashboard/mandates", label: "Mandats Gestion", icon: <ClipboardList size={18} /> },
+                { href: "/dashboard/biens-sous-mandat", label: "Biens sous mandat", icon: <Building2 size={18} /> },
                 { href: "/dashboard/properties", label: "Biens en Gestion", icon: <Building2 size={18} /> },
                 { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} /> },
                 { href: "/dashboard/agenda", label: "Agenda & Visites", icon: <CalendarDays size={18} /> },
@@ -163,6 +163,7 @@ export default function MobileMenu({
         return [
             { href: "/dashboard", label: "Vue Synthèse", icon: <LayoutDashboard size={18} /> },
             { href: "/dashboard/properties", label: "Mes Biens & Immeubles", icon: <Building2 size={18} /> },
+            { href: "/dashboard/mandates", label: "Mes Mandats de Gestion", icon: <ClipboardList size={18} /> },
             { href: "/dashboard/leases", label: "Baux & Contrats", icon: <FileText size={18} /> },
             { href: "/dashboard/receipts", label: "Quittances & Loyers", icon: <Receipt size={18} /> },
             { href: "/dashboard/disputes", label: "Contentieux & Recouvrement", icon: <Scale size={18} /> },

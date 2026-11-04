@@ -45,8 +45,8 @@ export default function AgencePrototypeHomeScreen() {
           {(
             [
               ['home', 'Accueil'],
-              ['biens', 'Portefeuille (BAI-NNN)'],
-              ['mandants', 'Mandants'],
+              ['biens', 'Biens sous mandat'],
+              ['mandants', 'Bailleurs mandants'],
               ['ext', 'Bail externe → DGI (ADD-23)'],
               ['flux', 'Reversements (− 8 %)'],
               ['verif', 'Visites Niv. 4 (15 000 F)'],
@@ -110,14 +110,15 @@ export default function AgencePrototypeHomeScreen() {
 
         {aTab === 'biens' && (
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
-            <Text style={styles.h1}>Portefeuille multi-bailleurs</Text>
+            <Text style={styles.h1}>Biens gérés sous mandat (Mandats reçus)</Text>
+            <Text style={styles.subMuted}>Biens et lots immobiliers confiés à votre agence par mandat de gestion.</Text>
             {mandants.map((m) => (
               <View key={m.id} style={styles.card}>
                 <Text style={styles.boldText}>
-                  Bailleur : {roleView === 'collab' && m.mask ? m.bai : m.nom}
+                  Bailleur mandant : {roleView === 'collab' && m.mask ? m.bai : m.nom}
                 </Text>
                 <Text style={styles.subMuted}>
-                  Mandat {m.ref} · {roleView === 'collab' && m.mask ? 'Identité masquée (RG-CONF-04)' : `Code : ${m.bai}`}
+                  Mandat {m.ref} · {roleView === 'collab' && m.mask ? 'Identité masquée (RG-CONF-04)' : `Code bailleur : ${m.bai}`} · Encaissement : {m.enc.toLocaleString('fr-FR')} F
                 </Text>
               </View>
             ))}

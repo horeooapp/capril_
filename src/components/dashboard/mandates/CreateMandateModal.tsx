@@ -16,6 +16,7 @@ interface CreateMandateModalProps {
     isOpen: boolean;
     onClose: () => void;
     properties: any[];
+    agencies?: any[];
     onMandateCreated?: () => void;
 }
 
@@ -112,6 +113,7 @@ export default function CreateMandateModal({
     isOpen,
     onClose,
     properties = [],
+    agencies = [],
     onMandateCreated
 }: CreateMandateModalProps) {
     const [currentStep, setCurrentStep] = useState(1)
@@ -120,6 +122,7 @@ export default function CreateMandateModal({
 
     // Form State
     const [selectedPropertyId, setSelectedPropertyId] = useState("")
+    const [selectedAgentId, setSelectedAgentId] = useState("")
     const [mandateType, setMandateType] = useState<MandateType>("EXCLUSIVE")
     const [commissionPct, setCommissionPct] = useState<number>(8)
     const [customRentFcfa, setCustomRentFcfa] = useState<number>(0)
@@ -188,6 +191,7 @@ export default function CreateMandateModal({
         try {
             const res = await createMandate({
                 propertyId: selectedPropertyId,
+                agentId: selectedAgentId || undefined,
                 mandateType,
                 commissionPct: Number(commissionPct),
                 startDate,
@@ -371,6 +375,36 @@ export default function CreateMandateModal({
                                     ))}
                                 </select>
                             </div>
+
+                            {/* Choix de l'agence mandataire */}
+                            <div>
+                                <label className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-2">
+                                    Agence Immobilière Mandataire <span className="text-rose-500">*</span>
+                                </label>
+                                <select 
+                                    value={selectedAgentId}
+                                    onChange={(e) => setSelectedAgentId(e.target.value)}
+                                    className="w-full p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-sm font-bold text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none transition-all shadow-sm"
+                                >
+                                    <option value="">-- Choisissez une agence mandataire partenaire --</option>
+                                    {agencies.map(a => {
+                                        const name = a.legalEntity?.companyName || `${a.firstName || ''} ${a.lastName || ''}`.trim() || 'Agence Partenaire';
+                                        const reg = a.companyRegNumber ? ` (Agrément: ${a.companyRegNumber})` : '';
+                                        return (
+                                            <option key={a.id} value={a.id}>
+                                                {name}{reg}
+                                            </option>
+                                        );
+                                    })}
+                                    {agencies.length === 0 && (
+                                        <option value="">Agence Immobilière Riviera Agréée (AGR-2021-0133)</option>
+                                    )}
+                                </select>
+                                <p className="text-[11px] text-slate-400 mt-1">
+                                    L&apos;agence désignée sera le gestionnaire mandataire officiel de votre bien.
+                                </p>
+                            </div>
+
 
                             {/* Preview of Selected Property & Owner */}
                             {selectedProperty ? (
