@@ -104,6 +104,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             { href: "/dashboard/properties", label: "Mes Biens", icon: <Building2 size={18} /> },
             { href: "/dashboard/mandates", label: "Mes Mandats de Gestion", icon: <ClipboardList size={18} /> },
             { href: "/dashboard/leases", label: "Mes Baux", icon: <FileText size={18} /> },
+            { href: "/dashboard/matching", label: "Candidatures Reçues", icon: <User size={18} /> },
             { href: "/dashboard/receipts", label: "Loyers & Quittances", icon: <Receipt size={18} /> },
             { href: "/dashboard/disputes", label: "Impayés & Contentieux", icon: <Scale size={18} /> },
             { href: "/dashboard/inspections", label: "États des lieux (EDL)", icon: <MapPin size={18} /> },

@@ -246,7 +246,7 @@ export async function createLease(data: {
                 data: {
                     userId: tenantId,
                     title: "🎉 Contrat de bail prêt à signer !",
-                    message: `Le propriétaire a validé votre bail (${leaseRef}). Votre code de signature électronique est : ${signingOtp}.`,
+                    content: `Le propriétaire a validé votre bail (${leaseRef}). Votre code de signature électronique est : ${signingOtp}.`,
                     type: "BAIL_CREE",
                     link: signatureUrl
                 }
@@ -305,7 +305,7 @@ export async function createLease(data: {
         // 11. Multi-Channel Notifications to Propriétaire (Landlord)
         const ownerUser = await prisma.user.findUnique({
             where: { id: ownerId },
-            select: { name: true, firstName: true, lastName: true, email: true, phone: true }
+            select: { firstName: true, lastName: true, email: true, phone: true }
         });
 
         // a) In-App Notification to Landlord
@@ -313,7 +313,7 @@ export async function createLease(data: {
             data: {
                 userId: ownerId,
                 title: "✅ Contrat de bail généré et transmis",
-                message: `Le contrat de bail (${leaseRef}) pour ${bienNom} a été généré et notifié au locataire (${tenantDisplayName}) par WhatsApp et Email.`,
+                content: `Le contrat de bail (${leaseRef}) pour ${bienNom} a été généré et notifié au locataire (${tenantDisplayName}) par WhatsApp et Email.`,
                 type: "BAIL_TRANSMIS",
                 link: `/dashboard/leases/${lease.id}`
             }

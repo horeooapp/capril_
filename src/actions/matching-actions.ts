@@ -16,17 +16,12 @@ export async function getPendingCandidatures() {
         })
         const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role
 
-        let logementCondition: any = {}
-        if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
-            logementCondition = { ownerUserId: session.user.id }
-        } else {
-            logementCondition = {
-                OR: [
-                    { ownerUserId: session.user.id },
-                    { managedByUserId: session.user.id }
-                ]
-            }
-        }
+        const logementCondition = {
+            OR: [
+                { ownerUserId: session.user.id },
+                { managedByUserId: session.user.id }
+            ]
+        };
 
         const candidatures = await prisma.candidature.findMany({
             where: {
@@ -61,17 +56,12 @@ export async function getAcceptedCandidatures() {
         })
         const activeRole = fullUser?.capaciteActive || (session.user as any)?.chosenRole || fullUser?.role
 
-        let logementCondition: any = {}
-        if (['LANDLORD', 'LANDLORD_PRO', 'PROPRIETAIRE'].includes(activeRole)) {
-            logementCondition = { ownerUserId: session.user.id }
-        } else {
-            logementCondition = {
-                OR: [
-                    { ownerUserId: session.user.id },
-                    { managedByUserId: session.user.id }
-                ]
-            }
-        }
+        const logementCondition = {
+            OR: [
+                { ownerUserId: session.user.id },
+                { managedByUserId: session.user.id }
+            ]
+        };
 
         const candidatures = await prisma.candidature.findMany({
             where: {
@@ -182,7 +172,7 @@ export async function processCandidature(
                     data: {
                         userId: candidature.candidatId,
                         title: "🎉 Candidature acceptée & Contrat de bail prêt !",
-                        message: `Le propriétaire a accepté votre candidature pour ${bienNom} et a initié votre contrat de bail.`,
+                        content: `Le propriétaire a accepté votre candidature pour ${bienNom} et a initié votre contrat de bail.`,
                         type: "BAIL_CREE",
                         link: "/mon-espace-locataire/leases"
                     }
@@ -239,7 +229,7 @@ export async function processCandidature(
                     data: {
                         userId: candidature.candidatId,
                         title: "Information demandée sur votre candidature",
-                        message: `Le propriétaire de ${bienNom} vous a envoyé une demande : "${complementTexte}".`,
+                        content: `Le propriétaire de ${bienNom} vous a envoyé une demande : "${complementTexte}".`,
                         type: "INFO_CANDIDATURE",
                         link: "/mon-espace-locataire/marketplace"
                     }
@@ -290,7 +280,7 @@ export async function processCandidature(
                     data: {
                         userId: candidature.candidatId,
                         title: "Mise à jour de votre candidature",
-                        message: `Votre candidature pour le bien ${bienNom} n'a pas été retenue pour cette fois.`,
+                        content: `Votre candidature pour le bien ${bienNom} n'a pas été retenue pour cette fois.`,
                         type: "CANDIDATURE_REJETEE",
                         link: "/mon-espace-locataire/marketplace"
                     }

@@ -10,11 +10,15 @@ export async function getNotifications() {
 
     if (!userId) return []
 
-    return await prisma.notification.findMany({
+    const notifs = await prisma.notification.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
         take: 20
     })
+    return notifs.map(n => ({
+        ...n,
+        message: n.content
+    }))
 }
 
 export async function markAsRead(notificationId: string) {

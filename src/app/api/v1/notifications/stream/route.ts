@@ -32,7 +32,7 @@ export async function GET(req: Request) {
                             take: 20
                         });
                         
-                        const payload = `data: ${JSON.stringify(notifications)}\n\n`;
+                        const payload = `data: ${JSON.stringify(notifications.map(n => ({ ...n, message: n.content })))}\n\n`;
                         controller.enqueue(encoder.encode(payload));
                     } catch (e) {
                         console.error("[SSE] Erreur requête initiale:", e);
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
                                 take: 20
                             });
                             
-                            const payload = `data: ${JSON.stringify(allNotifications)}\n\n`;
+                            const payload = `data: ${JSON.stringify(allNotifications.map(n => ({ ...n, message: n.content })))}\n\n`;
                             controller.enqueue(encoder.encode(payload));
                         }
                         

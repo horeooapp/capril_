@@ -36,6 +36,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
         '/dashboard/biens-sous-mandat',
         '/dashboard/properties',
         '/dashboard/leases',
+        '/dashboard/matching',
         '/dashboard/receipts',
         '/dashboard/disputes',
         '/dashboard/inspections',

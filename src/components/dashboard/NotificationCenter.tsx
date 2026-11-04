@@ -7,7 +7,8 @@ import Link from "next/link"
 interface Notification {
     id: string;
     title: string;
-    message: string;
+    message?: string;
+    content?: string;
     status: string;
     read: boolean;
     link?: string;
@@ -107,7 +108,7 @@ export default function NotificationCenter({ variant = 'default' }: { variant?: 
                                                     </button>
                                                 )}
                                             </div>
-                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{n.message}</p>
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{n.content || n.message}</p>
                                             {n.link && (
                                                 <Link 
                                                     href={n.link}
