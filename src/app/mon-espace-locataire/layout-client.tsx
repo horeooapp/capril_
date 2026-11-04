@@ -29,7 +29,12 @@ export default function LocataireLayoutClient({
     const pathname = usePathname();
     const isLoginPage = pathname?.includes('/mon-espace-locataire/login');
     const activeRole = dbActiveRole || session?.user?.role;
-    const handleLogout = () => executeLogout("/mon-espace-locataire/login");
+    const handleLogout = () => {
+        if (onLogout) {
+            try { onLogout(); } catch {}
+        }
+        executeLogout("/mon-espace-locataire/login");
+    };
 
     if (isLoginPage) {
         return (

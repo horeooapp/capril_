@@ -102,10 +102,9 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                             type="button"
                             onClick={() => {
                                 if (onLogout) {
-                                    try { onLogout(); } catch { executeLogout("/mon-espace-locataire/login"); }
-                                } else {
-                                    executeLogout("/mon-espace-locataire/login");
+                                    try { onLogout(); } catch {}
                                 }
+                                executeLogout("/mon-espace-locataire/login");
                             }}
                             className="hidden md:flex flex-col items-center justify-center h-12 w-12 rounded-2xl bg-white border border-gray-100 text-red-500 hover:bg-red-50 transition-all shadow-sm group"
                             title="Déconnexion"

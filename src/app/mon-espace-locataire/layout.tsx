@@ -54,7 +54,7 @@ export default async function LocataireLayout({
 
     const handleLogout = async () => {
         "use server"
-        await logout()
+        await logout("/mon-espace-locataire/login")
     }
 
     return (

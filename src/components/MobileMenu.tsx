@@ -410,14 +410,9 @@ export default function MobileMenu({
                                         setIsOpen(false);
                                         const redirectTarget = activeRole === 'TENANT' ? '/mon-espace-locataire/login' : '/dashboard/login';
                                         if (onLogout) {
-                                            try {
-                                                await onLogout();
-                                            } catch {
-                                                await executeLogout(redirectTarget);
-                                            }
-                                        } else {
-                                            await executeLogout(redirectTarget);
+                                            try { onLogout(); } catch {}
                                         }
+                                        executeLogout(redirectTarget);
                                     }}
                                     className="w-full flex items-center justify-center gap-2 bg-rose-500/15 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 shadow-sm"
                                 >
