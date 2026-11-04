@@ -1,16 +1,14 @@
-import { View, Image, StyleSheet, Dimensions, StatusBar } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, StatusBar, Pressable, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import NativeOTPForm from '../components/auth/NativeOTPForm';
 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
+    const router = useRouter();
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#0B1120" />
-            
-            {/* Background elements (Glassmorphism & glows) */}
-            <View style={[styles.glow, styles.glow1]} />
-            <View style={[styles.glow, styles.glow2]} />
+            <StatusBar barStyle="dark-content" backgroundColor="#F4F5F9" />
             
             <View style={styles.content}>
                 <View style={styles.header}>
@@ -19,13 +17,21 @@ export default function LoginScreen() {
                         style={styles.logo}
                         resizeMode="contain"
                     />
+                    <Text style={styles.badge}>QAPRIL LOCATAIRE · MOBILE</Text>
                 </View>
 
                 <NativeOTPForm 
                     role="TENANT" 
-                    title="VOTRE HABITAT" 
-                    subtitle="Saisissez votre email pour accéder à votre espace locataire sécurisé."
+                    title="ESPACE LOCATAIRE" 
+                    subtitle="Saisissez votre email ou téléphone pour accéder à vos quittances, caution et passeport locatif."
                 />
+
+                <Pressable
+                    style={styles.demoBtn}
+                    onPress={() => router.replace('/(tabs)' as any)}
+                >
+                    <Text style={styles.demoBtnText}>Aperçu direct de la maquette mobile (8 écrans) →</Text>
+                </Pressable>
             </View>
         </View>
     );
@@ -34,26 +40,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#021812', // Tenant theme dark bg
-    },
-    glow: {
-        position: 'absolute',
-        width: width * 0.8,
-        height: height * 0.6,
-        borderRadius: width,
-        opacity: 0.15,
-    },
-    glow1: {
-        top: -height * 0.1,
-        left: -width * 0.2,
-        backgroundColor: '#10B981', // Emerald glow
-        transform: [{ scale: 1.5 }],
-    },
-    glow2: {
-        bottom: -height * 0.1,
-        right: -width * 0.2,
-        backgroundColor: '#059669', // Emerald dark glow
-        transform: [{ scale: 1.2 }],
+        backgroundColor: '#2C3E6B',
     },
     content: {
         flex: 1,
@@ -61,12 +48,32 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'center',
-        marginTop: 60,
-        marginBottom: 20,
+        marginTop: 56,
+        marginBottom: 16,
     },
     logo: {
-        width: 150,
-        height: 60,
-        tintColor: '#ffffff', // Invert to white
-    }
+        width: 140,
+        height: 54,
+        tintColor: '#ffffff',
+    },
+    badge: {
+        marginTop: 6,
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: 1,
+    },
+    demoBtn: {
+        marginHorizontal: 24,
+        marginTop: 12,
+        paddingVertical: 12,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.14)',
+        alignItems: 'center',
+    },
+    demoBtnText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '700',
+    },
 });

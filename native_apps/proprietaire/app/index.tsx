@@ -1,72 +1,399 @@
-import { View, Image, StyleSheet, Dimensions, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Image,
+  StyleSheet,
+  StatusBar,
+  Pressable,
+  Text,
+  ScrollView,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import {
+  Building2,
+  Briefcase,
+  ShieldCheck,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Home,
+  Check,
+} from 'lucide-react-native';
 import NativeOTPForm from '../components/auth/NativeOTPForm';
-
-const { width, height } = Dimensions.get('window');
+import {
+  getStoredProfile,
+  setStoredProfile,
+  setStoredToken,
+  UserProfileRole,
+} from '../lib/api';
 
 export default function LoginScreen() {
-    return (
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#0A1128" />
-            
-            {/* Background elements (Glassmorphism & glows) */}
-            <View style={[styles.glow, styles.glow1]} />
-            <View style={[styles.glow, styles.glow2]} />
-            
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <Image 
-                        source={{ uri: 'https://www.qapril.net/logo.png' }} 
-                        style={styles.logo}
-                        resizeMode="contain"
-                    />
-                </View>
+  const router = useRouter();
+  const [selectedProfile, setSelectedProfile] = useState<UserProfileRole>('proprietaire');
 
-                <NativeOTPForm 
-                    role="LANDLORD" 
-                    title="ESPACE PATRIMOINE" 
-                    subtitle="Saisissez votre email pour gérer et superviser vos investissements."
-                />
-            </View>
+  useEffect(() => {
+    // Vérifier si un profil est déjà mémorisé
+    getStoredProfile().then((saved) => {
+      if (saved === 'proprietaire' || saved === 'agence') {
+        setSelectedProfile(saved);
+      }
+    });
+  }, []);
+
+  const isProprietaire = selectedProfile === 'proprietaire';
+  const primaryColor = isProprietaire ? '#1B4D3E' : '#1F2A44';
+  const accentColor = isProprietaire ? '#E8A020' : '#3B82F6';
+
+  const handleDemoAccess = async () => {
+    await setStoredProfile(selectedProfile);
+    await setStoredToken(`demo-session-${selectedProfile}-${Date.now()}`);
+    router.replace({
+      pathname: '/(tabs)',
+      params: { profile: selectedProfile },
+    } as any);
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: isProprietaire ? '#0B2019' : '#0B1329' }]}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={isProprietaire ? '#0B2019' : '#0B1329'}
+      />
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* LOGO & TITRE */}
+        <View style={styles.header}>
+          <Image
+            source={{ uri: 'https://www.qapril.net/logo.png' }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.badge, { color: accentColor }]}>
+            {isProprietaire
+              ? 'ESPACE PROPRIÉTAIRE BAILLEUR DIRECT'
+              : 'ESPACE AGENCE IMMOBILIÈRE AGRÉÉE'}
+          </Text>
+          <Text style={styles.subTitle}>
+            Plateforme certifiée de gestion immobilière · DGI & SHA-256
+          </Text>
         </View>
-    );
+
+        {/* ÉTAPE OBLIGATOIRE : CHOIX STRICT DU PROFIL */}
+        <View style={styles.selectorSection}>
+          <View style={styles.stepHeaderRow}>
+            <View style={[styles.stepNumBadge, { backgroundColor: accentColor }]}>
+              <Text style={styles.stepNumText}>1</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.selectorLabel}>VOTRE RÔLE POUR CETTE SESSION</Text>
+              <Text style={styles.selectorSub}>
+                Seul le dashboard du profil choisi sera strictement chargé.
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rolesRow}>
+            {/* CARTE PROPRIÉTAIRE */}
+            <Pressable
+              style={[
+                styles.roleCard,
+                isProprietaire && styles.roleCardActiveBailleur,
+              ]}
+              onPress={() => setSelectedProfile('proprietaire')}
+            >
+              <View style={styles.roleCardTop}>
+                <View
+                  style={[
+                    styles.roleIconWrap,
+                    { backgroundColor: isProprietaire ? '#1B4D3E' : 'rgba(255,255,255,0.08)' },
+                  ]}
+                >
+                  <Home color={isProprietaire ? '#FFFFFF' : '#9CA3AF'} size={20} />
+                </View>
+                {isProprietaire && (
+                  <View style={styles.activeCheckPill}>
+                    <Check color="#FFFFFF" size={13} />
+                  </View>
+                )}
+              </View>
+
+              <Text style={[styles.roleCardTitle, isProprietaire && { color: '#FFFFFF' }]}>
+                Propriétaire
+              </Text>
+              <Text style={styles.roleCardSub}>Bailleur direct / Particulier</Text>
+
+              <View style={styles.roleFeaturesList}>
+                <Text style={styles.roleFeatureItem}>• Mes biens & lots propres</Text>
+                <Text style={styles.roleFeatureItem}>• Baux, quittances & loyers</Text>
+                <Text style={styles.roleFeatureItem}>• Signalements locataires (RG-MAI-01)</Text>
+              </View>
+
+              <View
+                style={[
+                  styles.roleCardFooter,
+                  isProprietaire ? { backgroundColor: 'rgba(232, 160, 32, 0.15)' } : { opacity: 0.4 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.roleCardFooterText,
+                    { color: isProprietaire ? '#E8A020' : '#9CA3AF' },
+                  ]}
+                >
+                  {isProprietaire ? '● Profil sélectionné' : 'Sélectionner'}
+                </Text>
+              </View>
+            </Pressable>
+
+            {/* CARTE AGENCE */}
+            <Pressable
+              style={[
+                styles.roleCard,
+                !isProprietaire && styles.roleCardActiveAgence,
+              ]}
+              onPress={() => setSelectedProfile('agence')}
+            >
+              <View style={styles.roleCardTop}>
+                <View
+                  style={[
+                    styles.roleIconWrap,
+                    { backgroundColor: !isProprietaire ? '#1F2A44' : 'rgba(255,255,255,0.08)' },
+                  ]}
+                >
+                  <Briefcase color={!isProprietaire ? '#FFFFFF' : '#9CA3AF'} size={20} />
+                </View>
+                {!isProprietaire && (
+                  <View style={[styles.activeCheckPill, { backgroundColor: '#3B82F6' }]}>
+                    <Check color="#FFFFFF" size={13} />
+                  </View>
+                )}
+              </View>
+
+              <Text style={[styles.roleCardTitle, !isProprietaire && { color: '#FFFFFF' }]}>
+                Agence
+              </Text>
+              <Text style={styles.roleCardSub}>Cabinet Agréé CPRAIMA</Text>
+
+              <View style={styles.roleFeaturesList}>
+                <Text style={styles.roleFeatureItem}>• Portefeuille multi-mandants</Text>
+                <Text style={styles.roleFeatureItem}>• Substitution RG-MAN-01</Text>
+                <Text style={styles.roleFeatureItem}>• Rétrocessions & Honoraires (8%)</Text>
+              </View>
+
+              <View
+                style={[
+                  styles.roleCardFooter,
+                  !isProprietaire ? { backgroundColor: 'rgba(59, 130, 246, 0.15)' } : { opacity: 0.4 },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.roleCardFooterText,
+                    { color: !isProprietaire ? '#60A5FA' : '#9CA3AF' },
+                  ]}
+                >
+                  {!isProprietaire ? '● Profil sélectionné' : 'Sélectionner'}
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* FORMULAIRE DE CONNEXION STRICT AU PROFIL SÉLECTIONNÉ */}
+        <View style={styles.formContainer}>
+          <NativeOTPForm
+            role={isProprietaire ? 'LANDLORD' : 'ADMIN'}
+            profile={selectedProfile}
+            title={
+              isProprietaire
+                ? 'CONNEXION PROPRIÉTAIRE'
+                : 'CONNEXION AGENCE IMMOBILIÈRE'
+            }
+            subtitle={
+              isProprietaire
+                ? 'Saisissez votre email pour charger strictement votre tableau de bord bailleur.'
+                : 'Saisissez votre email agréé pour charger strictement la console de gestion d’agence.'
+            }
+          />
+        </View>
+
+        {/* ACCÈS DÉMO RAPIDE DU PROFIL CHOISI */}
+        <Pressable style={styles.demoBtn} onPress={handleDemoAccess}>
+          <Sparkles color={accentColor} size={16} />
+          <Text style={[styles.demoBtnText, { color: '#FFFFFF' }]}>
+            {isProprietaire
+              ? 'Accéder au Dashboard Propriétaire (Mode Démo) →'
+              : 'Accéder au Dashboard Agence Agréée (Mode Démo) →'}
+          </Text>
+        </Pressable>
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#0A1128', // Landlord theme dark bg
-    },
-    glow: {
-        position: 'absolute',
-        width: width * 0.8,
-        height: height * 0.6,
-        borderRadius: width,
-        opacity: 0.15,
-    },
-    glow1: {
-        top: -height * 0.1,
-        left: -width * 0.2,
-        backgroundColor: '#d97706', // Amber glow
-        transform: [{ scale: 1.5 }],
-    },
-    glow2: {
-        bottom: -height * 0.1,
-        right: -width * 0.2,
-        backgroundColor: '#2563eb', // Blue glow
-        transform: [{ scale: 1.2 }],
-    },
-    content: {
-        flex: 1,
-        zIndex: 10,
-    },
-    header: {
-        alignItems: 'center',
-        marginTop: 60,
-        marginBottom: 20,
-    },
-    logo: {
-        width: 150,
-        height: 60,
-        tintColor: '#ffffff', // Invert to white
-    }
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  header: {
+    alignItems: 'center',
+    marginTop: 48,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  logo: {
+    width: 150,
+    height: 52,
+    tintColor: '#ffffff',
+  },
+  badge: {
+    marginTop: 8,
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  subTitle: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#9CA3AF',
+    textAlign: 'center',
+  },
+  selectorSection: {
+    marginHorizontal: 18,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  stepHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  stepNumBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepNumText: {
+    color: '#0B2019',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  selectorLabel: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  selectorSub: {
+    color: '#9CA3AF',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  rolesRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  roleCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  roleCardActiveBailleur: {
+    borderColor: '#10B981',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+  },
+  roleCardActiveAgence: {
+    borderColor: '#3B82F6',
+    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+  },
+  roleCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  roleIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeCheckPill: {
+    backgroundColor: '#10B981',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleCardTitle: {
+    color: '#E5E7EB',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  roleCardSub: {
+    color: '#9CA3AF',
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  roleFeaturesList: {
+    gap: 3,
+    marginBottom: 10,
+  },
+  roleFeatureItem: {
+    color: '#D1D5DB',
+    fontSize: 9.5,
+    lineHeight: 13,
+  },
+  roleCardFooter: {
+    borderRadius: 8,
+    paddingVertical: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleCardFooterText: {
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  formContainer: {
+    marginHorizontal: 18,
+  },
+  demoBtn: {
+    marginHorizontal: 18,
+    marginTop: 14,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+  },
+  demoBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
 });

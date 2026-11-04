@@ -239,7 +239,7 @@ export default function DeclareIncidentForm({ leaseId, propertyId }: { leaseId: 
                         className="w-full bg-[#FF8200] hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-2xl shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                        Envoyer ma déclaration
+                        Émettre le signalement vers le propriétaire
                     </button>
                 </form>
             )}

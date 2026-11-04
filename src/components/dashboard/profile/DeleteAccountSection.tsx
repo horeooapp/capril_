@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Trash2, AlertTriangle, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { deleteUserAccount } from "@/actions/profile"
-import { signOut } from "next-auth/react"
+import { executeLogout } from "@/lib/auth-logout"
 
 export function DeleteAccountSection() {
     const [isOpen, setIsOpen] = useState(false)
@@ -20,7 +20,7 @@ export function DeleteAccountSection() {
         try {
             const result = await deleteUserAccount()
             if (result.success) {
-                await signOut({ callbackUrl: "/" })
+                await executeLogout("/")
             } else {
                 setError(result.error || "Une erreur est survenue")
             }

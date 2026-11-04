@@ -6,7 +6,8 @@ import { choisirTypeConnexion } from "@/actions/auth.actions";
 import InteractiveShowcase from "./InteractiveShowcase";
 import InteractiveModulesGrid from "./InteractiveModulesGrid";
 import InteractiveMarketChart from "./InteractiveMarketChart";
-import { signOut, SessionProvider } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
+import { executeLogout } from "@/lib/auth-logout";
 import MobileMenu from "@/components/MobileMenu";
 import {
   FileText,
@@ -203,7 +204,7 @@ export default function QaprilLandingV2({
                   <span className="hidden xs:inline">Mon </span>Espace <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={() => executeLogout("/")}
                   className="hidden sm:flex p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                   title="Déconnexion"
                 >
@@ -227,7 +228,7 @@ export default function QaprilLandingV2({
                 session={session} 
                 variant="dark"
                 activeRole={session?.user ? (session?.user?.role || "MEMBRE") : "PORTAIL"}
-                onLogout={() => signOut({ callbackUrl: "/" })}
+                onLogout={() => executeLogout("/")}
               />
             </div>
           </div>

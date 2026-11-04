@@ -28,7 +28,7 @@ export default async function AdminLayout({
     const isGloballyActive = await isRoleGloballyActive(session.user.id, activeRole);
     if (!isGloballyActive) {
         // This browser has a stale role, force logout
-        redirect("/api/auth/signout")
+        redirect("/api/auth/logout?callbackUrl=/admin/login")
     }
 
     if (activeRole !== "ADMIN" && activeRole !== "SUPER_ADMIN") {

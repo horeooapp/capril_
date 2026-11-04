@@ -4,19 +4,49 @@ import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import { Send, Check, CheckCheck } from 'lucide-react-native';
 
+const DEMO_LOCATAIRE_MESSAGES = [
+    {
+        id: 'msg-1',
+        contenu: "Bonjour Monsieur N’Guessan, j'ai émis un signalement d'incident concernant la fuite d'eau sous l'évier de la cuisine.",
+        roleExpediteur: 'LOCATAIRE',
+        statut: 'LU', // 2 encoches rouges car le bailleur l'a lu
+        dateEnvoi: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
+    },
+    {
+        id: 'msg-2',
+        contenu: "Bonjour Madame Kouamé. J'ai bien reçu votre signalement avec photo horodatée SHA-256. L'artisan plombier passera demain à 10h.",
+        roleExpediteur: 'PROPRIO',
+        statut: 'LU',
+        dateEnvoi: new Date(Date.now() - 1 * 3600 * 1000).toISOString()
+    },
+    {
+        id: 'msg-3',
+        contenu: "Parfait, je serai présente à 10h. Merci pour votre réactivité !",
+        roleExpediteur: 'LOCATAIRE',
+        statut: 'LU', // 2 encoches rouges
+        dateEnvoi: new Date(Date.now() - 30 * 60 * 1000).toISOString()
+    },
+    {
+        id: 'msg-4',
+        contenu: "Entendu. Dès que l'intervention est terminée, nous validerons la clôture contradictoire du ticket sur QAPRIL.",
+        roleExpediteur: 'PROPRIO',
+        statut: 'LU',
+        dateEnvoi: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    }
+];
+
 export default function ChatScreen() {
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<any[]>(DEMO_LOCATAIRE_MESSAGES);
     const [newMessage, setNewMessage] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const flatListRef = useRef<FlatList>(null);
 
     const loadMessages = async () => {
         try {
             const response = await fetchWithAuth('/chat');
             const json = await response.json();
-            if (response.ok) {
-                setMessages(json.messages || []);
-                // Marquer comme lus
+            if (response.ok && json.messages && json.messages.length > 0) {
+                setMessages(json.messages);
                 await fetchWithAuth('/chat/read', {
                     method: 'POST',
                     body: JSON.stringify({ role: 'LOCATAIRE' })
@@ -24,15 +54,12 @@ export default function ChatScreen() {
             }
         } catch (e) {
             console.error("Erreur chargement chat", e);
-        } finally {
-            if (loading) setLoading(false);
         }
     };
 
     useEffect(() => {
         loadMessages();
-        // Polling toutes les 3 secondes pour simuler le temps réel
-        const interval = setInterval(loadMessages, 3000);
+        const interval = setInterval(loadMessages, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -43,14 +70,13 @@ export default function ChatScreen() {
             id: Date.now().toString(),
             contenu: newMessage.trim(),
             roleExpediteur: 'LOCATAIRE',
-            statut: 'ENVOYE',
+            statut: 'RECU', // 2 encoches grises dès émission
             dateEnvoi: new Date().toISOString()
         };
 
         setMessages(prev => [...prev, optimisticMessage]);
         setNewMessage('');
         
-        // Scroll to bottom
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
@@ -61,7 +87,7 @@ export default function ChatScreen() {
                     role: 'LOCATAIRE'
                 })
             });
-            loadMessages(); // Recharger pour avoir le vrai ID et statut
+            loadMessages();
         } catch (e) {
             console.error("Erreur envoi message", e);
         }
@@ -71,18 +97,42 @@ export default function ChatScreen() {
         const isMe = item.roleExpediteur === 'LOCATAIRE';
         
         return (
-            <View className={`flex-row mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                <View className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${isMe ? 'bg-qgreen rounded-br-sm' : 'bg-white border border-qgrey-2 rounded-bl-sm'}`}>
-                    <Text className={`text-base ${isMe ? 'text-white' : 'text-qnavy'}`}>{item.contenu}</Text>
-                    <View className="flex-row items-center justify-end mt-1 gap-1">
-                        <Text className={`text-[10px] ${isMe ? 'text-white/80' : 'text-qtext-light'}`}>
+            <View style={{ marginBottom: 12, flexDirection: 'row', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
+                <View style={{
+                    maxWidth: '82%',
+                    padding: 12,
+                    borderRadius: 16,
+                    backgroundColor: isMe ? '#0D2B6E' : '#FFFFFF',
+                    borderWidth: isMe ? 0 : 1,
+                    borderColor: '#E2E8F0',
+                    borderBottomRightRadius: isMe ? 2 : 16,
+                    borderBottomLeftRadius: !isMe ? 2 : 16,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 2,
+                    elevation: 1,
+                }}>
+                    {!isMe && (
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#0D2B6E', marginBottom: 2, textTransform: 'uppercase' }}>
+                            Koffi N’Guessan (Bailleur)
+                        </Text>
+                    )}
+                    <Text style={{ fontSize: 14, color: isMe ? '#FFFFFF' : '#1E293B', lineHeight: 20 }}>
+                        {item.contenu}
+                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 4, gap: 4 }}>
+                        <Text style={{ fontSize: 10, color: isMe ? 'rgba(255,255,255,0.7)' : '#94A3B8' }}>
                             {new Date(item.dateEnvoi).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
+                        {/* ENCOCHES RÉGLEMENTAIRES SUR LES MESSAGES ENVOYÉS */}
                         {isMe && (
                             item.statut === 'LU' ? (
-                                <CheckCheck size={14} color="#FFF" className="ml-0.5" />
+                                <CheckCheck size={14} color="#EF4444" />
+                            ) : item.statut === 'RECU' ? (
+                                <CheckCheck size={14} color="#9CA3AF" />
                             ) : (
-                                <Check size={14} color="#FFF" opacity={0.7} className="ml-0.5" />
+                                <Check size={13} color="#9CA3AF" />
                             )
                         )}
                     </View>
@@ -91,49 +141,78 @@ export default function ChatScreen() {
         );
     };
 
-    if (loading) {
-        return (
-            <SafeAreaView className="flex-1 bg-background justify-center items-center">
-                <ActivityIndicator size="large" color="#00C896" />
-            </SafeAreaView>
-        );
-    }
-
     return (
-        <SafeAreaView className="flex-1 bg-background">
-            <View className="p-5 border-b border-qgrey-2 bg-white/90">
-                <Text className="text-xl font-bold text-qnavy">Propriétaire</Text>
-                <Text className="text-xs text-qgreen font-medium mt-0.5">En ligne</Text>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+            {/* HEADER CHAT */}
+            <View style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View>
+                        <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
+                            Koffi N’Guessan
+                        </Text>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#0D2B6E' }}>
+                            Bailleur en titre · Résidence Émeraude
+                        </Text>
+                    </View>
+                    <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN LIGNE</Text>
+                    </View>
+                </View>
+
+                {/* BANDEAU LÉGENDE DES ENCOCHES */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <CheckCheck size={12} color="#9CA3AF" />
+                        <Text style={{ fontSize: 10, color: '#64748B', fontWeight: '600' }}>2 encoches grises : reçu</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <CheckCheck size={12} color="#EF4444" />
+                        <Text style={{ fontSize: 10, color: '#DC2626', fontWeight: '700' }}>2 encoches rouges : lu</Text>
+                    </View>
+                </View>
             </View>
 
-            <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                className="flex-1"
-            >
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <FlatList
                     ref={flatListRef}
                     data={messages}
                     keyExtractor={(item) => item.id}
                     renderItem={renderMessage}
-                    contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+                    contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
 
-                <View className="flex-row p-4 bg-white border-t border-qgrey-2 items-end gap-3 shadow-lg">
+                <View style={{ flexDirection: 'row', padding: 12, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', alignItems: 'center', gap: 8 }}>
                     <TextInput
-                        className="flex-1 bg-qgrey-1 border border-qgrey-2 rounded-[20px] px-4 py-3 text-qnavy text-base max-h-[100px] min-h-[40px]"
-                        placeholder="Écrivez un message..."
+                        style={{
+                            flex: 1,
+                            backgroundColor: '#F1F5F9',
+                            borderWidth: 1,
+                            borderColor: '#CBD5E1',
+                            borderRadius: 20,
+                            paddingHorizontal: 14,
+                            paddingVertical: 10,
+                            color: '#0F172A',
+                            fontSize: 14,
+                        }}
+                        placeholder="Écrire à votre bailleur..."
                         placeholderTextColor="#94A3B8"
                         value={newMessage}
                         onChangeText={setNewMessage}
-                        multiline
                     />
                     <Pressable 
-                        className={`bg-qgreen w-11 h-11 rounded-full justify-center items-center mb-0.5 ${!newMessage.trim() ? 'opacity-50' : ''}`}
+                        style={{
+                            backgroundColor: newMessage.trim() ? '#0D2B6E' : '#94A3B8',
+                            width: 42,
+                            height: 42,
+                            borderRadius: 21,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
                         onPress={sendMessage}
                         disabled={!newMessage.trim()}
                     >
-                        <Send color="#fff" size={20} />
+                        <Send color="#FFFFFF" size={18} />
                     </Pressable>
                 </View>
             </KeyboardAvoidingView>

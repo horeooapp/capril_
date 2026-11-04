@@ -21,6 +21,15 @@ export async function createMaintenanceTicket(data: {
 }) {
   const session = await ensureAuthenticated();
   const userId = session.user.id;
+  const userRole = (session.user as any)?.chosenRole || session.user.role;
+
+  // Règle de gestion QAPRIL : Le propriétaire reçoit les signalements et ne les émet pas.
+  // Seul le locataire en titre peut émettre un signalement d'incident sur son logement.
+  if (userRole === "LANDLORD" || userRole === "OWNER") {
+    return {
+      error: "Règle de gestion QAPRIL : Le propriétaire reçoit les signalements et ne les émet pas. Seul le locataire en titre peut émettre un signalement d'incident sur son logement."
+    };
+  }
 
   try {
     let leaseId = data.leaseId;

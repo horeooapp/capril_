@@ -37,7 +37,7 @@ run_cmd("cd /opt/qapril && git fetch origin main && git reset --hard origin/main
 run_cmd("cd /opt/qapril && docker compose build app && docker compose up -d app")
 
 # 2b. Synchronisation du schéma Prisma (ADD-08, ADD-11, ADD-15 : M-CHAMPION, BienRole.MANAGER)
-run_cmd("docker exec qapril_app node node_modules/prisma/build/index.js db push --skip-generate")
+run_cmd("docker exec qapril_app node node_modules/prisma/build/index.js db push --accept-data-loss --skip-generate")
 
 # 3. Assurer les permissions utilisateur (nextjs:nodejs) sur le volume uploads_data
 run_cmd("docker exec -u 0 qapril_app chown -R nextjs:nodejs /app/uploads_data && docker exec -u 0 qapril_app chmod -R 775 /app/uploads_data")

@@ -53,11 +53,17 @@ export async function getTenantDashboard() {
                 },
                 receipts: {
                     orderBy: { createdAt: "desc" },
-                    take: 5
+                    take: 24
                 },
                 arrears: {
                     where: { status: { in: ["unpaid", "UNPAID"] } }
-                }
+                },
+                openingState: true,
+                etatsDesLieux: {
+                    orderBy: { createdAt: "desc" },
+                    take: 2
+                },
+                cautionBail: true
             }
         })
 
@@ -202,10 +208,22 @@ export async function getTenantDashboard() {
         const now = new Date()
         const rentDeadline = new Date(now.getFullYear(), now.getMonth(), 10)
 
-        // 6. Score Locatif (Passeport)
+        // 6. Score Locatif (Passeport) & Profil Public / Recherche
         const locataireProfile = await prisma.locataireProfile.findUnique({
             where: { userId }
         })
+
+        const profilPublic = await (prisma as any).locataireProfilPublic?.findUnique({
+            where: { userId }
+        }).catch(() => null)
+
+        const compatibleProperties = await prisma.property.findMany({
+            where: {
+                status: { in: ["AVAILABLE", "VACANT", "PUBLISHED"] }
+            },
+            take: 4,
+            orderBy: { createdAt: "desc" }
+        }).catch(() => [])
 
         return serializeObject({
             success: true,
@@ -220,6 +238,9 @@ export async function getTenantDashboard() {
             },
             utilities,
             score: locataireProfile?.scoreActuel || 750,
+            locataireProfile,
+            profilPublic,
+            compatibleProperties,
             pendingDeclarations,
             pendingSignatureLease: pendingSignatureLease ? serializeLease(pendingSignatureLease) : null
         })

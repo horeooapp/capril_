@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Qapril Agences Agréées",
+    "slug": "agence",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "../proprietaire/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "../proprietaire/assets/splash_v3.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1F2A44"
+    },
+    "scheme": "qaprilagence",
+    "runtimeVersion": "1.0.0",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "ci.qapril.agence",
+      "adaptiveIcon": {
+        "foregroundImage": "../proprietaire/assets/logo-qapril.png",
+        "backgroundColor": "#1F2A44"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
+        }
+      ],
+      "expo-font",
+      "expo-router",
+      "expo-secure-store"
+    ]
+  }
+}
+

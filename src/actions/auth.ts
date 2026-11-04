@@ -277,8 +277,32 @@ export async function loginWithAdminCredentials(email: string, password: string)
 }
 
 export async function logout() {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "/";
-    await signOut({ redirectTo: "/login" })
+    try {
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        const cookiesToDelete = [
+            "authjs.session-token",
+            "__Secure-authjs.session-token",
+            "next-auth.session-token",
+            "__Secure-next-auth.session-token",
+            "authjs.csrf-token",
+            "__Host-authjs.csrf-token",
+            "next-auth.csrf-token",
+            "__Host-next-auth.csrf-token",
+            "authjs.callback-url",
+            "next-auth.callback-url",
+            "qapril_type",
+            "userToken",
+            "userProfileRole",
+            "qapril_selected_profile",
+        ];
+        for (const c of cookiesToDelete) {
+            try {
+                cookieStore.delete(c);
+            } catch {}
+        }
+    } catch {}
+    await signOut({ redirectTo: "/login" });
 }
 
 /**
