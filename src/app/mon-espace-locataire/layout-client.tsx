@@ -2,6 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import MobileMenu from "@/components/MobileMenu"
 import { motion, AnimatePresence } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
@@ -25,8 +26,18 @@ export default function LocataireLayoutClient({
     onLogout,
     dbActiveRole
 }: LocataireLayoutClientProps) {
+    const pathname = usePathname();
+    const isLoginPage = pathname?.includes('/mon-espace-locataire/login');
     const activeRole = dbActiveRole || session?.user?.role;
     const handleLogout = () => executeLogout("/mon-espace-locataire/login");
+
+    if (isLoginPage) {
+        return (
+            <SessionProvider session={session}>
+                {children}
+            </SessionProvider>
+        );
+    }
 
     return (
         <SessionProvider session={session}>

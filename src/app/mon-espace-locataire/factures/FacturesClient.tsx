@@ -366,3 +366,4 @@ export default function FacturesClient({ initialFactures = [], lease, user }: Fa
     </div>
   )
 }
+

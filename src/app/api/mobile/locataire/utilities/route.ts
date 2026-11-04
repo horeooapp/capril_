@@ -146,3 +146,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message || "Erreur lors du règlement." }, { status: 500 });
     }
 }
+

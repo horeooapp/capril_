@@ -63,7 +63,7 @@ export async function getTenantDashboard() {
                     orderBy: { createdAt: "desc" },
                     take: 2
                 },
-                cautionBail: true
+                caution: true
             }
         })
 
@@ -249,7 +249,7 @@ export async function getTenantDashboard() {
         console.error("[TENANT-ACTION] Critical failure:", error)
         return serializeObject({ 
             success: false, 
-            error: process.env.NODE_ENV === 'development' ? error.message : "Impossible de charger vos données. Veuillez réessayer plus tard." 
+            error: error.message || "Impossible de charger vos données. Veuillez réessayer plus tard." 
         })
     }
 }
