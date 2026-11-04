@@ -55,14 +55,18 @@ export async function removeStoredToken(): Promise<void> {
     }
 }
 
+// Détection dynamique et sécurisée de l'URL API (Production QAPRIL)
 const getApiUrl = () => {
+    if (process.env.EXPO_PUBLIC_API_URL) {
+        return process.env.EXPO_PUBLIC_API_URL;
+    }
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
-        return 'http://localhost:3000/api/mobile';
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:3000/api/mobile';
+        }
+        return 'https://qapril.net/api/mobile';
     }
-    if (__DEV__) {
-        return 'http://192.168.1.8:3000/api/mobile';
-    }
-    return 'https://www.qapril.net/api/mobile';
+    return 'https://qapril.net/api/mobile';
 };
 
 export const API_URL = getApiUrl();
