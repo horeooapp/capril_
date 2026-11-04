@@ -30,15 +30,21 @@ export default auth(async (req) => {
         }
     }
 
-    // 2. [SEC-FIX F-06] Protection stricte brute-force sur les routes d'auth et OTP
-    // Couvre /api/auth, /api/mobile/auth, /api/mobile/shared/*/otp et /api/v1/auth/otp
-    const isSensitiveAuth = path.startsWith("/api/auth")
+    // 2. [SEC-FIX F-06] Protection stricte brute-force sur les routes d'authentification et OTP
+    // EXCLUSION FORMELLE : logout (/api/auth/logout, /logout) et polling session (/api/auth/session, /api/auth/csrf)
+    const isLogoutRoute = path.includes("logout") || path.startsWith("/api/auth/logout");
+    const isSessionPoll = path === "/api/auth/session" || path === "/api/auth/csrf";
+
+    const isSensitiveAuth = !isLogoutRoute && !isSessionPoll && (
+        path.startsWith("/api/auth/callback")
+        || path.startsWith("/api/auth/signin")
         || path.startsWith("/api/mobile/auth")
         || path.startsWith("/api/mobile/login")
-        || path.includes("/otp");
+        || path.includes("/otp")
+    );
 
     if (isSensitiveAuth) {
-        const withinAuthLimit = await checkRateLimit(`auth:${ip}`, 5, 300); // 5 tentatives / 5 min
+        const withinAuthLimit = await checkRateLimit(`auth:${ip}`, 15, 300); // 15 tentatives / 5 min pour login/OTP
         if (!withinAuthLimit) {
             console.warn(`[SECURITY] Potential brute-force from IP: ${ip} on: ${path}`);
             return new NextResponse("Security Lock: Too Many Attempts", { status: 429 });
