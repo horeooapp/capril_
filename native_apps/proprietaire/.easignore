@@ -1,0 +1,13 @@
+# EAS Build ignore file
+# Ignore local native folders so EAS Build runs `expo prebuild` cleanly with managed workflow
+android/
+ios/
+
+# Dependencies & caches
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Logs
+*.log

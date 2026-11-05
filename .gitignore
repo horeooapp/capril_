@@ -54,6 +54,11 @@ test-smtp.js
 
 # mobile apps
 **/node_modules/
+native_apps/*/android/
+native_apps/*/ios/
+**/android/.gradle/
+**/android/app/build/
+**/android/build/
 
 # CI/CD runner cache markers (runner-local, must not be committed)
 .prisma_schema_hash
