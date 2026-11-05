@@ -17,8 +17,8 @@ export async function GET(request: Request) {
                 where: {
                     OR: [
                         { tenantId: user.userId },
-                        { property: { ownerUserId: user.userId } },
-                        { property: { landlordId: user.userId } }
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } }
                     ],
                     status: 'ACTIVE'
                 },
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
             if (activeLease) {
                 leaseId = activeLease.id;
             } else {
-                return NextResponse.json({ messages: [] });
+                return NextResponse.json({ messages: [], interlocutorName: '', interlocutorRole: '' });
             }
         }
 
@@ -37,8 +37,38 @@ export async function GET(request: Request) {
             include: { property: true }
         });
 
-        if (!lease || (lease.tenantId !== user.userId && lease.property.landlordId !== user.userId && lease.property.ownerUserId !== user.userId)) {
+        if (!lease || (lease.tenantId !== user.userId && lease.landlordId !== user.userId && lease.property?.ownerUserId !== user.userId)) {
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+        }
+
+        // Déterminer l'interlocuteur
+        const isTenant = lease.tenantId === user.userId;
+        let interlocutorName = isTenant ? 'Bailleur' : 'Locataire';
+        let interlocutorRole = isTenant ? 'Bailleur' : 'Locataire';
+
+        if (isTenant) {
+            const landlordId = lease.landlordId || lease.property?.ownerUserId;
+            if (landlordId) {
+                const landlord = await prisma.user.findUnique({
+                    where: { id: landlordId },
+                    select: { firstName: true, lastName: true }
+                });
+                if (landlord) {
+                    interlocutorName = lease.bailleurMasque
+                        ? 'Bailleur certifié'
+                        : `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+                }
+            }
+        } else {
+            if (lease.tenantId) {
+                const tenant = await prisma.user.findUnique({
+                    where: { id: lease.tenantId },
+                    select: { firstName: true, lastName: true }
+                });
+                if (tenant) {
+                    interlocutorName = `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || 'Locataire';
+                }
+            }
         }
 
         const messages = await prisma.messagerieBail.findMany({
@@ -46,7 +76,13 @@ export async function GET(request: Request) {
             orderBy: { dateEnvoi: 'asc' }
         });
 
-        return NextResponse.json({ messages });
+        return NextResponse.json({
+            messages,
+            interlocutorName,
+            interlocutorRole,
+            leaseReference: lease.leaseReference,
+            propertyName: lease.property?.name || 'Logement'
+        });
 
     } catch (error) {
         console.error("[MOBILE API] chat GET error:", error);
@@ -64,13 +100,17 @@ export async function POST(request: Request) {
         let { leaseId } = body;
         const { contenu, role } = body;
 
+        if (!contenu || !contenu.trim()) {
+            return NextResponse.json({ error: "Le contenu du message est requis" }, { status: 400 });
+        }
+
         if (!leaseId) {
             const activeLease = await prisma.lease.findFirst({
                 where: {
                     OR: [
                         { tenantId: user.userId },
-                        { property: { ownerUserId: user.userId } },
-                        { property: { landlordId: user.userId } }
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } }
                     ],
                     status: 'ACTIVE'
                 },
@@ -78,24 +118,33 @@ export async function POST(request: Request) {
             });
             if (activeLease) {
                 leaseId = activeLease.id;
+            } else {
+                return NextResponse.json({ error: "Aucun bail actif pour associer ce message" }, { status: 400 });
             }
         }
 
-        if (!leaseId || !contenu) {
-            return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
+        // Vérification d'accès
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
+            include: { property: true }
+        });
+
+        if (!lease || (lease.tenantId !== user.userId && lease.landlordId !== user.userId && lease.property?.ownerUserId !== user.userId)) {
+            return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
-        const newMessage = await prisma.messagerieBail.create({
+        // Création du message infalsifiable
+        const message = await prisma.messagerieBail.create({
             data: {
                 leaseId,
-                contenu,
-                expediteurId: user.userId,
-                roleExpediteur: role || 'SYSTEME', // PROPRIO | LOCATAIRE
-                statut: 'ENVOYE'
+                roleExpediteur: role || (lease.tenantId === user.userId ? 'LOCATAIRE' : 'PROPRIO'),
+                contenu: contenu.trim(),
+                statut: 'RECU', // Immédiatement "reçu" par le serveur central QAPRIL (2 encoches grises)
+                dateEnvoi: new Date()
             }
         });
 
-        return NextResponse.json({ message: newMessage });
+        return NextResponse.json({ success: true, message });
 
     } catch (error) {
         console.error("[MOBILE API] chat POST error:", error);

@@ -2,12 +2,13 @@ import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platf
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
-import { Send, Check, CheckCheck, ShieldCheck, User } from 'lucide-react-native';
+import { Send, Check, CheckCheck } from 'lucide-react-native';
 
-export default function ChatScreen() {
+export default function ProprietaireChatScreen() {
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [interlocutorName, setInterlocutorName] = useState('Locataire');
     const flatListRef = useRef<FlatList>(null);
 
     const loadMessages = async () => {
@@ -16,6 +17,9 @@ export default function ChatScreen() {
             const json = await response.json();
             if (response.ok && json.messages) {
                 setMessages(json.messages);
+                if (json.interlocutorName) {
+                    setInterlocutorName(json.interlocutorName);
+                }
                 if (json.messages.length > 0) {
                     await fetchWithAuth('/chat/read', {
                         method: 'POST',
@@ -24,7 +28,7 @@ export default function ChatScreen() {
                 }
             }
         } catch (e) {
-            console.error("Erreur chargement chat", e);
+            console.error("Erreur chargement chat proprio", e);
         }
     };
 
@@ -41,7 +45,7 @@ export default function ChatScreen() {
             id: Date.now().toString(),
             contenu: newMessage.trim(),
             roleExpediteur: 'PROPRIO',
-            statut: 'RECU', // Directement 2 encoches grises à la réception
+            statut: 'RECU', // 2 encoches grises dès émission
             dateEnvoi: new Date().toISOString()
         };
 
@@ -86,7 +90,7 @@ export default function ChatScreen() {
                 }}>
                     {!isMe && (
                         <Text style={{ fontSize: 10, fontWeight: '800', color: '#1B4D3E', marginBottom: 2, textTransform: 'uppercase' }}>
-                            Adjoua Kouamé (Locataire)
+                            {interlocutorName}
                         </Text>
                     )}
                     <Text style={{ fontSize: 14, color: isMe ? '#FFFFFF' : '#1E293B', lineHeight: 20 }}>
@@ -119,10 +123,10 @@ export default function ChatScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Messagerie Bailleurs & Locataires
+                            Messagerie Bailleur
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#1B4D3E' }}>
-                            Échanges certifiés · Horodatage SHA-256
+                            Échanges certifiés avec vos locataires · Horodatage SHA-256
                         </Text>
                     </View>
                     <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
@@ -153,10 +157,10 @@ export default function ChatScreen() {
                     ListEmptyComponent={
                         <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
                             <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center' }}>
-                                Aucun message dans cette conversation
+                                Aucun message échangé
                             </Text>
                             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 8, lineHeight: 18 }}>
-                                Vos échanges avec vos locataires s'afficheront ici avec accusés de réception et horodatage certifié.
+                                Vos messages avec vos locataires apparaîtront ici en temps réel avec valeur légale.
                             </Text>
                         </View>
                     }
@@ -176,7 +180,7 @@ export default function ChatScreen() {
                             color: '#0F172A',
                             fontSize: 14,
                         }}
-                        placeholder="Écrire à Adjoua Kouamé..."
+                        placeholder={`Écrire à ${interlocutorName}...`}
                         placeholderTextColor="#94A3B8"
                         value={newMessage}
                         onChangeText={setNewMessage}

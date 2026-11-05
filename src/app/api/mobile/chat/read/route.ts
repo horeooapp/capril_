@@ -17,8 +17,8 @@ export async function POST(request: Request) {
                 where: {
                     OR: [
                         { tenantId: user.userId },
-                        { property: { ownerUserId: user.userId } },
-                        { property: { landlordId: user.userId } }
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } }
                     ],
                     status: 'ACTIVE'
                 },

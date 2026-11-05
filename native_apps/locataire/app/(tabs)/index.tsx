@@ -93,11 +93,9 @@ export default function LocatairePrototypeScreen() {
   const [factureOp, setFactureOp] = useState<'Wave' | 'Orange Money' | 'MTN MoMo' | 'Moov'>('Wave');
   const [facturePaying, setFacturePaying] = useState(false);
   const [factureReceipt, setFactureReceipt] = useState<any>(null);
-  const [factureHistory, setFactureHistory] = useState<any[]>([
-    { id: 'f-1', cat: 'EAU', service: 'SODECI', ref: 'SOD-892301', montant: 14500, date: '02 Nov 2026', statut: 'PAYEE' },
-    { id: 'f-2', cat: 'ELEC', service: 'CIE Compteur Prépayé', ref: '1409281729', montant: 10000, date: '28 Oct 2026', statut: 'PAYEE', token: '4829-1029-4819-3019' },
-    { id: 'f-3', cat: 'NET', service: 'Orange Livebox Fibre', ref: 'BOX-99201', montant: 25000, date: '15 Oct 2026', statut: 'PAYEE' },
-  ]);
+  const [factureHistory, setFactureHistory] = useState<any[]>([]);
+  const [receiptsList, setReceiptsList] = useState<any[]>([]);
+  const [marketList, setMarketList] = useState<any[]>([]);
   const [copiedToken, setCopiedToken] = useState(false);
 
   const router = useRouter();
@@ -105,13 +103,29 @@ export default function LocatairePrototypeScreen() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const response = await fetchWithAuth('/locataire/dashboard');
-        const json = await response.json();
-        if (response.ok) {
+        const [dashRes, receiptsRes, marketRes] = await Promise.all([
+          fetchWithAuth('/locataire/dashboard'),
+          fetchWithAuth('/locataire/receipts'),
+          fetchWithAuth('/marketplace')
+        ]);
+        if (dashRes.ok) {
+          const json = await dashRes.json();
           setData(json);
         }
+        if (receiptsRes.ok) {
+          const recJson = await receiptsRes.json();
+          if (recJson.receipts && Array.isArray(recJson.receipts)) {
+            setReceiptsList(recJson.receipts);
+          }
+        }
+        if (marketRes.ok) {
+          const mJson = await marketRes.json();
+          if (mJson.annonces && Array.isArray(mJson.annonces)) {
+            setMarketList(mJson.annonces);
+          }
+        }
       } catch (e) {
-        // Fallback to prototype data if offline or dev
+        console.error('Erreur chargement dashboard locataire', e);
       } finally {
         setLoading(false);
       }
@@ -119,9 +133,14 @@ export default function LocatairePrototypeScreen() {
     loadDashboard();
   }, []);
 
+  const userName = data?.user ? ((data.user.firstName || "") + " " + (data.user.lastName || "")).trim() || data.user.email || "Locataire" : "Locataire";
+
+
   const loyer = data?.currentRentAmount || 0;
+  const depositAmount = data?.depositAmount || (loyer * 2);
   const propName = data?.propertyName || (data?.hasLease === false ? 'Aucun bail actif' : 'Votre logement');
-  const bailRef = data?.leaseReference || (data?.hasLease === false ? 'Aucun contrat' : 'BAIL EN COURS');
+  const propCommune = data?.propertyCommune || '';
+  const bailRef = data?.lease?.leaseReference || data?.leaseReference || (data?.hasLease === false ? 'Aucun contrat' : 'BAIL EN COURS');
   const fmt = (n: number) => n.toLocaleString('fr-FR') + ' F';
 
   if (loading) {
@@ -188,8 +207,8 @@ export default function LocatairePrototypeScreen() {
                     <Text style={styles.certifBadgeText}>LOCATAIRE CERTIFIÉ</Text>
                   </View>
                 </View>
-                <Text style={styles.drawerUser}>Adjoua Kouamé</Text>
-                <Text style={styles.drawerUserSub}>Bail {bailRef} · Cocody</Text>
+                <Text style={styles.drawerUser}>{userName}</Text>
+                <Text style={styles.drawerUserSub}>Bail {bailRef}{propCommune ? ` · ${propCommune}` : ''}</Text>
               </View>
               <Pressable
                 style={styles.drawerCloseBtn}
@@ -285,7 +304,7 @@ export default function LocatairePrototypeScreen() {
             <View style={styles.headerRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.subMuted}>QAPRIL · Espace locataire</Text>
-                <Text style={styles.h1}>Adjoua Kouamé</Text>
+                <Text style={styles.h1}>{userName}</Text>
                 <Text style={styles.subMuted}>{propName}</Text>
               </View>
               <Pressable
@@ -299,14 +318,16 @@ export default function LocatairePrototypeScreen() {
             {/* HERO LOYER */}
             <View style={styles.heroBlue}>
               <View style={styles.rowBetween}>
-                <Text style={styles.heroSub}>LOYER DE NOVEMBRE 2026</Text>
-                <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>À jour · 12/12 à l’heure</Text>
+                <Text style={styles.heroSub}>LOYER DU MOIS EN COURS</Text>
+                <View style={data?.rentStatus === 'PAID' ? styles.pillOk : [styles.pillOk, { backgroundColor: '#FEF3C7' }]}>
+                  <Text style={[styles.pillOkText, data?.rentStatus !== 'PAID' && { color: '#B45309' }]}>
+                    {data?.rentStatus === 'PAID' ? 'À jour · Loyer réglé' : 'À régler'}
+                  </Text>
                 </View>
               </View>
               <Text style={styles.heroBig}>{fmt(loyer)}</Text>
               <Text style={styles.heroSub}>
-                Prochaine échéance : le 5 décembre 2026 · Frais QAPRIL : 0 F
+                {data?.hasLease ? `Bail ${bailRef} · Prochaine échéance le ${data?.lease?.paymentDay || 5} du mois · Frais : 0 F` : 'Aucun contrat de bail actif'}
               </Text>
               <View style={styles.heroActions}>
                 <Pressable style={styles.btnWhite} onPress={() => setScreen('payer')}>
@@ -380,12 +401,12 @@ export default function LocatairePrototypeScreen() {
               <Pressable style={styles.cardGrid} onPress={() => setScreen('quittances')}>
                 <FileText color="#2C3E6B" size={20} />
                 <Text style={styles.cardTitle}>Quittances</Text>
-                <Text style={styles.cardSub}>12 quittances SHA-256</Text>
+                <Text style={styles.cardSub}>{receiptsList.length} quittance(s) certifiée(s)</Text>
               </Pressable>
               <Pressable style={styles.cardGrid} onPress={() => setScreen('caution')}>
                 <Lock color="#1E7E4E" size={20} />
                 <Text style={styles.cardTitle}>Ma caution</Text>
-                <Text style={styles.cardSub}>{fmt(loyer * 2)} consignés</Text>
+                <Text style={styles.cardSub}>{fmt(depositAmount)} consignés</Text>
               </Pressable>
               <Pressable style={styles.cardGrid} onPress={() => setScreen('bail')}>
                 <CalendarClock color="#2C3E6B" size={20} />
@@ -400,12 +421,12 @@ export default function LocatairePrototypeScreen() {
               <Pressable style={styles.cardGrid} onPress={() => setScreen('passeport')}>
                 <ShieldCheck color="#1E7E4E" size={20} />
                 <Text style={styles.cardTitle}>Mon passeport</Text>
-                <Text style={styles.cardSub}>Tranche ICL A · confidentiel</Text>
+                <Text style={styles.cardSub}>Niveau KYC {data?.user?.kycLevel ?? 1} · vérifié</Text>
               </Pressable>
               <Pressable style={styles.cardGrid} onPress={() => setScreen('recherche')}>
                 <Search color="#2C3E6B" size={20} />
                 <Text style={styles.cardTitle}>Ma recherche</Text>
-                <Text style={styles.cardSub}>3 offres compatibles</Text>
+                <Text style={styles.cardSub}>{marketList.length} offre(s) vérifiée(s)</Text>
               </Pressable>
             </View>
           </View>
@@ -503,43 +524,39 @@ export default function LocatairePrototypeScreen() {
 
             <View style={styles.card}>
               <View style={styles.rowBetween}>
-                <Text style={styles.boldText}>12 loyers payés à l’heure sur 12</Text>
+                <Text style={styles.boldText}>{receiptsList.length} quittance(s) enregistrée(s)</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>100 % régularité</Text>
+                  <Text style={styles.pillOkText}>CDC-CI Conforme</Text>
                 </View>
               </View>
-              <Pressable
-                style={[styles.btnGhost, { marginTop: 10 }]}
-                onPress={() =>
-                  Alert.alert(
-                    'Dossier PDF généré',
-                    'Pack de vos 12 dernières quittances certifiées SHA-256 prêt à être partagé.'
-                  )
-                }
-              >
-                <Text style={styles.btnGhostText}>Télécharger les 12 derniers mois (PDF unique)</Text>
-              </Pressable>
             </View>
 
-            {[
-              { m: 'Novembre 2026', d: '3 nov. 2026', via: 'Wave', sha: '9f3a…c17e' },
-              { m: 'Octobre 2026', d: '4 oct. 2026', via: 'Wave', sha: '8b2c…e04a' },
-              { m: 'Septembre 2026', d: '2 sept. 2026', via: 'Orange Money', sha: '71d9…33f1' },
-              { m: 'Août 2026', d: '3 août 2026', via: 'Wave', sha: '4e01…99b2' },
-            ].map((q, i) => (
-              <View key={i} style={styles.cardRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>{q.m} · {fmt(loyer)}</Text>
-                  <Text style={styles.subMuted}>Payé le {q.d} via {q.via} · SHA-256 {q.sha}</Text>
-                </View>
-                <Pressable
-                  style={styles.pillTint}
-                  onPress={() => Alert.alert('Quittance PDF', `Quittance ${q.m} (${q.sha}) ouverte.`)}
-                >
-                  <Text style={styles.pillTintText}>PDF</Text>
-                </Pressable>
+            {receiptsList.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                <FileText color="#9CA3AF" size={36} />
+                <Text style={[styles.boldText, { marginTop: 10, color: '#64748B' }]}>Aucune quittance émise</Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                  Vos quittances infalsifiables avec signature SHA-256 apparaîtront ici dès le règlement validé.
+                </Text>
               </View>
-            ))}
+            ) : (
+              receiptsList.map((q: any, i: number) => (
+                <View key={q.id || i} style={styles.cardRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.boldText}>{q.period || q.periodMonth} · {fmt(q.amount)}</Text>
+                    <Text style={styles.subMuted}>
+                      {q.date ? `Payé le ${q.date}` : ''} {q.paymentMethod ? `via ${q.paymentMethod}` : ''} {q.receiptHash ? `· SHA-256 ${q.receiptHash.substring(0, 8)}...` : ''}
+                    </Text>
+                  </View>
+                  <Pressable
+                    style={styles.pillTint}
+                    onPress={() => Alert.alert('Quittance PDF', `Quittance certifiée ${q.receiptRef || q.period} horodatée.`)}
+                  >
+                    <Text style={styles.pillTintText}>PDF</Text>
+                  </Pressable>
+                </View>
+              ))
+            )}
           </View>
         )}
 
@@ -555,9 +572,9 @@ export default function LocatairePrototypeScreen() {
 
             <View style={styles.heroBlue}>
               <Text style={styles.heroSub}>DÉPÔT DE GARANTIE CONSIGNÉ</Text>
-              <Text style={styles.heroBig}>{fmt(loyer * 2)}</Text>
+              <Text style={styles.heroBig}>{fmt(depositAmount)}</Text>
               <Text style={styles.heroSub}>
-                2 mois de loyer · Restitution légale sous 30 jours maximum après remise des clés (art. 416 CCH)
+                {data?.hasLease ? 'Restitution légale sous 30 jours maximum après remise des clés (art. 416 CCH)' : 'Aucun dépôt consigné actuellement'}
               </Text>
             </View>
 
@@ -601,18 +618,24 @@ export default function LocatairePrototypeScreen() {
             </Text>
 
             <View style={styles.card}>
-              <Text style={styles.label}>PRINCIPE DES DEUX HORLOGES</Text>
+              <Text style={styles.label}>INFORMATIONS CONTRACTUELLES</Text>
               <View style={[styles.rowBetween, { marginTop: 8 }]}>
-                <Text style={styles.subMuted}>Horloge contractuelle (entrée)</Text>
-                <Text style={styles.boldText}>1 juil. 2025 → 30 juin 2027</Text>
+                <Text style={styles.subMuted}>Période du contrat</Text>
+                <Text style={styles.boldText}>
+                  {data?.lease?.startDate ? new Date(data.lease.startDate).toLocaleDateString('fr-FR') : 'Date non renseignée'} → {data?.lease?.endDate ? new Date(data.lease.endDate).toLocaleDateString('fr-FR') : 'Durée indéterminée'}
+                </Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
-                <Text style={styles.subMuted}>Prochaine révision légale (3 ans)</Text>
-                <Text style={styles.boldText}>Pas avant le 1 juil. 2028</Text>
+                <Text style={styles.subMuted}>Loyer mensuel contractuel</Text>
+                <Text style={styles.boldText}>{fmt(loyer)}</Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
-                <Text style={styles.subMuted}>Préavis contractuel</Text>
-                <Text style={styles.boldText}>3 mois</Text>
+                <Text style={styles.subMuted}>Jour d’échéance</Text>
+                <Text style={styles.boldText}>Le {data?.lease?.paymentDay || 5} du mois</Text>
+              </View>
+              <View style={[styles.rowBetween, { marginTop: 6 }]}>
+                <Text style={styles.subMuted}>Dépôt de garantie consigné</Text>
+                <Text style={styles.boldText}>{fmt(depositAmount)}</Text>
               </View>
             </View>
 
@@ -649,23 +672,32 @@ export default function LocatairePrototypeScreen() {
               </Text>
             </Pressable>
 
-            {[
-              { t: 'Contrat de bail signé + Reçu DGI', s: `${bailRef} · art. 414 CCH · SHA-256` },
-              { t: 'État des lieux d’entrée contradictoire', s: '14 photos horodatées · compteurs relevés' },
-              { t: 'Attestation de dépôt de garantie', s: `${fmt(loyer * 2)} · 2 mois consignés` },
-            ].map((doc, i) => (
-              <Pressable
-                key={i}
-                style={styles.cardRow}
-                onPress={() => Alert.alert(doc.t, 'Document PDF certifié SHA-256 ouvert.')}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>{doc.t}</Text>
-                  <Text style={styles.subMuted}>{doc.s}</Text>
-                </View>
-                <ChevronRight color="#6B7280" size={18} />
-              </Pressable>
-            ))}
+            {data?.hasLease ? (
+              [
+                { t: `Contrat de bail certifié (${bailRef})`, s: `${propName} · Enregistré · SHA-256` },
+                { t: 'Attestation de dépôt de garantie', s: `${fmt(depositAmount)} consignés CDC-CI` },
+              ].map((doc, i) => (
+                <Pressable
+                  key={i}
+                  style={styles.cardRow}
+                  onPress={() => Alert.alert(doc.t, 'Document contractuel certifié.')}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.boldText}>{doc.t}</Text>
+                    <Text style={styles.subMuted}>{doc.s}</Text>
+                  </View>
+                  <ChevronRight color="#6B7280" size={18} />
+                </Pressable>
+              ))
+            ) : (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 28 }]}>
+                <Folder color="#9CA3AF" size={32} />
+                <Text style={[styles.boldText, { marginTop: 8, color: '#64748B' }]}>Aucun document actif</Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                  Vos pièces contractuelles apparaîtront dès l’activation de votre bail.
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -686,7 +718,7 @@ export default function LocatairePrototypeScreen() {
                   <Text style={styles.pillOkText}>Tranche A · Excellente</Text>
                 </View>
               </View>
-              <Text style={styles.heroBig}>12 / 12 à l’heure</Text>
+              <Text style={styles.heroBig}>{data?.paidReceiptsCount ?? 0} loyer(s) à l’heure</Text>
               <Text style={styles.heroSub}>
                 Votre score chiffré exact vous appartient : un bailleur ne voit que votre tranche (A, B ou C)
               </Text>
@@ -755,46 +787,43 @@ export default function LocatairePrototypeScreen() {
               </Pressable>
             </View>
 
-            {[
-              {
-                title: 'Appartement 3P · Cocody Angré 8e Tranche',
-                loyer: 165000,
-                compat: 92,
-                niv: 'Bien vérifié · Niveau 3 (Titre contrôlé)',
-              },
-              {
-                title: 'Appartement 3P · Marcory Résidentiel',
-                loyer: 200000,
-                compat: 86,
-                niv: 'Bien vérifié · Niveau 4 (Visite CPRAIMA-CI)',
-              },
-            ].map((off, i) => (
-              <View key={i} style={styles.card}>
-                <View style={styles.rowBetween}>
-                  <Text style={styles.boldText}>{off.title}</Text>
-                  <View style={styles.pillTint}>
-                    <Text style={styles.pillTintText}>Compat. {off.compat}/100</Text>
-                  </View>
-                </View>
-                <Text style={[styles.h2, { color: '#2C3E6B', marginTop: 4 }]}>
-                  {fmt(off.loyer)} / mois
+            {marketList.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                <Search color="#9CA3AF" size={36} />
+                <Text style={[styles.boldText, { marginTop: 10, color: '#64748B' }]}>Aucun bien disponible</Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                  De nouveaux logements certifiés et conformes sont publiés régulièrement.
                 </Text>
-                <Text style={[styles.subMuted, { marginTop: 2 }]}>
-                  {off.niv} · Dépôt max 2 mois · Avance max 2 mois
-                </Text>
-                <Pressable
-                  style={[styles.btnPrimary, { marginTop: 10 }]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Candidature envoyée',
-                      'Votre Passeport Locatif (Tranche A, sans pièces sensibles) a été transmis au bailleur.'
-                    )
-                  }
-                >
-                  <Text style={styles.btnPrimaryText}>Candidater en 1 clic avec mon Passeport</Text>
-                </Pressable>
               </View>
-            ))}
+            ) : (
+              marketList.map((off: any, i: number) => (
+                <View key={off.id || i} style={styles.card}>
+                  <View style={styles.rowBetween}>
+                    <Text style={styles.boldText}>{off.name || off.title || 'Logement certifié'}</Text>
+                    <View style={styles.pillTint}>
+                      <Text style={styles.pillTintText}>{off.commune || 'Abidjan'}</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.h2, { color: '#2C3E6B', marginTop: 4 }]}>
+                    {fmt(off.declaredRentFcfa || off.price || 0)} / mois
+                  </Text>
+                  <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                    {off.propertyType || 'Résidentiel'} · {off.address || 'Abidjan'}
+                  </Text>
+                  <Pressable
+                    style={[styles.btnPrimary, { marginTop: 10 }]}
+                    onPress={() =>
+                      Alert.alert(
+                        'Candidature envoyée',
+                        'Votre Passeport Locatif a été transmis au bailleur en toute sécurité.'
+                      )
+                    }
+                  >
+                    <Text style={styles.btnPrimaryText}>Candidater avec mon Passeport</Text>
+                  </Pressable>
+                </View>
+              ))
+            )}
           </View>
         )}
       </ScrollView>
@@ -808,8 +837,8 @@ export default function LocatairePrototypeScreen() {
               Partagez ce lien sécurisé sur WhatsApp : votre proche règle via Wave, Orange Money, MTN ou carte, et la quittance SHA-256 est émise directement à votre nom.
             </Text>
             <View style={styles.recapBox}>
-              <Text style={styles.boldText}>https://pay.qapril.ci/p/BAIL-2025-0417-NOV</Text>
-              <Text style={styles.subMuted}>Montant : {fmt(loyer)} · Bénéficiaire quittance : Adjoua Kouamé</Text>
+              <Text style={styles.boldText}>https://pay.qapril.ci/p/{bailRef}</Text>
+              <Text style={styles.subMuted}>Montant : {fmt(loyer)} · Bénéficiaire quittance : {userName}</Text>
             </View>
             <Pressable
               style={styles.btnPrimary}
@@ -836,7 +865,7 @@ export default function LocatairePrototypeScreen() {
               Certifiée par QAPRIL · bail enregistré DGI et loyer à jour
             </Text>
             <View style={styles.recapBox}>
-              <Text style={styles.boldText}>Titulaire : Adjoua Kouamé</Text>
+              <Text style={styles.boldText}>Titulaire : {userName}</Text>
               <Text style={styles.subMuted}>Logement : {propName}</Text>
               <Text style={styles.subMuted}>Bail : {bailRef} (Enregistré DGI · art. 414 CCH)</Text>
               <Text style={[styles.subMuted, { marginTop: 6, fontWeight: '700', color: '#1E7E4E' }]}>
@@ -868,7 +897,7 @@ export default function LocatairePrototypeScreen() {
               Ni votre score chiffré, ni votre salaire exact, ni votre CNI ne sont affichés.
             </Text>
             <View style={styles.recapBox}>
-              <Text style={styles.boldText}>Adjoua K. · Tranche ICL A</Text>
+              <Text style={styles.boldText}>{userName} · Tranche ICL {data?.user?.kycLevel >= 2 ? 'A' : 'B'}</Text>
               <Text style={styles.subMuted}>• Régularité : 12/12 loyers payés à l’heure</Text>
               <Text style={styles.subMuted}>• Revenus ≥ 3 × loyer : {shareRev ? 'Oui (vérifié)' : 'Non partagé'}</Text>
               <Text style={styles.subMuted}>• Garant : {shareGarant ? 'Oui (engagé)' : 'Non partagé'}</Text>

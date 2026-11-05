@@ -8,6 +8,7 @@ export default function ChatScreen() {
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [interlocutorName, setInterlocutorName] = useState('Bailleur');
     const flatListRef = useRef<FlatList>(null);
 
     const loadMessages = async () => {
@@ -16,6 +17,9 @@ export default function ChatScreen() {
             const json = await response.json();
             if (response.ok && json.messages) {
                 setMessages(json.messages);
+                if (json.interlocutorName) {
+                    setInterlocutorName(json.interlocutorName);
+                }
                 if (json.messages.length > 0) {
                     await fetchWithAuth('/chat/read', {
                         method: 'POST',
@@ -86,7 +90,7 @@ export default function ChatScreen() {
                 }}>
                     {!isMe && (
                         <Text style={{ fontSize: 10, fontWeight: '800', color: '#0D2B6E', marginBottom: 2, textTransform: 'uppercase' }}>
-                            Koffi N’Guessan (Bailleur)
+                            {interlocutorName}
                         </Text>
                     )}
                     <Text style={{ fontSize: 14, color: isMe ? '#FFFFFF' : '#1E293B', lineHeight: 20 }}>
@@ -176,7 +180,7 @@ export default function ChatScreen() {
                             color: '#0F172A',
                             fontSize: 14,
                         }}
-                        placeholder="Écrire à votre bailleur..."
+                        placeholder={`Écrire à ${interlocutorName}...`}
                         placeholderTextColor="#94A3B8"
                         value={newMessage}
                         onChangeText={setNewMessage}

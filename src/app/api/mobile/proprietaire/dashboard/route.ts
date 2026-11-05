@@ -10,6 +10,19 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
         }
 
+        const userRecord = await prisma.user.findUnique({
+            where: { id: user.userId },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                phone: true,
+                kycLevel: true,
+                kycStatus: true,
+            }
+        });
+
         // Récupérer les biens (Properties) du propriétaire
         const properties = await prisma.property.findMany({
             where: {
@@ -17,23 +30,19 @@ export async function GET(request: Request) {
             },
             include: {
                 leases: {
-                    where: { status: 'ACTIVE' }
+                    where: { status: 'ACTIVE' },
+                    include: {
+                        tenant: {
+                            select: { firstName: true, lastName: true, phone: true }
+                        }
+                    }
                 }
             }
         });
 
         const totalProperties = properties.length;
-        
-        if (totalProperties === 0) {
-            return NextResponse.json({
-                totalProperties: 0,
-                occupancyRate: 0,
-                monthlyRevenue: 0,
-                vacantProperties: 0
-            });
-        }
 
-        // Calculs basiques
+        // Calculs des revenus et de l'occupation
         let occupiedCount = 0;
         let expectedRevenue = 0;
 
@@ -44,43 +53,60 @@ export async function GET(request: Request) {
             }
         });
 
-        const occupancyRate = Math.round((occupiedCount / totalProperties) * 100);
-        const vacantProperties = totalProperties - occupiedCount;
+        const occupancyRate = totalProperties > 0 ? Math.round((occupiedCount / totalProperties) * 100) : 0;
+        const vacantProperties = Math.max(0, totalProperties - occupiedCount);
 
-        const pendingLeases = await prisma.lease.findMany({
+        // Encaissements réels du mois en cours
+        const currentMonthStr = new Date().toISOString().substring(0, 7);
+        const paidReceipts = await prisma.receipt.findMany({
             where: {
-                ownerId: user.userId,
-                status: 'PENDING',
-                isSignedElectronically: false // Assuming false means not signed by owner/tenant
+                lease: {
+                    OR: [
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { landlordId: user.userId } }
+                    ]
+                },
+                periodMonth: currentMonthStr,
+                status: { in: ['paid', 'PAID'] }
             },
-            take: 1
+            select: {
+                totalAmount: true,
+                rentAmount: true
+            }
         });
-        
+
+        const collectedRevenue = paidReceipts.reduce((sum, r) => sum + (r.totalAmount || r.rentAmount || 0), 0);
+
         const pendingLeasesCount = await prisma.lease.count({
             where: {
-                ownerId: user.userId,
+                OR: [
+                    { landlordId: user.userId },
+                    { property: { ownerUserId: user.userId } },
+                    { property: { landlordId: user.userId } }
+                ],
                 status: 'PENDING'
             }
         });
 
-        const incidentsCount = await prisma.reclamationLocataire.count({
+        const incidentsCount = await prisma.ticketMaintenance.count({
             where: {
-                lease: {
-                    property: {
-                        OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
-                    }
+                logement: {
+                    OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
                 },
-                statut: { in: ['OUVERT', 'EN_COURS'] }
+                statut: { in: ['NOUVEAU', 'EN_COURS', 'OUVERT'] }
             }
         });
 
         return NextResponse.json({
+            user: userRecord,
             totalProperties,
+            occupiedCount,
             occupancyRate,
             monthlyRevenue: expectedRevenue,
+            collectedRevenue,
             vacantProperties,
             pendingLeasesCount,
-            pendingLeaseId: pendingLeases.length > 0 ? pendingLeases[0].id : null,
             incidentsCount,
             currency: 'XOF'
         });

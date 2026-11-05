@@ -13,7 +13,8 @@ export async function GET(request: Request) {
         // Récupérer le bail du locataire
         const lease = await prisma.lease.findFirst({
             where: { tenantId: user.userId },
-            include: { property: true }
+            include: { property: true },
+            orderBy: { createdAt: 'desc' }
         });
 
         if (!lease) {
@@ -27,10 +28,13 @@ export async function GET(request: Request) {
 
         const receipts = dbReceipts.map(r => ({
             id: r.id,
-            date: r.paidAt?.toISOString().substring(0, 10) || '',
-            amount: r.totalAmount,
+            receiptRef: r.receiptRef,
+            date: r.paidAt?.toISOString().substring(0, 10) || r.createdAt.toISOString().substring(0, 10),
+            amount: r.totalAmount || r.rentAmount || 0,
             status: r.status === 'paid' || r.status === 'PAID' ? 'PAID' : 'PENDING',
-            period: r.moisConcerne || r.periodMonth
+            period: r.moisConcerne || r.periodMonth,
+            paymentMethod: r.paymentMethod || 'Wave',
+            receiptHash: r.receiptHash || null
         }));
 
         return NextResponse.json({

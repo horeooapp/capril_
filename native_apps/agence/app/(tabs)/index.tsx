@@ -23,17 +23,8 @@ export default function AgencePrototypeHomeScreen() {
   const [roleView, setRoleView] = useState<'chef' | 'collab'>('chef');
   const [aTab, setATab] = useState<'home' | 'biens' | 'mandants' | 'ext' | 'flux' | 'verif' | 'team'>('home');
 
-  const [mandants, setMandants] = useState([
-    { id: 'M1', nom: 'Koffi N’Guessan', bai: 'BAI-007', ref: 'M-2026-014', mask: true, diaspora: true, enc: 350000, rev: 'du' },
-    { id: 'M2', nom: 'SCI Les Palmiers', bai: 'BAI-003', ref: 'M-2025-088', mask: false, diaspora: false, enc: 200000, rev: 'du' },
-    { id: 'M3', nom: 'Aïssata Diallo', bai: 'BAI-005', ref: 'M-2026-002', mask: true, diaspora: true, enc: 260000, rev: 'fait' },
-  ]);
-
-  const [verifs, setVerifs] = useState([
-    { bien: 'Cour commune · Yopougon Niangon', dem: 'Koffi N’Guessan (hors mandat)', st: 'demande' },
-    { bien: 'Immeuble · Abobo PK18', dem: 'Bailleur BAI-012', st: 'planifiee' },
-    { bien: 'Villa · Bingerville', dem: 'SCI Horizon', st: 'rapport' },
-  ]);
+  const [mandants, setMandants] = useState<any[]>([]);
+  const [verifs, setVerifs] = useState<any[]>([]);
 
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
@@ -69,7 +60,7 @@ export default function AgencePrototypeHomeScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.subMuted}>Agence Riviera · AGR-2021-0133 · CPRAIMA-CI</Text>
             <Text style={styles.h1}>
-              {roleView === 'chef' ? 'Estelle Aka · Chef d’agence' : 'Yves Koffi · Gestionnaire'}
+              {roleView === 'chef' ? 'Chef d’agence' : 'Gestionnaire'}
             </Text>
           </View>
           <Pressable
@@ -112,7 +103,12 @@ export default function AgencePrototypeHomeScreen() {
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
             <Text style={styles.h1}>Biens gérés sous mandat (Mandats reçus)</Text>
             <Text style={styles.subMuted}>Biens et lots immobiliers confiés à votre agence par mandat de gestion.</Text>
-            {mandants.map((m) => (
+            {mandants.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 28 }]}>
+                <Building2 color="#9CA3AF" size={32} />
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 8 }}>Aucun bien sous mandat</Text>
+              </View>
+            ) : mandants.map((m) => (
               <View key={m.id} style={styles.card}>
                 <Text style={styles.boldText}>
                   Bailleur mandant : {roleView === 'collab' && m.mask ? m.bai : m.nom}
@@ -128,7 +124,12 @@ export default function AgencePrototypeHomeScreen() {
         {aTab === 'mandants' && (
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
             <Text style={styles.h1}>Mes bailleurs mandants</Text>
-            {mandants.map((m) => (
+            {mandants.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 28 }]}>
+                <Building2 color="#9CA3AF" size={32} />
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 8 }}>Aucun bien sous mandat</Text>
+              </View>
+            ) : mandants.map((m) => (
               <View key={m.id} style={styles.card}>
                 <Text style={styles.boldText}>{roleView === 'chef' || !m.mask ? m.nom : m.bai}</Text>
                 {roleView === 'chef' && (
@@ -204,8 +205,8 @@ export default function AgencePrototypeHomeScreen() {
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
             <Text style={styles.h1}>Équipe & Masquage (RG-CONF-02)</Text>
             <View style={styles.card}>
-              <Text style={styles.boldText}>Estelle Aka · Chef d’agence (Bailleurs réels visibles)</Text>
-              <Text style={styles.boldText}>Yves Koffi · Gestionnaire (Codes BAI-NNN sur biens masqués)</Text>
+              <Text style={styles.boldText}>Chef d’agence (Bailleurs réels visibles)</Text>
+              <Text style={styles.boldText}>Gestionnaire (Codes BAI-NNN sur biens masqués)</Text>
               <Text style={styles.boldText}>Awa Cissé · Gestionnaire (Codes BAI-NNN sur biens masqués)</Text>
             </View>
           </View>

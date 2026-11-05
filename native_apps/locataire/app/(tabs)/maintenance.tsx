@@ -29,28 +29,38 @@ export default function MaintenanceScreen() {
   const [description, setDescription] = useState('');
   const [hasPhoto, setHasPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState([
-    {
-      id: '1',
-      cat: '💧 Plomberie',
-      t: 'Fuite sous l’évier de la cuisine',
-      d: 'Émis le 2 nov. 2026 à 14:20 · 2 photos horodatées',
-      dest: 'Reçu par le bailleur (Koffi N’Guessan)',
-      st: 'Pris en charge',
-      stColor: '#3B82F6',
-      stBg: '#EFF6FF',
-    },
-    {
-      id: '2',
-      cat: '⚡ Électricité',
-      t: 'Interrupteur couloir remplacé',
-      d: 'Émis le 12 oct. 2026 · Clôturé contradictoirement',
-      dest: 'Validé et réglé par le bailleur',
-      st: 'Résolu',
-      stColor: '#059669',
-      stBg: '#ECFDF5',
-    },
-  ]);
+  const [history, setHistory] = useState<any[]>([]);
+  const [landlordName, setLandlordName] = useState('Bailleur propriétaire');
+  const [propertyName, setPropertyName] = useState('Votre logement');
+
+  const loadTickets = async () => {
+    try {
+      const res = await fetchWithAuth('/locataire/maintenance');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.tickets && Array.isArray(json.tickets)) {
+          setHistory(json.tickets.map((t: any) => ({
+            id: t.id,
+            cat: t.categorie || 'Incident',
+            t: t.description,
+            d: t.dateSignalement ? `Émis le ${new Date(t.dateSignalement).toLocaleDateString('fr-FR')}` : 'Signalé',
+            dest: `Reçu par ${json.landlordName || 'le bailleur'}`,
+            st: t.statut === 'RESOLU' ? 'Résolu' : t.statut === 'EN_COURS' ? 'Pris en charge' : 'Transmis',
+            stColor: t.statut === 'RESOLU' ? '#059669' : t.statut === 'EN_COURS' ? '#3B82F6' : '#D97706',
+            stBg: t.statut === 'RESOLU' ? '#ECFDF5' : t.statut === 'EN_COURS' ? '#EFF6FF' : '#FEF3C7',
+          })));
+        }
+        if (json.landlordName) setLandlordName(json.landlordName);
+        if (json.propertyName) setPropertyName(json.propertyName);
+      }
+    } catch (e) {
+      console.error('Erreur chargement maintenance', e);
+    }
+  };
+
+  React.useEffect(() => {
+    loadTickets();
+  }, []);
 
   const handleSubmit = async () => {
     if (!title.trim() || !description.trim()) {
@@ -60,7 +70,7 @@ export default function MaintenanceScreen() {
 
     setLoading(true);
     try {
-      await fetchWithAuth('/locataire/maintenance', {
+      const res = await fetchWithAuth('/locataire/maintenance', {
         method: 'POST',
         body: JSON.stringify({
           category,
@@ -69,33 +79,22 @@ export default function MaintenanceScreen() {
           hasPhoto,
         }),
       });
-      Alert.alert(
-        'Signalement émis avec succès',
-        'Votre signalement a été transmis au bailleur avec horodatage certifié SHA-256 (ADD-11).'
-      );
+      if (res.ok) {
+        Alert.alert(
+          'Signalement émis avec succès',
+          `Votre signalement a été transmis à ${landlordName} avec horodatage certifié SHA-256 (ADD-11).`
+        );
+        setTitle('');
+        setDescription('');
+        setHasPhoto(false);
+        loadTickets();
+      } else {
+        const errJson = await res.json();
+        Alert.alert('Erreur', errJson.error || 'Erreur lors de l’envoi');
+      }
     } catch (e) {
-      Alert.alert(
-        'Signalement enregistré',
-        'Votre signalement a été horodaté et notifié à votre bailleur (Koffi N’Guessan).'
-      );
+      Alert.alert('Erreur', 'Impossible de joindre le serveur.');
     } finally {
-      const selectedCat = CATEGORIES.find((c) => c.id === category)?.label || 'Incident';
-      setHistory((prev) => [
-        {
-          id: String(Date.now()),
-          cat: selectedCat,
-          t: title.trim(),
-          d: 'Émis à l’instant · Preuve horodatée SHA-256',
-          dest: 'Transmis au bailleur (En attente d’accusé)',
-          st: 'Transmis',
-          stColor: '#D97706',
-          stBg: '#FEF3C7',
-        },
-        ...prev,
-      ]);
-      setTitle('');
-      setDescription('');
-      setHasPhoto(false);
       setLoading(false);
     }
   };
@@ -119,8 +118,8 @@ export default function MaintenanceScreen() {
             </Text>
             <View style={styles.destinataireCard}>
               <Text style={styles.destinataireLabel}>DESTINATAIRE NOTIFIÉ :</Text>
-              <Text style={styles.destinataireName}>Koffi N’Guessan (Bailleur propriétaire)</Text>
-              <Text style={styles.destinataireSub}>Logement : Appartement A1 · Résidence Émeraude</Text>
+              <Text style={styles.destinataireName}>{landlordName}</Text>
+              <Text style={styles.destinataireSub}>Logement : {propertyName}</Text>
             </View>
           </View>
 
@@ -219,8 +218,17 @@ export default function MaintenanceScreen() {
               <Text style={styles.historyCount}>{history.length} déclarations</Text>
             </View>
 
-            {history.map((h) => (
-              <View key={h.id} style={styles.historyCard}>
+            {history.length === 0 ? (
+              <View style={[styles.historyCard, { alignItems: 'center', paddingVertical: 28 }]}>
+                <Wrench color="#9CA3AF" size={32} />
+                <Text style={[styles.historyTitle, { marginTop: 8, color: '#64748B' }]}>Aucun incident signalé</Text>
+                <Text style={[styles.historySub, { textAlign: 'center', marginTop: 4 }]}>
+                  En cas de panne ou dégradation, utilisez le formulaire ci-dessus pour notifier votre bailleur avec preuve horodatée.
+                </Text>
+              </View>
+            ) : (
+              history.map((h) => (
+                <View key={h.id} style={styles.historyCard}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.historyCat}>{h.cat}</Text>
                   <View style={[styles.pill, { backgroundColor: h.stBg }]}>
@@ -240,7 +248,7 @@ export default function MaintenanceScreen() {
                   <Text style={styles.historySub}>{h.d}</Text>
                 </View>
               </View>
-            ))}
+            )))}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

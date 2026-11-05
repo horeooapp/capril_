@@ -9,18 +9,24 @@ export async function GET(request: Request) {
 
         const lease = await prisma.lease.findFirst({
             where: { tenantId: user.userId, status: 'ACTIVE' },
-            include: { property: true }
+            include: { property: true },
+            orderBy: { createdAt: 'desc' }
         });
 
         if (!lease) {
             return NextResponse.json({ error: "Aucun bail trouvé" }, { status: 404 });
         }
 
-        // Renvoie une URL fictive de PDF pour la démo, ou qrCodeUrl si présent
         return NextResponse.json({
             id: lease.id,
-            property: lease.property.name,
-            documentUrl: lease.qrCodeUrl || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+            leaseReference: lease.leaseReference,
+            property: lease.property?.name || 'Votre logement',
+            startDate: lease.startDate,
+            endDate: lease.endDate,
+            rentAmount: lease.rentAmount,
+            depositAmount: lease.depositAmount,
+            status: lease.status,
+            documentUrl: lease.qrCodeUrl || `/api/mobile/leases/${lease.id}/pdf`
         });
 
     } catch (error) {

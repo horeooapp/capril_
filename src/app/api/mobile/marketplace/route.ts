@@ -2,6 +2,19 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getPublicMarketplaceAnnonces } from '@/actions/marketplace-actions';
 
+export async function GET(request: Request) {
+    try {
+        const annonces = await getPublicMarketplaceAnnonces();
+        return NextResponse.json({
+            success: true,
+            annonces: annonces || []
+        });
+    } catch (error: any) {
+        console.error('Marketplace GET API Error:', error);
+        return NextResponse.json({ success: false, annonces: [] }, { status: 500 });
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const { token } = await request.json();
@@ -12,7 +25,7 @@ export async function POST(request: Request) {
 
         const user = await prisma.user.findFirst({
             where: {
-                id: token // Simplification pour le mobile (on utilise l'ID comme token pour l'instant)
+                id: token
             }
         });
 

@@ -90,8 +90,10 @@ export default function BailleurAndAgencePrototypeScreen() {
 
   const [bBiens, setBBiens] = useState<any[]>([]);
   const [bBaux, setBBaux] = useState<any[]>([]);
+  const [bReceipts, setBReceipts] = useState<any[]>([]);
+  const [dashData, setDashData] = useState<any>(null);
 
-  // --- ÉTATS PROTOTYPE AGENCE AGRÉÉE ---
+  // --- ÉTATS AGENCE AGRÉÉE ---
   const [aTab, setATab] = useState<
     'home' | 'biens' | 'mandants' | 'baux' | 'ext' | 'flux' | 'verif' | 'team'
   >('home');
@@ -120,17 +122,24 @@ export default function BailleurAndAgencePrototypeScreen() {
           return;
         }
 
-        const [dashRes, propsRes] = await Promise.all([
+        const [dashRes, propsRes, leasesRes, recRes] = await Promise.all([
           fetchWithAuth('/proprietaire/dashboard'),
-          fetchWithAuth('/proprietaire/properties')
+          fetchWithAuth('/proprietaire/properties'),
+          fetchWithAuth('/proprietaire/leases'),
+          fetchWithAuth('/proprietaire/receipts')
         ]);
+
+        if (dashRes.ok) {
+          const dJson = await dashRes.json();
+          setDashData(dJson);
+        }
 
         if (propsRes.ok) {
           const propsJson = await propsRes.json();
           if (propsJson.properties && Array.isArray(propsJson.properties)) {
             setBBiens(propsJson.properties.map((p: any) => ({
               id: p.id,
-              struct: p.commune || 'Abidjan',
+              struct: p.commune || p.address || 'Abidjan',
               type: p.propertyType || 'Bien',
               name: p.name,
               loyer: p.currentRent || p.declaredRentFcfa || 0,
@@ -143,6 +152,28 @@ export default function BailleurAndAgencePrototypeScreen() {
             })));
           }
         }
+
+        if (leasesRes.ok) {
+          const lJson = await leasesRes.json();
+          if (lJson.leases && Array.isArray(lJson.leases)) {
+            setBBaux(lJson.leases.map((l: any) => ({
+              ref: l.leaseReference,
+              bien: l.property?.name || 'Bien',
+              loc: l.tenant ? `${l.tenant.firstName || ''} ${l.tenant.lastName || ''}`.trim() : 'Locataire',
+              loyer: l.rentAmount || 0,
+              duree: l.durationMonths || 12,
+              dgi: true,
+              sha: l.id.substring(0, 8) + '...'
+            })));
+          }
+        }
+
+        if (recRes.ok) {
+          const rJson = await recRes.json();
+          if (rJson.receipts && Array.isArray(rJson.receipts)) {
+            setBReceipts(rJson.receipts);
+          }
+        }
       } catch (e) {
         console.error("Erreur chargement dashboard propriétaire", e);
       } finally {
@@ -151,6 +182,17 @@ export default function BailleurAndAgencePrototypeScreen() {
     };
     init();
   }, [params.profile]);
+
+  const userName = dashData?.user
+    ? (`${dashData.user.firstName || ''} ${dashData.user.lastName || ''}`.trim() || dashData.user.email || 'Propriétaire')
+    : 'Propriétaire';
+  const userInitials = userName
+    .split(' ')
+    .filter(Boolean)
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2) || 'PR';
 
   const fmt = (n: number) =>
     eurMode && appMode === 'bailleur'
@@ -232,7 +274,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={styles.drawerHeaderTop}>
                 <View style={[styles.drawerAvatarBox, { backgroundColor: primaryColor }]}>
                   <Text style={styles.drawerAvatarText}>
-                    {isBailleur ? 'KN' : 'AR'}
+                    {isBailleur ? userInitials : 'AR'}
                   </Text>
                 </View>
                 <Pressable
@@ -245,7 +287,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
               <View style={{ marginTop: 12 }}>
                 <Text style={styles.drawerUser}>
-                  {isBailleur ? 'Koffi N’Guessan' : 'Cabinet Agence Riviera'}
+                  {isBailleur ? userName : 'Cabinet Agence Riviera'}
                 </Text>
                 <View style={styles.drawerBadgeRow}>
                   <View style={[styles.certifBadge, { backgroundColor: isBailleur ? '#FEF3C7' : '#EFF6FF' }]}>
@@ -255,7 +297,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     </Text>
                   </View>
                   <Text style={styles.drawerUserSub}>
-                    {isBailleur ? '3 biens · 2 baux DGI' : 'AGR-2021-0133'}
+                    {isBailleur ? `${bBiens.length} bien(s) · ${bBaux.length} bail(aux)` : 'AGR-2021-0133'}
                   </Text>
                 </View>
               </View>
@@ -361,7 +403,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                           Signalements reçus
                         </Text>
                         <View style={styles.incidentCountBadge}>
-                          <Text style={styles.incidentCountText}>2</Text>
+                          <Text style={styles.incidentCountText}>{dashData?.incidentsCount ?? 0}</Text>
                         </View>
                       </View>
                       <Text style={styles.drawerItemDesc}>Déclarations émises par les locataires</Text>
@@ -451,8 +493,8 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={styles.sectionGap}>
                 <View style={styles.rowBetween}>
                   <View>
-                    <Text style={styles.subMuted}>Novembre 2026 · Espace bailleur</Text>
-                    <Text style={styles.h1}>Koffi N’Guessan</Text>
+                    <Text style={styles.subMuted}>Espace Propriétaire Bailleur</Text>
+                    <Text style={styles.h1}>{userName}</Text>
                   </View>
                   <Pressable
                     style={styles.pillGold}
@@ -465,13 +507,13 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <View style={[styles.heroCard, { backgroundColor: '#1B4D3E' }]}>
                   <View style={styles.rowBetween}>
                     <Text style={styles.heroSub}>LOYERS ENCAISSÉS CE MOIS</Text>
-                    <Text style={styles.heroSub}>89 %</Text>
+                    <Text style={styles.heroSub}>{dashData?.occupancyRate ?? 0} % occupation</Text>
                   </View>
                   <Text style={styles.heroBig}>
-                    {fmt(760000)} <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {fmt(850000)}</Text>
+                    {fmt(dashData?.collectedRevenue || 0)} <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {fmt(dashData?.monthlyRevenue || 0)}</Text>
                   </Text>
                   <Text style={styles.heroSub}>
-                    2 loyers en retard (relance SMS auto J+7 RG-QUI-05) · Frais QAPRIL : 0 F
+                    {bBiens.filter((x) => x.statut === 'loue').length} bien(s) loué(s) sur {bBiens.length} · Frais de gestion : 0 F
                   </Text>
                 </View>
 
@@ -514,7 +556,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('cand')}>
                     <ShieldCheck color="#1E7E4E" size={20} />
                     <Text style={styles.boldText}>Vivier qualifié</Text>
-                    <Text style={styles.subMuted}>4 candidatures ICL</Text>
+                    <Text style={styles.subMuted}>Candidatures qualifiées</Text>
                   </Pressable>
                 </View>
               </View>
@@ -523,7 +565,16 @@ export default function BailleurAndAgencePrototypeScreen() {
             {bTab === 'biens' && (
               <View style={styles.sectionGap}>
                 <Text style={styles.h1}>Mes biens ({bBiens.length})</Text>
-                {bBiens.map((b) => (
+                {bBiens.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <Building2 color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucun bien enregistré</Text>
+                    <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                      Vos biens immobiliers apparaîtront ici avec leur niveau de conformité légale.
+                    </Text>
+                  </View>
+                ) : (
+                  bBiens.map((b) => (
                   <View key={b.id} style={styles.card}>
                     <View style={styles.rowBetween}>
                       <Text style={styles.boldText}>{b.name} · {b.type}</Text>
@@ -557,14 +608,23 @@ export default function BailleurAndAgencePrototypeScreen() {
                       </Pressable>
                     </View>
                   </View>
-                ))}
+                )))}
               </View>
             )}
 
             {bTab === 'baux' && (
               <View style={styles.sectionGap}>
                 <Text style={styles.h1}>Mes baux ({bBaux.length})</Text>
-                {bBaux.map((b) => (
+                {bBaux.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <FileSpreadsheet color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucun bail actif</Text>
+                    <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                      Vos contrats de baux enregistrés à la DGI apparaîtront ici.
+                    </Text>
+                  </View>
+                ) : (
+                  bBaux.map((b) => (
                   <View key={b.ref} style={styles.card}>
                     <View style={styles.rowBetween}>
                       <Text style={styles.boldText}>{b.bien} · {b.loc}</Text>
@@ -586,28 +646,38 @@ export default function BailleurAndAgencePrototypeScreen() {
                       </Pressable>
                     )}
                   </View>
-                ))}
+                )))}
               </View>
             )}
 
             {bTab === 'quit' && (
               <View style={styles.sectionGap}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.h1}>Quittances · Nov. 2026</Text>
+                  <Text style={styles.h1}>Quittances ({bReceipts.length})</Text>
                   <Pressable style={styles.pillGold} onPress={() => setCashModal(true)}>
                     <Text style={styles.pillGoldText}>+ Espèces</Text>
                   </Pressable>
                 </View>
-                <View style={styles.card}>
-                  <Text style={styles.boldText}>Yao Kouassi · Porte 1 · Impayé J+7</Text>
-                  <Text style={styles.subMuted}>SMS automatique envoyé à J+7 (RG-QUI-05)</Text>
-                  <Pressable
-                    style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 8 }]}
-                    onPress={() => Alert.alert('Relance envoyée', 'Relance SMS et notification horodatée envoyée.')}
-                  >
-                    <Text style={styles.btnPrimaryText}>Relancer maintenant</Text>
-                  </Pressable>
-                </View>
+                {bReceipts.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <FileText color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucune quittance émise</Text>
+                    <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
+                      Les quittances certifiées SHA-256 générées pour vos locataires apparaîtront ici.
+                    </Text>
+                  </View>
+                ) : (
+                  bReceipts.map((r: any, i: number) => (
+                    <View key={r.id || i} style={styles.card}>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.boldText}>{r.lease?.property?.name || 'Bien'} · {r.periodMonth}</Text>
+                        <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(r.totalAmount || r.rentAmount || 0)}</Text>
+                      </View>
+                      <Text style={styles.subMuted}>Locataire : {r.lease?.tenant ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim() : 'Locataire'}</Text>
+                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Conforme CDC-CI</Text>
+                    </View>
+                  ))
+                )}
               </View>
             )}
 
@@ -622,10 +692,10 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </Pressable>
                 </View>
                 <View style={styles.card}>
-                  <Text style={styles.subMuted}>ENCAISSÉ CE MOIS (FRAIS QAPRIL : 0 F)</Text>
-                  <Text style={styles.h1}>{fmt(760000)}</Text>
+                  <Text style={styles.subMuted}>ENCAISSÉ CE MOIS (FRAIS DE SERVICE : 0 F)</Text>
+                  <Text style={styles.h1}>{fmt(dashData?.collectedRevenue || 0)}</Text>
                   <Text style={styles.subMuted}>
-                    Vos loyers arrivent directement sur vos comptes Wave, Orange Money, MTN ou bancaire.
+                    Vos loyers confirmés sont automatiquement réconciliés et disponibles sans commission cachée.
                   </Text>
                 </View>
               </View>
@@ -642,16 +712,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.pillGoldText}>+ Confier un bien</Text>
                   </Pressable>
                 </View>
-                <View style={styles.card}>
-                  <Text style={styles.boldText}>Agence Riviera · AGR-2021-0133 (Agence agréée)</Text>
-                  <Text style={styles.subMuted}>
-                    Villa Marcory · Substitution totale et exclusive (RG-MAN-01) · Honoraires 8 % sur loyers perçus. Vous êtes en lecture seule ; collaborateurs : code BAI-007.
-                  </Text>
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.boldText}>Kouadio Ferdinand · Intermédiaire (D-2026-022)</Text>
-                  <Text style={styles.subMuted}>
-                    Cour Yopougon · Délégation partielle (quittances, encaissement, relances — jamais la modification du bail · RG-DEL-01) · Honoraires 8 %.
+                <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                  <Users color="#9CA3AF" size={36} />
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucun mandat délégué</Text>
+                  <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4, paddingHorizontal: 12 }]}>
+                    Vous gérez vos biens en direct. Utilisez le bouton « + Confier un bien » pour mandater une agence agréée ou un gérant.
                   </Text>
                 </View>
               </View>
@@ -663,18 +728,13 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <Text style={styles.subMuted}>
                   Vous voyez la tranche ICL et les badges, jamais le score chiffré ni les pièces réservées.
                 </Text>
-                {[
-                  { n: 'Adjoua K.', icl: 'A', ok: '12/12 à l’heure', compat: 92, prop: 165000 },
-                  { n: 'Sékou D.', icl: 'B', ok: '8/8 à l’heure', compat: 84, prop: 150000 },
-                ].map((c, i) => (
-                  <View key={i} style={styles.card}>
-                    <View style={styles.rowBetween}>
-                      <Text style={styles.boldText}>{c.n} · Tranche ICL {c.icl}</Text>
-                      <Text style={styles.boldText}>Compat. {c.compat}/100</Text>
-                    </View>
-                    <Text style={styles.subMuted}>{c.ok} · Propose {fmt(c.prop)}</Text>
-                  </View>
-                ))}
+                <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                  <Users color="#9CA3AF" size={36} />
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucune candidature en attente</Text>
+                  <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4, paddingHorizontal: 12 }]}>
+                    Dès qu’un candidat postule à l’un de vos biens avec son Passeport Locatif, son dossier apparaîtra ici.
+                  </Text>
+                </View>
               </View>
             )}
 
@@ -682,10 +742,9 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={styles.sectionGap}>
                 <Text style={styles.h1}>Vérification Bailleur (ADD-22)</Text>
                 <View style={styles.card}>
-                  <Text style={styles.boldText}>Niveau 1 · Déclaré (OTP) — Validé</Text>
-                  <Text style={styles.boldText}>Niveau 2 · Identité + Mobile Money — Validé</Text>
-                  <Text style={styles.boldText}>Niveau 3 · Titre de propriété contrôlé — 4 biens</Text>
-                  <Text style={styles.boldText}>Niveau 4 · Visite agence agréée CPRAIMA-CI — 1 bien</Text>
+                  <Text style={styles.boldText}>Niveau KYC actuel : Niveau {dashData?.user?.kycLevel ?? 1} ({dashData?.user?.kycStatus ?? 'Validé'})</Text>
+                  <Text style={[styles.subMuted, { marginTop: 4 }]}>Patrimoine déclaré : {bBiens.length} bien(s)</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2 }]}>Baux en cours : {bBaux.length} bail(aux)</Text>
                 </View>
               </View>
             )}
@@ -702,7 +761,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.subMuted}>Agence Riviera · AGR-2021-0133 · CPRAIMA-CI</Text>
                 <Text style={styles.h1}>
-                  {roleView === 'chef' ? 'Estelle Aka · Chef d’agence' : 'Yves Koffi · Gestionnaire'}
+                  {roleView === 'chef' ? 'Chef d’agence' : 'Gestionnaire'}
                 </Text>
               </View>
               <Pressable

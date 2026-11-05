@@ -2,6 +2,69 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 
+export async function GET(request: Request) {
+    try {
+        const user = await authenticateMobileRequest(request);
+        if (!user) {
+            return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
+        }
+
+        const activeLease = await prisma.lease.findFirst({
+            where: { tenantId: user.userId, status: 'ACTIVE' },
+            include: { property: true },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        let landlordName = 'Bailleur';
+        let propertyName = activeLease?.property?.name || 'Votre logement';
+
+        if (activeLease) {
+            const landlordId = activeLease.landlordId || activeLease.property?.ownerUserId;
+            if (landlordId) {
+                const landlord = await prisma.user.findUnique({
+                    where: { id: landlordId },
+                    select: { firstName: true, lastName: true }
+                });
+                if (landlord) {
+                    landlordName = activeLease.bailleurMasque
+                        ? 'Bailleur certifié'
+                        : `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+                }
+            }
+        }
+
+        const tickets = await prisma.ticketMaintenance.findMany({
+            where: { locataireId: user.userId },
+            include: {
+                logement: { select: { name: true, address: true, commune: true } }
+            },
+            orderBy: { dateSignalement: 'desc' }
+        });
+
+        const formattedTickets = tickets.map(t => ({
+            id: t.id,
+            ticketRef: t.ticketRef,
+            categorie: t.categorie,
+            description: t.description,
+            statut: t.statut,
+            urgence: t.urgence,
+            dateSignalement: t.dateSignalement?.toISOString() ?? null,
+            bien: t.logement ? `${t.logement.name} · ${t.logement.commune}` : propertyName,
+            destinataire: landlordName
+        }));
+
+        return NextResponse.json({
+            tickets: formattedTickets,
+            landlordName,
+            propertyName
+        });
+
+    } catch (error: any) {
+        console.error("[MOBILE API] locataire/maintenance GET error:", error);
+        return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const user = await authenticateMobileRequest(request);
@@ -11,7 +74,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { issueType, title, description } = body;
+        const { category, title, description, hasPhoto } = body;
 
         if (!title || !description) {
             return NextResponse.json({ error: "Le titre et la description sont requis." }, { status: 400 });
@@ -19,7 +82,9 @@ export async function POST(request: Request) {
 
         // Récupérer le bail (pour lier la requête à une propriété)
         const lease = await prisma.lease.findFirst({
-            where: { tenantId: user.userId, status: 'ACTIVE' }
+            where: { tenantId: user.userId, status: 'ACTIVE' },
+            include: { property: true },
+            orderBy: { createdAt: 'desc' }
         });
 
         if (!lease || !lease.propertyId) {
@@ -37,7 +102,7 @@ export async function POST(request: Request) {
                 leaseId: lease.id,
                 locataireId: user.userId,
                 description: `[${title}] ${description}`,
-                categorie: 'MAI_AU', // Default category since issueType might not match enum
+                categorie: category || 'MAI_AU',
                 urgence: 'NORMALE',
             }
         });
@@ -49,7 +114,7 @@ export async function POST(request: Request) {
         });
 
     } catch (error: any) {
-        console.error("[MOBILE API] locataire/maintenance error:", error);
-        return NextResponse.json({ error: "Erreur interne du serveur. Vérifiez le modèle Prisma." }, { status: 500 });
+        console.error("[MOBILE API] locataire/maintenance POST error:", error);
+        return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
     }
 }

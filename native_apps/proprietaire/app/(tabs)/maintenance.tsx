@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../../lib/api';
 import {
   View,
   Text,
+  ActivityIndicator,
   StyleSheet,
   Pressable,
   ScrollView,
@@ -29,55 +31,43 @@ export default function ProprietaireMaintenanceScreen() {
   const [filter, setFilter] = useState<'all' | 'nouveau' | 'en_cours' | 'resolu'>('all');
   const [selectedIncident, setSelectedIncident] = useState<any>(null);
   const [artisanNote, setArtisanNote] = useState('');
+  const [incidents, setIncidents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [incidents, setIncidents] = useState([
-    {
-      id: 'INC-2026-001',
-      bien: 'Appartement A1 · Résidence Émeraude, Cocody',
-      locataire: 'Adjoua Kouamé',
-      telephone: '+225 07 08 09 10 11',
-      titre: 'Fuite sous l’évier de la cuisine',
-      description:
-        'Un écoulement d’eau continu a été constaté sous le siphon. Présence d’humidité sous le meuble.',
-      categorie: '💧 Plomberie',
-      date: 'Émis le 2 nov. 2026 à 14:20 · SHA-256 certifié',
-      photosCount: 2,
-      statut: 'nouveau',
-      statutLabel: 'Nouveau reçu',
-      statutColor: '#DC2626',
-      statutBg: '#FEE2E2',
-    },
-    {
-      id: 'INC-2026-002',
-      bien: 'Appartement A3 · Résidence Émeraude, Cocody',
-      locataire: 'Jean-Marc Konan',
-      telephone: '+225 05 06 07 08 09',
-      titre: 'Climatiseur split salon en panne',
-      description: 'Le compresseur ne démarre plus, voyant orange clignotant sur l’unité murale.',
-      categorie: '❄️ Climatisation',
-      date: 'Émis hier à 09:15 · 1 photo horodatée',
-      photosCount: 1,
-      statut: 'en_cours',
-      statutLabel: 'Artisan mandaté',
-      statutColor: '#D97706',
-      statutBg: '#FEF3C7',
-    },
-    {
-      id: 'INC-2026-003',
-      bien: 'Villa Marcory Zone 4',
-      locataire: 'Représenté par Agence Riviera (M-2026-014)',
-      telephone: '+225 27 22 44 55 66',
-      titre: 'Réparation gâche électrique portail',
-      description: 'Gâche remplacée suite à une surtension. Facture artisan transmise pour archivage DGI.',
-      categorie: '⚡ Électricité',
-      date: 'Résolu le 28 oct. 2026',
-      photosCount: 2,
-      statut: 'resolu',
-      statutLabel: 'Résolu & validé',
-      statutColor: '#059669',
-      statutBg: '#ECFDF5',
-    },
-  ]);
+  const loadIncidents = async () => {
+    try {
+      const res = await fetchWithAuth('/proprietaire/maintenance');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.tickets && Array.isArray(json.tickets)) {
+          setIncidents(json.tickets.map((t: any) => ({
+            id: t.id,
+            ticketRef: t.ticketRef,
+            bien: t.bien || 'Logement',
+            locataire: t.locataire || 'Locataire',
+            telephone: t.telephone || '',
+            titre: t.description ? t.description.substring(0, 40) : 'Signalement',
+            description: t.description || '',
+            categorie: t.categorie || 'Maintenance',
+            date: t.dateSignalement ? `Émis le ${new Date(t.dateSignalement).toLocaleDateString('fr-FR')}` : 'Signalé',
+            photosCount: 0,
+            statut: t.statut === 'RESOLU' ? 'resolu' : t.statut === 'EN_COURS' ? 'en_cours' : 'nouveau',
+            statutLabel: t.statut === 'RESOLU' ? 'Résolu & validé' : t.statut === 'EN_COURS' ? 'En cours' : 'Nouveau reçu',
+            statutColor: t.statut === 'RESOLU' ? '#059669' : t.statut === 'EN_COURS' ? '#D97706' : '#DC2626',
+            statutBg: t.statut === 'RESOLU' ? '#ECFDF5' : t.statut === 'EN_COURS' ? '#FEF3C7' : '#FEE2E2',
+          })));
+        }
+      }
+    } catch (e) {
+      console.error('Erreur chargement maintenance', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadIncidents();
+  }, []);
 
   const handleUpdateStatus = (id: string, newStatus: 'en_cours' | 'resolu', label: string) => {
     setIncidents((prev) =>
@@ -139,9 +129,9 @@ export default function ProprietaireMaintenanceScreen() {
           {(
             [
               ['all', 'Tous les signalements'],
-              ['nouveau', 'Nouveaux reçus (1)'],
-              ['en_cours', 'Travaux en cours (1)'],
-              ['resolu', 'Résolus (1)'],
+              ['nouveau', `Nouveaux (${incidents.filter(x => x.statut === 'nouveau').length})`],
+              ['en_cours', `En cours (${incidents.filter(x => x.statut === 'en_cours').length})`],
+              ['resolu', `Résolus (${incidents.filter(x => x.statut === 'resolu').length})`],
             ] as [typeof filter, string][]
           ).map(([f, lbl]) => {
             const active = filter === f;
@@ -161,12 +151,23 @@ export default function ProprietaireMaintenanceScreen() {
 
         {/* LISTE DES SIGNALEMENTS REÇUS */}
         <View style={styles.listContainer}>
-          {filteredIncidents.map((inc) => (
-            <Pressable
-              key={inc.id}
-              style={styles.incidentCard}
-              onPress={() => setSelectedIncident(inc)}
-            >
+          {filteredIncidents.length === 0 ? (
+            <View style={[styles.incidentCard, { alignItems: 'center', paddingVertical: 36 }]}>
+              <Wrench color="#9CA3AF" size={36} />
+              <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 12 }}>
+                Aucun signalement {filter !== 'all' ? `(${filter})` : ''}
+              </Text>
+              <Text style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', marginTop: 4, paddingHorizontal: 16 }}>
+                Les déclarations de pannes émises par vos locataires apparaîtront ici avec photos horodatées et valeur légale.
+              </Text>
+            </View>
+          ) : (
+            filteredIncidents.map((inc) => (
+              <Pressable
+                key={inc.id}
+                style={styles.incidentCard}
+                onPress={() => setSelectedIncident(inc)}
+              >
               <View style={styles.rowBetween}>
                 <View style={styles.catBadge}>
                   <Text style={styles.catBadgeText}>{inc.categorie}</Text>
@@ -209,7 +210,7 @@ export default function ProprietaireMaintenanceScreen() {
                 </View>
               </View>
             </Pressable>
-          ))}
+          )))}
         </View>
       </ScrollView>
 
