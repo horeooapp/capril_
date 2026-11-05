@@ -5,6 +5,7 @@ import { Mail, ShieldCheck, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Sp
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { API_URL, getStoredToken, setStoredToken, setStoredProfile, UserProfileRole } from '../../lib/api';
+import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
 interface NativeOTPFormProps {
     role: 'TENANT' | 'LANDLORD' | 'ADMIN';
@@ -131,6 +132,7 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
                     await setStoredProfile(profile);
                 }
                 await setStoredToken(result.token);
+                registerForPushNotificationsAsync().catch(() => {});
                 router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
             } else {
                 setFeedback({ type: 'error', text: result.error || "Code incorrect ou expiré." });

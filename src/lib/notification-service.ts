@@ -243,8 +243,8 @@ export class NotificationService {
       const user = await prisma.user.findUnique({ where: { id: userId }, select: { pushToken: true } });
       if (!user?.pushToken) return false;
 
-      const title = "QAPRIL App";
-      const body = data.payload?.smsText || data.payload?.title || "Nouvelle notification importante sur votre espace QAPRIL.";
+      const title = data.payload?.titre || data.payload?.title || "QAPRIL App";
+      const body = data.payload?.message || data.payload?.smsText || data.payload?.title || data.payload?.titre || "Nouvelle notification importante sur votre espace QAPRIL.";
 
       // Case 1: Expo Push Token (Mobile)
       if (user.pushToken.startsWith('ExponentPushToken') || user.pushToken.startsWith('token:')) {
@@ -260,7 +260,8 @@ export class NotificationService {
             sound: 'default',
             title: title,
             body: body,
-            data: { event, referenceId: data.referenceId },
+            channelId: event === 'NOUVEAU_MESSAGE_BAIL' ? 'messages' : 'default',
+            data: { event, referenceId: data.referenceId, ...data.payload },
           }),
         });
         const resData = await response.json();

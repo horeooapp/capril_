@@ -2,6 +2,7 @@ import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platf
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
+import { playMessageNotificationSound } from '../../lib/notifications';
 import { Send, Check, CheckCheck } from 'lucide-react-native';
 
 export default function ChatScreen() {
@@ -12,6 +13,8 @@ export default function ChatScreen() {
     const [interlocutorName, setInterlocutorName] = useState('Bailleur');
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const flatListRef = useRef<FlatList>(null);
+    const lastMessageIdRef = useRef<string | null>(null);
+    const isFirstLoadRef = useRef<boolean>(true);
 
     useEffect(() => {
         const showSub = Keyboard.addListener(
@@ -39,12 +42,27 @@ export default function ChatScreen() {
         try {
             const response = await fetchWithAuth('/chat');
             const json = await response.json();
-            if (response.ok && json.messages) {
-                setMessages(json.messages);
+            if (response.ok && Array.isArray(json.messages)) {
+                const newMessages = json.messages;
+
+                // Jouer une notification sonore et vibrer si un nouveau message de l'interlocuteur est reçu
+                if (!isFirstLoadRef.current && newMessages.length > 0) {
+                    const latest = newMessages[newMessages.length - 1];
+                    if (latest.id !== lastMessageIdRef.current && latest.roleExpediteur !== 'LOCATAIRE') {
+                        playMessageNotificationSound(json.interlocutorName || 'Bailleur', latest.contenu);
+                    }
+                }
+
+                if (newMessages.length > 0) {
+                    lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
+                }
+                isFirstLoadRef.current = false;
+                setMessages(newMessages);
+
                 if (json.interlocutorName) {
                     setInterlocutorName(json.interlocutorName);
                 }
-                if (json.messages.length > 0) {
+                if (newMessages.length > 0) {
                     await fetchWithAuth('/chat/read', {
                         method: 'POST',
                         body: JSON.stringify({ role: 'LOCATAIRE' })
@@ -58,7 +76,7 @@ export default function ChatScreen() {
 
     useEffect(() => {
         loadMessages();
-        const interval = setInterval(loadMessages, 5000);
+        const interval = setInterval(loadMessages, 3500);
         return () => clearInterval(interval);
     }, []);
 

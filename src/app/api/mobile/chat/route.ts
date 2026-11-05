@@ -145,6 +145,65 @@ export async function POST(request: Request) {
             }
         });
 
+        // Envoi immédiat de la notification push au destinataire avec sonnerie
+        const destinataireId = lease.tenantId === user.userId
+            ? (lease.landlordId || lease.property?.ownerUserId)
+            : lease.tenantId;
+
+        if (destinataireId) {
+            try {
+                const [destinataire, expediteur] = await Promise.all([
+                    prisma.user.findUnique({
+                        where: { id: destinataireId },
+                        select: { pushToken: true, firstName: true, lastName: true }
+                    }),
+                    prisma.user.findUnique({
+                        where: { id: user.userId },
+                        select: { firstName: true, lastName: true }
+                    })
+                ]);
+
+                const senderName = expediteur
+                    ? `${expediteur.firstName || ''} ${expediteur.lastName || ''}`.trim()
+                    : (lease.tenantId === user.userId ? 'Locataire' : 'Bailleur');
+
+                if (destinataire?.pushToken) {
+                    const { sendExpoPushNotification } = await import('@/lib/expo-push');
+                    await sendExpoPushNotification({
+                        to: destinataire.pushToken,
+                        title: `💬 Message de ${senderName || 'votre correspondant'}`,
+                        body: contenu.trim(),
+                        sound: 'default',
+                        channelId: 'messages',
+                        data: {
+                            type: 'chat',
+                            leaseId,
+                            messageId: message.id
+                        }
+                    });
+                }
+
+                // Déclencher également la notification via NotificationService
+                const { NotificationService } = await import('@/lib/notification-service');
+                await NotificationService.envoyerNotification(
+                    destinataireId,
+                    "NOUVEAU_MESSAGE_BAIL",
+                    {
+                        payload: {
+                            titre: `Nouveau message de ${senderName || 'votre correspondant'}`,
+                            message: contenu.trim(),
+                            smsText: `QAPRIL: Nouveau message de ${senderName || 'votre correspondant'}: ${contenu.trim().substring(0, 100)}`,
+                            leaseId,
+                            msgId: message.id
+                        }
+                    }
+                ).catch((err: any) => console.warn('[Chat POST] NotificationService warning:', err));
+
+            } catch (notifErr) {
+                console.warn('[Chat POST] Erreur envoi push:', notifErr);
+            }
+        }
+
         return NextResponse.json({ success: true, message });
 
     } catch (error) {

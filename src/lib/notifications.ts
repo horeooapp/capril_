@@ -40,9 +40,14 @@ export async function sendNotification(payload: NotificationPayload): Promise<vo
             switch (channel) {
                 case 'PUSH':
                     if (user.pushToken) {
-                        // Placeholder: integrate with Firebase FCM
-                        console.log(`[PUSH] → ${user.pushToken}: ${payload.title || ''} | ${payload.content}`);
-                        delivered = true;
+                        const { sendExpoPushNotification } = await import("./expo-push");
+                        delivered = await sendExpoPushNotification({
+                            to: user.pushToken,
+                            title: payload.title || 'QAPRIL Notification',
+                            body: payload.content,
+                            sound: 'default',
+                            channelId: 'default',
+                        });
                     }
                     break;
 

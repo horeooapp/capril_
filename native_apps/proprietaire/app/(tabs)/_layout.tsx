@@ -1,7 +1,13 @@
+import { useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import { LayoutDashboard, Building2, Wallet, MessageCircle, User, Wrench } from 'lucide-react-native';
+import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
 export default function TabLayout() {
+  useEffect(() => {
+    registerForPushNotificationsAsync().catch(() => {});
+  }, []);
+
   return (
     <Tabs
       screenOptions={{
