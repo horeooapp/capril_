@@ -16,11 +16,13 @@ export async function GET(request: Request) {
         const receipts = await prisma.receipt.findMany({
             where: {
                 lease: {
-                    property: {
-                        OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
-                    }
+                    OR: [
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { managedByUserId: user.userId } }
+                    ]
                 },
-                status: 'PAID'
+                status: { in: ['paid', 'PAID'] }
             },
             include: {
                 lease: {

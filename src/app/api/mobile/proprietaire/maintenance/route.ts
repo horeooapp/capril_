@@ -31,7 +31,7 @@ export async function GET(request: Request) {
             logement: {
                 OR: [
                     { ownerUserId: user.userId },
-                    { landlordId: user.userId },
+                    { managedByUserId: user.userId },
                 ],
             },
         };
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
         const property = await prisma.property.findFirst({
             where: {
                 id: logementId,
-                OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }],
+                OR: [{ ownerUserId: user.userId }, { managedByUserId: user.userId }],
             },
         });
         if (!property) {

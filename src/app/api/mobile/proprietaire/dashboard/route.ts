@@ -26,11 +26,11 @@ export async function GET(request: Request) {
         // Récupérer les biens (Properties) du propriétaire
         const properties = await prisma.property.findMany({
             where: {
-                OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
+                OR: [{ ownerUserId: user.userId }, { managedByUserId: user.userId }]
             },
             include: {
                 leases: {
-                    where: { status: 'ACTIVE' },
+                    where: { status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] } },
                     include: {
                         tenant: {
                             select: { firstName: true, lastName: true, phone: true }
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
                     OR: [
                         { landlordId: user.userId },
                         { property: { ownerUserId: user.userId } },
-                        { property: { landlordId: user.userId } }
+                        { property: { managedByUserId: user.userId } }
                     ]
                 },
                 periodMonth: currentMonthStr,
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
                 OR: [
                     { landlordId: user.userId },
                     { property: { ownerUserId: user.userId } },
-                    { property: { landlordId: user.userId } }
+                    { property: { managedByUserId: user.userId } }
                 ],
                 status: 'PENDING'
             }
@@ -91,9 +91,11 @@ export async function GET(request: Request) {
 
         const incidentsCount = await prisma.ticketMaintenance.count({
             where: {
-                logement: {
-                    OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }]
-                },
+                OR: [
+                    { lease: { landlordId: user.userId } },
+                    { logement: { ownerUserId: user.userId } },
+                    { logement: { managedByUserId: user.userId } }
+                ],
                 statut: { in: ['NOUVEAU', 'EN_COURS', 'OUVERT'] }
             }
         });

@@ -31,7 +31,7 @@ export async function POST(
         const isOwner = lease.ownerId === user.userId;
         const isAgent = lease.agentId === user.userId;
         const isPropertyOwner = lease.property?.ownerUserId === user.userId;
-        const isPropertyLandlord = lease.property?.landlordId === user.userId;
+        const isPropertyLandlord = (lease.landlordId === user.userId || lease.property?.ownerUserId === user.userId);
 
         if (!isTenant && !isOwner && !isAgent && !isPropertyOwner && !isPropertyLandlord) {
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });

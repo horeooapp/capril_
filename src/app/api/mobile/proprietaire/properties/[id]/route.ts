@@ -125,7 +125,7 @@ export async function PATCH(
         const { id } = await params;
 
         const property = await prisma.property.findFirst({
-            where: { id, OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }] },
+            where: { id, OR: [{ ownerUserId: user.userId }, { managedByUserId: user.userId }] },
         });
         if (!property) {
             return NextResponse.json({ error: 'Propriété introuvable ou accès refusé.' }, { status: 404 });
@@ -166,7 +166,7 @@ export async function DELETE(
         const { id } = await params;
 
         const property = await prisma.property.findFirst({
-            where: { id, OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }] },
+            where: { id, OR: [{ ownerUserId: user.userId }, { managedByUserId: user.userId }] },
             include: { leases: { where: { status: 'ACTIVE' }, take: 1 } },
         });
         if (!property) {

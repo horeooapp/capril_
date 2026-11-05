@@ -27,12 +27,11 @@ export async function GET(request: Request) {
 
         const whereBase: any = {
             lease: {
-                property: {
-                    OR: [
-                        { ownerUserId: user.userId },
-                        { landlordId: user.userId },
-                    ],
-                },
+                OR: [
+                    { landlordId: user.userId },
+                    { property: { ownerUserId: user.userId } },
+                    { property: { managedByUserId: user.userId } }
+                ]
             },
         };
         if (leaseId) whereBase.leaseId = leaseId;

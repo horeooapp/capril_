@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         const status = searchParams.get('status') ?? undefined;
 
         const where: any = {
-            OR: [{ ownerUserId: user.userId }, { landlordId: user.userId }],
+            OR: [{ ownerUserId: user.userId }, { managedByUserId: user.userId }],
             ...(status ? { status } : {}),
         };
 
