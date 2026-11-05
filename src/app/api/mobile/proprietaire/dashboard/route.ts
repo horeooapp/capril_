@@ -85,7 +85,7 @@ export async function GET(request: Request) {
                     { property: { ownerUserId: user.userId } },
                     { property: { managedByUserId: user.userId } }
                 ],
-                status: 'PENDING'
+                status: { in: ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'PENDING_DEPOSIT'] }
             }
         });
 
@@ -96,7 +96,7 @@ export async function GET(request: Request) {
                     { logement: { ownerUserId: user.userId } },
                     { logement: { managedByUserId: user.userId } }
                 ],
-                statut: { in: ['NOUVEAU', 'EN_COURS', 'OUVERT'] }
+                statut: { in: ['EN_ATTENTE', 'PRIS_EN_CHARGE'] }
             }
         });
 

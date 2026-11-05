@@ -135,7 +135,7 @@ export async function GET(request: Request) {
         const openMaintenanceCount = await prisma.ticketMaintenance.count({
             where: {
                 locataireId: user.userId,
-                statut: { in: ['NOUVEAU', 'EN_COURS', 'OUVERT'] }
+                statut: { in: ['EN_ATTENTE', 'PRIS_EN_CHARGE'] }
             }
         });
 
