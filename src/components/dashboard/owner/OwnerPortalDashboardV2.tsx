@@ -56,7 +56,7 @@ export function OwnerPortalDashboardV2({
         ...p, 
         isOnline,
         label: p.name || `Unité ${p.unitNumber || ''}`,
-        statut: p.status === "active" ? "occupé" : "vacant",
+        statut: (p.isOccupied || p.status === 'rented' || p.status === 'RENTED' || p.leases?.some((l: any) => ['ACTIVE', 'ACTIVE_DECLARATIF', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status))) ? "occupé" : "vacant",
         paiement: p.leases?.[0]?.statutFiscal === "A_JOUR" ? "À jour" : p.leases?.[0]?.statutFiscal === "EN_RETARD" ? "Impayé" : "—",
         loyer: p.leases?.[0]?.rentAmount || p.declaredRentFcfa || 0,
         tenantName: (((p.leases?.[0]?.tenant?.firstName || '') + " " + (p.leases?.[0]?.tenant?.lastName || '')).trim() || "Anonyme")
@@ -218,7 +218,7 @@ export function OwnerPortalDashboardV2({
                       : "bg-slate-100 text-slate-600 border border-slate-200/60"
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${u.statut === "occupé" ? "bg-emerald-500" : "bg-slate-400"}`}></span>
-                    {u.statut === "occupé" ? "Occupé" : "Vacant"}
+                    {u.statut === "occupé" ? "Loué" : "Vacant"}
                   </span>
                   <span className="text-xs font-black text-slate-900 font-mono w-[85px] text-right">
                     {fmt(u.loyer)} <span className="text-[10px] font-normal text-slate-400">XOF</span>
