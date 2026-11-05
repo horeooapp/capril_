@@ -137,6 +137,7 @@ export async function POST(request: Request) {
         const message = await prisma.messagerieBail.create({
             data: {
                 leaseId,
+                expediteurId: user.userId,
                 roleExpediteur: role || (lease.tenantId === user.userId ? 'LOCATAIRE' : 'PROPRIO'),
                 contenu: contenu.trim(),
                 statut: 'RECU', // Immédiatement "reçu" par le serveur central QAPRIL (2 encoches grises)
