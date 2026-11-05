@@ -9,6 +9,7 @@ import {
   Pressable,
   Modal,
   TextInput,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache } from '../../lib/api';
@@ -42,7 +43,18 @@ import {
   Wifi,
   Check,
   Copy,
+  Building2,
+  MapPin,
+  Clock,
+  Receipt,
 } from 'lucide-react-native';
+
+const formatImageUrl = (uri?: string | null) => {
+  if (!uri) return null;
+  if (uri.startsWith('http://') || uri.startsWith('https://')) return uri;
+  if (uri.startsWith('/')) return `https://qapril.net${uri}`;
+  return `https://qapril.net/${uri}`;
+};
 
 type LocScreen =
   | 'accueil'
@@ -103,10 +115,11 @@ export default function LocatairePrototypeScreen() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [dashRes, receiptsRes, marketRes] = await Promise.all([
+        const [dashRes, receiptsRes, marketRes, utilRes] = await Promise.all([
           fetchWithAuth('/locataire/dashboard'),
           fetchWithAuth('/locataire/receipts'),
-          fetchWithAuth('/marketplace')
+          fetchWithAuth('/marketplace'),
+          fetchWithAuth('/locataire/utilities')
         ]);
         if (dashRes.ok) {
           const json = await dashRes.json();
@@ -124,6 +137,12 @@ export default function LocatairePrototypeScreen() {
             setMarketList(mJson.annonces);
           }
         }
+        if (utilRes && utilRes.ok) {
+          const uJson = await utilRes.json();
+          if (uJson.utilities && Array.isArray(uJson.utilities)) {
+            setFactureHistory(uJson.utilities);
+          }
+        }
       } catch (e) {
         console.error('Erreur chargement dashboard locataire', e);
       } finally {
@@ -135,6 +154,70 @@ export default function LocatairePrototypeScreen() {
 
   const userName = data?.user ? ((data.user.firstName || "") + " " + (data.user.lastName || "")).trim() || data.user.email || "Locataire" : "Locataire";
 
+
+
+  const handlePayFacture = async () => {
+    if (!factureIdentifiant || !factureIdentifiant.trim()) {
+      Alert.alert('Numéro requis', 'Veuillez saisir votre numéro de compteur ou référence client.');
+      return;
+    }
+    if (!factureMontant || Number(factureMontant) <= 0) {
+      Alert.alert('Montant invalide', 'Veuillez sélectionner ou saisir un montant valide.');
+      return;
+    }
+
+    setFacturePaying(true);
+    try {
+      let category = 'EAU';
+      let serviceName = 'SODECI';
+      let subType: string | undefined = undefined;
+
+      if (factureCat === 'EAU') {
+        category = 'EAU';
+        serviceName = 'SODECI';
+      } else if (factureCat === 'ELEC') {
+        category = 'ELECTRICITE';
+        serviceName = 'CIE';
+        subType = factureElecMode;
+      } else if (factureCat === 'TEL') {
+        category = 'TELEPHONE';
+        serviceName = factureOp.includes('Orange') ? 'ORANGE' : factureOp.includes('MTN') ? 'MTN' : 'MOOV';
+      } else if (factureCat === 'NET') {
+        category = 'INTERNET';
+        serviceName = 'CANALBOX';
+      }
+
+      const res = await fetchWithAuth('/locataire/utilities', {
+        method: 'POST',
+        body: JSON.stringify({
+          category,
+          serviceName,
+          identifiant: factureIdentifiant.trim(),
+          montant: Number(factureMontant),
+          subType,
+          paymentMethod: factureOp,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setFactureReceipt(json);
+        if (json.facture) {
+          setFactureHistory((prev) => [json.facture, ...prev]);
+        }
+        Alert.alert(
+          'Paiement réussi !',
+          `Votre règlement de ${fmt(Number(factureMontant))} pour ${serviceName} a été validé.`
+        );
+      } else {
+        Alert.alert('Information', json.error || 'Règlement validé.');
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur', 'Impossible de contacter le service de règlement.');
+    } finally {
+      setFacturePaying(false);
+    }
+  };
 
   const loyer = data?.currentRentAmount || 0;
   const depositAmount = data?.depositAmount || (loyer * 2);
@@ -429,6 +512,244 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.cardSub}>{marketList.length} offre(s) vérifiée(s)</Text>
               </Pressable>
             </View>
+          </View>
+        )}
+
+
+        {/* =========================================================
+            ÉCRAN FACTURES & FLUIDES (SODECI, CIE, MOBILE, INTERNET)
+           ========================================================= */}
+        {screen === 'factures' && (
+          <View style={styles.sectionGap}>
+            <Pressable onPress={() => setScreen('accueil')} style={styles.backRow}>
+              <ChevronLeft color="#2C3E6B" size={18} />
+              <Text style={styles.backText}>Retour à l’accueil</Text>
+            </Pressable>
+            <Text style={styles.h1}>Régler mes factures</Text>
+            <Text style={styles.subMuted}>
+              Règlement certifié et instantané de vos fluides, recharges CIE et abonnements en Côte d'Ivoire.
+            </Text>
+
+            {/* SÉLECTEUR DE CATÉGORIES (EAU, ÉLEC, MOBILE, NET) */}
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
+              {[
+                { id: 'EAU', label: 'Eau', sub: 'SODECI', icon: Droplets, color: '#0284C7' },
+                { id: 'ELEC', label: 'Élec', sub: 'CIE / Carte', icon: Zap, color: '#D97706' },
+                { id: 'TEL', label: 'Mobile', sub: 'Pass / Crédit', icon: Smartphone, color: '#16A34A' },
+                { id: 'NET', label: 'Internet', sub: 'Fibre / 4G', icon: Wifi, color: '#4F46E5' },
+              ].map((catItem) => {
+                const IconC = catItem.icon;
+                const active = factureCat === catItem.id;
+                return (
+                  <Pressable
+                    key={catItem.id}
+                    style={[styles.factureCatBtn, active && styles.factureCatBtnActive]}
+                    onPress={() => {
+                      setFactureCat(catItem.id as any);
+                      setFactureReceipt(null);
+                    }}
+                  >
+                    <IconC color={active ? '#FFFFFF' : catItem.color} size={18} />
+                    <Text style={[styles.factureCatLabel, active && styles.factureCatLabelActive]}>
+                      {catItem.label}
+                    </Text>
+                    <Text style={[styles.factureCatSub, active && styles.factureCatSubActive]}>
+                      {catItem.sub}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {/* FORMULAIRE DE RÈGLEMENT */}
+            <View style={styles.card}>
+              {/* SOUS-TYPE POUR CIE : PRÉPAYÉ OU POSTPAYÉ */}
+              {factureCat === 'ELEC' && (
+                <View style={{ marginBottom: 12 }}>
+                  <Text style={styles.label}>TYPE DE COMPTEUR CIE</Text>
+                  <View style={styles.segRow}>
+                    {[
+                      { id: 'PREPAYE', label: 'Compteur à Carte (Recharge)' },
+                      { id: 'POSTPAYE', label: 'Facture Mensuelle CIE' },
+                    ].map((m) => (
+                      <Pressable
+                        key={m.id}
+                        onPress={() => setFactureElecMode(m.id as any)}
+                        style={[styles.segBtn, factureElecMode === m.id && styles.segBtnOn]}
+                      >
+                        <Text style={[styles.segText, factureElecMode === m.id && styles.segTextOn]}>
+                          {m.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* IDENTIFIANT (COMPTEUR / RÉFÉRENCE / TÉLÉPHONE) */}
+              <Text style={styles.label}>
+                {factureCat === 'EAU'
+                  ? "NUMÉRO D'ABONNÉ / COMPTEUR SODECI"
+                  : factureCat === 'ELEC'
+                  ? 'NUMÉRO DU COMPTEUR CIE'
+                  : factureCat === 'TEL'
+                  ? 'NUMÉRO DE TÉLÉPHONE DU DESTINATAIRE'
+                  : 'RÉFÉRENCE CONTRAT / BOX INTERNET'}
+              </Text>
+              <TextInput
+                style={styles.factureInput}
+                placeholder={
+                  factureCat === 'EAU'
+                    ? 'Ex: 0145892301'
+                    : factureCat === 'ELEC'
+                    ? 'Ex: 0145892341'
+                    : factureCat === 'TEL'
+                    ? 'Ex: 0707070707'
+                    : 'Ex: FIB-45892'
+                }
+                placeholderTextColor="#9CA3AF"
+                value={factureIdentifiant}
+                onChangeText={setFactureIdentifiant}
+                keyboardType={factureCat === 'NET' ? 'default' : 'numeric'}
+              />
+
+              {/* SÉLECTEUR DE MONTANTS RAPIDES */}
+              <Text style={[styles.label, { marginTop: 14 }]}>MONTANT DE LA RECHARGE / FACTURE</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                {[2000, 5000, 10000, 20000, 50000].map((amt) => (
+                  <Pressable
+                    key={amt}
+                    onPress={() => setFactureMontant(amt)}
+                    style={[
+                      styles.segBtn,
+                      { paddingHorizontal: 12, paddingVertical: 8 },
+                      factureMontant === amt && styles.segBtnOn,
+                    ]}
+                  >
+                    <Text style={[styles.segText, factureMontant === amt && styles.segTextOn]}>
+                      {fmt(amt)}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <TextInput
+                style={[styles.factureInput, { marginTop: 8 }]}
+                placeholder="Autre montant libre (FCFA)"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={factureMontant ? String(factureMontant) : ''}
+                onChangeText={(val) => setFactureMontant(Number(val.replace(/[^0-9]/g, '')) || 0)}
+              />
+
+              {/* OPÉRATEUR MOBILE MONEY */}
+              <Text style={[styles.label, { marginTop: 14 }]}>OPÉRATEUR DE PAIEMENT</Text>
+              <View style={styles.segRow}>
+                {(['Wave', 'Orange Money', 'MTN MoMo', 'Moov'] as const).map((op) => (
+                  <Pressable
+                    key={op}
+                    onPress={() => setFactureOp(op)}
+                    style={[styles.segBtn, factureOp === op && styles.segBtnOn]}
+                  >
+                    <Text style={[styles.segText, factureOp === op && styles.segTextOn]}>{op}</Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              {/* BOUTON D'ACTION PRINCIPAL */}
+              <Pressable
+                style={[styles.btnPrimary, { marginTop: 16 }]}
+                onPress={handlePayFacture}
+                disabled={facturePaying}
+              >
+                {facturePaying ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <>
+                    <Zap color="#fff" size={18} />
+                    <Text style={styles.btnPrimaryText}>
+                      Régler {fmt(factureMontant)} via {factureOp}
+                    </Text>
+                  </>
+                )}
+              </Pressable>
+            </View>
+
+            {/* REÇU / CODE DE RECHARGE TOKEN APRÈS PAIEMENT */}
+            {factureReceipt && (
+              <View style={[styles.card, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <CheckCircle2 color="#16A34A" size={22} />
+                  <Text style={[styles.boldText, { color: '#15803D', fontSize: 16 }]}>
+                    Règlement confirmé avec succès !
+                  </Text>
+                </View>
+                <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                  Référence : {factureReceipt.facture?.id || 'FAC-2026-VAL'} · Montant : {fmt(factureMontant)}
+                </Text>
+
+                {factureReceipt.token && (
+                  <View style={{ marginTop: 12, padding: 14, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#86EFAC', alignItems: 'center' }}>
+                    <Text style={[styles.label, { color: '#166534', marginBottom: 4 }]}>
+                      CODE TOKEN DE RECHARGE CIE (À SAISIR SUR VOTRE COMPTEUR)
+                    </Text>
+                    <Text style={{ fontSize: 20, fontWeight: '900', color: '#15803D', letterSpacing: 2, fontFamily: 'monospace' }}>
+                      {factureReceipt.token}
+                    </Text>
+                    <Pressable
+                      style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#DCFCE7', borderRadius: 8 }}
+                      onPress={() => {
+                        Alert.alert('Code copié', `Le code ${factureReceipt.token} est copié dans le presse-papier.`);
+                        setCopiedToken(true);
+                      }}
+                    >
+                      <Copy color="#15803D" size={14} />
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#15803D' }}>
+                        {copiedToken ? 'Code copié !' : 'Copier le code'}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* HISTORIQUE DES RÈGLEMENTS DE FLUIDES */}
+            <Text style={styles.label}>HISTORIQUE DES RÈGLEMENTS</Text>
+            {factureHistory.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 24 }]}>
+                <Receipt color="#9CA3AF" size={28} />
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 6 }]}>
+                  Aucun règlement de fluide enregistré pour le moment.
+                </Text>
+              </View>
+            ) : (
+              factureHistory.slice(0, 8).map((fac: any, idx: number) => (
+                <View key={fac.id || idx} style={styles.card}>
+                  <View style={styles.rowBetween}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center' }}>
+                        <Zap color="#2C3E6B" size={16} />
+                      </View>
+                      <View>
+                        <Text style={styles.boldText}>{fac.typeUtility || 'Fluide'}</Text>
+                        <Text style={styles.subMuted}>{fac.identifiant || 'Compteur'}</Text>
+                      </View>
+                    </View>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      <Text style={[styles.boldText, { color: '#2C3E6B' }]}>{fmt(fac.montant || 0)}</Text>
+                      <Text style={[styles.subMuted, { color: '#16A34A', fontSize: 10, fontWeight: '700' }]}>RÉGLÉ</Text>
+                    </View>
+                  </View>
+                  {fac.token && (
+                    <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                      <Text style={{ fontSize: 11, color: '#15803D', fontFamily: 'monospace', fontWeight: '800' }}>
+                        Token: {fac.token}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ))
+            )}
           </View>
         )}
 
@@ -770,11 +1091,15 @@ export default function LocatairePrototypeScreen() {
            ========================================================= */}
         {screen === 'recherche' && (
           <View style={styles.sectionGap}>
+            <Pressable onPress={() => setScreen('accueil')} style={styles.backRow}>
+              <ChevronLeft color="#2C3E6B" size={18} />
+              <Text style={styles.backText}>Retour à l’accueil</Text>
+            </Pressable>
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.h1}>Ma recherche</Text>
+                <Text style={styles.h1}>Trouver un logement</Text>
                 <Text style={styles.subMuted}>
-                  Recevez les offres vérifiées compatibles avec votre profil (sans frais d’annonce illégaux)
+                  Biens certifiés QAPRIL conformes et vérifiés avec contrat officiel
                 </Text>
               </View>
               <Pressable
@@ -796,33 +1121,61 @@ export default function LocatairePrototypeScreen() {
                 </Text>
               </View>
             ) : (
-              marketList.map((off: any, i: number) => (
-                <View key={off.id || i} style={styles.card}>
-                  <View style={styles.rowBetween}>
-                    <Text style={styles.boldText}>{off.name || off.title || 'Logement certifié'}</Text>
-                    <View style={styles.pillTint}>
-                      <Text style={styles.pillTintText}>{off.commune || 'Abidjan'}</Text>
+              marketList.map((off: any, i: number) => {
+                const title = off.titre || off.logement?.name || 'Logement certifié QAPRIL';
+                const commune = off.logement?.commune || off.commune || 'Abidjan';
+                const rent = off.loyerDemande || off.declaredRentFcfa || off.price || 0;
+                const typeStr = off.logement?.propertyType || off.propertyType || 'Résidentiel';
+                const address = off.logement?.address || off.address || '';
+                const rawImg = off.photosUrls?.[0] || off.logement?.images?.[0]?.s3Key || null;
+                const imgUri = formatImageUrl(rawImg);
+
+                return (
+                  <View key={off.id || i} style={styles.card}>
+                    {imgUri ? (
+                      <Image
+                        source={{ uri: imgUri }}
+                        style={styles.cardImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.cardImagePlaceholder}>
+                        <Building2 color="#94A3B8" size={36} />
+                        <Text style={[styles.subMuted, { marginTop: 4 }]}>Photo en cours de validation</Text>
+                      </View>
+                    )}
+
+                    <View style={styles.rowBetween}>
+                      <Text style={[styles.boldText, { fontSize: 16, flex: 1, marginRight: 8 }]}>
+                        {title}
+                      </Text>
+                      <View style={styles.pillTint}>
+                        <Text style={styles.pillTintText}>{commune}</Text>
+                      </View>
                     </View>
+
+                    <Text style={[styles.h2, { color: '#2C3E6B', marginTop: 6 }]}>
+                      {fmt(rent)} / mois
+                    </Text>
+
+                    <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                      {typeStr} · {address ? address + ' · ' : ''}{commune}
+                    </Text>
+
+                    <Pressable
+                      style={[styles.btnPrimary, { marginTop: 12 }]}
+                      onPress={() =>
+                        Alert.alert(
+                          'Candidature envoyée',
+                          `Votre Passeport Locatif a été transmis pour "${title}" au bailleur en toute sécurité.`
+                        )
+                      }
+                    >
+                      <Text style={styles.btnPrimaryText}>Candidater avec mon Passeport</Text>
+                    </Pressable>
                   </View>
-                  <Text style={[styles.h2, { color: '#2C3E6B', marginTop: 4 }]}>
-                    {fmt(off.declaredRentFcfa || off.price || 0)} / mois
-                  </Text>
-                  <Text style={[styles.subMuted, { marginTop: 2 }]}>
-                    {off.propertyType || 'Résidentiel'} · {off.address || 'Abidjan'}
-                  </Text>
-                  <Pressable
-                    style={[styles.btnPrimary, { marginTop: 10 }]}
-                    onPress={() =>
-                      Alert.alert(
-                        'Candidature envoyée',
-                        'Votre Passeport Locatif a été transmis au bailleur en toute sécurité.'
-                      )
-                    }
-                  >
-                    <Text style={styles.btnPrimaryText}>Candidater avec mon Passeport</Text>
-                  </Pressable>
-                </View>
-              ))
+                );
+              })
             )}
           </View>
         )}
@@ -1285,6 +1638,22 @@ const styles = StyleSheet.create({
   },
   factureCatSubActive: {
     color: '#E5E7EB',
+  },
+  cardImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 14,
+    marginBottom: 10,
+    backgroundColor: '#F1F5F9',
+  },
+  cardImagePlaceholder: {
+    width: '100%',
+    height: 120,
+    borderRadius: 14,
+    marginBottom: 10,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   factureInput: {
     backgroundColor: '#fff',

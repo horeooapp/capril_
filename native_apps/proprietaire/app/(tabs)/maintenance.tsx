@@ -40,22 +40,27 @@ export default function ProprietaireMaintenanceScreen() {
       if (res.ok) {
         const json = await res.json();
         if (json.tickets && Array.isArray(json.tickets)) {
-          setIncidents(json.tickets.map((t: any) => ({
-            id: t.id,
-            ticketRef: t.ticketRef,
-            bien: t.bien || 'Logement',
-            locataire: t.locataire || 'Locataire',
-            telephone: t.telephone || '',
-            titre: t.description ? t.description.substring(0, 40) : 'Signalement',
-            description: t.description || '',
-            categorie: t.categorie || 'Maintenance',
-            date: t.dateSignalement ? `Émis le ${new Date(t.dateSignalement).toLocaleDateString('fr-FR')}` : 'Signalé',
-            photosCount: 0,
-            statut: t.statut === 'RESOLU' ? 'resolu' : t.statut === 'EN_COURS' ? 'en_cours' : 'nouveau',
-            statutLabel: t.statut === 'RESOLU' ? 'Résolu & validé' : t.statut === 'EN_COURS' ? 'En cours' : 'Nouveau reçu',
-            statutColor: t.statut === 'RESOLU' ? '#059669' : t.statut === 'EN_COURS' ? '#D97706' : '#DC2626',
-            statutBg: t.statut === 'RESOLU' ? '#ECFDF5' : t.statut === 'EN_COURS' ? '#FEF3C7' : '#FEE2E2',
-          })));
+          setIncidents(json.tickets.map((t: any) => {
+            const isResolu = t.statut === 'RESOLU' || t.statut === 'CLOTURE' || t.statut === 'RÉSOLU';
+            const isEnCours = t.statut === 'PRIS_EN_CHARGE' || t.statut === 'EN_COURS';
+            const statut = isResolu ? 'resolu' : isEnCours ? 'en_cours' : 'nouveau';
+            return {
+              id: t.id,
+              ticketRef: t.ticketRef,
+              bien: t.bien || 'Logement',
+              locataire: t.locataire || 'Locataire',
+              telephone: t.telephone || '',
+              titre: t.description ? t.description.substring(0, 40) : 'Signalement',
+              description: t.description || '',
+              categorie: t.categorie || 'Maintenance',
+              date: t.dateSignalement ? `Émis le ${new Date(t.dateSignalement).toLocaleDateString('fr-FR')}` : 'Signalé',
+              photosCount: 0,
+              statut,
+              statutLabel: isResolu ? 'Résolu & validé' : isEnCours ? 'En cours' : 'À traiter',
+              statutColor: isResolu ? '#059669' : isEnCours ? '#D97706' : '#DC2626',
+              statutBg: isResolu ? '#ECFDF5' : isEnCours ? '#FEF3C7' : '#FEE2E2',
+            };
+          }));
         }
       }
     } catch (e) {
@@ -87,6 +92,10 @@ export default function ProprietaireMaintenanceScreen() {
     Alert.alert('Mise à jour enregistrée', `Le signalement a été mis à jour : « ${label} ». Le locataire est notifié.`);
   };
 
+  const aTraiterCount = incidents.filter((x) => x.statut === 'nouveau').length;
+  const enCoursCount = incidents.filter((x) => x.statut === 'en_cours').length;
+  const resoluCount = incidents.filter((x) => x.statut === 'resolu').length;
+
   const filteredIncidents = incidents.filter((inc) => {
     if (filter === 'all') return true;
     return inc.statut === filter;
@@ -108,18 +117,18 @@ export default function ProprietaireMaintenanceScreen() {
           </Text>
         </View>
 
-        {/* STATISTIQUES EN TÊTE */}
+        {/* STATISTIQUES EN TÊTE CONNECTÉES À LA BDD */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#DC2626' }]}>1</Text>
+            <Text style={[styles.statValue, { color: '#DC2626' }]}>{aTraiterCount}</Text>
             <Text style={styles.statLabel}>À TRAITER</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#D97706' }]}>1</Text>
+            <Text style={[styles.statValue, { color: '#D97706' }]}>{enCoursCount}</Text>
             <Text style={styles.statLabel}>EN COURS</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#059669' }]}>1</Text>
+            <Text style={[styles.statValue, { color: '#059669' }]}>{resoluCount}</Text>
             <Text style={styles.statLabel}>RÉSOLU</Text>
           </View>
         </View>
