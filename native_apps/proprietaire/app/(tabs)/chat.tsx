@@ -1,15 +1,39 @@
-import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import { Send, Check, CheckCheck } from 'lucide-react-native';
 
 export default function ProprietaireChatScreen() {
+    const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [interlocutorName, setInterlocutorName] = useState('Locataire');
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
     const flatListRef = useRef<FlatList>(null);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            () => {
+                setKeyboardVisible(true);
+                setTimeout(() => {
+                    flatListRef.current?.scrollToEnd({ animated: true });
+                }, 100);
+            }
+        );
+        const hideSub = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => {
+                setKeyboardVisible(false);
+            }
+        );
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const loadMessages = async () => {
         try {
@@ -147,13 +171,18 @@ export default function ProprietaireChatScreen() {
                 </View>
             </View>
 
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+            <KeyboardAvoidingView 
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                style={{ flex: 1 }}
+            >
                 <FlatList
                     ref={flatListRef}
                     data={messages}
                     keyExtractor={(item) => item.id}
                     renderItem={renderMessage}
                     contentContainerStyle={{ padding: 16, paddingBottom: 24, flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
                             <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center' }}>
@@ -167,7 +196,17 @@ export default function ProprietaireChatScreen() {
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
 
-                <View style={{ flexDirection: 'row', padding: 12, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E2E8F0', alignItems: 'center', gap: 8 }}>
+                <View style={{ 
+                    flexDirection: 'row', 
+                    paddingHorizontal: 12, 
+                    paddingTop: 10,
+                    paddingBottom: keyboardVisible ? 10 : Math.max(insets.bottom, 10), 
+                    backgroundColor: '#FFFFFF', 
+                    borderTopWidth: 1, 
+                    borderTopColor: '#E2E8F0', 
+                    alignItems: 'center', 
+                    gap: 8 
+                }}>
                     <TextInput
                         style={{
                             flex: 1,

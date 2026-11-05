@@ -147,15 +147,11 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={[styles.container, { backgroundColor: theme.bg }]}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <View style={styles.card}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>{subtitle}</Text>
-                </View>
+        <View style={styles.card}>
+            <View style={styles.header}>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.subtitle}>{subtitle}</Text>
+            </View>
 
                 {feedback && (
                     <View style={[
@@ -251,8 +247,7 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
                         </Pressable>
                     </Animated.View>
                 )}
-            </View>
-        </KeyboardAvoidingView>
+        </View>
     );
 }
 

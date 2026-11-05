@@ -7,7 +7,10 @@ import {
   Pressable,
   Text,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   Building2,
@@ -45,16 +48,21 @@ export default function LoginScreen() {
   const accentColor = isProprietaire ? '#E8A020' : '#3B82F6';
 
   return (
-    <View style={[styles.container, { backgroundColor: isProprietaire ? '#0B2019' : '#0B1329' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: isProprietaire ? '#0B2019' : '#0B1329' }]} edges={['top', 'bottom', 'left', 'right']}>
       <StatusBar
         barStyle="light-content"
         backgroundColor={isProprietaire ? '#0B2019' : '#0B1329'}
       />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
         {/* LOGO & TITRE */}
         <View style={styles.header}>
           <Image
@@ -210,8 +218,9 @@ export default function LoginScreen() {
             }
           />
         </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

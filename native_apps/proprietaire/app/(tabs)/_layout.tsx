@@ -6,6 +6,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           backgroundColor: 'rgba(255, 255, 255, 0.96)',
           borderTopWidth: 1,
@@ -41,7 +42,6 @@ export default function TabLayout() {
         name="maintenance"
         options={{
           title: 'Signalements',
-          tabBarBadge: 2,
           tabBarIcon: ({ color, size }) => <Wrench color={color} size={size} />,
         }}
       />

@@ -22,6 +22,7 @@
     },
     "android": {
       "package": "ci.qapril.locataire",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#001C29"

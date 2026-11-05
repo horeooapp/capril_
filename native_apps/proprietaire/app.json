@@ -22,6 +22,7 @@
     },
     "android": {
       "package": "ci.qapril.proprietaire",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo-qapril.png",
         "backgroundColor": "#064E3B"

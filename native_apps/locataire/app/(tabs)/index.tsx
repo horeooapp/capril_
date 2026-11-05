@@ -378,7 +378,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {/* =========================================================
             ÉCRAN 1 · ACCUEIL LOCATAIRE
            ========================================================= */}
