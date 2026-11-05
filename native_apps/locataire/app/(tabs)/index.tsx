@@ -47,6 +47,7 @@ import {
   MapPin,
   Clock,
   Receipt,
+  ArrowUpDown,
 } from 'lucide-react-native';
 
 const formatImageUrl = (uri?: string | null) => {
@@ -109,6 +110,99 @@ export default function LocatairePrototypeScreen() {
   const [receiptsList, setReceiptsList] = useState<any[]>([]);
   const [marketList, setMarketList] = useState<any[]>([]);
   const [copiedToken, setCopiedToken] = useState(false);
+
+  // Recherche, tri et filtres pour "Trouver un logement"
+  const [marketSearchQuery, setMarketSearchQuery] = useState('');
+  const [marketSortPrice, setMarketSortPrice] = useState<'none' | 'asc' | 'desc'>('none');
+  const [marketCommune, setMarketCommune] = useState<string>('TOUTES');
+  const [marketType, setMarketType] = useState<string>('TOUS');
+
+  const availableCommunes = React.useMemo(() => {
+    const set = new Set<string>();
+    marketList.forEach((off: any) => {
+      const c = off.logement?.commune || off.commune;
+      if (c && typeof c === 'string' && c.trim()) {
+        set.add(c.trim());
+      }
+    });
+    return ['TOUTES', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [marketList]);
+
+  const availableTypes = [
+    { id: 'TOUS', label: 'Tous types' },
+    { id: 'APPARTEMENT', label: 'Appartement' },
+    { id: 'VILLA', label: 'Villa' },
+    { id: 'STUDIO', label: 'Studio' },
+    { id: 'DUPLEX', label: 'Duplex' },
+    { id: 'COMMERCE', label: 'Commerce & Bureau' },
+  ];
+
+  const filteredMarketList = React.useMemo(() => {
+    return marketList
+      .filter((off: any) => {
+        const title = (off.titre || off.logement?.name || '').toLowerCase();
+        const commune = (off.logement?.commune || off.commune || '').toLowerCase();
+        const address = (off.logement?.address || off.address || '').toLowerCase();
+        const typeStr = (off.logement?.propertyType || off.propertyType || '').toLowerCase();
+        const desc = (off.description || '').toLowerCase();
+
+        // 1. Recherche par mot-clé
+        if (marketSearchQuery.trim()) {
+          const q = marketSearchQuery.toLowerCase().trim();
+          const matches =
+            title.includes(q) ||
+            commune.includes(q) ||
+            address.includes(q) ||
+            typeStr.includes(q) ||
+            desc.includes(q);
+          if (!matches) return false;
+        }
+
+        // 2. Filtre par localité
+        if (marketCommune !== 'TOUTES') {
+          const c = (off.logement?.commune || off.commune || '').toLowerCase();
+          if (!c.includes(marketCommune.toLowerCase())) return false;
+        }
+
+        // 3. Filtre par type de bien
+        if (marketType !== 'TOUS') {
+          const combinedType = `${typeStr} ${title}`.toLowerCase();
+          if (marketType === 'APPARTEMENT' && !combinedType.includes('appart') && !combinedType.includes('studio')) return false;
+          if (marketType === 'VILLA' && !combinedType.includes('villa') && !combinedType.includes('maison')) return false;
+          if (marketType === 'STUDIO' && !combinedType.includes('studio')) return false;
+          if (marketType === 'DUPLEX' && !combinedType.includes('duplex')) return false;
+          if (marketType === 'COMMERCE' && !combinedType.includes('commerce') && !combinedType.includes('bureau') && !combinedType.includes('magasin')) return false;
+        }
+
+        return true;
+      })
+      .sort((a: any, b: any) => {
+        if (marketSortPrice === 'asc') {
+          const rentA = a.loyerDemande || a.declaredRentFcfa || a.price || 0;
+          const rentB = b.loyerDemande || b.declaredRentFcfa || b.price || 0;
+          return rentA - rentB;
+        }
+        if (marketSortPrice === 'desc') {
+          const rentA = a.loyerDemande || a.declaredRentFcfa || a.price || 0;
+          const rentB = b.loyerDemande || b.declaredRentFcfa || b.price || 0;
+          return rentB - rentA;
+        }
+        return 0;
+      });
+  }, [marketList, marketSearchQuery, marketCommune, marketType, marketSortPrice]);
+
+  const hasActiveFilters =
+    Boolean(marketSearchQuery.trim()) ||
+    marketSortPrice !== 'none' ||
+    marketCommune !== 'TOUTES' ||
+    marketType !== 'TOUS';
+
+  const resetMarketFilters = () => {
+    setMarketSearchQuery('');
+    setMarketSortPrice('none');
+    setMarketCommune('TOUTES');
+    setMarketType('TOUS');
+  };
 
   const router = useRouter();
 
@@ -1112,16 +1206,146 @@ export default function LocatairePrototypeScreen() {
               </Pressable>
             </View>
 
-            {marketList.length === 0 ? (
-              <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
-                <Search color="#9CA3AF" size={36} />
-                <Text style={[styles.boldText, { marginTop: 10, color: '#64748B' }]}>Aucun bien disponible</Text>
-                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
-                  De nouveaux logements certifiés et conformes sont publiés régulièrement.
+            {/* 1. BARRE DE RECHERCHE */}
+            <View style={styles.searchBarContainer}>
+              <Search color="#64748B" size={18} style={{ marginLeft: 12 }} />
+              <TextInput
+                style={styles.searchBarInput}
+                placeholder="Rechercher par mot-clé, commune, quartier..."
+                placeholderTextColor="#94A3B8"
+                value={marketSearchQuery}
+                onChangeText={setMarketSearchQuery}
+                returnKeyType="search"
+              />
+              {marketSearchQuery.length > 0 && (
+                <Pressable onPress={() => setMarketSearchQuery('')} style={{ padding: 8, marginRight: 4 }}>
+                  <X color="#64748B" size={16} />
+                </Pressable>
+              )}
+            </View>
+
+            {/* 2. TRI PAR PRIX */}
+            <View style={styles.filterSection}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <ArrowUpDown color="#2C3E6B" size={15} />
+                  <Text style={styles.filterSectionTitle}>TRIER PAR PRIX</Text>
+                </View>
+                {marketSortPrice !== 'none' && (
+                  <Pressable onPress={() => setMarketSortPrice('none')}>
+                    <Text style={{ fontSize: 11, color: '#DC2626', fontWeight: '700' }}>Réinitialiser</Text>
+                  </Pressable>
+                )}
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable
+                  style={[styles.filterChip, marketSortPrice === 'none' && styles.filterChipActive]}
+                  onPress={() => setMarketSortPrice('none')}
+                >
+                  <Text style={[styles.filterChipText, marketSortPrice === 'none' && styles.filterChipTextActive]}>
+                    Par défaut
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.filterChip, marketSortPrice === 'asc' && styles.filterChipActive]}
+                  onPress={() => setMarketSortPrice('asc')}
+                >
+                  <Text style={[styles.filterChipText, marketSortPrice === 'asc' && styles.filterChipTextActive]}>
+                    Prix croissant ↗
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.filterChip, marketSortPrice === 'desc' && styles.filterChipActive]}
+                  onPress={() => setMarketSortPrice('desc')}
+                >
+                  <Text style={[styles.filterChipText, marketSortPrice === 'desc' && styles.filterChipTextActive]}>
+                    Prix décroissant ↘
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* 3. FILTRE PAR LOCALITÉ */}
+            <View style={styles.filterSection}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <MapPin color="#2C3E6B" size={15} />
+                <Text style={styles.filterSectionTitle}>LOCALITÉ ({availableCommunes.length > 1 ? availableCommunes.length - 1 : 0} COMMUNE{availableCommunes.length > 2 ? 'S' : ''})</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {availableCommunes.map((com) => {
+                  const active = marketCommune === com;
+                  return (
+                    <Pressable
+                      key={com}
+                      style={[styles.filterChip, active && styles.filterChipActive]}
+                      onPress={() => setMarketCommune(com)}
+                    >
+                      <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
+                        {com === 'TOUTES' ? 'Toutes les localités' : com}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
+            {/* 4. FILTRE PAR TYPE DE BIEN */}
+            <View style={styles.filterSection}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <Building2 color="#2C3E6B" size={15} />
+                <Text style={styles.filterSectionTitle}>TYPE DE BIEN</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {availableTypes.map((t) => {
+                  const active = marketType === t.id;
+                  return (
+                    <Pressable
+                      key={t.id}
+                      style={[styles.filterChip, active && styles.filterChipActive]}
+                      onPress={() => setMarketType(t.id)}
+                    >
+                      <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
+                        {t.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
+            {/* RÉSULTATS & STATUT DES FILTRES */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, marginBottom: 2 }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#1E293B' }}>
+                {filteredMarketList.length} logement{filteredMarketList.length > 1 ? 's' : ''} disponible{filteredMarketList.length > 1 ? 's' : ''}
+                {hasActiveFilters && ` (sur ${marketList.length})`}
+              </Text>
+              {hasActiveFilters && (
+                <Pressable onPress={resetMarketFilters} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <X color="#DC2626" size={14} />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#DC2626' }}>Effacer les filtres</Text>
+                </Pressable>
+              )}
+            </View>
+
+            {filteredMarketList.length === 0 ? (
+              <View style={[styles.card, { alignItems: 'center', paddingVertical: 36 }]}>
+                <Search color="#9CA3AF" size={38} />
+                <Text style={[styles.boldText, { marginTop: 12, color: '#334155', fontSize: 16 }]}>
+                  {hasActiveFilters ? 'Aucun logement ne correspond à vos critères' : 'Aucun bien disponible'}
                 </Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 6, paddingHorizontal: 16 }]}>
+                  {hasActiveFilters
+                    ? 'Modifiez votre mot-clé ou réinitialisez les filtres pour afficher l’ensemble des offres.'
+                    : 'De nouveaux logements certifiés et conformes sont publiés régulièrement.'}
+                </Text>
+                {hasActiveFilters && (
+                  <Pressable style={[styles.btnPrimary, { marginTop: 16, paddingHorizontal: 20 }]} onPress={resetMarketFilters}>
+                    <Text style={styles.btnPrimaryText}>Réinitialiser tous les filtres</Text>
+                  </Pressable>
+                )}
               </View>
             ) : (
-              marketList.map((off: any, i: number) => {
+              filteredMarketList.map((off: any, i: number) => {
                 const title = off.titre || off.logement?.name || 'Logement certifié QAPRIL';
                 const commune = off.logement?.commune || off.commune || 'Abidjan';
                 const rent = off.loyerDemande || off.declaredRentFcfa || off.price || 0;
@@ -1666,5 +1890,59 @@ const styles = StyleSheet.create({
     color: '#1A1D26',
     marginTop: 6,
     fontFamily: 'monospace',
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  searchBarInput: {
+    flex: 1,
+    paddingVertical: 11,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: '#0F172A',
+  },
+  filterSection: {
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  filterSectionTitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#2C3E6B',
+    letterSpacing: 0.8,
+  },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  filterChipActive: {
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  filterChipTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '800',
   },
 });
