@@ -44,7 +44,7 @@ export async function GET(request: Request) {
                 include: {
                     locataire:   { select: { firstName: true, lastName: true, phone: true } },
                     logement:    { select: { name: true, address: true, commune: true } },
-                    prestataire: { select: { firstName: true, lastName: true, phone: true } },
+                    prestataire: { select: { id: true, nom: true, telephone: true, specialite: true } },
                 },
                 orderBy: { dateSignalement: 'desc' },
                 skip,
@@ -68,7 +68,7 @@ export async function GET(request: Request) {
                              ? `${t.locataire.firstName ?? ''} ${t.locataire.lastName ?? ''}`.trim()
                              : 'Locataire',
             prestataire:   t.prestataire
-                             ? `${t.prestataire.firstName ?? ''} ${t.prestataire.lastName ?? ''}`.trim()
+                             ? (t.prestataire.nom ?? 'Prestataire')
                              : null,
         }));
 
