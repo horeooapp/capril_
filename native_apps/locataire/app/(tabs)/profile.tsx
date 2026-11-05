@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F4F5F9' },
   scroll: { padding: 18, gap: 14 },
   sub: { fontSize: 12, color: '#6B7280', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '800', color: '#1A1D26' },
+  title: { fontSize: 24, fontWeight: '600', color: '#1A1D26' },
   heroCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
-  name: { fontSize: 17, fontWeight: '800', color: '#1A1D26' },
+  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '600' },
+  name: { fontSize: 17, fontWeight: '600', color: '#1A1D26' },
   email: { fontSize: 12, color: '#6B7280', marginTop: 2 },
   pillOk: {
     marginTop: 6,
@@ -156,9 +156,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F5EC',
     paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '800' },
+  pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '600' },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnSecondaryText: { color: '#2C3E6B', fontSize: 13, fontWeight: '800' },
+  btnSecondaryText: { color: '#2C3E6B', fontSize: 13, fontWeight: '600' },
   btnDanger: {
     backgroundColor: '#FBEAE8',
     borderRadius: 14,
@@ -190,5 +190,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnDangerText: { color: '#C0392B', fontSize: 13, fontWeight: '800' },
+  btnDangerText: { color: '#C0392B', fontSize: 13, fontWeight: '600' },
 });

@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F2EC' },
   scroll: { padding: 18, gap: 12 },
   sub: { fontSize: 12, color: '#6E6E73', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '800', color: '#1C1C1E' },
+  title: { fontSize: 24, fontWeight: '600', color: '#1C1C1E' },
   heroCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -157,8 +157,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
-  name: { fontSize: 17, fontWeight: '800', color: '#1C1C1E' },
+  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '600' },
+  name: { fontSize: 17, fontWeight: '600', color: '#1C1C1E' },
   email: { fontSize: 12, color: '#6E6E73', marginTop: 2 },
   pillOk: {
     marginTop: 6,
@@ -166,9 +166,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F5EC',
     paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '800' },
+  pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '600' },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     borderColor: '#E4E0D7',
     gap: 6,
   },
-  label: { fontSize: 11, fontWeight: '800', color: '#6E6E73', marginBottom: 4 },
+  label: { fontSize: 11, fontWeight: '600', color: '#6E6E73', marginBottom: 4 },
   item: { fontSize: 12, color: '#1C1C1E', fontWeight: '600' },
   cardRow: {
     backgroundColor: '#FFFFFF',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: 14, fontWeight: '700', color: '#1C1C1E' },
   cardSub: { fontSize: 11, color: '#6E6E73', marginTop: 2 },
-  statusText: { fontSize: 12, fontWeight: '800' },
+  statusText: { fontSize: 12, fontWeight: '600' },
   btnSecondary: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnSecondaryText: { color: '#1B4D3E', fontSize: 13, fontWeight: '800' },
+  btnSecondaryText: { color: '#1B4D3E', fontSize: 13, fontWeight: '600' },
   btnDanger: {
     backgroundColor: '#FBEAE8',
     borderRadius: 14,
@@ -213,5 +213,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnDangerText: { color: '#C0392B', fontSize: 13, fontWeight: '800' },
+  btnDangerText: { color: '#C0392B', fontSize: 13, fontWeight: '600' },
 });

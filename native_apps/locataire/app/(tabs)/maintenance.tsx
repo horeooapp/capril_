@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   roleTagText: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#059669',
     letterSpacing: 0.8,
   },
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
   },
   destinataireLabel: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#64748B',
     letterSpacing: 0.8,
   },
   destinataireName: {
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1E293B',
     marginTop: 2,
   },
@@ -323,14 +323,14 @@ const styles = StyleSheet.create({
   },
   sectionHeading: {
     fontSize: 11,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#6B7280',
     letterSpacing: 1.2,
     marginBottom: 4,
   },
   label: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#4B5563',
     letterSpacing: 0.8,
   },
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: '900',
+    fontWeight: '600',
     letterSpacing: 0.8,
   },
   historySection: {
@@ -434,12 +434,12 @@ const styles = StyleSheet.create({
   },
   historyCat: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#4B5563',
   },
   historyTitle: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#111827',
   },
   historyDestRow: {
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   },
   pillText: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
   },
   rowBetween: {
     flexDirection: 'row',

@@ -42,16 +42,16 @@ export function AgencyPortalDashboardV2({
     <div className="space-y-6">
       
       {/* ── TOP BANNER AGENCE AVEC NOM OFFICIEL DE L'AGENCE ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-sky-600"></span>
+            <span className="text-xs font-medium text-slate-500">
               Espace Professionnel · Agence Immobilière
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Bonjour, <span className="text-sky-700">{agencyDisplayName}</span>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+            Portefeuille & Gestion d'Agence · <span className="text-slate-600 font-normal">{agencyDisplayName}</span>
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
             Pilotez vos mandats, quittances certifiées et le suivi de vos portefeuilles clients.
@@ -61,14 +61,14 @@ export function AgencyPortalDashboardV2({
         <div className="flex flex-wrap items-center gap-2.5">
           <Link 
             href="/dashboard/mandates" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-sm transition-colors"
           >
             <Building2 size={15} />
             <span>Mes Mandats</span>
           </Link>
           <Link 
             href="/dashboard/matching" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium shadow-sm transition-colors"
           >
             <Users size={15} className="text-slate-400" />
             <span>Candidatures</span>
@@ -88,7 +88,7 @@ export function AgencyPortalDashboardV2({
               <Link 
                   key={t.href} 
                   href={t.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-[12.5px] font-semibold transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[12.5px] font-medium transition-colors whitespace-nowrap ${
                       t.active 
                       ? "bg-slate-800 text-white" 
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"

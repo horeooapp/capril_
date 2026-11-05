@@ -48,16 +48,16 @@ export function BrokerPortalDashboard({
         <div className="space-y-6">
             
             {/* ── TOP BANNER DÉMARCHEUR / INTERMÉDIAIRE AVEC NOM & PRÉNOM ── */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div>
                     <div className="flex items-center gap-2 mb-1.5">
-                        <span className="w-2 h-2 rounded-full bg-violet-600 animate-pulse"></span>
-                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        <span className="w-2 h-2 rounded-full bg-violet-600"></span>
+                        <span className="text-xs font-medium text-slate-500">
                             Espace Professionnel · Démarcheur & Intermédiaire Mandaté
                         </span>
                     </div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                        Bonjour, <span className="text-violet-700">{brokerDisplayName}</span>
+                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+                        Mandats de Prospection & Apports · <span className="text-slate-600 font-normal">{brokerDisplayName}</span>
                     </h1>
                     <p className="text-xs text-slate-500 mt-1 font-medium">
                         Gérez vos mandats de prospection, qualifiez les dossiers locataires et suivez vos commissions d'apport.
@@ -67,14 +67,14 @@ export function BrokerPortalDashboard({
                 <div className="flex flex-wrap items-center gap-2.5">
                     <Link 
                         href="/dashboard/mandates" 
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-sm transition-colors"
                     >
                         <ClipboardList size={15} />
                         <span>Nouveau Mandat</span>
                     </Link>
                     <Link 
                         href="/dashboard/matching" 
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium shadow-sm transition-colors"
                     >
                         <Users size={15} className="text-slate-400" />
                         <span>Candidatures</span>
@@ -94,7 +94,7 @@ export function BrokerPortalDashboard({
                     <Link 
                         key={t.href} 
                         href={t.href}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[12.5px] font-semibold transition-colors whitespace-nowrap ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[12.5px] font-medium transition-colors whitespace-nowrap ${
                             t.active 
                             ? "bg-violet-700 text-white" 
                             : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
@@ -205,7 +205,7 @@ export function BrokerPortalDashboard({
                             href={act.href}
                             className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200/80 bg-white hover:bg-violet-50/50 hover:border-violet-300 transition-all text-center group shadow-sm"
                         >
-                            <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center mb-2 transition-colors">
                                 {act.icon}
                             </div>
                             <span className="text-xs font-bold text-slate-700 group-hover:text-violet-900 transition-colors">

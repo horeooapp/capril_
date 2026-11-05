@@ -337,13 +337,13 @@ const styles = StyleSheet.create({
   },
   roleTagText: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#1B4D3E',
     letterSpacing: 0.8,
   },
   roleTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#141824',
     letterSpacing: -0.4,
   },
@@ -367,11 +367,11 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '600',
   },
   statLabel: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#6E6E73',
     letterSpacing: 0.8,
     marginTop: 2,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   filterChip: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 8,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E4E0D7',
@@ -420,12 +420,12 @@ const styles = StyleSheet.create({
   },
   catBadgeText: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#141824',
   },
   incidentTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#141824',
     letterSpacing: -0.2,
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   actionBtnHintText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1B4D3E',
   },
   pill: {
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   },
   pillText: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
   },
   rowBetween: {
     flexDirection: 'row',
@@ -516,13 +516,13 @@ const styles = StyleSheet.create({
   },
   modalRef: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#8E8E93',
     letterSpacing: 0.8,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#141824',
     marginTop: 2,
   },
@@ -542,14 +542,14 @@ const styles = StyleSheet.create({
   },
   modalSectionLabel: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#8E8E93',
     letterSpacing: 1,
     marginBottom: 4,
   },
   modalStrong: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#141824',
   },
   modalSub: {
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   modalActionBtnText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '600',
   },
 });
 

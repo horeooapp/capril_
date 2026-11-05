@@ -36,7 +36,6 @@ import {
   FileSpreadsheet,
   LogOut,
   User,
-  Sparkles,
   Zap,
   Droplets,
   Smartphone,
@@ -787,7 +786,7 @@ export default function LocatairePrototypeScreen() {
                     <Text style={[styles.label, { color: '#166534', marginBottom: 4 }]}>
                       CODE TOKEN DE RECHARGE CIE (À SAISIR SUR VOTRE COMPTEUR)
                     </Text>
-                    <Text style={{ fontSize: 20, fontWeight: '900', color: '#15803D', letterSpacing: 2, fontFamily: 'monospace' }}>
+                    <Text style={{ fontSize: 20, fontWeight: '600', color: '#15803D', letterSpacing: 2, fontFamily: 'monospace' }}>
                       {factureReceipt.token}
                     </Text>
                     <Pressable
@@ -836,7 +835,7 @@ export default function LocatairePrototypeScreen() {
                   </View>
                   {fac.token && (
                     <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
-                      <Text style={{ fontSize: 11, color: '#15803D', fontFamily: 'monospace', fontWeight: '800' }}>
+                      <Text style={{ fontSize: 11, color: '#15803D', fontFamily: 'monospace', fontWeight: '600' }}>
                         Token: {fac.token}
                       </Text>
                     </View>
@@ -1315,7 +1314,7 @@ export default function LocatairePrototypeScreen() {
 
             {/* RÉSULTATS & STATUT DES FILTRES */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4, marginBottom: 2 }}>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#1E293B' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#1E293B' }}>
                 {filteredMarketList.length} logement{filteredMarketList.length > 1 ? 's' : ''} disponible{filteredMarketList.length > 1 ? 's' : ''}
                 {hasActiveFilters && ` (sur ${marketList.length})`}
               </Text>
@@ -1519,7 +1518,7 @@ const styles = StyleSheet.create({
   },
   headerAppBadge: {
     fontSize: 9,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#6B7280',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -1532,7 +1531,7 @@ const styles = StyleSheet.create({
   },
   headerScreenName: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1A1D26',
     letterSpacing: -0.3,
   },
@@ -1574,7 +1573,7 @@ const styles = StyleSheet.create({
   },
   drawerBrand: {
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#2C3E6B',
     letterSpacing: 1,
   },
@@ -1589,13 +1588,13 @@ const styles = StyleSheet.create({
   },
   certifBadgeText: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#059669',
     letterSpacing: 0.5,
   },
   drawerUser: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1A1D26',
   },
   drawerUserSub: {
@@ -1616,7 +1615,7 @@ const styles = StyleSheet.create({
   },
   drawerSectionTitle: {
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#9CA3AF',
     letterSpacing: 1.5,
     marginBottom: 10,
@@ -1655,7 +1654,7 @@ const styles = StyleSheet.create({
   },
   drawerItemLabelActive: {
     color: '#2C3E6B',
-    fontWeight: '800',
+    fontWeight: '600',
   },
   drawerItemDesc: {
     fontSize: 11,
@@ -1673,11 +1672,11 @@ const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 40 },
   sectionGap: { gap: 14 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  h1: { fontSize: 22, fontWeight: '800', color: '#1A1D26', letterSpacing: -0.4 },
-  h2: { fontSize: 17, fontWeight: '800', color: '#1A1D26' },
+  h1: { fontSize: 22, fontWeight: '600', color: '#1A1D26', letterSpacing: -0.4 },
+  h2: { fontSize: 17, fontWeight: '600', color: '#1A1D26' },
   subMuted: { fontSize: 12, color: '#6B7280', lineHeight: 17 },
   boldText: { fontSize: 13, fontWeight: '700', color: '#1A1D26' },
-  label: { fontSize: 11, fontWeight: '800', color: '#6B7280', letterSpacing: 0.6 },
+  label: { fontSize: 11, fontWeight: '600', color: '#6B7280', letterSpacing: 0.6 },
   iconBtn: {
     width: 40,
     height: 40,
@@ -1695,7 +1694,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.82)', fontWeight: '600' },
-  heroBig: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.6 },
+  heroBig: { fontSize: 28, fontWeight: '600', color: '#FFFFFF', letterSpacing: -0.6 },
   heroActions: { flexDirection: 'row', gap: 8, marginTop: 10, flexWrap: 'wrap' },
   btnWhite: {
     backgroundColor: '#FFFFFF',
@@ -1704,7 +1703,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  btnWhiteText: { color: '#2C3E6B', fontSize: 12, fontWeight: '800' },
+  btnWhiteText: { color: '#2C3E6B', fontSize: 12, fontWeight: '600' },
   btnOutlineWhite: {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.35)',
@@ -1715,9 +1714,9 @@ const styles = StyleSheet.create({
   },
   btnOutlineWhiteText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  pillOk: { backgroundColor: '#E3F5EC', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999 },
+  pillOk: { backgroundColor: '#E3F5EC', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 8 },
   pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '700' },
-  pillTint: { backgroundColor: '#E8ECF6', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
+  pillTint: { backgroundColor: '#E8ECF6', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
   pillTintText: { color: '#2C3E6B', fontSize: 11, fontWeight: '700' },
   grid2: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   cardGrid: {
@@ -1729,7 +1728,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EF',
     gap: 4,
   },
-  cardTitle: { fontSize: 14, fontWeight: '800', color: '#1A1D26', marginTop: 4 },
+  cardTitle: { fontSize: 14, fontWeight: '600', color: '#1A1D26', marginTop: 4 },
   cardSub: { fontSize: 11, color: '#6B7280' },
   card: {
     backgroundColor: '#FFFFFF',
@@ -1779,7 +1778,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
   btnGhost: {
     backgroundColor: '#F4F5F9',
     borderRadius: 14,
@@ -1823,7 +1822,7 @@ const styles = StyleSheet.create({
   },
   factureQuickLabel: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '600',
     marginTop: 4,
   },
   factureQuickSub: {
@@ -1848,7 +1847,7 @@ const styles = StyleSheet.create({
   },
   factureCatLabel: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1A1D26',
     marginTop: 4,
   },
@@ -1920,7 +1919,7 @@ const styles = StyleSheet.create({
   },
   filterSectionTitle: {
     fontSize: 11,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#2C3E6B',
     letterSpacing: 0.8,
   },
@@ -1943,6 +1942,6 @@ const styles = StyleSheet.create({
   },
   filterChipTextActive: {
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontWeight: '600',
   },
 });

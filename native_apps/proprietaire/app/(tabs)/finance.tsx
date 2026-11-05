@@ -131,14 +131,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sub: { fontSize: 12, color: '#6E6E73', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '800', color: '#1C1C1E' },
+  title: { fontSize: 24, fontWeight: '600', color: '#1C1C1E' },
   eurBtn: {
     backgroundColor: '#FDF3DF',
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  eurBtnText: { fontSize: 11, fontWeight: '800', color: '#9A6500' },
+  eurBtnText: { fontSize: 11, fontWeight: '600', color: '#9A6500' },
   heroCard: {
     marginHorizontal: 18,
     marginBottom: 14,
@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.18)',
     paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  zeroFeeText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
-  heroBig: { fontSize: 28, fontWeight: '800', color: '#FFFFFF' },
+  zeroFeeText: { fontSize: 10, fontWeight: '600', color: '#FFFFFF' },
+  heroBig: { fontSize: 28, fontWeight: '600', color: '#FFFFFF' },
   heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.82)', lineHeight: 16 },
   reportBtn: {
     marginTop: 8,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  reportBtnText: { fontSize: 12, fontWeight: '800', color: '#1B4D3E' },
+  reportBtnText: { fontSize: 12, fontWeight: '600', color: '#1B4D3E' },
   list: { paddingHorizontal: 18, paddingBottom: 40, gap: 10 },
   card: {
     backgroundColor: '#FFFFFF',
@@ -190,5 +190,5 @@ const styles = StyleSheet.create({
   },
   property: { fontSize: 13, fontWeight: '700', color: '#1C1C1E' },
   meta: { fontSize: 11, color: '#6E6E73', marginTop: 2 },
-  amount: { fontSize: 14, fontWeight: '800', color: '#1E7E4E' },
+  amount: { fontSize: 14, fontWeight: '600', color: '#1E7E4E' },
 });

@@ -285,14 +285,14 @@ export default async function AdminDashboardOverview() {
 
                 <div className="kpi-grid">
                     <div className="kpi-card orange">
-                        <div className="kpi-glow"></div>
+                        
                         <div className="kpi-label">Total Loyers Encaissés</div>
                         <div className="kpi-val">{safeData.totalPayments.toLocaleString()} F</div>
                         <div className="kpi-delta up"><ArrowUpRight className="w-3 h-3" /> {safeData.totalPayments > 0 ? "Actif" : "Initial"}</div>
                     </div>
                     
                     <div className="kpi-card vert">
-                        <div className="kpi-glow"></div>
+                        
                         <div className="kpi-label">Contrats de Bail Actifs</div>
                         <div className="kpi-val">{safeData.totalLeases}</div>
                         <div className={`kpi-delta ${leaseDelta >= 0 ? 'up' : 'down'}`}>
@@ -301,7 +301,7 @@ export default async function AdminDashboardOverview() {
                     </div>
                     
                     <div className="kpi-card or">
-                        <div className="kpi-glow"></div>
+                        
                         <div className="kpi-label">Dossiers en Médiation</div>
                         <div className="kpi-val">{safeData.activeMediations}</div>
                         <div className="kpi-delta text-yellow-500">
@@ -310,7 +310,7 @@ export default async function AdminDashboardOverview() {
                     </div>
                     
                     <div className="kpi-card gris">
-                        <div className="kpi-glow"></div>
+                        
                         <div className="kpi-label">Identités Vérifiées</div>
                         <div className="kpi-val">{safeData.kycAutoRate}%</div>
                         <div className="kpi-delta up">Vérification Conforme</div>
@@ -331,8 +331,12 @@ export default async function AdminDashboardOverview() {
                             {currentTrend.map((t, idx) => (
                                 <div key={idx} className="bar-col">
                                     <div 
-                                        className={`bar ${idx % 2 === 0 ? 'orange' : 'vert'}`} 
-                                        style={{ height: `${(t.amount / maxTrendAmount) * 90 + 5}%` }}
+                                        className="bar" 
+                                        style={{ 
+                                            height: `${(t.amount / maxTrendAmount) * 90 + 5}%`,
+                                            backgroundColor: idx === currentTrend.length - 1 ? 'var(--ci-vert)' : '#CBD5E1',
+                                            borderRadius: '6px 6px 2px 2px'
+                                        }}
                                         title={`${t.amount.toLocaleString()} F`}
                                     ></div>
                                     <div className="bar-label" style={idx === currentTrend.length - 1 ? { color: 'var(--text-main)', fontWeight: 700 } : {}}>{t.label}</div>
@@ -419,7 +423,7 @@ export default async function AdminDashboardOverview() {
                                 {recentReceipts.length === 0 && (
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
-                                <div className="mm-card mtn-card mt-2 col-span-2" style={{ background: 'linear-gradient(135deg, var(--ci-nuit), #3b82f6)', color: '#fff' }}>
+                                <div className="mm-card mtn-card mt-2 col-span-2" style={{ backgroundColor: '#0F172A', color: '#fff', border: '1px solid #1E293B', borderRadius: '10px' }}>
                                     <div className="mm-op">TRESOR / CDC-CI</div>
                                     <div className="mm-amount">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
                                     <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Total Cautions en Sécurité (CDC-CI)</div>
@@ -480,33 +484,33 @@ export default async function AdminDashboardOverview() {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg mb-2"><Lock size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.totalVaultAmount.toLocaleString()} F</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Vault Consigné</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.totalVaultAmount.toLocaleString()} F</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Vault Consigné</div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-blue-100 text-blue-600 rounded-lg mb-2"><Key size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.totalPasseports}</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Passeports Générés</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.totalPasseports}</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Passeports Générés</div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-amber-100 text-amber-600 rounded-lg mb-2"><Trophy size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.totalChampions}</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Champions Actifs</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.totalChampions}</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Champions Actifs</div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg mb-2"><Globe size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.totalDiaspora}</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Diaspora VIP</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.totalDiaspora}</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Diaspora VIP</div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-orange-100 text-orange-600 rounded-lg mb-2"><Wifi size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.totalAbonnements}</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Abonnements Actifs</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.totalAbonnements}</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Abonnements Actifs</div>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center text-center">
                             <div className="p-2 bg-red-100 text-red-600 rounded-lg mb-2"><AlertTriangle size={20}/></div>
-                            <div className="text-xl font-black text-gray-900">{safeData.activeSignalements}</div>
-                            <div className="text-[10px] uppercase text-gray-500 font-bold">Signalements Actifs</div>
+                            <div className="text-xl font-semibold text-slate-900 font-mono">{safeData.activeSignalements}</div>
+                            <div className="text-[11px] text-slate-500 font-medium">Signalements Actifs</div>
                         </div>
                     </div>
                 </div>
@@ -523,7 +527,7 @@ export default async function AdminDashboardOverview() {
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
                             <div>
-                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.totalDgi.toLocaleString()} F</div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{safeData.totalDgi.toLocaleString()} F</div>
                                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Droits M17 collectés</div>
                             </div>
                         </div>
@@ -538,7 +542,7 @@ export default async function AdminDashboardOverview() {
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/><path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                             </div>
                             <div>
-                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.fraudAlerts} Alertes</div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{safeData.fraudAlerts} Alertes</div>
                                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Profils risqués détectés</div>
                             </div>
                         </div>
@@ -553,7 +557,7 @@ export default async function AdminDashboardOverview() {
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
                             <div>
-                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 800 }}>{safeData.totalSmsDeclarations} Total</div>
+                                <div style={{ fontFamily: 'var(--font-head)', fontSize: '20px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{safeData.totalSmsDeclarations} Total</div>
                                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Confirmées: {safeData.confirmedSmsDeclarations}</div>
                             </div>
                         </div>

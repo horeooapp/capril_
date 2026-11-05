@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   center: { justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 10 },
   sub: { fontSize: 12, color: '#6B7280', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '800', color: '#1A1D26', marginTop: 2 },
+  title: { fontSize: 24, fontWeight: '600', color: '#1A1D26', marginTop: 2 },
   banner: {
     marginHorizontal: 18,
     marginBottom: 12,
@@ -125,15 +125,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  bannerTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  bannerTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   bannerSub: { color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 2 },
   packBtn: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  packBtnText: { color: '#2C3E6B', fontSize: 11, fontWeight: '800' },
+  packBtnText: { color: '#2C3E6B', fontSize: 11, fontWeight: '600' },
   list: { paddingHorizontal: 18, paddingBottom: 40, gap: 10 },
   card: {
     flexDirection: 'row',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8ECF6',
     paddingHorizontal: 10,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 8,
   },
-  pdfBtnText: { fontSize: 11, fontWeight: '800', color: '#2C3E6B' },
+  pdfBtnText: { fontSize: 11, fontWeight: '600', color: '#2C3E6B' },
 });
