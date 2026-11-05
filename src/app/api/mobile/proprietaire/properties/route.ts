@@ -30,7 +30,7 @@ export async function GET(request: Request) {
             include: {
                 images: { where: { isMain: true }, take: 1 },
                 leases: {
-                    where: { status: { in: ['ACTIVE', 'LOYER_IMPAYE', 'ACTIVE_DECLARATIF'] } },
+                    where: { status: { in: ['ACTIVE', 'LOYER_IMPAYE', 'ACTIVE_DECLARATIF', 'PENDING_CONFIRMATION', 'PENDING_SIGNATURE', 'PENDING_DEPOSIT', 'MISE_EN_DEMEURE', 'CLEMENCE_EN_COURS'] } },
                     include: { tenant: { select: { firstName: true, lastName: true } } },
                     take: 1,
                 },
@@ -40,6 +40,11 @@ export async function GET(request: Request) {
 
         const formatted = properties.map(p => {
             const activeLease = p.leases[0] ?? null;
+            const isRented = Boolean(
+                activeLease ||
+                p.status === 'rented' ||
+                p.status === 'RENTED'
+            );
             return {
                 id:               p.id,
                 propertyCode:     p.propertyCode,
@@ -53,11 +58,12 @@ export async function GET(request: Request) {
                 declaredRentFcfa: Number(p.declaredRentFcfa ?? 0),
                 superficieM2:     p.superficieM2 ? Number(p.superficieM2) : null,
                 imageUrl:         p.images[0]?.s3Key ?? null,
-                occupancyStatus:  activeLease ? 'Occupé' : 'Vacant',
+                occupancyStatus:  isRented ? 'Loué' : 'Vacant',
+                isRented:         isRented,
                 tenantName:       activeLease?.tenant
                                     ? `${activeLease.tenant.firstName ?? ''} ${activeLease.tenant.lastName ?? ''}`.trim()
                                     : null,
-                currentRent:      activeLease ? Number(activeLease.rentAmount ?? 0) : 0,
+                currentRent:      activeLease ? Number(activeLease.rentAmount ?? 0) : Number(p.declaredRentFcfa ?? 0),
             };
         });
 
