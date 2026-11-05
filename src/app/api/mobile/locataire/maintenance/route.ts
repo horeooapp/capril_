@@ -16,7 +16,7 @@ export async function GET(request: Request) {
         });
 
         let landlordName = 'Bailleur';
-        let propertyName = activeLease?.property?.name || 'Votre logement';
+        const propertyName = activeLease?.property?.name || 'Votre logement';
 
         if (activeLease) {
             const landlordId = activeLease.landlordId || activeLease.property?.ownerUserId;

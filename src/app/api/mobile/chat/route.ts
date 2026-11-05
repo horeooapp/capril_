@@ -44,7 +44,7 @@ export async function GET(request: Request) {
         // Déterminer l'interlocuteur
         const isTenant = lease.tenantId === user.userId;
         let interlocutorName = isTenant ? 'Bailleur' : 'Locataire';
-        let interlocutorRole = isTenant ? 'Bailleur' : 'Locataire';
+        const interlocutorRole = isTenant ? 'Bailleur' : 'Locataire';
 
         if (isTenant) {
             const landlordId = lease.landlordId || lease.property?.ownerUserId;
