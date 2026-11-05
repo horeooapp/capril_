@@ -105,37 +105,37 @@ export function OwnerPortalDashboardV2({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+            <span className="text-xs font-medium text-slate-500">
               Espace Propriétaire · Gestion Directe
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Bonjour, <span className="text-emerald-700">{displayName}</span>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
+            Patrimoine & Flux Locatifs
           </h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium">
-            Supervisez votre patrimoine immobilier, vos quittances certifiées et vos flux locatifs en temps réel.
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Supervision du portefeuille en gestion directe · {displayName}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link 
             href="/dashboard/leases/new" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 "
           >
             <Plus size={15} />
             <span>Nouveau Bail</span>
           </Link>
           <Link 
             href="/dashboard/properties/new" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 "
           >
             <Building2 size={15} className="text-slate-400" />
             <span>Ajouter un Bien</span>
           </Link>
           <Link 
             href="/dashboard/receipts" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200 "
           >
             <Receipt size={15} className="text-slate-500" />
             <span>Quittances</span>
@@ -364,8 +364,8 @@ export function OwnerPortalDashboardV2({
                       onClick={() => handleToggleMarketplace(u.id.replace('E-', ''), !u.isOnline, u.name || u.label)}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
                         u.isOnline 
-                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 hover:-translate-y-0.5" 
-                          : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 hover:-translate-y-0.5"
+                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 " 
+                          : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 "
                       }`}
                     >
                       {u.isOnline ? <ToggleRight size={17} className="text-rose-500"/> : <ToggleLeft size={17} className="text-slate-400"/>}

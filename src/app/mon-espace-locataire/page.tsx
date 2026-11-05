@@ -28,6 +28,7 @@ import {
     BookOpen,
     Users,
     Building2,
+    Home,
     Clock,
     Sparkles,
     Droplets,
@@ -230,8 +231,8 @@ export default function LocataireDashboardPage() {
                         </div>
                     ) : (
                         <div className="bg-white/80 backdrop-blur-md p-10 rounded-3xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)]">
-                            <div className="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-4xl shadow-inner mb-6 mx-auto">
-                                🏠
+                            <div className="w-16 h-16 bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-center text-slate-700 mb-6 mx-auto">
+                                <Home size={32} />
                             </div>
                             <h1 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight">
                                 Bienvenue sur votre Espace Locataire
@@ -356,7 +357,7 @@ export default function LocataireDashboardPage() {
                 
                 {/* PRIMARY HERO: Rent & Payment (8 cols) */}
                 <BentoItem className="md:col-span-8 p-7 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-[#0F172A] via-[#0B1222] to-[#020617] text-white border-none shadow-[0_20px_50px_rgba(15,23,42,0.25)] min-h-[260px]">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    {/* Calm dark surface */}
                     
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
@@ -389,7 +390,7 @@ export default function LocataireDashboardPage() {
                     <div className="mt-8 flex flex-wrap gap-3 relative z-10">
                         <Link 
                             href="/mon-espace-locataire/payment" 
-                            className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl px-6 py-3.5 text-xs uppercase tracking-wider transition-all duration-200 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 hover:-translate-y-0.5"
+                            className="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-xl px-6 py-3 text-xs transition-colors flex items-center justify-center gap-2"
                         >
                             <span>Régler maintenant</span>
                             <ArrowUpRight size={16} />
@@ -410,7 +411,7 @@ export default function LocataireDashboardPage() {
                     <div>
                         <div className="flex items-center justify-between mb-4">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                <Sparkles size={12} /> Passeport Actif
+                                <ShieldCheck size={13} /> Passeport vérifié
                             </span>
                             <span className="text-[10px] font-bold text-slate-400">Palier Or</span>
                         </div>

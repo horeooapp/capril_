@@ -36,7 +36,6 @@ import {
   LogOut,
   User,
   Bell,
-  Sparkles,
   Wrench,
 } from 'lucide-react-native';
 
@@ -371,7 +370,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                       <IconComponent color={active ? '#FFFFFF' : primaryColor} size={18} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.drawerItemLabel, active && { color: primaryColor, fontWeight: '800' }]}>
+                      <Text style={[styles.drawerItemLabel, active && { color: primaryColor, fontWeight: '600' }]}>
                         {item.label}
                       </Text>
                       <Text style={styles.drawerItemDesc} numberOfLines={1}>
@@ -428,7 +427,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.drawerItemLabel}>Affichage devise : {eurMode ? 'Euros (€)' : 'FCFA (F)'}</Text>
                     <Text style={styles.drawerItemDesc}>Bascule instantanée des montants</Text>
                   </View>
-                  <Text style={{ fontSize: 13, fontWeight: '800', color: primaryColor }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: primaryColor }}>
                     {eurMode ? '€' : 'F'}
                   </Text>
                 </Pressable>
@@ -1129,7 +1128,7 @@ const styles = StyleSheet.create({
   },
   headerScreenName: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#FFFFFF',
     letterSpacing: -0.3,
   },
@@ -1245,12 +1244,12 @@ const styles = StyleSheet.create({
   },
   certifBadgeText: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
   drawerUser: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#1A1D26',
   },
   drawerUserSub: {
@@ -1333,7 +1332,7 @@ const styles = StyleSheet.create({
   },
   drawerModeBtnTextActive: {
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontWeight: '600',
   },
   drawerScroll: {
     marginTop: 14,
@@ -1398,14 +1397,14 @@ const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 40 },
   sectionGap: { gap: 12 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  h1: { fontSize: 21, fontWeight: '800', color: '#1C1C1E', letterSpacing: -0.4 },
-  h2: { fontSize: 17, fontWeight: '800', color: '#1C1C1E' },
+  h1: { fontSize: 21, fontWeight: '600', color: '#1C1C1E', letterSpacing: -0.4 },
+  h2: { fontSize: 17, fontWeight: '600', color: '#1C1C1E' },
   subMuted: { fontSize: 12, color: '#6E6E73', lineHeight: 17 },
   boldText: { fontSize: 13, fontWeight: '700', color: '#1C1C1E' },
-  label: { fontSize: 11, fontWeight: '800', color: '#6E6E73', letterSpacing: 0.6 },
+  label: { fontSize: 11, fontWeight: '600', color: '#6E6E73', letterSpacing: 0.6 },
   heroCard: { borderRadius: 22, padding: 18, gap: 6 },
   heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.82)', fontWeight: '600' },
-  heroBig: { fontSize: 27, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5 },
+  heroBig: { fontSize: 27, fontWeight: '600', color: '#FFFFFF', letterSpacing: -0.5 },
   kpiRow: { flexDirection: 'row', gap: 8 },
   kpiBox: {
     flex: 1,
@@ -1415,7 +1414,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E4E0D7',
   },
-  kpiNum: { fontSize: 20, fontWeight: '800', color: '#1C1C1E' },
+  kpiNum: { fontSize: 20, fontWeight: '600', color: '#1C1C1E' },
   grid2: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   cardGrid: {
     width: '48%',
@@ -1440,7 +1439,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
   },
-  pillGoldText: { fontSize: 11, fontWeight: '800', color: '#9A6500' },
+  pillGoldText: { fontSize: 11, fontWeight: '600', color: '#9A6500' },
   input: {
     borderWidth: 1,
     borderColor: '#E4E0D7',
@@ -1464,7 +1463,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 14,
   },
-  btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800' },
+  btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
   btnGhost: {
     borderRadius: 14,
     height: 42,

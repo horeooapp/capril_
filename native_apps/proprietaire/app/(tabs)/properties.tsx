@@ -197,7 +197,7 @@ export default function PropertiesScreen() {
         ListEmptyComponent={
           <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 30 }}>
             <Building2 size={44} color="#94A3B8" />
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: '500', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
               {hasActiveFilters ? 'Aucun bien ne correspond aux filtres' : 'Aucun bien enregistré'}
             </Text>
             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   center: { justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10, gap: 8 },
   sub: { fontSize: 12, color: '#6E6E73', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '800', color: '#1C1C1E' },
+  title: { fontSize: 24, fontWeight: '600', color: '#1C1C1E' },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -296,16 +296,16 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 6,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E4E0D7',
   },
   chipOn: { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' },
-  chipText: { fontSize: 12, fontWeight: '700', color: '#1C1C1E' },
+  chipText: { fontSize: 12, fontWeight: '500', color: '#1C1C1E' },
   chipTextOn: { color: '#FFFFFF' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  sortLabel: { fontSize: 11, fontWeight: '800', color: '#6E6E73' },
+  sortLabel: { fontSize: 11, fontWeight: '600', color: '#6E6E73' },
   sortChip: {
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
   sortChipActive: {
     backgroundColor: '#1B4D3E',
   },
-  sortChipText: { fontSize: 11, fontWeight: '700', color: '#555' },
+  sortChipText: { fontSize: 11, fontWeight: '500', color: '#555' },
   sortChipTextActive: { color: '#FFF' },
   list: { paddingHorizontal: 18, paddingBottom: 40, gap: 10 },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 16,
     padding: 15,
     borderWidth: 1,
     borderColor: '#E4E0D7',
@@ -336,12 +336,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  propertyName: { fontSize: 14, color: '#1C1C1E', fontWeight: '800' },
+  propertyName: { fontSize: 14, color: '#1C1C1E', fontWeight: '600' },
   propertyAddress: { fontSize: 12, color: '#6E6E73', marginTop: 2 },
-  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   statusOccupied: { backgroundColor: '#E3F5EC' },
   statusVacant: { backgroundColor: '#FBEAE8' },
-  statusText: { fontSize: 11, fontWeight: '800' },
+  statusText: { fontSize: 11, fontWeight: '600' },
   statusTextOccupied: { color: '#1E7E4E' },
   statusTextVacant: { color: '#C0392B' },
   tenantBanner: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
   tenantText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '500',
     color: '#15803D',
   },
   footerRow: {
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E4E0D7',
   },
-  rent: { fontSize: 14, fontWeight: '800', color: '#1B4D3E' },
+  rent: { fontSize: 14, fontWeight: '600', color: '#1B4D3E' },
   badgesRight: { flexDirection: 'row', gap: 6 },
   nivPill: {
     flexDirection: 'row',
@@ -377,9 +377,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F5EC',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 6,
   },
-  nivText: { fontSize: 10, fontWeight: '800', color: '#1E7E4E' },
+  nivText: { fontSize: 10, fontWeight: '600', color: '#1E7E4E' },
   maskPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -387,9 +387,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FDF3DF',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 6,
   },
-  maskText: { fontSize: 10, fontWeight: '800', color: '#9A6500' },
+  maskText: { fontSize: 10, fontWeight: '600', color: '#9A6500' },
   resetBtn: {
     marginTop: 14,
     backgroundColor: '#1B4D3E',
@@ -400,6 +400,6 @@ const styles = StyleSheet.create({
   resetBtnText: {
     color: '#FFF',
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '600',
   },
 });

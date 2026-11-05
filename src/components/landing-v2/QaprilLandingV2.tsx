@@ -262,10 +262,8 @@ export default function QaprilLandingV2({
               </div>
             ))}
 
-            {/* OVERLAY SOUVERAIN ÉLÉGANT & MULTI-COUCHE (HAUTE LISIBILITÉ & AMBIANCE LUXE) */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/65 z-10" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_25%,rgba(217,119,6,0.18),transparent_70%)] z-10" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-10" />
+            {/* OVERLAY SOUVERAIN ÉLÉGANT & HAUTE LISIBILITÉ */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/60 z-10" />
           </div>
 
           {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
@@ -278,78 +276,72 @@ export default function QaprilLandingV2({
                 Conforme à la loi sur le bail d'habitation · Côte d'Ivoire
               </div>
 
-              <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6 max-w-4xl">
-                Gérez vos maisons et vos loyers en toute confiance,{" "}
-                <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
-                  sans friction.
-                </span>
+              <h1 className="text-3xl sm:text-5xl xl:text-6xl font-semibold text-white tracking-tight leading-[1.12] mb-6 max-w-4xl">
+                Gestion locative certifiée et baux d'habitation conformes en Côte d'Ivoire
               </h1>
 
               <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-10 max-w-3xl">
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution à la Caisse des Dépôts (CDC-CI). Tout est clair, rapide et protégé.
               </p>
 
-              {/* 3 Portails Métiers Directs (Cartes Apple/Meta Design Frosted) */}
+              {/* 3 Portails Métiers Directs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <button
                   onClick={() => handleLogin("BAILLEUR")}
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-amber-400/70 shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-amber-400/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shadow-sm group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center text-amber-300 shadow-sm group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
                       <Building2 className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-amber-300 group-hover:bg-amber-500/20 transition-all">
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-amber-300 group-hover:bg-amber-500/20 transition-colors">
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
-                    Propriétaires
+                  <div className="text-sm font-semibold text-white relative z-10">
+                    Propriétaires bailleurs
                   </div>
-                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
+                  <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
                     Gérez vos biens, encaissez vos loyers et suivez vos quittances.
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleLogin("LOCATAIRE")}
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-sky-400/70 shadow-lg hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-sky-400/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300 shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/20 flex items-center justify-center text-sky-300 shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-colors">
                       <Users className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-sky-300 group-hover:bg-sky-500/20 transition-all">
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-sky-300 group-hover:bg-sky-500/20 transition-colors">
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
-                    Locataires
+                  <div className="text-sm font-semibold text-white relative z-10">
+                    Locataires certifiés
                   </div>
-                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
-                    Payez par Wave/Mobile Money et recevez votre reçu immédiat.
+                  <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
+                    Payez par Wave/Mobile Money et recevez votre reçu officiel immédiat.
                   </p>
                 </button>
 
                 <Link
                   href="/dashboard/login/agency"
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-xl border border-white/15 hover:border-emerald-400/70 shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer block overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-emerald-400/40 shadow-sm transition-colors duration-200 group cursor-pointer block overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/15 to-transparent rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-sm group-hover:bg-emerald-400 group-hover:text-slate-950 transition-all duration-300">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/20 flex items-center justify-center text-emerald-300 shadow-sm group-hover:bg-emerald-400 group-hover:text-slate-950 transition-colors">
                       <Layers className="w-5 h-5" />
                     </div>
-                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-emerald-300 group-hover:bg-emerald-500/20 transition-all">
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-emerald-300 group-hover:bg-emerald-500/20 transition-colors">
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                  <div className="text-[13px] font-black text-white uppercase tracking-wider relative z-10">
+                  <div className="text-sm font-semibold text-white relative z-10">
                     Agences & Mandats
                   </div>
-                  <p className="text-[11px] text-slate-300 font-medium mt-1 leading-snug relative z-10">
+                  <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
                     Pilotez vos mandats, portefeuilles et commissions en toute sérénité.
                   </p>
                 </Link>

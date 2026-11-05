@@ -172,3 +172,4 @@ export async function playMessageNotificationSound(senderName: string, messageCo
     console.warn('[Notifications] Erreur lecture sonnerie message:', e);
   }
 }
+
