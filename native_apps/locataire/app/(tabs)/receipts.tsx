@@ -12,15 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Download, FileText, CheckCircle2 } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
-const FALLBACK_RECEIPTS = [
-  { id: 'Q-2026-11', period: 'Novembre 2026', date: '2026-11-03', amount: 150000, via: 'Wave', sha: '9f3a…c17e' },
-  { id: 'Q-2026-10', period: 'Octobre 2026', date: '2026-10-04', amount: 150000, via: 'Wave', sha: '8b2c…e04a' },
-  { id: 'Q-2026-09', period: 'Septembre 2026', date: '2026-09-02', amount: 150000, via: 'Orange Money', sha: '71d9…33f1' },
-  { id: 'Q-2026-08', period: 'Août 2026', date: '2026-08-03', amount: 150000, via: 'Wave', sha: '4e01…99b2' },
-];
-
 export default function ReceiptsScreen() {
-  const [receipts, setReceipts] = useState<any[]>(FALLBACK_RECEIPTS);
+  const [receipts, setReceipts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,11 +21,11 @@ export default function ReceiptsScreen() {
       try {
         const response = await fetchWithAuth('/locataire/receipts');
         const json = await response.json();
-        if (response.ok && json.receipts?.length) {
+        if (response.ok && json.receipts) {
           setReceipts(json.receipts);
         }
       } catch (e) {
-        // Fallback seed kept
+        console.error("Erreur chargement quittances", e);
       } finally {
         setLoading(false);
       }
@@ -57,23 +50,36 @@ export default function ReceiptsScreen() {
 
       <View style={styles.banner}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.bannerTitle}>12 / 12 loyers payés à l’heure</Text>
-          <Text style={styles.bannerSub}>Opposable aux tiers, banques et consulats</Text>
+          <Text style={styles.bannerTitle}>{receipts.length} quittance{receipts.length > 1 ? 's' : ''} émise{receipts.length > 1 ? 's' : ''}</Text>
+          <Text style={styles.bannerSub}>Opposable aux tiers, banques et consulats (SHA-256)</Text>
         </View>
-        <Pressable
-          style={styles.packBtn}
-          onPress={() =>
-            Alert.alert('Pack 12 mois', 'PDF groupé des 12 dernières quittances SHA-256 généré.')
-          }
-        >
-          <Text style={styles.packBtnText}>Pack 12 mois</Text>
-        </Pressable>
+        {receipts.length > 0 && (
+          <Pressable
+            style={styles.packBtn}
+            onPress={() =>
+              Alert.alert('Pack Quittances', 'Téléchargement de vos quittances certifiées.')
+            }
+          >
+            <Text style={styles.packBtnText}>Tout exporter</Text>
+          </Pressable>
+        )}
       </View>
 
       <FlatList
         data={receipts}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
+            <FileText size={40} color="#94A3B8" />
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
+              Aucune quittance émise pour le moment
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
+              Vos quittances infalsifiables avec signature SHA-256 apparaîtront ici dès la validation de vos règlements de loyer.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.iconBox}>
@@ -81,20 +87,20 @@ export default function ReceiptsScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.month}>
-                {item.period || 'Loyer mensuel'} · {(item.amount || 150000).toLocaleString('fr-FR')} F
+                {item.period || 'Loyer mensuel'} · {(item.amount || 0).toLocaleString('fr-FR')} F
               </Text>
               <Text style={styles.meta}>
-                Payé le {new Date(item.date || Date.now()).toLocaleDateString('fr-FR')} · {item.via || 'Mobile Money'} · SHA-256 {item.sha || '9f3a…c17e'}
+                {item.date ? `Payé le ${new Date(item.date).toLocaleDateString('fr-FR')}` : 'En cours'} · {item.via || 'Mobile Money'}
               </Text>
             </View>
             <Pressable
               style={styles.pdfBtn}
               onPress={() =>
-                Alert.alert('Quittance PDF', `Ouverture de la quittance certifiée ${item.id}`)
+                Alert.alert('Quittance certifiée', `Référence quittance: ${item.id}\nStatut: ${item.status || 'VALIDE'}`)
               }
             >
               <Download color="#2C3E6B" size={16} />
-              <Text style={styles.pdfBtnText}>PDF</Text>
+              <Text style={styles.pdfBtnText}>Détail</Text>
             </Pressable>
           </View>
         )}

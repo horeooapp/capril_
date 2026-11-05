@@ -14,30 +14,41 @@ export async function POST(request: Request) {
 
         const normalizedEmail = email.toLowerCase().trim();
 
-        // 1. Verify OTP in Redis
-        let storedOtp: string | null = null;
-        if (redis) {
+        // 1. Verify OTP in Database (emailVerificationToken) and Redis
+        let isValid = false;
+
+        const dbToken = await prisma.emailVerificationToken.findFirst({
+            where: {
+                token: otp,
+                email: normalizedEmail,
+                usedAt: null
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        if (dbToken && dbToken.expiresAt > new Date()) {
+            isValid = true;
+            // Mark token as used
+            await prisma.emailVerificationToken.update({
+                where: { id: dbToken.id },
+                data: { usedAt: new Date() }
+            });
+        }
+
+        if (!isValid && redis) {
             try {
-                storedOtp = await redis.get(`otp:${normalizedEmail}`);
+                const storedOtp = await redis.get(`otp:${normalizedEmail}`);
+                if (storedOtp === otp) {
+                    isValid = true;
+                    await redis.del(`otp:${normalizedEmail}`);
+                }
             } catch (e) {
-                console.warn("[Redis] Failed to get OTP, falling back to backdoor", e);
+                console.warn("[Redis] Failed to get or delete OTP", e);
             }
         }
 
-        // BACKDOOR TEST MODE (Temporary)
-        const isValid = storedOtp === otp || otp === '123456';
-
         if (!isValid) {
-            return NextResponse.json({ error: "Code OTP incorrect ou expiré." }, { status: 401 });
-        }
-
-        // 2. Clear OTP
-        if (redis && storedOtp === otp) {
-             try {
-                 await redis.del(`otp:${normalizedEmail}`);
-             } catch (e) {
-                 console.warn("[Redis] Failed to delete OTP", e);
-             }
+            return NextResponse.json({ error: "Code de sécurité incorrect ou expiré." }, { status: 401 });
         }
 
         // 3. Check if user exists

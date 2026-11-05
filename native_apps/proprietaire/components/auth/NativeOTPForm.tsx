@@ -16,7 +16,7 @@ interface NativeOTPFormProps {
 export default function NativeOTPForm({ role, title, subtitle, profile = 'proprietaire' }: NativeOTPFormProps) {
     const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
     const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('123456');
+    const [otp, setOtp] = useState('');
     const [isPending, setIsPending] = useState(false);
     const [feedback, setFeedback] = useState<{ type: 'error' | 'info' | 'success'; text: string } | null>(null);
     const router = useRouter();
@@ -63,14 +63,6 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
         accent: '#34D399',
     };
 
-    const bypassDirectLogin = async () => {
-        if (profile) {
-            await setStoredProfile(profile);
-        }
-        await setStoredToken(`demo-session-${profile}-${Date.now()}`);
-        router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
-    };
-
     const handleRequestOTP = async () => {
         setFeedback(null);
         const trimmedEmail = email.trim();
@@ -83,7 +75,7 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
         setIsPending(true);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         try {
             const response = await fetch(`${API_URL}/auth/request-otp`, {
@@ -97,19 +89,15 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
             const result = await response.json();
 
             if (response.ok && result.success) {
-                setOtp('123456');
-                setFeedback({ type: 'success', text: "Code de sécurité envoyé ! Code test : 123456" });
+                setOtp('');
+                setFeedback({ type: 'success', text: "Code de sécurité envoyé par e-mail !" });
                 setStep('OTP');
             } else {
-                setOtp('123456');
-                setFeedback({ type: 'info', text: "Validation rapide active (Code démo : 123456)" });
-                setStep('OTP');
+                setFeedback({ type: 'error', text: result.error || "Impossible d'envoyer le code de sécurité. Vérifiez votre adresse e-mail." });
             }
         } catch (error) {
             clearTimeout(timeoutId);
-            setOtp('123456');
-            setFeedback({ type: 'info', text: "Mode démo / hors-ligne actif. Code d'accès : 123456" });
-            setStep('OTP');
+            setFeedback({ type: 'error', text: "Erreur de connexion au serveur. Vérifiez votre connexion internet." });
         } finally {
             setIsPending(false);
         }
@@ -118,24 +106,14 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
     const handleVerifyOTP = async () => {
         setFeedback(null);
         if (!otp || otp.length < 6) {
-            setFeedback({ type: 'error', text: "Veuillez entrer le code à 6 chiffres." });
+            setFeedback({ type: 'error', text: "Veuillez entrer le code à 6 chiffres reçu." });
             return;
         }
 
         setIsPending(true);
 
-        if (otp === '123456') {
-            if (profile) {
-                await setStoredProfile(profile);
-            }
-            await setStoredToken(`qapril-token-${profile}-${Date.now()}`);
-            setIsPending(false);
-            router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
-            return;
-        }
-
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         try {
             const response = await fetch(`${API_URL}/auth/verify-otp`, {
@@ -148,22 +126,18 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
             clearTimeout(timeoutId);
             const result = await response.json();
             
-            if (response.ok && result.success) {
+            if (response.ok && result.success && result.token) {
                 if (profile) {
                     await setStoredProfile(profile);
                 }
                 await setStoredToken(result.token);
                 router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
             } else {
-                setFeedback({ type: 'error', text: result.error || "Code incorrect. Essayez 123456." });
+                setFeedback({ type: 'error', text: result.error || "Code incorrect ou expiré." });
             }
         } catch (error) {
             clearTimeout(timeoutId);
-            if (profile) {
-                await setStoredProfile(profile);
-            }
-            await setStoredToken(`fallback-token-${Date.now()}`);
-            router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
+            setFeedback({ type: 'error', text: "Erreur de communication avec le serveur." });
         } finally {
             setIsPending(false);
         }
@@ -230,25 +204,15 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
                                 </>
                             )}
                         </Pressable>
-
-                        <Pressable 
-                            style={styles.quickAccessBtn}
-                            onPress={bypassDirectLogin}
-                        >
-                            <Sparkles color={theme.accent} size={15} />
-                            <Text style={[styles.quickAccessText, { color: theme.accent }]}>
-                                Accéder directement sans code (Mode Démo) →
-                            </Text>
-                        </Pressable>
                     </Animated.View>
                 ) : (
                     <Animated.View entering={FadeInDown} exiting={FadeOutUp} style={styles.form}>
-                        <Text style={styles.label}>CODE DE SÉCURITÉ (TEST : 123456)</Text>
+                        <Text style={styles.label}>CODE DE SÉCURITÉ REÇU PAR EMAIL</Text>
                         <View style={styles.inputContainer}>
                             <ShieldCheck color={theme.primary} size={20} style={styles.icon} />
                             <TextInput
                                 style={[styles.input, styles.otpInput]}
-                                placeholder="123456"
+                                placeholder="Code à 6 chiffres"
                                 placeholderTextColor="#6b7280"
                                 value={otp}
                                 onChangeText={setOtp}

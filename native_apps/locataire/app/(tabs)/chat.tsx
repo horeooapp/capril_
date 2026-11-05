@@ -4,39 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import { Send, Check, CheckCheck } from 'lucide-react-native';
 
-const DEMO_LOCATAIRE_MESSAGES = [
-    {
-        id: 'msg-1',
-        contenu: "Bonjour Monsieur N’Guessan, j'ai émis un signalement d'incident concernant la fuite d'eau sous l'évier de la cuisine.",
-        roleExpediteur: 'LOCATAIRE',
-        statut: 'LU', // 2 encoches rouges car le bailleur l'a lu
-        dateEnvoi: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
-    },
-    {
-        id: 'msg-2',
-        contenu: "Bonjour Madame Kouamé. J'ai bien reçu votre signalement avec photo horodatée SHA-256. L'artisan plombier passera demain à 10h.",
-        roleExpediteur: 'PROPRIO',
-        statut: 'LU',
-        dateEnvoi: new Date(Date.now() - 1 * 3600 * 1000).toISOString()
-    },
-    {
-        id: 'msg-3',
-        contenu: "Parfait, je serai présente à 10h. Merci pour votre réactivité !",
-        roleExpediteur: 'LOCATAIRE',
-        statut: 'LU', // 2 encoches rouges
-        dateEnvoi: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-    },
-    {
-        id: 'msg-4',
-        contenu: "Entendu. Dès que l'intervention est terminée, nous validerons la clôture contradictoire du ticket sur QAPRIL.",
-        roleExpediteur: 'PROPRIO',
-        statut: 'LU',
-        dateEnvoi: new Date(Date.now() - 5 * 60 * 1000).toISOString()
-    }
-];
-
 export default function ChatScreen() {
-    const [messages, setMessages] = useState<any[]>(DEMO_LOCATAIRE_MESSAGES);
+    const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const flatListRef = useRef<FlatList>(null);
@@ -45,12 +14,14 @@ export default function ChatScreen() {
         try {
             const response = await fetchWithAuth('/chat');
             const json = await response.json();
-            if (response.ok && json.messages && json.messages.length > 0) {
+            if (response.ok && json.messages) {
                 setMessages(json.messages);
-                await fetchWithAuth('/chat/read', {
-                    method: 'POST',
-                    body: JSON.stringify({ role: 'LOCATAIRE' })
-                });
+                if (json.messages.length > 0) {
+                    await fetchWithAuth('/chat/read', {
+                        method: 'POST',
+                        body: JSON.stringify({ role: 'LOCATAIRE' })
+                    });
+                }
             }
         } catch (e) {
             console.error("Erreur chargement chat", e);
@@ -148,14 +119,14 @@ export default function ChatScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Koffi N’Guessan
+                            Messagerie Sécurisée
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#0D2B6E' }}>
-                            Bailleur en titre · Résidence Émeraude
+                            Échanges certifiés bailleur & locataire · Horodatage SHA-256
                         </Text>
                     </View>
                     <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN LIGNE</Text>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN DIRECT</Text>
                     </View>
                 </View>
 
@@ -178,7 +149,17 @@ export default function ChatScreen() {
                     data={messages}
                     keyExtractor={(item) => item.id}
                     renderItem={renderMessage}
-                    contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+                    contentContainerStyle={{ padding: 16, paddingBottom: 24, flexGrow: 1 }}
+                    ListEmptyComponent={
+                        <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
+                            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center' }}>
+                                Aucun message échangé
+                            </Text>
+                            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 8, lineHeight: 18 }}>
+                                Vos messages avec votre bailleur apparaîtront ici en temps réel avec traçabilité intégrale.
+                            </Text>
+                        </View>
+                    }
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
 

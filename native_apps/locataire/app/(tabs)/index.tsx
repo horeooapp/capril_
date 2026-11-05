@@ -119,9 +119,9 @@ export default function LocatairePrototypeScreen() {
     loadDashboard();
   }, []);
 
-  const loyer = data?.currentRentAmount || 150000;
-  const propName = data?.propertyName || 'Appartement A1 · Résidence Émeraude, Cocody';
-  const bailRef = data?.leaseReference || 'BAIL-2025-0417';
+  const loyer = data?.currentRentAmount || 0;
+  const propName = data?.propertyName || (data?.hasLease === false ? 'Aucun bail actif' : 'Votre logement');
+  const bailRef = data?.leaseReference || (data?.hasLease === false ? 'Aucun contrat' : 'BAIL EN COURS');
   const fmt = (n: number) => n.toLocaleString('fr-FR') + ' F';
 
   if (loading) {

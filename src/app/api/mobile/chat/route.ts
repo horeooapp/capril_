@@ -12,14 +12,22 @@ export async function GET(request: Request) {
         let leaseId = url.searchParams.get('leaseId');
 
         if (!leaseId) {
-            // Si pas de leaseId, on essaie de trouver le bail actif si c'est un locataire
+            // Trouver le bail actif associé à l'utilisateur (locataire ou bailleur)
             const activeLease = await prisma.lease.findFirst({
-                where: { tenantId: user.userId, status: 'ACTIVE' }
+                where: {
+                    OR: [
+                        { tenantId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { landlordId: user.userId } }
+                    ],
+                    status: 'ACTIVE'
+                },
+                orderBy: { createdAt: 'desc' }
             });
             if (activeLease) {
                 leaseId = activeLease.id;
             } else {
-                return NextResponse.json({ error: "leaseId est requis ou aucun bail actif trouvé" }, { status: 400 });
+                return NextResponse.json({ messages: [] });
             }
         }
 
@@ -29,7 +37,7 @@ export async function GET(request: Request) {
             include: { property: true }
         });
 
-        if (!lease || (lease.tenantId !== user.userId && lease.property.landlordId !== user.userId)) {
+        if (!lease || (lease.tenantId !== user.userId && lease.property.landlordId !== user.userId && lease.property.ownerUserId !== user.userId)) {
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
@@ -58,7 +66,15 @@ export async function POST(request: Request) {
 
         if (!leaseId) {
             const activeLease = await prisma.lease.findFirst({
-                where: { tenantId: user.userId, status: 'ACTIVE' }
+                where: {
+                    OR: [
+                        { tenantId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { landlordId: user.userId } }
+                    ],
+                    status: 'ACTIVE'
+                },
+                orderBy: { createdAt: 'desc' }
             });
             if (activeLease) {
                 leaseId = activeLease.id;

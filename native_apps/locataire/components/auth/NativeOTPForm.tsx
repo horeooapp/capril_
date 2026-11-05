@@ -15,7 +15,7 @@ interface NativeOTPFormProps {
 export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormProps) {
     const [step, setStep] = useState<'EMAIL' | 'OTP'>('EMAIL');
     const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState('123456');
+    const [otp, setOtp] = useState('');
     const [isPending, setIsPending] = useState(false);
     const [feedback, setFeedback] = useState<{ type: 'error' | 'info' | 'success'; text: string } | null>(null);
     const router = useRouter();
@@ -69,12 +69,6 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
         }
     }[role];
 
-    const bypassDirectLogin = async () => {
-        const userEmail = email.trim() || `demo.${role.toLowerCase()}@qapril.ci`;
-        await setStoredToken(`demo-session-${role.toLowerCase()}-${Date.now()}`);
-        router.replace('/(tabs)' as any);
-    };
-
     const handleRequestOTP = async () => {
         setFeedback(null);
         const trimmedEmail = email.trim();
@@ -86,9 +80,8 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
         setIsPending(true);
 
-        // Tentative d'appel API avec timeout strict de 2,5s pour éviter tout blocage
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         try {
             const response = await fetch(`${API_URL}/auth/request-otp`, {
@@ -102,21 +95,15 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
             const result = await response.json();
 
             if (response.ok && result.success) {
-                setOtp('123456');
-                setFeedback({ type: 'success', text: "Code de sécurité envoyé ! Code test : 123456" });
+                setOtp('');
+                setFeedback({ type: 'success', text: "Code de sécurité envoyé par e-mail !" });
                 setStep('OTP');
             } else {
-                // Fallback démo transparent
-                setOtp('123456');
-                setFeedback({ type: 'info', text: "Validation rapide active (Code démo : 123456)" });
-                setStep('OTP');
+                setFeedback({ type: 'error', text: result.error || "Impossible d'envoyer le code de sécurité. Vérifiez votre adresse e-mail." });
             }
         } catch (error) {
             clearTimeout(timeoutId);
-            // Si le serveur local est éteint ou inaccessible, on bascule immédiatement sur le code démo sans faire attendre l'utilisateur
-            setOtp('123456');
-            setFeedback({ type: 'info', text: "Mode démo / hors-ligne actif. Code d'accès : 123456" });
-            setStep('OTP');
+            setFeedback({ type: 'error', text: "Erreur de connexion au serveur. Vérifiez votre connexion internet." });
         } finally {
             setIsPending(false);
         }
@@ -125,22 +112,14 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
     const handleVerifyOTP = async () => {
         setFeedback(null);
         if (!otp || otp.length < 6) {
-            setFeedback({ type: 'error', text: "Veuillez entrer le code à 6 chiffres." });
+            setFeedback({ type: 'error', text: "Veuillez entrer le code à 6 chiffres reçu." });
             return;
         }
 
         setIsPending(true);
 
-        // Si le code saisi est le code démo universel '123456', connexion immédiate sans attendre l'API
-        if (otp === '123456') {
-            await setStoredToken(`qapril-token-${role.toLowerCase()}-${Date.now()}`);
-            setIsPending(false);
-            router.replace('/(tabs)' as any);
-            return;
-        }
-
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
         try {
             const response = await fetch(`${API_URL}/auth/verify-otp`, {
@@ -153,17 +132,15 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
             clearTimeout(timeoutId);
             const result = await response.json();
             
-            if (response.ok && result.success) {
+            if (response.ok && result.success && result.token) {
                 await setStoredToken(result.token);
                 router.replace('/(tabs)' as any);
             } else {
-                setFeedback({ type: 'error', text: result.error || "Code incorrect. Essayez 123456." });
+                setFeedback({ type: 'error', text: result.error || "Code incorrect ou expiré." });
             }
         } catch (error) {
             clearTimeout(timeoutId);
-            // Fallback de secours
-            await setStoredToken(`fallback-token-${Date.now()}`);
-            router.replace('/(tabs)' as any);
+            setFeedback({ type: 'error', text: "Erreur de communication avec le serveur." });
         } finally {
             setIsPending(false);
         }
@@ -230,25 +207,15 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
                                 </>
                             )}
                         </Pressable>
-
-                        <Pressable 
-                            style={styles.quickAccessBtn}
-                            onPress={bypassDirectLogin}
-                        >
-                            <Sparkles color={theme.accent} size={15} />
-                            <Text style={[styles.quickAccessText, { color: theme.accent }]}>
-                                Accéder directement sans code (Mode Démo) →
-                            </Text>
-                        </Pressable>
                     </Animated.View>
                 ) : (
                     <Animated.View entering={FadeInDown} exiting={FadeOutUp} style={styles.form}>
-                        <Text style={styles.label}>CODE DE SÉCURITÉ (TEST : 123456)</Text>
+                        <Text style={styles.label}>CODE DE SÉCURITÉ REÇU PAR EMAIL</Text>
                         <View style={styles.inputContainer}>
                             <ShieldCheck color={theme.primary} size={20} style={styles.icon} />
                             <TextInput
                                 style={[styles.input, styles.otpInput]}
-                                placeholder="123456"
+                                placeholder="Code à 6 chiffres"
                                 placeholderTextColor="#6b7280"
                                 value={otp}
                                 onChangeText={setOtp}

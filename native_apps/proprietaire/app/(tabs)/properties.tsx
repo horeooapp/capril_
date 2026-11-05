@@ -12,15 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Building2, ShieldCheck, Lock } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
-const FALLBACK_PROPERTIES = [
-  { id: 'A1', name: 'Appartement A1 · 3P', address: 'Résidence Émeraude · Cocody', occupancyStatus: 'Loué', currentRent: 150000, niv: 3, masque: false, mandat: null },
-  { id: 'A3', name: 'Appartement A3 · 2P', address: 'Résidence Émeraude · Cocody', occupancyStatus: 'Loué', currentRent: 120000, niv: 3, masque: true, mandat: null },
-  { id: 'B2', name: 'Appartement B2 · 3P', address: 'Résidence Émeraude · Cocody', occupancyStatus: 'Vacant', currentRent: 165000, niv: 3, masque: false, mandat: null },
-  { id: 'V1', name: 'Villa Marcory · 4P', address: 'Marcory Zone 4', occupancyStatus: 'Loué', currentRent: 350000, niv: 4, masque: true, mandat: 'Agence Riviera (AGR-2021-0133)' },
-];
-
 export default function PropertiesScreen() {
-  const [properties, setProperties] = useState<any[]>(FALLBACK_PROPERTIES);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'Loué' | 'Vacant'>('all');
 
@@ -29,11 +22,11 @@ export default function PropertiesScreen() {
       try {
         const response = await fetchWithAuth('/proprietaire/properties');
         const json = await response.json();
-        if (response.ok && json.properties?.length) {
+        if (response.ok && json.properties) {
           setProperties(json.properties);
         }
       } catch (e) {
-        // Fallback kept
+        console.error("Erreur chargement biens", e);
       } finally {
         setLoading(false);
       }
@@ -75,6 +68,17 @@ export default function PropertiesScreen() {
         data={list}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
+            <Building2 size={40} color="#94A3B8" />
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
+              Aucun bien trouvé
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
+              {filter !== 'all' ? `Aucun bien au statut ${filter.toLowerCase()}.` : 'Vos biens enregistrés apparaîtront ici avec leur niveau de conformité.'}
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.rowBetween}>
@@ -84,7 +88,7 @@ export default function PropertiesScreen() {
                 </View>
                 <View>
                   <Text style={styles.propertyName}>{item.name}</Text>
-                  <Text style={styles.propertyAddress}>{item.address}</Text>
+                  <Text style={styles.propertyAddress}>{item.address || item.commune || 'Abidjan'}</Text>
                 </View>
               </View>
               <View
@@ -110,7 +114,7 @@ export default function PropertiesScreen() {
 
             <View style={styles.footerRow}>
               <Text style={styles.rent}>
-                {(item.currentRent || 120000).toLocaleString('fr-FR')} F / mois
+                {(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
               </Text>
               <View style={styles.badgesRight}>
                 <View style={styles.nivPill}>

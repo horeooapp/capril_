@@ -14,12 +14,20 @@ export async function POST(request: Request) {
 
         if (!leaseId) {
             const activeLease = await prisma.lease.findFirst({
-                where: { tenantId: user.userId, status: 'ACTIVE' }
+                where: {
+                    OR: [
+                        { tenantId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { landlordId: user.userId } }
+                    ],
+                    status: 'ACTIVE'
+                },
+                orderBy: { createdAt: 'desc' }
             });
             if (activeLease) {
                 leaseId = activeLease.id;
             } else {
-                return NextResponse.json({ error: "leaseId est requis" }, { status: 400 });
+                return NextResponse.json({ success: true, message: "Aucun bail actif" });
             }
         }
 

@@ -14,16 +14,9 @@ import { fetchWithAuth } from '../../lib/api';
 
 const EUR_RATE = 655.957;
 
-const FALLBACK_TX = [
-  { id: 'T1', property: 'Appartement A1 · Adjoua Kouamé', date: '2026-11-03', amount: 150000, via: 'Wave', type: 'INCOME' },
-  { id: 'T2', property: 'Villa Marcory · Agence Riviera', date: '2026-11-01', amount: 350000, via: 'Reversement Agence', type: 'INCOME' },
-  { id: 'T3', property: 'Appartement A3 · Jean-Marc Konan', date: '2026-11-05', amount: 120000, via: 'Orange Money', type: 'INCOME' },
-  { id: 'T4', property: 'Studio B1 · Aya Bamba', date: '2026-11-02', amount: 80000, via: 'MTN MoMo', type: 'INCOME' },
-];
-
 export default function FinanceScreen() {
-  const [transactions, setTransactions] = useState<any[]>(FALLBACK_TX);
-  const [balance, setBalance] = useState(760000);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [balance, setBalance] = useState(0);
   const [eur, setEur] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -32,12 +25,12 @@ export default function FinanceScreen() {
       try {
         const response = await fetchWithAuth('/proprietaire/finance');
         const json = await response.json();
-        if (response.ok && json.transactions?.length) {
-          setTransactions(json.transactions);
-          setBalance(json.balance || 760000);
+        if (response.ok) {
+          setTransactions(json.transactions || []);
+          setBalance(json.balance || 0);
         }
       } catch (e) {
-        // Fallback kept
+        console.error("Erreur chargement flux financiers", e);
       } finally {
         setLoading(false);
       }
@@ -96,18 +89,29 @@ export default function FinanceScreen() {
         data={transactions}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
+            <FileText size={40} color="#94A3B8" />
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
+              Aucun encaissement enregistré
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
+              Vos encaissements et versements de loyers apparaîtront ici dès leur validation en temps réel.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.iconBox}>
               <ArrowDownLeft color="#1E7E4E" size={18} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.property}>{item.property}</Text>
+              <Text style={styles.property}>{item.property || 'Loyer perçu'}</Text>
               <Text style={styles.meta}>
                 {new Date(item.date || Date.now()).toLocaleDateString('fr-FR')} · {item.via || 'Mobile Money'}
               </Text>
             </View>
-            <Text style={styles.amount}>+{fmt(item.amount || 120000)}</Text>
+            <Text style={styles.amount}>+{fmt(item.amount || 0)}</Text>
           </View>
         )}
       />

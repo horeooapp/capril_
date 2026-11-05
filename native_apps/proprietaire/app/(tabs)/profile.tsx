@@ -65,13 +65,17 @@ export default function ProfileScreen() {
   };
 
   const displayName = user
-    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Koffi N’Guessan'
-    : 'Koffi N’Guessan';
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Bailleur Propriétaire'
+    : 'Bailleur Propriétaire';
+
+  const avatarInitials = user?.firstName && user?.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : (user?.email?.[0] || 'B').toUpperCase();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.sub}>Conformité Niveaux 1 à 4 (ADD-22) & Diaspora (ADD-16)</Text>
+        <Text style={styles.sub}>Espace Bailleur & Gestion Immobilière</Text>
         <Text style={styles.title}>Mon Compte</Text>
 
         {loading ? (
@@ -80,13 +84,15 @@ export default function ProfileScreen() {
           <>
             <View style={styles.heroCard}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>KN</Text>
+                <Text style={styles.avatarText}>{avatarInitials}</Text>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.email}>{user?.email || 'koffi.nguessan@qapril.ci'}</Text>
+                <Text style={styles.email}>{user?.email || 'Non renseigné'}</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>Bailleur vérifié · Niveau 3 & 4</Text>
+                  <Text style={styles.pillOkText}>
+                    {user?.isCertified ? 'Bailleur certifié · Identité validée' : 'Compte actif · Espace Bailleur'}
+                  </Text>
                 </View>
               </View>
             </View>

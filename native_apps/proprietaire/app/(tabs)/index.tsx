@@ -88,19 +88,8 @@ export default function BailleurAndAgencePrototypeScreen() {
   const [mandatModal, setMandatModal] = useState(false);
   const [mType, setMType] = useState<'agree' | 'nonagree' | 'inter'>('agree');
 
-  const [bBiens, setBBiens] = useState([
-    { id: 'A1', struct: 'Résidence Émeraude · Cocody', type: 'Appartement 3P', name: 'Appartement A1', loyer: 150000, loc: 'Adjoua Kouamé', icl: 'A', statut: 'loue', niv: 3, masque: false, mandat: null as any },
-    { id: 'A3', struct: 'Résidence Émeraude · Cocody', type: 'Appartement 2P', name: 'Appartement A3', loyer: 120000, loc: 'Jean-Marc Konan', icl: 'B', statut: 'loue', niv: 3, masque: true, mandat: null as any },
-    { id: 'B2', struct: 'Résidence Émeraude · Cocody', type: 'Appartement 3P', name: 'Appartement B2', loyer: 165000, loc: null, icl: '—', statut: 'vacant', niv: 3, masque: false, mandat: null as any, offre: true },
-    { id: 'V1', struct: 'Villa Marcory Zone 4', type: 'Villa 4P', name: 'Villa Marcory', loyer: 350000, loc: 'BAI-007 · locataire géré', icl: '—', statut: 'loue', niv: 4, masque: true, mandat: { type: 'agree', nom: 'Agence Riviera', ref: 'M-2026-014', agr: 'AGR-2021-0133' } },
-    { id: 'C1', struct: 'Cour commune · Yopougon', type: 'Chambre', name: 'Porte 1', loyer: 45000, loc: 'Yao Kouassi', icl: 'C', statut: 'loue', niv: 1, masque: false, mandat: { type: 'inter', nom: 'Kouadio Ferdinand', ref: 'D-2026-022' }, late: 7 },
-  ]);
-
-  const [bBaux, setBBaux] = useState([
-    { ref: 'BAIL-2025-0417', bien: 'Appartement A1', loc: 'Adjoua Kouamé', loyer: 150000, duree: 24, st: 'actif', dgi: true, sha: '9f3a…c17e' },
-    { ref: 'BAIL-2026-0912', bien: 'Appartement A3', loc: 'Jean-Marc Konan', loyer: 120000, duree: 24, st: 'dgi', dgi: false, sha: '41b8…0d2a' },
-    { ref: 'BAIL-2026-0301', bien: 'Villa Marcory', loc: 'Représenté par Agence Riviera · M-2026-014', loyer: 350000, duree: 24, st: 'actif', dgi: true, sha: '7d19…e4f3' },
-  ]);
+  const [bBiens, setBBiens] = useState<any[]>([]);
+  const [bBaux, setBBaux] = useState<any[]>([]);
 
   // --- ÉTATS PROTOTYPE AGENCE AGRÉÉE ---
   const [aTab, setATab] = useState<
@@ -108,17 +97,8 @@ export default function BailleurAndAgencePrototypeScreen() {
   >('home');
   const [roleView, setRoleView] = useState<'chef' | 'collab'>('chef');
 
-  const [mandants, setMandants] = useState([
-    { id: 'M1', nom: 'Koffi N’Guessan', bai: 'BAI-007', ref: 'M-2026-014', mask: true, diaspora: true, enc: 350000, rev: 'du' },
-    { id: 'M2', nom: 'SCI Les Palmiers', bai: 'BAI-003', ref: 'M-2025-088', mask: false, diaspora: false, enc: 200000, rev: 'du' },
-    { id: 'M3', nom: 'Aïssata Diallo', bai: 'BAI-005', ref: 'M-2026-002', mask: true, diaspora: true, enc: 260000, rev: 'fait' },
-  ]);
-
-  const [verifs, setVerifs] = useState([
-    { bien: 'Cour commune · Yopougon Niangon', dem: 'Koffi N’Guessan (hors mandat)', st: 'demande' },
-    { bien: 'Immeuble · Abobo PK18', dem: 'Bailleur BAI-012', st: 'planifiee' },
-    { bien: 'Villa · Bingerville', dem: 'SCI Horizon', st: 'rapport' },
-  ]);
+  const [mandants, setMandants] = useState<any[]>([]);
+  const [verifs, setVerifs] = useState<any[]>([]);
 
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
@@ -140,9 +120,31 @@ export default function BailleurAndAgencePrototypeScreen() {
           return;
         }
 
-        await fetchWithAuth('/proprietaire/dashboard');
+        const [dashRes, propsRes] = await Promise.all([
+          fetchWithAuth('/proprietaire/dashboard'),
+          fetchWithAuth('/proprietaire/properties')
+        ]);
+
+        if (propsRes.ok) {
+          const propsJson = await propsRes.json();
+          if (propsJson.properties && Array.isArray(propsJson.properties)) {
+            setBBiens(propsJson.properties.map((p: any) => ({
+              id: p.id,
+              struct: p.commune || 'Abidjan',
+              type: p.propertyType || 'Bien',
+              name: p.name,
+              loyer: p.currentRent || p.declaredRentFcfa || 0,
+              loc: p.tenantName || 'Aucun locataire',
+              icl: 'A',
+              statut: (p.occupancyStatus === 'Occupé' || p.occupancyStatus === 'Loué') ? 'loue' : 'vacant',
+              niv: 3,
+              masque: false,
+              mandat: null
+            })));
+          }
+        }
       } catch (e) {
-        // Fallback to prototype seed
+        console.error("Erreur chargement dashboard propriétaire", e);
       } finally {
         setLoading(false);
       }

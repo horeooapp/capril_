@@ -44,15 +44,6 @@ export default function LoginScreen() {
   const primaryColor = isProprietaire ? '#1B4D3E' : '#1F2A44';
   const accentColor = isProprietaire ? '#E8A020' : '#3B82F6';
 
-  const handleDemoAccess = async () => {
-    await setStoredProfile(selectedProfile);
-    await setStoredToken(`demo-session-${selectedProfile}-${Date.now()}`);
-    router.replace({
-      pathname: '/(tabs)',
-      params: { profile: selectedProfile },
-    } as any);
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: isProprietaire ? '#0B2019' : '#0B1329' }]}>
       <StatusBar
@@ -219,16 +210,6 @@ export default function LoginScreen() {
             }
           />
         </View>
-
-        {/* ACCÈS DÉMO RAPIDE DU PROFIL CHOISI */}
-        <Pressable style={styles.demoBtn} onPress={handleDemoAccess}>
-          <Sparkles color={accentColor} size={16} />
-          <Text style={[styles.demoBtnText, { color: '#FFFFFF' }]}>
-            {isProprietaire
-              ? 'Accéder au Dashboard Propriétaire (Mode Démo) →'
-              : 'Accéder au Dashboard Agence Agréée (Mode Démo) →'}
-          </Text>
-        </Pressable>
       </ScrollView>
     </View>
   );
@@ -378,22 +359,5 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginHorizontal: 18,
-  },
-  demoBtn: {
-    marginHorizontal: 18,
-    marginTop: 14,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.14)',
-  },
-  demoBtnText: {
-    fontSize: 12,
-    fontWeight: '800',
   },
 });

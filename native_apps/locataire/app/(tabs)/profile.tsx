@@ -64,13 +64,17 @@ export default function ProfileScreen() {
   };
 
   const displayName = user
-    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Adjoua Kouamé'
-    : 'Adjoua Kouamé';
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Locataire'
+    : 'Locataire';
+
+  const avatarInitials = user?.firstName && user?.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : (user?.email?.[0] || 'L').toUpperCase();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.sub}>Confidentialité & Passeport Locatif (ADD-21)</Text>
+        <Text style={styles.sub}>Confidentialité & Passeport Locatif</Text>
         <Text style={styles.title}>Mon Profil</Text>
 
         {loading ? (
@@ -79,13 +83,15 @@ export default function ProfileScreen() {
           <>
             <View style={styles.heroCard}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>AK</Text>
+                <Text style={styles.avatarText}>{avatarInitials}</Text>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.email}>{user?.email || 'adjoua.kouame@qapril.ci'}</Text>
+                <Text style={styles.email}>{user?.email || 'Non renseigné'}</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>Identité vérifiée · Tranche ICL A</Text>
+                  <Text style={styles.pillOkText}>
+                    {user?.isCertified ? 'Identité certifiée · Dossier Validé' : 'Compte actif · Espace Locataire'}
+                  </Text>
                 </View>
               </View>
             </View>

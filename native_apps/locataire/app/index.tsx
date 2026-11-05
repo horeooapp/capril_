@@ -25,13 +25,6 @@ export default function LoginScreen() {
                     title="ESPACE LOCATAIRE" 
                     subtitle="Saisissez votre email ou téléphone pour accéder à vos quittances, caution et passeport locatif."
                 />
-
-                <Pressable
-                    style={styles.demoBtn}
-                    onPress={() => router.replace('/(tabs)' as any)}
-                >
-                    <Text style={styles.demoBtnText}>Aperçu direct de la maquette mobile (8 écrans) →</Text>
-                </Pressable>
             </View>
         </View>
     );
@@ -62,18 +55,5 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '800',
         letterSpacing: 1,
-    },
-    demoBtn: {
-        marginHorizontal: 24,
-        marginTop: 12,
-        paddingVertical: 12,
-        borderRadius: 12,
-        backgroundColor: 'rgba(255,255,255,0.14)',
-        alignItems: 'center',
-    },
-    demoBtnText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: '700',
     },
 });
