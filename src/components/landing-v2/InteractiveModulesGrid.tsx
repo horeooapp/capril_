@@ -67,7 +67,7 @@ const MODULES: FeatureModule[] = [
     icon: Scale,
     badge: "92% d'Accords",
     gradient: "from-emerald-500/15 via-transparent to-transparent",
-    previewImage: "/images/impact_vision.png",
+    previewImage: "/images/hero_ivory_coast_home_interior_1773609718319.png",
     interactiveDetails: {
       title: "Protocole de Règlement Amiable",
       metrics: [
@@ -109,7 +109,7 @@ const MODULES: FeatureModule[] = [
     icon: FolderLock,
     badge: "Conforme ARTCI",
     gradient: "from-indigo-500/15 via-transparent to-transparent",
-    previewImage: "/images/passport_visual.png",
+    previewImage: "/images/passport_visual_fcfa.png",
     interactiveDetails: {
       title: "Classeur Foncier Souverain",
       metrics: [
@@ -130,7 +130,7 @@ const MODULES: FeatureModule[] = [
     icon: BarChart3,
     badge: "Observatoire 2026",
     gradient: "from-amber-500/15 via-transparent to-transparent",
-    previewImage: "/slider/bg_slider_2.png",
+    previewImage: "/images/abidjan_plateau_bg.png",
     interactiveDetails: {
       title: "Argus Immobilier Abidjanais",
       metrics: [
@@ -220,9 +220,9 @@ export default function InteractiveModulesGrid() {
                   <img
                     src={m.previewImage}
                     alt={m.title}
-                    className="w-full h-full object-cover object-center filter brightness-[0.8] contrast-[1.05] group-hover:scale-105 group-hover:brightness-[0.9] transition-all duration-500"
+                    className="w-full h-full object-cover object-center filter brightness-[0.9] contrast-[1.1] group-hover:scale-105 group-hover:brightness-[0.9] transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-slate-950" />
+                  <div className="absolute inset-0 bg-slate-950/30" />
                   <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-white">
                     <span className="font-semibold truncate max-w-[170px] drop-shadow-sm">
                       {m.interactiveDetails.title}

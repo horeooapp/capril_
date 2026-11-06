@@ -290,6 +290,13 @@ export default function QaprilLandingV2({
                   onClick={() => handleLogin("BAILLEUR")}
                   className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
+                  {/* Image d'illustration réelle */}
+                  <img
+                    src="/images/login_landlord_visual.jpg"
+                    alt="Propriétaires Bailleurs"
+                    className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1] group-hover:scale-105 group-hover:brightness-[0.35] transition-all duration-700 pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/75 group-hover:bg-slate-950/60 transition-colors pointer-events-none" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center text-amber-300 shadow-sm group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
                       <Building2 className="w-5 h-5" />
@@ -310,6 +317,13 @@ export default function QaprilLandingV2({
                   onClick={() => handleLogin("LOCATAIRE")}
                   className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
+                  {/* Image d'illustration réelle */}
+                  <img
+                    src="/images/hero_family_moving_new_home_1773609766414.png"
+                    alt="Locataires certifiés"
+                    className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1] group-hover:scale-105 group-hover:brightness-[0.35] transition-all duration-700 pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/75 group-hover:bg-slate-950/60 transition-colors pointer-events-none" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/20 flex items-center justify-center text-sky-300 shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-colors">
                       <Users className="w-5 h-5" />
@@ -330,6 +344,13 @@ export default function QaprilLandingV2({
                   href="/dashboard/login/agency"
                   className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 shadow-sm transition-colors duration-200 group cursor-pointer block overflow-hidden"
                 >
+                  {/* Image d'illustration réelle */}
+                  <img
+                    src="/images/hero_abidjan_modern_district_1773609699145.png"
+                    alt="Agences & Mandats"
+                    className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1] group-hover:scale-105 group-hover:brightness-[0.35] transition-all duration-700 pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/75 group-hover:bg-slate-950/60 transition-colors pointer-events-none" />
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/20 flex items-center justify-center text-emerald-300 shadow-sm group-hover:bg-emerald-400 group-hover:text-slate-950 transition-colors">
                       <Layers className="w-5 h-5" />
@@ -1122,18 +1143,29 @@ export default function QaprilLandingV2({
             10. GRAND BANDEAU D'APPEL À L'ACTION INSTITUTIONNEL
         ══════════════════════════════════════════════════════════════════ */}
         <section className="py-20 px-4 sm:px-6 max-w-7xl mx-auto">
-          <div className="qp-card-light p-8 sm:p-14 rounded-2xl bg-white border border-slate-300 text-center max-w-4xl mx-auto shadow-sm">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-5">
-              Rejoignez QAPRIL dès aujourd'hui
+          <div className="relative rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 p-8 sm:p-14 text-center max-w-4xl mx-auto shadow-2xl">
+            {/* Image de fond architecturale crépusculaire d'Abidjan */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+              <img
+                src="/images/hero_abidjan_skyline_dusk_1773609749211.png"
+                alt="Skyline crépusculaire Abidjan"
+                className="w-full h-full object-cover object-center filter brightness-[0.35] contrast-[1.1]"
+              />
+              <div className="absolute inset-0 bg-slate-950/80" />
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mb-4 leading-tight">
-              Louez et gérez vos maisons en toute confiance partout en Côte d'Ivoire.
-            </h2>
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-wider mb-5">
+                Rejoignez QAPRIL dès aujourd'hui
+              </div>
 
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto mb-8">
-              Démarrez gratuitement aujourd'hui. Rédigez vos baux, recevez vos loyers à temps et conservez vos reçus officiels sans vous déplacer.
-            </p>
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4 leading-tight">
+                Louez et gérez vos maisons en toute confiance partout en Côte d'Ivoire.
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl mx-auto mb-8">
+                Démarrez gratuitement aujourd'hui. Rédigez vos baux, recevez vos loyers à temps et conservez vos reçus officiels sans vous déplacer.
+              </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               {session?.user ? (
@@ -1162,8 +1194,9 @@ export default function QaprilLandingV2({
             </div>
 
             <p className="text-xs text-slate-400 mt-5">
-              Inscription simple et rapide · Sans engagement · Conforme aux lois ivoiriennes
-            </p>
+                Inscription simple et rapide · Sans engagement · Conforme aux lois ivoiriennes
+              </p>
+            </div>
           </div>
         </section>
       </main>

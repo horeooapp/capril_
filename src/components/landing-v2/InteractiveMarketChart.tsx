@@ -28,9 +28,15 @@ export default function InteractiveMarketChart() {
 
   return (
     <div className="relative rounded-3xl bg-slate-950 text-white p-6 sm:p-8 lg:p-10 border border-slate-800 shadow-2xl overflow-hidden">
-      {/* Glow d'ambiance Meta/Fintech */}
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-amber-500/15 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
+      {/* Image de fond architecturale nocturne d'Abidjan */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <img
+          src="/images/hero_abidjan_night_lights_1773609789756.png"
+          alt="Skyline nocturne Abidjan"
+          className="w-full h-full object-cover object-center filter brightness-[0.35] contrast-[1.15]"
+        />
+        <div className="absolute inset-0 bg-slate-950/80" />
+      </div>
 
       {/* Header du Widget */}
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800/80">

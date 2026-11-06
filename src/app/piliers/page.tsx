@@ -60,7 +60,8 @@ export default function PiliersPage() {
           desc: "Vos contrats signés restent toujours accessibles sur votre téléphone 24h/24, prêts à être présentés en cas de besoin ou devant les autorités."
         }
       ],
-      legalImpact: "Élimine les mauvais contrats rédigés à la main qui causent des palabres inutiles."
+      legalImpact: "Élimine les mauvais contrats rédigés à la main qui causent des palabres inutiles.",
+      image: "/images/feature_leases.jpg"
     },
     {
       id: "paiement-quittance",
@@ -150,7 +151,8 @@ export default function PiliersPage() {
           desc: "Ceux qui paient à bonne date bénéficient d'une réputation solide et d'un traitement prioritaire pour se loger."
         }
       ],
-      legalImpact: "Installe la confiance mutuelle entre propriétaires et locataires sans discrimination."
+      legalImpact: "Installe la confiance mutuelle entre propriétaires et locataires sans discrimination.",
+      image: "/images/passport_visual_fcfa.png"
     }
   ];
 
@@ -181,9 +183,17 @@ export default function PiliersPage() {
       <main className="relative z-10">
         {/* ─── HERO SECTION ─── */}
         <section
-          className="relative pt-40 pb-28 overflow-hidden"
-          style={{ background: "var(--ink)" }}
+          className="relative pt-40 pb-28 overflow-hidden bg-slate-950 text-white"
         >
+          {/* Image de fond architecturale Abidjan */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <img
+              src="/images/hero_abidjan_skyline_dusk_1773609749211.png"
+              alt="Skyline Abidjan crépuscule"
+              className="w-full h-full object-cover object-center filter brightness-[0.3] contrast-[1.1]"
+            />
+            <div className="absolute inset-0 bg-slate-950/75" />
+          </div>
           <div
             className="absolute inset-0"
             aria-hidden
@@ -346,9 +356,27 @@ export default function PiliersPage() {
                       </span>
                     </div>
 
-                    <p className="text-base text-slate-700 leading-relaxed mb-8 font-medium">
+                    <p className="text-base text-slate-700 leading-relaxed mb-6 font-medium">
                       {p.summary}
                     </p>
+
+                    {/* Illustration Visuelle Réelle du Pilier */}
+                    {p.image && (
+                      <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-8 bg-slate-950 group">
+                        <div className="relative h-60 sm:h-72 w-full overflow-hidden">
+                          <img
+                            src={p.image}
+                            alt={p.title}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-slate-950/30" />
+                          <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-xs font-black uppercase tracking-wider shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                            {p.badge}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-4 mb-10">
                       <div className="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">

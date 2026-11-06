@@ -155,7 +155,16 @@ export default function TarifsPage() {
       <main className="relative z-10">
 
         {/* ─── HERO ─── */}
-        <section className="relative pt-40 pb-28 overflow-hidden" style={{ background: "var(--ink)" }}>
+        <section className="relative pt-40 pb-28 overflow-hidden bg-slate-950 text-white">
+          {/* Image de fond architecturale Abidjan */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <img
+              src="/images/hero_abidjan_night_lights_1773609789756.png"
+              alt="Abidjan vue aérienne"
+              className="w-full h-full object-cover object-center filter brightness-[0.3] contrast-[1.1]"
+            />
+            <div className="absolute inset-0 bg-slate-950/75" />
+          </div>
           <div className="absolute inset-0" aria-hidden style={{
             backgroundImage: "none",
             backgroundSize: "60px 60px"

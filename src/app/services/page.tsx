@@ -46,7 +46,8 @@ export default function ServicesPage() {
         "Distinction claire entre l'usure normale du temps et les dégâts causés par le locataire",
         "Rapport PDF officiel envoyé immédiatement par SMS et WhatsApp aux deux parties"
       ],
-      legalNote: "Conforme à la loi n° 2019-576 régissant les états des lieux contradictoires en Côte d'Ivoire."
+      legalNote: "Conforme à la loi n° 2019-576 régissant les états des lieux contradictoires en Côte d'Ivoire.",
+      image: "/images/feature_leases.jpg"
     },
     {
       id: "m-mediation",
@@ -63,7 +64,8 @@ export default function ServicesPage() {
         "Accord d'entente écrit doté d'une vraie valeur d'engagement pour les deux parties",
         "Évite les convocations au commissariat ou au tribunal et préserve la bonne entente"
       ],
-      legalNote: "Reconnu par les mécanismes de conciliation amiable en Côte d'Ivoire."
+      legalNote: "Reconnu par les mécanismes de conciliation amiable en Côte d'Ivoire.",
+      image: "/images/hero_ivory_coast_home_interior_1773609718319.png"
     },
     {
       id: "m-charges",
@@ -80,7 +82,8 @@ export default function ServicesPage() {
         "Montant ajouté clairement sur l'avis de loyer de chaque mois",
         "Historique des consommations pour repérer rapidement les fuites d'eau"
       ],
-      legalNote: "Supprime les disputes récurrentes sur le partage des factures CIE et SODECI."
+      legalNote: "Supprime les disputes récurrentes sur le partage des factures CIE et SODECI.",
+      image: "/images/hero_abidjan_modern_district_1773609699145.png"
     },
     {
       id: "m-fiscal",
@@ -97,7 +100,8 @@ export default function ServicesPage() {
         "Téléchargement en PDF prêt à remettre à votre centre des impôts ou comptable",
         "Protection contre les erreurs et les pénalités de retard"
       ],
-      legalNote: "Conforme aux exigences de la Direction Générale des Impôts (DGI) de Côte d'Ivoire."
+      legalNote: "Conforme aux exigences de la Direction Générale des Impôts (DGI) de Côte d'Ivoire.",
+      image: "/images/cdc_visual_fcfa.png"
     },
     {
       id: "m-recouvrement",
@@ -114,7 +118,8 @@ export default function ServicesPage() {
         "Génération automatique d'une mise en demeure conforme à la loi ivoirienne n° 2019-576",
         "Dossier complet et propre prêt à transmettre à un commissaire de justice si besoin"
       ],
-      legalNote: "Respecte scrupuleusement les délais légaux prévus par la loi ivoirienne avant toute action."
+      legalNote: "Respecte scrupuleusement les délais légaux prévus par la loi ivoirienne avant toute action.",
+      image: "/images/feature_mobile_payment.jpg"
     },
     {
       id: "m-vault",
@@ -131,7 +136,8 @@ export default function ServicesPage() {
         "Sauvegarde permanente en ligne pour ne plus jamais égarer de contrat papier",
         "Preuves reconnues et recevables devant toutes les autorités ivoiriennes"
       ],
-      legalNote: "Conserve vos preuves locatives pendant toute la durée légale requise."
+      legalNote: "Conserve vos preuves locatives pendant toute la durée légale requise.",
+      image: "/images/passport_visual_fcfa.png"
     }
   ];
 
@@ -143,9 +149,17 @@ export default function ServicesPage() {
       <main className="relative z-10">
         {/* ─── HERO SECTION ─── */}
         <section
-          className="relative pt-40 pb-28 overflow-hidden"
-          style={{ background: "var(--ink)" }}
+          className="relative pt-40 pb-28 overflow-hidden bg-slate-950 text-white"
         >
+          {/* Image de fond architecturale Abidjan */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <img
+              src="/images/abidjan_plateau_bg.png"
+              alt="Plateau Abidjan"
+              className="w-full h-full object-cover object-center filter brightness-[0.3] contrast-[1.1]"
+            />
+            <div className="absolute inset-0 bg-slate-950/75" />
+          </div>
           <div
             className="absolute inset-0"
             aria-hidden
@@ -293,6 +307,24 @@ export default function ServicesPage() {
                     <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium mb-6">
                       {mod.desc}
                     </p>
+
+                    {/* Illustration Visuelle Réelle du Service */}
+                    {mod.image && (
+                      <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-6 bg-slate-950 group">
+                        <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+                          <img
+                            src={mod.image}
+                            alt={mod.title}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-slate-950/25" />
+                          <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-xs font-black uppercase tracking-wider shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                            {mod.code}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-3.5 mb-8">
                       <div className="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">

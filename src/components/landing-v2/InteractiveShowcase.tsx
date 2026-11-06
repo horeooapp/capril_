@@ -98,7 +98,7 @@ const STORIES: FeatureStory[] = [
     subtitle: "Plafonnement légal strict. La caution est mise en sécurité à la CDC-CI et restituée sans tracasserie à la sortie.",
     badgeColor: "bg-sky-500/10 text-sky-600 border-sky-500/20",
     accentColor: "#0284C7",
-    image: "/images/cdc_visual.png",
+    image: "/images/cdc_visual_fcfa.png",
     icon: ShieldCheck,
     mockup: {
       title: "Certificat de Consignation CDC-CI",
@@ -257,9 +257,9 @@ export default function InteractiveShowcase() {
               <img
                 src={activeStory.image}
                 alt={activeStory.title}
-                className="w-full h-full object-cover object-center filter brightness-[0.75] contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
+                className="w-full h-full object-cover object-center filter brightness-[0.85] contrast-[1.1] group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-slate-950" />
+              <div className="absolute inset-0 bg-slate-950/40" />
             </div>
 
             {/* Widget Glassmorphism flottant par-dessus l'image (Style Apple / iOS) */}

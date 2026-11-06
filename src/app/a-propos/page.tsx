@@ -15,10 +15,14 @@ export default function AboutPage() {
 
       <main className="relative z-10" style={{ paddingBottom: '100px' }}>
         {/* HERO SECTION */}
-        <section className="relative py-32" style={{ background: 'var(--ink)', color: 'white', overflow: 'hidden' }}>
-          <div className="absolute inset-0 z-0">
-            <div className="hero-blob-1" style={{ opacity: 0.3 }}></div>
-            <div className="hero-blob-2" style={{ opacity: 0.3 }}></div>
+        <section className="relative py-32 bg-slate-950 text-white overflow-hidden">
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <img
+              src="/images/hero_abidjan.png"
+              alt="Abidjan"
+              className="w-full h-full object-cover object-center filter brightness-[0.35] contrast-[1.1]"
+            />
+            <div className="absolute inset-0 bg-slate-950/75" />
           </div>
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -67,18 +71,26 @@ export default function AboutPage() {
                   </motion.div>
                 </div>
               </div>
-              <div className="relative group">
-                <div className="absolute -inset-8 rounded-[4rem] -z-10 rotate-3 group-hover:rotate-0 transition-transform duration-700" style={{ background: 'var(--sky-l)' }}></div>
-                <div className="p-12 rounded-[3.5rem] border border-white shadow-2xl relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.7)' }}>
-                  <div className="absolute top-0 right-0 w-32 h-32 blur-3xl -mr-16 -mt-16" style={{ background: 'var(--sky)' }}></div>
-                  <h3 className="text-3xl font-black uppercase text-ink mb-10 italic">Notre Engagement</h3>
-                  <blockquote className="text-xl font-black leading-tight text-ink mb-10 relative">
-                    <span className="absolute -left-5 -top-3 text-4xl opacity-20">"</span>
-                    La technologie doit servir l'humain en apportant la certitude là où régnait autrefois l'incertitude.
-                    <span className="absolute -right-2 text-4xl opacity-20">"</span>
+              <div className="relative group rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white">
+                <div className="relative h-72 sm:h-80 w-full overflow-hidden">
+                  <img
+                    src="/images/about_visual.png"
+                    alt="Engagement QAPRIL Côte d'Ivoire"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-slate-950/25" />
+                  <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/95 text-slate-900 text-xs font-black uppercase tracking-wider shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-[#059669]" />
+                    Pacte Républicain de Confiance
+                  </div>
+                </div>
+                <div className="p-8 sm:p-10 bg-white border-t border-slate-100">
+                  <h3 className="text-2xl font-black uppercase text-slate-900 mb-4 tracking-tight">Notre Engagement</h3>
+                  <blockquote className="text-base font-bold text-slate-800 leading-snug mb-4 italic border-l-4 border-amber-500 pl-4">
+                    « La technologie doit servir l'humain en apportant la certitude légale là où régnait autrefois l'incertitude. »
                   </blockquote>
-                  <p className="text-ink3 font-medium text-md leading-relaxed">
-                    Nous travaillons chaque jour pour que chaque Ivoirien, qu'il soit propriétaire de son patrimoine ou locataire de son toit, puisse dormir sereinement grâce à la certification QAPRIL.
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                    Nous travaillons chaque jour pour que chaque Ivoirien, qu'il soit propriétaire de son patrimoine ou locataire de son toit, puisse vivre sereinement grâce à la certification officielle QAPRIL.
                   </p>
                 </div>
               </div>

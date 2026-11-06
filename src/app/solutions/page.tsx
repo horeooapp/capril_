@@ -67,7 +67,8 @@ export default function SolutionsPage() {
         }
       ],
       actionBtn: "Ouvrir mon Espace Propriétaire",
-      actionHref: "/dashboard"
+      actionHref: "/dashboard",
+      image: "/images/login_landlord_visual.jpg"
     },
     {
       id: "locataires",
@@ -103,7 +104,8 @@ export default function SolutionsPage() {
         }
       ],
       actionBtn: "Accéder à l'Espace Locataire",
-      actionHref: "/mon-espace-locataire"
+      actionHref: "/mon-espace-locataire",
+      image: "/images/hero_family_moving_new_home_1773609766414.png"
     },
     {
       id: "agences",
@@ -139,7 +141,8 @@ export default function SolutionsPage() {
         }
       ],
       actionBtn: "Découvrir la Solution Agences",
-      actionHref: "/contact"
+      actionHref: "/contact",
+      image: "/images/hero_abidjan_modern_district_1773609699145.png"
     },
     {
       id: "diaspora",
@@ -175,7 +178,8 @@ export default function SolutionsPage() {
         }
       ],
       actionBtn: "Gérer mes Biens depuis l'Étranger",
-      actionHref: "/contact"
+      actionHref: "/contact",
+      image: "/images/abidjan_plateau_bg.png"
     },
     {
       id: "institutionnels",
@@ -211,7 +215,8 @@ export default function SolutionsPage() {
         }
       ],
       actionBtn: "Contacter le Pôle Partenaires",
-      actionHref: "/contact"
+      actionHref: "/contact",
+      image: "/images/cdc_visual_fcfa.png"
     }
   ];
 
@@ -334,8 +339,26 @@ export default function SolutionsPage() {
                 </div>
               </div>
 
+              {/* Illustration Visuelle Métier */}
+              {currentRole.image && (
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm mt-8 mb-4 bg-slate-950 group">
+                  <div className="relative h-64 sm:h-80 w-full overflow-hidden">
+                    <img
+                      src={currentRole.image}
+                      alt={currentRole.label}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/30" />
+                    <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-xs font-black uppercase tracking-wider shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-[#059669]" />
+                      Solution Certifiée · {currentRole.label}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Indicateurs clés chiffrés */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-10 mt-10 border-t border-slate-100">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 mt-6 border-t border-slate-100">
                 {currentRole.keyMetrics.map((m, i) => (
                   <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                     <div className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
