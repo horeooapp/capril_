@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qapril Proprietaires",
     "slug": "proprietaire",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -33,7 +33,7 @@
         "USE_BIOMETRIC",
         "USE_FINGERPRINT"
       ],
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "favicon": "./assets/favicon.png"

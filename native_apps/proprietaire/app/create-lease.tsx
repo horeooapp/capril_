@@ -1,145 +1,618 @@
-import { View, Text, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import {
+  ChevronLeft,
+  FileSpreadsheet,
+  Building2,
+  User,
+  ShieldCheck,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  Phone,
+  Mail,
+  Coins,
+} from 'lucide-react-native';
 import { fetchWithAuth } from '../lib/api';
-import { useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+
+const DURATION_OPTIONS = [
+  { id: '12', label: '12 mois (1 an)' },
+  { id: '24', label: '24 mois (2 ans)' },
+  { id: '36', label: '36 mois (3 ans)' },
+];
 
 export default function CreateLeaseScreen() {
-    const router = useRouter();
-    const [properties, setProperties] = useState<any[]>([]);
-    const [selectedPropertyId, setSelectedPropertyId] = useState('');
-    const [tenantEmail, setTenantEmail] = useState('');
-    const [rentAmount, setRentAmount] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [loadingProps, setLoadingProps] = useState(true);
+  const router = useRouter();
+  const params = useLocalSearchParams<{
+    propertyId?: string;
+    propertyName?: string;
+    rent?: string;
+  }>();
 
-    useEffect(() => {
-        const loadProperties = async () => {
-            try {
-                const res = await fetchWithAuth('/proprietaire/properties');
-                const data = await res.json();
-                if (res.ok) {
-                    const vacants = data.properties.filter((p: any) => p.status === 'Vacant');
-                    setProperties(vacants);
-                    if (vacants.length > 0) setSelectedPropertyId(vacants[0].id);
-                }
-            } catch (e) {
-                Alert.alert("Erreur", "Impossible de charger vos biens");
-            } finally {
-                setLoadingProps(false);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loadingProps, setLoadingProps] = useState(true);
+
+  // Form states
+  const [selectedPropertyId, setSelectedPropertyId] = useState(params.propertyId || '');
+  const [tenantName, setTenantName] = useState('');
+  const [tenantPhone, setTenantPhone] = useState('');
+  const [tenantEmail, setTenantEmail] = useState('');
+  const [rentAmount, setRentAmount] = useState(params.rent || '');
+  const [depositAmount, setDepositAmount] = useState('');
+  const [advanceAmount, setAdvanceAmount] = useState('');
+  const [durationMonths, setDurationMonths] = useState('12');
+  const [loading, setLoading] = useState(false);
+
+  // Charger les biens du propriétaire
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        const res = await fetchWithAuth('/proprietaire/properties');
+        const data = await res.json();
+        if (res.ok && data.properties) {
+          // Filtrer les biens vacants en priorité, ou tous les biens
+          const vacants = data.properties.filter((p: any) => !p.isRented && p.occupancyStatus !== 'Loué');
+          setProperties(vacants.length > 0 ? vacants : data.properties);
+          
+          if (!selectedPropertyId) {
+            if (params.propertyId) {
+              setSelectedPropertyId(params.propertyId);
+            } else if (vacants.length > 0) {
+              setSelectedPropertyId(vacants[0].id);
+              if (vacants[0].currentRent || vacants[0].declaredRentFcfa) {
+                setRentAmount(String(vacants[0].currentRent || vacants[0].declaredRentFcfa));
+              }
             }
-        };
-        loadProperties();
-    }, []);
-
-    const handleCreate = async () => {
-        if (!selectedPropertyId || !tenantEmail || !rentAmount) {
-            Alert.alert("Erreur", "Veuillez remplir tous les champs");
-            return;
+          }
         }
-
-        setLoading(true);
-        try {
-            const res = await fetchWithAuth('/proprietaire/leases/create', {
-                method: 'POST',
-                body: JSON.stringify({
-                    propertyId: selectedPropertyId,
-                    tenantEmail: tenantEmail.trim().toLowerCase(),
-                    rentAmount: rentAmount
-                })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                Alert.alert("Succès", "Le bail a été généré en PDF et envoyé au locataire.", [
-                    { text: "OK", onPress: () => router.back() }
-                ]);
-            } else {
-                Alert.alert("Erreur", data.error || "Impossible de créer le bail");
-            }
-        } catch (e) {
-            Alert.alert("Erreur", "Problème de connexion");
-        } finally {
-            setLoading(false);
-        }
+      } catch (e) {
+        console.warn("Erreur chargement biens pour bail:", e);
+      } finally {
+        setLoadingProps(false);
+      }
     };
+    loadProperties();
+  }, []);
 
-    return (
-        <SafeAreaView className="flex-1 bg-background">
-            <View className="flex-row items-center p-5 pt-3 border-b border-qgrey-2 bg-white/90">
-                <Pressable onPress={() => router.back()} className="p-1 mr-4">
-                    <ChevronLeft color="#0F1117" size={28} />
-                </Pressable>
-                <Text className="text-2xl font-bold text-qnavy">Nouveau Bail</Text>
+  // Recalcul automatique de la caution et avance (max 2 mois selon la loi ivoirienne)
+  useEffect(() => {
+    const rentNum = parseFloat(rentAmount.replace(/\s/g, '')) || 0;
+    if (rentNum > 0) {
+      if (!depositAmount || parseFloat(depositAmount) === 0) {
+        setDepositAmount(String(rentNum * 2));
+      }
+      if (!advanceAmount || parseFloat(advanceAmount) === 0) {
+        setAdvanceAmount(String(rentNum * 2));
+      }
+    }
+  }, [rentAmount]);
+
+  const rentNum = parseFloat(rentAmount.replace(/\s/g, '')) || 0;
+  const depositNum = parseFloat(depositAmount.replace(/\s/g, '')) || 0;
+  const advanceNum = parseFloat(advanceAmount.replace(/\s/g, '')) || 0;
+  const maxLegalCaution = rentNum * 2;
+
+  const isDepositOverLimit = rentNum > 0 && depositNum > maxLegalCaution;
+  const isAdvanceOverLimit = rentNum > 0 && advanceNum > maxLegalCaution;
+
+  const handleCreate = async () => {
+    if (!selectedPropertyId) {
+      Alert.alert('Erreur', 'Veuillez sélectionner un bien immobilier.');
+      return;
+    }
+    if (!tenantEmail.trim() && !tenantPhone.trim()) {
+      Alert.alert('Erreur', 'Veuillez renseigner au moins un email ou un téléphone pour le locataire.');
+      return;
+    }
+    if (!rentAmount.trim() || rentNum <= 0) {
+      Alert.alert('Erreur', 'Veuillez préciser le montant du loyer mensuel en FCFA.');
+      return;
+    }
+    if (isDepositOverLimit || isAdvanceOverLimit) {
+      Alert.alert(
+        'Plafonnement Légal Dépassé',
+        `Selon la Loi N° 2019-576 (Art. 415 & 416 CCH), la caution et l'avance sont strictement plafonnées à 2 mois maximum (soit ${(maxLegalCaution).toLocaleString('fr-FR')} FCFA). Veuillez ajuster les montants.`
+      );
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetchWithAuth('/proprietaire/leases/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          propertyId: selectedPropertyId,
+          tenantEmail: tenantEmail.trim().toLowerCase(),
+          tenantPhone: tenantPhone.trim(),
+          tenantName: tenantName.trim(),
+          rentAmount: rentAmount.trim(),
+          depositAmount: depositAmount.trim() || String(maxLegalCaution),
+          avanceLoyer: advanceAmount.trim() || String(maxLegalCaution),
+          durationMonths: durationMonths,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        Alert.alert(
+          'Bail Créé & Envoyé !',
+          `Le contrat de bail officiel a été généré en PDF et scellé numériquement.\n\nUne notification SMS a été transmise au locataire pour sa signature par code OTP.\n\nRéf : ${data.lease?.leaseReference || 'Enregistré'}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert('Erreur', data.error || 'Impossible de créer le bail.');
+      }
+    } catch (e) {
+      Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+          <ChevronLeft color="#1C1C1E" size={26} />
+        </Pressable>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerTitle}>Nouveau Bail Certifié</Text>
+          <Text style={styles.headerSub}>Rédiger un contrat conforme à la Loi 2019-576</Text>
+        </View>
+      </View>
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* BANDEAU RÈGLEMENTAIRE */}
+          <View style={styles.legalNotice}>
+            <ShieldCheck color="#1B4D3E" size={20} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.legalNoticeTitle}>Sécurisation Intégrale & Signature SMS</Text>
+              <Text style={styles.legalNoticeDesc}>
+                Le bail est scellé avec empreinte SHA-256. Vos deux parties signent par code OTP SMS légal, et la quittance QR code est immédiatement activée.
+              </Text>
+            </View>
+          </View>
+
+          {/* 1. SÉLECTION DU BIEN */}
+          <View style={styles.formSection}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.sectionTitle}>1. BIEN IMMOBILIER</Text>
+              <Pressable
+                onPress={() => router.push('/create-property')}
+                style={styles.addPropertyLink}
+              >
+                <Text style={styles.addPropertyLinkText}>+ Ajouter un autre bien</Text>
+              </Pressable>
             </View>
 
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
-                <ScrollView contentContainerStyle={{ padding: 20 }}>
-                    <Text className="text-qtext-light text-base mb-8 leading-6">
-                        Renseignez les informations du locataire pour générer un contrat de bail PDF officiel certifié par QAPRIL.
+            {loadingProps ? (
+              <ActivityIndicator color="#1B4D3E" style={{ marginVertical: 12 }} />
+            ) : properties.length === 0 ? (
+              <View style={styles.emptyPropsCard}>
+                <Building2 color="#9CA3AF" size={28} />
+                <Text style={styles.emptyPropsText}>
+                  Vous n'avez aucun bien disponible. Créez d'abord un bien immobilier.
+                </Text>
+                <Pressable
+                  style={styles.btnSmallGreen}
+                  onPress={() => router.push('/create-property')}
+                >
+                  <Text style={styles.btnSmallGreenText}>+ Créer un bien</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.chipsWrap}>
+                {properties.map((p) => {
+                  const active = selectedPropertyId === p.id;
+                  return (
+                    <Pressable
+                      key={p.id}
+                      onPress={() => {
+                        setSelectedPropertyId(p.id);
+                        if (p.currentRent || p.declaredRentFcfa) {
+                          setRentAmount(String(p.currentRent || p.declaredRentFcfa));
+                        }
+                      }}
+                      style={[styles.propChip, active && styles.propChipActive]}
+                    >
+                      <Building2 color={active ? '#FFFFFF' : '#1B4D3E'} size={15} />
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={[styles.propChipTitle, active && styles.propChipTextActive]}
+                          numberOfLines={1}
+                        >
+                          {p.name}
+                        </Text>
+                        <Text
+                          style={[styles.propChipSub, active && styles.propChipSubActive]}
+                          numberOfLines={1}
+                        >
+                          {p.commune || 'Abidjan'} · {(p.currentRent || p.declaredRentFcfa || 0).toLocaleString('fr-FR')} F
+                        </Text>
+                      </View>
+                      {active && <CheckCircle2 color="#FFFFFF" size={16} />}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+
+          {/* 2. LOCATAIRE */}
+          <View style={styles.formSection}>
+            <Text style={styles.sectionTitle}>2. INFORMATIONS DU LOCATAIRE</Text>
+
+            <Text style={styles.fieldLabel}>Nom et Prénom du locataire *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Kouadio Jean-Marc"
+              placeholderTextColor="#9CA3AF"
+              value={tenantName}
+              onChangeText={setTenantName}
+            />
+
+            <Text style={styles.fieldLabel}>Numéro de Téléphone (pour signature SMS OTP) *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 0701020304"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="phone-pad"
+              value={tenantPhone}
+              onChangeText={setTenantPhone}
+            />
+
+            <Text style={styles.fieldLabel}>Email du locataire *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: locataire@gmail.com"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={tenantEmail}
+              onChangeText={setTenantEmail}
+            />
+          </View>
+
+          {/* 3. CONDITIONS FINANCIÈRES & LÉGALES */}
+          <View style={styles.formSection}>
+            <Text style={styles.sectionTitle}>3. CONDITIONS FINANCIÈRES (LOI 2019-576)</Text>
+
+            <Text style={styles.fieldLabel}>Loyer Mensuel (FCFA) *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 250000"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="numeric"
+              value={rentAmount}
+              onChangeText={setRentAmount}
+            />
+
+            <View style={{ marginTop: 6 }}>
+              <View style={styles.rowBetween}>
+                <Text style={styles.fieldLabel}>Dépôt de garantie / Caution (FCFA)</Text>
+                <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
+              </View>
+              <TextInput
+                style={[styles.input, isDepositOverLimit && styles.inputError]}
+                placeholder={`Ex: ${maxLegalCaution}`}
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={depositAmount}
+                onChangeText={setDepositAmount}
+              />
+              {isDepositOverLimit && (
+                <Text style={styles.errorText}>
+                  ⚠️ La caution ne peut dépasser 2 mois de loyer selon la loi ivoirienne.
+                </Text>
+              )}
+            </View>
+
+            <View style={{ marginTop: 6 }}>
+              <View style={styles.rowBetween}>
+                <Text style={styles.fieldLabel}>Avance sur Loyer (FCFA)</Text>
+                <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
+              </View>
+              <TextInput
+                style={[styles.input, isAdvanceOverLimit && styles.inputError]}
+                placeholder={`Ex: ${maxLegalCaution}`}
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={advanceAmount}
+                onChangeText={setAdvanceAmount}
+              />
+              {isAdvanceOverLimit && (
+                <Text style={styles.errorText}>
+                  ⚠️ L'avance sur loyer ne peut dépasser 2 mois selon la loi ivoirienne.
+                </Text>
+              )}
+            </View>
+
+            <Text style={styles.fieldLabel}>Durée du bail</Text>
+            <View style={styles.chipsWrap}>
+              {DURATION_OPTIONS.map((d) => {
+                const active = durationMonths === d.id;
+                return (
+                  <Pressable
+                    key={d.id}
+                    onPress={() => setDurationMonths(d.id)}
+                    style={[styles.durationChip, active && styles.durationChipActive]}
+                  >
+                    <Text style={[styles.durationChipText, active && styles.durationChipTextActive]}>
+                      {d.label}
                     </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
 
-                    {loadingProps ? (
-                        <ActivityIndicator color="#FF8B00" style={{ marginTop: 20 }} />
-                    ) : properties.length === 0 ? (
-                        <View className="p-5 bg-qred-pale rounded-xl border border-qred/30">
-                            <Text className="text-qred text-center font-medium">Vous n'avez aucun bien vacant. Ajoutez d'abord un bien.</Text>
-                        </View>
-                    ) : (
-                        <View className="gap-4">
-                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Sélectionnez un bien vacant</Text>
-                            <View className="flex-row flex-wrap gap-3 mb-2">
-                                {properties.map(p => (
-                                    <Pressable 
-                                        key={p.id} 
-                                        className={`p-3 rounded-xl border ${selectedPropertyId === p.id ? 'border-qorange bg-qorange/10' : 'border-qgrey-2 bg-white'}`}
-                                        onPress={() => setSelectedPropertyId(p.id)}
-                                    >
-                                        <Text className={`${selectedPropertyId === p.id ? 'text-qorange font-bold' : 'text-qtext-light font-medium'}`}>
-                                            {p.name}
-                                        </Text>
-                                    </Pressable>
-                                ))}
-                            </View>
-
-                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Email du locataire (compte QAPRIL)</Text>
-                            <TextInput
-                                className="bg-white border border-qgrey-2 rounded-xl p-4 text-qnavy text-base"
-                                placeholder="ex: locataire@gmail.com"
-                                placeholderTextColor="#94A3B8"
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                value={tenantEmail}
-                                onChangeText={setTenantEmail}
-                            />
-
-                            <Text className="text-qnavy text-base font-bold mb-[-8px]">Loyer Mensuel (FCFA)</Text>
-                            <TextInput
-                                className="bg-white border border-qgrey-2 rounded-xl p-4 text-qnavy text-base"
-                                placeholder="ex: 250000"
-                                placeholderTextColor="#94A3B8"
-                                keyboardType="numeric"
-                                value={rentAmount}
-                                onChangeText={setRentAmount}
-                            />
-
-                            <Pressable 
-                                className={`bg-qorange p-4 rounded-xl items-center mt-5 shadow-sm ${loading ? 'opacity-70' : ''}`}
-                                onPress={handleCreate}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <ActivityIndicator color="#FFF" />
-                                ) : (
-                                    <Text className="text-white text-base font-bold">Générer le contrat PDF</Text>
-                                )}
-                            </Pressable>
-                        </View>
-                    )}
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    );
+          {/* BOUTON D'ACTION PRINCIPAL */}
+          <Pressable
+            style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+            onPress={handleCreate}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <View style={styles.submitBtnContent}>
+                <FileSpreadsheet color="#FFFFFF" size={18} />
+                <Text style={styles.submitBtnText}>Générer le Contrat de Bail PDF</Text>
+              </View>
+            )}
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F2EC',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E0D7',
+    gap: 12,
+  },
+  backBtn: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1C1C1E',
+  },
+  headerSub: {
+    fontSize: 11,
+    color: '#6E6E73',
+    fontWeight: '500',
+    marginTop: 1,
+  },
+  scroll: {
+    padding: 16,
+    paddingBottom: 40,
+    gap: 16,
+  },
+  rowBetween: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  legalNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    backgroundColor: '#E6F4EA',
+    borderWidth: 1,
+    borderColor: '#CEEAD6',
+    borderRadius: 14,
+  },
+  legalNoticeTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1B4D3E',
+  },
+  legalNoticeDesc: {
+    fontSize: 11,
+    color: '#2D3748',
+    lineHeight: 16,
+    marginTop: 2,
+  },
+  formSection: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#E4E0D7',
+    gap: 10,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#1B4D3E',
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
+  addPropertyLink: {
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: '#F0FDF4',
+  },
+  addPropertyLinkText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#166534',
+  },
+  fieldLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 4,
+  },
+  helperLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  input: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    fontSize: 14,
+    color: '#111827',
+  },
+  inputError: {
+    borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+  },
+  errorText: {
+    fontSize: 11,
+    color: '#DC2626',
+    marginTop: 3,
+    fontWeight: '500',
+  },
+  chipsWrap: {
+    gap: 8,
+    marginTop: 4,
+  },
+  propChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  propChipActive: {
+    backgroundColor: '#1B4D3E',
+    borderColor: '#1B4D3E',
+  },
+  propChipTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  propChipSub: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 1,
+  },
+  propChipTextActive: {
+    color: '#FFFFFF',
+  },
+  propChipSubActive: {
+    color: '#D1FAE5',
+  },
+  emptyPropsCard: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    gap: 8,
+  },
+  emptyPropsText: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  btnSmallGreen: {
+    backgroundColor: '#1B4D3E',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  btnSmallGreenText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  durationChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+  },
+  durationChipActive: {
+    backgroundColor: '#1B4D3E',
+    borderColor: '#1B4D3E',
+  },
+  durationChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  durationChipTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  submitBtn: {
+    backgroundColor: '#1B4D3E',
+    borderRadius: 14,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  submitBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+});

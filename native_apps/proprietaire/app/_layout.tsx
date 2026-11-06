@@ -18,6 +18,8 @@ export default function RootLayout() {
       <Stack.Screen name="index" options={{ title: "Accueil" }} />
       <Stack.Screen name="login" options={{ title: "Connexion", gestureEnabled: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="create-property" options={{ title: "Nouveau Bien", presentation: "modal" }} />
+      <Stack.Screen name="create-lease" options={{ title: "Nouveau Bail", presentation: "modal" }} />
     </Stack>
   );
 }

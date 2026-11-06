@@ -554,10 +554,26 @@ export default function BailleurAndAgencePrototypeScreen() {
 
                 <Text style={styles.label}>ACTIONS RAPIDES</Text>
                 <View style={styles.grid2}>
+                  <Pressable
+                    style={[styles.cardGrid, { backgroundColor: '#F0FDF4', borderColor: '#86EFAC' }]}
+                    onPress={() => router.push('/create-property')}
+                  >
+                    <Building2 color="#166534" size={20} />
+                    <Text style={[styles.boldText, { color: '#166534' }]}>+ Nouveau Bien</Text>
+                    <Text style={styles.subMuted}>Immatriculation QAPRIL</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.cardGrid, { backgroundColor: '#FEF3C7', borderColor: '#FCD34D' }]}
+                    onPress={() => router.push('/create-lease')}
+                  >
+                    <FileSpreadsheet color="#92400E" size={20} />
+                    <Text style={[styles.boldText, { color: '#92400E' }]}>+ Nouveau Bail</Text>
+                    <Text style={styles.subMuted}>Loi 2019-576 & SMS OTP</Text>
+                  </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('baux')}>
                     <FileText color="#1B4D3E" size={20} />
                     <Text style={styles.boldText}>Baux & DGI</Text>
-                    <Text style={styles.subMuted}>Gratuit · art. 414 CCH</Text>
+                    <Text style={styles.subMuted}>Enregistrement fiscal</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setCashModal(true)}>
                     <Camera color="#9A6500" size={20} />
@@ -572,7 +588,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('cand')}>
                     <ShieldCheck color="#1E7E4E" size={20} />
                     <Text style={styles.boldText}>Vivier qualifié</Text>
-                    <Text style={styles.subMuted}>Candidatures qualifiées</Text>
+                    <Text style={styles.subMuted}>Dossiers locataires</Text>
                   </Pressable>
                 </View>
               </View>
@@ -580,7 +596,15 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {bTab === 'biens' && (
               <View style={styles.sectionGap}>
-                <Text style={styles.h1}>Mes biens ({bBiens.length})</Text>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.h1}>Mes biens ({bBiens.length})</Text>
+                  <Pressable
+                    style={styles.pillGold}
+                    onPress={() => router.push('/create-property')}
+                  >
+                    <Text style={styles.pillGoldText}>+ Ajouter un bien</Text>
+                  </Pressable>
+                </View>
                 {bBiens.length === 0 ? (
                   <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
                     <Building2 color="#9CA3AF" size={36} />
@@ -630,7 +654,15 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {bTab === 'baux' && (
               <View style={styles.sectionGap}>
-                <Text style={styles.h1}>Mes baux ({bBaux.length})</Text>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.h1}>Mes baux ({bBaux.length})</Text>
+                  <Pressable
+                    style={styles.pillGold}
+                    onPress={() => router.push('/create-lease')}
+                  >
+                    <Text style={styles.pillGoldText}>+ Rédiger un bail</Text>
+                  </Pressable>
+                </View>
                 {bBaux.length === 0 ? (
                   <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
                     <FileSpreadsheet color="#9CA3AF" size={36} />

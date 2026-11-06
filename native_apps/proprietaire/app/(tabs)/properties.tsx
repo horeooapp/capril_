@@ -11,10 +11,22 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Building2, ShieldCheck, Lock, Search, X, ArrowUpDown, User } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import {
+  Building2,
+  ShieldCheck,
+  Lock,
+  Search,
+  X,
+  ArrowUpDown,
+  User,
+  Plus,
+  FileSpreadsheet,
+} from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
 export default function PropertiesScreen() {
+  const router = useRouter();
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -119,8 +131,29 @@ export default function PropertiesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.sub}>Patrimoine & Niveaux de vérification 1 à 4 (ADD-22)</Text>
-        <Text style={styles.title}>Mes Biens ({properties.length})</Text>
+        {/* TITRE + BOUTONS D'ACTION RAPIDE (NOUVEAU BIEN / NOUVEAU BAIL) */}
+        <View style={styles.headerTopRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.sub}>Patrimoine & Conformité (Loi 2019-576)</Text>
+            <Text style={styles.title}>Mes Biens ({properties.length})</Text>
+          </View>
+          <View style={styles.headerActionBtns}>
+            <Pressable
+              style={styles.headerBtnPrimary}
+              onPress={() => router.push('/create-property')}
+            >
+              <Plus color="#FFFFFF" size={15} />
+              <Text style={styles.headerBtnPrimaryText}>Bien</Text>
+            </Pressable>
+            <Pressable
+              style={styles.headerBtnSecondary}
+              onPress={() => router.push('/create-lease')}
+            >
+              <FileSpreadsheet color="#1B4D3E" size={15} />
+              <Text style={styles.headerBtnSecondaryText}>Bail</Text>
+            </Pressable>
+          </View>
+        </View>
 
         {/* 1. BARRE DE RECHERCHE */}
         <View style={styles.searchBar}>
@@ -195,19 +228,27 @@ export default function PropertiesScreen() {
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1B4D3E']} />}
         ListEmptyComponent={
-          <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 30 }}>
+          <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 20 }}>
             <Building2 size={44} color="#94A3B8" />
-            <Text style={{ fontSize: 16, fontWeight: '500', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
               {hasActiveFilters ? 'Aucun bien ne correspond aux filtres' : 'Aucun bien enregistré'}
             </Text>
-            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
+            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18, maxWidth: 280 }}>
               {hasActiveFilters
                 ? 'Essayez de réinitialiser la recherche ou de changer de filtre pour voir vos biens.'
-                : 'Vos biens apparaîtront ici dès qu’ils seront créés avec leur niveau de conformité.'}
+                : 'Ajoutez votre première maison, appartement ou commerce pour démarrer la gestion.'}
             </Text>
-            {hasActiveFilters && (
+            {hasActiveFilters ? (
               <Pressable style={styles.resetBtn} onPress={resetFilters}>
                 <Text style={styles.resetBtnText}>Réinitialiser les filtres</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.emptyAddBtn}
+                onPress={() => router.push('/create-property')}
+              >
+                <Plus color="#FFFFFF" size={16} />
+                <Text style={styles.emptyAddBtnText}>Ajouter mon premier bien</Text>
               </Pressable>
             )}
           </View>
@@ -229,7 +270,7 @@ export default function PropertiesScreen() {
                   </View>
                 </View>
 
-                {/* BADGE STATUT CONFORME : LOUÉ / VACANT */}
+                {/* BADGE STATUT : LOUÉ / VACANT */}
                 <View style={[styles.statusBadge, rented ? styles.statusOccupied : styles.statusVacant]}>
                   <Text style={[styles.statusText, rented ? styles.statusTextOccupied : styles.statusTextVacant]}>
                     {rented ? 'Loué' : 'Vacant'}
@@ -243,6 +284,26 @@ export default function PropertiesScreen() {
                   <User color="#1E7E4E" size={13} />
                   <Text style={styles.tenantText}>Locataire : {item.tenantName}</Text>
                 </View>
+              )}
+
+              {/* ACTION CRÉER UN BAIL SI LE BIEN EST VACANT */}
+              {!rented && (
+                <Pressable
+                  style={styles.createLeaseBtn}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/create-lease',
+                      params: {
+                        propertyId: item.id,
+                        propertyName: item.name,
+                        rent: String(item.currentRent || item.declaredRentFcfa || 0),
+                      },
+                    } as any)
+                  }
+                >
+                  <FileSpreadsheet color="#1B4D3E" size={14} />
+                  <Text style={styles.createLeaseBtnText}>Rédiger un bail pour ce bien</Text>
+                </Pressable>
               )}
 
               <View style={styles.footerRow}>
@@ -273,9 +334,53 @@ export default function PropertiesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F2EC' },
   center: { justifyContent: 'center', alignItems: 'center' },
-  header: { paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10, gap: 8 },
-  sub: { fontSize: 12, color: '#6E6E73', fontWeight: '600' },
-  title: { fontSize: 24, fontWeight: '600', color: '#1C1C1E' },
+  header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10, gap: 8 },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerActionBtns: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerBtnPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#1B4D3E',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  headerBtnPrimaryText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  headerBtnSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#1B4D3E',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+  },
+  headerBtnSecondaryText: {
+    color: '#1B4D3E',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  sub: { fontSize: 11, color: '#6E6E73', fontWeight: '600' },
+  title: { fontSize: 22, fontWeight: '700', color: '#1C1C1E', marginTop: 1 },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -302,26 +407,26 @@ const styles = StyleSheet.create({
     borderColor: '#E4E0D7',
   },
   chipOn: { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' },
-  chipText: { fontSize: 12, fontWeight: '500', color: '#1C1C1E' },
-  chipTextOn: { color: '#FFFFFF' },
-  sortRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  sortLabel: { fontSize: 11, fontWeight: '600', color: '#6E6E73' },
+  chipText: { fontSize: 12, fontWeight: '600', color: '#4B5563' },
+  chipTextOn: { color: '#FFFFFF', fontWeight: '700' },
+  sortRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  sortLabel: { fontSize: 11, color: '#6E6E73', fontWeight: '600' },
   sortChip: {
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: '#EBE7DE',
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E4E0D7',
   },
-  sortChipActive: {
-    backgroundColor: '#1B4D3E',
-  },
-  sortChipText: { fontSize: 11, fontWeight: '500', color: '#555' },
-  sortChipTextActive: { color: '#FFF' },
-  list: { paddingHorizontal: 18, paddingBottom: 40, gap: 10 },
+  sortChipActive: { backgroundColor: '#E8A020', borderColor: '#E8A020' },
+  sortChipText: { fontSize: 11, color: '#6E6E73', fontWeight: '500' },
+  sortChipTextActive: { color: '#FFFFFF', fontWeight: '700' },
+  list: { padding: 16, gap: 12, paddingBottom: 32 },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 15,
+    borderRadius: 14,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#E4E0D7',
     gap: 10,
@@ -331,19 +436,19 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 38,
     height: 38,
-    borderRadius: 12,
-    backgroundColor: '#E3EDE9',
-    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#E6EFEA',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  propertyName: { fontSize: 14, color: '#1C1C1E', fontWeight: '600' },
-  propertyAddress: { fontSize: 12, color: '#6E6E73', marginTop: 2 },
-  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  propertyName: { fontSize: 15, fontWeight: '700', color: '#1C1C1E' },
+  propertyAddress: { fontSize: 12, color: '#6E6E73', marginTop: 1 },
+  statusBadge: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: 6 },
   statusOccupied: { backgroundColor: '#E3F5EC' },
-  statusVacant: { backgroundColor: '#FBEAE8' },
-  statusText: { fontSize: 11, fontWeight: '600' },
+  statusVacant: { backgroundColor: '#FEE2E2' },
+  statusText: { fontSize: 11, fontWeight: '700' },
   statusTextOccupied: { color: '#1E7E4E' },
-  statusTextVacant: { color: '#C0392B' },
+  statusTextVacant: { color: '#DC2626' },
   tenantBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -355,20 +460,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#DCFCE7',
   },
-  tenantText: {
+  tenantText: { fontSize: 12, color: '#166534', fontWeight: '600' },
+  createLeaseBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+    borderRadius: 8,
+    paddingVertical: 8,
+    marginTop: 2,
+  },
+  createLeaseBtnText: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#15803D',
+    fontWeight: '700',
+    color: '#166534',
   },
   footerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 8,
+    alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#E4E0D7',
+    borderTopColor: '#F3F4F6',
+    paddingTop: 10,
   },
-  rent: { fontSize: 14, fontWeight: '600', color: '#1B4D3E' },
+  rent: { fontSize: 14, fontWeight: '800', color: '#1B4D3E' },
   badgesRight: { flexDirection: 'row', gap: 6 },
   nivPill: {
     flexDirection: 'row',
@@ -376,30 +494,46 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: '#E3F5EC',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: 6,
   },
-  nivText: { fontSize: 10, fontWeight: '600', color: '#1E7E4E' },
+  nivText: { fontSize: 10, color: '#1E7E4E', fontWeight: '600' },
   maskPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#FDF3DF',
+    backgroundColor: '#FEF3C7',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: 6,
   },
-  maskText: { fontSize: 10, fontWeight: '600', color: '#9A6500' },
+  maskText: { fontSize: 10, color: '#92400E', fontWeight: '600' },
   resetBtn: {
     marginTop: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#1B4D3E',
+    borderRadius: 8,
+  },
+  resetBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  emptyAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 16,
     backgroundColor: '#1B4D3E',
     paddingHorizontal: 18,
-    paddingVertical: 9,
+    paddingVertical: 10,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  resetBtnText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '600',
+  emptyAddBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });
