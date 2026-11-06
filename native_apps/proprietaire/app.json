@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qapril Proprietaires",
     "slug": "proprietaire",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,8 @@
       "permissions": [
         "USE_BIOMETRIC",
         "USE_FINGERPRINT"
-      ]
+      ],
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,7 +42,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) \u00e0 utiliser Face ID ou Touch ID pour une connexion s\u00e9curis\u00e9e."
         }
       ],
       "expo-font",

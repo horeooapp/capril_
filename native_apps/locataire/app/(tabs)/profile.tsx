@@ -1,3 +1,4 @@
+import { AppVersionBadge } from '../../components/AppVersionBadge';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -152,6 +153,7 @@ export default function ProfileScreen() {
             </Pressable>
           </>
         )}
+        <AppVersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

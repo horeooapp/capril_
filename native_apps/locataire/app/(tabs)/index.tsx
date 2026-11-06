@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache } from '../../lib/api';
 import { useRouter } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
+import { VersionUpdateModal } from '../../components/VersionUpdateModal';
 import {
   Bell,
   CheckCircle2,
