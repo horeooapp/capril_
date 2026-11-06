@@ -42,33 +42,33 @@ import {
 const SLIDES = [
   {
     image: "/slider/bg_slider_1.png",
-    title: "Résidence Moderne Abidjan",
-    subtitle: "Sécurisation locative intégrale",
-    location: "Cocody Ambassades",
+    title: "Résidences Contemporaines d'Abidjan",
+    subtitle: "Gestion locative certifiée & Baux 100% conformes",
+    location: "Cocody Ambassades · Côte d'Ivoire",
   },
   {
     image: "/slider/bg_slider_2.png",
-    title: "Immeuble d'Habitation Haut Standing",
-    subtitle: "Baux numérisés & quittances certifiées",
+    title: "Plateau & Immeubles de Prestige",
+    subtitle: "Baux numérisés & quittances officielles avec QR code",
     location: "Plateau · Centre d'Affaires",
   },
   {
     image: "/slider/bg_slider_3.png",
     title: "Villas Duplex & Domaines Privés",
-    subtitle: "Dépôts de garantie consignés à la CDC-CI",
-    location: "Riviera Golf · Zone Résidentielle",
+    subtitle: "Cautions consignées à la Caisse des Dépôts (CDC-CI)",
+    location: "Riviera Golf & Beverly Hills",
   },
   {
     image: "/slider/bg_slider_4.png",
-    title: "Ensemble Immobilier & Mandats d'Agence",
-    subtitle: "Gestion multi-lots & reversements automatisés",
-    location: "Marcory Zone 4",
+    title: "Ensembles Résidentiels & Mandats d'Agences",
+    subtitle: "Gestion multi-lots & reversements instantanés Wave / MoMo",
+    location: "Marcory Zone 4 & Biétry",
   },
   {
     image: "/slider/bg_slider_5.png",
-    title: "Parc Résidentiel Nouvelle Génération",
-    subtitle: "Score ICL pour locataires certifiés",
-    location: "Bingerville · Abidjan Est",
+    title: "Remise des Clés & Emménagement Serein",
+    subtitle: "Passeport locatif avec Score ICL de ponctualité",
+    location: "Bingerville & Côte Lagunaire",
   },
 ];
 
@@ -263,7 +263,7 @@ export default function QaprilLandingV2({
             ))}
 
             {/* OVERLAY SOUVERAIN ÉLÉGANT & HAUTE LISIBILITÉ */}
-            <div className="absolute inset-0 bg-slate-950 z-10" />
+            <div className="absolute inset-0 bg-slate-950/50 z-10" />
           </div>
 
           {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
@@ -634,26 +634,29 @@ export default function QaprilLandingV2({
                     Activer mon compte Propriétaire <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                  <div className="text-xs font-mono text-[#D97706] mb-4 uppercase tracking-wider font-bold">
-                    [Aperçu Tableau de Bord Propriétaire]
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white group">
+                  <div className="relative h-64 sm:h-72 w-full overflow-hidden">
+                    <img
+                      src="/images/login_landlord_visual.jpg"
+                      alt="Gestion locative bailleur Abidjan"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/35" />
+                    <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-[#059669]" />
+                      Patrimoine Sécurisé · Cocody & Marcory
+                    </div>
                   </div>
-                  <div className="space-y-2.5 font-mono text-xs">
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Patrimoine suivi</span>
-                      <span className="text-slate-900 font-bold">14 Biens · Abidjan (Cocody / Marcory)</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Loyers encaissés ce mois</span>
-                      <span className="text-[#059669] font-bold">4 250 000 XOF (100% à jour)</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Cautions gardées en sécurité</span>
-                      <span className="text-[#0284C7] font-bold">8 500 000 XOF (CDC-CI)</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Dernier reçu délivré</span>
-                      <span className="text-slate-900 font-bold">Reçu N° 2026-042 envoyé ✓</span>
+                  <div className="p-5 bg-white border-t border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Loyers ce mois</span>
+                        <span className="text-[#059669] font-bold text-sm">4 250 000 XOF</span>
+                      </div>
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Cautions CDC-CI</span>
+                        <span className="text-[#0284C7] font-bold text-sm">8 500 000 XOF</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -699,26 +702,29 @@ export default function QaprilLandingV2({
                     Accéder à mon Espace Locataire <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                  <div className="text-xs font-mono text-[#0284C7] mb-4 uppercase tracking-wider font-bold">
-                    [Aperçu Espace Locataire]
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white group">
+                  <div className="relative h-64 sm:h-72 w-full overflow-hidden">
+                    <img
+                      src="/images/hero_family_moving_new_home_1773609766414.png"
+                      alt="Famille locataire emménageant à Abidjan"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/35" />
+                    <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-[#0284C7]" />
+                      Locataire Certifié · Grade A+
+                    </div>
                   </div>
-                  <div className="space-y-2.5 font-mono text-xs">
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Niveau de confiance</span>
-                      <span className="text-[#059669] font-bold">Très bon payeur (Grade A+)</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Prochaine échéance</span>
-                      <span className="text-slate-900 font-bold">05 Novembre · 180 000 XOF</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Caution protégée</span>
-                      <span className="text-[#D97706] font-bold">360 000 XOF à la CDC-CI</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Mes reçus de loyer</span>
-                      <span className="text-slate-700 font-bold">24 Reçus Disponibles</span>
+                  <div className="p-5 bg-white border-t border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Prochaine échéance</span>
+                        <span className="text-slate-900 font-bold text-sm">180 000 XOF · Wave</span>
+                      </div>
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Caution Protégée</span>
+                        <span className="text-[#D97706] font-bold text-sm">360 000 XOF (CDC-CI)</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -829,26 +835,29 @@ export default function QaprilLandingV2({
                     Demander une présentation <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
-                <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                  <div className="text-xs font-mono text-[#D97706] mb-4 uppercase tracking-wider font-bold">
-                    [Protocole Professionnel & Sécurité]
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white group">
+                  <div className="relative h-64 sm:h-72 w-full overflow-hidden">
+                    <img
+                      src="/images/cdc_visual_fcfa.png"
+                      alt="Cadre réglementaire Caisse des Dépôts et Consignations"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/35" />
+                    <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                      Cadre Souverain CDC-CI & DGI
+                    </div>
                   </div>
-                  <div className="space-y-2.5 font-mono text-xs">
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Protection des documents</span>
-                      <span className="text-slate-900 font-bold">Cryptage de niveau bancaire</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Signatures et reçus</span>
-                      <span className="text-[#059669] font-bold">Infalsifiables & Inviolables</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Paiements & Opérations</span>
-                      <span className="text-[#0284C7] font-bold">Conforme aux normes bancaires</span>
-                    </div>
-                    <div className="p-3 bg-white rounded border border-slate-200 flex justify-between items-center">
-                      <span className="text-slate-500">Protection des données</span>
-                      <span className="text-slate-900 font-bold">Données hébergées en sécurité</span>
+                  <div className="p-5 bg-white border-t border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Valeur Légale</span>
+                        <span className="text-slate-900 font-bold text-sm">Code Construction CI</span>
+                      </div>
+                      <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Sécurité Dépôts</span>
+                        <span className="text-[#059669] font-bold text-sm">Séquestre d'État CDC-CI</span>
+                      </div>
                     </div>
                   </div>
                 </div>
