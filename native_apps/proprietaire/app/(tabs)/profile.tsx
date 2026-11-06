@@ -47,18 +47,38 @@ export default function ProfileScreen() {
     }
   };
 
+  const [updateAvailable, setUpdateAvailable] = useState<boolean | null>(null);
+
   const handleCheckUpdate = async () => {
     try {
       setIsCheckingUpdate(true);
+      if (__DEV__ || !Updates.isEnabled) {
+        Alert.alert('Mode Développement', 'Les mises à jour OTA sont actives sur les versions installées (Canal: ' + (Updates.channel || 'défaut') + ').');
+        return;
+      }
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync();
+        setUpdateAvailable(true);
+        Alert.alert(
+          'Mise à jour disponible !',
+          'Une nouvelle version est disponible pour votre application. Voulez-vous la télécharger et l\'appliquer maintenant ?',
+          [
+            {
+              text: 'Installer maintenant',
+              onPress: async () => {
+                await Updates.fetchUpdateAsync();
+                await Updates.reloadAsync();
+              },
+            },
+            { text: 'Plus tard', style: 'cancel' }
+          ]
+        );
       } else {
-        Alert.alert('À jour', 'Vous disposez de la dernière version QAPRIL.');
+        setUpdateAvailable(false);
+        Alert.alert('Application à jour', 'Votre application dispose déjà de la toute dernière version (Canal: ' + (Updates.channel || 'production') + ').');
       }
-    } catch (error) {
-      Alert.alert('Info', 'Vérification OTA terminée.');
+    } catch (error: any) {
+      Alert.alert('Information', 'Vérification de mise à jour effectuée (Canal: ' + (Updates.channel || 'production') + ').');
     } finally {
       setIsCheckingUpdate(false);
     }
@@ -118,10 +138,23 @@ export default function ProfileScreen() {
               </Text>
             </Pressable>
 
-            <Pressable style={styles.btnSecondary} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
-              <RefreshCw color="#1B4D3E" size={16} />
-              <Text style={styles.btnSecondaryText}>Vérifier les mises à jour (OTA)</Text>
-            </Pressable>
+            <View style={{ gap: 6 }}>
+              {updateAvailable === true && (
+                <View style={{ backgroundColor: '#059669', padding: 12, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>✓ MISE À JOUR DISPONIBLE</Text>
+                  <Text style={{ color: '#A7F3D0', fontSize: 11 }}>Appuyez ci-dessous</Text>
+                </View>
+              )}
+              <Pressable style={styles.btnSecondary} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
+                <RefreshCw color="#1B4D3E" size={16} />
+                <Text style={styles.btnSecondaryText}>
+                  {isCheckingUpdate ? 'Recherche en cours...' : 'Vérifier les mises à jour (OTA)'}
+                </Text>
+              </Pressable>
+              <Text style={{ fontSize: 10, color: '#9CA3AF', textAlign: 'center' }}>
+                Canal actif : {Updates.channel || 'production'} · Version : {Updates.updateId ? Updates.updateId.substring(0, 8) : 'Base APK'}
+              </Text>
+            </View>
 
             <Pressable style={styles.btnDanger} onPress={handleLogout}>
               <LogOut color="#C0392B" size={16} />

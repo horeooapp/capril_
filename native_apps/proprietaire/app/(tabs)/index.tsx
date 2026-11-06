@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache } from '../../lib/api';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import {
   Building2,
   FileText,
@@ -257,6 +258,9 @@ export default function BailleurAndAgencePrototypeScreen() {
           </Pressable>
         </View>
       </View>
+
+      {/* BANNIÈRE MISE À JOUR DISPONIBLE */}
+      <UpdateNotificationBanner />
 
       {/* MENU MOBILE DÉROULANT / TIROIR DE GAUCHE */}
       <Modal
