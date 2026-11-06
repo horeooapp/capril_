@@ -43,11 +43,20 @@ const COMMUNES_ABIDJAN = [
 
 const PROPERTY_TYPES = [
   { id: 'APARTMENT', label: 'Appartement' },
-  { id: 'VILLA', label: 'Villa' },
+  { id: 'VILLA', label: 'Villa / Maison' },
+  { id: 'TERRAIN_URBAIN_NU', label: 'Terrain urbain nu (ADD-25)' },
+  { id: 'TERRAIN_RURAL', label: 'Terrain rural (ADD-25)' },
   { id: 'STUDIO', label: 'Studio' },
-  { id: 'COMMERCIAL', label: 'Magasin / Commerce' },
-  { id: 'OFFICE', label: 'Bureau' },
-  { id: 'BUILDING', label: 'Immeuble' },
+  { id: 'COMMERCIAL', label: 'Commerce / Local' },
+  { id: 'BUILDING', label: 'Immeuble entier' },
+];
+
+const NATURES_TITRES = [
+  { id: 'ACD', label: 'ACD (Pleine propriété)' },
+  { id: 'TITRE_FONCIER', label: 'Titre Foncier' },
+  { id: 'LETTRE_ATTRIBUTION', label: 'Lettre d\'attribution' },
+  { id: 'ATTESTATION_VILLAGEOISE', label: 'Attestation villageoise' },
+  { id: 'CERTIFICAT_FONCIER_RURAL', label: 'Certificat foncier rural' },
 ];
 
 const LEASE_TYPES = [
@@ -68,6 +77,12 @@ export default function CreatePropertyScreen() {
   const [rent, setRent] = useState('');
   const [surface, setSurface] = useState('');
   const [unitLabel, setUnitLabel] = useState('');
+  const [isForSale, setIsForSale] = useState(false);
+  const [natureTitre, setNatureTitre] = useState('ACD');
+  const [numeroTitre, setNumeroTitre] = useState('');
+  const [numeroLot, setNumeroLot] = useState('');
+  const [numeroIlot, setNumeroIlot] = useState('');
+  const [estViabilise, setEstViabilise] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const finalCommune = commune === 'Autre' ? customCommune.trim() : commune;
@@ -96,9 +111,18 @@ export default function CreatePropertyScreen() {
           commune: finalCommune,
           propertyType,
           leaseType,
-          declaredRentFcfa: rent ? parseFloat(rent.replace(/\s/g, '')) : 0,
+          declaredRentFcfa: !isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : 0,
           superficieM2: surface ? parseFloat(surface.replace(/\s/g, '')) : undefined,
           unitLabel: unitLabel.trim() || undefined,
+          // Extensions ADD-25
+          forSale: isForSale,
+          prixVenteFcfa: isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : undefined,
+          categorie_vente: isForSale ? propertyType : undefined,
+          titre_type: isForSale ? natureTitre : undefined,
+          titre_numero: isForSale && numeroTitre.trim() ? numeroTitre.trim().toUpperCase() : undefined,
+          numero_lot: isForSale && numeroLot.trim() ? numeroLot.trim() : undefined,
+          numero_ilot: isForSale && numeroIlot.trim() ? numeroIlot.trim() : undefined,
+          est_viabilise: isForSale ? estViabilise : undefined,
         }),
       });
 
@@ -185,6 +209,26 @@ export default function CreatePropertyScreen() {
               onChangeText={setName}
             />
 
+            <Text style={styles.fieldLabel}>Destination du bien *</Text>
+            <View style={styles.chipsWrap}>
+              <Pressable
+                onPress={() => setIsForSale(false)}
+                style={[styles.chip, !isForSale && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, !isForSale && styles.chipTextActive]}>
+                  Location (Gestion locative)
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setIsForSale(true)}
+                style={[styles.chip, isForSale && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, isForSale && styles.chipTextActive]}>
+                  Vente / Transaction (ADD-25)
+                </Text>
+              </Pressable>
+            </View>
+
             <Text style={styles.fieldLabel}>Type de bien *</Text>
             <View style={styles.chipsWrap}>
               {PROPERTY_TYPES.map((t) => {
@@ -220,6 +264,61 @@ export default function CreatePropertyScreen() {
                 );
               })}
             </View>
+
+            {isForSale && (
+              <View style={{ marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: '#E2E8F0' }}>
+                <Text style={styles.fieldLabel}>Nature du titre juridique (RG-VTE-03) *</Text>
+                <View style={styles.chipsWrap}>
+                  {NATURES_TITRES.map((t) => {
+                    const active = natureTitre === t.id;
+                    return (
+                      <Pressable
+                        key={t.id}
+                        onPress={() => setNatureTitre(t.id)}
+                        style={[styles.chip, active && styles.chipActive]}
+                      >
+                        <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                          {t.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>N° du titre foncier / ACD (RG-VTE-05) *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex : ACD-2023-9821 ou TF-12435"
+                  placeholderTextColor="#94A3B8"
+                  value={numeroTitre}
+                  onChangeText={setNumeroTitre}
+                  autoCapitalize="characters"
+                />
+
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.fieldLabel}>N° de Lot</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Ex : 12"
+                      placeholderTextColor="#94A3B8"
+                      value={numeroLot}
+                      onChangeText={setNumeroLot}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.fieldLabel}>N° d'Îlot</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Ex : 04"
+                      placeholderTextColor="#94A3B8"
+                      value={numeroIlot}
+                      onChangeText={setNumeroIlot}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
 
           {/* 2. LOCALISATION */}

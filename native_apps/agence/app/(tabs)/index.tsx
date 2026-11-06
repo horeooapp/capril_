@@ -25,7 +25,7 @@ function calcDroitsDgi(loyer: number, duree: number, pages = PAGES_STD) {
 export default function AgencePrototypeHomeScreen() {
   const router = useRouter();
   const [roleView, setRoleView] = useState<'chef' | 'collab'>('chef');
-  const [aTab, setATab] = useState<'home' | 'biens' | 'mandants' | 'ext' | 'flux' | 'verif' | 'team'>('home');
+  const [aTab, setATab] = useState<'home' | 'biens' | 'ventes' | 'mandants' | 'ext' | 'flux' | 'verif' | 'team'>('home');
 
   const [loading, setLoading] = useState(true);
   const [agencyData, setAgencyData] = useState<any>(null);
@@ -33,6 +33,7 @@ export default function AgencePrototypeHomeScreen() {
 
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
+  const [prixVenteSim, setPrixVenteSim] = useState('35000000');
 
   const loadData = async () => {
     try {
@@ -195,6 +196,126 @@ export default function AgencePrototypeHomeScreen() {
                 </Text>
               </View>
             ))}
+          </View>
+        )}
+
+                {!loading && aTab === 'ventes' && (
+          <View style={[styles.sectionGap, { marginTop: 12 }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.h1}>Transactions & Ventes (ADD-25)</Text>
+                <Text style={styles.subMuted}>Terrains nus, bâtis, ACD et droits de mutation DGI 4%.</Text>
+              </View>
+              <Pressable 
+                onPress={() => router.push('/create-property')}
+                style={{ backgroundColor: '#0F172A', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 6 }}
+              >
+                <Plus size={14} color="#FFF" />
+                <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '700' }}>Nouveau bien</Text>
+              </Pressable>
+            </View>
+
+            {/* Avertissement RG-VTE-16 */}
+            <View style={[styles.card, { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1', borderLeftWidth: 4, borderLeftColor: '#0F172A' }]}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#0F172A', textTransform: 'uppercase' }}>
+                Règle Absolue RG-VTE-16 (Séquestre Notarial)
+              </Text>
+              <Text style={{ fontSize: 11, color: '#334155', marginTop: 4, lineHeight: 16 }}>
+                QAPRIL ne détient, n'achemine ni ne séquestre aucun acompte, prix ou arrhes. Tous les paiements de vente transitent obligatoirement par le compte séquestre de l'étude notariale désignée.
+              </Text>
+            </View>
+
+            {/* Simulateur fiscal mobile */}
+            <View style={[styles.card, { borderColor: '#E2E8F0' }]}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#0F172A', marginBottom: 6 }}>
+                Simulateur Fiscal & Notarial Rapide
+              </Text>
+              <Text style={{ fontSize: 11, color: '#64748B', marginBottom: 10 }}>
+                Droits DGI 4% (CGI) · Barème officiel notarial dégressif
+              </Text>
+
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#334155', marginBottom: 4 }}>
+                Prix de vente souhaité (FCFA)
+              </Text>
+              <TextInput
+                style={[styles.input, { backgroundColor: '#F8FAFC', fontWeight: '800', fontSize: 15, color: '#0F172A' }]}
+                keyboardType="numeric"
+                value={prixVenteSim}
+                onChangeText={setPrixVenteSim}
+                placeholder="35000000"
+              />
+
+              {(() => {
+                const pv = parseFloat((prixVenteSim || '0').replace(/\s/g, '')) || 0;
+                const dgi = Math.round(pv * 0.04);
+                const com = Math.round(pv * 0.05);
+                const notaire = Math.round(pv * 0.025);
+                const totalFrais = dgi + notaire + com;
+                const netVendeur = pv - com;
+                const fmtM = (n: number) => n.toLocaleString('fr-FR');
+                return (
+                  <View style={{ marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9', gap: 6 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 11, color: '#64748B' }}>Droits DGI (4 %) :</Text>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#0F172A' }}>{fmtM(dgi)} F</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 11, color: '#64748B' }}>Émoluments notaire (indicatifs) :</Text>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#0F172A' }}>{fmtM(notaire)} F</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text style={{ fontSize: 11, color: '#64748B' }}>Commission agence (5 %) :</Text>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#0F172A' }}>{fmtM(com)} F</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#0F172A', padding: 8, borderRadius: 6, marginTop: 4 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFF' }}>Net vendeur estimé :</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '900', color: '#10B981' }}>{fmtM(netVendeur)} F</Text>
+                    </View>
+                  </View>
+                );
+              })()}
+            </View>
+
+            {/* Liste des biens en vente */}
+            <View style={{ marginTop: 4 }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#0F172A', marginBottom: 8 }}>
+                Biens et terrains sous mandat ({properties.filter((p: any) => p.forSale || p.categorie_vente).length})
+              </Text>
+
+              {properties.filter((p: any) => p.forSale || p.categorie_vente).length === 0 ? (
+                <View style={[styles.card, { alignItems: 'center', paddingVertical: 24 }]}>
+                  <Building2 color="#94A3B8" size={28} />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#64748B', marginTop: 8 }}>
+                    Aucun terrain ou bien en vente actif
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#94A3B8', marginTop: 4, textAlign: 'center' }}>
+                    Créez un bien en sélectionnant « Vente / Transaction (ADD-25) ».
+                  </Text>
+                </View>
+              ) : (
+                properties.filter((p: any) => p.forSale || p.categorie_vente).map((bien: any) => (
+                  <View key={bien.id} style={[styles.card, { marginBottom: 10 }]}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={{ fontSize: 13, fontWeight: '800', color: '#0F172A', flex: 1 }}>{bien.name}</Text>
+                      <View style={{ backgroundColor: bien.titre_type === 'ACD' ? '#DCFCE7' : '#FEF3C7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                        <Text style={{ fontSize: 9, fontWeight: '800', color: bien.titre_type === 'ACD' ? '#166534' : '#92400E' }}>
+                          {bien.titre_type || 'TITRE EN COURS'}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
+                      {bien.city} · {bien.superficie_m2 || bien.surface || '-'} m² · Lot {bien.numero_lot || '-'}
+                    </Text>
+                    <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1F5F9', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={{ fontSize: 10, color: '#94A3B8', textTransform: 'uppercase', fontWeight: '700' }}>Prix de vente</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '900', color: '#0F172A' }}>
+                        {(bien.prixVenteFcfa || bien.price || 0).toLocaleString('fr-FR')} FCFA
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
           </View>
         )}
 

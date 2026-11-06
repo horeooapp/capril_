@@ -5,7 +5,7 @@ import Link from "next/link"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
-import { Building2, Users, FileText, Settings2, BarChart3, Receipt, ClipboardList, ShieldCheck, Calculator } from "lucide-react"
+import { Building2, Users, FileText, Settings2, BarChart3, Receipt, ClipboardList, ShieldCheck, Calculator, TrendingUp, Compass } from "lucide-react"
 
 
 
@@ -60,6 +60,13 @@ export function AgencyPortalDashboardV2({
 
         <div className="flex flex-wrap items-center gap-2.5">
           <Link 
+            href="/dashboard/ventes" 
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-sm transition-colors"
+          >
+            <TrendingUp size={15} />
+            <span>Ventes & Terrains (ADD-25)</span>
+          </Link>
+          <Link 
             href="/dashboard/mandates" 
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium shadow-sm transition-colors"
           >
@@ -80,6 +87,7 @@ export function AgencyPortalDashboardV2({
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {[
               { href: '/dashboard', label: 'Vue Globale', icon: <BarChart3 size={16} />, active: true },
+              { href: '/dashboard/ventes', label: 'Ventes & Terrains (ADD-25)', icon: <TrendingUp size={16} /> },
               { href: '/dashboard/comptabilite', label: 'Comptabilité SYSCOHADA', icon: <Calculator size={16} /> },
               { href: '/dashboard/mandates', label: 'Mandats', icon: <Building2 size={16} /> },
               { href: '/dashboard/matching', label: 'Dossiers Locataires', icon: <Users size={16} /> },
@@ -151,6 +159,7 @@ export function AgencyPortalDashboardV2({
              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 py-2">
                  {[
                       { label: "Nouveau Locataire", icon: <Users size={16} />, href: "/dashboard/matching/new" },
+                      { label: "Ventes & Terrains (ADD-25)", icon: <Compass size={16} />, href: "/dashboard/ventes" },
                       { label: "Comptabilité SYSCOHADA", icon: <Calculator size={16} />, href: "/dashboard/comptabilite" },
                       { label: "Opération Caisse", icon: <Receipt size={16} />, href: "/dashboard/wallet/transaction" },
                       { label: "Déclarer Incident", icon: <ShieldCheck size={16} />, href: "/dashboard/disputes/new" },

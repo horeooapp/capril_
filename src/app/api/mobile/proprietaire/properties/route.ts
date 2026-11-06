@@ -82,7 +82,26 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { name, address, commune, propertyType, leaseType, declaredRentFcfa, superficieM2, typeStructure, parentPropertyId, unitLabel } = body;
+        const { 
+            name, 
+            address, 
+            commune, 
+            propertyType, 
+            leaseType, 
+            declaredRentFcfa, 
+            superficieM2, 
+            typeStructure, 
+            parentPropertyId, 
+            unitLabel,
+            forSale,
+            prixVenteFcfa,
+            categorie_vente,
+            titre_type,
+            titre_numero,
+            numero_lot,
+            numero_ilot,
+            est_viabilise
+        } = body;
 
         if (!address || !commune) {
             return NextResponse.json({ error: 'address et commune sont obligatoires.' }, { status: 400 });
@@ -109,6 +128,28 @@ export async function POST(request: Request) {
 
         const isAgencyUser = ['AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT'].includes(user.role);
 
+        // RG-VTE-05 : CONTRÔLE D'UNICITÉ DU TITRE
+        if (forSale && titre_numero && titre_type) {
+            const titreClean = String(titre_numero).trim().toUpperCase();
+            const doublon = await prisma.property.findFirst({
+                where: {
+                    titre_type,
+                    titre_numero: titreClean,
+                    city: { contains: commune.trim(), mode: 'insensitive' }
+                }
+            });
+
+            if (doublon) {
+                return NextResponse.json({
+                    error: `RG-VTE-05 : Le titre ${titre_type} N° ${titreClean} est déjà enregistré sur la plateforme pour un bien sur ${commune}. La double mise en vente est strictement proscrite.`
+                }, { status: 409 });
+            }
+        }
+
+        let niveauVerif = 1;
+        if (titre_type === 'ACD' || titre_type === 'TITRE_FONCIER') niveauVerif = 3;
+        else if (titre_type) niveauVerif = 2;
+
         const property = await prisma.property.create({
             data: {
                 propertyCode:     finalPropertyCode,
@@ -127,6 +168,17 @@ export async function POST(request: Request) {
                 parentPropertyId: parentPropertyId ?? null,
                 unitLabel:        unitLabel ?? null,
                 status:           'active',
+                // ADD-25 Vente & Terrains
+                forSale:          Boolean(forSale),
+                prixVenteFcfa:    prixVenteFcfa ? Number(prixVenteFcfa) : null,
+                price:            prixVenteFcfa ? Number(prixVenteFcfa) : (declaredRentFcfa ? Number(declaredRentFcfa) : 0),
+                categorie_vente:  categorie_vente ?? (forSale ? propertyType : null),
+                titre_type:       titre_type ?? null,
+                titre_numero:     titre_numero ? String(titre_numero).trim().toUpperCase() : null,
+                numero_lot:       numero_lot ?? null,
+                numero_ilot:      numero_ilot ?? null,
+                est_viabilise:    Boolean(est_viabilise),
+                niveau_verif_vente: forSale ? niveauVerif : 1,
             },
         });
 
