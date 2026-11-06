@@ -13,7 +13,7 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache } from '../../lib/api';
+import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
@@ -453,34 +453,22 @@ export default function LocatairePrototypeScreen() {
                 style={[styles.drawerItem, { marginTop: 8 }]}
                 onPress={() => {
                   setMenuOpen(false);
-                  Alert.alert(
-                    'Déconnexion',
-                    'Voulez-vous fermer votre session mobile locataire ?',
-                    [
-                      { text: 'Annuler', style: 'cancel' },
-                      {
-                        text: 'Se déconnecter',
-                        style: 'destructive',
-                        onPress: async () => {
-                          try {
-                            await clearAppSessionAndCache();
-                          } catch (err) {
-                            console.warn('Erreur clearAppSessionAndCache:', err);
-                          }
-                          if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
-                            window.location.href = '/';
-                          } else {
-                            try {
-                              if (router.canDismiss()) {
-                                router.dismissAll();
-                              }
-                            } catch {}
-                            router.replace('/');
-                          }
+                  setTimeout(() => {
+                    Alert.alert(
+                      'Déconnexion',
+                      'Voulez-vous fermer votre session mobile locataire ?',
+                      [
+                        { text: 'Annuler', style: 'cancel' },
+                        {
+                          text: 'Se déconnecter',
+                          style: 'destructive',
+                          onPress: async () => {
+                            await logoutAndRedirect(router);
+                          },
                         },
-                      },
-                    ]
-                  );
+                      ]
+                    );
+                  }, 150);
                 }}
               >
                 <View style={[styles.drawerItemIconWrap, { backgroundColor: '#FEE2E2' }]}>

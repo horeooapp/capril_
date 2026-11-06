@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
 import { ShieldCheck, Globe, LogOut, RefreshCw } from 'lucide-react-native';
-import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache } from '../../lib/api';
+import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -50,21 +50,7 @@ export default function ProfileScreen() {
           text: 'Se déconnecter',
           style: 'destructive',
           onPress: async () => {
-            try {
-              await clearAppSessionAndCache();
-            } catch (err) {
-              console.warn('Erreur clearAppSessionAndCache:', err);
-            }
-            if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
-              window.location.href = '/';
-            } else {
-              try {
-                if (router.canDismiss()) {
-                  router.dismissAll();
-                }
-              } catch {}
-              router.replace('/');
-            }
+            await logoutAndRedirect(router);
           },
         },
       ]

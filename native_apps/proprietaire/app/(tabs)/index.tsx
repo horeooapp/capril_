@@ -12,7 +12,7 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache } from '../../lib/api';
+import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
@@ -461,34 +461,22 @@ export default function BailleurAndAgencePrototypeScreen() {
                 style={[styles.drawerItem, styles.drawerLogoutItem]}
                 onPress={() => {
                   setMenuOpen(false);
-                  Alert.alert(
-                    'Changer de profil / Déconnexion',
-                    'Voulez-vous fermer cette session pour changer de profil (Propriétaire ou Agence) ou vous reconnecter ?',
-                    [
-                      { text: 'Annuler', style: 'cancel' },
-                      {
-                        text: 'Déconnexion',
-                        style: 'destructive',
-                        onPress: async () => {
-                          try {
-                            await clearAppSessionAndCache();
-                          } catch (err) {
-                            console.warn('Erreur clearAppSessionAndCache:', err);
-                          }
-                          if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
-                            window.location.href = '/';
-                          } else {
-                            try {
-                              if (router.canDismiss()) {
-                                router.dismissAll();
-                              }
-                            } catch {}
-                            router.replace('/');
-                          }
+                  setTimeout(() => {
+                    Alert.alert(
+                      'Changer de profil / Déconnexion',
+                      'Voulez-vous fermer cette session pour changer de profil (Propriétaire ou Agence) ou vous reconnecter ?',
+                      [
+                        { text: 'Annuler', style: 'cancel' },
+                        {
+                          text: 'Déconnexion',
+                          style: 'destructive',
+                          onPress: async () => {
+                            await logoutAndRedirect(router);
+                          },
                         },
-                      },
-                    ]
-                  );
+                      ]
+                    );
+                  }, 150);
                 }}
               >
                 <View style={[styles.drawerItemIconWrap, { backgroundColor: '#FEE2E2' }]}>

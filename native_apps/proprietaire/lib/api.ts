@@ -157,6 +157,27 @@ export async function clearAppSessionAndCache(): Promise<void> {
     }
 }
 
+/**
+ * Déconnexion totale et redirection vers l'écran d'authentification /login
+ */
+export async function logoutAndRedirect(router: any): Promise<void> {
+    try {
+        await clearAppSessionAndCache();
+    } catch (err) {
+        console.warn('Erreur clearAppSessionAndCache:', err);
+    }
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+        window.location.href = '/login';
+    } else {
+        try {
+            if (router.canDismiss && router.canDismiss()) {
+                router.dismissAll();
+            }
+        } catch {}
+        router.replace('/login');
+    }
+}
+
 // Détection dynamique et sécurisée de l'URL API (Production QAPRIL)
 const getApiUrl = () => {
     if (process.env.EXPO_PUBLIC_API_URL) {

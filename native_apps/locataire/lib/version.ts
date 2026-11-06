@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL Locataire';
 export const APP_KEY = 'locataire';
-export const APP_VERSION = '1.1.1';
-export const BUILD_NUMBER = 3;
+export const APP_VERSION = '1.1.2';
+export const BUILD_NUMBER = 4;
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;

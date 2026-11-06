@@ -16,6 +16,8 @@ export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ title: "Accueil" }} />
+      <Stack.Screen name="login" options={{ title: "Connexion", gestureEnabled: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
     </Stack>
   );
 }
