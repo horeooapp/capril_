@@ -16,6 +16,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
+        tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: 'rgba(255, 255, 255, 0.98)',
           borderTopWidth: 1,
@@ -25,58 +26,58 @@ export default function TabLayout() {
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.04,
           shadowRadius: 4,
-          height: 60 + Math.max(insets.bottom, 16),
-          paddingBottom: Math.max(insets.bottom, 16),
+          height: 54 + Math.max(insets.bottom, 14),
+          paddingBottom: Math.max(insets.bottom, 14),
           paddingTop: 8,
         },
-        tabBarActiveTintColor: '#1B4D3E',
-        tabBarInactiveTintColor: '#6E6E73',
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
         },
+        tabBarActiveTintColor: '#1B4D3E',
+        tabBarInactiveTintColor: '#9CA3AF',
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Accueil',
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Accueil',
+          tabBarIcon: ({ color, focused }) => <Home color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="properties"
         options={{
-          title: 'Biens',
-          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Biens',
+          tabBarIcon: ({ color, focused }) => <Building2 color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="maintenance"
         options={{
-          title: 'Signalements',
-          tabBarIcon: ({ color, size }) => <Wrench color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Signalements',
+          tabBarIcon: ({ color, focused }) => <Wrench color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="finance"
         options={{
-          title: 'Finances',
-          tabBarIcon: ({ color, size }) => <Wallet color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Finances',
+          tabBarIcon: ({ color, focused }) => <Wallet color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'Messages',
-          tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Messages',
+          tabBarIcon: ({ color, focused }) => <MessageCircle color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profil',
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+          tabBarAccessibilityLabel: 'Profil',
+          tabBarIcon: ({ color, focused }) => <User color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
     </Tabs>
