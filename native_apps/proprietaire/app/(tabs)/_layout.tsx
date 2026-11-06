@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import { LayoutDashboard, Building2, Wallet, MessageCircle, User, Wrench } from 'lucide-react-native';
+import { Home, Building2, Wallet, MessageCircle, User, Wrench } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     registerForPushNotificationsAsync().catch(() => {});
   }, []);
@@ -14,27 +17,31 @@ export default function TabLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
           borderTopWidth: 1,
           borderTopColor: '#E4E0D7',
-          elevation: 0,
-          height: 68,
-          paddingBottom: 10,
-          paddingTop: 6,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.04,
+          shadowRadius: 4,
+          height: 60 + Math.max(insets.bottom, 16),
+          paddingBottom: Math.max(insets.bottom, 16),
+          paddingTop: 8,
         },
         tabBarActiveTintColor: '#1B4D3E',
         tabBarInactiveTintColor: '#6E6E73',
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '700',
+          fontSize: 11,
+          fontWeight: '600',
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tableau de bord',
-          tabBarIcon: ({ color, size }) => <LayoutDashboard color={color} size={size} />,
+          title: 'Accueil',
+          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -54,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="finance"
         options={{
-          title: 'Flux & DGI',
+          title: 'Finances',
           tabBarIcon: ({ color, size }) => <Wallet color={color} size={size} />,
         }}
       />
@@ -68,7 +75,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Plus & Profil',
+          title: 'Profil',
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
