@@ -185,14 +185,14 @@ export default function SolutionsPage() {
       id: "institutionnels",
       label: "Professionnels & Partenaires",
       icon: <Landmark className="w-5 h-5" />,
-      tagline: "Pour les banques, la CDC-CI, la DGI, notaires et assureurs",
+      tagline: "Pour les banques, la DGI, notaires et assureurs",
       heroTitle: "Fiabilisation des données locatives et traçabilité financière",
       desc: "Appuyez vos décisions de crédit, conformités fiscales et sécurisations de dépôts sur des historiques de paiement et des baux infalsifiables.",
       badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-300",
       accent: "#047857",
       keyMetrics: [
         { val: "100%", label: "Traçabilité des paiements" },
-        { val: "Sécurisé", label: "Conforme CDC-CI & DGI" },
+        { val: "Sécurisé", label: "Conforme CCH & DGI" },
         { val: "UEMOA", label: "Normes financières respectées" },
         { val: "Code QR", label: "Reçus vérifiables en direct" }
       ],
@@ -202,8 +202,8 @@ export default function SolutionsPage() {
           desc: "Utilisez le carnet de paiement certifié pour évaluer la capacité réelle de remboursement d'un client demandant un prêt."
         },
         {
-          title: "Lien réglementaire avec la Caisse des Dépôts (CDC-CI)",
-          desc: "Gestion automatique de la mise en réserve et du suivi des cautions locatives selon les règles de la CDC-CI."
+          title: "Gestion réglementaire des dépôts de garantie",
+          desc: "Gestion automatique de la mise en réserve et du suivi des cautions locatives selon la législation en vigueur."
         },
         {
           title: "Reçus et déclarations vérifiables pour les impôts",

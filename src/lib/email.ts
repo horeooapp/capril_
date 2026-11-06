@@ -183,7 +183,7 @@ export function wrapInPremiumTemplate(content: string, title?: string) {
                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
                           <td align="center">
-                              <p style="margin:0 0 8px 0; font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 1px;">✓ Conforme CDC-CI (Caisse des Dépôts et Consignations)</p>
+                              <p style="margin:0 0 8px 0; font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 1px;">✓ Conforme Loi 2019-576 (Code de la Construction et de l'Habitat)</p>
                               <p style="margin:0; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">🔒 Infrastructure Protégée AES-256</p>
                           </td>
                       </tr>

@@ -65,7 +65,7 @@ export default function AppDepthCards() {
             />
             <DepthCard 
                 title="Protection des Revenus"
-                description="La sécurité institutionnelle au service de l'immobilier. En partenariat avec la Caisse des Dépôts et Consignations, nous automalisons la sécurisation des dépôts de garantie, protégeant les intérêts financiers des deux parties."
+                description="La sécurité institutionnelle au service de l'immobilier. En conformité avec le Code de la Construction et de l'Habitat, nous automatisons la sécurisation des dépôts de garantie, protégeant les intérêts financiers des deux parties."
                 image="/images/cdc_visual_fcfa.png"
                 link="/impact"
             />

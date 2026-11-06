@@ -161,7 +161,7 @@ export default function TrustLocataireClient({ profile }: any) {
                              </li>
                              <li className="flex items-start gap-3">
                                 <div className="w-6 h-6 bg-amber-600 text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">2</div>
-                                <p className="text-[14px] font-medium text-gray-700">Faites certifier votre caution par la CDC-CI (+50 pts).</p>
+                                <p className="text-[14px] font-medium text-gray-700">Faites certifier votre caution et dépôt de garantie (+50 pts).</p>
                              </li>
                              <li className="flex items-start gap-3">
                                 <div className="w-6 h-6 bg-amber-600 text-white rounded-lg flex items-center justify-center flex-shrink-0 text-[12px] font-bold">3</div>

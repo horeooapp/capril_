@@ -195,7 +195,7 @@ export default function ManualOfficielContent() {
                             
                             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">3.1 Le Séquestre (Vault Caution)</h3>
-                                <p className="text-sm mb-4 leading-relaxed">Fini les litiges de fin de bail. QAPRIL dispose d'un coffre numérique adossé à la CDC-CI pour sécuriser les cautions.</p>
+                                <p className="text-sm mb-4 leading-relaxed">Fini les litiges de fin de bail. QAPRIL dispose d'un coffre numérique de séquestre dédié pour sécuriser les cautions.</p>
                                 <ul className="space-y-2 text-sm font-medium mb-6">
                                     <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> Allez dans <strong>Vault Caution</strong></li>
                                     <li className="flex gap-3"><Lock className="shrink-0 text-emerald-500 mt-1" size={16} /> Cliquez sur <strong>Consigner</strong> pour bloquer l'argent perçu du locataire.</li>

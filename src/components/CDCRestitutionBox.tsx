@@ -45,7 +45,7 @@ export default function CDCRestitutionBox({ leaseId, deposit }: CDCRestitutionBo
                 <CheckCircle2 size={32} />
                 <div>
                     <h3 className="font-bold">Caution Restituée</h3>
-                    <p className="text-sm opacity-80">Les fonds ont été libérés par la CDC-CI.</p>
+                    <p className="text-sm opacity-80">Les fonds ont été libérés sur le compte séquestre.</p>
                 </div>
             </div>
         )
@@ -115,7 +115,7 @@ export default function CDCRestitutionBox({ leaseId, deposit }: CDCRestitutionBo
                         </div>
                         <div>
                             <h4 className="font-bold text-gray-900">Demande en cours d'arbitrage</h4>
-                            <p className="text-sm text-gray-500 mt-1">Le locataire et les services de la CDC-CI examinent votre proposition de restitution de {amountToReturn.toLocaleString()} XOF.</p>
+                            <p className="text-sm text-gray-500 mt-1">Le locataire et les services de gestion examinent votre proposition de restitution de {amountToReturn.toLocaleString()} XOF.</p>
                         </div>
                         <div className="bg-gray-50 p-3 rounded-lg flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                             <span className="w-2 h-2 bg-orange-400 rounded-full"></span>

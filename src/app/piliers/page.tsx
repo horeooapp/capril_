@@ -98,7 +98,7 @@ export default function PiliersPage() {
       num: "03",
       icon: <ShieldCheck className="w-7 h-7 text-[#0284C7]" />,
       badge: "Protection de la Caution",
-      title: "Caution Protégée à la Caisse des Dépôts (CDC-CI)",
+      title: "Caution Protégée & Séquestre Dédié",
       lawRef: "Plafonnement légal à 2 mois de loyer",
       accent: "#0284C7",
       summary:
@@ -319,7 +319,7 @@ export default function PiliersPage() {
                   <ShieldCheck className="w-4 h-4" /> Conformité Juridique
                 </div>
                 <p className="text-xs text-slate-700 leading-relaxed">
-                  Tous les modules QAPRIL respectent rigoureusement les normes de l'ANAH-CI, de la CDC-CI, de la DGI et de l'ARTCI (protection des données personnelles).
+                  Tous les modules QAPRIL respectent rigoureusement les normes de l'ANAH-CI, de la DGI et de l'ARTCI (protection des données personnelles).
                 </p>
               </div>
             </div>
@@ -456,7 +456,7 @@ export default function PiliersPage() {
                 <Landmark className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black text-slate-900 mb-2">
-                Consignation Caisse des Dépôts (CDC-CI)
+                Séquestre Réglementé du Dépôt de Garantie
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
                 La consignation institutionnelle des fonds garantit que les cautions ne sont jamais détournées et demeurent immédiatement liquides pour le remboursement de fin de bail.

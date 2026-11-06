@@ -55,7 +55,7 @@ const SLIDES = [
   {
     image: "/slider/bg_slider_3.png",
     title: "Villas Duplex & Domaines Privés",
-    subtitle: "Cautions consignées à la Caisse des Dépôts (CDC-CI)",
+    subtitle: "Cautions et dépôts de garantie sécurisés",
     location: "Riviera Golf & Beverly Hills",
   },
   {
@@ -281,7 +281,7 @@ export default function QaprilLandingV2({
               </h1>
 
               <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-10 max-w-3xl">
-                Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution à la Caisse des Dépôts (CDC-CI). Tout est clair, rapide et protégé.
+                Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution en compte séquestre dédié. Tout est clair, rapide et protégé.
               </p>
 
               {/* 3 Portails Métiers Directs */}
@@ -477,7 +477,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
-                  <span>CDC-CI (Cautions)</span>
+                  <span>Cautions & Séquestre</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
@@ -511,7 +511,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
-                  <span>CDC-CI (Cautions)</span>
+                  <span>Cautions & Séquestre</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
@@ -675,7 +675,7 @@ export default function QaprilLandingV2({
                         <span className="text-[#059669] font-bold text-sm">4 250 000 XOF</span>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Cautions CDC-CI</span>
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Cautions Sécurisées</span>
                         <span className="text-[#0284C7] font-bold text-sm">8 500 000 XOF</span>
                       </div>
                     </div>
@@ -706,7 +706,7 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Caution de 2 mois protégée :</strong> Votre caution est mise en sécurité à la Caisse des Dépôts (CDC-CI), pas de surprise à la sortie.
+                        <strong className="text-slate-900">Caution de 2 mois protégée :</strong> Votre caution est mise en sécurité sur un compte séquestre dédié, pas de surprise à la sortie.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
@@ -744,7 +744,7 @@ export default function QaprilLandingV2({
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
                         <span className="text-slate-500 block text-[10px] uppercase font-bold">Caution Protégée</span>
-                        <span className="text-[#D97706] font-bold text-sm">360 000 XOF (CDC-CI)</span>
+                        <span className="text-[#D97706] font-bold text-sm">360 000 XOF (Séquestre)</span>
                       </div>
                     </div>
                   </div>
@@ -845,7 +845,7 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Cautions sécurisées CDC-CI :</strong> Interconnexion officielle avec la Caisse des Dépôts et Consignations.
+                        <strong className="text-slate-900">Cautions sécurisées :</strong> Sécurisation légale des dépôts de garantie avec respect strict du plafonnement.
                       </div>
                     </div>
                   </div>
@@ -860,13 +860,13 @@ export default function QaprilLandingV2({
                   <div className="relative h-64 sm:h-72 w-full overflow-hidden">
                     <img
                       src="/images/cdc_visual_fcfa.png"
-                      alt="Cadre réglementaire Caisse des Dépôts et Consignations"
+                      alt="Cadre réglementaire officiel du logement"
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-slate-950/35" />
                     <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-sm">
                       <span className="w-2 h-2 rounded-full bg-[#D97706]" />
-                      Cadre Souverain CDC-CI & DGI
+                      Cadre Souverain CCH & DGI
                     </div>
                   </div>
                   <div className="p-5 bg-white border-t border-slate-100">
@@ -877,7 +877,7 @@ export default function QaprilLandingV2({
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
                         <span className="text-slate-500 block text-[10px] uppercase font-bold">Sécurité Dépôts</span>
-                        <span className="text-[#059669] font-bold text-sm">Séquestre d'État CDC-CI</span>
+                        <span className="text-[#059669] font-bold text-sm">Séquestre de Garantie Réglementé</span>
                       </div>
                     </div>
                   </div>
@@ -998,7 +998,7 @@ export default function QaprilLandingV2({
                     On exige souvent 3 à 6 mois de caution, et il est très difficile de récupérer son argent à la sortie.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">2 mois de caution maximum :</span> Respect strict de la loi, argent protégé à la Caisse des Dépôts (CDC-CI) et rendu sans palabre.
+                    <span className="text-[#059669] font-bold">2 mois de caution maximum :</span> Respect strict de la loi, argent protégé en compte séquestre dédié et rendu sans palabre.
                   </td>
                 </tr>
 
@@ -1099,7 +1099,7 @@ export default function QaprilLandingV2({
               },
               {
                 q: "Comment sont protégés les 2 mois de caution ?",
-                a: "La loi ivoirienne interdit d'exiger plus de 2 mois de caution. Sur QAPRIL, cette somme est mise en sécurité auprès de la Caisse des Dépôts et Consignations de Côte d'Ivoire (CDC-CI). À la fin du bail, après vérification de l'état des lieux de sortie, l'argent est restitué au locataire sans difficulté.",
+                a: "La loi ivoirienne interdit d'exiger plus de 2 mois de caution. Sur QAPRIL, cette somme est mise en sécurité sur un compte séquestre dédié conformément à la loi. À la fin du bail, après vérification de l'état des lieux de sortie, l'argent est restitué au locataire sans difficulté.",
               },
               {
                 q: "Combien ça coûte pour les propriétaires et les locataires ?",
@@ -1239,7 +1239,7 @@ export default function QaprilLandingV2({
                 </li>
                 <li>
                   <Link href="/fonctionnalites" className="hover:text-slate-900 transition-colors">
-                    Cautions sécurisées (CDC-CI)
+                    Cautions sécurisées
                   </Link>
                 </li>
                 <li>

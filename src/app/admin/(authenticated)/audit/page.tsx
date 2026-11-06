@@ -265,7 +265,7 @@ export default function AuditPage() {
                         Validation Légale
                     </h3>
                     <p className="text-gray-500 text-sm leading-relaxed font-medium">
-                        Ce registre répond aux exigences de traçabilité stricte de la DGI et de la CDC-CI pour la gestion du patrimoine numérique.
+                        Ce registre répond aux exigences de traçabilité stricte de la DGI et du CCH pour la gestion du patrimoine numérique.
                     </p>
                 </div>
                 <div className="p-6 rounded-3xl bg-ivoire-dark shadow-xl overflow-hidden relative group">

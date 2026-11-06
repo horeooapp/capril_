@@ -46,7 +46,7 @@ export default async function CDCGlobalDashboard() {
                     </div>
                     <div>
                         <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Registre C.D.C</h1>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Caisse des Dépôts et Consignations</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mt-1">Séquestre des Dépôts de Garantie</p>
                     </div>
                 </div>
             </div>

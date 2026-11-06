@@ -41,7 +41,7 @@ export default async function FeaturesPage() {
         { id: "NEWS_TICKER", name: "News Ticker", description: "Informations défilantes sur le tableau de bord", enabled: true },
         { id: "SMS_NOTIFICATIONS", name: "Notifications SMS", description: "Alertes automatiques par SMS et WhatsApp", enabled: true },
         { id: "LANDING_PAGE", name: "Page d'Accueil Marketing", description: "Vitrine publique d'agence immobilière personnalisée", enabled: true },
-        { id: "CDC_CONSIGNATION", name: "Consignation CDC", description: "Dépôts des cautions et garanties légales (Caisse des Dépôts)", enabled: true },
+        { id: "CDC_CONSIGNATION", name: "Séquestre des Cautions", description: "Dépôts des cautions et garanties légales en compte séquestre", enabled: true },
         { id: "ASSURANCE_LOYER", name: "Assurance Loyers Impayés", description: "Souscription directe et vérification d'éligibilité locataire", enabled: true },
         { id: "M16_ANAH", name: "Aides à la Rénovation", description: "Dossiers de demande de subventions et primes de rénovation", enabled: true },
         { id: "USSD_PORTAL", name: "Portail USSD", description: "Accès hors-ligne via syntaxe USSD pour locataires", enabled: true },

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: "%s | QAPRIL"
   },
   description: "QAPRIL simplifie la gestion immobilière : propriétaires, locataires, agents. Administration, suivi des loyers et contrats en un seul endroit.",
-  keywords: ["gestion immobilière", "logiciel immobilier", "gestion locative", "propriétaire", "locataire", "Côte d'Ivoire", "Abidjan", "CDC-CI", "QAPRIL", "bail certifié"],
+  keywords: ["gestion immobilière", "logiciel immobilier", "gestion locative", "propriétaire", "locataire", "Côte d'Ivoire", "Abidjan", "QAPRIL", "bail certifié"],
   authors: [{ name: "QAPRIL Infrastructure" }],
   creator: "QAPRIL",
   publisher: "QAPRIL",

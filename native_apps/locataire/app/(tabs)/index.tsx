@@ -71,11 +71,11 @@ type LocScreen =
   | 'recherche';
 
 const MENU_ITEMS = [
-  { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes CDC-CI', icon: Home },
+  { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes', icon: Home },
   { id: 'factures' as LocScreen, label: 'Régler mes factures', desc: 'Eau (SODECI), Élec (CIE), Téléphone, Internet', icon: Zap },
   { id: 'payer' as LocScreen, label: 'Payer mon loyer', desc: 'Wave, Orange, MTN, Moov et Carte bancaire', icon: CreditCard },
   { id: 'quittances' as LocScreen, label: 'Mes quittances', desc: 'Historique certifié et téléchargement PDF', icon: FileText },
-  { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Séquestre CDC-CI et conformité légale', icon: ShieldCheck },
+  { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Séquestre du dépôt de garantie et conformité légale', icon: ShieldCheck },
   { id: 'bail' as LocScreen, label: 'Mon contrat de bail', desc: 'Clauses, reconduction et état des lieux', icon: FileSpreadsheet },
   { id: 'documents' as LocScreen, label: 'Mes documents', desc: 'Attestations, pièces et quittances', icon: Folder },
   { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Score de solvabilité et ponctualité', icon: UserCheck },
@@ -953,7 +953,7 @@ export default function LocatairePrototypeScreen() {
               <View style={styles.rowBetween}>
                 <Text style={styles.boldText}>{receiptsList.length} quittance(s) enregistrée(s)</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>CDC-CI Conforme</Text>
+                  <Text style={styles.pillOkText}>Conforme Loi 2019-576</Text>
                 </View>
               </View>
             </View>
@@ -1102,7 +1102,7 @@ export default function LocatairePrototypeScreen() {
             {data?.hasLease ? (
               [
                 { t: `Contrat de bail certifié (${bailRef})`, s: `${propName} · Enregistré · SHA-256` },
-                { t: 'Attestation de dépôt de garantie', s: `${fmt(depositAmount)} consignés CDC-CI` },
+                { t: 'Attestation de dépôt de garantie', s: `${fmt(depositAmount)} séquestrés conformes` },
               ].map((doc, i) => (
                 <Pressable
                   key={i}

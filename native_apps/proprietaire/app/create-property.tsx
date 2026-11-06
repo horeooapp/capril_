@@ -191,7 +191,7 @@ export default function CreatePropertyScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Enregistrement Officiel QAPRIL</Text>
               <Text style={styles.legalNoticeDesc}>
-                Votre bien sera immatriculé avec un code officiel unique pour la DGI et la CDC-CI, garantissant sa conformité à la Loi 2019-576.
+                Votre bien sera immatriculé avec un code officiel unique pour la DGI, garantissant sa conformité à la Loi 2019-576.
               </Text>
             </View>
           </View>

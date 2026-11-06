@@ -44,7 +44,7 @@ export async function transferToVault(cautionId: string) {
         revalidatePath("/dashboard/trust")
         return { success: true }
     } catch (e) {
-        return { error: "Erreur technique lors du transfert vers la Caisse des Dépôts." }
+        return { error: "Erreur technique lors du transfert vers le compte séquestre." }
     }
 }
 

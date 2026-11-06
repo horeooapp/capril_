@@ -539,7 +539,7 @@ export default function AdminSyscohadaAccountingClient({ initialData, agenciesLi
                                 {fmt(data.rapprochementMandants.cautionsDetenues)} <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748B" }}>XOF</span>
                             </div>
                             <div style={{ fontSize: "11px", color: "#64748B", marginTop: "6px" }}>
-                                Dépôts locataires (Compte 165100 / CDC-CI)
+                                Dépôts locataires (Compte 165100 / Séquestre)
                             </div>
                         </div>
                     </div>

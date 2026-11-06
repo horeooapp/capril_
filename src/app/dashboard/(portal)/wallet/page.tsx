@@ -140,7 +140,7 @@ export default function WalletPage() {
               <Landmark className="text-slate-800" size={20} />
             </div>
             <div>
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Caisse des Dépôts</h3>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Compte Séquestre Cautions</h3>
               <p className="text-[10px] font-bold text-gray-500">Registre des cautions sécurisées.</p>
             </div>
           </div>

@@ -92,7 +92,7 @@ const TUTORIALS: TutorialItem[] = [
     },
     {
         id: "tut-3",
-        title: "Séquestrer et restituer une caution dans le Vault CDC-CI",
+        title: "Séquestrer et restituer une caution dans le Coffre-Fort Caution",
         subtitle: "Bloquez le dépôt de garantie sur un compte de cantonnement sécurisé pour éliminer tout litige de fin de location.",
         category: "Séquestre & Caution",
         duration: "3 min",
@@ -104,7 +104,7 @@ const TUTORIALS: TutorialItem[] = [
                 stepNumber: 1,
                 title: "Consigner le dépôt de garantie",
                 description: "Rendez-vous dans 'Vault Caution' et cliquez sur 'Consigner'. Sélectionnez le bail et saisissez le montant de la caution versée par le locataire.",
-                tip: "Les fonds sont sécurisés auprès de la Caisse des Dépôts et Consignations de Côte d'Ivoire (CDC-CI)."
+                tip: "Les fonds sont sécurisés sur un compte séquestre dédié conformément à la législation ivoirienne."
             },
             {
                 stepNumber: 2,
@@ -255,8 +255,8 @@ const FAQS = [
         a: "Le franc CFA d'Afrique de l'Ouest est officiellement désigné sous le code international ISO 4217 'XOF'. QAPRIL standardise toutes ses transactions financières en XOF pour garantir la conformité avec la BCEAO et le système bancaire."
     },
     {
-        q: "Comment fonctionne le séquestre CDC-CI dans le Vault Caution ?",
-        a: "Le Vault bloque le montant de la caution sur un compte dédié de la Caisse des Dépôts et Consignations. Ni le propriétaire ni le locataire ne peuvent y toucher unilatéralement, ce qui garantit qu'en fin de location, l'argent sera disponible immédiatement sans contestation."
+        q: "Comment fonctionne le séquestre dans le Vault Caution ?",
+        a: "Le Vault bloque le montant de la caution sur un compte dédié du compte séquestre dédié. Ni le propriétaire ni le locataire ne peuvent y toucher unilatéralement, ce qui garantit qu'en fin de location, l'argent sera disponible immédiatement sans contestation."
     },
     {
         q: "Comment exporter mes données fiscales pour la Direction Générale des Impôts (DGI) ?",

@@ -25,7 +25,7 @@ export default function VaultClient({ data }: { data: any }) {
             setModalOpen(false)
             setSelectedCaution(null)
             setLoading(false)
-            toast.success("Caution consignée avec succès à la CDC-CI ! Le locataire a été notifié.")
+            toast.success("Caution sécurisée avec succès ! Le locataire a été notifié.")
         }, 2000);
     }
 
@@ -40,7 +40,7 @@ export default function VaultClient({ data }: { data: any }) {
                     <div className="space-y-5 flex-1">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400">
                             <ShieldCheck size={14} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Partenaire CDC-CI</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Séquestre Réglementé</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">
                             Le Séquestre <span className="text-emerald-500">Institutionnel.</span>
@@ -189,7 +189,7 @@ export default function VaultClient({ data }: { data: any }) {
                                     </div>
                                     <div className="flex justify-between items-center text-sm pt-4 border-t border-slate-200">
                                         <span className="font-bold text-slate-500">Destination</span>
-                                        <span className="font-black text-emerald-600 flex items-center gap-1"><ShieldCheck size={14} /> Coffre CDC-CI</span>
+                                        <span className="font-black text-emerald-600 flex items-center gap-1"><ShieldCheck size={14} /> Coffre Séquestre</span>
                                     </div>
                                 </div>
 

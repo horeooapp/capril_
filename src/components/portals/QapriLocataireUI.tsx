@@ -942,7 +942,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
         <div style={{fontSize:11,color:T.textMid}}>Montant attendu : {fmt(300000)} XOF</div>
       </div>
       <div style={{background:T.navyPale,borderRadius:10,padding:"10px 12px",fontSize:10,color:T.textMid,lineHeight:1.7}}>
-        💡 <strong>Modèle CDC — 0 XOF de frais.</strong> Si votre caution est consignée à la CDC-CI, vous récupérez 100% en fin de bail. Demandez à votre bailleur de procéder via QAPRIL.
+        💡 <strong>Dépôt de garantie — 0 XOF de frais.</strong> Si votre caution est sécurisée en compte séquestre, vous récupérez 100% en fin de bail. Demandez à votre bailleur de procéder via QAPRIL.
       </div>
       <button onClick={()=>cl("caution")} style={{width:"100%",background:T.navy,border:"none",borderRadius:10,padding:"10px",fontSize:11,fontWeight:700,color:T.white,cursor:"pointer",marginTop:12}}>Fermer</button>
     </Sheet>

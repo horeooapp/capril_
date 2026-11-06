@@ -734,7 +734,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(r.totalAmount || r.rentAmount || 0)}</Text>
                       </View>
                       <Text style={styles.subMuted}>Locataire : {r.lease?.tenant ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim() : 'Locataire'}</Text>
-                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Conforme CDC-CI</Text>
+                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Conforme Loi 2019-576</Text>
                     </View>
                   ))
                 )}

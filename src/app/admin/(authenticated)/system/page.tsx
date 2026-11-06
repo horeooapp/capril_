@@ -52,7 +52,7 @@ const SYSTEM_FEATURES: SystemFeatureDef[] = [
     },
     {
         key: "CDC_CONSIGNATION",
-        label: "Séquestre Caisse des Dépôts (CDC-CI)",
+        label: "Séquestre des Cautions & Garanties",
         description: "Module officiel de consignation des dépôts de garantie (2 mois max) selon la loi ivoirienne.",
         category: "PAIEMENT",
         icon: "🏦",

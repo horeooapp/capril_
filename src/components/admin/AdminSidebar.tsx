@@ -59,7 +59,7 @@ export default function AdminSidebar({ onLogout, sessionUser }: AdminSidebarProp
             <div className="nav-section">Finances</div>
             <Link href="/admin/fiscal" className={`nav-item ${pathname === '/admin/fiscal' ? 'active' : ''}`}>
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a2 2 0 014 0v1" stroke="currentColor" strokeWidth="1.5"/><circle cx="8" cy="9" r="1.5" fill="currentColor"/></svg>
-              Cautions (CDC-CI)
+              Cautions (Séquestre)
             </Link>
             <Link href="/admin/reversals" className={`nav-item ${pathname === '/admin/reversals' ? 'active' : ''}`}>
               <svg className="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 10l4-4 4 4 4-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>

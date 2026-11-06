@@ -424,9 +424,9 @@ export default async function AdminDashboardOverview() {
                                     <div className="text-center text-[10px] text-gray-500 w-full py-4 col-span-2">En attente de transactions</div>
                                 )}
                                 <div className="mm-card mtn-card mt-2 col-span-2" style={{ backgroundColor: '#0F172A', color: '#fff', border: '1px solid #1E293B', borderRadius: '10px' }}>
-                                    <div className="mm-op">TRESOR / CDC-CI</div>
+                                    <div className="mm-op">SEQUESTRE / TRESOR</div>
                                     <div className="mm-amount">{safeData.cdcAmount.toLocaleString() || '0'} F</div>
-                                    <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Total Cautions en Sécurité (CDC-CI)</div>
+                                    <div className="mm-sub" style={{color: 'rgba(255,255,255,0.8)'}}>Total Cautions en Séquestre</div>
                                 </div>
                             </div>
                         </div>

@@ -199,7 +199,7 @@ export async function processCandidature(
                     <div style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 20px; margin: 20px 0;">
                         <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Statut :</strong> Candidature retenue & Contrat de bail introduit</p>
                         ${createdLeaseRef ? `<p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Référence Bail :</strong> ${createdLeaseRef}</p>` : ""}
-                        <p style="margin: 0; font-size: 14px; color: #065F46;">Votre projet de contrat conforme à la législation ivoirienne (CCH & CDC-CI) est maintenant disponible.</p>
+                        <p style="margin: 0; font-size: 14px; color: #065F46;">Votre projet de contrat conforme à la législation ivoirienne (CCH) est maintenant disponible.</p>
                     </div>
 
                     <p style="margin: 0 0 24px 0;">Veuillez cliquer sur le bouton ci-dessous pour relire les clauses du bail et procéder à votre signature électronique sécurisée :</p>

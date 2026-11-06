@@ -60,7 +60,7 @@ export default function LandlordLoginPage() {
                         </h1>
 
                         <p className="text-sm xl:text-base text-slate-300 font-medium leading-relaxed mb-8 max-w-lg">
-                            Suivi en temps réel des encaissements par Mobile Money, consignation légale des cautions à la CDC-CI et quittances fiscales conformes DGI.
+                            Suivi en temps réel des encaissements par Mobile Money, sécurisation légale des cautions et quittances fiscales conformes DGI.
                         </p>
 
                         {/* Trust Badges */}

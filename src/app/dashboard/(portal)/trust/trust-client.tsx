@@ -17,7 +17,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
             const res = await transferToVault(id)
             if (res.error) toast.error(res.error)
             else {
-                toast.success("Consignation CDC-CI effectuée avec succès.")
+                toast.success("Séquestre de caution effectué avec succès.")
                 setCautions(prev => prev.map(c => c.id === id ? { ...c, status: "CONSIGNEE", dateConsignation: new Date().toLocaleDateString('fr-FR'), hash: Math.random().toString(36).substring(2, 10).toUpperCase() + "-CDC" } : c))
             }
         })
@@ -33,7 +33,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                 loading: 'Consignation en masse...',
                 success: () => {
                     setCautions(prev => prev.map(c => c.status === "A_TRANSFERER" ? { ...c, status: "CONSIGNEE", dateConsignation: new Date().toLocaleDateString('fr-FR'), hash: "MASS-CDC-OK" } : c))
-                    return `${toTransfer.length} cautions transférées à la CDC-CI.`
+                    return `${toTransfer.length} cautions sécurisées en compte séquestre.`
                 },
                 error: 'Erreur lors du transfert en bloc.'
             }
@@ -49,10 +49,10 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                         <ShieldAlert size={12} /> Conformité Légale (Loi n°2019-576)
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
-                         Coffre-Fort CDC-CI
+                         Coffre-Fort des Cautions
                     </h1>
                     <p className="text-[13.5px] font-medium text-slate-500 mt-1">
-                        Consignation étatique des dépôts de garantie (Cautions) à la Caisse des Dépôts et Consignations.
+                        Sécurisation réglementée des dépôts de garantie (Cautions) conformément à la loi.
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -76,7 +76,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
                         <CircleDollarSign className="text-amber-400" size={24} />
                     </div>
                     <div className="relative z-10">
-                        <p className="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-1 shadow-sm">Bloqué à la CDC-CI (Sécurisé)</p>
+                        <p className="text-[11px] font-bold text-amber-400 uppercase tracking-widest mb-1 shadow-sm">Bloqué en Séquestre Réglementé</p>
                         <p className="text-4xl font-black">{totalConsigne.toLocaleString()} <span className="text-[13px] text-slate-400 font-bold">XOF</span></p>
                     </div>
                 </div>
@@ -106,7 +106,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
             <div className="bg-amber-50 border border-amber-200 p-6 rounded-[16px] shadow-sm flex items-start gap-4">
                 <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={20} />
                 <p className="text-[13px] text-amber-800 font-medium leading-relaxed">
-                    <strong className="font-bold uppercase tracking-widest text-amber-900 mr-2">Note Légale :</strong> Conformément à la législation ivoirienne, le dépôt de garantie ne doit plus être conservé par le bailleur ni l'agence. Une fois encaissé via QAPRIL, il doit être conféré au compte séquestre CDC-CI de l'État sous 48h.
+                    <strong className="font-bold uppercase tracking-widest text-amber-900 mr-2">Note Légale :</strong> Conformément à la législation ivoirienne, le dépôt de garantie ne doit plus être conservé par le bailleur ni l'agence. Une fois encaissé via QAPRIL, il doit être conféré au compte séquestre dédié sous 48h.
                 </p>
             </div>
 

@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     const mapping = {
       amount: Number(caution?.montantFcfa || lease.depositAmount || 0),
       status: cdc ? (cdc.status === 'CONSIGNED' ? 'Consignée (CDC)' : 'En cours CDC') : (caution?.restituee ? 'Restituée' : 'Détenue par bailleur'),
-      destination: cdc ? 'Caisse des Dépôts' : (caution?.destination || 'Propriétaire'),
+      destination: cdc ? 'Compte Séquestre' : (caution?.destination || 'Propriétaire'),
       certificat: caution?.certificatRef || null,
       restituee: caution?.restituee || !!cdc?.returnedAt
     };

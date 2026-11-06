@@ -200,7 +200,7 @@ export default function InteractiveMarketChart() {
           <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Données certifiées DGI & CDC-CI</span>
+              <span>Données certifiées DGI & CCH</span>
             </div>
             <span className="text-xs font-bold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 cursor-pointer">
               Simuler <ArrowUpRight className="w-3.5 h-3.5" />

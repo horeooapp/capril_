@@ -129,7 +129,7 @@ export async function POST(request: Request) {
 
         page.drawText('3. CONDITIONS FINANCIÈRES & SÛRETÉS (LOI 2019-576) :', { x: 50, y: height - 375, size: 13, font: boldFont });
         page.drawText(`Loyer mensuel principal : ${rentNum.toLocaleString('fr-FR')} XOF`, { x: 50, y: height - 395, size: 11, font: boldFont });
-        page.drawText(`Dépôt de garantie (Caution) : ${finalDeposit.toLocaleString('fr-FR')} XOF (Consigné CDC-CI · Max légal 2 mois)`, { x: 50, y: height - 415, size: 11, font });
+        page.drawText(`Dépôt de garantie (Caution) : ${finalDeposit.toLocaleString('fr-FR')} XOF (Séquestre réglementé · Max légal 2 mois)`, { x: 50, y: height - 415, size: 11, font });
         page.drawText(`Avance sur loyer : ${finalAdvance.toLocaleString('fr-FR')} XOF (Max légal 2 mois)`, { x: 50, y: height - 430, size: 11, font });
         if (chargesAmount) {
             page.drawText(`Provisions pour charges : ${parseFloat(chargesAmount).toLocaleString('fr-FR')} XOF / mois`, { x: 50, y: height - 445, size: 10, font });

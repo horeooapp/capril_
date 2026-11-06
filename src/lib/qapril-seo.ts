@@ -23,7 +23,7 @@ export const QAPRIL_SEO_CONFIG = {
     home: {
       title:       "QAPRIL — Gestion Immobilière Intelligente",
       description: "QAPRIL simplifie la gestion immobilière : locataires, propriétaires, agences et diaspora. Administration, suivi des loyers et contrats en un seul endroit.",
-      keywords:    "gestion immobilière, logiciel immobilier, gestion locative, propriétaire, locataire, diaspora, agence immobilière, Côte d'Ivoire, Abidjan, CDC-CI",
+      keywords:    "gestion immobilière, logiciel immobilier, gestion locative, propriétaire, locataire, diaspora, agence immobilière, Côte d'Ivoire, Abidjan",
       canonical:   "https://www.qapril.net/",
     },
     register: {

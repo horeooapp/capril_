@@ -62,7 +62,7 @@ export default function ImpactClient() {
                 </div>
                 <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Impact Social</h3>
                 <p className="text-gray-500 font-medium leading-relaxed text-lg">
-                  Nous éradiquons la précarité liée au logement en normalisant les relations contractuelles. En sécurisant les cautions via la CDC-CI, nous rendons l&apos;accès au logement plus juste pour des milliers d&apos;Ivoiriens.
+                  Nous éradiquons la précarité liée au logement en normalisant les relations contractuelles. En sécurisant les cautions en compte séquestre dédié, nous rendons l&apos;accès au logement plus juste pour des milliers d&apos;Ivoiriens.
                 </p>
               </motion.div>
 
@@ -94,7 +94,7 @@ export default function ImpactClient() {
                 </div>
                 <h3 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Impact Institutionnel</h3>
                 <p className="text-gray-500 font-medium leading-relaxed text-lg">
-                  En collaboration avec le Ministère de la Construction et la CDC-CI, QAPRIL structure le Registre National. Nous fournissons à l&apos;État les données nécessaires pour piloter les politiques publiques du logement.
+                  En collaboration avec les acteurs institutionnels du logement, QAPRIL structure le Registre National. Nous fournissons à l&apos;État les données nécessaires pour piloter les politiques publiques du logement.
                 </p>
               </motion.div>
             </div>
@@ -124,7 +124,7 @@ export default function ImpactClient() {
                         <div className="text-gray-900 font-black text-7xl mb-6 tracking-tighter italic">100%</div>
                         <h4 className="text-2xl font-black uppercase tracking-tight mb-6">Cautions Sécurisées</h4>
                         <p className="text-gray-500 font-medium leading-relaxed text-lg">
-                            Chaque dépôt de caution est tracé et transmis à la Caisse des Dépôts et Consignations (Part 10). Cela garantit aux locataires de récupérer leurs fonds et aux propriétaires de bénéficier d&apos;une protection légale.
+                            Chaque dépôt de caution est tracé et sécurisé en compte séquestre réglementé (Part 10). Cela garantit aux locataires de récupérer leurs fonds et aux propriétaires de bénéficier d&apos;une protection légale.
                         </p>
                     </div>
                 </div>

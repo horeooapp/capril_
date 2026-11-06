@@ -51,7 +51,7 @@ export default function TenantLoginPage() {
                     >
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-wider text-amber-300 mb-6">
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                            Passeport Locataire & Caution CDC-CI
+                            Passeport Locataire & Caution Sécurisée
                         </div>
 
                         <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-tight mb-4 uppercase text-white">

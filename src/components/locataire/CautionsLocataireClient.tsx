@@ -126,7 +126,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                                     onChange={(e) => setFormData({...formData, destination: e.target.value})}
                                 >
                                     <option value="PROPRIETAIRE">Chez le Propriétaire / Mandataire</option>
-                                    <option value="CDC_CI">Consignée à la Caisse des Dépôts (CDC-CI - Sécurisée)</option>
+                                    <option value="CDC_CI">Consignée sur compte séquestre dédié (Sécurisée)</option>
                                 </select>
                              </div>
 
