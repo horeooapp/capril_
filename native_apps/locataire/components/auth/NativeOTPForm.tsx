@@ -110,6 +110,56 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
         }
     };
 
+    
+    const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
+        const trimmedEmail = email.trim().toLowerCase();
+        if (!trimmedEmail) {
+            setFeedback({
+                type: 'info',
+                text: `Veuillez renseigner votre adresse e-mail ci-dessus puis appuyez sur Continuer avec ${provider === 'google' ? 'Google' : provider === 'apple' ? 'Apple' : 'Facebook'}.`
+            });
+            return;
+        }
+
+        setIsPending(true);
+        setFeedback(null);
+        try {
+            const response = await fetch(`${API_URL}/auth/oauth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    provider,
+                    email: trimmedEmail,
+                    role: role || (profile === 'proprietaire' ? 'LANDLORD' : 'TENANT'),
+                    name: trimmedEmail.split('@')[0],
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success && result.token) {
+                if (profile) {
+                    await setStoredProfile(profile);
+                }
+                await setStoredToken(result.token);
+                registerForPushNotificationsAsync().catch(console.error);
+                router.replace('/(tabs)');
+            } else {
+                setFeedback({
+                    type: 'error',
+                    text: result.error || `Erreur d'authentification sociale ${provider}`
+                });
+            }
+        } catch (err: any) {
+            setFeedback({
+                type: 'error',
+                text: 'Connexion réseau impossible. Vérifiez votre connexion.'
+            });
+        } finally {
+            setIsPending(false);
+        }
+    };
+
     const handleVerifyOTP = async () => {
         setFeedback(null);
         if (!otp || otp.length < 6) {
@@ -205,6 +255,45 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
                                 </>
                             )}
                         </Pressable>
+
+                        {/* SÉPARATEUR CONNEXION SOCIALE */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 14 }}>
+                            <View style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
+                            <Text style={{ marginHorizontal: 10, fontSize: 10, fontWeight: '700', color: '#9CA3AF', letterSpacing: 0.5 }}>
+                                OU CONTINUER AVEC
+                            </Text>
+                            <View style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
+                        </View>
+
+                        {/* BOUTONS SOCIAUX GOOGLE / APPLE / FACEBOOK */}
+                        <View style={{ gap: 8 }}>
+                            <Pressable
+                                style={styles.socialButton}
+                                onPress={() => handleSocialAuth('google')}
+                                disabled={isPending}
+                            >
+                                <Text style={styles.socialGoogleIcon}>G</Text>
+                                <Text style={styles.socialButtonTextDark}>Continuer avec Google</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={[styles.socialButton, { backgroundColor: '#000000', borderColor: '#000000' }]}
+                                onPress={() => handleSocialAuth('apple')}
+                                disabled={isPending}
+                            >
+                                <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '900', marginRight: 8 }}></Text>
+                                <Text style={styles.socialButtonTextLight}>Continuer avec Apple</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={[styles.socialButton, { backgroundColor: '#1877F2', borderColor: '#1877F2' }]}
+                                onPress={() => handleSocialAuth('facebook')}
+                                disabled={isPending}
+                            >
+                                <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '900', marginRight: 8 }}>f</Text>
+                                <Text style={styles.socialButtonTextLight}>Continuer avec Facebook</Text>
+                            </Pressable>
+                        </View>
                     </Animated.View>
                 ) : (
                     <Animated.View entering={FadeInDown} exiting={FadeOutUp} style={styles.form}>
@@ -254,6 +343,37 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 }
 
 const styles = StyleSheet.create({
+    socialButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 44,
+        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    socialGoogleIcon: {
+        fontSize: 16,
+        fontWeight: '900',
+        color: '#4285F4',
+        marginRight: 8,
+    },
+    socialButtonTextDark: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#1F2937',
+    },
+    socialButtonTextLight: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#FFFFFF',
+    },
     container: {
         flex: 1,
         justifyContent: 'center',

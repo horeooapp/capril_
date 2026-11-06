@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Mail, ShieldCheck, ArrowRight, Loader2, ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
 import { requestOTP, loginWithOTP } from "@/actions/auth"
+import SocialAuthButtons from "./SocialAuthButtons"
 
 interface EmailOTPFormProps {
     role: 'TENANT' | 'LANDLORD' | 'ADMIN' | 'AGENCY'
@@ -205,6 +206,11 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                     </>
                                 )}
                             </motion.button>
+
+                            <SocialAuthButtons 
+                                callbackUrl={redirectPath} 
+                                role={role} 
+                            />
                         </motion.form>
                     ) : (
                         <motion.form

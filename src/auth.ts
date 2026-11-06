@@ -2,6 +2,9 @@ import NextAuth, { CredentialsSignin } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
+import Facebook from "next-auth/providers/facebook"
+import Apple from "next-auth/providers/apple"
 
 class CustomAuthError extends CredentialsSignin {
   code: string;
@@ -23,6 +26,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     debug: process.env.NODE_ENV === "development",
     adapter: PrismaAdapter(prisma),
     providers: [
+        Google({
+            clientId: process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || "google-client-id",
+            clientSecret: process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET || "google-client-secret",
+            allowDangerousEmailAccountLinking: true,
+        }),
+        Facebook({
+            clientId: process.env.AUTH_FACEBOOK_ID || process.env.FACEBOOK_CLIENT_ID || "facebook-client-id",
+            clientSecret: process.env.AUTH_FACEBOOK_SECRET || process.env.FACEBOOK_CLIENT_SECRET || "facebook-client-secret",
+            allowDangerousEmailAccountLinking: true,
+        }),
+        Apple({
+            clientId: process.env.AUTH_APPLE_ID || process.env.APPLE_CLIENT_ID || "apple-client-id",
+            clientSecret: process.env.AUTH_APPLE_SECRET || process.env.APPLE_CLIENT_SECRET || "apple-client-secret",
+            allowDangerousEmailAccountLinking: true,
+        }),
         Credentials({
             id: "email-otp",
             name: "Email OTP",
